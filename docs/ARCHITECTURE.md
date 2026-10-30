@@ -166,3 +166,28 @@ internal/platform/{postgres,objectstore,queue,outbox,clock,logger}/
 
 AccessPolicyGate必须在创建、执行、重试、fallback、推送接入和恢复阶段检查。maintained仅IPMI-only；不允许通过Flow、外部控制器或采集器代理恢复SSH/Agent/Redfish。不能采集时返回原因与历史观测。时序/日志产品选择、采样和容量策略按部署评审决定，保留现有数据库技术。
 详细存储/所有权矩阵见DATA-DICTIONARY运维增补；页面/API先Mock后Go，见OPERATIONS-DESIGN.md。
+
+## IA v2.3 · 双平面与统一抽屉
+
+前端新增单一 ProjectContext、URL projectId 路由守卫、每标签页内存作用域、TanStack Query 和可取消请求/订阅。部署 query key 含 projectId+permission revision；运维 query key 含授权项目集合+可清除过滤。SSE 带 Last-Event-ID、重连补齐与逐次鉴权。保留现有Go模块单体和 Outbox，不新建微服务；具体注册表与频率见 IA-V2.3.md。
+
+## IA v2.4 实施增补
+
+双平面ProjectContext、TanStack Query、按作用域取消请求/订阅、授权集合缓存与SSE恢复见IA-V2.4；不引入真实设备后端。
+
+
+## IA v2.4 Mock 前端实施记录
+
+导航树、完整页面清单、路由/权限/作用域/加载策略、五/八Tab抽屉与API对照统一见 [IA24-IMPLEMENTATION-MATRIX.md](IA24-IMPLEMENTATION-MATRIX.md)。原FR-0…24、门禁、BOM与维护态规则保留。当前实现为前端Mock，不表示已实现Go/真实设备/真实AI。权威种子为 `fixtures/demo-full-64-b300/demo-seed.json`；原包83集合，补齐与规范化后集合数量以当前manifest为准，主项目硬件数量不变。结构检查、数据修复、契约与交互结果以IA24-*报告为准，无法采集/缺少证据保持unknown或阻断。
+
+
+## 当前六阶段主链路修正
+
+本轮用户明确废弃数字门禁作为主链。当前唯一业务顺序、状态机、逐目标放行、安全交接、独立BOM菜单与API约束以[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)为准。历史编号只按[DELIVERY-MIGRATION.md](DELIVERY-MIGRATION.md)追溯，不得用于解锁。验机失败关联统一Issues并定向复验；NCCL不反写验机；清理/归档/客户签署齐全后才进入维护态。NP仍是网络内部断言。当前仅前端Mock与契约实现，没有真实设备后端。
+
+
+## Fabric Topology 增补
+
+Topology查询投影不持有第二套Device事实。物理视图组合BOM/Cable/PhysicalPort与LLDP/接口/DDM；逻辑视图组合批准规划、独立observed配置、BGP。Typed Mock Provider隔离数据源；按需Query支持AbortSignal、作用域key、分组及cursor渐进展开。Go接入在用户确认前端后逐模块实施。
+
+完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。

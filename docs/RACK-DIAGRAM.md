@@ -82,3 +82,22 @@
 6. 正反面、全深设备、多机柜、空 U 折叠、缩放、键盘操作、撤销/重做和 SVG/PNG/PDF 导出可用。
 7. 所有图纸版本、位置修改、发布和导出在 CMDB timeline/审计中可追溯；敏感凭据在图、Mock、API 普通响应和导出中为零。
 8. Mock 与真实 API 使用同一 OpenAPI 类型；前端阶段无需后端即可演示生成、审核、修改、差异、发布和导出状态。
+
+## IA v2.4 实施增补
+
+新增跨授权项目机房视角/机柜分布与健康利用率，单柜SVG编辑器保持独立；确定性生成、来源、高度、不覆盖已发布版本与版本diff规则不变。
+
+
+## IA v2.4 Mock 前端实施记录
+
+导航树、完整页面清单、路由/权限/作用域/加载策略、五/八Tab抽屉与API对照统一见 [IA24-IMPLEMENTATION-MATRIX.md](IA24-IMPLEMENTATION-MATRIX.md)。原FR-0…24、门禁、BOM与维护态规则保留。当前实现为前端Mock，不表示已实现Go/真实设备/真实AI。权威种子为 `fixtures/demo-full-64-b300/demo-seed.json`；原包83集合，补齐与规范化后集合数量以当前manifest为准，主项目硬件数量不变。结构检查、数据修复、契约与交互结果以IA24-*报告为准，无法采集/缺少证据保持unknown或阻断。
+
+
+## 当前六阶段主链路修正
+
+本轮用户明确废弃数字门禁作为主链。当前唯一业务顺序、状态机、逐目标放行、安全交接、独立BOM菜单与API约束以[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)为准。历史编号只按[DELIVERY-MIGRATION.md](DELIVERY-MIGRATION.md)追溯，不得用于解锁。验机失败关联统一Issues并定向复验；NCCL不反写验机；清理/归档/客户签署齐全后才进入维护态。NP仍是网络内部断言。当前仅前端Mock与契约实现，没有真实设备后端。
+
+
+## 单柜详情工作区增补
+
+固定单柜窄画布、左侧层级导航和右侧八Tab为本轮布局要求；交互、API、元数据、Mock来源及待执行验收见[RACK-WORKSPACE.md](RACK-WORKSPACE.md)。资产/位置和既有安全模型不变。右侧按需加载，不以缺失指标显示正常。当前构建/浏览器验证按用户安排等待统一执行。

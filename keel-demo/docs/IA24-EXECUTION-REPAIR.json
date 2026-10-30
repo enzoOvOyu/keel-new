@@ -1,0 +1,119 @@
+{
+  "source": "supplied full demo execution_targets",
+  "repairs": [
+    {
+      "id": "exec-0001",
+      "reported_target_count": 64,
+      "provided_target_snapshot_count": 8,
+      "provided_task_evidence_count": 3,
+      "method": "use explicit supplied target IDs, preserve original declaration, derive per-target result projection"
+    },
+    {
+      "id": "exec-0002",
+      "reported_target_count": 64,
+      "provided_target_snapshot_count": 8,
+      "provided_task_evidence_count": 3,
+      "method": "use explicit supplied target IDs, preserve original declaration, derive per-target result projection"
+    },
+    {
+      "id": "exec-0003",
+      "reported_target_count": 64,
+      "provided_target_snapshot_count": 8,
+      "provided_task_evidence_count": 3,
+      "method": "use explicit supplied target IDs, preserve original declaration, derive per-target result projection"
+    },
+    {
+      "id": "exec-0004",
+      "reported_target_count": 64,
+      "provided_target_snapshot_count": 8,
+      "provided_task_evidence_count": 3,
+      "method": "use explicit supplied target IDs, preserve original declaration, derive per-target result projection"
+    },
+    {
+      "id": "exec-0005",
+      "reported_target_count": 64,
+      "provided_target_snapshot_count": 8,
+      "provided_task_evidence_count": 3,
+      "method": "use explicit supplied target IDs, preserve original declaration, derive per-target result projection"
+    },
+    {
+      "id": "exec-0006",
+      "reported_target_count": 64,
+      "provided_target_snapshot_count": 8,
+      "provided_task_evidence_count": 3,
+      "method": "use explicit supplied target IDs, preserve original declaration, derive per-target result projection"
+    },
+    {
+      "id": "exec-0007",
+      "reported_target_count": 64,
+      "provided_target_snapshot_count": 8,
+      "provided_task_evidence_count": 3,
+      "method": "use explicit supplied target IDs, preserve original declaration, derive per-target result projection"
+    },
+    {
+      "id": "exec-0008",
+      "reported_target_count": 64,
+      "provided_target_snapshot_count": 8,
+      "provided_task_evidence_count": 3,
+      "method": "use explicit supplied target IDs, preserve original declaration, derive per-target result projection"
+    },
+    {
+      "id": "exec-0009",
+      "reported_target_count": 64,
+      "provided_target_snapshot_count": 8,
+      "provided_task_evidence_count": 3,
+      "method": "use explicit supplied target IDs, preserve original declaration, derive per-target result projection"
+    },
+    {
+      "id": "exec-0010",
+      "reported_target_count": 64,
+      "provided_target_snapshot_count": 8,
+      "provided_task_evidence_count": 3,
+      "method": "use explicit supplied target IDs, preserve original declaration, derive per-target result projection"
+    },
+    {
+      "id": "exec-0011",
+      "reported_target_count": 64,
+      "provided_target_snapshot_count": 8,
+      "provided_task_evidence_count": 3,
+      "method": "use explicit supplied target IDs, preserve original declaration, derive per-target result projection"
+    },
+    {
+      "id": "exec-0012",
+      "reported_target_count": 64,
+      "provided_target_snapshot_count": 8,
+      "provided_task_evidence_count": 3,
+      "method": "use explicit supplied target IDs, preserve original declaration, derive per-target result projection"
+    }
+  ],
+  "blocked_snapshots": [
+    {
+      "id": "exec-0003",
+      "targets": [
+        "srv-0001",
+        "srv-0002",
+        "srv-0003",
+        "srv-0004",
+        "srv-0005",
+        "srv-0006",
+        "srv-0007",
+        "srv-0008"
+      ],
+      "reason": "server targets in a switch-only Flow; no device ID substitution or automatic retry"
+    },
+    {
+      "id": "exec-0009",
+      "targets": [
+        "srv-0001",
+        "srv-0002",
+        "srv-0003",
+        "srv-0004",
+        "srv-0005",
+        "srv-0006",
+        "srv-0007",
+        "srv-0008"
+      ],
+      "reason": "server targets in a switch-only Flow; no device ID substitution or automatic retry"
+    }
+  ]
+}

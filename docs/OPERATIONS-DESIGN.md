@@ -65,3 +65,8 @@ Alert/配置漂移 → 复用T1–T7 Issue → 冻结资产/版本/影响范围 
 RetentionPolicy按数据类别、项目/资产范围、热存储窗口、归档/删除时间、legal_hold、审批revision定义；具体天数、采集间隔、型号阈值、RPO/RTO待负责人批准。被证据/审批/历史执行引用的数据不得提前删除；允许删除原始payload时必须保留元数据、hash、来源与expired标记，界面不能把“过期已清理”显示为“从未采集”。
 
 本次只冻结页面和OpenAPI/Mock数据契约；不实现采集器、后端、时序数据库、真实BMC/设备或新增运维页面代码。开发顺序见IMPLEMENTATION-PLAN的OPS增补。
+
+
+## 当前六阶段主链路修正
+
+本轮用户明确废弃数字门禁作为主链。当前唯一业务顺序、状态机、逐目标放行、安全交接、独立BOM菜单与API约束以[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)为准。历史编号只按[DELIVERY-MIGRATION.md](DELIVERY-MIGRATION.md)追溯，不得用于解锁。验机失败关联统一Issues并定向复验；NCCL不反写验机；清理/归档/客户签署齐全后才进入维护态。NP仍是网络内部断言。当前仅前端Mock与契约实现，没有真实设备后端。

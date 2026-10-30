@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-30",
+  "implementation": "changed_not_accepted",
+  "verification": "LIMITED UI SMOKE PASS; full business regression NOT RUN",
+  "reason": "User will designate consolidated testing time; do not repeat tests during implementation",
+  "generation": [
+    "JSON/SQL/counts/manifest",
+    "resource-specific OpenAPI",
+    "TypeScript API types",
+    "IA navigation/route matrix"
+  ],
+  "service": "Docker keel-demo-web-1 running on 5180; Rack and Fabric Topology opened in Chromium",
+  "counts": {
+    "servers": 64,
+    "gpus": 512,
+    "switches": 24,
+    "racks": 16,
+    "ports": 640,
+    "switch_ports": 1024,
+    "cables": 704,
+    "delivery_stage_records": 384,
+    "validation_checks": 512,
+    "topology_networks": 40,
+    "topology_memberships": 992,
+    "topology_bgp_sessions": 64
+  },
+  "pending": [
+    "full six-stage business dependency/waiver/issue/retest/cleanup regression at user-designated time",
+    "all Rack tabs/drawer/export regression",
+    "topology reverse links/history/permissions/progressive expansion full acceptance"
+  ],
+  "checks": [
+    "Final TypeScript+Vite production build PASS after port-path correction",
+    "Rack canvas bounded and inspector wider PASS",
+    "Rack canvas device selection -> selected detail PASS",
+    "Environment lazy load and range selection PASS",
+    "Physical cable dual endpoints highlight/details PASS",
+    "Physical -> logical network and configuration diff PASS",
+    "Browser page_errors: []"
+  ],
+  "report": "docs/TOPOLOGY-RACK-SMOKE.json",
+  "build_warning": "Non-blocking large bundle warning (1.62 MB JS); no chunk-splitting refactor in this task"
+}

@@ -48,7 +48,7 @@
 - BLOCK 未清零不得提交；关键身份/端口/线缆关系不确定不得自动放行。
 - 标准 BOM 包服务器与网络物料同批次、同事务提交；同批次同摘要幂等，同批次异摘要拒绝覆盖。
 - 网络方案由客户与网络工程师决定。平台不得擅自补造 IP/VLAN/ASN/VNI/QoS/breakout/链路方案。
-- `PASS/FAIL/BLOCKED/WAIVED`、NP-1..NP-6、G1..G6、PushJob 状态按 PRD 实现。unknown、缺失或过期证据不等于 PASS。
+- `PASS/FAIL/BLOCKED/WAIVED`、NP-1..NP-6、六阶段交付主链路、PushJob 状态按 PRD 实现。unknown、缺失或过期证据不等于 PASS。
 - 生产网络配置必须校验、备份、审批、下发、复采验证；禁止绕过审批。
 - 秘密不得写入日志、审计正文、测试 fixture、参数快照或 Git。
 
@@ -69,7 +69,7 @@
 
 ## 6. 前端先行实施硬规则
 1. P0 先建立全局壳层、路由、设计 token、类型化 API client、mock provider、统一状态组件。
-2. 先把所有主菜单页面做成可交互 mock 原型，优先覆盖项目总览、BOM 导入、CMDB、Flow 列表、执行详情、交换机/服务器资产、网络交付、G1–G6、工单、监控、模板/介质/参数。
+2. 先把所有主菜单页面做成可交互 mock 原型，优先覆盖项目总览、BOM 导入、CMDB、Flow 列表、执行详情、交换机/服务器资产、网络交付、六阶段交付主链路、工单、监控、模板/介质/参数。
 3. 所有列表、筛选、排序、分页、抽屉、确认框、批量选择、任务日志、状态变更必须可操作；不允许“看起来像按钮但没行为”。
 4. mock 必须从 API provider 返回，集中在 `web/src/mocks`；组件里禁止内嵌大段业务假数据。
 5. 后端接入按模块逐个替换 provider；不得重写 UI 或更改 API 语义。OpenAPI 与 mock 类型、真实 Go handler 以同一契约生成/校验。
@@ -92,7 +92,7 @@
 - 参考项目只借鉴行为，不复制代码或引入 Svelte/Flask 运行依赖。
 
 ## 固定演示数据
-- 全平台统一使用 `fixtures/demo-64-b300/demo-seed.json` 与 `fixtures/demo-64-b300/seed-demo.sql`；不要在 React 页面或 API handler 中重复造另一套业务数据。
+- 全平台统一使用 `fixtures/demo-full-64-b300/demo-seed.json` 与 `fixtures/demo-full-64-b300/seed-demo.sql`；不要在 React 页面或 API handler 中重复造另一套业务数据。
 - 首先让所有页面通过类型化 API Provider 读取 fixture，完成可交互 Mock；数据库装载仅用于隔离演示环境，不是生产领域表设计。
 - 64 台 B300 是合成演示切片；严禁复制原始 Excel 中的真实 SN、IP、MAC、账号、密码或完整原始行。
 - Mock 的执行/网络下发只改变演示状态，必须显示 `SIMULATION_ONLY`，绝不能连接真实设备。
@@ -106,3 +106,44 @@
 - maintained严格IPMI-only。不得因运维、维修、审批、定时采集、重试、fallback、恢复或第三方代理重新打开SSH/Agent/Redfish。不能采集就明确限制并保留历史；不伪造健康。
 - 固件、电源、配置/回滚与退役动作必须有权限/确认/审批/租约/审计及验证；未知副作用先对账；秘密只保留受控引用。
 - 采样间隔、阈值、保留天数、专用存储产品和RPO/RTO未确认时记录决策，不自行设为生产默认；无测试证据的OPS验收保持NOT RUN。
+
+## IA v2.3 执行约束
+
+- 部署页面绑定 `/p/:projectId/deploy/` 和唯一 ProjectContext；运维跨授权项目且过滤可清除；系统管理仅展示权限允许的资源。详见 `docs/IA-V2.3.md`。
+- 顶栏和项目列表共用切换动作；取消旧请求/SSE，query key 和批量确认冻结项目/目标/版本；不得将菜单隐藏当作授权。
+- 服务器五Tab、网络八Tab复用唯一DrawerDetail；按需加载、URL/键盘/返回及状态/来源规范不得省略。
+- 本次仅冻结设计及前端实施计划；未实现项和未运行的验收明确标注，不声称Mock或后端已完成。maintained严格IPMI-only。
+
+## IA v2.4 前端实施
+
+- 按 docs/IA-V2.4.md 的双平面、ProjectContext、授权项目过滤、加载协议及抽屉规则实施；Fabric/Fleet/Flows各为单一一级入口。
+- 本轮v2.4路由优先于旧v2.3路由描述；维护态Redfish冲突未决前仍执行IPMI-only，禁止SSH/Agent/Redfish及代理绕过。
+- 真实Excel未提供，不声称实际检查；不得泄露真实凭据或原始敏感数据。
+
+
+## 2026-10-30 全量数据包接入
+最新权威演示数据为 `fixtures/demo-full-64-b300/demo-seed.json`（来源 `keel-ia-v2.4-full-demo-pack.zip`），覆盖83个集合和33个工作簿结构Sheet。停止在运行时合并旧扩展种子或额外A100资产；其他两个项目仅上下文，不虚构额外设备。导入检查见 `docs/IA24-DATA-IMPORT-REPORT.json`，覆盖见 `docs/IA-V2.4-MOCK-COVERAGE.md`。真实Excel仍未提供；workbook-profile只作为提供的结构元数据，不等于本轮实际检查原工作簿。新包的旧PRD不能删去FR-18…24或放宽既有IPMI-only；不可解析项目成员不得自动授权。
+
+
+当前执行阶段为用户明确授权的IA v2.4前端Mock实施。OPS“本次只改设计文档”是历史设计阶段限制，不阻止本轮已授权的前端工作；保持IPMI-only及其他业务安全约束。当前导航、页面与真实验证记录见 `docs/IA24-IMPLEMENTATION-MATRIX.md`。不得把历史计划或只通过构建当作已完成业务验收。
+
+
+## IA24-05 · 用户确认的GPU-NIC默认映射
+用户于本轮明确：没有单独说明时，GPU1–8分别对应NIC1–8。对当前B300切片按此规则确认512条GPU-NIC关系，NIC9/10保留存储角色；不再把已有LLDP链路显示成全部unknown。矩阵行GPU、列NIC，点击显示物理端口、线缆、交换机、来源与观测；配对关系与线序/新鲜度判据分开，异常不能被配对规则覆盖。
+
+
+## 当前优先约束：六阶段主链路
+唯一主链为开局配置→网络就绪→装机→验机→NCCL测试→优雅退场。BOM独立菜单。旧门禁仅历史查询，禁止作为当前阶段；网络NP断言不是主阶段。验机检查按内部子任务组织，异常必须关联项目/设备/端口/检查/Execution到统一Issues；未整改复验不放行。WAIVED不等于PASSED且不能跳过安全清理和客户签署。先完成此项实现，再机柜布局，再Fabric Topology。用户指定时间点前暂停重复回归与构建，验证标NOT RUN。
+
+
+## Fabric Topology 执行约束
+- Fabric下独立Topology，物理Cable与逻辑网络分模型，禁止从物理线缆推断VLAN/VRF/VNI/BGP。
+- 稳定资产/端口ID来自CMDB，显式演示扩展只在统一fixture，不复制资产。
+- 先完成交互、契约、Mock和文档；Go/真实设备不在本轮范围。
+- 用户要求集中测试前不重复构建/浏览器回归；完整业务验收保持NOT RUN；必要启动检查已执行，详见IMPLEMENTATION-STATUS.json。
+
+
+## Git 提交约定（用户要求）
+- 每次完成一项修改后，必须创建 Git 提交，不积累未提交的已完成改动。
+- 目标仓库固定为 `enzoOvOyu/keel-new`；推送前确认远程地址，不得推送到旧 keel 仓库。
+- 提交说明应准确描述实际变更和验证范围；未经运行的检查不得声称通过。

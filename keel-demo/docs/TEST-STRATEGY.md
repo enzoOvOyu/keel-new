@@ -83,3 +83,35 @@
 - Go接入后才验证事务Outbox、project隔离、调度/租约并发、存储归档/恢复和适配器golden。真机测试单独授权PoC，不把Mock通过当成真实硬件验证。
 
 本轮仅执行文档/OpenAPI一致性检查；上述新增运行时测试均NOT RUN。
+
+## IA v2.3 · 双平面与统一抽屉
+
+IA验收分层：OpenAPI schema和分页/权限错误契约；ProjectContext单元测试含竞态取消和双标签隔离；跨项目数据安全及批量快照冲突；抽屉键盘/URL/滚动/懒加载与无嵌套；SSE游标补齐和权限撤销；1440×900、1280、窄屏与 light/dark 浏览器检查。新增运行时测试当前 NOT RUN。
+
+## IA v2.4 实施增补
+
+按阶段测试ProjectContext竞态与隔离、统一Provider契约、两个抽屉懒加载/键盘、机房下钻与版本冲突、工单闭环与SSE续传，不以截图代替行为验证。
+
+
+## IA v2.4 Mock 前端实施记录
+
+导航树、完整页面清单、路由/权限/作用域/加载策略、五/八Tab抽屉与API对照统一见 [IA24-IMPLEMENTATION-MATRIX.md](IA24-IMPLEMENTATION-MATRIX.md)。原FR-0…24、门禁、BOM与维护态规则保留。当前实现为前端Mock，不表示已实现Go/真实设备/真实AI。权威种子为 `fixtures/demo-full-64-b300/demo-seed.json`；原包83集合，补齐与规范化后集合数量以当前manifest为准，主项目硬件数量不变。结构检查、数据修复、契约与交互结果以IA24-*报告为准，无法采集/缺少证据保持unknown或阻断。
+
+
+## 当前六阶段主链路修正
+
+本轮用户明确废弃数字门禁作为主链。当前唯一业务顺序、状态机、逐目标放行、安全交接、独立BOM菜单与API约束以[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)为准。历史编号只按[DELIVERY-MIGRATION.md](DELIVERY-MIGRATION.md)追溯，不得用于解锁。验机失败关联统一Issues并定向复验；NCCL不反写验机；清理/归档/客户签署齐全后才进入维护态。NP仍是网络内部断言。当前仅前端Mock与契约实现，没有真实设备后端。
+
+本轮新增验收：装机前网络阻断、验机前装机阻断、验机问题自动工单/端口/Execution关联、未整改或未复验不放行、NCCL不改验机、混合批次分项计数、WAIVED期限/范围、未知副作用清理阻断、撤销/归档/客户签署完整性、旧编号无活动解锁、BOM独立菜单。按用户安排尚未执行本轮统一测试，状态NOT RUN；不得沿用旧报告宣称通过。
+
+
+## 单柜详情工作区增补
+
+固定单柜窄画布、左侧层级导航和右侧八Tab为本轮布局要求；交互、API、元数据、Mock来源及待执行验收见[RACK-WORKSPACE.md](RACK-WORKSPACE.md)。资产/位置和既有安全模型不变。右侧按需加载，不以缺失指标显示正常。当前构建/浏览器验证按用户安排等待统一执行。
+
+
+## Fabric Topology 增补
+
+待执行关键检查：双端引用完整性与资产数量；逻辑关系不依赖Cable推断；healthy需充分新鲜证据、陈旧/缺失不能健康；选择/双视图保留上下文；规划/实际Diff；Issue/Drawer链接；权限/历史缺失；大图初始分组+局部与cursor。只测试受影响交付链/Rack/Topology；当前生产构建和Rack/Topology最小浏览器检查通过；未展开全平台回归，详见TOPOLOGY-RACK-SMOKE.json。
+
+完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。

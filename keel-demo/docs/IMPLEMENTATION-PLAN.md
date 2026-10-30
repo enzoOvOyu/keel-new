@@ -14,7 +14,7 @@
 
 1. 建 React + TypeScript + Vite + shadcn/ui 应用壳、响应式 Sidebar/Header、项目上下文、路由、面包屑、权限占位。
 2. 建 `api` interfaces + OpenAPI TypeScript types + `ApiProvider`；提供 `mock` / `http` 两种 provider，通过环境变量切换。
-3. 先补全全平台 API 契约（BOM、CMDB、资产、Flow、Executions、日志、任务、网络底座、PXE、G1-G6、工单、监控、模板、介质、参数、审计、项目/权限）。
+3. 先补全全平台 API 契约（BOM、CMDB、资产、Flow、Executions、日志、任务、网络底座、PXE、六阶段交付主链路、工单、监控、模板、介质、参数、审计、项目/权限）。
 4. 建统一 DataTable、StatusBadge、IssuePanel、DiffViewer、SourceCellViewer、EvidenceList、ExecutionTimeline、LogViewer、TargetMatrix、ConfirmDialog。
 5. 根据 DESIGN-SYSTEM 和 UI-REFERENCE 完成全部主菜单页面的 mock 版；模拟成功、空、错误、权限拒绝、部分失败、未知/过期数据和长任务状态。
 6. 不接真实设备，不写生产执行后端；mock 任务按固定状态时间线可手动暂停、继续、重试、终止（明确标记 mock）。
@@ -63,11 +63,11 @@
 
 ## 7. P5 — 网络底座与服务器交付
 
-按 PRD 实现网络基线/模板、ZTP、配置 Doublecheck、审批下发闭环、LLDP 三方校验、G1–G6、Mapping、工单、监控。每个域先完成 mock UI/API 契约，再逐模块接 Go 后端和 simulator。不得因 mock 缺少真实设备而将 unknown 伪装 PASS。
+按 PRD 实现网络基线/模板、ZTP、配置 Doublecheck、审批下发闭环、LLDP 三方校验、六阶段交付主链路、Mapping、工单、监控。每个域先完成 mock UI/API 契约，再逐模块接 Go 后端和 simulator。不得因 mock 缺少真实设备而将 unknown 伪装 PASS。
 
 ## 8. P6 — 端到端交付、退场与交付后维护
 
-实现 Flow 编排、G4/G5/G6、报告、优雅退出、凭据撤销、CMDB maintained 状态。所有执行、报告、门禁、审批和资产生命周期事件自动沉淀并互相关联。
+实现 Flow 编排、装机基础配置/RoCE子任务/NCCL测试、报告、优雅退出、凭据撤销、CMDB maintained 状态。所有执行、报告、门禁、审批和资产生命周期事件自动沉淀并互相关联。
 
 ## 9. 每阶段最小验证集
 
@@ -99,3 +99,33 @@
 5. maintained任务恢复、重试/fallback、外部来源接入和凭据吊销先做安全验收，再允许真实适配器。未定阈值/存储产品/保留数值记录DECISIONS，不用假成功绕过。
 
 阶段完成条件以ACCEPTANCE的OPS项为准；文档通过不等于Mock/真机通过。
+
+## IA v2.3 · 双平面与统一抽屉
+
+IA v2.3 插入前端 Mock 阶段：先冻结 IA-V2.3.md 的页面注册、作用域/权限/加载协议及OpenAPI→补跨项目fixture与契约测试→ProjectContext/Query和路由→共享DrawerDetail及两类领域Tab→迁移业务页面和双向处置链→状态/可访问性/浏览器验收。用户确认后才逐域对接Go，不提前实现真实设备操作。
+
+## IA v2.4 实施增补
+
+按IA v2.4分五阶段：上下文/导航→Dashboard/BOM/CMDB/RackView→Fleet/Fabric/Monitor/Issues→Flows→Validation/NetTest/NCCL/Config/Provision/Cleanup/Admin；先契约和Mock，再按授权接Go。
+
+
+## IA v2.4 Mock 前端实施记录
+
+导航树、完整页面清单、路由/权限/作用域/加载策略、五/八Tab抽屉与API对照统一见 [IA24-IMPLEMENTATION-MATRIX.md](IA24-IMPLEMENTATION-MATRIX.md)。原FR-0…24、门禁、BOM与维护态规则保留。当前实现为前端Mock，不表示已实现Go/真实设备/真实AI。权威种子为 `fixtures/demo-full-64-b300/demo-seed.json`；原包83集合，补齐与规范化后集合数量以当前manifest为准，主项目硬件数量不变。结构检查、数据修复、契约与交互结果以IA24-*报告为准，无法采集/缺少证据保持unknown或阻断。
+
+
+## 当前六阶段主链路修正
+
+本轮用户明确废弃数字门禁作为主链。当前唯一业务顺序、状态机、逐目标放行、安全交接、独立BOM菜单与API约束以[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)为准。历史编号只按[DELIVERY-MIGRATION.md](DELIVERY-MIGRATION.md)追溯，不得用于解锁。验机失败关联统一Issues并定向复验；NCCL不反写验机；清理/归档/客户签署齐全后才进入维护态。NP仍是网络内部断言。当前仅前端Mock与契约实现，没有真实设备后端。
+
+
+## 单柜详情工作区增补
+
+固定单柜窄画布、左侧层级导航和右侧八Tab为本轮布局要求；交互、API、元数据、Mock来源及待执行验收见[RACK-WORKSPACE.md](RACK-WORKSPACE.md)。资产/位置和既有安全模型不变。右侧按需加载，不以缺失指标显示正常。当前构建/浏览器验证按用户安排等待统一执行。
+
+
+## Fabric Topology 增补
+
+执行顺序：六阶段+BOM独立入口→Rack三区布局与八Tab→Fabric Topology物理/逻辑交互及显式关联→契约/Mock/文档同步。前三部分只做前端Mock；集中构建/浏览器由用户安排，未验证保持NOT RUN，之后逐模块考虑Go。
+
+完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。

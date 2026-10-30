@@ -1,0 +1,14 @@
+import fs from 'node:fs';import YAML from 'yaml';
+const file='docs/openapi.yaml';const doc=YAML.parseDocument(fs.readFileSync(file,'utf8'));const ref=n=>({'$ref':'#/components/schemas/'+n});const str={type:'string'};const schema=(props,required=Object.keys(props))=>({type:'object',properties:props,required,additionalProperties:false});
+const specs={
+ IAFlowTask:schema({id:str,label:str,script:str,depends_on:{type:'array',items:str},x:{type:'number'},y:{type:'number'}}),
+ IAFlowDefinition:schema({version:{type:'integer',const:1},tasks:{type:'array',minItems:1,items:ref('IAFlowTask')},trigger:{type:'string',enum:['manual','cron','event']},event_type:{type:['string','null']}}),
+ IAObservationBundle:schema({device_id:str,project_id:str,context:ref('OpsObservationContext'),configuration:{type:'array',items:ref('IAConfigObservation')},metrics:{type:'array',items:ref('IAMetricObservation')},lldp:{type:'array',items:ref('IALLDPObservation')},fdb:{type:'array',items:ref('IAFDBObservation')},arp:{type:'array',items:ref('IAARPObservation')},ddm:{type:'array',items:ref('IADDMObservation')},logs:{type:'array',items:ref('IALogObservation')}}),
+ IAConfigObservation:schema({path:str,expected:str,observed:str,verdict:{type:'string',enum:['PASS','FAIL','BLOCKED','WAIVED']},rule_ref:str,context:ref('OpsObservationContext')}),
+ IAMetricObservation:schema({id:str,key:str,unit:str,value:{type:['number','null']},history:{type:'array',items:schema({time:str,value:{type:['number','null']}})},context:ref('OpsObservationContext')}),
+ IALLDPObservation:schema({id:str,local_port_id:str,peer_port_id:{type:['string','null']},chassis_id:str,port_id:{type:['string','null']},sysname:{type:['string','null']},sysdesc:str,context:ref('OpsObservationContext')}),
+ IAFDBObservation:schema({mac:str,vlan:{type:['integer','null']},port_id:str,entry_type:{type:'string',enum:['dynamic','static']},context:ref('OpsObservationContext')}),
+ IAARPObservation:schema({ip:str,mac:str,vrf:{type:['string','null']},port_id:str,state:str,context:ref('OpsObservationContext')}),
+ IADDMObservation:schema({id:str,port_id:str,rx_dbm:{type:'number'},tx_dbm:{type:'number'},temperature_c:{type:'number'},voltage_v:{type:'number'},bias_ma:{type:'number'},model:str,serial:str,context:ref('OpsObservationContext')}),
+ IALogObservation:schema({id:str,level:{type:'string',enum:['INFO','WARN','ERROR']},message:str,context:ref('OpsObservationContext')})
+};for(const [name,s]of Object.entries(specs))doc.setIn(['components','schemas',name],s);for(const n of ['Flow','FlowWriteRequest'])doc.setIn(['components','schemas',n,'properties','definition'],ref('IAFlowDefinition'));for(const n of ['IAServerTab','IANetworkTab'])doc.setIn(['components','schemas',n,'properties','observations'],ref('IAObservationBundle'));fs.writeFileSync(file,String(doc));

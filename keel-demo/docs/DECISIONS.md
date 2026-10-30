@@ -42,3 +42,22 @@
 | OPS-P02 | 各类别保留天数、legal_hold责任人与RPO/RTO | 不提前清理被引用证据；生产启用前确认 |
 | OPS-P03 | 每型号指标阈值、采样间隔与freshness窗口 | 引用批准revision，缺失为unknown/BLOCKED，不臆造阈值 |
 | OPS-P04 | maintained/IPMI-only设备可提供的实际指标及独立外部数据源 | 按能力与策略展示，无法读取为unsupported/policy_denied，只读历史 |
+
+## IA v2.3 · 双平面与统一抽屉
+
+### IA v2.3 实施范围冲突
+本次需求前文要求前端Mock实现，但第8节明确“本次仅更新设计规范和前端 IA 实现计划”。按较具体的范围限制先冻结文档与契约，不声称前端实现或验收通过；如需执行前端开发，以后续明确任务启动。单项目种子不构成跨项目验收证据。
+
+### IA v2.4 待决冲突
+- IA24-01：本轮 §6.3 将 maintained 的 Redfish 列为可用；既有 PRD FR-9、OPS-D02、SECURITY 和 AGENTS 明确维护态 **IPMI-only**、禁止 Redfish/SSH/Agent。待产品与安全负责人明确批准变更前，按现有 IPMI-only 执行，展示 Redfish policy_denied；不阻塞无关页面。
+- IA24-02：本轮要求实际检查 `TX B300 Layout-new.xlsx`；工作区检索未找到工作簿。现有 Excel Profile 是设计资料而非本次实测；不能根据文件名或旧描述声称已检查真实文件。待提供受控文件后只读取结构并脱敏记录，不复制真实行或凭据。
+- IA24-03：是否集成 Kestra 执行引擎尚无部署、许可证、隔离和授权决策；本轮使用明确标记的前端 Mock，不声称实现或接入成熟调度器。
+
+
+### IA24-04 最新数据包授权与维护策略冲突
+新包project_members的user-admin/user-delivery/user-network可按唯一角色定位既有身份，但user-ops不存在且角色DE不能唯一推出SRE；在明确之前不授予该记录的权限。当前以users.project_scopes及可解析成员记录为授权事实，admin可以查看全部项目。新包maint-001/002允许Redfish，与PRD FR-9/OPS明确的IPMI-only冲突，保留历史源记录但操作仍拒绝Redfish。metadata计数/摘要陈旧属于可确定修复，不修改资产身份。
+
+
+## IA v2.4 Mock 前端实施记录
+
+导航树、完整页面清单、路由/权限/作用域/加载策略、五/八Tab抽屉与API对照统一见 [IA24-IMPLEMENTATION-MATRIX.md](IA24-IMPLEMENTATION-MATRIX.md)。原FR-0…24、门禁、BOM与维护态规则保留。当前实现为前端Mock，不表示已实现Go/真实设备/真实AI。权威种子为 `fixtures/demo-full-64-b300/demo-seed.json`；原包83集合，补齐与规范化后集合数量以当前manifest为准，主项目硬件数量不变。结构检查、数据修复、契约与交互结果以IA24-*报告为准，无法采集/缺少证据保持unknown或阻断。

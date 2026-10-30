@@ -1,0 +1,11 @@
+{
+  "checks": [
+    "authorized cross-project dashboard",
+    "switch and clear filter keeps other authorized assets",
+    "unauthorized deployment denied",
+    "project-scoped BOM source mapping",
+    "room overview drills into single rack editor",
+    "Flow create/targets/run/pause"
+  ],
+  "errors": []
+}

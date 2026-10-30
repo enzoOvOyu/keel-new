@@ -6,7 +6,7 @@
 
 `keel` 面向 B300/GB300 千卡/万卡集群交付，统一编排网络底座、裸金属装机、验机、网络线序、配置、连通性、NCCL、退场和 CMDB 交接。产品原则：交付即代码、物料唯一事实源、阶段门禁、可追溯、失败可恢复。
 
-**范围内**：网络底座（`keel-fabric`）、BOM 与智能开局资料导入、PXE、Redfish/IPMI、G1–G6 验机门禁、Mapping、批量配置、NCCL、Flow、AI 辅助排障、优雅退出、RBAC/审计、项目模板、监控告警、型号库、CMDB、BMC/固件管理、端到端交付编排。
+**范围内**：网络底座（`keel-fabric`）、BOM 与智能开局资料导入、PXE、Redfish/IPMI、六阶段交付主链路 验机门禁、Mapping、批量配置、NCCL、Flow、AI 辅助排障、优雅退出、RBAC/审计、项目模板、监控告警、型号库、CMDB、BMC/固件管理、端到端交付编排。
 
 **范围外**：平台替客户决定网络设计方案、地址/VLAN/ASN/VNI/QoS/无损参数/端口 breakout 等配置内容；模型训练；机房动环；财务资产系统内部实现。网络方案由客户与网络工程师商定后导入。平台负责承接、版本化、渲染、校验、审批、下发、回读和漂移闭环。
 
@@ -24,18 +24,11 @@
 
 ## 3. 端到端主流程
 
-```text
-原始网络开局资料/服务器BOM
-  -> 原始文件解析与字段映射
-  -> 标准化预览、问题修复、确认提交
-  -> 统一BOM版本（服务器+网络同批次）
-  -> 网络规划/环境自检/交换机ZTP/配置闭环/网络健康
-  -> PXE装机/SSH互信/G1预收集/G2线序/G3 Mapping
-  -> G4基线配置/G5 RoCE连通性/G6 NCCL
-  -> 优雅退出/CMDB维护态
-```
+唯一活动主链：**开局配置 → 网络就绪 → 装机 → 验机 → NCCL测试 → 优雅退场**。
 
-网络阶段使用 `N-S0..N-S9` 作为证据标签，不建立第二套与 G1–G6 并列的门禁。网络前置断言 `NP-1..NP-6` 是服务器流程的硬依赖，定义见 §5。
+设备/机柜/批次/项目均按相同六阶段记录统计；前序未通过不解锁后序。验机中的硬件、GPU/NIC、PCIe、网卡/MAC、LLDP、DDM、配置一致性和必要RoCE测试是子任务，不是主阶段。BOM是独立部署菜单，不属于Provision。网络就绪必须先于PXE/OS；NP-1…NP-6仍为网络内部断言，不是六个交付阶段。
+
+详细状态机、放行条件与验收见[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)，历史编号迁移见[DELIVERY-MIGRATION.md](DELIVERY-MIGRATION.md)。
 
 ## 4. 核心功能需求
 
@@ -85,11 +78,9 @@ PXE：UEFI HTTP Boot 优先、Legacy PXE 兜底；ProxyDHCP+iPXE+HTTP；按 SN/M
 
 ### FR-4 验机、Mapping 与工单
 
-- G1 预收集 GPU UUID/BDF/NVLink/HBM、NIC BDF/MAC/接口/RDMA/链路/光模块、系统 SN/BMC/OS/驱动和 PCIe 拓扑；此阶段不得下发正式 GPUrail/RoCE 配置。
-- G2 四步：GPU-NIC 拓扑确认、启动并采集 LLDP、BOM/服务器 LLDP/交换机 LLDP 三方对照、DL 确认。每步产生版本化 StepReport；缺少一侧证据为 BLOCKED。
-- G3 发布不可变 MappingRevision，维护 GPU↔NIC↔物理端口↔OS 接口↔交换机端口的可追溯关系。
-- G4 基线配置；G5 RoCE 连通性；G6 NCCL。前置门禁不满足则禁止启动。
-- 故障统一 T1–T7 工单，证据绑定设备/端口/作业；处置后只重验受影响范围。
+验机在装机阶段有效通过之后启动。硬件在位/健康、GPU/NIC及默认GPU1–8↔NIC1–8配对、PCIe拓扑、网卡状态/MAC、双侧LLDP与BOM三方线序、DDM、配置一致性、RoCE等分别作为内部检查任务，独立记录结果和证据；不得用数字门禁再次组成交付主链。
+
+FAIL/BLOCKED必须自动生成或关联统一Issues，绑定项目、设备、端口、check_key、原始证据及Execution。整改与受影响范围定向复验完成前，对应设备不能判验机通过。MappingRevision仍不可变、可追溯，配置实施与一致性复核分开。全量批次必须分别显示成功、失败、阻断及待处理；不能用单设备成功掩盖其他失败。
 
 ### FR-5 服务器批量配置
 
@@ -97,7 +88,7 @@ ConfigSet 版本化；驱动、固件、OS、CUDA、NCCL、网卡分割、GPU-NI
 
 ### FR-6 NCCL 与网络连通性
 
-NCCL 前必须通过 G5；支持单机、机型通信域、跨机小集群、目标分组和全域档位。测试结果关联 Flow、BOM、MappingRevision、配置版本和网络证据。只对实际覆盖范围给 PASS，不将抽样结果描述为全覆盖。
+NCCL属于第五主阶段，只能对验机通过或合法限定豁免、且验机工单已整改复验关闭、网络测试前置满足的目标运行。NP-5/NP-6继续由网络域提供证据。NCCL结果只更新本阶段，不反向更改验机。报告绑定Flow/Execution、BOM、Mapping、配置和真实覆盖范围。NetTest/RoCE保留为网络/验机支撑功能，不增加主阶段。
 
 ### FR-7 自定义作业
 
@@ -137,7 +128,7 @@ Redfish/IPMI 带外操作、固件升级、凭据批次轮换；危险操作必�
 
 ### FR-16 端到端项目编排
 
-统一展示网络阶段 N-S0..N-S9、服务器 G1..G6、Flow、工单和交付状态。所有阶段状态来源于持久化证据，不由前端推断。
+统一展示网络阶段 N-S0..N-S9、服务器 六阶段交付主链路、Flow、工单和交付状态。所有阶段状态来源于持久化证据，不由前端推断。
 
 ### FR-17 自动机柜图生成
 
@@ -152,7 +143,7 @@ Redfish/IPMI 带外操作、固件升级、凭据批次轮换；危险操作必�
 
 - `NP-1`：目标链路两端交换机与端口在统一 BOM 中建模，breakout 子口独立成行。
 - `NP-2`：交换机 ZTP 完成，最近 Golden 比对无 Critical 漂移。
-- `NP-3`：G2 三方线序比对通过并写入 PortModel；由 G2 产生。
+- `NP-3`：验机内部LLDP三方线序检查通过并写入PortModel；不作为网络就绪/装机前置。
 - `NP-4`：网络就绪证据在 `gate.readiness_ttl=30s` 内刷新且 LLDP 可读。
 - `NP-5`：全网健康通过（BGP 邻居 100% Up、光功率在阈值内、要求 PTP 的项目已锁定）。
 - `NP-6`：无损基线可用；不可采集的能力标 `unknown`/降级，证据不足为 BLOCKED。
@@ -181,8 +172,8 @@ Redfish/IPMI 带外操作、固件升级、凭据批次轮换；危险操作必�
 ## 8. MVP 顺序
 
 P0：项目/RBAC、型号库最小能力、统一 BOM、原始开局导入/预览/审核/校验/提交、审计、仿真器与 API 契约。
-P1：PXE、Redfish、G1/G2/G3、工单与证据链。
-P2：网络 ZTP/配置闭环、G4/G5、ConfigSet/Flow。
+P1：PXE、Redfish、验机硬件检查/验机LLDP检查/Mapping发布、工单与证据链。
+P2：网络 ZTP/配置闭环、装机基础配置/RoCE子任务、ConfigSet/Flow。
 P3：NCCL、监控告警、AI 排障、优雅退出、CMDB 完整交接。
 
 ## 9. 验收原则
@@ -234,3 +225,40 @@ maintained不是功能终点。CMDB是统一资产身份、有效关系与生命
 - NE从交换机端口下钻LLDP/FDB/ARP/DDM和漂移，仍经原PushJob审批链变更。
 - DL审核维护/退役范围与历史可追溯性，Viewer只读历史；都不能重开已撤销通道。
 具体页面、字段与链路见OPERATIONS-DESIGN.md；验收OPS-001…OPS-016见ACCEPTANCE.md。上述FR是设计要求，不是已实现声明。
+
+## IA v2.3 · 双平面与统一抽屉
+
+新增 **FR-23 IA v2.3 双平面与设备详情**：部署平面以项目为作用域，运维平面以授权项目集合为作用域，系统管理按资源权限控制。导航、页面和职责见 IA-V2.3.md §1、§5；ProjectContext、两类设备抽屉和加载协议见 §2–4。保留 FR-0…22、G/NP/PushJob和 maintained/IPMI-only。权限由服务端 permissions[] 和各次请求共同校验，前端菜单不是安全边界。
+
+### FR-24 IA v2.4 与全局 RackView
+部署以项目作用域，运维跨授权项目，系统管理独立。/projects 为项目目录；/dashboard、/fleet、/racks、/issues、/monitor、/flows、/cmdb、/ai为运维入口；/admin为系统入口。全局机房视角展示机柜分布、容量、健康与异常，下钻独立单柜编辑器，数据来自BOM/CMDB与明确来源。Fabric/Fleet/Flows均为单一一级入口，子页面见IA-V2.4.md。maintained冲突见DECISIONS IA24-01。
+
+
+## IA v2.4 Mock 前端实施记录
+
+导航树、完整页面清单、路由/权限/作用域/加载策略、五/八Tab抽屉与API对照统一见 [IA24-IMPLEMENTATION-MATRIX.md](IA24-IMPLEMENTATION-MATRIX.md)。原FR-0…24、门禁、BOM与维护态规则保留。当前实现为前端Mock，不表示已实现Go/真实设备/真实AI。权威种子为 `fixtures/demo-full-64-b300/demo-seed.json`；原包83集合，补齐与规范化后集合数量以当前manifest为准，主项目硬件数量不变。结构检查、数据修复、契约与交互结果以IA24-*报告为准，无法采集/缺少证据保持unknown或阻断。
+
+
+## IA24-05 · 用户确认的GPU-NIC默认映射
+用户于本轮明确：没有单独说明时，GPU1–8分别对应NIC1–8。对当前B300切片按此规则确认512条GPU-NIC关系，NIC9/10保留存储角色；不再把已有LLDP链路显示成全部unknown。矩阵行GPU、列NIC，点击显示物理端口、线缆、交换机、来源与观测；配对关系与线序/新鲜度判据分开，异常不能被配对规则覆盖。
+
+
+### FR-25 六阶段交付状态机与交接
+KICKOFF → NETWORK_READINESS → PROVISIONING → VALIDATION → NCCL_VALIDATION → CLEANUP_HANDOVER为唯一顺序。阶段状态NOT_STARTED/READY/RUNNING/BLOCKED/FAILED/PASSED/WAIVED。WAIVED记录审批人、理由、范围与有效期，不等于PASSED且不绕过前置。Cleanup包含执行停止、临时资源、Agent/SSH撤销、凭据处理、日志证据归档及客户签署；安全要求不可豁免，全部完成后才进入maintained/IPMI-only。旧编号只保留历史追溯。
+
+
+## 当前六阶段主链路修正
+
+本轮用户明确废弃数字门禁作为主链。当前唯一业务顺序、状态机、逐目标放行、安全交接、独立BOM菜单与API约束以[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)为准。历史编号只按[DELIVERY-MIGRATION.md](DELIVERY-MIGRATION.md)追溯，不得用于解锁。验机失败关联统一Issues并定向复验；NCCL不反写验机；清理/归档/客户签署齐全后才进入维护态。NP仍是网络内部断言。当前仅前端Mock与契约实现，没有真实设备后端。
+
+
+## 单柜详情工作区增补
+
+固定单柜窄画布、左侧层级导航和右侧八Tab为本轮布局要求；交互、API、元数据、Mock来源及待执行验收见[RACK-WORKSPACE.md](RACK-WORKSPACE.md)。资产/位置和既有安全模型不变。右侧按需加载，不以缺失指标显示正常。当前构建/浏览器验证按用户安排等待统一执行。
+
+
+## Fabric Topology 增补
+
+FR-26 Fabric Topology：Fabric独立Topology入口；物理布线与逻辑网络使用独立模型共享CMDB稳定ID。双端线缆/端口、逻辑层级与规划/实际Diff、双视图定位、局部展开与历史查询均按FABRIC-TOPOLOGY实现。观察页面不承担审批或生产变更。原FR与六阶段依赖保持不变。
+
+完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。

@@ -40,10 +40,10 @@ CMDB 从 BOM 导入开始自动沉淀全链记录；所有实体和事件通过�
 
 ## Mock 数据库装载
 
-`fixtures/demo-64-b300/demo-seed.json` 是固定演示数据源，`seed-demo.sql` 写入隔离的 `keel_demo` schema。仅对一次性演示库执行：
+`fixtures/demo-full-64-b300/demo-seed.json` 是固定演示数据源，`seed-demo.sql` 写入隔离的 `keel_demo` schema。仅对一次性演示库执行：
 
 ```bash
-PGOPTIONS="-c keel.allow_demo_seed=true" psql "$KEEL_DEMO_DATABASE_URL" -v ON_ERROR_STOP=1 -f fixtures/demo-64-b300/seed-demo.sql
+PGOPTIONS="-c keel.allow_demo_seed=true" psql "$KEEL_DEMO_DATABASE_URL" -v ON_ERROR_STOP=1 -f fixtures/demo-full-64-b300/seed-demo.sql
 ```
 
 SQL 默认拒绝执行，除非显式设置 `keel.allow_demo_seed=true`。不要对生产库运行，不要给演示服务配置真实设备执行权限。
@@ -53,3 +53,30 @@ SQL 默认拒绝执行，除非显式设置 `keel.allow_demo_seed=true`。不要
 新增交付后运维设计入口：[OPERATIONS-IMPACT.md](OPERATIONS-IMPACT.md)（已有/缺失/冲突与处理）、[OPERATIONS-DESIGN.md](OPERATIONS-DESIGN.md)（完整生命周期、独立页面、事实所有权与安全边界）。PRD新增FR-18…22，未重编号/删除原交付能力。ACCEPTANCE新增OPS-001…016，openapi.yaml增加专用Ops*契约。
 
 本次设计变更不等于新增运维功能已经实现；尤其维护态IPMI-only禁止恢复SSH/Agent/Redfish，能力不足只显示历史/unknown/unsupported。完整文档变更与检查结果见OPERATIONS-CHANGELOG.md。
+
+## IA v2.3 · 双平面与统一抽屉
+
+IA v2.3 设计及实施计划入口：[IA-V2.3.md](IA-V2.3.md)。该段为v2.3历史设计记录；本轮已进入v2.4前端Mock实施，当前覆盖与验收以IA24实施对照及实际报告为准。
+
+## IA v2.4 实施增补
+
+新增 [IA-V2.4.md](IA-V2.4.md)；与IA v2.3路由有差异时，以本轮用户明确的v2.4路由为准。
+
+
+## 2026-10-30 全量数据包接入
+最新权威演示数据为 `fixtures/demo-full-64-b300/demo-seed.json`（来源 `keel-ia-v2.4-full-demo-pack.zip`），覆盖83个集合和33个工作簿结构Sheet。停止在运行时合并旧扩展种子或额外A100资产；其他两个项目仅上下文，不虚构额外设备。导入检查见 `docs/IA24-DATA-IMPORT-REPORT.json`，覆盖见 `docs/IA-V2.4-MOCK-COVERAGE.md`。真实Excel仍未提供；workbook-profile只作为提供的结构元数据，不等于本轮实际检查原工作簿。新包的旧PRD不能删去FR-18…24或放宽既有IPMI-only；不可解析项目成员不得自动授权。
+
+
+## IA v2.4 Mock 前端实施记录
+
+导航树、完整页面清单、路由/权限/作用域/加载策略、五/八Tab抽屉与API对照统一见 [IA24-IMPLEMENTATION-MATRIX.md](IA24-IMPLEMENTATION-MATRIX.md)。原FR-0…24、门禁、BOM与维护态规则保留。当前实现为前端Mock，不表示已实现Go/真实设备/真实AI。权威种子为 `fixtures/demo-full-64-b300/demo-seed.json`；原包83集合，补齐与规范化后集合数量以当前manifest为准，主项目硬件数量不变。结构检查、数据修复、契约与交互结果以IA24-*报告为准，无法采集/缺少证据保持unknown或阻断。
+
+
+## 当前六阶段主链路修正
+
+本轮用户明确废弃数字门禁作为主链。当前唯一业务顺序、状态机、逐目标放行、安全交接、独立BOM菜单与API约束以[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)为准。历史编号只按[DELIVERY-MIGRATION.md](DELIVERY-MIGRATION.md)追溯，不得用于解锁。验机失败关联统一Issues并定向复验；NCCL不反写验机；清理/归档/客户签署齐全后才进入维护态。NP仍是网络内部断言。当前仅前端Mock与契约实现，没有真实设备后端。
+
+
+## 当前待验收变更
+
+[六阶段主链](DELIVERY-LIFECYCLE.md)、[单柜详情工作区](RACK-WORKSPACE.md)、[Fabric Topology](FABRIC-TOPOLOGY.md)。导航/路由/API见[实施对照](IA24-IMPLEMENTATION-MATRIX.md)，本轮实际运行记录与未执行检查见[状态记录](IMPLEMENTATION-STATUS.json)。不要以旧报告证明本轮UI。

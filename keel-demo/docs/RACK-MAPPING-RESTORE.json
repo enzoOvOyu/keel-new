@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "checks": [
+    "Independent Mapping tab visible",
+    "Server selection keeps Mapping tab and updates matrix",
+    "GPU3/NIC3 matrix cell changes evidence selection",
+    "NIC to switch-port evidence rendered"
+  ],
+  "browser_page_errors": [],
+  "scope": "Focused browser check only; no full regression or repeated production build"
+}

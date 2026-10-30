@@ -1,0 +1,47 @@
+{
+  "phase": "six-stage implementation synchronization",
+  "verification_status": "NOT RUN — user requested a unified test window",
+  "documents_updated": [
+    "PRD.md",
+    "ARCHITECTURE.md",
+    "SYSTEM-DESIGN.md",
+    "DATA-DICTIONARY.md",
+    "API-CONVENTIONS.md",
+    "DOMAIN-API-CONTRACTS.md",
+    "MOCK-DATA-CONTRACT.md",
+    "IMPLEMENTATION-PLAN.md",
+    "ACCEPTANCE.md",
+    "TEST-STRATEGY.md",
+    "DESIGN-SYSTEM.md",
+    "UI-FLOWS.md",
+    "UI-REFERENCE.md",
+    "RACK-DIAGRAM.md",
+    "IA-V2.4.md",
+    "SECURITY.md",
+    "DEPLOYMENT.md",
+    "README.md",
+    "EXCEL-IMPORT-PROFILE.md",
+    "OPERATIONS-DESIGN.md",
+    "OPERATIONS-IMPACT.md",
+    "AGENTS.md",
+    "DELIVERY-LIFECYCLE.md",
+    "DELIVERY-MIGRATION.md"
+  ],
+  "active_stage_ids": [
+    "KICKOFF",
+    "NETWORK_READINESS",
+    "PROVISIONING",
+    "VALIDATION",
+    "NCCL_VALIDATION",
+    "CLEANUP_HANDOVER"
+  ],
+  "legacy_storage": [
+    "legacy_gate_evidence",
+    "legacy_step_reports",
+    "legacy_gate_summary"
+  ],
+  "next_tasks": [
+    "rack three-panel detail/monitoring layout",
+    "Fabric physical/logical topology"
+  ]
+}

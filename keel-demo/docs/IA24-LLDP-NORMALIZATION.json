@@ -1,0 +1,7 @@
+{
+  "source_records": 512,
+  "canonical_roce_ports": 512,
+  "source_bom_uid_mismatches": 511,
+  "explicit_mismatch_scenarios_retained": 28,
+  "method": "Keep confirmed BOM unchanged. Normalize synthetic LLDP to the 512 RoCE ports. Preserve 28 explicit fault scenarios as a permutation of existing physical endpoints. Keep immutable source_original on each record."
+}

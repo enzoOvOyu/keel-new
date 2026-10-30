@@ -1,0 +1,39 @@
+{
+  "stage_order": [
+    "KICKOFF",
+    "NETWORK_READINESS",
+    "PROVISIONING",
+    "VALIDATION",
+    "NCCL_VALIDATION",
+    "CLEANUP_HANDOVER"
+  ],
+  "legacy_mapping": {
+    "G1": [
+      "VALIDATION",
+      "hardware_inventory"
+    ],
+    "G2": [
+      "VALIDATION",
+      "lldp_line_order"
+    ],
+    "G3": [
+      "VALIDATION",
+      "gpu_nic_mapping"
+    ],
+    "G4": [
+      "PROVISIONING",
+      "baseline_apply"
+    ],
+    "G5": [
+      "VALIDATION",
+      "roce_connectivity"
+    ],
+    "G6": [
+      "NCCL_VALIDATION",
+      "nccl_test"
+    ]
+  },
+  "stage_records": 384,
+  "validation_checks": 512,
+  "legacy_gate_records": 7
+}

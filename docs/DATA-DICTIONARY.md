@@ -145,3 +145,40 @@ CMDB 是投影/查询模型；不要让多个模块直接重复写入同一 CMDB
 所有运维资源都含稳定asset_id、project_id、id、source/time和revision或不可变snapshot引用。API资产ID指向Device.id/item_uid映射，CMDBEntity.stable_ref指回同一身份；不增加第三种Machine主键。配置正文、指标样本和日志通过artifact/snapshot/query refs关联CMDB。
 
 能力supported/unsupported/unknown、保鲜fresh/aging/stale/unknown、质量good/degraded/failed/unknown分别定义；既有Device.freshness中legacy unsupported值在新运维契约适配为capability=unsupported，而不更改既有API枚举。门禁四值与PushJob原状态不变。具体wire字段以openapi.yaml的Ops*专用schema为准。
+
+## IA v2.3 · 双平面与统一抽屉
+
+ProjectContext 是前端每标签页会话值，不是数据库事实表；Session.permissions[]、authorized_project_ids、permission_revision由服务端授权产生。Drawer query 绑定 project_id、稳定 device_id、tab、版本及来源。跨项目关系仍通过现有 CMDB、BOM、PhysicalPort、Issue、Execution、Config 和事件ID引用，不复制资产。
+
+## IA v2.4 实施增补
+
+ProjectContext仅为标签页内状态；资产/端口/线缆/工单/Execution关联稳定ID与project_id，不另建平行资产；RackDiagram是CMDB位置投影。
+
+
+## IA v2.4 Mock 前端实施记录
+
+导航树、完整页面清单、路由/权限/作用域/加载策略、五/八Tab抽屉与API对照统一见 [IA24-IMPLEMENTATION-MATRIX.md](IA24-IMPLEMENTATION-MATRIX.md)。原FR-0…24、门禁、BOM与维护态规则保留。当前实现为前端Mock，不表示已实现Go/真实设备/真实AI。权威种子为 `fixtures/demo-full-64-b300/demo-seed.json`；原包83集合，补齐与规范化后集合数量以当前manifest为准，主项目硬件数量不变。结构检查、数据修复、契约与交互结果以IA24-*报告为准，无法采集/缺少证据保持unknown或阻断。
+
+
+## IA24-05 · 用户确认的GPU-NIC默认映射
+用户于本轮明确：没有单独说明时，GPU1–8分别对应NIC1–8。对当前B300切片按此规则确认512条GPU-NIC关系，NIC9/10保留存储角色；不再把已有LLDP链路显示成全部unknown。矩阵行GPU、列NIC，点击显示物理端口、线缆、交换机、来源与观测；配对关系与线序/新鲜度判据分开，异常不能被配对规则覆盖。
+
+
+六阶段新增/迁移实体：DeliveryStageRecord（逐项目/设备/阶段）、DeliveryStageEvent（追加审计证据）、ValidationCheck（验机内部子任务）、DeliveryBatch（冻结目标与混合结果）、ProvisioningReceipt、ValidationRemediation、HandoverRecord。复用Device/Port/BOM/Issue/Execution，不建立平行资产。旧门禁和旧StepReport仅在legacy_*集合查询。
+
+
+## 当前六阶段主链路修正
+
+本轮用户明确废弃数字门禁作为主链。当前唯一业务顺序、状态机、逐目标放行、安全交接、独立BOM菜单与API约束以[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)为准。历史编号只按[DELIVERY-MIGRATION.md](DELIVERY-MIGRATION.md)追溯，不得用于解锁。验机失败关联统一Issues并定向复验；NCCL不反写验机；清理/归档/客户签署齐全后才进入维护态。NP仍是网络内部断言。当前仅前端Mock与契约实现，没有真实设备后端。
+
+
+## 单柜详情工作区增补
+
+固定单柜窄画布、左侧层级导航和右侧八Tab为本轮布局要求；交互、API、元数据、Mock来源及待执行验收见[RACK-WORKSPACE.md](RACK-WORKSPACE.md)。资产/位置和既有安全模型不变。右侧按需加载，不以缺失指标显示正常。当前构建/浏览器验证按用户安排等待统一执行。
+
+
+## Fabric Topology 增补
+
+复用Device/PhysicalPort/Cable/Rack稳定ID，不新增Machine/Switch身份。TopologyFabric、TopologyNetwork、TopologyMembership为版本化逻辑规划投影；TopologyObservedNetwork、TopologyBGPSession、TopologyPortObservation为独立观测；TopologySnapshot保存不可变来源切片。network_id、device_id、port_ids、baseline_id、source/time/freshness/support及revision必须可追溯。专用时序/日志仍通过资产关联，不塞入CMDB。
+
+完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。

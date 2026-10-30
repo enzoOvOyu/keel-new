@@ -59,3 +59,37 @@ flowchart TD
 ```
 
 所有节点受maintained/IPMI-only限制；维修、审批、重试、升级和回滚不包含恢复SSH/Agent/Redfish的隐藏步骤。交付CleanupRun与最终退役是两条不同流程。
+
+## IA v2.3 · 双平面与统一抽屉
+
+IA v2.3 流程：顶栏或部署项目目录→同一 switchProject→取消旧项目请求与SSE→新部署路由；运维默认过滤更新但允许清除。端口异常↔事件↔工单↔处置↔定向重验证↔关闭，携带授权项目、资产、证据及返回路径。详情抽屉不嵌套。
+
+## IA v2.4 实施增补
+
+设备异常→事件→告警→工单→分派→处置→定向复验→关闭；项目切换双入口共享上下文；全局机房→单柜编辑器。
+
+
+## IA v2.4 Mock 前端实施记录
+
+导航树、完整页面清单、路由/权限/作用域/加载策略、五/八Tab抽屉与API对照统一见 [IA24-IMPLEMENTATION-MATRIX.md](IA24-IMPLEMENTATION-MATRIX.md)。原FR-0…24、门禁、BOM与维护态规则保留。当前实现为前端Mock，不表示已实现Go/真实设备/真实AI。权威种子为 `fixtures/demo-full-64-b300/demo-seed.json`；原包83集合，补齐与规范化后集合数量以当前manifest为准，主项目硬件数量不变。结构检查、数据修复、契约与交互结果以IA24-*报告为准，无法采集/缺少证据保持unknown或阻断。
+
+
+## IA24-05 · 用户确认的GPU-NIC默认映射
+用户于本轮明确：没有单独说明时，GPU1–8分别对应NIC1–8。对当前B300切片按此规则确认512条GPU-NIC关系，NIC9/10保留存储角色；不再把已有LLDP链路显示成全部unknown。矩阵行GPU、列NIC，点击显示物理端口、线缆、交换机、来源与观测；配对关系与线序/新鲜度判据分开，异常不能被配对规则覆盖。
+
+
+## 当前六阶段主链路修正
+
+本轮用户明确废弃数字门禁作为主链。当前唯一业务顺序、状态机、逐目标放行、安全交接、独立BOM菜单与API约束以[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)为准。历史编号只按[DELIVERY-MIGRATION.md](DELIVERY-MIGRATION.md)追溯，不得用于解锁。验机失败关联统一Issues并定向复验；NCCL不反写验机；清理/归档/客户签署齐全后才进入维护态。NP仍是网络内部断言。当前仅前端Mock与契约实现，没有真实设备后端。
+
+
+## 单柜详情工作区增补
+
+固定单柜窄画布、左侧层级导航和右侧八Tab为本轮布局要求；交互、API、元数据、Mock来源及待执行验收见[RACK-WORKSPACE.md](RACK-WORKSPACE.md)。资产/位置和既有安全模型不变。右侧按需加载，不以缺失指标显示正常。当前构建/浏览器验证按用户安排等待统一执行。
+
+
+## Fabric Topology 增补
+
+Fabric→Topology→物理全局分组→机柜/Pod展开→设备/端口/线缆→双端证据；线缆→明确逻辑网络→配置Diff/BGP异常→物理设备/端口→统一Issues→处置/定向复验。逻辑网络无关联时unknown，不能凭物理连线补造。切换视图保留scope/filter/focus，URL支持返回。
+
+完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。

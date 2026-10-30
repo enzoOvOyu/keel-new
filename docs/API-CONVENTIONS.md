@@ -221,7 +221,7 @@ Commit must fail with `422 BLOCKING_ISSUES_PRESENT` if any unresolved BLOCK exis
 | Flow | CRUD、版本、目标预览、参数 schema、schedule、run | 手动/定时运行、禁用、版本 diff |
 | Execution | 列表、详情、targets、attempts、logs、outputs、pause/resume/kill/retry | running/partial/failed/result_unknown、日志持续追加 |
 | 网络底座 | 基线、模板、ZTP、PushJob、diff、审批、DDM、LLDP、健康 | 审批阻断、unknown、漂移、回滚 |
-| 服务器交付 | PXE、Redfish、G1-G6、Mapping、ConfigSet | 门禁未满足、证据过期、定向重验 |
+| 服务器交付 | PXE、Redfish、六阶段交付主链路、Mapping、ConfigSet | 门禁未满足、证据过期、定向重验 |
 | 工单 | 列表、详情、证据、指派、处置、重验、关闭 | T1-T7 与执行/端口关联 |
 | 监控/告警 | 指标、日志、告警、趋势、事件时间线 | 数据缺失、降级、告警聚合 |
 | 模板/介质/参数 | 版本、审批、兼容性、引用关系、回滚 | draft/released/deprecated、兼容失败 |
@@ -276,3 +276,38 @@ Commit must fail with `422 BLOCKING_ISSUES_PRESENT` if any unresolved BLOCK exis
 - 请求/响应/日志/审计禁止秘密值。凭据由后端按用途解析受控绑定，普通设备接口只给credential_binding_id或受控脱敏引用；不接收原始password/token。
 - 配置修改不新增旁路PATCH running-config；网络写操作仍走原PushJob状态机与NE+DE/Critical+NH。固件与电源任务必须验证独立租约、审批引用、动作/目标/版本、策略revision及执行前权限。
 专用字段与路径以openapi.yaml Ops* schemas为准；行为见DOMAIN-API-CONTRACTS和OPERATIONS-DESIGN。
+
+## IA v2.3 · 双平面与统一抽屉
+
+IA v2.3：部署请求携带 project_id；跨项目查询服务端从会话授权集合求交，project_id 可选仅作为过滤，不接受客户端自称授权集合。分页与 request_id 沿用既有规范。SSE 支持 Last-Event-ID、断线补齐、连接及事件投递权限校验；项目变化取消旧请求。页面加载协议和查询 key 见 IA-V2.3.md。
+
+## IA v2.4 实施增补
+
+沿用/ia/session、/ia/cross-project、/ia/projects/.../tabs及/ia/events/stream；项目作用域、授权范围、Last-Event-ID、取消和错误语义见IA-V2.4，真实后端不得信任客户端权限列表。
+
+
+## IA v2.4 Mock 前端实施记录
+
+导航树、完整页面清单、路由/权限/作用域/加载策略、五/八Tab抽屉与API对照统一见 [IA24-IMPLEMENTATION-MATRIX.md](IA24-IMPLEMENTATION-MATRIX.md)。原FR-0…24、门禁、BOM与维护态规则保留。当前实现为前端Mock，不表示已实现Go/真实设备/真实AI。权威种子为 `fixtures/demo-full-64-b300/demo-seed.json`；原包83集合，补齐与规范化后集合数量以当前manifest为准，主项目硬件数量不变。结构检查、数据修复、契约与交互结果以IA24-*报告为准，无法采集/缺少证据保持unknown或阻断。
+
+
+## 当前六阶段主链路修正
+
+本轮用户明确废弃数字门禁作为主链。当前唯一业务顺序、状态机、逐目标放行、安全交接、独立BOM菜单与API约束以[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)为准。历史编号只按[DELIVERY-MIGRATION.md](DELIVERY-MIGRATION.md)追溯，不得用于解锁。验机失败关联统一Issues并定向复验；NCCL不反写验机；清理/归档/客户签署齐全后才进入维护态。NP仍是网络内部断言。当前仅前端Mock与契约实现，没有真实设备后端。
+
+
+## 单柜详情工作区增补
+
+固定单柜窄画布、左侧层级导航和右侧八Tab为本轮布局要求；交互、API、元数据、Mock来源及待执行验收见[RACK-WORKSPACE.md](RACK-WORKSPACE.md)。资产/位置和既有安全模型不变。右侧按需加载，不以缺失指标显示正常。当前构建/浏览器验证按用户安排等待统一执行。
+
+
+## Fabric Topology 增补
+
+新增/projects/{project_id}/fabric/topology/{physical|logical|filters}与/details/{kind}/{id}，资源专用FabricTopology* schemas。显式项目ID、范围/分组/过滤/cursor/limit(10..120)/at；local必须device_id。权限失败403、无对象/历史404、参数422。只读查询可重试，不产生审批或设备副作用；懒加载协议见FABRIC-TOPOLOGY。
+
+完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。
+
+
+### Rack Mapping 入口恢复
+
+机柜右侧保留八个原详情Tab，并增加独立Mapping Tab。workspace/{tab}支持mapping；GPU-NIC矩阵与端口/LLDP追溯共用既有Provider，切换服务器保留Mapping并同步画布选中，不改变配对或线序判据。

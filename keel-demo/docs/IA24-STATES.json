@@ -1,0 +1,10 @@
+{
+  "checks": [
+    "visible cancellable loading",
+    "empty state",
+    "API error and retry",
+    "permission denial and recovery",
+    "invalid imported snapshot quarantined",
+    "maintained and unsupported metrics"
+  ]
+}

@@ -136,3 +136,37 @@ ObservationContext是所有新观测的必需字段。ConfigBaseline映射既有
 全局device路径仍按资源所属project授权；list/detail/history/export/job/subscribe同策略。维护态限制与能力状态独立：supported并不代表policy_allowed。ops Mock与HTTP实现使用同一OpenAPI类型；新增设计schema不代表Handler已经实现。
 
 运维退役终态写入只允许已批准 RetirementJob 完成其停止采集、凭据撤销与保留检查后产生；MaintenanceRequest 不允许直接选择 retired，禁止通过普通维护事件绕过退役审批。
+
+## IA v2.3 · 双平面与统一抽屉
+
+IA v2.3 专用契约：GET /ia/session 返回授权项目、permissions[]、permission_revision；GET /ia/cross-project/{resource} 使用授权范围与可选项目过滤；GET /ia/projects/{project_id}/devices/{device_id}/tabs/{tab} 仅懒加载指定领域Tab；GET /ia/events/stream 使用 Last-Event-ID 与事件权限复核。数据模型见 OpenAPI IA* schema。历史 Ops API、网络审批和门禁契约继续生效。
+
+## IA v2.4 实施增补
+
+保留IA、Ops和现有领域资源，新增前先收紧专用schema；不以通用数据对象冒充冻结契约。Fabric/Fleet/Flows的子页面由各自领域API提供。
+
+
+## IA v2.4 Mock 前端实施记录
+
+导航树、完整页面清单、路由/权限/作用域/加载策略、五/八Tab抽屉与API对照统一见 [IA24-IMPLEMENTATION-MATRIX.md](IA24-IMPLEMENTATION-MATRIX.md)。原FR-0…24、门禁、BOM与维护态规则保留。当前实现为前端Mock，不表示已实现Go/真实设备/真实AI。权威种子为 `fixtures/demo-full-64-b300/demo-seed.json`；原包83集合，补齐与规范化后集合数量以当前manifest为准，主项目硬件数量不变。结构检查、数据修复、契约与交互结果以IA24-*报告为准，无法采集/缺少证据保持unknown或阻断。
+
+
+## IA24-05 · 用户确认的GPU-NIC默认映射
+用户于本轮明确：没有单独说明时，GPU1–8分别对应NIC1–8。对当前B300切片按此规则确认512条GPU-NIC关系，NIC9/10保留存储角色；不再把已有LLDP链路显示成全部unknown。矩阵行GPU、列NIC，点击显示物理端口、线缆、交换机、来源与观测；配对关系与线序/新鲜度判据分开，异常不能被配对规则覆盖。
+
+
+## 当前六阶段主链路修正
+
+本轮用户明确废弃数字门禁作为主链。当前唯一业务顺序、状态机、逐目标放行、安全交接、独立BOM菜单与API约束以[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)为准。历史编号只按[DELIVERY-MIGRATION.md](DELIVERY-MIGRATION.md)追溯，不得用于解锁。验机失败关联统一Issues并定向复验；NCCL不反写验机；清理/归档/客户签署齐全后才进入维护态。NP仍是网络内部断言。当前仅前端Mock与契约实现，没有真实设备后端。
+
+
+## 单柜详情工作区增补
+
+固定单柜窄画布、左侧层级导航和右侧八Tab为本轮布局要求；交互、API、元数据、Mock来源及待执行验收见[RACK-WORKSPACE.md](RACK-WORKSPACE.md)。资产/位置和既有安全模型不变。右侧按需加载，不以缺失指标显示正常。当前构建/浏览器验证按用户安排等待统一执行。
+
+
+## Fabric Topology 增补
+
+FabricTopologyGraph返回nodes/edges/total_nodes/total_edges/next_cursor/warnings/snapshot_at/request_id。node/edge引用CMDB UID，物理边必须source_port_id/target_port_id/cable_id。detail返回双端、显式network关联、逐字段Diff、LLDP/FDB/ARP/DDM/BGP及统一Issue/Execution。物理/逻辑查询与节点/边详情均具专用schema，不能退化GenericObject。
+
+完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。

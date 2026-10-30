@@ -73,3 +73,17 @@ maintained强制IPMI-only：禁止Keel恢复SSH、Agent、Redfish，禁止通过
 固件、电源、配置、回滚、维护/退役命令必须冻结稳定资产与精确版本，操作确认、最小权限、批准记录、维护窗口、独占Lease+fencing token、审计与执行后验证。网络仍复用NE+DE/Critical+NH的PushJob审批，不新增直接配置接口。副作用未知先对账，禁止自动重放刷写/重启。
 
 RetentionPolicy/legal_hold与导出授权覆盖指标、日志、配置快照、原始观测、下载任务及历史查询；归档/保留策略不绕过跨项目隔离。具体验收见OPS-006/007/010/011/014/015。
+
+## IA v2.4 实施增补
+
+本轮维护态Redfish与已批准IPMI-only冲突；未决前禁止Redfish/SSH/Agent及代理绕过，审批/重试均不能放宽。
+
+
+## IA v2.4 Mock 前端实施记录
+
+导航树、完整页面清单、路由/权限/作用域/加载策略、五/八Tab抽屉与API对照统一见 [IA24-IMPLEMENTATION-MATRIX.md](IA24-IMPLEMENTATION-MATRIX.md)。原FR-0…24、门禁、BOM与维护态规则保留。当前实现为前端Mock，不表示已实现Go/真实设备/真实AI。权威种子为 `fixtures/demo-full-64-b300/demo-seed.json`；原包83集合，补齐与规范化后集合数量以当前manifest为准，主项目硬件数量不变。结构检查、数据修复、契约与交互结果以IA24-*报告为准，无法采集/缺少证据保持unknown或阻断。
+
+
+## 当前六阶段主链路修正
+
+本轮用户明确废弃数字门禁作为主链。当前唯一业务顺序、状态机、逐目标放行、安全交接、独立BOM菜单与API约束以[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)为准。历史编号只按[DELIVERY-MIGRATION.md](DELIVERY-MIGRATION.md)追溯，不得用于解锁。验机失败关联统一Issues并定向复验；NCCL不反写验机；清理/归档/客户签署齐全后才进入维护态。NP仍是网络内部断言。当前仅前端Mock与契约实现，没有真实设备后端。

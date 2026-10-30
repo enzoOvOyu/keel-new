@@ -15,7 +15,7 @@
 | DeviceModelRevision | 已发布型号与能力矩阵；BOM 工程校验引用它 |
 | NetworkBaselineRevision | 已商定网络配置基线；不得由 AI 生成或擅自补齐 |
 | PhysicalPort / Cable | 稳定物理端口；线缆引用两端端口 UID |
-| MappingRevision | G3 发布的 GPU-NIC-端口-交换机映射不可变快照 |
+| MappingRevision | Mapping发布 发布的 GPU-NIC-端口-交换机映射不可变快照 |
 | GateEvidence | 对象、门禁、`PASS/FAIL/BLOCKED/WAIVED`、证据引用、规则版本、采集时间、过期时间 |
 | FlowRevision / Execution / TaskAttempt | 作业定义、运行实例、单任务尝试和结果 |
 | PushJob | 网络配置计划、审批、执行、复采和回滚状态 |
@@ -92,9 +92,9 @@ manifest 必须声明 project/batch/template revision/schema/file list/column li
 
 ## 7. 门禁与网络配置状态
 
-GateEvidence 统一四值：`PASS/FAIL/BLOCKED/WAIVED`。每条证据带 `subject_ref`、`gate_id`、`rule_revision`、`observed_at`、`valid_until`、`source`、`evidence_refs`。过期证据不可用于放行。动态网络就绪默认 TTL 30 秒。
+检查结果统一四值：`PASS/FAIL/BLOCKED/WAIVED`。每条证据带 `subject_ref`、`gate_id`、`rule_revision`、`observed_at`、`valid_until`、`source`、`evidence_refs`。过期证据不可用于放行。动态网络就绪默认 TTL 30 秒。
 
-NP-1..NP-6 见 PRD §5。G2 启动只检查 NP-1/NP-2/NP-4；NP-3 由 G2 三方比对产出；NP-5/NP-6 是 G5/G6 前置。不可采集时为 BLOCKED/unknown，不能判 PASS。
+网络就绪在开局配置之后、装机之前，检查NP-1/NP-2/NP-4；NP-3由装机后的验机线序任务产生，不得形成装机循环依赖。NP-5/NP-6为NCCL网络测试前置。缺失或不可采集为BLOCKED/unknown。
 
 PushJob 的唯一状态机：`CREATED/PRECHECKING/BLOCKED/READY/APPROVED/REJECTED/EXECUTING/VERIFYING/COMPLETED/PARTIAL/ROLLING_BACK/ROLLED_BACK/ARCHIVED`。PRECHECKING 未通过不能 READY；未审批不能 EXECUTING；下发后必须复采复比。未知副作用先对账再重试。
 
@@ -195,3 +195,32 @@ CollectionJob复用Job/worker与任务尝试机制；状态queued→running→su
 
 ### 观测与保留
 采集结果追加快照；失败保存失败Job和最近成功观测引用，成功时间不前移。LLDP/FDB/ARP/DDM含snapshot_id与ObservationContext，历史分页/时序查询使用专用存储索引。RetentionPolicy和legal_hold约束清理；原文过期后保留hash/版本/关联元数据与expired标识。GateEvidence四值、NP与PushJob原状态机保持不变。
+
+## IA v2.3 · 双平面与统一抽屉
+
+项目切换检查授权→取消旧作用域请求/订阅→关闭旧抽屉→更新上下文与部署URL；跨项目运维不删除其他授权项目数据。批量确认冻结项目、目标、revision，服务端提交时重新检查。抽屉选择、Tab、来源与状态只属于UI投影，不能成为资产第二事实源。维护态 IPMI-only 不因上下文切换改变。
+
+## IA v2.4 实施增补
+
+切换项目取消旧请求、清除旧抽屉；批量确认冻结项目、设备ID与版本。生命周期及IPMI-only不因IA变化而改变。
+
+
+## IA v2.4 Mock 前端实施记录
+
+导航树、完整页面清单、路由/权限/作用域/加载策略、五/八Tab抽屉与API对照统一见 [IA24-IMPLEMENTATION-MATRIX.md](IA24-IMPLEMENTATION-MATRIX.md)。原FR-0…24、门禁、BOM与维护态规则保留。当前实现为前端Mock，不表示已实现Go/真实设备/真实AI。权威种子为 `fixtures/demo-full-64-b300/demo-seed.json`；原包83集合，补齐与规范化后集合数量以当前manifest为准，主项目硬件数量不变。结构检查、数据修复、契约与交互结果以IA24-*报告为准，无法采集/缺少证据保持unknown或阻断。
+
+
+## IA24-05 · 用户确认的GPU-NIC默认映射
+用户于本轮明确：没有单独说明时，GPU1–8分别对应NIC1–8。对当前B300切片按此规则确认512条GPU-NIC关系，NIC9/10保留存储角色；不再把已有LLDP链路显示成全部unknown。矩阵行GPU、列NIC，点击显示物理端口、线缆、交换机、来源与观测；配对关系与线序/新鲜度判据分开，异常不能被配对规则覆盖。
+
+
+## 当前六阶段主链路修正
+
+本轮用户明确废弃数字门禁作为主链。当前唯一业务顺序、状态机、逐目标放行、安全交接、独立BOM菜单与API约束以[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)为准。历史编号只按[DELIVERY-MIGRATION.md](DELIVERY-MIGRATION.md)追溯，不得用于解锁。验机失败关联统一Issues并定向复验；NCCL不反写验机；清理/归档/客户签署齐全后才进入维护态。NP仍是网络内部断言。当前仅前端Mock与契约实现，没有真实设备后端。
+
+
+## Fabric Topology 增补
+
+物理Cable边和逻辑membership/BGP/containment边不能合并；关联只由显式稳定设备/端口ID建立。planned/observed两种边样式，health五值独立于交付阶段PASS/FAIL。逻辑异常映射至同一端口/Cable/Issue，不能反向改变验机结果。历史快照不可变，找不到at版本不使用当前数据代替。
+
+完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。

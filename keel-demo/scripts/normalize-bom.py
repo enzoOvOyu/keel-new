@@ -1,0 +1,8 @@
+import json
+from pathlib import Path
+p=Path(__file__).resolve().parents[1]/'fixtures/demo-full-64-b300/demo-seed.json';d=json.loads(p.read_text());c=d['collections'];keys={'servers':'server','switches':'switch','gpus':'gpu','nics':'nic','ports':'port','switch_ports':'port','optics':'optic_module','cables':'cable'};refs={r['id']:r.get('source_bom_item_id') or r['id'] for key in keys for r in c[key]};rows=[]
+for key,category in keys.items():
+ for r in c[key]:
+  parent=r.get('server_id') or r.get('component_id') or r.get('device_id') or r.get('parent_port_id');uid=refs[r['id']]
+  rows.append({'id':uid,'item_uid':uid,'project_id':r['project_id'],'bom_import_batch_id':c['bom_imports'][0]['id'],'category':category,'status':'imported','source_of_record':'design_bom','source':'normalized_supplied_asset_projection','asset_ref':r['id'],'model_version_ref':r.get('model_ref'),'model':r.get('model'),'serial':r.get('serial'),'parent_uid':refs.get(parent),'position':{'rack_id':r['rack_id'],'u_start':r['rack_u'],'u_height':r['u_height']} if r.get('rack_id') else None,'endpoint_a_uid':r.get('endpoint_a_uid'),'endpoint_b_uid':r.get('endpoint_b_uid'),'port_name':r.get('physical_name'),'port_index':str(r['port_index']) if r.get('port_index') is not None else None,'role':r.get('role') or r.get('network_role'),'revision':1,'is_demo':True})
+c['bom_items']=rows;d['meta']['counts']={k:len(v) for k,v in c.items()};d['meta']['collection_counts']=d['meta']['counts'];p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');print('Unified BOM projection:',len(rows),'items; no additional asset identities')

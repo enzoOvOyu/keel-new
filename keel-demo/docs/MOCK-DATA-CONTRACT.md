@@ -4,7 +4,7 @@
 
 先让前端获得完整、可交互、数据自洽的控制台，再逐模块接入 Go 后端。Mock 是 API 契约的可执行实现，不是散落在 React 组件中的静态对象。
 
-- 唯一演示数据集：`fixtures/demo-64-b300/demo-seed.json`；PostgreSQL 装载脚本：`fixtures/demo-64-b300/seed-demo.sql`。
+- 唯一演示数据集：`fixtures/demo-full-64-b300/demo-seed.json`；PostgreSQL 装载脚本：`fixtures/demo-full-64-b300/seed-demo.sql`。
 - 64 台 B300 为**合成演示切片**，不是源 Excel 实际数量的声明。按每台 8 GPU、10 个网络适配器建模，共 512 GPU、640 NIC、16 个 42U 机柜、24 台交换机、704 条线缆；另含 4,600+ CMDB 实体和 5,900+ 关系记录。所有标识和地址均为虚构值。
 - 禁止把源 Excel 的真实 SN、MAC、IP、账号、密码或完整原始行复制进 fixture。演示 hostname 使用 `.invalid`，IPv4 使用文档保留网段，MAC 使用本地管理地址。
 - 所有执行、下发、采集、监控和审批均显示 `execution_mode=mock` / `SIMULATION_ONLY`；Mock 不得连接真实设备，不得伪装真实成功。
@@ -15,7 +15,7 @@
 ### 2.1 推荐的第一步
 
 1. 建一个**专用演示数据库**，不复用生产库凭据。
-2. 执行 `fixtures/demo-64-b300/seed-demo.sql`，数据写入隔离的 `keel_demo` schema。
+2. 执行 `fixtures/demo-full-64-b300/seed-demo.sql`，数据写入隔离的 `keel_demo` schema。
 3. Mock API 从 `keel_demo.mock_resource`、`mock_relation`、`mock_event` 读取 JSONB payload，按 OpenAPI 响应 envelope 返回；业务动作写入同一 schema 的 mock store/audit，避免只弹 toast。
 4. 前端默认 `VITE_API_MODE=mock`，页面只依赖 typed API services；不直接导入 fixture。后续将 `VITE_API_MODE=http` 指向 Go API，页面和 TypeScript 资源类型不变。
 
@@ -53,7 +53,7 @@ export interface ApiProvider {
 | CMDB | `cmdb_entities`, `cmdb_relationships`, `lifecycle_events` | BOM 起点、设备关系、执行、工单、机柜图事件；支持详情、关系图和时间线 |
 | 工作流/脚本执行 | `flows`, `schedules`, `executions`, `task_runs`, `execution_logs`, `execution_outputs` | 目标快照、参数、定时频率、运行/成功/失败/部分成功/终止/结果未知、日志 cursor、重试与输出物 |
 | 网络底座 | `network_baselines`, `push_jobs`, `switches`, `switch_ports`, `optics`, `cables` | ZTP、IN_SYNC/DRIFT、预检、审批、下发、回滚状态；模拟数据不能触发真实网络操作 |
-| 交付门禁 | `gate_evidence`, `delivery_runs`, `mapping_revisions` | G1-G6、NP-1..NP-6 相关展示，PASS/FAIL/BLOCKED/WAIVED、证据有效期与豁免信息 |
+| 交付门禁 | `gate_evidence`, `delivery_runs`, `mapping_revisions` | 六阶段交付主链路、NP-1..NP-6 相关展示，PASS/FAIL/BLOCKED/WAIVED、证据有效期与豁免信息 |
 | 工单/告警/监控 | `issues`, `alerts`, `metrics`, `monitoring_sources` | T1-T7、严重级别、趋势、来源、unknown/degraded 能力、定向复验状态 |
 | 机柜图 | `rack_diagrams`, `rack_diagram_revisions`, `rack_placements`, `racks` | 16 个 42U 机柜、设备位置、U 位占用、自动生成/人工覆盖、冲突提示、发布版本 |
 | 平台治理 | `media`, `parameters`, `users`, `audit_events` | 介质版本/审批、参数目录、角色权限展示、审计前后差异脱敏 |
@@ -100,7 +100,7 @@ export interface ApiProvider {
 
 ```bash
 # 仅在 disposable demo PostgreSQL 上执行
-PGOPTIONS="-c keel.allow_demo_seed=true" psql "$KEEL_DEMO_DATABASE_URL" -v ON_ERROR_STOP=1 -f fixtures/demo-64-b300/seed-demo.sql
+PGOPTIONS="-c keel.allow_demo_seed=true" psql "$KEEL_DEMO_DATABASE_URL" -v ON_ERROR_STOP=1 -f fixtures/demo-full-64-b300/seed-demo.sql
 
 # 通过 API_MODE 切换，不要让浏览器组件自行读取 SQL/JSON fixture
 VITE_API_MODE=mock
@@ -129,3 +129,41 @@ VITE_API_MODE=mock
 固定新场景：ops-maintained-ipmi-only、ops-unsupported-gpu-utilization、ops-collection-timeout、ops-observed-config-missing、ops-critical-drift、ops-ddm-threshold-crossed、ops-lldp-missing-side、ops-firmware-incompatible、ops-firmware-result-unknown、ops-retention-expired、ops-repair-revalidate、ops-retired-history。通道拒绝必须先于任何模拟成功；不能靠“刷新”把unsupported变为PASS。页面正常/空/加载/权限/错误/历史过期场景均需明确。
 
 实施时先生成覆盖报告：物理资产计数不变、全部FK可解析、配置三类事实不混用、单位/时间/阈值合法、样本0与null分离、任务/审批状态一致、维护态无禁用通道、秘密值为零。当前既有expanded-seed交付孵化数据不自动满足本运维契约，需单独实现和验收。
+
+## IA v2.3 · 双平面与统一抽屉
+
+新增 IA Mock 需要至少两个获授权合成项目和一个未授权项目，项目/设备/端口/告警/工单/事件均使用稳定引用；保留原64台B300种子规模和完整关联，不将未授权资源暴露给跨项目查询。固定场景覆盖延迟项目切换、权限撤销、SSE断线重连、空数据、stale、unsupported及maintained。需要新增完整 fixture 与 provider 契约测试；当前尚未实现。
+
+## IA v2.4 实施增补
+
+固定64台B300与512GPU；跨项目使用独立合成项目和明确授权，提供失败、阻断、未知、陈旧、维护与拒绝场景，记录字段来源、时间和能力。
+
+
+## 2026-10-30 全量数据包接入
+最新权威演示数据为 `fixtures/demo-full-64-b300/demo-seed.json`（来源 `keel-ia-v2.4-full-demo-pack.zip`），覆盖83个集合和33个工作簿结构Sheet。停止在运行时合并旧扩展种子或额外A100资产；其他两个项目仅上下文，不虚构额外设备。导入检查见 `docs/IA24-DATA-IMPORT-REPORT.json`，覆盖见 `docs/IA-V2.4-MOCK-COVERAGE.md`。真实Excel仍未提供；workbook-profile只作为提供的结构元数据，不等于本轮实际检查原工作簿。新包的旧PRD不能删去FR-18…24或放宽既有IPMI-only；不可解析项目成员不得自动授权。
+
+
+## IA v2.4 Mock 前端实施记录
+
+导航树、完整页面清单、路由/权限/作用域/加载策略、五/八Tab抽屉与API对照统一见 [IA24-IMPLEMENTATION-MATRIX.md](IA24-IMPLEMENTATION-MATRIX.md)。原FR-0…24、门禁、BOM与维护态规则保留。当前实现为前端Mock，不表示已实现Go/真实设备/真实AI。权威种子为 `fixtures/demo-full-64-b300/demo-seed.json`；原包83集合，补齐与规范化后集合数量以当前manifest为准，主项目硬件数量不变。结构检查、数据修复、契约与交互结果以IA24-*报告为准，无法采集/缺少证据保持unknown或阻断。
+
+
+## IA24-05 · 用户确认的GPU-NIC默认映射
+用户于本轮明确：没有单独说明时，GPU1–8分别对应NIC1–8。对当前B300切片按此规则确认512条GPU-NIC关系，NIC9/10保留存储角色；不再把已有LLDP链路显示成全部unknown。矩阵行GPU、列NIC，点击显示物理端口、线缆、交换机、来源与观测；配对关系与线序/新鲜度判据分开，异常不能被配对规则覆盖。
+
+
+## 当前六阶段主链路修正
+
+本轮用户明确废弃数字门禁作为主链。当前唯一业务顺序、状态机、逐目标放行、安全交接、独立BOM菜单与API约束以[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)为准。历史编号只按[DELIVERY-MIGRATION.md](DELIVERY-MIGRATION.md)追溯，不得用于解锁。验机失败关联统一Issues并定向复验；NCCL不反写验机；清理/归档/客户签署齐全后才进入维护态。NP仍是网络内部断言。当前仅前端Mock与契约实现，没有真实设备后端。
+
+
+## 单柜详情工作区增补
+
+固定单柜窄画布、左侧层级导航和右侧八Tab为本轮布局要求；交互、API、元数据、Mock来源及待执行验收见[RACK-WORKSPACE.md](RACK-WORKSPACE.md)。资产/位置和既有安全模型不变。右侧按需加载，不以缺失指标显示正常。当前构建/浏览器验证按用户安排等待统一执行。
+
+
+## Fabric Topology 增补
+
+权威fixture增加topology_fabrics/networks/memberships/observed_networks/bgp_sessions/port_observations/snapshots；VNI/VRF和路由对端是explicit_synthetic_topology_v1独立演示规划/观测，不是从Cable推断。保留原包数据与source_original，双侧LLDP修复报告见TOPOLOGY-DATA-NORMALIZATION.json。覆盖known fault、降级、stale/unknown和rail-8仅规划。64B300/512GPU/24交换机/16机柜/704Cable不增加设备副本。
+
+完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。

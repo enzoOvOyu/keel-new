@@ -43,8 +43,8 @@
 
 | ID | 场景 | 预期结果 |
 |---|---|---|
-| NET-001 | NP-1/NP-2/NP-4 未满足时启动 G2 | 禁止启动并列出缺失断言 |
-| NET-002 | G2 任一侧 LLDP 缺失 | BLOCKED，不得将空结果当 PASS |
+| NET-001 | NP-1/NP-2/NP-4 未满足时启动 验机LLDP检查 | 禁止启动并列出缺失断言 |
+| NET-002 | 验机LLDP检查 任一侧 LLDP 缺失 | BLOCKED，不得将空结果当 PASS |
 | NET-003 | BOM/服务器 LLDP/交换机 LLDP 不一致 | 定位端口对、保存证据并映射到 T1–T7 工单 |
 | NET-004 | 关键证据过期/设备能力不可采集 | BLOCKED 或 unknown，不能默认正常 |
 | NET-005 | PushJob 未审批 | 不得进入 EXECUTING |
@@ -108,4 +108,40 @@
 | OPS-015 | 保留到期、legal_hold、历史证据引用 | 引用/冻结阻止提前删除；过期payload与从未采集区分，元数据/hash可追溯 |
 | OPS-016 | 64节点+24交换机Mock与OpenAPI验证 | 物理计数不变、FK/单位/时间/状态自洽、无秘密、专用schema通过；浏览器关键路径与真机结果分开记录 |
 
-不更改已有BOM、G1–G6、NP、PushJob验收判据。
+不更改已有BOM、六阶段交付主链路、NP、PushJob验收判据。
+
+## IA v2.3 · 双平面与统一抽屉
+
+新增 IA-001…010，当前均 NOT RUN：三分区及路由覆盖；部署 projectId；双入口同一状态；切换请求取消；跨项目过滤/授权及其他项目数据不丢失；两标签提交范围隔离；服务器五Tab/网络八Tab唯一抽屉；首次懒加载/URL/滚动/键盘；SSE重连Last-Event-ID及权限撤销；异常到工单、处置和定向验证双向路径。maintained禁止SSH/Agent/Redfish；权限测试必须覆盖服务端/provider，不仅测菜单。
+
+## IA v2.4 实施增补
+
+IA24验收：双平面与项目隔离、跨授权项目查询、BOM/机柜关系、机房与单柜、五/八Tab懒加载、观测证据、工作流生命周期、权限、SSE和浏览器检查；未执行项保持NOT RUN。
+
+
+## IA v2.4 Mock 前端实施记录
+
+导航树、完整页面清单、路由/权限/作用域/加载策略、五/八Tab抽屉与API对照统一见 [IA24-IMPLEMENTATION-MATRIX.md](IA24-IMPLEMENTATION-MATRIX.md)。原FR-0…24、门禁、BOM与维护态规则保留。当前实现为前端Mock，不表示已实现Go/真实设备/真实AI。权威种子为 `fixtures/demo-full-64-b300/demo-seed.json`；原包83集合，补齐与规范化后集合数量以当前manifest为准，主项目硬件数量不变。结构检查、数据修复、契约与交互结果以IA24-*报告为准，无法采集/缺少证据保持unknown或阻断。
+
+
+## IA24-05 · 用户确认的GPU-NIC默认映射
+用户于本轮明确：没有单独说明时，GPU1–8分别对应NIC1–8。对当前B300切片按此规则确认512条GPU-NIC关系，NIC9/10保留存储角色；不再把已有LLDP链路显示成全部unknown。矩阵行GPU、列NIC，点击显示物理端口、线缆、交换机、来源与观测；配对关系与线序/新鲜度判据分开，异常不能被配对规则覆盖。
+
+
+## 当前六阶段主链路修正
+
+本轮用户明确废弃数字门禁作为主链。当前唯一业务顺序、状态机、逐目标放行、安全交接、独立BOM菜单与API约束以[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)为准。历史编号只按[DELIVERY-MIGRATION.md](DELIVERY-MIGRATION.md)追溯，不得用于解锁。验机失败关联统一Issues并定向复验；NCCL不反写验机；清理/归档/客户签署齐全后才进入维护态。NP仍是网络内部断言。当前仅前端Mock与契约实现，没有真实设备后端。
+
+本轮新增验收：装机前网络阻断、验机前装机阻断、验机问题自动工单/端口/Execution关联、未整改或未复验不放行、NCCL不改验机、混合批次分项计数、WAIVED期限/范围、未知副作用清理阻断、撤销/归档/客户签署完整性、旧编号无活动解锁、BOM独立菜单。按用户安排尚未执行本轮统一测试，状态NOT RUN；不得沿用旧报告宣称通过。
+
+
+## 单柜详情工作区增补
+
+固定单柜窄画布、左侧层级导航和右侧八Tab为本轮布局要求；交互、API、元数据、Mock来源及待执行验收见[RACK-WORKSPACE.md](RACK-WORKSPACE.md)。资产/位置和既有安全模型不变。右侧按需加载，不以缺失指标显示正常。当前构建/浏览器验证按用户安排等待统一执行。
+
+
+## Fabric Topology 增补
+
+TOPO-01…09：独立双视图；双端稳定引用；Cable选中高亮；Fabric/Pod/Rail/VLAN/VRF/VNI/BGP；双向定位；规划/实际/观测分离；端口/设备/Issue下钻；分组/局部/cursor；Mock与CMDB一致。当前NOT RUN，待用户指定集中测试时间；不得用契约生成替代浏览器验收。
+
+完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。

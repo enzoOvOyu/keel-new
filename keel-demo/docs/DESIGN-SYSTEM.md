@@ -63,7 +63,7 @@
 
 ### 5.4 交付总览与门禁
 
-显示网络阶段和 G1–G6 的独立状态、前置断言、证据新鲜度、责任角色和阻断原因。状态四值统一：PASS/FAIL/BLOCKED/WAIVED；WAIVED 必须显示批准人、原因和有效期。
+显示网络阶段和 六阶段交付主链路 的独立状态、前置断言、证据新鲜度、责任角色和阻断原因。状态四值统一：PASS/FAIL/BLOCKED/WAIVED；WAIVED 必须显示批准人、原因和有效期。
 
 ### 5.5 执行详情
 
@@ -115,7 +115,7 @@ Overview（阶段时间线/汇总）、Targets（目标矩阵）、Logs（实时
 - 不得把所有字段塞进一张宽表；用详情抽屉、分组 Tab、结构化 diff 和源数据下钻承载复杂信息。
 
 ### 9.3 交互线框必须先于细节开发
-每个主页面在实现前至少用 Mermaid 或 ASCII 画出页面结构和主要交互路径，纳入 PR 或 `docs/ui-flows/`。最少包含全局导航、BOM 导入、机柜图、CMDB 详情、Flow 列表、Execution 详情、网络设备详情、G1-G6 门禁、工单详情。不得只用文字说“现代、美观”。
+每个主页面在实现前至少用 Mermaid 或 ASCII 画出页面结构和主要交互路径，纳入 PR 或 `docs/ui-flows/`。最少包含全局导航、BOM 导入、机柜图、CMDB 详情、Flow 列表、Execution 详情、网络设备详情、六阶段交付主链路 门禁、工单详情。不得只用文字说“现代、美观”。
 
 ### 9.4 视觉验收
 - 以 1440×900 桌面为主视口；关键页面检查 1280px 宽布局与窄屏降级。
@@ -178,3 +178,42 @@ Execution 详情
 配置diff采用三栏批准基线/intended/observed与结构化差异，固定精确revision和采集时间，危险动作展示目标资产/项目/版本/审批/通道/维护窗口。禁止一个通用“确定”弹窗替代这些上下文。设备操作受拒绝时说明IPMI-only/不支持原因和可查看历史，不能出现“恢复SSH/启用Agent”按钮。
 
 交互线框见UI-REFERENCE的OPS补充，端到端流程见UI-FLOWS；本次仅设计，待Mock契约冻结后实现。
+
+## IA v2.3 · 双平面与统一抽屉
+
+IA v2.3 顶栏品牌/环境/⌘K/通知/ProjectSwitcher/用户，左侧三分区；统一 DrawerDetail，服务器五 Tab、网络八 Tab，列表点击/状态直达、前后设备、键盘、URL、懒加载和滚动恢复。所有动态字段展示 source/observed_at/freshness/support；light/dark、焦点和窄屏状态列入验收。完整规格见 IA-V2.3.md。
+
+## IA v2.4 实施增补
+
+统一顶栏和三分区Sidebar；Fleet/Fabric紧凑列表+专属五/八Tab抽屉，RackView使用机房可视化和独立编辑器。
+
+
+## IA v2.4 Mock 前端实施记录
+
+导航树、完整页面清单、路由/权限/作用域/加载策略、五/八Tab抽屉与API对照统一见 [IA24-IMPLEMENTATION-MATRIX.md](IA24-IMPLEMENTATION-MATRIX.md)。原FR-0…24、门禁、BOM与维护态规则保留。当前实现为前端Mock，不表示已实现Go/真实设备/真实AI。权威种子为 `fixtures/demo-full-64-b300/demo-seed.json`；原包83集合，补齐与规范化后集合数量以当前manifest为准，主项目硬件数量不变。结构检查、数据修复、契约与交互结果以IA24-*报告为准，无法采集/缺少证据保持unknown或阻断。
+
+
+## IA24-05 · 用户确认的GPU-NIC默认映射
+用户于本轮明确：没有单独说明时，GPU1–8分别对应NIC1–8。对当前B300切片按此规则确认512条GPU-NIC关系，NIC9/10保留存储角色；不再把已有LLDP链路显示成全部unknown。矩阵行GPU、列NIC，点击显示物理端口、线缆、交换机、来源与观测；配对关系与线序/新鲜度判据分开，异常不能被配对规则覆盖。
+
+
+## 当前六阶段主链路修正
+
+本轮用户明确废弃数字门禁作为主链。当前唯一业务顺序、状态机、逐目标放行、安全交接、独立BOM菜单与API约束以[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)为准。历史编号只按[DELIVERY-MIGRATION.md](DELIVERY-MIGRATION.md)追溯，不得用于解锁。验机失败关联统一Issues并定向复验；NCCL不反写验机；清理/归档/客户签署齐全后才进入维护态。NP仍是网络内部断言。当前仅前端Mock与契约实现，没有真实设备后端。
+
+
+## 单柜详情工作区增补
+
+固定单柜窄画布、左侧层级导航和右侧八Tab为本轮布局要求；交互、API、元数据、Mock来源及待执行验收见[RACK-WORKSPACE.md](RACK-WORKSPACE.md)。资产/位置和既有安全模型不变。右侧按需加载，不以缺失指标显示正常。当前构建/浏览器验证按用户安排等待统一执行。
+
+
+## Fabric Topology 增补
+
+Topology采用左侧主画布+右侧详情。Physical/Logical双视图切换保留筛选、设备与线缆上下文。规划虚线，观测实线；healthy绿、warning黄、critical红、unknown灰、planned蓝，配合文本。选中线缆高亮双端/路径，无关对象降低亮度；端口详情内联，设备详情使用唯一共享Drawer。
+
+完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。
+
+
+### Rack Mapping 入口恢复
+
+机柜右侧保留八个原详情Tab，并增加独立Mapping Tab。workspace/{tab}支持mapping；GPU-NIC矩阵与端口/LLDP追溯共用既有Provider，切换服务器保留Mapping并同步画布选中，不改变配对或线序判据。

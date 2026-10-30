@@ -386,6 +386,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                project_id: components["parameters"]["ProjectId"];
                 device_id: string;
             };
             cookie?: never;
@@ -426,6 +427,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                project_id: components["parameters"]["ProjectId"];
                 flow_id: string;
             };
             cookie?: never;
@@ -483,7 +485,9 @@ export interface paths {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                flow_id: string;
+            };
             cookie?: never;
         };
         /** List Flow 定时频率 */
@@ -502,6 +506,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                flow_id: string;
                 schedule_id: string;
             };
             cookie?: never;
@@ -542,6 +547,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                project_id: components["parameters"]["ProjectId"];
                 device_id: string;
             };
             cookie?: never;
@@ -582,6 +588,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                project_id: components["parameters"]["ProjectId"];
                 baseline_id: string;
             };
             cookie?: never;
@@ -644,10 +651,18 @@ export interface paths {
             };
             cookie?: never;
         };
-        /** List 门禁证据 */
+        /**
+         * List 门禁证据
+         * @deprecated
+         * @description Legacy gate history only. Old numeric gates never unlock the six-stage delivery pipeline.
+         */
         get: operations["listGateEvidences"];
         put?: never;
-        /** Create 门禁证据 */
+        /**
+         * Create 门禁证据
+         * @deprecated
+         * @description Legacy gate history only. Old numeric gates never unlock the six-stage delivery pipeline.
+         */
         post: operations["createGateEvidence"];
         delete?: never;
         options?: never;
@@ -660,18 +675,27 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                project_id: components["parameters"]["ProjectId"];
                 gate_id: string;
             };
             cookie?: never;
         };
-        /** Get 门禁证据 */
+        /**
+         * Get 门禁证据
+         * @deprecated
+         * @description Legacy gate history only. Old numeric gates never unlock the six-stage delivery pipeline.
+         */
         get: operations["getGateEvidence"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        /** Update 门禁证据 */
+        /**
+         * Update 门禁证据
+         * @deprecated
+         * @description Legacy gate history only. Old numeric gates never unlock the six-stage delivery pipeline.
+         */
         patch: operations["updateGateEvidence"];
         trace?: never;
     };
@@ -700,6 +724,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                project_id: components["parameters"]["ProjectId"];
                 issue_id: string;
             };
             cookie?: never;
@@ -740,6 +765,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                project_id: components["parameters"]["ProjectId"];
                 alert_id: string;
             };
             cookie?: never;
@@ -1822,6 +1848,2158 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{project_id}/operations/devices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * List managed devices in delivery and operations scopes
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsListDevices"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devices/{device_id}/operations/detail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Get unified server or switch operations detail
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsGetDeviceDetail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devices/{device_id}/operations/configurations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Query configurations with provenance, capability, freshness and history
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsListConfigurations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devices/{device_id}/operations/config-diffs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Query config-diffs with provenance, capability, freshness and history
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsListConfigDiffs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devices/{device_id}/operations/ports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Query ports with provenance, capability, freshness and history
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsListPorts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devices/{device_id}/operations/telemetry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Query telemetry with provenance, capability, freshness and history
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsListTelemetry"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devices/{device_id}/operations/lldp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Query lldp with provenance, capability, freshness and history
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsListLLDP"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devices/{device_id}/operations/fdb": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Query fdb with provenance, capability, freshness and history
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsListFDB"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devices/{device_id}/operations/arp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Query arp with provenance, capability, freshness and history
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsListARP"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devices/{device_id}/operations/ddm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Query ddm with provenance, capability, freshness and history
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsListDDM"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devices/{device_id}/operations/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Query metrics with provenance, capability, freshness and history
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsListMetrics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devices/{device_id}/operations/logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Query logs with provenance, capability, freshness and history
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsListLogs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devices/{device_id}/operations/firmware": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Query firmware with provenance, capability, freshness and history
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsListFirmware"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devices/{device_id}/operations/bmc": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Read BMC capability, allowed IPMI state and historical sensors
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsGetBmc"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devices/{device_id}/operations/bmc/sel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Query BMC SEL events without widening device access
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsListBmcSEL"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devices/{device_id}/operations/links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Read linked BOM, CMDB, jobs, alerts, issues and audit IDs
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsGetAssetLinks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devices/{device_id}/operations/power-jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create an approved, confirmed and leased power operation
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        post: operations["opsCreatePowerJob"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devices/{device_id}/operations/firmware-upgrade-jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create a firmware plan; never flash automatically
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        post: operations["opsCreateFirmwareUpgrade"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/firmware-upgrade-jobs/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Read firmware plan, approval, execution and verification
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsGetFirmwareUpgrade"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/firmware-upgrade-jobs/{job_id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve a frozen compatible firmware plan
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        post: operations["opsApproveFirmwareUpgrade"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/firmware-upgrade-jobs/{job_id}/execute": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Execute approved firmware plan only on permitted channel
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        post: operations["opsExecuteFirmwareUpgrade"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/collection-policies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * List periodic collection policies
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsListCollectionPolicies"];
+        put?: never;
+        /**
+         * Create a scoped periodic collection policy
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        post: operations["opsCreateCollectionPolicy"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/collection-policies/{policy_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                policy_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Version collection schedule, timeout and freshness policy
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        patch: operations["opsUpdateCollectionPolicy"];
+        trace?: never;
+    };
+    "/devices/{device_id}/collection-jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh permitted observations using frozen policy and capabilities
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        post: operations["opsCreateCollectionJob"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/collection-jobs/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Read collection state, attempts, timeout and last success
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsGetCollectionJob"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/collection-jobs/{job_id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Retry safe collection after current permission and channel checks
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        post: operations["opsRetryCollectionJob"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devices/{device_id}/maintenance-events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Read maintenance, repair and revalidation history
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsListMaintenanceEvents"];
+        put?: never;
+        /**
+         * Apply audited maintenance transition without reopening channels
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        post: operations["opsCreateMaintenanceEvent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devices/{device_id}/retirement-jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Retire device with approved retention, stop and revocation plans
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        post: operations["opsCreateRetirementJob"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/operations/jobs/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Read scoped operations job and evidence references
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsGetJob"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/operations/retention-policies/{policy_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                policy_id: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Read approved retention and legal hold policy
+         * @description OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
+         */
+        get: operations["opsGetRetentionPolicy"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ia/session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get current principal, authorized projects and permissions */
+        get: operations["getIASession"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ia/cross-project/{resource}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List resources within server-authorized projects; optional project filter */
+        get: operations["listIACrossProject"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ia/projects/{project_id}/devices/{device_id}/tabs/{tab}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lazily load exactly one authorized device tab */
+        get: operations["getIADeviceTab"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ia/events/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Resume authorized execution, port and alert events using Last-Event-ID
+         * @description Server authorizes project scope at connect and event delivery, deduplicates by event_id and supports replay after Last-Event-ID. Permission revocation closes or re-authorizes the stream. No real device connection in mock.
+         */
+        get: operations["streamIAEvents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ia/ai-providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Frontend-first resource contract. Authorized project scope; no real execution or secrets. */
+        get: operations["listIAAIProvider"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ia/ai-jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Frontend-first resource contract. Authorized project scope; no real execution or secrets. */
+        get: operations["listIAAIJob"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ia/knowledge-sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Frontend-first resource contract. Authorized project scope; no real execution or secrets. */
+        get: operations["listIAKnowledgeSource"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ia/ai-feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Frontend-first resource contract. Authorized project scope; no real execution or secrets. */
+        get: operations["listIAAIFeedback"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ia/notification-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Frontend-first resource contract. Authorized project scope; no real execution or secrets. */
+        get: operations["listIANotificationSetting"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ia/api-tokens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Frontend-first resource contract. Authorized project scope; no real execution or secrets. */
+        get: operations["listIAAPIToken"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ia/ssh-trust": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Frontend-first resource contract. Authorized project scope; no real execution or secrets. */
+        get: operations["listIASshTrust"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ia/collection-policies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Frontend-first resource contract. Authorized project scope; no real execution or secrets. */
+        get: operations["listIACollectionPolicy"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/timeline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of project_timelines */
+        get: operations["fullprojecttimelinesprojectsprojectIdtimeline"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dashboard/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of dashboard_snapshots */
+        get: operations["fulldashboardsnapshotsdashboardsummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fleet/servers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of servers */
+        get: operations["fullserversfleetservers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fleet/servers/{serverId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of servers */
+        get: operations["fullserversfleetserversserverId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fleet/servers/{serverId}/runtime": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of server_runtime */
+        get: operations["fullserverruntimefleetserversserverIdruntime"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fleet/servers/{serverId}/bmc": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of bmc_inventory */
+        get: operations["fullbmcinventoryfleetserversserverIdbmc"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fleet/servers/{serverId}/bmc/sensors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of bmc_sensors */
+        get: operations["fullbmcsensorsfleetserversserverIdbmcsensors"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fleet/servers/{serverId}/firmware": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of firmware_inventory */
+        get: operations["fullfirmwareinventoryfleetserversserverIdfirmware"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fleet/servers/{serverId}/config/diff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of server_observed_configs */
+        get: operations["fullserverobservedconfigsfleetserversserverIdconfigdiff"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fabric/switches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of switches */
+        get: operations["fullswitchesfabricswitches"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fabric/switches/{switchId}/runtime": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of switch_runtime */
+        get: operations["fullswitchruntimefabricswitchesswitchIdruntime"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fabric/switches/{switchId}/config/baseline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of switch_config_baselines */
+        get: operations["fullswitchconfigbaselinesfabricswitchesswitchIdconfigbaseline"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fabric/switches/{switchId}/config/running": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of switch_running_configs */
+        get: operations["fullswitchrunningconfigsfabricswitchesswitchIdconfigrunning"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fabric/switches/{switchId}/config/diff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of switch_config_diffs */
+        get: operations["fullswitchconfigdiffsfabricswitchesswitchIdconfigdiff"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fabric/switches/{switchId}/interfaces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of switch_interfaces */
+        get: operations["fullswitchinterfacesfabricswitchesswitchIdinterfaces"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fabric/switches/{switchId}/lldp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of lldp_neighbors */
+        get: operations["fulllldpneighborsfabricswitchesswitchIdlldp"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fabric/switches/{switchId}/fdb": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of fdb_entries */
+        get: operations["fullfdbentriesfabricswitchesswitchIdfdb"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fabric/switches/{switchId}/arp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of arp_entries */
+        get: operations["fullarpentriesfabricswitchesswitchIdarp"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fabric/switches/{switchId}/ddm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of ddm_samples */
+        get: operations["fullddmsamplesfabricswitchesswitchIdddm"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fabric/switches/{switchId}/bgp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of switch_bgp_neighbors */
+        get: operations["fullswitchbgpneighborsfabricswitchesswitchIdbgp"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fabric/switches/{switchId}/logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of switch_logs */
+        get: operations["fullswitchlogsfabricswitchesswitchIdlogs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bom/imports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of bom_imports */
+        get: operations["fullbomimportsbomimports"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bom/imports/{importId}/sheets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of bom_sheet_regions */
+        get: operations["fullbomsheetregionsbomimportsimportIdsheets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bom/imports/{importId}/mappings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of bom_mapping_candidates */
+        get: operations["fullbommappingcandidatesbomimportsimportIdmappings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bom/imports/{importId}/issues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of bom_issues */
+        get: operations["fullbomissuesbomimportsimportIdissues"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/entities/{entityId}/relationships": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of cmdb_relationships */
+        get: operations["fullcmdbrelationshipscmdbentitiesentityIdrelationships"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/entities/{entityId}/timeline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of lifecycle_events */
+        get: operations["fulllifecycleeventscmdbentitiesentityIdtimeline"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/racks/global-map": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of rack_global_maps */
+        get: operations["fullrackglobalmapsracksglobalmap"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/racks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of racks */
+        get: operations["fullracksracks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/racks/{rackId}/diagram": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of rack_diagrams */
+        get: operations["fullrackdiagramsracksrackIddiagram"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/racks/{rackId}/placements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of rack_placements */
+        get: operations["fullrackplacementsracksrackIdplacements"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rack-diagrams/revisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of rack_diagram_revisions */
+        get: operations["fullrackdiagramrevisionsrackdiagramsrevisions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of flows */
+        get: operations["fullflowsflows"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/{flowId}/revisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of flow_revisions */
+        get: operations["fullflowrevisionsflowsflowIdrevisions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flow-blueprints": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of flow_blueprints */
+        get: operations["fullflowblueprintsflowblueprints"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flow-target-groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of flow_target_groups */
+        get: operations["fullflowtargetgroupsflowtargetgroups"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/executions/{executionId}/targets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of execution_targets */
+        get: operations["fullexecutiontargetsexecutionsexecutionIdtargets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/executions/{executionId}/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of task_runs */
+        get: operations["fulltaskrunsexecutionsexecutionIdtasks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/executions/{executionId}/logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of execution_logs */
+        get: operations["fullexecutionlogsexecutionsexecutionIdlogs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/executions/{executionId}/outputs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of execution_outputs */
+        get: operations["fullexecutionoutputsexecutionsexecutionIdoutputs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/schedules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of schedules */
+        get: operations["fullschedulesschedules"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of issues */
+        get: operations["fullissuesissues"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/alerts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of alerts */
+        get: operations["fullalertsalerts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/monitor/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of metric_series */
+        get: operations["fullmetricseriesmonitormetrics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/monitor/collections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of collection_jobs */
+        get: operations["fullcollectionjobsmonitorcollections"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/monitor/sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of monitoring_sources */
+        get: operations["fullmonitoringsourcesmonitorsources"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/delivery/gates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Typed mock view of gate_evidence
+         * @deprecated
+         * @description Legacy gate history only. Old numeric gates never unlock the six-stage delivery pipeline.
+         */
+        get: operations["fullgateevidencedeliverygates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/delivery/mapping-revisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of mapping_revisions */
+        get: operations["fullmappingrevisionsdeliverymappingrevisions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fabric/push-jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of push_jobs */
+        get: operations["fullpushjobsfabricpushjobs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fabric/network-baselines": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of network_baselines */
+        get: operations["fullnetworkbaselinesfabricnetworkbaselines"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of users */
+        get: operations["fullusersadminusers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of templates */
+        get: operations["fulltemplatesadmintemplates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/device-models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of device_models */
+        get: operations["fulldevicemodelsadmindevicemodels"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/parameters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of parameters */
+        get: operations["fullparametersadminparameters"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/media": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of media */
+        get: operations["fullmediaadminmedia"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/audit-events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of audit_events */
+        get: operations["fullauditeventsadminauditevents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of ai_providers */
+        get: operations["fullaiprovidersaiproviders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of ai_tasks */
+        get: operations["fullaitasksaitasks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/evaluations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Typed mock view of ai_evaluations */
+        get: operations["fullaievaluationsaievaluations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ia/projects/{project_id}/servers/{server_id}/mapping": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getServerMappingMatrix"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/delivery/stages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend. */
+        get: operations["listDeliveryStages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/delivery/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend. */
+        get: operations["getDeliveryStageSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/delivery/stages/{stage_id}/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend. */
+        post: operations["startDeliveryStage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/delivery/stages/{stage_id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend. */
+        post: operations["completeDeliveryStage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/delivery/stages/{stage_id}/waivers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend. */
+        post: operations["waiveDeliveryStage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/validation/checks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend. */
+        get: operations["listValidationChecks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issues/{issue_id}/validation-remediations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend. */
+        post: operations["applyMockValidationRemediation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issues/{issue_id}/validation-retests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend. */
+        post: operations["startValidationRetest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/handover-records": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend. */
+        get: operations["listHandoverRecords"];
+        put?: never;
+        /** @description Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend. */
+        post: operations["prepareHandover"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/handover-records/{handover_id}/advance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend. */
+        post: operations["advanceHandoverStep"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/racks/{rack_id}/workspace/{tab}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** On-demand rack detail workspace; load only the active tab */
+        get: operations["getRackWorkspaceTab"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/fabric/topology/physical": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** CMDB/Cable dual-ended physical topology with evidence */
+        get: operations["getFabricPhysicalTopology"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/fabric/topology/logical": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Independent logical hierarchy and intended/observed comparison */
+        get: operations["getFabricLogicalTopology"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/fabric/topology/details/{kind}/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getFabricTopologyDetail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/fabric/topology/filters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getFabricTopologyFilters"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2185,6 +4363,9 @@ export interface components {
             created_at: string;
             /** Format: date-time */
             updated_at: string;
+            definition?: components["schemas"]["IAFlowDefinition"];
+            /** @enum {string} */
+            stage_id?: "KICKOFF" | "NETWORK_READINESS" | "PROVISIONING" | "VALIDATION" | "NCCL_VALIDATION" | "CLEANUP_HANDOVER";
         };
         Execution: {
             id: string;
@@ -2221,6 +4402,8 @@ export interface components {
             request_id?: string;
             /** Format: date-time */
             created_at: string;
+            /** @enum {string} */
+            stage_id?: "KICKOFF" | "NETWORK_READINESS" | "PROVISIONING" | "VALIDATION" | "NCCL_VALIDATION" | "CLEANUP_HANDOVER";
         };
         Schedule: {
             id: string;
@@ -2307,6 +4490,10 @@ export interface components {
             finished_at?: string | null;
             rollback_state?: string | null;
         };
+        /**
+         * @deprecated
+         * @description Historical-only legacy gate record; never a current delivery phase.
+         */
         GateEvidence: {
             id: string;
             subject_type: string;
@@ -2496,6 +4683,9 @@ export interface components {
             concurrency_limit?: number;
             /** @enum {string} */
             failure_policy?: "continue" | "stop" | "threshold";
+            definition?: components["schemas"]["IAFlowDefinition"];
+            /** @enum {string} */
+            stage_id?: "KICKOFF" | "NETWORK_READINESS" | "PROVISIONING" | "VALIDATION" | "NCCL_VALIDATION" | "CLEANUP_HANDOVER";
         };
         Rack: {
             rack_id: string;
@@ -2607,6 +4797,4565 @@ export interface components {
                 issue_count?: number;
             };
             request_id: string;
+        };
+        /** @enum {string} */
+        OpsCapabilityStatus: "supported" | "unsupported" | "unknown";
+        /** @enum {string} */
+        OpsFreshnessStatus: "fresh" | "aging" | "stale" | "unknown";
+        /** @enum {string} */
+        OpsQualityStatus: "good" | "degraded" | "failed" | "unknown";
+        /** @enum {string} */
+        OpsVerdict: "PASS" | "FAIL" | "BLOCKED" | "WAIVED";
+        /** @description maintained MUST use ipmi_only and allow only approved IPMI purposes. SSH/Agent/Redfish and proxy bypass forbidden; external_readonly is a separately approved observation source, never a device executor. */
+        OpsAccessPolicy: {
+            revision: number;
+            /** @enum {string} */
+            mode: "delivery_approved" | "ipmi_only" | "retired";
+            allowed_protocols: ("ipmi" | "redfish" | "ssh" | "agent" | "external_readonly")[];
+            policy_allowed: boolean;
+            policy_reason: string;
+            credential_binding_id?: string | null;
+        } & (unknown & unknown);
+        OpsMaintenanceState: {
+            /** @enum {string} */
+            state: "normal" | "planned" | "in_maintenance" | "repairing" | "revalidating" | "retirement_pending" | "retired";
+            /** Format: date-time */
+            window_start?: string | null;
+            /** Format: date-time */
+            window_end?: string | null;
+            reason: string;
+            issue_refs: string[];
+            change_refs: string[];
+            approval_refs: string[];
+            verification_refs: string[];
+            access_policy: components["schemas"]["OpsAccessPolicy"];
+            revision: number;
+        };
+        /** @description A successful zero is numeric 0; missing/unsupported value is null with reason. Failed collection never advances last successful collected_at. Verdict is separate from capability/freshness/quality. */
+        OpsObservationContext: {
+            project_id: string;
+            asset_id: string;
+            source: string;
+            adapter_version: string;
+            /** Format: date-time */
+            collected_at: string | null;
+            /** Format: date-time */
+            received_at: string;
+            capability_status: components["schemas"]["OpsCapabilityStatus"];
+            freshness_status: components["schemas"]["OpsFreshnessStatus"];
+            quality_status: components["schemas"]["OpsQualityStatus"];
+            policy_allowed: boolean;
+            policy_reason: string;
+            threshold_revision_id: string | null;
+            retention_policy_id: string;
+            collection_job_id: string | null;
+            reason: string | null;
+        };
+        /** @enum {string} */
+        OpsDataAvailability: "available" | "not_collected" | "expired";
+        OpsLabel: {
+            name: string;
+            value: string;
+        };
+        OpsThreshold: {
+            revision_id: string;
+            model_revision_id: string;
+            metric_key: string;
+            unit: string;
+            lower_bound: number | null;
+            upper_bound: number | null;
+            channel: string | null;
+            approved_by: string[];
+        };
+        OpsDeviceSummary: {
+            id: string;
+            project_id: string;
+            /** @enum {string} */
+            category: "server" | "switch";
+            display_name: string;
+            hostname?: string | null;
+            serial_redacted?: string | null;
+            model_ref?: string | null;
+            role?: string | null;
+            site?: string | null;
+            rack?: string | null;
+            rack_u?: string | null;
+            management_address_redacted?: string | null;
+            lifecycle_status: string;
+            managed_status: string;
+            health_status?: string | null;
+            /** Format: date-time */
+            last_seen_at?: string | null;
+            /** @enum {string} */
+            freshness?: "fresh" | "aging" | "stale" | "unknown" | "unsupported";
+            source_bom_item_id?: string | null;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+            revision?: number;
+            asset_id: string;
+            maintenance: components["schemas"]["OpsMaintenanceState"];
+            fabric?: string | null;
+            pod?: string | null;
+            nos_version?: string | null;
+            /** @enum {string} */
+            configuration_state: "in_sync" | "drift" | "unknown";
+            alert_count: number;
+            context: components["schemas"]["OpsObservationContext"];
+        };
+        OpsComponentConfiguration: {
+            component_asset_id: string;
+            /** @enum {string} */
+            kind: "cpu" | "memory" | "gpu" | "nic" | "disk" | "psu" | "fan" | "bmc" | "other";
+            model?: string | null;
+            vendor?: string | null;
+            /** @description Unit: bytes */
+            capacity_bytes?: number | null;
+            pci_bdf?: string | null;
+            firmware_version?: string | null;
+            port_ids?: string[];
+            context: components["schemas"]["OpsObservationContext"];
+        };
+        OpsSoftwareInventory: {
+            os: string | null;
+            kernel: string | null;
+            driver: string | null;
+            cuda: string | null;
+            nccl: string | null;
+            pcie_topology_snapshot_id: string | null;
+            context: components["schemas"]["OpsObservationContext"];
+        };
+        OpsBmcInfo: {
+            address_redacted: string | null;
+            ipmi_capability: components["schemas"]["OpsCapabilityStatus"];
+            redfish_capability: components["schemas"]["OpsCapabilityStatus"];
+            /** @enum {string} */
+            ipmi_reachability: "reachable" | "unreachable" | "unknown";
+            redfish_policy_allowed: boolean;
+            sensor_snapshot_ids: string[];
+            sel_snapshot_ids: string[];
+            boot_target: string | null;
+            firmware_inventory_refs: string[];
+            access_policy: components["schemas"]["OpsAccessPolicy"];
+            context: components["schemas"]["OpsObservationContext"];
+        };
+        OpsDeviceDetail: {
+            device: components["schemas"]["OpsDeviceSummary"];
+            components: components["schemas"]["OpsComponentConfiguration"][];
+            software: components["schemas"]["OpsSoftwareInventory"] | null;
+            bmc: components["schemas"]["OpsBmcInfo"] | null;
+            port_ids: string[];
+            config_revision_ids: string[];
+            metric_keys: string[];
+            firmware_inventory_ids: string[];
+            link_index_ref: string;
+            context: components["schemas"]["OpsObservationContext"];
+        };
+        OpsConfigurationRevision: {
+            id: string;
+            project_id: string;
+            revision: number;
+            /** Format: date-time */
+            created_at: string;
+            source: string;
+            /** @description Stable Device.id / BOM item_uid mapping; not a new asset identity */
+            asset_id: string;
+            /** @enum {string} */
+            fact_kind: "approved_baseline" | "intended" | "observed";
+            /** @enum {string} */
+            domain: "server" | "network";
+            /** @description NetworkBaselineRevision / ConfigSetRevision or immutable snapshot identity */
+            existing_revision_ref: string;
+            baseline_revision_id: string | null;
+            template_revision_id: string | null;
+            target_snapshot_id: string | null;
+            collection_snapshot_id: string | null;
+            /** @enum {string} */
+            format: "server_inventory" | "running" | "nvue" | "rendered" | "reference";
+            content_hash: string;
+            payload_ref: string | null;
+            approval_refs: string[];
+            data_availability: components["schemas"]["OpsDataAvailability"];
+            context: components["schemas"]["OpsObservationContext"];
+        } & (unknown & unknown);
+        OpsConfigDiffItem: {
+            path: string;
+            expected_redacted: string | number | boolean | null;
+            observed_redacted: string | number | boolean | null;
+            /** @enum {string} */
+            severity: "info" | "minor" | "major" | "critical" | "unknown";
+            rule_revision_id: string;
+            source_ref: string;
+        };
+        OpsConfigDiff: {
+            id: string;
+            project_id: string;
+            revision: number;
+            /** Format: date-time */
+            created_at: string;
+            source: string;
+            /** @description Stable Device.id / BOM item_uid mapping; not a new asset identity */
+            asset_id: string;
+            baseline_revision_id: string;
+            intended_revision_id: string;
+            observed_revision_id: string | null;
+            rule_revision_id: string;
+            /** @enum {string} */
+            drift_level: "none" | "minor" | "major" | "critical" | "unknown";
+            verdict: components["schemas"]["OpsVerdict"];
+            items: components["schemas"]["OpsConfigDiffItem"][];
+            approval_valid: boolean;
+            context: components["schemas"]["OpsObservationContext"];
+        } & unknown;
+        OpsPortSettings: {
+            role: string | null;
+            /** @description Unit: bps */
+            speed_bps: number | null;
+            /** @description Unit: bytes */
+            mtu: number | null;
+            vlan_ids: number[];
+            pfc_enabled: boolean | null;
+            ecn_enabled: boolean | null;
+            qos_revision_id: string | null;
+        };
+        OpsPort: {
+            id: string;
+            project_id: string;
+            revision: number;
+            /** Format: date-time */
+            created_at: string;
+            source: string;
+            /** @description Stable Device.id / BOM item_uid mapping; not a new asset identity */
+            asset_id: string;
+            /** @description Existing PhysicalPort stable ID */
+            physical_port_id: string;
+            device_id: string;
+            breakout_parent_id: string | null;
+            physical_name: string;
+            os_interface: string | null;
+            permanent_mac_redacted: string | null;
+            intended_settings: components["schemas"]["OpsPortSettings"];
+            observed_settings: components["schemas"]["OpsPortSettings"];
+            /** @enum {string} */
+            admin_state: "up" | "down" | "unknown";
+            /** @enum {string} */
+            oper_state: "up" | "down" | "unknown";
+            error_count: number | null;
+            flap_count: number | null;
+            optic_asset_id: string | null;
+            mapping_revision_ids: string[];
+            context: components["schemas"]["OpsObservationContext"];
+        };
+        OpsSnapshot: {
+            id: string;
+            project_id: string;
+            revision: number;
+            /** Format: date-time */
+            created_at: string;
+            source: string;
+            /** @description Stable Device.id / BOM item_uid mapping; not a new asset identity */
+            asset_id: string;
+            /** @enum {string} */
+            snapshot_kind: "hardware" | "software" | "configuration" | "lldp" | "fdb" | "arp" | "ddm" | "health" | "lossless" | "sel";
+            content_hash: string;
+            payload_ref: string | null;
+            data_availability: components["schemas"]["OpsDataAvailability"];
+            context: components["schemas"]["OpsObservationContext"];
+        };
+        OpsLLDPEntry: {
+            local_port_id: string;
+            peer_asset_id: string | null;
+            peer_port_id: string | null;
+            chassis_id_redacted: string | null;
+            port_id_redacted: string | null;
+            sysname: string | null;
+            sysdesc_redacted: string | null;
+            expected_peer_asset_id: string | null;
+            expected_peer_port_id: string | null;
+            verdict: components["schemas"]["OpsVerdict"];
+            snapshot_id: string;
+            context: components["schemas"]["OpsObservationContext"];
+        };
+        OpsFDBEntry: {
+            mac_redacted: string;
+            vlan_id: number | null;
+            learning_port_id: string;
+            /** @enum {string} */
+            entry_type: "dynamic" | "static" | "unknown";
+            /** Format: date-time */
+            learned_at: string | null;
+            anomaly_reason: string | null;
+            snapshot_id: string;
+            context: components["schemas"]["OpsObservationContext"];
+        };
+        OpsARPEntry: {
+            ip_redacted: string;
+            mac_redacted: string | null;
+            vlan_id: number | null;
+            vrf: string | null;
+            interface_ref: string;
+            state: string;
+            snapshot_id: string;
+            context: components["schemas"]["OpsObservationContext"];
+        };
+        OpsDDMEntry: {
+            port_id: string;
+            optic_asset_id: string;
+            channel: string;
+            /** @description Unit: dBm */
+            rx_dbm: number | null;
+            /** @description Unit: dBm */
+            tx_dbm: number | null;
+            /** @description Unit: degrees Celsius */
+            temperature_c: number | null;
+            /** @description Unit: V */
+            voltage_v: number | null;
+            /** @description Unit: mA */
+            bias_ma: number | null;
+            model: string | null;
+            vendor: string | null;
+            serial_redacted: string | null;
+            thresholds: components["schemas"]["OpsThreshold"][];
+            snapshot_id: string;
+            context: components["schemas"]["OpsObservationContext"];
+        };
+        OpsMetricSample: {
+            metric_key: string;
+            value: number | null;
+            unit: string;
+            labels: components["schemas"]["OpsLabel"][];
+            counter_reset: boolean;
+            snapshot_id: string;
+            threshold_revision_id: string | null;
+            context: components["schemas"]["OpsObservationContext"];
+        } & unknown;
+        OpsLogEvent: {
+            id: string;
+            /** Format: date-time */
+            timestamp: string;
+            /** @enum {string} */
+            level: "DEBUG" | "INFO" | "WARN" | "ERROR" | "UNKNOWN";
+            message_redacted: string;
+            snapshot_id: string;
+            cursor: string;
+            context: components["schemas"]["OpsObservationContext"];
+        };
+        OpsFirmwareInventory: {
+            id: string;
+            project_id: string;
+            revision: number;
+            /** Format: date-time */
+            created_at: string;
+            source: string;
+            /** @description Stable Device.id / BOM item_uid mapping; not a new asset identity */
+            asset_id: string;
+            component_asset_id: string;
+            /** @enum {string} */
+            firmware_kind: "bios" | "bmc" | "nic" | "gpu" | "switch_nos" | "other";
+            observed_version: string | null;
+            target_baseline_revision_id: string | null;
+            media_artifact_id: string | null;
+            /** @enum {string} */
+            compatibility: "compatible" | "incompatible" | "unknown";
+            upgrade_job_refs: string[];
+            context: components["schemas"]["OpsObservationContext"];
+        };
+        OpsScheduleSpec: {
+            enabled: boolean;
+            /** @enum {string} */
+            expression_type: "cron" | "interval";
+            expression: string;
+            timezone: string;
+            /** @enum {string} */
+            misfire_policy: "skip" | "run_once";
+            /** Format: date-time */
+            next_run_at: string | null;
+        };
+        OpsCollectionPolicy: {
+            id: string;
+            project_id: string;
+            revision: number;
+            /** Format: date-time */
+            created_at: string;
+            source: string;
+            name: string;
+            target_asset_ids: string[];
+            snapshot_kinds: ("hardware" | "software" | "configuration" | "lldp" | "fdb" | "arp" | "ddm" | "health" | "lossless" | "sel")[];
+            /** @enum {string} */
+            protocol: "ipmi" | "redfish" | "ssh" | "agent" | "external_readonly";
+            schedule: components["schemas"]["OpsScheduleSpec"];
+            timeout_seconds: number;
+            max_attempts: number;
+            backoff_seconds: number;
+            freshness_policy_ref: string;
+            retention_policy_ref: string;
+            access_policy_revision: number;
+        };
+        OpsCollectionPolicyRequest: {
+            name: string;
+            target_asset_ids: string[];
+            snapshot_kinds: ("hardware" | "software" | "configuration" | "lldp" | "fdb" | "arp" | "ddm" | "health" | "lossless" | "sel")[];
+            /** @enum {string} */
+            protocol: "ipmi" | "redfish" | "ssh" | "agent" | "external_readonly";
+            schedule: components["schemas"]["OpsScheduleSpec"];
+            timeout_seconds: number;
+            max_attempts: number;
+            backoff_seconds: number;
+            freshness_policy_ref: string;
+            retention_policy_ref: string;
+            access_policy_revision: number;
+        };
+        OpsJob: {
+            id: string;
+            project_id: string;
+            revision: number;
+            /** Format: date-time */
+            created_at: string;
+            source: string;
+            /** @description Same stable identifier as id */
+            job_id: string;
+            /** @enum {string} */
+            kind: "collection" | "power_control" | "firmware_upgrade" | "retirement";
+            /** @enum {string} */
+            status: "queued" | "running" | "succeeded" | "partial" | "failed" | "cancelled" | "timed_out" | "result_unknown";
+            target_asset_ids: string[];
+            execution_id: string | null;
+            /** Format: date-time */
+            started_at: string | null;
+            /** Format: date-time */
+            finished_at: string | null;
+            /** Format: date-time */
+            last_success_at: string | null;
+            attempt: number;
+            max_attempts: number;
+            safe_to_retry: boolean;
+            error_code: string | null;
+            error_summary_redacted: string | null;
+            approval_refs: string[];
+            lease_ref: string | null;
+            access_policy_revision: number;
+            result_snapshot_ids: string[];
+        };
+        OpsCollectionRequest: {
+            snapshot_kinds: ("hardware" | "software" | "configuration" | "lldp" | "fdb" | "arp" | "ddm" | "health" | "lossless" | "sel")[];
+            /** @enum {string} */
+            protocol: "ipmi" | "redfish" | "ssh" | "agent" | "external_readonly";
+            policy_id: string;
+            access_policy_revision: number;
+            reason: string;
+        };
+        OpsJobControlRequest: {
+            reason: string;
+            expected_revision: number;
+            reconciliation_ref?: string | null;
+        };
+        OpsPowerRequest: {
+            /** @enum {string} */
+            action: "power_on" | "power_off" | "power_cycle" | "reset";
+            reason: string;
+            approval_refs: string[];
+            maintenance_window_ref: string;
+            access_policy_revision: number;
+            expected_device_revision: number;
+        };
+        OpsFirmwareUpgradeRequest: {
+            component_asset_ids: string[];
+            media_artifact_id: string;
+            baseline_revision_id: string;
+            before_inventory_revision_ids: string[];
+            maintenance_window_ref: string;
+            reason: string;
+            access_policy_revision: number;
+        };
+        OpsFirmwareUpgradeJob: {
+            id: string;
+            project_id: string;
+            revision: number;
+            /** Format: date-time */
+            created_at: string;
+            source: string;
+            /** @description Same stable identifier as id */
+            job_id: string;
+            /** @enum {string} */
+            kind: "collection" | "power_control" | "firmware_upgrade" | "retirement";
+            /** @enum {string} */
+            status: "queued" | "running" | "succeeded" | "partial" | "failed" | "cancelled" | "timed_out" | "result_unknown";
+            target_asset_ids: string[];
+            execution_id: string | null;
+            /** Format: date-time */
+            started_at: string | null;
+            /** Format: date-time */
+            finished_at: string | null;
+            /** Format: date-time */
+            last_success_at: string | null;
+            attempt: number;
+            max_attempts: number;
+            safe_to_retry: boolean;
+            error_code: string | null;
+            error_summary_redacted: string | null;
+            approval_refs: string[];
+            lease_ref: string | null;
+            access_policy_revision: number;
+            result_snapshot_ids: string[];
+            component_asset_ids: string[];
+            media_artifact_id: string;
+            baseline_revision_id: string;
+            /** @enum {string} */
+            compatibility: "compatible" | "incompatible" | "unknown";
+            /** @enum {string} */
+            approval_state: "pending" | "approved" | "rejected";
+            before_inventory_revision_ids: string[];
+            after_inventory_revision_ids: string[];
+            verification_ref?: string | null;
+        };
+        OpsApprovalRequest: {
+            /** @enum {string} */
+            decision: "approved" | "rejected";
+            reason: string;
+            expected_revision: number;
+            plan_content_hash: string;
+        };
+        OpsMaintenanceEvent: {
+            id: string;
+            project_id: string;
+            revision: number;
+            /** Format: date-time */
+            created_at: string;
+            source: string;
+            /** @description Stable Device.id / BOM item_uid mapping; not a new asset identity */
+            asset_id: string;
+            /** @enum {string} */
+            from_state: "normal" | "planned" | "in_maintenance" | "repairing" | "revalidating" | "retirement_pending" | "retired";
+            /** @enum {string} */
+            to_state: "normal" | "planned" | "in_maintenance" | "repairing" | "revalidating" | "retirement_pending" | "retired";
+            reason: string;
+            /** Format: date-time */
+            window_start: string | null;
+            /** Format: date-time */
+            window_end: string | null;
+            issue_refs: string[];
+            change_refs: string[];
+            approval_refs: string[];
+            verification_refs: string[];
+            actor: string;
+            access_policy_revision: number;
+        };
+        OpsMaintenanceRequest: {
+            /**
+             * @description Retired is terminal and can only be produced by an approved retirement job; direct transition requests cannot select it.
+             * @enum {string}
+             */
+            to_state: "normal" | "planned" | "in_maintenance" | "repairing" | "revalidating" | "retirement_pending";
+            reason: string;
+            /** Format: date-time */
+            window_start?: string | null;
+            /** Format: date-time */
+            window_end?: string | null;
+            issue_refs: string[];
+            change_refs: string[];
+            approval_refs: string[];
+            verification_refs: string[];
+            expected_revision: number;
+        };
+        OpsRetirementRequest: {
+            reason: string;
+            approval_refs: string[];
+            retention_policy_ref: string;
+            /** @constant */
+            legal_hold_checked: true;
+            collection_stop_plan_ref: string;
+            credential_revocation_plan_ref: string;
+            expected_revision: number;
+        };
+        OpsAssetLink: {
+            /** @enum {string} */
+            resource_type: "bom" | "cmdb" | "execution" | "push_job" | "approval" | "gate_evidence" | "mapping" | "config_revision" | "collection_job" | "firmware_job" | "alert" | "issue" | "audit";
+            resource_id: string;
+            revision: number | null;
+            /** Format: date-time */
+            occurred_at: string | null;
+            source: string;
+        };
+        OpsAssetLinks: {
+            project_id: string;
+            asset_id: string;
+            links: components["schemas"]["OpsAssetLink"][];
+        };
+        OpsRetentionPolicy: {
+            id: string;
+            revision: number;
+            /** @enum {string} */
+            category: "metrics" | "logs" | "configuration" | "telemetry" | "audit" | "firmware_evidence";
+            project_id: string;
+            hot_window_policy: string;
+            archive_window_policy: string;
+            purge_policy: string;
+            legal_hold: boolean;
+            approved_by: string[];
+        };
+        OpsDeviceListEnvelope: {
+            data: components["schemas"]["OpsDeviceSummary"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+            data_availability: components["schemas"]["OpsDataAvailability"];
+        };
+        OpsConfigurationListEnvelope: {
+            data: components["schemas"]["OpsConfigurationRevision"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+            data_availability: components["schemas"]["OpsDataAvailability"];
+        };
+        OpsConfigDiffListEnvelope: {
+            data: components["schemas"]["OpsConfigDiff"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+            data_availability: components["schemas"]["OpsDataAvailability"];
+        };
+        OpsPortListEnvelope: {
+            data: components["schemas"]["OpsPort"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+            data_availability: components["schemas"]["OpsDataAvailability"];
+        };
+        OpsTelemetryListEnvelope: {
+            data: components["schemas"]["OpsSnapshot"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+            data_availability: components["schemas"]["OpsDataAvailability"];
+        };
+        OpsLLDPListEnvelope: {
+            data: components["schemas"]["OpsLLDPEntry"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+            data_availability: components["schemas"]["OpsDataAvailability"];
+        };
+        OpsFDBListEnvelope: {
+            data: components["schemas"]["OpsFDBEntry"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+            data_availability: components["schemas"]["OpsDataAvailability"];
+        };
+        OpsARPListEnvelope: {
+            data: components["schemas"]["OpsARPEntry"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+            data_availability: components["schemas"]["OpsDataAvailability"];
+        };
+        OpsDDMListEnvelope: {
+            data: components["schemas"]["OpsDDMEntry"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+            data_availability: components["schemas"]["OpsDataAvailability"];
+        };
+        OpsMetricListEnvelope: {
+            data: components["schemas"]["OpsMetricSample"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+            data_availability: components["schemas"]["OpsDataAvailability"];
+        };
+        OpsLogListEnvelope: {
+            data: components["schemas"]["OpsLogEvent"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+            data_availability: components["schemas"]["OpsDataAvailability"];
+        };
+        OpsFirmwareListEnvelope: {
+            data: components["schemas"]["OpsFirmwareInventory"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+            data_availability: components["schemas"]["OpsDataAvailability"];
+        };
+        OpsCollectionPolicyListEnvelope: {
+            data: components["schemas"]["OpsCollectionPolicy"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+            data_availability: components["schemas"]["OpsDataAvailability"];
+        };
+        OpsMaintenanceEventListEnvelope: {
+            data: components["schemas"]["OpsMaintenanceEvent"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+            data_availability: components["schemas"]["OpsDataAvailability"];
+        };
+        OpsDeviceDetailEnvelope: {
+            data: components["schemas"]["OpsDeviceDetail"];
+            request_id: string;
+        };
+        OpsBmcEnvelope: {
+            data: components["schemas"]["OpsBmcInfo"];
+            request_id: string;
+        };
+        OpsJobEnvelope: {
+            data: components["schemas"]["OpsJob"];
+            request_id: string;
+        };
+        OpsFirmwareUpgradeJobEnvelope: {
+            data: components["schemas"]["OpsFirmwareUpgradeJob"];
+            request_id: string;
+        };
+        OpsCollectionPolicyEnvelope: {
+            data: components["schemas"]["OpsCollectionPolicy"];
+            request_id: string;
+        };
+        OpsMaintenanceEventEnvelope: {
+            data: components["schemas"]["OpsMaintenanceEvent"];
+            request_id: string;
+        };
+        OpsAssetLinksEnvelope: {
+            data: components["schemas"]["OpsAssetLinks"];
+            request_id: string;
+        };
+        OpsRetentionPolicyEnvelope: {
+            data: components["schemas"]["OpsRetentionPolicy"];
+            request_id: string;
+        };
+        IAProject: {
+            id: string;
+            name: string;
+            status: string;
+            permissions: string[];
+        };
+        IASession: {
+            actor_id: string;
+            authorized_projects: components["schemas"]["IAProject"][];
+            permissions: string[];
+            permission_revision: string;
+        };
+        IASessionEnvelope: {
+            data: components["schemas"]["IASession"];
+            request_id: string;
+        };
+        IAObservation: {
+            source: string;
+            /** Format: date-time */
+            observed_at: string | null;
+            /** @enum {string} */
+            freshness: "fresh" | "aging" | "stale" | "unknown";
+            /** @enum {string} */
+            support: "supported" | "unsupported" | "unknown";
+            /** @enum {string} */
+            quality: "good" | "degraded" | "failed" | "unknown";
+            policy_allowed: boolean;
+            reason: string | null;
+        };
+        IAField: {
+            key: string;
+            label: string;
+            value: string | number | boolean | null;
+            unit: string | null;
+            observation: components["schemas"]["IAObservation"];
+        };
+        IAEntityLink: {
+            /** @enum {string} */
+            resource_type: "device" | "port" | "issue" | "execution" | "event" | "evidence";
+            resource_id: string;
+            project_id: string;
+        };
+        IAServerTab: {
+            project_id: string;
+            device_id: string;
+            /** @constant */
+            device_type: "server";
+            /** @enum {string} */
+            tab: "inventory" | "mapping" | "ports" | "pcie" | "monitoring";
+            fields: components["schemas"]["IAField"][];
+            links: components["schemas"]["IAEntityLink"][];
+            /** @enum {string} */
+            data_availability: "available" | "empty" | "unknown" | "unsupported" | "stale";
+            observations?: components["schemas"]["IAObservationBundle"];
+        };
+        IANetworkTab: {
+            project_id: string;
+            device_id: string;
+            /** @constant */
+            device_type: "switch";
+            /** @enum {string} */
+            tab: "identity" | "configuration" | "scripts" | "events" | "runtime" | "lossless" | "optics" | "logs";
+            fields: components["schemas"]["IAField"][];
+            links: components["schemas"]["IAEntityLink"][];
+            /** @enum {string} */
+            data_availability: "available" | "empty" | "unknown" | "unsupported" | "stale";
+            observations?: components["schemas"]["IAObservationBundle"];
+        };
+        IATabEnvelope: {
+            data: components["schemas"]["IAServerTab"] | components["schemas"]["IANetworkTab"];
+            request_id: string;
+        };
+        IACrossProjectItem: {
+            id: string;
+            project_id: string;
+            /** @enum {string} */
+            resource_type: "devices" | "alerts" | "issues";
+            title: string;
+            status: string;
+            resource_revision: number;
+        };
+        IACrossProjectEnvelope: {
+            data: components["schemas"]["IACrossProjectItem"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        IAEvent: {
+            event_id: string;
+            sequence: number;
+            project_id: string;
+            /** @description Canonical collection resource name; project authorization is rechecked per event. */
+            resource_type: string;
+            resource_id: string;
+            event_type: string;
+            /** Format: date-time */
+            occurred_at: string;
+            revision: number;
+        };
+        IAFlowTask: {
+            id: string;
+            label: string;
+            script: string;
+            depends_on: string[];
+            x: number;
+            y: number;
+        };
+        IAFlowDefinition: {
+            /** @constant */
+            version: 1;
+            tasks: components["schemas"]["IAFlowTask"][];
+            /** @enum {string} */
+            trigger: "manual" | "cron" | "event";
+            event_type: string | null;
+        };
+        IAObservationBundle: {
+            device_id: string;
+            project_id: string;
+            context: components["schemas"]["OpsObservationContext"];
+            configuration: components["schemas"]["IAConfigObservation"][];
+            metrics: components["schemas"]["IAMetricObservation"][];
+            lldp: components["schemas"]["IALLDPObservation"][];
+            fdb: components["schemas"]["IAFDBObservation"][];
+            arp: components["schemas"]["IAARPObservation"][];
+            ddm: components["schemas"]["IADDMObservation"][];
+            logs: components["schemas"]["IALogObservation"][];
+        };
+        IAConfigObservation: {
+            path: string;
+            expected: string;
+            observed: string;
+            /** @enum {string} */
+            verdict: "PASS" | "FAIL" | "BLOCKED" | "WAIVED";
+            rule_ref: string;
+            context: components["schemas"]["OpsObservationContext"];
+        };
+        IAMetricObservation: {
+            id: string;
+            key: string;
+            unit: string;
+            value: number | null;
+            history: {
+                time: string;
+                value: number | null;
+            }[];
+            context: components["schemas"]["OpsObservationContext"];
+        };
+        IALLDPObservation: {
+            id: string;
+            local_port_id: string;
+            peer_port_id: string | null;
+            chassis_id: string;
+            port_id: string | null;
+            sysname: string | null;
+            sysdesc: string;
+            context: components["schemas"]["OpsObservationContext"];
+        };
+        IAFDBObservation: {
+            mac: string;
+            vlan: number | null;
+            port_id: string;
+            /** @enum {string} */
+            entry_type: "dynamic" | "static";
+            context: components["schemas"]["OpsObservationContext"];
+        };
+        IAARPObservation: {
+            ip: string;
+            mac: string;
+            vrf: string | null;
+            port_id: string;
+            state: string;
+            context: components["schemas"]["OpsObservationContext"];
+        };
+        IADDMObservation: {
+            id: string;
+            port_id: string;
+            rx_dbm: number;
+            tx_dbm: number;
+            temperature_c: number;
+            voltage_v: number;
+            bias_ma: number;
+            model: string;
+            serial: string;
+            context: components["schemas"]["OpsObservationContext"];
+            thresholds?: {
+                rx_low_warn_dbm?: number;
+                rx_low_crit_dbm?: number;
+                tx_low_warn_dbm?: number;
+                temperature_high_warn_c?: number;
+                temperature_high_crit_c?: number;
+            };
+        };
+        IALogObservation: {
+            id: string;
+            /** @enum {string} */
+            level: "INFO" | "WARN" | "ERROR";
+            message: string;
+            context: components["schemas"]["OpsObservationContext"];
+        };
+        IAAIProvider: {
+            id: string;
+            project_id: string;
+            revision: number;
+            name: string;
+            model: string;
+            api_url: string;
+            credential_ref: string;
+            enabled: boolean;
+            timeout_seconds: number;
+            max_attempts: number;
+            tokens_used: number;
+            status: string;
+        };
+        IAAIProviderEnvelope: {
+            data: components["schemas"]["IAAIProvider"][];
+            request_id: string;
+        };
+        IAAIJob: {
+            id: string;
+            project_id: string;
+            revision: number;
+            provider_id: string;
+            import_id: string;
+            status: string;
+            attempt: number;
+            tokens_used: number;
+            source_refs: string[];
+            error_code: string | null;
+            created_at: string;
+        };
+        IAAIJobEnvelope: {
+            data: components["schemas"]["IAAIJob"][];
+            request_id: string;
+        };
+        IAKnowledgeSource: {
+            id: string;
+            project_id: string;
+            revision: number;
+            name: string;
+            source_ref: string;
+            status: string;
+            version: string;
+        };
+        IAKnowledgeSourceEnvelope: {
+            data: components["schemas"]["IAKnowledgeSource"][];
+            request_id: string;
+        };
+        IAAIFeedback: {
+            id: string;
+            project_id: string;
+            revision: number;
+            task_id: string;
+            field: string;
+            original: string;
+            corrected: string;
+            reason: string;
+            status: string;
+        };
+        IAAIFeedbackEnvelope: {
+            data: components["schemas"]["IAAIFeedback"][];
+            request_id: string;
+        };
+        IANotificationSetting: {
+            id: string;
+            project_id: string;
+            revision: number;
+            name: string;
+            event_types: string[];
+            channel: string;
+            enabled: boolean;
+        };
+        IANotificationSettingEnvelope: {
+            data: components["schemas"]["IANotificationSetting"][];
+            request_id: string;
+        };
+        IAAPIToken: {
+            id: string;
+            project_id: string;
+            revision: number;
+            name: string;
+            scopes: string[];
+            expires_at: string;
+            status: string;
+            token_prefix: string;
+        };
+        IAAPITokenEnvelope: {
+            data: components["schemas"]["IAAPIToken"][];
+            request_id: string;
+        };
+        IASshTrust: {
+            id: string;
+            project_id: string;
+            revision: number;
+            device_id: string;
+            fingerprint: string;
+            status: string;
+            source: string;
+            observed_at: string;
+        };
+        IASshTrustEnvelope: {
+            data: components["schemas"]["IASshTrust"][];
+            request_id: string;
+        };
+        IACollectionPolicy: {
+            id: string;
+            project_id: string;
+            revision: number;
+            name: string;
+            /** @enum {string} */
+            protocol: "ipmi" | "agent" | "ssh" | "redfish";
+            /** @enum {string} */
+            scope: "maintained" | "delivery";
+            interval_seconds: number;
+            timeout_seconds: number;
+            max_attempts: number;
+            status: string;
+            notice: string;
+        };
+        IACollectionPolicyEnvelope: {
+            data: components["schemas"]["IACollectionPolicy"][];
+            request_id: string;
+        };
+        FullProjects: {
+            id: string;
+            code: string;
+            name: string;
+            status: string;
+            template_id: string;
+            region: string;
+            site: string;
+            owner: string;
+            created_at: string;
+            updated_at: string;
+            revision: number;
+            is_demo: boolean;
+            lifecycle_stage: string;
+            description: string;
+            environment?: string;
+        };
+        FullProjectsListEnvelope: {
+            data: components["schemas"]["FullProjects"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullTemplates: {
+            id: string;
+            name: string;
+            version: string;
+            status: string;
+            server_model: string;
+            server_u_height: number;
+            rack_u_height: number;
+            network_baseline_ref: string;
+            bom_mapping_revision: string;
+            os_baseline: string;
+            driver_baseline: string;
+            cuda_baseline: string;
+            nccl_baseline: string;
+            created_at: string;
+            revision: number;
+            is_demo: boolean;
+        };
+        FullTemplatesListEnvelope: {
+            data: components["schemas"]["FullTemplates"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullRacks: {
+            id: string;
+            project_id: string;
+            name: string;
+            site: string;
+            row: string;
+            position: string;
+            u_height: number;
+            status: string;
+            power_capacity_kw: number;
+            power_used_kw: number;
+            server_count: number;
+            switch_count: number;
+            created_at: string;
+            updated_at: string;
+            revision: number;
+            hall_id: string;
+            floor: string;
+            health_status: string;
+            power_status: string;
+            cooling_status: string;
+            temperature_inlet_c: number;
+            temperature_outlet_c: number;
+            occupancy_percent: number;
+            is_demo: boolean;
+            pod_id: string;
+            group_source: string;
+        };
+        FullRacksListEnvelope: {
+            data: components["schemas"]["FullRacks"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullServers: {
+            id: string;
+            project_id: string;
+            category: string;
+            hostname: string;
+            serial: string;
+            model_ref: string;
+            model: string;
+            role: string;
+            site: string;
+            rack_id: string;
+            rack: string;
+            rack_u: number;
+            u_height: number;
+            management_address: string;
+            lifecycle_status: string;
+            managed_status: string;
+            health_status: string;
+            last_seen_at: string;
+            freshness: string;
+            source_bom_item_id: string;
+            source: string;
+            created_at: string;
+            updated_at: string;
+            revision: number;
+            gpu_count: number;
+            nic_count: number;
+            power_kw: number;
+            execution_mode: string;
+            maintenance_state: string;
+            agent_status: string;
+            bmc_status: string;
+            cpu_utilization_percent: number;
+            memory_utilization_percent: number;
+            disk_utilization_percent: number;
+            gpu_utilization_percent: number;
+            gpu_power_kw: number;
+            is_demo: boolean;
+        };
+        FullServersListEnvelope: {
+            data: components["schemas"]["FullServers"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullGpus: {
+            id: string;
+            project_id: string;
+            server_id: string;
+            category: string;
+            model: string;
+            vendor: string;
+            uuid: string;
+            pci_bdf: string;
+            memory_gb: number;
+            health_status: string;
+            nvlink_status: string;
+            source_bom_item_id: string;
+            revision: number;
+            is_demo: boolean;
+        };
+        FullGpusListEnvelope: {
+            data: components["schemas"]["FullGpus"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullNics: {
+            id: string;
+            project_id: string;
+            server_id: string;
+            category: string;
+            model: string;
+            network_role: string;
+            port_count: number;
+            speed: string;
+            pci_bdf: string;
+            permanent_mac: string;
+            health_status: string;
+            source_bom_item_id: string;
+            revision: number;
+            is_demo: boolean;
+        };
+        FullNicsListEnvelope: {
+            data: components["schemas"]["FullNics"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullPorts: {
+            id: string;
+            project_id: string;
+            device_id: string;
+            component_id: string;
+            physical_name: string;
+            port_index: number;
+            network_role: string;
+            speed: string;
+            mac: string;
+            admin_state: string;
+            oper_state: string;
+            peer_port_id: string;
+            source_bom_item_id: string;
+            revision: number;
+            is_demo: boolean;
+        };
+        FullPortsListEnvelope: {
+            data: components["schemas"]["FullPorts"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullSwitches: {
+            id: string;
+            project_id: string;
+            category: string;
+            hostname: string;
+            serial: string;
+            model_ref: string;
+            model: string;
+            role: string;
+            site: string;
+            rack_id: string;
+            rack: string;
+            rack_u: number;
+            u_height: number;
+            management_address: string;
+            nos_version: string;
+            ztp_status: string;
+            config_status: string;
+            health_status: string;
+            managed_status: string;
+            last_seen_at: string;
+            freshness: string;
+            source_bom_item_id: string;
+            revision: number;
+            execution_mode: string;
+            maintenance_state: string;
+            cpu_utilization_percent: number;
+            memory_utilization_percent: number;
+            temperature_c: number;
+            is_demo: boolean;
+        };
+        FullSwitchesListEnvelope: {
+            data: components["schemas"]["FullSwitches"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullSwitchPorts: {
+            id: string;
+            project_id: string;
+            device_id: string;
+            physical_name: string;
+            port_index: number;
+            role: string;
+            speed: string;
+            breakout_mode: string;
+            admin_state: string;
+            oper_state: string;
+            optic_module_id: string;
+            revision: number;
+            peer_port_id?: string;
+            is_demo: boolean;
+        };
+        FullSwitchPortsListEnvelope: {
+            data: components["schemas"]["FullSwitchPorts"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullOptics: {
+            id: string;
+            project_id: string;
+            parent_port_id: string;
+            model: string;
+            serial: string;
+            vendor: string;
+            media_type: string;
+            speed: string;
+            temperature_c: number;
+            rx_power_dbm: number;
+            tx_power_dbm: number;
+            status: string;
+            revision: number;
+            is_demo: boolean;
+        };
+        FullOpticsListEnvelope: {
+            data: components["schemas"]["FullOptics"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullCables: {
+            id: string;
+            project_id: string;
+            category: string;
+            endpoint_a_uid: string;
+            endpoint_b_uid: string;
+            endpoint_a_name: string;
+            endpoint_b_name: string;
+            cable_type: string;
+            sub_type: string;
+            length_m: number;
+            status: string;
+            line_check: string;
+            source: string;
+            revision: number;
+            is_demo: boolean;
+        };
+        FullCablesListEnvelope: {
+            data: components["schemas"]["FullCables"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullBomImports: {
+            id: string;
+            project_id: string;
+            source_file_name: string;
+            content_sha256: string;
+            template_revision_id: string;
+            status: string;
+            sheet_count: number;
+            entity_counts: {
+                server: number;
+                gpu: number;
+                nic: number;
+                port: number;
+                switch: number;
+                optic_module: number;
+                cable: number;
+            };
+            issue_counts: {
+                BLOCK: number;
+                WARN: number;
+                INFO: number;
+            };
+            mapping_revision: string;
+            validation_revision: string;
+            cmdb_projection_status: string;
+            created_by: string;
+            created_at: string;
+            revision: number;
+            is_demo: boolean;
+        };
+        FullBomImportsListEnvelope: {
+            data: components["schemas"]["FullBomImports"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullBomSheetRegions: {
+            id: string;
+            import_id: string;
+            sheet_name: string;
+            sheet_index: number;
+            range: string;
+            detected_kind: string;
+            purpose_hint: string;
+            header_rows: string[];
+            row_count: number;
+            column_count: number;
+            confidence: number;
+            sensitive_columns_detected: boolean;
+            status: string;
+            parser_mode: string;
+            source_file: string;
+            source_values_copied: boolean;
+            is_demo: boolean;
+        };
+        FullBomSheetRegionsListEnvelope: {
+            data: components["schemas"]["FullBomSheetRegions"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullBomMappingCandidates: {
+            id: string;
+            import_id: string;
+            source: {
+                sheet: string;
+                cell: string;
+                header: string;
+                value_redacted: string;
+            };
+            target_entity: string;
+            target_field: string;
+            normalized_value: string | number | null;
+            rule_source: string;
+            confidence: number;
+            status: string;
+            rationale: string;
+            revision: number;
+            is_demo: boolean;
+        };
+        FullBomMappingCandidatesListEnvelope: {
+            data: components["schemas"]["FullBomMappingCandidates"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullBomIssues: {
+            id: string;
+            project_id: string;
+            import_id: string;
+            severity: string;
+            code: string;
+            message: string;
+            source_location: {
+                sheet: string;
+                cell: string;
+            };
+            entity_ref: string;
+            field: string;
+            resolution_status: string;
+            rule_version: string;
+            is_demo: boolean;
+            source_original: {
+                id: string;
+                project_id: string;
+                import_id: string;
+                severity: string;
+                code: string;
+                message: string;
+                source_location: {
+                    sheet: string;
+                    cell: string;
+                };
+                entity_ref: string;
+                field: string;
+                resolution_status: string;
+                rule_version: string;
+                is_demo: boolean;
+            };
+            resolution_reason: string;
+        };
+        FullBomIssuesListEnvelope: {
+            data: components["schemas"]["FullBomIssues"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullFlows: {
+            id: string;
+            project_id: string;
+            name: string;
+            description: string;
+            status: string;
+            revision: number;
+            target_types: string[];
+            script_ref: string;
+            script_language: string;
+            parameter_schema?: {
+                type: string;
+                properties: {
+                    collect_level?: {
+                        type: string;
+                        enum: string[];
+                    };
+                    scope?: {
+                        type: string;
+                        enum: string[];
+                    };
+                    include_ddm?: {
+                        type: string;
+                    };
+                    strict?: {
+                        type: string;
+                    };
+                    duration_seconds?: {
+                        type: string;
+                        minimum: number;
+                        maximum: number;
+                    };
+                    dry_run?: {
+                        type: string;
+                        const: boolean;
+                    };
+                };
+            };
+            timeout_seconds: number;
+            retry_policy: {
+                max_attempts: number;
+                backoff?: string;
+            };
+            concurrency_limit: number;
+            failure_policy: string;
+            schedule_summary: string;
+            last_execution?: string | null;
+            success_rate?: number;
+            created_by: string;
+            updated_at: string;
+            revision_at?: string;
+            is_demo?: boolean;
+            script: string;
+            script_source?: string;
+            stage_id: string;
+            system_managed?: boolean;
+            created_at?: string;
+        };
+        FullFlowsListEnvelope: {
+            data: components["schemas"]["FullFlows"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullSchedules: {
+            id: string;
+            project_id: string;
+            flow_id: string;
+            enabled: boolean;
+            expression: string;
+            expression_type: string;
+            timezone: string;
+            next_run_at: string;
+            last_run_at: string;
+            misfire_policy: string;
+            revision: number;
+            is_demo: boolean;
+        };
+        FullSchedulesListEnvelope: {
+            data: components["schemas"]["FullSchedules"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullExecutions: {
+            id: string;
+            flow_id: string;
+            flow_revision: number;
+            project_id: string;
+            status: string;
+            trigger_source: string;
+            started_by: string;
+            target_snapshot_id: string;
+            target_count: number;
+            counts: {
+                success?: number;
+                running?: number;
+                failed?: number;
+            };
+            started_at: string;
+            finished_at: string | null;
+            duration_ms?: number | null;
+            schedule_id?: string | null;
+            parameter_snapshot_redacted?: {
+                project_id: string;
+                template_revision: string;
+                execution_mode: string;
+                dry_run: boolean;
+            };
+            cmdb_projection_status?: string;
+            request_id?: string;
+            execution_mode: string;
+            demo_notice?: string;
+            is_demo?: boolean;
+            reported_target_count?: number;
+            reported_counts?: {
+                queued: number;
+                running: number;
+                success: number;
+                warning: number;
+                failed: number;
+                killed: number;
+                result_unknown: number;
+            };
+            target_ids: string[];
+            snapshot_scope_notice?: string;
+            snapshot_complete: boolean;
+            data_quality?: string;
+            stage_id: string;
+            legacy_stage_association?: boolean;
+            reported_status?: string;
+            snapshot_error?: string;
+        };
+        FullExecutionsListEnvelope: {
+            data: components["schemas"]["FullExecutions"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullTaskRuns: {
+            id: string;
+            project_id: string;
+            execution_id: string;
+            task_key: string;
+            target_id: string;
+            status: string;
+            attempt_count: number;
+            started_at: string;
+            finished_at: string | null;
+            duration_ms?: number;
+            exit_code: number;
+            error_summary?: string | null;
+            retryable?: boolean;
+            execution_mode: string;
+            source: string;
+            source_target_record_id?: string;
+            stage_id?: string;
+        };
+        FullTaskRunsListEnvelope: {
+            data: components["schemas"]["FullTaskRuns"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullExecutionLogs: {
+            id: string;
+            execution_id: string;
+            task_run_id: string;
+            target_id: string;
+            attempt: number;
+            timestamp: string;
+            level: string;
+            message_redacted: string;
+            cursor: string;
+            is_demo: boolean;
+            source_task_run_id?: string;
+        };
+        FullExecutionLogsListEnvelope: {
+            data: components["schemas"]["FullExecutionLogs"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullExecutionOutputs: {
+            id: string;
+            execution_id: string;
+            target_id: string;
+            name: string;
+            media_type: string;
+            size_bytes: number;
+            sha256: string;
+            artifact_ref: string;
+            created_at: string;
+            is_demo: boolean;
+        };
+        FullExecutionOutputsListEnvelope: {
+            data: components["schemas"]["FullExecutionOutputs"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullGateEvidence: {
+            id: string;
+            project_id: string;
+            subject_type: string;
+            subject_id: string;
+            gate_id: string;
+            verdict: string;
+            evidence_refs: string[];
+            rule_versions: string[];
+            collected_at: string;
+            valid_until: string;
+            waiver: {
+                approved_by: string;
+                reason: string;
+                scope: string[];
+                expires_at: string;
+                remediation_plan: string;
+            } | null;
+            revision: number;
+            is_demo: boolean;
+        };
+        FullGateEvidenceListEnvelope: {
+            data: components["schemas"]["FullGateEvidence"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullDeliveryRuns: {
+            id: string;
+            project_id: string;
+            target_snapshot_id: string;
+            current_stage: string;
+            status: string;
+            started_at: string;
+            finished_at: string | null;
+            blocked_reasons: string[];
+            cmdb_projection_status: string;
+            execution_mode: string;
+            is_demo: boolean;
+            legacy_gate_summary: {
+                G1: string;
+                G2: string;
+                G3: string;
+                G4: string;
+                G5: string;
+                G6: string;
+            };
+            stage_order: string[];
+            stage_summary: {
+                KICKOFF: {
+                    PASSED: number;
+                    READY: number;
+                };
+                NETWORK_READINESS: {
+                    PASSED: number;
+                    BLOCKED: number;
+                    READY: number;
+                    NOT_STARTED: number;
+                };
+                PROVISIONING: {
+                    PASSED: number;
+                    BLOCKED: number;
+                    READY: number;
+                    NOT_STARTED: number;
+                };
+                VALIDATION: {
+                    FAILED: number;
+                    PASSED: number;
+                    BLOCKED: number;
+                    READY: number;
+                    NOT_STARTED: number;
+                };
+                NCCL_VALIDATION: {
+                    BLOCKED: number;
+                    PASSED: number;
+                    NOT_STARTED: number;
+                };
+                CLEANUP_HANDOVER: {
+                    BLOCKED: number;
+                    READY: number;
+                    NOT_STARTED: number;
+                };
+            };
+        };
+        FullDeliveryRunsListEnvelope: {
+            data: components["schemas"]["FullDeliveryRuns"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullMappingRevisions: {
+            id: string;
+            project_id: string;
+            revision: number;
+            status: string;
+            source_bom_import_id: string;
+            device_count: number;
+            nic_count: number;
+            gpu_count: number;
+            port_count: number;
+            confirmed_pairs: number;
+            blocked_pairs: number;
+            created_by: string;
+            created_at: string;
+            content_hash: string;
+            is_demo: boolean;
+        };
+        FullMappingRevisionsListEnvelope: {
+            data: components["schemas"]["FullMappingRevisions"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullIssues: {
+            id: string;
+            project_id: string;
+            issue_type: string;
+            source_domain: string;
+            source_ref: string;
+            severity: string;
+            status: string;
+            title: string;
+            affected_entities: string[];
+            evidence_refs: string[];
+            assignee_id?: string;
+            resolution: string | null;
+            created_at: string;
+            updated_at?: string;
+            closed_at?: string | null;
+            execution_mode: string;
+            is_demo?: boolean;
+            source_check_id?: string;
+            stage_id?: string;
+            device_id?: string;
+            port_ids?: string[];
+            execution_id?: string;
+            retest_status?: string;
+        };
+        FullIssuesListEnvelope: {
+            data: components["schemas"]["FullIssues"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullAlerts: {
+            id: string;
+            project_id: string;
+            rule_id: string;
+            severity: string;
+            status: string;
+            source: string;
+            subject_ref: string;
+            first_seen_at: string;
+            last_seen_at: string;
+            count: number;
+            summary: string;
+            evidence_refs: string[];
+            acknowledged_by?: string | null;
+            suppression?: string | null;
+            execution_mode?: string;
+            is_demo: boolean;
+        };
+        FullAlertsListEnvelope: {
+            data: components["schemas"]["FullAlerts"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullMetrics: {
+            id: string;
+            timestamp: string;
+            project_id: string;
+            scope: string;
+            metric_key: string;
+            value: number;
+            unit: string;
+            status: string;
+            source: string;
+            is_demo: boolean;
+        };
+        FullMetricsListEnvelope: {
+            data: components["schemas"]["FullMetrics"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullMonitoringSources: {
+            id: string;
+            name: string;
+            domain: string;
+            status: string;
+            last_collected_at: string;
+            coverage_percent: number;
+            capabilities: string[];
+            execution_mode: string;
+            is_demo: boolean;
+            degraded_capabilities?: string[];
+        };
+        FullMonitoringSourcesListEnvelope: {
+            data: components["schemas"]["FullMonitoringSources"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullCmdbEntities: {
+            id: string;
+            entity_type: string;
+            stable_ref: string;
+            project_id: string;
+            display_name: string;
+            current_status: string;
+            source_event_id: string;
+            source_refs: string[];
+            relationships_summary?: {
+                rack_id?: string;
+                gpu_count?: number;
+                nic_count?: number;
+                role?: string;
+                server_count?: number;
+                switch_count?: number;
+                entity_counts?: {
+                    server: number;
+                    gpu: number;
+                    nic: number;
+                    port: number;
+                    switch: number;
+                    optic_module: number;
+                    cable: number;
+                };
+                flow_id?: string;
+                status?: string;
+                affected_entities?: string[];
+                endpoint_a_uid?: string;
+                endpoint_b_uid?: string;
+                server_id?: string;
+                pci_bdf?: string;
+                network_role?: string;
+                device_id?: string;
+                peer_port_id?: string | null;
+                parent_port_id?: string;
+                speed?: string;
+            };
+            freshness: string;
+            projection_status: string;
+            created_at: string;
+            updated_at?: string;
+            revision: number;
+            is_demo?: boolean;
+            execution_mode?: string;
+            source?: string;
+        };
+        FullCmdbEntitiesListEnvelope: {
+            data: components["schemas"]["FullCmdbEntities"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullCmdbRelationships: {
+            id: string;
+            project_id: string;
+            from_ref: string;
+            relation_type: string;
+            to_ref: string;
+            source_event_id: string;
+            valid_from: string;
+            valid_to: string | null;
+            revision: number;
+            is_demo?: boolean;
+            execution_mode?: string;
+            source?: string;
+        };
+        FullCmdbRelationshipsListEnvelope: {
+            data: components["schemas"]["FullCmdbRelationships"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullLifecycleEvents: {
+            id: string;
+            entity_id: string;
+            event_type: string;
+            occurred_at: string;
+            actor: string;
+            source_domain: string;
+            source_ref: string;
+            revision_ref: string | null;
+            summary_redacted: string;
+            status: string;
+            request_id: string;
+            is_demo: boolean;
+        };
+        FullLifecycleEventsListEnvelope: {
+            data: components["schemas"]["FullLifecycleEvents"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullRackDiagrams: {
+            id: string;
+            project_id: string;
+            name: string;
+            source_bom_revision: string;
+            source_model_revision: string;
+            status: string;
+            current_revision_id: string;
+            rack_count: number;
+            placement_count: number;
+            issue_count: number;
+            created_at: string;
+            updated_at: string;
+            execution_mode: string;
+            revision: number;
+            global_map_id: string;
+            view_modes: string[];
+            is_demo: boolean;
+        };
+        FullRackDiagramsListEnvelope: {
+            data: components["schemas"]["FullRackDiagrams"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullRackDiagramRevisions: {
+            id: string;
+            diagram_id: string;
+            revision: number;
+            status: string;
+            source_bom_revision: string;
+            source_model_revision: string;
+            generation_engine_version: string;
+            content_hash: string;
+            placements: {
+                id: string;
+                diagram_revision_id: string;
+                rack_id: string;
+                item_id: string;
+                u_start: number;
+                u_height: number;
+                face: string;
+                orientation: string;
+                source: string;
+                manual_override: boolean;
+                status: string;
+                revision: number;
+                is_demo: boolean;
+            }[];
+            issues: {
+                id: string;
+                severity: string;
+                code: string;
+                message: string;
+                rack_id?: string;
+                blocks_publish: boolean;
+            }[];
+            created_by: string;
+            created_at: string;
+            published_at?: string;
+            execution_mode: string;
+            global_map_ref?: string;
+            generation_inputs?: {
+                bom_revision: string;
+                model_revision: string;
+                rack_inventory_revision: number;
+                algorithm: string;
+                strategy: string;
+            };
+            is_demo: boolean;
+        };
+        FullRackDiagramRevisionsListEnvelope: {
+            data: components["schemas"]["FullRackDiagramRevisions"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullRackPlacements: {
+            id: string;
+            diagram_revision_id: string;
+            rack_id: string;
+            item_id: string;
+            u_start: number;
+            u_height: number;
+            face: string;
+            orientation: string;
+            source: string;
+            manual_override: boolean;
+            status: string;
+            revision: number;
+            is_demo: boolean;
+        };
+        FullRackPlacementsListEnvelope: {
+            data: components["schemas"]["FullRackPlacements"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullMedia: {
+            id: string;
+            name: string;
+            type: string;
+            version: string;
+            architecture: string;
+            compatible_models: string[];
+            sha256: string;
+            approval_state: string;
+            retirement_state: string;
+            artifact_ref: string;
+            created_at: string;
+            revision: number;
+            is_demo: boolean;
+        };
+        FullMediaListEnvelope: {
+            data: components["schemas"]["FullMedia"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullParameters: {
+            id: string;
+            key: string;
+            type: string;
+            allowed_values: (string | number)[];
+            default_value: string | number;
+            scope: string;
+            template_refs: string[];
+            revision: number;
+            is_demo: boolean;
+        };
+        FullParametersListEnvelope: {
+            data: components["schemas"]["FullParameters"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullDeviceModels: {
+            id: string;
+            kind: string;
+            vendor: string;
+            model: string;
+            version: string;
+            u_height: number;
+            gpu_count?: number;
+            gpu_memory_gb?: number;
+            nic_profiles?: {
+                role: string;
+                count: number;
+                speed: string;
+            }[];
+            status: string;
+            source: string;
+            is_demo: boolean;
+            port_profiles?: {
+                speed: string;
+                count: number;
+            }[];
+        };
+        FullDeviceModelsListEnvelope: {
+            data: components["schemas"]["FullDeviceModels"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullNetworkBaselines: {
+            id: string;
+            project_id: string;
+            version: number;
+            status: string;
+            source_ref: string;
+            approved_by: string[];
+            content_hash: string;
+            created_at: string;
+            revision: number;
+            is_demo: boolean;
+        };
+        FullNetworkBaselinesListEnvelope: {
+            data: components["schemas"]["FullNetworkBaselines"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullPushJobs: {
+            id: string;
+            project_id: string;
+            status: string;
+            target_snapshot_id: string;
+            baseline_revision: string;
+            diff_summary: {
+                critical: number;
+                major: number;
+                minor: number;
+            };
+            precheck: {
+                verdict: string;
+                checks_total: number;
+                checks_passed: number;
+                checks_failed: number;
+            };
+            approvals: string[];
+            progress: {
+                total: number;
+                completed: number;
+            };
+            started_at: string;
+            finished_at: string | null;
+            rollback_state: string;
+            execution_mode: string;
+            is_demo: boolean;
+        };
+        FullPushJobsListEnvelope: {
+            data: components["schemas"]["FullPushJobs"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullUsers: {
+            id: string;
+            username: string;
+            display_name: string;
+            roles: string[];
+            project_scopes: string[];
+            status: string;
+            is_demo: boolean;
+        };
+        FullUsersListEnvelope: {
+            data: components["schemas"]["FullUsers"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullAuditEvents: {
+            id: string;
+            actor: string;
+            action: string;
+            resource_type: string;
+            resource_id: string;
+            project_id: string;
+            request_id: string;
+            before_redacted: {
+                status: string;
+            } | null;
+            after_redacted: {
+                status: string;
+            };
+            timestamp: string;
+            approval_refs: string[];
+            execution_mode: string;
+            is_demo: boolean;
+        };
+        FullAuditEventsListEnvelope: {
+            data: components["schemas"]["FullAuditEvents"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullProjectAssets: {
+            id: string;
+            project_id: string;
+            device_id: string;
+            role: string;
+            status: string;
+            template_revision: string;
+            bom_import_id: string;
+            created_at: string;
+            revision: number;
+            is_demo: boolean;
+        };
+        FullProjectAssetsListEnvelope: {
+            data: components["schemas"]["FullProjectAssets"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullOverview: {
+            project_id: string;
+            server_count: number;
+            gpu_count: number;
+            nic_count: number;
+            switch_count: number;
+            rack_count: number;
+            cable_count: number;
+            managed_devices: number;
+            healthy_devices: number;
+            warning_devices: number;
+            critical_devices: number;
+            active_executions: number;
+            open_issues: number;
+            cmdb_projection_status: string;
+            network_stage_summary: {
+                "N-S1": string;
+                "N-S4": string;
+                "N-S5": string;
+                "N-S6": string;
+                "N-S7": string;
+            };
+            power_capacity_kw: number;
+            power_used_kw: number;
+            execution_mode: string;
+            is_demo: boolean;
+            legacy_gate_summary: {
+                G1: string;
+                G2: string;
+                G3: string;
+                G4: string;
+                G5: string;
+                G6: string;
+            };
+            stage_summary: {
+                KICKOFF: {
+                    PASSED: number;
+                    READY: number;
+                };
+                NETWORK_READINESS: {
+                    PASSED: number;
+                    BLOCKED: number;
+                    READY: number;
+                    NOT_STARTED: number;
+                };
+                PROVISIONING: {
+                    PASSED: number;
+                    BLOCKED: number;
+                    READY: number;
+                    NOT_STARTED: number;
+                };
+                VALIDATION: {
+                    FAILED: number;
+                    PASSED: number;
+                    BLOCKED: number;
+                    READY: number;
+                    NOT_STARTED: number;
+                };
+                NCCL_VALIDATION: {
+                    BLOCKED: number;
+                    PASSED: number;
+                    NOT_STARTED: number;
+                };
+                CLEANUP_HANDOVER: {
+                    BLOCKED: number;
+                    READY: number;
+                    NOT_STARTED: number;
+                };
+            };
+        };
+        FullOverviewListEnvelope: {
+            data: components["schemas"]["FullOverview"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullLocations: {
+            id: string;
+            type: string;
+            name: string;
+            code: string;
+            region?: string;
+            timezone?: string;
+            is_demo: boolean;
+            parent_id?: string;
+        };
+        FullLocationsListEnvelope: {
+            data: components["schemas"]["FullLocations"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullProjectMembers: {
+            id: string;
+            project_id: string;
+            user_id: string;
+            role: string;
+            permissions: string[];
+            status: string;
+            is_demo: boolean;
+            source_user_alias?: string;
+        };
+        FullProjectMembersListEnvelope: {
+            data: components["schemas"]["FullProjectMembers"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullProjectTimelines: {
+            id: string;
+            project_id: string;
+            lifecycle: string;
+            current_stage: string;
+            completion_percent: number;
+            blocked_count: number;
+            updated_at: string;
+            is_demo: boolean;
+            legacy_stages: {
+                key: string;
+                status: string;
+            }[];
+            stages: {
+                stage_id: string;
+                name: string;
+                order: number;
+            }[];
+            progress_source: string;
+        };
+        FullProjectTimelinesListEnvelope: {
+            data: components["schemas"]["FullProjectTimelines"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullServerRuntime: {
+            id: string;
+            project_id: string;
+            server_id: string;
+            cpu_utilization_percent: number;
+            memory_utilization_percent: number;
+            disk_utilization_percent: number;
+            gpu_utilization_percent: number;
+            gpu_power_kw: number;
+            cpu_temperature_c: number;
+            inlet_temperature_c: number;
+            fan_speed_rpm: number;
+            power_state: string;
+            health_status: string;
+            source: string;
+            observed_at: string;
+            freshness: string;
+            execution_mode: string;
+            is_demo: boolean;
+        };
+        FullServerRuntimeListEnvelope: {
+            data: components["schemas"]["FullServerRuntime"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullBmcInventory: {
+            id: string;
+            project_id: string;
+            server_id: string;
+            address: string;
+            protocol: string;
+            firmware_version: string;
+            health: string;
+            power_state: string;
+            uid_led: string;
+            sel_count: number;
+            last_reachable_at: string;
+            channel_state: string;
+            source: string;
+            observed_at: string;
+            is_demo: boolean;
+        };
+        FullBmcInventoryListEnvelope: {
+            data: components["schemas"]["FullBmcInventory"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullBmcSensors: {
+            id: string;
+            project_id: string;
+            server_id: string;
+            sensor_type: string;
+            value: number;
+            unit: string;
+            status: string;
+            source: string;
+            observed_at: string;
+            freshness: string;
+            is_demo: boolean;
+        };
+        FullBmcSensorsListEnvelope: {
+            data: components["schemas"]["FullBmcSensors"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullBmcSelEvents: {
+            id: string;
+            project_id: string;
+            server_id: string;
+            record_id: string;
+            severity: string;
+            message: string;
+            occurred_at: string;
+            source: string;
+            is_demo: boolean;
+        };
+        FullBmcSelEventsListEnvelope: {
+            data: components["schemas"]["FullBmcSelEvents"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullFirmwareInventory: {
+            id: string;
+            project_id: string;
+            device_id: string;
+            component: string;
+            current_version: string;
+            desired_version: string;
+            compliance: string;
+            last_scanned_at: string;
+            source: string;
+            is_demo: boolean;
+        };
+        FullFirmwareInventoryListEnvelope: {
+            data: components["schemas"]["FullFirmwareInventory"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullServerConfigBaselines: {
+            id: string;
+            project_id: string;
+            server_id: string;
+            baseline_revision: string;
+            os: string;
+            kernel: string;
+            driver: string;
+            cuda: string;
+            nccl: string;
+            bios: string;
+            bmc: string;
+            roce_profile: string;
+            approved: boolean;
+            source: string;
+            revision: number;
+            is_demo: boolean;
+        };
+        FullServerConfigBaselinesListEnvelope: {
+            data: components["schemas"]["FullServerConfigBaselines"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullServerObservedConfigs: {
+            id: string;
+            project_id: string;
+            server_id: string;
+            observed_at: string;
+            os: string;
+            kernel: string;
+            driver: string;
+            cuda: string;
+            nccl: string;
+            bios: string;
+            bmc: string;
+            roce_profile: string;
+            diff_status: string;
+            source: string;
+            freshness: string;
+            is_demo: boolean;
+        };
+        FullServerObservedConfigsListEnvelope: {
+            data: components["schemas"]["FullServerObservedConfigs"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullSwitchRuntime: {
+            id: string;
+            project_id: string;
+            switch_id: string;
+            cpu_percent: number;
+            memory_percent: number;
+            temperature_c: number;
+            power_state: string;
+            fan_status: string;
+            bgp_state: string;
+            health_status: string;
+            observed_at: string;
+            freshness: string;
+            source: string;
+            execution_mode: string;
+            is_demo: boolean;
+        };
+        FullSwitchRuntimeListEnvelope: {
+            data: components["schemas"]["FullSwitchRuntime"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullSwitchConfigBaselines: {
+            id: string;
+            project_id: string;
+            switch_id: string;
+            revision: string;
+            approved: boolean;
+            hostname: string;
+            nos_version: string;
+            asn: number;
+            vlans: number[];
+            mtu: number;
+            pfc_priorities: number[];
+            ecn_profile: string;
+            qos_profile: string;
+            source: string;
+            created_at: string;
+            is_demo: boolean;
+        };
+        FullSwitchConfigBaselinesListEnvelope: {
+            data: components["schemas"]["FullSwitchConfigBaselines"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullSwitchRunningConfigs: {
+            id: string;
+            project_id: string;
+            switch_id: string;
+            revision: string;
+            approved: boolean;
+            hostname: string;
+            nos_version: string;
+            asn: number;
+            vlans: number[];
+            mtu: number;
+            pfc_priorities: number[];
+            ecn_profile: string;
+            qos_profile: string;
+            source: string;
+            created_at: string;
+            baseline_id: string;
+            observed_at: string;
+            is_demo: boolean;
+        };
+        FullSwitchRunningConfigsListEnvelope: {
+            data: components["schemas"]["FullSwitchRunningConfigs"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullSwitchConfigDiffs: {
+            id: string;
+            project_id: string;
+            switch_id: string;
+            baseline_revision: string;
+            running_revision: string;
+            severity: string;
+            changes: {
+                field: string;
+                expected: number | string;
+                actual: number | string;
+            }[];
+            status: string;
+            detected_at: string;
+            is_demo: boolean;
+        };
+        FullSwitchConfigDiffsListEnvelope: {
+            data: components["schemas"]["FullSwitchConfigDiffs"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullSwitchInterfaces: {
+            id: string;
+            project_id: string;
+            switch_id: string;
+            switch_port_id: string;
+            name: string;
+            port_index: number;
+            role: string;
+            admin_state: string;
+            oper_state: string;
+            speed: string;
+            mtu: number;
+            vlan_ids: number[];
+            rx_errors: number;
+            tx_errors: number;
+            rx_drops: number;
+            tx_drops: number;
+            flap_count: number;
+            observed_at: string;
+            freshness: string;
+            source: string;
+            is_demo: boolean;
+        };
+        FullSwitchInterfacesListEnvelope: {
+            data: components["schemas"]["FullSwitchInterfaces"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullLldpNeighbors: {
+            id: string;
+            project_id: string;
+            local_switch_id: string;
+            local_port_id: string;
+            local_port_name: string;
+            remote_device_id: string;
+            remote_device_name: string;
+            remote_port_id: string;
+            remote_port_name: string;
+            chassis_id: string;
+            port_id: string;
+            sys_name: string;
+            sys_desc: string;
+            observed_at: string;
+            freshness: string;
+            source: string;
+            match_status: string;
+            source_original: {
+                id: string;
+                project_id: string;
+                local_switch_id: string;
+                local_port_id: string;
+                local_port_name: string;
+                remote_device_id: string;
+                remote_device_name: string;
+                remote_port_id: string;
+                remote_port_name: string;
+                chassis_id: string;
+                port_id: string;
+                sys_name: string;
+                sys_desc: string;
+                observed_at: string;
+                freshness: string;
+                source: string;
+                match_status: string;
+                is_demo: boolean;
+            };
+            normalization_rule: string;
+            is_demo: boolean;
+        };
+        FullLldpNeighborsListEnvelope: {
+            data: components["schemas"]["FullLldpNeighbors"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullFdbEntries: {
+            id: string;
+            project_id: string;
+            switch_id: string;
+            mac: string;
+            vlan_id: number;
+            port_id: string;
+            port_name: string;
+            entry_type: string;
+            last_seen_at: string;
+            source: string;
+            is_demo: boolean;
+        };
+        FullFdbEntriesListEnvelope: {
+            data: components["schemas"]["FullFdbEntries"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullArpEntries: {
+            id: string;
+            project_id: string;
+            switch_id: string;
+            ip_address: string;
+            mac: string;
+            vlan_id: number;
+            vrf: string;
+            interface: string;
+            state: string;
+            observed_at: string;
+            source: string;
+            is_demo: boolean;
+        };
+        FullArpEntriesListEnvelope: {
+            data: components["schemas"]["FullArpEntries"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullDdmSamples: {
+            id: string;
+            project_id: string;
+            switch_id: string;
+            switch_port_id: string;
+            optic_module_id: string;
+            model: string;
+            vendor: string;
+            serial: string;
+            rx_power_dbm: number;
+            tx_power_dbm: number;
+            voltage_v: number;
+            temperature_c: number;
+            bias_current_ma: number;
+            thresholds: {
+                rx_low_warn_dbm: number;
+                rx_low_crit_dbm: number;
+                tx_low_warn_dbm: number;
+                temperature_high_warn_c: number;
+                temperature_high_crit_c: number;
+            };
+            status: string;
+            observed_at: string;
+            freshness: string;
+            source: string;
+            is_demo: boolean;
+        };
+        FullDdmSamplesListEnvelope: {
+            data: components["schemas"]["FullDdmSamples"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullSwitchBgpNeighbors: {
+            id: string;
+            project_id: string;
+            switch_id: string;
+            neighbor_ip: string;
+            remote_asn: number;
+            state: string;
+            uptime_seconds: number;
+            prefixes_received: number;
+            observed_at: string;
+            source: string;
+            is_demo: boolean;
+        };
+        FullSwitchBgpNeighborsListEnvelope: {
+            data: components["schemas"]["FullSwitchBgpNeighbors"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullSwitchLogs: {
+            id: string;
+            project_id: string;
+            switch_id: string;
+            severity: string;
+            facility: string;
+            message: string;
+            occurred_at: string;
+            source: string;
+            is_demo: boolean;
+        };
+        FullSwitchLogsListEnvelope: {
+            data: components["schemas"]["FullSwitchLogs"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullRackGlobalMaps: {
+            id: string;
+            project_id: string;
+            name: string;
+            revision: number;
+            site_ids: string[];
+            hall_ids: string[];
+            rack_ids: string[];
+            source: string;
+            updated_at: string;
+            is_demo: boolean;
+        };
+        FullRackGlobalMapsListEnvelope: {
+            data: components["schemas"]["FullRackGlobalMaps"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullRackPowerCircuits: {
+            id: string;
+            project_id: string;
+            rack_id: string;
+            name: string;
+            capacity_kw: number;
+            load_kw: number;
+            phase: string;
+            status: string;
+            observed_at: string;
+            source: string;
+            is_demo: boolean;
+        };
+        FullRackPowerCircuitsListEnvelope: {
+            data: components["schemas"]["FullRackPowerCircuits"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullRackEnvironmentSensors: {
+            id: string;
+            project_id: string;
+            rack_id: string;
+            inlet_temp_c: number;
+            outlet_temp_c: number;
+            humidity_percent: number;
+            observed_at: string;
+            source: string;
+            freshness: string;
+            is_demo: boolean;
+            capabilities: {
+                liquid_flow_lpm: string;
+                voltage_v: string;
+            };
+            support: string;
+        };
+        FullRackEnvironmentSensorsListEnvelope: {
+            data: components["schemas"]["FullRackEnvironmentSensors"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullRackIssues: {
+            id: string;
+            project_id: string;
+            rack_id: string;
+            severity: string;
+            code: string;
+            title: string;
+            description: string;
+            blocks_publish: boolean;
+            status: string;
+            is_demo: boolean;
+        };
+        FullRackIssuesListEnvelope: {
+            data: components["schemas"]["FullRackIssues"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullMetricSeries: {
+            id: string;
+            project_id: string;
+            subject_type: string;
+            subject_id: string;
+            metric_key: string;
+            value: number | null;
+            unit: string;
+            timestamp: string;
+            source: string;
+            freshness: string;
+            is_demo: boolean;
+            support?: string;
+        };
+        FullMetricSeriesListEnvelope: {
+            data: components["schemas"]["FullMetricSeries"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullCollectionJobs: {
+            id: string;
+            project_id: string;
+            target_type: string;
+            target_id: string;
+            profile: string;
+            status: string;
+            started_at: string;
+            finished_at: string | null;
+            source: string;
+            retry_count: number;
+            execution_mode: string;
+            is_demo: boolean;
+        };
+        FullCollectionJobsListEnvelope: {
+            data: components["schemas"]["FullCollectionJobs"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullMaintenanceRecords: {
+            id: string;
+            project_id: string;
+            device_id: string;
+            status: string;
+            mode: string;
+            reason: string;
+            started_at: string;
+            approved_by: string;
+            allowed_channels: string[];
+            denied_channels: string[];
+            is_demo: boolean;
+        };
+        FullMaintenanceRecordsListEnvelope: {
+            data: components["schemas"]["FullMaintenanceRecords"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullFirmwareJobs: {
+            id: string;
+            project_id: string;
+            component: string;
+            target_count: number;
+            status: string;
+            target_version: string;
+            canary_count: number;
+            success_count: number;
+            failed_count: number;
+            started_at: string;
+            finished_at: string | null;
+            approved_by: string;
+            execution_mode: string;
+            is_demo: boolean;
+        };
+        FullFirmwareJobsListEnvelope: {
+            data: components["schemas"]["FullFirmwareJobs"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullBiosProfiles: {
+            id: string;
+            project_id: string;
+            name: string;
+            revision: number;
+            status: string;
+            settings: {
+                Above4GDecoding: string;
+                SRIOV: string;
+                NUMA: string;
+                IOMMU: string;
+                PCIeARI: string;
+            };
+            approved_by: string;
+            is_demo: boolean;
+        };
+        FullBiosProfilesListEnvelope: {
+            data: components["schemas"]["FullBiosProfiles"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullAiProviders: {
+            id: string;
+            name: string;
+            provider_type: string;
+            base_url: string;
+            model: string;
+            status: string;
+            credential_ref: string;
+            secret_present: boolean;
+            secret_value_exposed: boolean;
+            capabilities: string[];
+            timeout_seconds: number;
+            max_retries: number;
+            is_demo: boolean;
+        };
+        FullAiProvidersListEnvelope: {
+            data: components["schemas"]["FullAiProviders"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullAiTasks: {
+            id: string;
+            project_id: string;
+            import_id: string;
+            provider_id: string;
+            task_type: string;
+            status: string;
+            sheets_total: number;
+            sheets_recognized: number;
+            sheets_need_review: number;
+            mapping_candidates: number;
+            tokens_input: number;
+            tokens_output: number;
+            duration_ms: number;
+            created_at: string;
+            execution_mode: string;
+            notice: string;
+            is_demo: boolean;
+        };
+        FullAiTasksListEnvelope: {
+            data: components["schemas"]["FullAiTasks"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullAiEvaluations: {
+            id: string;
+            project_id: string;
+            dataset: string;
+            sample_count: number;
+            field_accuracy: number;
+            critical_field_recall: number;
+            relationship_accuracy: number;
+            human_review_rate: number;
+            status: string;
+            note: string;
+            is_demo: boolean;
+        };
+        FullAiEvaluationsListEnvelope: {
+            data: components["schemas"]["FullAiEvaluations"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullFlowTargetGroups: {
+            id: string;
+            project_id: string;
+            name: string;
+            target_type: string;
+            selector: {
+                project_id?: string;
+                model?: string;
+                managed_status?: string;
+                role?: string;
+                rack_id?: string;
+            };
+            resolved_count: number;
+            revision: number;
+            is_demo: boolean;
+        };
+        FullFlowTargetGroupsListEnvelope: {
+            data: components["schemas"]["FullFlowTargetGroups"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullFlowRevisions: {
+            id: string;
+            flow_id: string;
+            project_id: string;
+            revision: number;
+            status: string;
+            yaml_ref: string;
+            change_summary: string;
+            created_by: string;
+            created_at: string;
+            is_demo: boolean;
+        };
+        FullFlowRevisionsListEnvelope: {
+            data: components["schemas"]["FullFlowRevisions"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullExecutionTargets: {
+            id: string;
+            execution_id: string;
+            project_id: string;
+            target_id: string;
+            target_type: string;
+            status: string;
+            started_at: string;
+            finished_at: string | null;
+            exit_code: number;
+            execution_mode: string;
+            is_demo: boolean;
+        };
+        FullExecutionTargetsListEnvelope: {
+            data: components["schemas"]["FullExecutionTargets"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullFlowBlueprints: {
+            id: string;
+            name: string;
+            category: string;
+            target_types: string[];
+            revision: number;
+            status: string;
+            task_count: number;
+            description: string;
+            is_demo: boolean;
+        };
+        FullFlowBlueprintsListEnvelope: {
+            data: components["schemas"]["FullFlowBlueprints"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullDashboardSnapshots: {
+            id: string;
+            scope: string;
+            generated_at: string;
+            project_count: number;
+            server_count: number;
+            gpu_count: number;
+            switch_count: number;
+            rack_count: number;
+            active_alerts: number;
+            open_issues: number;
+            running_executions: number;
+            delivery_completion_percent: number;
+            health_summary: {
+                healthy: number;
+                warning: number;
+                critical: number;
+                maintenance: number;
+            };
+            is_demo: boolean;
+        };
+        FullDashboardSnapshotsListEnvelope: {
+            data: components["schemas"]["FullDashboardSnapshots"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullFleetSummaries: {
+            id: string;
+            project_id: string;
+            server_count: number;
+            gpu_count: number;
+            healthy: number;
+            warning: number;
+            critical: number;
+            maintained: number;
+            agentless: number;
+            agent_disconnected: number;
+            last_updated_at: string;
+            is_demo: boolean;
+        };
+        FullFleetSummariesListEnvelope: {
+            data: components["schemas"]["FullFleetSummaries"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullFabricSummaries: {
+            id: string;
+            project_id: string;
+            switch_count: number;
+            in_sync: number;
+            drift_minor: number;
+            drift_major: number;
+            ports_total: number;
+            ports_up: number;
+            ports_down: number;
+            ports_flapping: number;
+            ddm_warning: number;
+            lldp_neighbors: number;
+            fdb_entries: number;
+            arp_entries: number;
+            last_updated_at: string;
+            is_demo: boolean;
+        };
+        FullFabricSummariesListEnvelope: {
+            data: components["schemas"]["FullFabricSummaries"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullKnowledgeSources: {
+            id: string;
+            project_id: string;
+            revision: number;
+            name: string;
+            source_ref: string;
+            status: string;
+            version: string;
+        };
+        FullKnowledgeSourcesListEnvelope: {
+            data: components["schemas"]["FullKnowledgeSources"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullAiFeedback: {
+            id: string;
+            project_id: string;
+            revision: number;
+            task_id: string;
+            field: string;
+            original: string;
+            corrected: string;
+            reason: string;
+            status: string;
+        };
+        FullAiFeedbackListEnvelope: {
+            data: components["schemas"]["FullAiFeedback"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullNotificationSettings: {
+            id: string;
+            project_id: string;
+            revision: number;
+            name: string;
+            event_types: string[];
+            channel: string;
+            enabled: boolean;
+        };
+        FullNotificationSettingsListEnvelope: {
+            data: components["schemas"]["FullNotificationSettings"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullApiTokens: {
+            id: string;
+            project_id: string;
+            revision: number;
+            name: string;
+            scopes: string[];
+            expires_at: string;
+            status: string;
+            token_prefix: string;
+        };
+        FullApiTokensListEnvelope: {
+            data: components["schemas"]["FullApiTokens"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullSshTrust: {
+            id: string;
+            project_id: string;
+            revision: number;
+            device_id: string;
+            fingerprint: string;
+            status: string;
+            source: string;
+            observed_at: string;
+        };
+        FullSshTrustListEnvelope: {
+            data: components["schemas"]["FullSshTrust"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullCollectionPolicies: {
+            id: string;
+            project_id: string;
+            revision: number;
+            name: string;
+            protocol: string;
+            scope: string;
+            interval_seconds: number;
+            timeout_seconds: number;
+            max_attempts: number;
+            status: string;
+            notice: string;
+        };
+        FullCollectionPoliciesListEnvelope: {
+            data: components["schemas"]["FullCollectionPolicies"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullStepReports: {
+            id: string;
+            project_id: string;
+            subject_id: string;
+            gate_id: string;
+            name: string;
+            verdict: string;
+            metrics: {
+                scenario_index?: number;
+                evidence_kind?: string;
+                observed_gpu_count?: number;
+                observed_nic_count?: number;
+            };
+            collected_at: string;
+            valid_until: string;
+            rule_versions: string[];
+            source_refs: string[];
+            source: string;
+            test_scope: string;
+            execution_mode: string;
+            revision?: number;
+            notice?: string;
+        };
+        FullStepReportsListEnvelope: {
+            data: components["schemas"]["FullStepReports"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullMappingPairs: {
+            id: string;
+            project_id: string;
+            server_id: string;
+            gpu_id: string;
+            gpu_bdf: string;
+            nic_id: string;
+            nic_bdf: string;
+            server_port_id: string;
+            switch_port_id: string;
+            line_verdict: string;
+            status: string;
+            source: string;
+            evidence_refs: string[];
+            server_lldp_peer: string;
+            switch_lldp_peer: string;
+            cable_id: string;
+            pairing_policy: string;
+            review_reason: string;
+            collected_at: string;
+            freshness: string;
+        };
+        FullMappingPairsListEnvelope: {
+            data: components["schemas"]["FullMappingPairs"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullMonitoringRules: {
+            id: string;
+            project_id: string;
+            name: string;
+            metric_key: string;
+            operator: string;
+            threshold: number;
+            scope: string;
+            status: string;
+            approved_by: string | null;
+            source: string;
+            revision: number;
+            notice: string;
+        };
+        FullMonitoringRulesListEnvelope: {
+            data: components["schemas"]["FullMonitoringRules"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        ProjectWriteRequest: {
+            name: string;
+            code: string;
+            template_id: string;
+            site?: string;
+            region?: string;
+            owner?: string;
+            expected_revision?: number;
+        };
+        CMDBProjectionRequest: {
+            source_event_id: string;
+            source_domain: string;
+            stable_ref: string;
+            expected_revision?: number;
+        };
+        DeviceWriteRequest: {
+            source_bom_item_id?: string;
+            hostname?: string;
+            model_ref?: string;
+            role?: string;
+            site?: string;
+            rack_id?: string;
+            rack_u?: number;
+            operator_notes?: string;
+            expected_revision?: number;
+        };
+        ScheduleWriteRequest: {
+            flow_id?: string;
+            enabled?: boolean;
+            expression: string;
+            /** @enum {string} */
+            expression_type?: "cron" | "interval";
+            timezone: string;
+            /** @enum {string} */
+            misfire_policy?: "skip" | "fire_once";
+            expected_revision?: number;
+        };
+        NetworkBaselineWriteRequest: {
+            version: string;
+            source_ref: string;
+            content_hash: string;
+            /** @enum {string} */
+            status?: "draft" | "tested" | "released" | "deprecated";
+            approval_refs?: string[];
+            expected_revision?: number;
+        };
+        PushJobWriteRequest: {
+            project_id: string;
+            baseline_revision: string;
+            target_snapshot_id?: string;
+            target_ids: string[];
+            target_versions?: {
+                [key: string]: number;
+            };
+            /** @enum {string} */
+            change_level?: "normal" | "critical";
+            expected_revision?: number;
+        };
+        /**
+         * @deprecated
+         * @description Historical-only legacy gate record; never a current delivery phase.
+         */
+        GateEvidenceWriteRequest: {
+            /** @enum {string} */
+            subject_type?: "server" | "switch" | "project";
+            subject_id: string;
+            /** @enum {string} */
+            gate_id: "G1" | "G2" | "G3" | "G4" | "G5" | "G6";
+            /** @enum {string} */
+            verdict: "PASS" | "FAIL" | "BLOCKED" | "WAIVED";
+            evidence_refs: string[];
+            rule_versions?: string[];
+            /** Format: date-time */
+            collected_at?: string;
+            /** Format: date-time */
+            valid_until?: string;
+            waiver?: {
+                approved_by?: string;
+                reason?: string;
+                scope?: string;
+                valid_until?: string;
+                remediation_plan?: string;
+            };
+            expected_revision?: number;
+        };
+        IssueWriteRequest: {
+            title: string;
+            /** @enum {string} */
+            issue_type: "T1" | "T2" | "T3" | "T4" | "T5" | "T6" | "T7";
+            severity?: string;
+            source_domain?: string;
+            source_ref?: string;
+            affected_entities: string[];
+            evidence_refs?: string[];
+            assignee_id?: string;
+            resolution?: string;
+            expected_revision?: number;
+        };
+        AlertWriteRequest: {
+            rule_id: string;
+            severity?: string;
+            source?: string;
+            subject_ref: string;
+            summary: string;
+            evidence_refs?: string[];
+            expected_revision?: number;
+        };
+        TemplateWriteRequest: {
+            name: string;
+            version: string;
+            server_model?: string;
+            network_baseline_ref?: string;
+            bom_mapping_revision?: string;
+            os_baseline?: string;
+            driver_baseline?: string;
+            cuda_baseline?: string;
+            nccl_baseline?: string;
+            source_template_id?: string;
+            /** @enum {string} */
+            status?: "draft" | "released" | "deprecated";
+            expected_revision?: number;
+        };
+        MediaWriteRequest: {
+            name: string;
+            type: string;
+            version: string;
+            architecture?: string;
+            compatible_models?: string[];
+            sha256: string;
+            artifact_ref: string;
+            expected_revision?: number;
+        };
+        ParameterWriteRequest: {
+            key: string;
+            type: string;
+            allowed_values?: (string | number | boolean)[];
+            default_value?: string | number | boolean | null;
+            scope?: string;
+            template_refs?: string[];
+            change_reason?: string;
+            expected_revision?: number;
+        };
+        UserWriteRequest: {
+            username: string;
+            display_name?: string;
+            roles: string[];
+            project_scopes?: string[];
+            /** @enum {string} */
+            status?: "active" | "disabled";
+            expected_revision?: number;
+        };
+        AuditProjectionRequest: {
+            source_event_id: string;
+            resource_id: string;
+            action: string;
+            project_id?: string;
+            approval_refs?: string[];
+        };
+        FlowValidationRequest: {
+            definition: components["schemas"]["IAFlowDefinition"];
+            script_ref?: string;
+            expected_revision?: number;
+        };
+        IADeviceOperation: {
+            id: string;
+            project_id: string;
+            operation: string;
+            /** @enum {string} */
+            status: "draft" | "validated" | "approved" | "queued" | "running" | "verifying" | "success" | "failed" | "timeout" | "blocked" | "killed" | "result_unknown";
+            target_ids?: string[];
+            target_id?: string;
+            media_ref?: string;
+            reason?: string;
+            issue_id?: string;
+            evidence_refs?: string[];
+            created_at?: string;
+            revision?: number;
+            expected_revision?: number;
+        };
+        ProjectPatchRequest: {
+            name?: string;
+            code?: string;
+            template_id?: string;
+            site?: string;
+            region?: string;
+            owner?: string;
+            expected_revision: number;
+        };
+        DevicePatchRequest: {
+            source_bom_item_id?: string;
+            hostname?: string;
+            model_ref?: string;
+            role?: string;
+            site?: string;
+            rack_id?: string;
+            rack_u?: number;
+            operator_notes?: string;
+            expected_revision: number;
+        };
+        SchedulePatchRequest: {
+            flow_id?: string;
+            enabled?: boolean;
+            expression?: string;
+            /** @enum {string} */
+            expression_type?: "cron" | "interval";
+            timezone?: string;
+            /** @enum {string} */
+            misfire_policy?: "skip" | "fire_once";
+            expected_revision: number;
+        };
+        NetworkBaselinePatchRequest: {
+            version?: string;
+            source_ref?: string;
+            content_hash?: string;
+            /** @enum {string} */
+            status?: "draft" | "tested" | "released" | "deprecated";
+            approval_refs?: string[];
+            expected_revision: number;
+        };
+        PushJobPatchRequest: {
+            project_id?: string;
+            baseline_revision?: string;
+            target_snapshot_id?: string;
+            target_ids?: string[];
+            target_versions?: {
+                [key: string]: number;
+            };
+            /** @enum {string} */
+            change_level?: "normal" | "critical";
+            expected_revision: number;
+        };
+        /**
+         * @deprecated
+         * @description Historical-only legacy gate record; never a current delivery phase.
+         */
+        GateEvidencePatchRequest: {
+            /** @enum {string} */
+            subject_type?: "server" | "switch" | "project";
+            subject_id?: string;
+            /** @enum {string} */
+            gate_id?: "G1" | "G2" | "G3" | "G4" | "G5" | "G6";
+            /** @enum {string} */
+            verdict?: "PASS" | "FAIL" | "BLOCKED" | "WAIVED";
+            evidence_refs?: string[];
+            rule_versions?: string[];
+            /** Format: date-time */
+            collected_at?: string;
+            /** Format: date-time */
+            valid_until?: string;
+            waiver?: {
+                approved_by?: string;
+                reason?: string;
+                scope?: string;
+                valid_until?: string;
+                remediation_plan?: string;
+            };
+            expected_revision: number;
+        };
+        IssuePatchRequest: {
+            title?: string;
+            /** @enum {string} */
+            issue_type?: "T1" | "T2" | "T3" | "T4" | "T5" | "T6" | "T7";
+            severity?: string;
+            source_domain?: string;
+            source_ref?: string;
+            affected_entities?: string[];
+            evidence_refs?: string[];
+            assignee_id?: string;
+            resolution?: string;
+            expected_revision: number;
+        };
+        AlertPatchRequest: {
+            rule_id?: string;
+            severity?: string;
+            source?: string;
+            subject_ref?: string;
+            summary?: string;
+            evidence_refs?: string[];
+            expected_revision: number;
+        };
+        TemplatePatchRequest: {
+            name?: string;
+            version?: string;
+            server_model?: string;
+            network_baseline_ref?: string;
+            bom_mapping_revision?: string;
+            os_baseline?: string;
+            driver_baseline?: string;
+            cuda_baseline?: string;
+            nccl_baseline?: string;
+            source_template_id?: string;
+            /** @enum {string} */
+            status?: "draft" | "released" | "deprecated";
+            expected_revision: number;
+        };
+        MediaPatchRequest: {
+            name?: string;
+            type?: string;
+            version?: string;
+            architecture?: string;
+            compatible_models?: string[];
+            sha256?: string;
+            artifact_ref?: string;
+            expected_revision: number;
+        };
+        ParameterPatchRequest: {
+            key?: string;
+            type?: string;
+            allowed_values?: (string | number | boolean)[];
+            default_value?: string | number | boolean | null;
+            scope?: string;
+            template_refs?: string[];
+            change_reason?: string;
+            expected_revision: number;
+        };
+        UserPatchRequest: {
+            username?: string;
+            display_name?: string;
+            roles?: string[];
+            project_scopes?: string[];
+            /** @enum {string} */
+            status?: "active" | "disabled";
+            expected_revision: number;
+        };
+        FullConfigSets: {
+            id: string;
+            project_id: string;
+            execution_mode: string;
+            source: string;
+            revision: number;
+            name: string;
+            status: string;
+            target_ids: string[];
+            media_refs: {
+                os: string;
+            };
+            mapping_revision_id: string;
+            created_at: string;
+        };
+        FullConfigSetsListEnvelope: {
+            data: components["schemas"]["FullConfigSets"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullNetworkAssertions: {
+            id: string;
+            project_id: string;
+            execution_mode: string;
+            source: string;
+            revision: number;
+            code: string;
+            name: string;
+            verdict: string;
+            collected_at: string;
+            source_refs: string[];
+            valid_for_seconds: number;
+            notice: string;
+        };
+        FullNetworkAssertionsListEnvelope: {
+            data: components["schemas"]["FullNetworkAssertions"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullServerLldpObservations: {
+            id: string;
+            project_id: string;
+            execution_mode: string;
+            source: string;
+            revision: number;
+            server_id: string;
+            port_id: string;
+            peer_port_id: string | null;
+            observed_at: string;
+            freshness: string;
+            notice: string;
+            evidence_ref?: string;
+            source_original?: {
+                id: string;
+                project_id: string;
+                execution_mode: string;
+                source: string;
+                revision: number;
+                server_id: string;
+                port_id: string;
+                peer_port_id: string;
+                observed_at: string;
+                freshness: string;
+                notice: string;
+                evidence_ref: string;
+            };
+            support?: string;
+        };
+        FullServerLldpObservationsListEnvelope: {
+            data: components["schemas"]["FullServerLldpObservations"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullTaskEvidenceArchive: {
+            id: string;
+            execution_id: string;
+            task_key: string;
+            target_id: string;
+            status: string;
+            attempt_count: number;
+            started_at: string;
+            finished_at: string | null;
+            duration_ms: number | null;
+            exit_code: number | null;
+            error_summary: string | null;
+            retryable: boolean;
+            execution_mode: string;
+            is_demo: boolean;
+        };
+        FullTaskEvidenceArchiveListEnvelope: {
+            data: components["schemas"]["FullTaskEvidenceArchive"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullBomItems: {
+            id: string;
+            item_uid: string;
+            project_id: string;
+            bom_import_batch_id: string;
+            category: string;
+            status: string;
+            source_of_record: string;
+            source: string;
+            asset_ref: string;
+            model_version_ref: string | null;
+            model: string | null;
+            serial: string | null;
+            parent_uid: string | null;
+            position: {
+                rack_id: string;
+                u_start: number;
+                u_height: number;
+            } | null;
+            endpoint_a_uid: string | null;
+            endpoint_b_uid: string | null;
+            port_name: string | null;
+            port_index: string | null;
+            role: string | null;
+            revision: number;
+            is_demo: boolean;
+        };
+        FullBomItemsListEnvelope: {
+            data: components["schemas"]["FullBomItems"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullScenarioProfiles: {
+            id: string;
+            project_id: string;
+            name: string;
+            label: string;
+            patches: string[];
+            revision: number;
+        };
+        FullScenarioProfilesListEnvelope: {
+            data: components["schemas"]["FullScenarioProfiles"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        IAMappingLink: {
+            id: string;
+            project_id: string;
+            server_id: string;
+            nic_id: string | null;
+            nic_bdf: string | null;
+            network_role: string;
+            port_name: string;
+            mac: string;
+            speed: string;
+            oper_state: string;
+            expected_port_id: string | null;
+            observed_port_id: string | null;
+            switch_id: string | null;
+            switch_hostname: string | null;
+            switch_port_name: string | null;
+            cable_id: string | null;
+            cable_verdict: string;
+            server_lldp_peer: string | null;
+            lldp_match_state: string;
+            /** @enum {string} */
+            line_verdict: "PASS" | "FAIL" | "BLOCKED";
+            source: string;
+            observed_at: string | null;
+            freshness: string;
+            /** @enum {string} */
+            support: "supported" | "unknown" | "unsupported";
+            lldp_id: string | null;
+            source_refs: string[];
+        };
+        IAMappingMatrix: {
+            project_id: string;
+            server_id: string;
+            gpus: components["schemas"]["FullGpus"][];
+            nics: components["schemas"]["FullNics"][];
+            pairs: components["schemas"]["FullMappingPairs"][];
+            links: components["schemas"]["IAMappingLink"][];
+            rule_ref: string;
+            rule_description: string;
+        };
+        IAMappingEnvelope: {
+            data: components["schemas"]["IAMappingMatrix"];
+            request_id: string;
+        };
+        /** @enum {string} */
+        DeliveryStageId: "KICKOFF" | "NETWORK_READINESS" | "PROVISIONING" | "VALIDATION" | "NCCL_VALIDATION" | "CLEANUP_HANDOVER";
+        /** @enum {string} */
+        DeliveryStageState: "NOT_STARTED" | "READY" | "RUNNING" | "BLOCKED" | "FAILED" | "PASSED" | "WAIVED";
+        DeliveryWaiver: {
+            approved_by: string;
+            reason: string;
+            scope: string[];
+            /** @enum {string} */
+            stage_id: "KICKOFF" | "NETWORK_READINESS" | "PROVISIONING" | "VALIDATION" | "NCCL_VALIDATION" | "CLEANUP_HANDOVER";
+            /** Format: date-time */
+            valid_until: string;
+            remediation_plan: string;
+        };
+        DeliveryStageRecord: {
+            id: string;
+            project_id: string;
+            device_id: string;
+            /** @enum {string} */
+            stage_id: "KICKOFF" | "NETWORK_READINESS" | "PROVISIONING" | "VALIDATION" | "NCCL_VALIDATION" | "CLEANUP_HANDOVER";
+            /** @enum {string} */
+            status: "NOT_STARTED" | "READY" | "RUNNING" | "BLOCKED" | "FAILED" | "PASSED" | "WAIVED";
+            evidence_refs: string[];
+            execution_ids: string[];
+            check_ids?: string[];
+            /** Format: date-time */
+            observed_at?: string | null;
+            /** Format: date-time */
+            valid_until?: string | null;
+            waiver?: components["schemas"]["DeliveryWaiver"] | null;
+            blocked_reasons?: string[];
+            /** Format: date-time */
+            readiness_observed_at?: string;
+            source?: string;
+            revision: number;
+            last_event_id?: string;
+            /** @constant */
+            execution_mode?: "mock";
+            historical_result?: {
+                /** @enum {string} */
+                status: "NOT_STARTED" | "READY" | "RUNNING" | "BLOCKED" | "FAILED" | "PASSED" | "WAIVED";
+                evidence_refs: string[];
+            };
+        };
+        ValidationCheck: {
+            id: string;
+            project_id: string;
+            device_id: string;
+            /** @constant */
+            stage_id: "VALIDATION";
+            /** @enum {string} */
+            check_key: "hardware_inventory" | "gpu_nic_inventory" | "pcie_topology" | "nic_mac" | "lldp_line_order" | "optics" | "config_consistency" | "roce_connectivity";
+            name?: string;
+            /** @enum {string} */
+            verdict: "PASS" | "FAIL" | "BLOCKED" | "WAIVED";
+            required?: boolean;
+            evidence_refs: string[];
+            port_ids: string[];
+            execution_id: string | null;
+            issue_id?: string;
+            source: string;
+            /** Format: date-time */
+            observed_at: string;
+            /** Format: date-time */
+            valid_until: string;
+            /** @enum {string} */
+            freshness?: "fresh" | "stale" | "unknown";
+            /** @enum {string} */
+            support?: "supported" | "unsupported" | "unknown";
+            revision: number;
+            /** @constant */
+            execution_mode?: "mock";
+        };
+        DeliveryStageCommand: {
+            project_id: string;
+            /** @enum {string} */
+            stage_id: "KICKOFF" | "NETWORK_READINESS" | "PROVISIONING" | "VALIDATION" | "NCCL_VALIDATION" | "CLEANUP_HANDOVER";
+            target_ids: string[];
+            expected_revisions?: {
+                [key: string]: number;
+            };
+            idempotency_key?: string;
+        };
+        DeliveryStageStartResult: {
+            batch_id: string;
+            execution_id: string | null;
+            started: string[];
+            blocked: {
+                device_id: string;
+                reasons: string[];
+                id?: string;
+            }[];
+        };
+        DeliveryStageSummary: {
+            /** @enum {string} */
+            stage_id: "KICKOFF" | "NETWORK_READINESS" | "PROVISIONING" | "VALIDATION" | "NCCL_VALIDATION" | "CLEANUP_HANDOVER";
+            name: string;
+            total: number;
+            counts: {
+                NOT_STARTED: number;
+                READY: number;
+                RUNNING: number;
+                BLOCKED: number;
+                FAILED: number;
+                PASSED: number;
+                WAIVED: number;
+            };
+            completion_percent: number;
+        };
+        DeliveryWaiverRequest: {
+            project_id: string;
+            device_id: string;
+            /** @enum {string} */
+            stage_id: "KICKOFF" | "NETWORK_READINESS" | "PROVISIONING" | "VALIDATION" | "NCCL_VALIDATION" | "CLEANUP_HANDOVER";
+            reason: string;
+            /** Format: date-time */
+            valid_until: string;
+            remediation_plan: string;
+            expected_revision: number;
+        };
+        ValidationRemediationRequest: {
+            reason: string;
+            /** @constant */
+            simulation_only: true;
+            expected_revision: number;
+        };
+        ValidationRetestRequest: {
+            resolution: string;
+            target_check_ids: string[];
+            expected_revision: number;
+        };
+        HandoverStep: {
+            id: string;
+            name: string;
+            /** @enum {string} */
+            status: "pending" | "completed";
+            evidence_ref: string | null;
+        };
+        HandoverRecord: {
+            id: string;
+            project_id: string;
+            device_id: string;
+            /** @constant */
+            stage_id: "CLEANUP_HANDOVER";
+            status: string;
+            approved_by?: string;
+            approval_scope?: string[];
+            lease_ref?: string;
+            resource_manifest?: {
+                source: string;
+                temporary_accounts: string[];
+                credential_refs: string[];
+                temporary_files: string[];
+                agent_refs: string[];
+            };
+            steps: components["schemas"]["HandoverStep"][];
+            customer_signoff: {
+                signed_by: string;
+                recorded_by: string;
+                /** Format: date-time */
+                signed_at: string;
+                source: string;
+            } | null;
+            /** Format: date-time */
+            created_at?: string;
+            revision: number;
+        };
+        HandoverPrepareRequest: {
+            project_id: string;
+            target_ids: string[];
+            expected_revisions: {
+                [key: string]: number;
+            };
+        };
+        HandoverAdvanceRequest: {
+            project_id: string;
+            expected_revision: number;
+            step_id: string;
+            customer_signer?: string;
+        };
+        DeliveryStageListEnvelope: {
+            data: components["schemas"]["DeliveryStageRecord"][];
+            request_id: string;
+        };
+        DeliveryStageSummaryEnvelope: {
+            data: components["schemas"]["DeliveryStageSummary"][];
+            request_id: string;
+        };
+        ValidationCheckListEnvelope: {
+            data: components["schemas"]["ValidationCheck"][];
+            request_id: string;
+        };
+        DeliveryStageStartEnvelope: {
+            data: components["schemas"]["DeliveryStageStartResult"];
+            request_id: string;
+        };
+        HandoverListEnvelope: {
+            data: components["schemas"]["HandoverRecord"][];
+            request_id: string;
+        };
+        HandoverEnvelope: {
+            data: components["schemas"]["HandoverRecord"];
+            request_id: string;
+        };
+        FullLegacyGateEvidence: {
+            id: string;
+            project_id: string;
+            subject_type: string;
+            subject_id: string;
+            verdict: string;
+            evidence_refs: string[];
+            rule_versions: string[];
+            collected_at: string;
+            valid_until: string;
+            waiver: {
+                approved_by: string;
+                reason: string;
+                scope: string[];
+                expires_at: string;
+                remediation_plan: string;
+            } | null;
+            revision: number;
+            is_demo: boolean;
+            historical_only: boolean;
+            legacy_gate_id: string;
+            migration_target: {
+                stage_id: string;
+                check_key: string;
+            };
+        };
+        FullLegacyGateEvidenceListEnvelope: {
+            data: components["schemas"]["FullLegacyGateEvidence"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullLegacyStepReports: {
+            id: string;
+            project_id: string;
+            subject_id: string;
+            name: string;
+            verdict: string;
+            metrics: {
+                scenario_index?: number;
+                evidence_kind?: string;
+                observed_gpu_count?: number;
+                observed_nic_count?: number;
+            };
+            collected_at: string;
+            valid_until: string;
+            rule_versions: string[];
+            source_refs: string[];
+            source: string;
+            test_scope: string;
+            execution_mode: string;
+            historical_only: boolean;
+            legacy_gate_id: string;
+            migration_target: {
+                stage_id: string;
+                check_key: string;
+            };
+            revision?: number;
+            notice?: string;
+        };
+        FullLegacyStepReportsListEnvelope: {
+            data: components["schemas"]["FullLegacyStepReports"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullDeliveryStageDefinitions: {
+            id: string;
+            name: string;
+            order: number;
+            scope: string;
+            previous_stage_id: string | null;
+            execution_mode: string;
+        };
+        FullDeliveryStageDefinitionsListEnvelope: {
+            data: components["schemas"]["FullDeliveryStageDefinitions"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullValidationChecks: {
+            id: string;
+            project_id: string;
+            device_id: string;
+            stage_id: string;
+            check_key: string;
+            name: string;
+            verdict: string;
+            required: boolean;
+            evidence_refs: string[];
+            port_ids: string[];
+            execution_id: string | null;
+            source: string;
+            observed_at: string;
+            valid_until: string;
+            freshness: string;
+            support: string;
+            revision: number;
+            execution_mode: string;
+            issue_id?: string;
+        };
+        FullValidationChecksListEnvelope: {
+            data: components["schemas"]["FullValidationChecks"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullDeliveryStageRecords: {
+            id: string;
+            project_id: string;
+            device_id: string;
+            stage_id: string;
+            status: string;
+            evidence_refs: string[];
+            execution_ids: string[];
+            check_ids: string[];
+            observed_at: string | null;
+            valid_until: string | null;
+            waiver: string | null;
+            blocked_reasons: string[];
+            source: string;
+            revision: number;
+            execution_mode: string;
+            historical_result?: {
+                status: string;
+                evidence_refs: string[];
+            };
+        };
+        FullDeliveryStageRecordsListEnvelope: {
+            data: components["schemas"]["FullDeliveryStageRecords"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullDeliveryStageEvents: {
+            id: string;
+            project_id: string;
+            device_id: string;
+            stage_id: string;
+            from_status: string;
+            to_status: string;
+            evidence_refs: string[];
+            reason: string;
+            actor: string;
+            occurred_at: string;
+            source: string;
+            historical_snapshot: boolean;
+        };
+        FullDeliveryStageEventsListEnvelope: {
+            data: components["schemas"]["FullDeliveryStageEvents"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullDeliveryBatches: {
+            id: string;
+            project_id: string;
+            name: string;
+            rack_id: string;
+            target_ids: string[];
+            revision: number;
+        };
+        FullDeliveryBatchesListEnvelope: {
+            data: components["schemas"]["FullDeliveryBatches"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullTestReports: {
+            id: string;
+            project_id: string;
+            subject_id: string;
+            name: string;
+            verdict: string;
+            metrics: {
+                scenario_index?: number;
+                evidence_kind?: string;
+            };
+            collected_at: string;
+            valid_until: string;
+            rule_versions: string[];
+            source_refs: string[];
+            source: string;
+            test_scope: string;
+            execution_mode: string;
+            historical_only: boolean;
+            legacy_gate_id: string;
+            migration_target: {
+                stage_id: string;
+                check_key: string;
+            };
+            stage_id: string;
+            test_kind: string;
+            revision?: number;
+            notice?: string;
+        };
+        FullTestReportsListEnvelope: {
+            data: components["schemas"]["FullTestReports"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        RackObservationMeta: {
+            source: string;
+            observed_at: string | null;
+            /** @enum {string} */
+            freshness: "fresh" | "stale" | "unknown" | "aging";
+            /** @enum {string} */
+            support: "supported" | "unsupported" | "unknown";
+        };
+        RackWorkspaceSections: {
+            environment?: components["schemas"]["FullRackEnvironmentSensors"][];
+            power?: components["schemas"]["FullRackPowerCircuits"][];
+            trends?: components["schemas"]["FullMetricSeries"][];
+            gpus?: components["schemas"]["FullGpus"][];
+            nics?: components["schemas"]["FullNics"][];
+            bmc_inventory?: components["schemas"]["FullBmcInventory"][];
+            firmware_inventory?: components["schemas"]["FullFirmwareInventory"][];
+            server_config_baselines?: components["schemas"]["FullServerConfigBaselines"][];
+            server_observed_configs?: components["schemas"]["FullServerObservedConfigs"][];
+            switch_config_baselines?: components["schemas"]["FullSwitchConfigBaselines"][];
+            switch_running_configs?: components["schemas"]["FullSwitchRunningConfigs"][];
+            switch_config_diffs?: components["schemas"]["FullSwitchConfigDiffs"][];
+            ports?: (components["schemas"]["FullPorts"] | components["schemas"]["FullSwitchPorts"])[];
+            cables?: components["schemas"]["FullCables"][];
+            interfaces?: components["schemas"]["FullSwitchInterfaces"][];
+            lldp?: components["schemas"]["FullLldpNeighbors"][];
+            server_lldp?: components["schemas"]["FullServerLldpObservations"][];
+            fdb?: components["schemas"]["FullFdbEntries"][];
+            arp?: components["schemas"]["FullArpEntries"][];
+            ddm?: components["schemas"]["FullDdmSamples"][];
+            mapping?: components["schemas"]["FullMappingPairs"][];
+            alerts?: components["schemas"]["FullAlerts"][];
+            issues?: components["schemas"]["FullIssues"][];
+            revisions?: components["schemas"]["FullRackDiagramRevisions"][];
+            executions?: components["schemas"]["FullExecutions"][];
+            collections?: components["schemas"]["FullCollectionJobs"][];
+            audit?: components["schemas"]["FullAuditEvents"][];
+        };
+        RackWorkspaceTabResponse: {
+            rack: components["schemas"]["FullRacks"];
+            devices: (components["schemas"]["FullServers"] | components["schemas"]["FullSwitches"])[];
+            selected: components["schemas"]["FullServers"] | components["schemas"]["FullSwitches"] | null;
+            placements: components["schemas"]["FullRackPlacements"][];
+            sections: components["schemas"]["RackWorkspaceSections"];
+            context: components["schemas"]["RackObservationMeta"];
+            request_id: string;
+        };
+        FullTopologyFabrics: {
+            project_id: string;
+            source: string;
+            observed_at: string;
+            freshness: string;
+            support: string;
+            revision: number;
+            execution_mode: string;
+            is_demo: boolean;
+            id: string;
+            name: string;
+            baseline_id: string;
+            pod_ids: string[];
+        };
+        FullTopologyFabricsListEnvelope: {
+            data: components["schemas"]["FullTopologyFabrics"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullTopologyNetworks: {
+            project_id: string;
+            source: string;
+            observed_at: string;
+            freshness: string;
+            support: string;
+            revision: number;
+            execution_mode: string;
+            is_demo: boolean;
+            id: string;
+            name: string;
+            fabric_id: string;
+            pod_id: string;
+            rail: string;
+            network_role: string;
+            vlan_id: number;
+            vrf: string;
+            vni: number;
+            baseline_id: string;
+            approval_state: string;
+            planning_source: string;
+        };
+        FullTopologyNetworksListEnvelope: {
+            data: components["schemas"]["FullTopologyNetworks"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullTopologyMemberships: {
+            project_id: string;
+            source: string;
+            observed_at: string;
+            freshness: string;
+            support: string;
+            revision: number;
+            execution_mode: string;
+            is_demo: boolean;
+            id: string;
+            network_id: string;
+            device_id: string;
+            port_ids: string[];
+            fabric_id: string;
+            pod_id: string;
+            rail: string;
+            baseline_id: string;
+            asn: number | null;
+            vlan_id: number;
+            vrf: string;
+            vni: number;
+            pfc_priorities: number[];
+            ecn_profile: string;
+        };
+        FullTopologyMembershipsListEnvelope: {
+            data: components["schemas"]["FullTopologyMemberships"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullTopologyObservedNetworks: {
+            project_id: string;
+            source: string;
+            observed_at: string;
+            freshness: string;
+            support: string;
+            revision: number;
+            execution_mode: string;
+            is_demo: boolean;
+            id: string;
+            membership_id: string;
+            network_id: string;
+            device_id: string;
+            running_config_id: string;
+            vlan_id: number;
+            vrf: string;
+            vni: number | null;
+            asn: number;
+            pfc_priorities: number[];
+            ecn_profile: string;
+        };
+        FullTopologyObservedNetworksListEnvelope: {
+            data: components["schemas"]["FullTopologyObservedNetworks"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullTopologyBgpSessions: {
+            project_id: string;
+            source: string;
+            observed_at: string;
+            freshness: string;
+            support: string;
+            revision: number;
+            execution_mode: string;
+            is_demo: boolean;
+            id: string;
+            fabric_id: string;
+            pod_id: string;
+            source_device_id: string;
+            target_device_id: string;
+            source_port_id: string | null;
+            target_port_id: string;
+            local_asn: number;
+            remote_asn: number;
+            state: string;
+            baseline_id: string;
+            planned: boolean;
+            evidence_class: string;
+        };
+        FullTopologyBgpSessionsListEnvelope: {
+            data: components["schemas"]["FullTopologyBgpSessions"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullTopologySnapshots: {
+            project_id: string;
+            source: string;
+            observed_at: string;
+            freshness: string;
+            support: string;
+            revision: number;
+            execution_mode: string;
+            is_demo: boolean;
+            id: string;
+            captured_at: string;
+            snapshot_kind: string;
+            network_ids: string[];
+            description: string;
+            data: {
+                servers: components["schemas"]["FullServers"][];
+                switches: components["schemas"]["FullSwitches"][];
+                racks: components["schemas"]["FullRacks"][];
+                ports: components["schemas"]["FullPorts"][];
+                switch_ports: components["schemas"]["FullSwitchPorts"][];
+                cables: components["schemas"]["FullCables"][];
+                switch_interfaces: components["schemas"]["FullSwitchInterfaces"][];
+                lldp_neighbors: components["schemas"]["FullLldpNeighbors"][];
+                server_lldp_observations: components["schemas"]["FullServerLldpObservations"][];
+                ddm_samples: components["schemas"]["FullDdmSamples"][];
+                topology_networks: components["schemas"]["FullTopologyNetworks"][];
+                topology_memberships: components["schemas"]["FullTopologyMemberships"][];
+                topology_observed_networks: components["schemas"]["FullTopologyObservedNetworks"][];
+                topology_bgp_sessions: components["schemas"]["FullTopologyBgpSessions"][];
+                topology_fabrics: components["schemas"]["FullTopologyFabrics"][];
+                topology_port_observations: components["schemas"]["FullTopologyPortObservations"][];
+            };
+        };
+        FullTopologySnapshotsListEnvelope: {
+            data: components["schemas"]["FullTopologySnapshots"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullTopologyPortObservations: {
+            project_id: string;
+            source: string;
+            observed_at: string;
+            freshness: string;
+            support: string;
+            revision: number;
+            execution_mode: string;
+            is_demo: boolean;
+            id: string;
+            physical_port_id: string;
+            device_id: string;
+            oper_state: string;
+            speed: string;
+        };
+        FullTopologyPortObservationsListEnvelope: {
+            data: components["schemas"]["FullTopologyPortObservations"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FabricTopologyNode: {
+            id: string;
+            label: string;
+            /** @enum {string} */
+            kind: "device" | "group" | "fabric" | "pod" | "network";
+            role: string;
+            device_id: string | null;
+            port_ids: string[];
+            rack_id: string | null;
+            /** @enum {string} */
+            health: "healthy" | "warning" | "critical" | "unknown" | "planned";
+            count: number;
+            network_ids: string[];
+            source: string;
+            observed_at: string | null;
+            freshness: string;
+            support: string;
+        };
+        FabricTopologyEdge: {
+            id: string;
+            source: string;
+            target: string;
+            source_port_id: string | null;
+            target_port_id: string | null;
+            cable_id: string | null;
+            /** @enum {string} */
+            relation: "physical_cable" | "membership" | "bgp" | "containment";
+            /** @enum {string} */
+            mode: "planned" | "observed";
+            /** @enum {string} */
+            health: "healthy" | "warning" | "critical" | "unknown" | "planned";
+            network_ids: string[];
+            evidence_refs: string[];
+            source_label: string;
+            target_label: string;
+            speed: string | null;
+            source_kind: string;
+            observed_at: string | null;
+            freshness: string;
+            support: string;
+        };
+        FabricTopologyDifference: {
+            id: string;
+            device_id: string;
+            field: string;
+            baseline_id: string;
+            planned: string | number | number[] | null;
+            actual: string | number | number[] | null;
+            /** @enum {string} */
+            verdict: "healthy" | "warning" | "critical" | "unknown" | "planned";
+            source: string;
+            observed_at: string | null;
+            freshness: string;
+        };
+        FabricTopologyGraph: {
+            nodes: components["schemas"]["FabricTopologyNode"][];
+            edges: components["schemas"]["FabricTopologyEdge"][];
+            total_nodes: number;
+            total_edges: number;
+            next_cursor: string | null;
+            warnings: string[];
+            snapshot_at: string | null;
+            request_id: string;
+        };
+        FabricTopologyEndpoint: {
+            id: string;
+            device_id: string;
+            physical_name: string;
+            device: components["schemas"]["FullServers"] | components["schemas"]["FullSwitches"];
+            planned_speed: string | null;
+            actual_speed: string | null;
+            observed: components["schemas"]["FullSwitchInterfaces"] | components["schemas"]["FullTopologyPortObservations"] | null;
+        } & {
+            [key: string]: unknown;
+        };
+        FabricTopologyDetail: {
+            /** @enum {string} */
+            kind: "device" | "port" | "cable" | "network" | "edge";
+            id: string;
+            record: components["schemas"]["FullServers"] | components["schemas"]["FullSwitches"] | components["schemas"]["FullPorts"] | components["schemas"]["FullSwitchPorts"] | components["schemas"]["FullCables"] | components["schemas"]["FullTopologyNetworks"] | components["schemas"]["FullTopologyMemberships"] | components["schemas"]["FullTopologyObservedNetworks"] | components["schemas"]["FullTopologyBgpSessions"];
+            endpoints: components["schemas"]["FabricTopologyEndpoint"][];
+            networks: components["schemas"]["FullTopologyNetworks"][];
+            memberships: components["schemas"]["FullTopologyMemberships"][];
+            observed: components["schemas"]["FullTopologyObservedNetworks"][];
+            differences: components["schemas"]["FabricTopologyDifference"][];
+            lldp: (components["schemas"]["FullLldpNeighbors"] | components["schemas"]["FullServerLldpObservations"])[];
+            fdb: components["schemas"]["FullFdbEntries"][];
+            arp: components["schemas"]["FullArpEntries"][];
+            ddm: components["schemas"]["FullDdmSamples"][];
+            bgp: components["schemas"]["FullTopologyBgpSessions"][];
+            issues: components["schemas"]["FullIssues"][];
+            alerts: components["schemas"]["FullAlerts"][];
+            executions: components["schemas"]["FullExecutions"][];
+            history: components["schemas"]["FullAuditEvents"][];
+            physical_cable_ids: string[];
+            context: components["schemas"]["RackObservationMeta"];
+            request_id: string;
+        };
+        FabricTopologyFilters: {
+            sites: string[];
+            pods: string[];
+            racks: {
+                id: string;
+                label: string;
+            }[];
+            fabrics: {
+                id: string;
+                label: string;
+            }[];
+            rails: string[];
+            roles: string[];
+            network_roles: string[];
+            snapshots: {
+                id: string;
+                label: string;
+            }[];
+            request_id: string;
+        };
+        FabricTopologyQuery: {
+            project_id: string;
+            /**
+             * @default global
+             * @enum {string}
+             */
+            scope: "global" | "group" | "local";
+            /**
+             * @default rack
+             * @enum {string}
+             */
+            group_by: "rack" | "pod" | "role";
+            site?: string;
+            pod?: string;
+            rack?: string;
+            fabric?: string;
+            rail?: string;
+            role?: string;
+            network_role?: string;
+            /** @enum {string} */
+            health?: "healthy" | "warning" | "critical" | "unknown" | "planned" | "anomalies";
+            q?: string;
+            device_id?: string;
+            network_id?: string;
+            /** @default 40 */
+            limit: number;
+            cursor?: string;
+            at?: string;
+            /**
+             * @default compare
+             * @enum {string}
+             */
+            comparison: "compare" | "planned" | "observed";
         };
     };
     responses: {
@@ -3140,7 +9889,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["ProjectWriteRequest"];
             };
         };
         responses: {
@@ -3198,7 +9947,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["ProjectPatchRequest"];
             };
         };
         responses: {
@@ -3258,7 +10007,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["CMDBProjectionRequest"];
             };
         };
         responses: {
@@ -3347,7 +10096,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["DeviceWriteRequest"];
             };
         };
         responses: {
@@ -3372,6 +10121,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                project_id: components["parameters"]["ProjectId"];
                 device_id: string;
             };
             cookie?: never;
@@ -3399,13 +10149,14 @@ export interface operations {
                 "If-Match"?: string;
             };
             path: {
+                project_id: components["parameters"]["ProjectId"];
                 device_id: string;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["DevicePatchRequest"];
             };
         };
         responses: {
@@ -3494,6 +10245,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                project_id: components["parameters"]["ProjectId"];
                 flow_id: string;
             };
             cookie?: never;
@@ -3521,6 +10273,7 @@ export interface operations {
                 "If-Match"?: string;
             };
             path: {
+                project_id: components["parameters"]["ProjectId"];
                 flow_id: string;
             };
             cookie?: never;
@@ -3587,7 +10340,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["RunFlowRequest"];
             };
         };
         responses: {
@@ -3645,7 +10398,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["ExecutionControlRequest"];
             };
         };
         responses: {
@@ -3675,7 +10428,9 @@ export interface operations {
                 sort?: string;
             };
             header?: never;
-            path?: never;
+            path: {
+                flow_id: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -3700,12 +10455,14 @@ export interface operations {
             header?: {
                 "Idempotency-Key"?: string;
             };
-            path?: never;
+            path: {
+                flow_id: string;
+            };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["ScheduleWriteRequest"];
             };
         };
         responses: {
@@ -3730,6 +10487,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                flow_id: string;
                 schedule_id: string;
             };
             cookie?: never;
@@ -3757,13 +10515,14 @@ export interface operations {
                 "If-Match"?: string;
             };
             path: {
+                flow_id: string;
                 schedule_id: string;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["SchedulePatchRequest"];
             };
         };
         responses: {
@@ -3827,7 +10586,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["DeviceWriteRequest"];
             };
         };
         responses: {
@@ -3852,6 +10611,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                project_id: components["parameters"]["ProjectId"];
                 device_id: string;
             };
             cookie?: never;
@@ -3879,13 +10639,14 @@ export interface operations {
                 "If-Match"?: string;
             };
             path: {
+                project_id: components["parameters"]["ProjectId"];
                 device_id: string;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["DevicePatchRequest"];
             };
         };
         responses: {
@@ -3949,7 +10710,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["NetworkBaselineWriteRequest"];
             };
         };
         responses: {
@@ -3974,6 +10735,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                project_id: components["parameters"]["ProjectId"];
                 baseline_id: string;
             };
             cookie?: never;
@@ -4001,13 +10763,14 @@ export interface operations {
                 "If-Match"?: string;
             };
             path: {
+                project_id: components["parameters"]["ProjectId"];
                 baseline_id: string;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["NetworkBaselinePatchRequest"];
             };
         };
         responses: {
@@ -4067,7 +10830,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["PushJobWriteRequest"];
             };
         };
         responses: {
@@ -4125,7 +10888,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["PushJobPatchRequest"];
             };
         };
         responses: {
@@ -4187,26 +10950,15 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["GenericObject"];
-            };
-        };
+        requestBody?: never;
         responses: {
-            /** @description Success */
-            200: {
+            /** @description Legacy gate writes retired. Use delivery stage commands and validation check operations. */
+            410: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": components["schemas"]["ResourceEnvelope"];
-                };
+                content?: never;
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
         };
     };
     getGateEvidence: {
@@ -4214,6 +10966,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                project_id: components["parameters"]["ProjectId"];
                 gate_id: string;
             };
             cookie?: never;
@@ -4241,30 +10994,20 @@ export interface operations {
                 "If-Match"?: string;
             };
             path: {
+                project_id: components["parameters"]["ProjectId"];
                 gate_id: string;
             };
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["GenericObject"];
-            };
-        };
+        requestBody?: never;
         responses: {
-            /** @description Success */
-            200: {
+            /** @description Legacy gate writes retired. Use delivery stage commands and validation check operations. */
+            410: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": components["schemas"]["ResourceEnvelope"];
-                };
+                content?: never;
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
         };
     };
     listIssues: {
@@ -4311,7 +11054,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["IssueWriteRequest"];
             };
         };
         responses: {
@@ -4336,6 +11079,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                project_id: components["parameters"]["ProjectId"];
                 issue_id: string;
             };
             cookie?: never;
@@ -4363,13 +11107,14 @@ export interface operations {
                 "If-Match"?: string;
             };
             path: {
+                project_id: components["parameters"]["ProjectId"];
                 issue_id: string;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["IssuePatchRequest"];
             };
         };
         responses: {
@@ -4433,7 +11178,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["AlertWriteRequest"];
             };
         };
         responses: {
@@ -4458,6 +11203,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                project_id: components["parameters"]["ProjectId"];
                 alert_id: string;
             };
             cookie?: never;
@@ -4485,13 +11231,14 @@ export interface operations {
                 "If-Match"?: string;
             };
             path: {
+                project_id: components["parameters"]["ProjectId"];
                 alert_id: string;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["AlertPatchRequest"];
             };
         };
         responses: {
@@ -4551,7 +11298,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["TemplateWriteRequest"];
             };
         };
         responses: {
@@ -4609,7 +11356,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["TemplatePatchRequest"];
             };
         };
         responses: {
@@ -4669,7 +11416,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["MediaWriteRequest"];
             };
         };
         responses: {
@@ -4727,7 +11474,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["MediaPatchRequest"];
             };
         };
         responses: {
@@ -4787,7 +11534,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["ParameterWriteRequest"];
             };
         };
         responses: {
@@ -4845,7 +11592,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["ParameterPatchRequest"];
             };
         };
         responses: {
@@ -4905,7 +11652,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["UserWriteRequest"];
             };
         };
         responses: {
@@ -4963,7 +11710,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["UserPatchRequest"];
             };
         };
         responses: {
@@ -5023,7 +11770,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["AuditProjectionRequest"];
             };
         };
         responses: {
@@ -5254,7 +12001,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenericObject"];
+                "application/json": components["schemas"]["FlowValidationRequest"];
             };
         };
         responses: {
@@ -6446,6 +13193,6503 @@ export interface operations {
                 };
             };
             404: components["responses"]["NotFound"];
+        };
+    };
+    opsListDevices: {
+        parameters: {
+            query?: {
+                /** @description rack_id */
+                rack_id?: string;
+                /** @description model_ref */
+                model_ref?: string;
+                /** @description delivery_status */
+                delivery_status?: string;
+                /** @description health_status */
+                health_status?: string;
+                /** @description maintenance_state */
+                maintenance_state?: string;
+                /** @description fabric */
+                fabric?: string;
+                /** @description pod */
+                pod?: string;
+                /** @description role */
+                role?: string;
+                /** @description nos_version */
+                nos_version?: string;
+                /** @description configuration_state */
+                configuration_state?: string;
+                /** @description category */
+                category?: "server" | "switch";
+                /** @description has_alert */
+                has_alert?: boolean;
+                /** @description search */
+                search?: string;
+                /** @description sort */
+                sort?: "display_name" | "rack" | "last_seen_at" | "health_status";
+                /** @description limit */
+                limit?: number;
+                /** @description cursor */
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                project_id: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsDeviceListEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsGetDeviceDetail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsDeviceDetailEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsListConfigurations: {
+        parameters: {
+            query?: {
+                /** @description since */
+                since?: string;
+                /** @description until */
+                until?: string;
+                /** @description snapshot_id */
+                snapshot_id?: string;
+                /** @description limit */
+                limit?: number;
+                /** @description cursor */
+                cursor?: string;
+                /** @description fact_kind */
+                fact_kind?: "approved_baseline" | "intended" | "observed";
+            };
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsConfigurationListEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsListConfigDiffs: {
+        parameters: {
+            query?: {
+                /** @description since */
+                since?: string;
+                /** @description until */
+                until?: string;
+                /** @description snapshot_id */
+                snapshot_id?: string;
+                /** @description limit */
+                limit?: number;
+                /** @description cursor */
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsConfigDiffListEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsListPorts: {
+        parameters: {
+            query?: {
+                /** @description since */
+                since?: string;
+                /** @description until */
+                until?: string;
+                /** @description snapshot_id */
+                snapshot_id?: string;
+                /** @description limit */
+                limit?: number;
+                /** @description cursor */
+                cursor?: string;
+                /** @description port_id */
+                port_id?: string;
+            };
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsPortListEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsListTelemetry: {
+        parameters: {
+            query?: {
+                /** @description since */
+                since?: string;
+                /** @description until */
+                until?: string;
+                /** @description snapshot_id */
+                snapshot_id?: string;
+                /** @description limit */
+                limit?: number;
+                /** @description cursor */
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsTelemetryListEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsListLLDP: {
+        parameters: {
+            query?: {
+                /** @description since */
+                since?: string;
+                /** @description until */
+                until?: string;
+                /** @description snapshot_id */
+                snapshot_id?: string;
+                /** @description limit */
+                limit?: number;
+                /** @description cursor */
+                cursor?: string;
+                /** @description port_id */
+                port_id?: string;
+            };
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsLLDPListEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsListFDB: {
+        parameters: {
+            query?: {
+                /** @description since */
+                since?: string;
+                /** @description until */
+                until?: string;
+                /** @description snapshot_id */
+                snapshot_id?: string;
+                /** @description limit */
+                limit?: number;
+                /** @description cursor */
+                cursor?: string;
+                /** @description port_id */
+                port_id?: string;
+            };
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsFDBListEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsListARP: {
+        parameters: {
+            query?: {
+                /** @description since */
+                since?: string;
+                /** @description until */
+                until?: string;
+                /** @description snapshot_id */
+                snapshot_id?: string;
+                /** @description limit */
+                limit?: number;
+                /** @description cursor */
+                cursor?: string;
+                /** @description port_id */
+                port_id?: string;
+            };
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsARPListEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsListDDM: {
+        parameters: {
+            query?: {
+                /** @description since */
+                since?: string;
+                /** @description until */
+                until?: string;
+                /** @description snapshot_id */
+                snapshot_id?: string;
+                /** @description limit */
+                limit?: number;
+                /** @description cursor */
+                cursor?: string;
+                /** @description port_id */
+                port_id?: string;
+            };
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsDDMListEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsListMetrics: {
+        parameters: {
+            query?: {
+                /** @description since */
+                since?: string;
+                /** @description until */
+                until?: string;
+                /** @description snapshot_id */
+                snapshot_id?: string;
+                /** @description limit */
+                limit?: number;
+                /** @description cursor */
+                cursor?: string;
+                /** @description metric_key */
+                metric_key?: string;
+                /** @description port_id */
+                port_id?: string;
+                /** @description component_asset_id */
+                component_asset_id?: string;
+                /** @description aggregation */
+                aggregation?: "raw" | "min" | "max" | "avg";
+            };
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsMetricListEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsListLogs: {
+        parameters: {
+            query?: {
+                /** @description since */
+                since?: string;
+                /** @description until */
+                until?: string;
+                /** @description snapshot_id */
+                snapshot_id?: string;
+                /** @description limit */
+                limit?: number;
+                /** @description cursor */
+                cursor?: string;
+                /** @description level */
+                level?: string;
+                /** @description search */
+                search?: string;
+            };
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsLogListEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsListFirmware: {
+        parameters: {
+            query?: {
+                /** @description since */
+                since?: string;
+                /** @description until */
+                until?: string;
+                /** @description snapshot_id */
+                snapshot_id?: string;
+                /** @description limit */
+                limit?: number;
+                /** @description cursor */
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsFirmwareListEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsGetBmc: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsBmcEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsListBmcSEL: {
+        parameters: {
+            query?: {
+                /** @description since */
+                since?: string;
+                /** @description until */
+                until?: string;
+                /** @description snapshot_id */
+                snapshot_id?: string;
+                /** @description limit */
+                limit?: number;
+                /** @description cursor */
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsLogListEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsGetAssetLinks: {
+        parameters: {
+            query?: {
+                /** @description limit */
+                limit?: number;
+                /** @description cursor */
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsAssetLinksEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsCreatePowerJob: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                "If-Match"?: components["parameters"]["IfMatch"];
+            };
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpsPowerRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsJobEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsCreateFirmwareUpgrade: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpsFirmwareUpgradeRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsFirmwareUpgradeJobEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsGetFirmwareUpgrade: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsFirmwareUpgradeJobEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsApproveFirmwareUpgrade: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                "If-Match"?: components["parameters"]["IfMatch"];
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpsApprovalRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsFirmwareUpgradeJobEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsExecuteFirmwareUpgrade: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                "If-Match"?: components["parameters"]["IfMatch"];
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpsJobControlRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsFirmwareUpgradeJobEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsListCollectionPolicies: {
+        parameters: {
+            query?: {
+                /** @description limit */
+                limit?: number;
+                /** @description cursor */
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                project_id: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsCollectionPolicyListEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsCreateCollectionPolicy: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                project_id: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpsCollectionPolicyRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsCollectionPolicyEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsUpdateCollectionPolicy: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                "If-Match"?: components["parameters"]["IfMatch"];
+            };
+            path: {
+                policy_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpsCollectionPolicyRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsCollectionPolicyEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsCreateCollectionJob: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpsCollectionRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsJobEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsGetCollectionJob: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsJobEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsRetryCollectionJob: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                "If-Match"?: components["parameters"]["IfMatch"];
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpsJobControlRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsJobEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsListMaintenanceEvents: {
+        parameters: {
+            query?: {
+                /** @description since */
+                since?: string;
+                /** @description until */
+                until?: string;
+                /** @description snapshot_id */
+                snapshot_id?: string;
+                /** @description limit */
+                limit?: number;
+                /** @description cursor */
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsMaintenanceEventListEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsCreateMaintenanceEvent: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                "If-Match"?: components["parameters"]["IfMatch"];
+            };
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpsMaintenanceRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsMaintenanceEventEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsCreateRetirementJob: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+                "If-Match"?: components["parameters"]["IfMatch"];
+            };
+            path: {
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpsRetirementRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsJobEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsGetJob: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsJobEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    opsGetRetentionPolicy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                policy_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsRetentionPolicyEnvelope"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden or ACCESS_POLICY_DENIED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Revision/idempotency/approval conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description CAPABILITY_UNSUPPORTED / EVIDENCE_UNAVAILABLE / domain invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Source unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    getIASession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IASessionEnvelope"];
+                };
+            };
+            /** @description Unauthorized or outside the permitted project scope */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthorized or outside the permitted project scope */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthorized or outside the permitted project scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    listIACrossProject: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                resource: "devices" | "alerts" | "issues";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IACrossProjectEnvelope"];
+                };
+            };
+            /** @description Unauthorized or outside the permitted project scope */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthorized or outside the permitted project scope */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthorized or outside the permitted project scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    getIADeviceTab: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                device_id: string;
+                tab: "inventory" | "mapping" | "ports" | "pcie" | "monitoring" | "identity" | "configuration" | "scripts" | "events" | "runtime" | "lossless" | "optics" | "logs";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IATabEnvelope"];
+                };
+            };
+            /** @description Unauthorized or outside the permitted project scope */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthorized or outside the permitted project scope */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthorized or outside the permitted project scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    streamIAEvents: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                resource_type?: "executions" | "execution_logs" | "ports" | "alerts";
+            };
+            header?: {
+                "Last-Event-ID"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description SSE events; each data item is an IAEvent */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": string;
+                };
+            };
+            /** @description Unauthorized or outside the permitted project scope */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthorized or outside the permitted project scope */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    listIAAIProvider: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized resources */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IAAIProviderEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listIAAIJob: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized resources */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IAAIJobEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listIAKnowledgeSource: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized resources */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IAKnowledgeSourceEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listIAAIFeedback: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized resources */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IAAIFeedbackEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listIANotificationSetting: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized resources */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IANotificationSettingEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listIAAPIToken: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized resources */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IAAPITokenEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listIASshTrust: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized resources */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IASshTrustEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listIACollectionPolicy: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized resources */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IACollectionPolicyEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullprojecttimelinesprojectsprojectIdtimeline: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullProjectTimelinesListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fulldashboardsnapshotsdashboardsummary: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullDashboardSnapshotsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullserversfleetservers: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullServersListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullserversfleetserversserverId: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                serverId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullServersListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullserverruntimefleetserversserverIdruntime: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                serverId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullServerRuntimeListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullbmcinventoryfleetserversserverIdbmc: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                serverId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullBmcInventoryListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullbmcsensorsfleetserversserverIdbmcsensors: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                serverId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullBmcSensorsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullfirmwareinventoryfleetserversserverIdfirmware: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                serverId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullFirmwareInventoryListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullserverobservedconfigsfleetserversserverIdconfigdiff: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                serverId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullServerObservedConfigsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullswitchesfabricswitches: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullSwitchesListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullswitchruntimefabricswitchesswitchIdruntime: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                switchId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullSwitchRuntimeListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullswitchconfigbaselinesfabricswitchesswitchIdconfigbaseline: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                switchId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullSwitchConfigBaselinesListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullswitchrunningconfigsfabricswitchesswitchIdconfigrunning: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                switchId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullSwitchRunningConfigsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullswitchconfigdiffsfabricswitchesswitchIdconfigdiff: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                switchId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullSwitchConfigDiffsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullswitchinterfacesfabricswitchesswitchIdinterfaces: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                switchId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullSwitchInterfacesListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fulllldpneighborsfabricswitchesswitchIdlldp: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                switchId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullLldpNeighborsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullfdbentriesfabricswitchesswitchIdfdb: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                switchId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullFdbEntriesListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullarpentriesfabricswitchesswitchIdarp: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                switchId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullArpEntriesListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullddmsamplesfabricswitchesswitchIdddm: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                switchId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullDdmSamplesListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullswitchbgpneighborsfabricswitchesswitchIdbgp: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                switchId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullSwitchBgpNeighborsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullswitchlogsfabricswitchesswitchIdlogs: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                switchId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullSwitchLogsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullbomimportsbomimports: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullBomImportsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullbomsheetregionsbomimportsimportIdsheets: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                importId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullBomSheetRegionsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullbommappingcandidatesbomimportsimportIdmappings: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                importId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullBomMappingCandidatesListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullbomissuesbomimportsimportIdissues: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                importId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullBomIssuesListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullcmdbrelationshipscmdbentitiesentityIdrelationships: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                entityId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullCmdbRelationshipsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fulllifecycleeventscmdbentitiesentityIdtimeline: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                entityId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullLifecycleEventsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullrackglobalmapsracksglobalmap: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullRackGlobalMapsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullracksracks: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullRacksListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullrackdiagramsracksrackIddiagram: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                rackId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullRackDiagramsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullrackplacementsracksrackIdplacements: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                rackId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullRackPlacementsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullrackdiagramrevisionsrackdiagramsrevisions: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullRackDiagramRevisionsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullflowsflows: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullFlowsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullflowrevisionsflowsflowIdrevisions: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                flowId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullFlowRevisionsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullflowblueprintsflowblueprints: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullFlowBlueprintsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullflowtargetgroupsflowtargetgroups: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullFlowTargetGroupsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullexecutiontargetsexecutionsexecutionIdtargets: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                executionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullExecutionTargetsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fulltaskrunsexecutionsexecutionIdtasks: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                executionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullTaskRunsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullexecutionlogsexecutionsexecutionIdlogs: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                executionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullExecutionLogsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullexecutionoutputsexecutionsexecutionIdoutputs: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path: {
+                executionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullExecutionOutputsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullschedulesschedules: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullSchedulesListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullissuesissues: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullIssuesListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullalertsalerts: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullAlertsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullmetricseriesmonitormetrics: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullMetricSeriesListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullcollectionjobsmonitorcollections: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullCollectionJobsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullmonitoringsourcesmonitorsources: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullMonitoringSourcesListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullgateevidencedeliverygates: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullGateEvidenceListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullmappingrevisionsdeliverymappingrevisions: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullMappingRevisionsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullpushjobsfabricpushjobs: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullPushJobsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullnetworkbaselinesfabricnetworkbaselines: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullNetworkBaselinesListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullusersadminusers: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullUsersListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fulltemplatesadmintemplates: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullTemplatesListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fulldevicemodelsadmindevicemodels: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullDeviceModelsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullparametersadminparameters: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullParametersListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullmediaadminmedia: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullMediaListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullauditeventsadminauditevents: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullAuditEventsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullaiprovidersaiproviders: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullAiProvidersListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullaitasksaitasks: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullAiTasksListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    fullaievaluationsaievaluations: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                cursor?: string;
+                limit?: number;
+                q?: string;
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized source records, paginated; missing data is not healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FullAiEvaluationsListEnvelope"];
+                };
+            };
+            /** @description Project or resource permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getServerMappingMatrix: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                server_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description GPU-NIC pairing and independent planned/observed network links */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IAMappingEnvelope"];
+                };
+            };
+            /** @description Project permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Server not in project */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listDeliveryStages: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized stage result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeliveryStageListEnvelope"];
+                };
+            };
+            /** @description Permission/project denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stage prerequisite, stale evidence or revision conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid target scope or missing evidence */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getDeliveryStageSummary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized stage result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeliveryStageSummaryEnvelope"];
+                };
+            };
+            /** @description Permission/project denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stage prerequisite, stale evidence or revision conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid target scope or missing evidence */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    startDeliveryStage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                stage_id: "KICKOFF" | "NETWORK_READINESS" | "PROVISIONING" | "VALIDATION" | "NCCL_VALIDATION" | "CLEANUP_HANDOVER";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeliveryStageCommand"];
+            };
+        };
+        responses: {
+            /** @description Authorized stage result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeliveryStageStartEnvelope"];
+                };
+            };
+            /** @description Permission/project denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stage prerequisite, stale evidence or revision conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid target scope or missing evidence */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    completeDeliveryStage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                stage_id: "KICKOFF" | "NETWORK_READINESS" | "PROVISIONING" | "VALIDATION" | "NCCL_VALIDATION" | "CLEANUP_HANDOVER";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeliveryStageCommand"];
+            };
+        };
+        responses: {
+            /** @description Authorized stage result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeliveryStageListEnvelope"];
+                };
+            };
+            /** @description Permission/project denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stage prerequisite, stale evidence or revision conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid target scope or missing evidence */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    waiveDeliveryStage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                stage_id: "KICKOFF" | "NETWORK_READINESS" | "PROVISIONING" | "VALIDATION" | "NCCL_VALIDATION" | "CLEANUP_HANDOVER";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeliveryWaiverRequest"];
+            };
+        };
+        responses: {
+            /** @description Authorized stage result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeliveryStageListEnvelope"];
+                };
+            };
+            /** @description Permission/project denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stage prerequisite, stale evidence or revision conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid target scope or missing evidence */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listValidationChecks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized stage result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationCheckListEnvelope"];
+                };
+            };
+            /** @description Permission/project denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stage prerequisite, stale evidence or revision conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid target scope or missing evidence */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    applyMockValidationRemediation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                issue_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ValidationRemediationRequest"];
+            };
+        };
+        responses: {
+            /** @description Authorized stage result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationCheckListEnvelope"];
+                };
+            };
+            /** @description Permission/project denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stage prerequisite, stale evidence or revision conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid target scope or missing evidence */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    startValidationRetest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                issue_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ValidationRetestRequest"];
+            };
+        };
+        responses: {
+            /** @description Authorized stage result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationCheckListEnvelope"];
+                };
+            };
+            /** @description Permission/project denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stage prerequisite, stale evidence or revision conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid target scope or missing evidence */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listHandoverRecords: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized stage result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HandoverListEnvelope"];
+                };
+            };
+            /** @description Permission/project denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stage prerequisite, stale evidence or revision conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid target scope or missing evidence */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    prepareHandover: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HandoverPrepareRequest"];
+            };
+        };
+        responses: {
+            /** @description Authorized stage result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HandoverListEnvelope"];
+                };
+            };
+            /** @description Permission/project denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stage prerequisite, stale evidence or revision conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid target scope or missing evidence */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    advanceHandoverStep: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                handover_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HandoverAdvanceRequest"];
+            };
+        };
+        responses: {
+            /** @description Authorized stage result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HandoverEnvelope"];
+                };
+            };
+            /** @description Permission/project denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stage prerequisite, stale evidence or revision conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid target scope or missing evidence */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getRackWorkspaceTab: {
+        parameters: {
+            query?: {
+                device_id?: string;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+                rack_id: string;
+                tab: "overview" | "environment" | "devices" | "selected" | "network" | "mapping" | "topology" | "alerts" | "history";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized rack and selected-tab evidence; null is never zero */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RackWorkspaceTabResponse"];
+                };
+            };
+            /** @description Project/asset permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rack not in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Device outside rack or unsupported tab */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getFabricPhysicalTopology: {
+        parameters: {
+            query?: {
+                scope?: "global" | "group" | "local";
+                group_by?: "rack" | "pod" | "role";
+                site?: string;
+                pod?: string;
+                rack?: string;
+                fabric?: string;
+                rail?: string;
+                role?: string;
+                network_role?: string;
+                health?: "healthy" | "warning" | "critical" | "unknown" | "planned" | "anomalies";
+                q?: string;
+                device_id?: string;
+                network_id?: string;
+                limit?: number;
+                cursor?: string;
+                at?: string;
+                comparison?: "compare" | "planned" | "observed";
+            };
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized, progressively expanded topology */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FabricTopologyGraph"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Historical snapshot unavailable; current data is not substituted */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid filter/cursor or missing local device */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getFabricLogicalTopology: {
+        parameters: {
+            query?: {
+                scope?: "global" | "group" | "local";
+                group_by?: "rack" | "pod" | "role";
+                site?: string;
+                pod?: string;
+                rack?: string;
+                fabric?: string;
+                rail?: string;
+                role?: string;
+                network_role?: string;
+                health?: "healthy" | "warning" | "critical" | "unknown" | "planned" | "anomalies";
+                q?: string;
+                device_id?: string;
+                network_id?: string;
+                limit?: number;
+                cursor?: string;
+                at?: string;
+                comparison?: "compare" | "planned" | "observed";
+            };
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized, progressively expanded topology */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FabricTopologyGraph"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Historical snapshot unavailable; current data is not substituted */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid filter/cursor or missing local device */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getFabricTopologyDetail: {
+        parameters: {
+            query?: {
+                at?: string;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+                kind: "device" | "port" | "cable" | "network" | "edge";
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Dual-end evidence, logical/physical association and configuration diff */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FabricTopologyDetail"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Object or snapshot unavailable */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getFabricTopologyFilters: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized filter values and historical snapshots */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FabricTopologyFilters"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
 }
