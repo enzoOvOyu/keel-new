@@ -221,6 +221,10 @@ func (s *Server) commit(w http.ResponseWriter, r *http.Request, id string, rev i
 		return
 	}
 	if status == "COMMITTED" {
+		if _, newSubmit := ctx.Value(submitScopeKey{}).(submitScope); newSubmit {
+			fail(w, 409, "IMPORT_IMMUTABLE")
+			return
+		}
 		var existingImport string
 		keyErr := tx.QueryRow(ctx, "SELECT import_id::text FROM idempotency_record WHERE project_id=$1 AND key=$2", s.project, r.Header.Get("Idempotency-Key")).Scan(&existingImport)
 		if keyErr == nil && existingImport != id {
@@ -237,6 +241,101 @@ func (s *Server) commit(w http.ResponseWriter, r *http.Request, id string, rev i
 	}
 	var items []bom.Item
 	json.Unmarshal(raw, &items)
+	scope, workbenchSubmit := ctx.Value(submitScopeKey{}).(submitScope)
+	var wb bom.Workbench
+	var mode string
+	if e = tx.QueryRow(ctx, "SELECT workbench,import_mode FROM bom_import_batch WHERE id=$1", id).Scan(&raw, &mode); e != nil {
+		fail(w, 500, "DATABASE_ERROR")
+		return
+	}
+	if mode != "legacy" && !workbenchSubmit {
+		fail(w, 422, "WORKBENCH_CONFIRMATION_REQUIRED")
+		return
+	}
+	selected := map[string]bool{}
+	selectedAssets := map[string]string{}
+	existingAssets := map[string]bool{}
+	if workbenchSubmit {
+		if len(scope.IDs) == 0 {
+			fail(w, 422, "SELECTION_REQUIRED")
+			return
+		}
+		for _, v := range scope.IDs {
+			if selected[v] {
+				fail(w, 422, "DUPLICATE_SELECTION")
+				return
+			}
+			selected[v] = true
+		}
+		var previous []byte
+		if tx.QueryRow(ctx, "SELECT results FROM bom_submission WHERE project_id=$1 AND idempotency_key=$2 AND import_id=$3", s.project, r.Header.Get("Idempotency-Key"), id).Scan(&previous) == nil {
+			tx.Rollback(ctx)
+			s.receipt(w, r, id)
+			return
+		}
+		json.Unmarshal(raw, &wb)
+		s.workbenchIssues(ctx, id, &wb)
+		found := 0
+		items = nil
+		for _, rec := range wb.Records {
+			if mode == "fixed" && !rec.Ignored && rec.Blocked() {
+				fail(w, 422, "FIXED_IMPORT_HAS_BLOCKERS")
+				return
+			}
+			if selected[rec.ID] {
+				found++
+				if rec.Imported || rec.Ignored || !rec.Confirmed || rec.Blocked() {
+					fail(w, 422, "SELECTED_RECORDS_NOT_CONFIRMED_OR_VALID")
+					return
+				}
+				for _, issue := range rec.Issues {
+					if issue.Severity == "WARNING" && !scope.WarningAck {
+						fail(w, 422, "WARNING_CONFIRMATION_REQUIRED")
+						return
+					}
+				}
+				items = append(items, bom.WorkbenchItem(rec, s.project))
+			}
+			if mode == "fixed" && !rec.Ignored && !rec.Imported && !selected[rec.ID] {
+				fail(w, 422, "FIXED_IMPORT_REQUIRES_ALL_RECORDS")
+				return
+			}
+		}
+		if found != len(selected) {
+			fail(w, 422, "RECORD_NOT_FOUND")
+			return
+		}
+		// Previously imported dependencies retain their identity and may support later subsets.
+		imported := map[string]bom.Item{}
+		for _, rec := range wb.Records {
+			if rec.Imported {
+				imported[rec.ID] = bom.WorkbenchItem(rec, s.project)
+			}
+		}
+		items = bom.ResolveWorkbench(bom.EnsureRacks(bom.ExpandPorts(bom.ResolveWorkbench(items))))
+		items = s.existingBOMDependencies(ctx, items)
+		included := map[string]bool{}
+		for _, i := range items {
+			included[i.UID] = true
+		}
+		for pos := 0; pos < len(items); pos++ {
+			for _, dep := range []string{items[pos].Parent, items[pos].A, items[pos].B, items[pos].Fields["rack_uid"], items[pos].Fields["port_uid"]} {
+				if dep == "" || included[dep] {
+					continue
+				}
+				if prior, ok := imported[dep]; ok {
+					items = append(items, prior)
+					included[dep] = true
+				} else {
+					fail(w, 422, "SELECT_RELATED_DEPENDENCIES")
+					return
+				}
+			}
+		}
+		items = bom.ResolveWorkbench(items)
+
+	}
+
 	var bindings map[string]string
 	json.Unmarshal(reviewBindings, &bindings)
 	for j := range items {
@@ -247,7 +346,7 @@ func (s *Server) commit(w http.ResponseWriter, r *http.Request, id string, rev i
 			items[j].Fields["model_version_ref"] = ref
 		}
 	}
-	if version != rev || reviewed == nil || *reviewed != version || hasBlockers(s.validateDraft(ctx, id, items)) {
+	if version != rev || (!workbenchSubmit && (reviewed == nil || *reviewed != version)) || hasBlockers(s.validateDraft(ctx, id, items)) {
 		fail(w, 422, "REVIEW_OR_VALIDATION_REQUIRED")
 		return
 	}
@@ -256,12 +355,17 @@ func (s *Server) commit(w http.ResponseWriter, r *http.Request, id string, rev i
 		fail(w, 422, "REFERENCE_UNRESOLVED")
 		return
 	}
+	for j, i := range items {
+		if selected[i.UID] {
+			selectedAssets[i.UID] = normalized[j].UID
+		}
+	}
 	items = normalized
 	for j := range items {
 		item := &items[j]
-		if item.Model != "" {
+		if item.Model != "" && bom.RequiresModel(bom.AssetType(*item)) {
 			var modelRef string
-			e = tx.QueryRow(ctx, "SELECT id::text FROM device_model_revision WHERE model=$1 AND category=$2 AND ($3='' OR id::text=$3)", item.Model, item.Category, item.Fields["model_version_ref"]).Scan(&modelRef)
+			e = tx.QueryRow(ctx, "SELECT id::text FROM device_model_revision WHERE model=$1 AND category=$2 AND ($3='' OR id::text=$3)", item.Model, bom.AssetType(*item), item.Fields["model_version_ref"]).Scan(&modelRef)
 			if e != nil {
 				fail(w, 422, "MODEL_REVISION_REQUIRED")
 				return
@@ -303,6 +407,18 @@ func (s *Server) commit(w http.ResponseWriter, r *http.Request, id string, rev i
 	// Material identity is global; stable IDs are derived from the confirmed identity, not row order.
 	for _, item := range items {
 		// Already normalized with references in one graph pass.
+		if workbenchSubmit {
+			var oldRaw []byte
+			if tx.QueryRow(ctx, "SELECT payload FROM bom_item WHERE identity_key=$1", bom.Identity(item)).Scan(&oldRaw) == nil {
+				var old bom.Item
+				json.Unmarshal(oldRaw, &old)
+				existingAssets[item.UID] = true
+				if !sameMaterial(old, item) {
+					fail(w, 409, "EXISTING_ASSET_CHANGE_REQUIRES_REVIEW")
+					return
+				}
+			}
+		}
 		b, _ := json.Marshal(item)
 		_, e = tx.Exec(ctx, "INSERT INTO bom_item(item_uid,identity_key,category,serial,payload) VALUES($1,$2,$3,$4,$5) ON CONFLICT(identity_key) DO UPDATE SET payload=excluded.payload", item.UID, bom.Identity(item), item.Category, item.Serial, b)
 		if e != nil {
@@ -332,6 +448,39 @@ func (s *Server) commit(w http.ResponseWriter, r *http.Request, id string, rev i
 	_, e = tx.Exec(ctx, "INSERT INTO outbox_event(id,project_id,event_type,payload) VALUES($1,$2,'bom.committed',$3)", uuid.NewString(), s.project, payload)
 	if e == nil {
 		_, e = tx.Exec(ctx, "UPDATE bom_import_batch SET status='COMMITTED',committed_revision=$2 WHERE id=$1", id, revision)
+	}
+	if e == nil && workbenchSubmit {
+		results := []any{}
+		index := 0
+		remaining := 0
+		for j := range wb.Records {
+			rec := &wb.Records[j]
+			if selected[rec.ID] {
+				rec.Imported = true
+				rec.AssetID = selectedAssets[rec.ID]
+				index++
+				resultStatus := "imported"
+				if existingAssets[rec.AssetID] {
+					resultStatus = "linked_existing"
+				}
+				results = append(results, map[string]any{"record_id": rec.ID, "asset_id": rec.AssetID, "status": resultStatus, "sheet_name": rec.Sheet, "source_row": rec.Row})
+			}
+			if !rec.Imported && !rec.Ignored {
+				remaining++
+			}
+		}
+		wb.State = "imported"
+		next := "COMMITTED"
+		if remaining > 0 {
+			wb.State = "partially_imported"
+			next = "PARTIALLY_IMPORTED"
+		}
+		workspace, _ := json.Marshal(wb)
+		result, _ := json.Marshal(results)
+		_, e = tx.Exec(ctx, "UPDATE bom_import_batch SET workbench=$2,status=$3,revision=revision+1 WHERE id=$1", id, workspace, next)
+		if e == nil {
+			_, e = tx.Exec(ctx, "INSERT INTO bom_submission(id,import_id,project_id,idempotency_key,request_digest,revision_id,results) VALUES($1,$2,$3,$4,$5,$6,$7)", uuid.NewString(), id, s.project, key, digest, revision, result)
+		}
 	}
 	if e == nil {
 		_, e = tx.Exec(ctx, "INSERT INTO audit_event(id,project_id,actor,action,resource_id) VALUES($1,$2,$3,'bom.committed',$4)", uuid.NewString(), s.project, actorName(ctx), id)
@@ -402,4 +551,20 @@ func itemValues(i bom.Item) map[string]string {
 		m[k] = v
 	}
 	return m
+}
+
+// Importing the same asset may add provenance, but cannot silently replace its material facts.
+func sameMaterial(a, b bom.Item) bool {
+	if bom.AssetType(a) != bom.AssetType(b) || a.Serial != b.Serial || a.Model != b.Model || a.Parent != b.Parent || a.A != b.A || a.B != b.B {
+		return false
+	}
+	for k, v := range b.Fields {
+		if k == "model_version_ref" || k == "category" || k == "item_uid" {
+			continue
+		}
+		if old := a.Fields[k]; old != v && v != "" {
+			return false
+		}
+	}
+	return true
 }

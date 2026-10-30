@@ -11,14 +11,16 @@ import (
 )
 
 type Cell struct {
-	Ref       string `json:"source_cell"`
-	Row       int    `json:"source_row"`
-	Column    int    `json:"source_column"`
-	Value     string `json:"original_value"`
-	Formula   string `json:"formula,omitempty"`
-	Hidden    bool   `json:"hidden"`
-	Sensitive bool   `json:"sensitive"`
-	Sheet     string `json:"sheet_name"`
+	Ref           string `json:"source_cell"`
+	Row           int    `json:"source_row"`
+	Column        int    `json:"source_column"`
+	Value         string `json:"original_value"`
+	Formula       string `json:"formula,omitempty"`
+	FormulaBacked bool   `json:"formula_backed,omitempty"`
+	Hidden        bool   `json:"hidden"`
+	Sensitive     bool   `json:"sensitive"`
+	Sheet         string `json:"sheet_name"`
+	StyleID       int    `json:"style_id,omitempty"`
 }
 type Sheet struct {
 	Name      string   `json:"sheet_name"`
@@ -71,7 +73,7 @@ func Parse(data []byte) (Workbook, error) {
 	for idx, name := range f.GetSheetList() {
 		visible, _ := f.GetSheetVisible(name)
 		dim, _ := f.GetSheetDimension(name)
-		s := Sheet{Name: name, Order: idx, Hidden: !visible, Dimension: dim, Purpose: "unclassified", Parser: "excelize-structure/v2", Cells: []Cell{}, Merges: []string{}}
+		s := Sheet{Name: name, Order: idx, Hidden: !visible, Dimension: dim, Purpose: "unclassified", Parser: "excelize-ir/v3", Cells: []Cell{}, Merges: []string{}}
 		merges, e := f.GetMergeCells(name)
 		if e != nil {
 			return result, e
@@ -117,7 +119,8 @@ func Parse(data []byte) (Workbook, error) {
 					v = "[REDACTED]"
 					formula = ""
 				}
-				s.Cells = append(s.Cells, Cell{ref, r, c + 1, v, formula, !rv || !cv, redact, name})
+				style, _ := f.GetCellStyle(name, ref)
+				s.Cells = append(s.Cells, Cell{Ref: ref, Row: r, Column: c + 1, Value: v, Formula: formula, FormulaBacked: formula != "", Hidden: !rv || !cv, Sensitive: redact, Sheet: name, StyleID: style})
 			}
 		}
 		if e := rows.Error(); e != nil {

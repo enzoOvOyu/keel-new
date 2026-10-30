@@ -122,19 +122,21 @@ func (s *Server) validateDraft(ctx context.Context, id string, items []bom.Item)
 	out := bom.Validate(items)
 	for _, item := range items {
 		for field, c := range item.Sources {
-			if c.Formula != "" {
+			if c.Formula != "" || c.FormulaBacked {
 				out = append(out, bom.Issue{ID: "formula-" + item.UID, Severity: "WARNING", Rule: "FORMULA-CACHE", Version: "1.0", Item: item.UID, Field: field, Reason: "Cached formula result is preserved without execution; confirm its applicability during review"})
 				break
 			}
 		}
 	}
 	capabilities := map[string]map[string]any{}
-	rows, e := s.db.Query(ctx, "SELECT category,model,capabilities FROM device_model_revision")
+	modelVersions := map[string][]string{}
+	rows, e := s.db.Query(ctx, "SELECT id::text,category,model,capabilities FROM device_model_revision")
 	if e == nil {
 		for rows.Next() {
-			var kind, model string
+			var revisionID, kind, model string
 			var raw []byte
-			rows.Scan(&kind, &model, &raw)
+			rows.Scan(&revisionID, &kind, &model, &raw)
+			modelVersions[kind+":"+model] = append(modelVersions[kind+":"+model], revisionID)
 			var cap map[string]any
 			json.Unmarshal(raw, &cap)
 			capabilities[kind+":"+model] = cap
@@ -143,13 +145,21 @@ func (s *Server) validateDraft(ctx context.Context, id string, items []bom.Item)
 	}
 	out = append(out, bom.Engineering(items, capabilities)...)
 	for _, item := range items {
-		if item.Model != "" && (item.Category == "server" || item.Category == "switch" || item.Category == "gpu" || item.Category == "nic" || item.Category == "psu" || item.Category == "bmc" || item.Category == "optic_module") {
-			var count int
-			e := s.db.QueryRow(ctx, "SELECT count(*) FROM device_model_revision WHERE model=$1 AND category=$2 AND ($3='' OR id::text=$3)", item.Model, item.Category, item.Fields["model_version_ref"]).Scan(&count)
-			if e != nil || count != 1 {
+		if item.Model != "" && bom.RequiresModel(item.Category) {
+			count := 0
+			for _, revisionID := range modelVersions[item.Category+":"+item.Model] {
+				if item.Fields["model_version_ref"] == "" || item.Fields["model_version_ref"] == revisionID {
+					count++
+				}
+			}
+			if count != 1 {
 				out = append(out, bom.Issue{ID: "model-" + item.UID, Severity: "BLOCKER", Rule: "MODEL-APPROVED-REVISION", Version: "1.0", Item: item.UID, Field: "model", Reason: "Model must resolve to exactly one approved catalog revision"})
 			}
 		}
+	}
+	var mode string
+	if s.db.QueryRow(ctx, "SELECT import_mode FROM bom_import_batch WHERE id=$1", id).Scan(&mode) == nil && mode != "legacy" {
+		return out
 	}
 	var raw, workbook []byte
 	var confirmed bool

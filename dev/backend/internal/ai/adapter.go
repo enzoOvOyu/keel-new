@@ -227,6 +227,9 @@ func Decode(b []byte) ([]Candidate, error) {
 }
 
 type Provider struct {
+	Calls                int
+	TotalInputTokens     int
+	TotalOutputTokens    int
 	ConfigID             string
 	ConfigRevision       int64
 	TokenParameter       string

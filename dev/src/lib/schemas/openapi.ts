@@ -5236,6 +5236,120 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/bom-imports/{import_id}/workbench": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        /** Four-step staged records, deterministic checks and per-record submission reports */
+        get: operations["getBOMWorkbench"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bom-imports/{import_id}/workbench/initialize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Explicit mode selection for an uncommitted legacy batch; preserve previous mappings */
+        post: operations["initializeLegacyBOMWorkbench"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bom-imports/{import_id}/workbench/records": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Correct, confirm or explicitly exclude selected staged source rows */
+        post: operations["postBOMWorkbenchRecords"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bom-imports/{import_id}/workbench/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Re-run deterministic checks without AI */
+        post: operations["postBOMWorkbenchValidate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bom-imports/{import_id}/workbench/recognize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Queue source-grounded AI extraction for selected rows; never commit assets */
+        post: operations["postBOMWorkbenchRecognize"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bom-imports/{import_id}/workbench/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Freeze revision and selected confirmed records; atomically commit unified BOM and Outbox */
+        post: operations["postBOMWorkbenchSubmit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -11902,10 +12016,193 @@ export interface components {
             source_row: number;
             source_column: number;
             original_value: string;
+            /** @description Cached value originated from a formula; full expression is available in immutable workbook detail. */
+            formula_backed?: boolean;
             formula?: string;
             hidden: boolean;
             sensitive: boolean;
             sheet_name?: string;
+        };
+        BOMWorkbenchRecord: {
+            /** @description Explicit model ambiguity blocks confirmation until a reasoned manual correction. */
+            ambiguity?: boolean;
+            unmapped_cells?: components["schemas"]["BOMSourceCell"][];
+            cell_dispositions?: {
+                [key: string]: string;
+            };
+            header_context?: components["schemas"]["BOMSourceCell"][];
+            id: string;
+            sheet_name: string;
+            source_row: number;
+            source_cells: components["schemas"]["BOMSourceCell"][];
+            original_description: string;
+            item: components["schemas"]["BOMDraftItem"];
+            /** @enum {string} */
+            recognition_status: "recognized" | "needs_review" | "unrecognized";
+            confidence: number | null;
+            /** @enum {string} */
+            method: "rules" | "pending" | "source_relation" | "provider" | "manual";
+            confirmed: boolean;
+            ignored: boolean;
+            imported: boolean;
+            asset_id?: string;
+            reason?: string;
+            before?: {
+                [key: string]: string;
+            };
+            issues: components["schemas"]["BOMWorkbenchIssue"][];
+        };
+        BOMWorkbenchIssue: {
+            id: string;
+            rule_id: string;
+            version: string;
+            item_uid: string;
+            field: string;
+            reason: string;
+            /** @enum {string} */
+            severity: "BLOCKER" | "WARNING" | "INFO";
+        };
+        BOMRecordWriteResult: {
+            record_id: string;
+            asset_id: string;
+            status: string;
+            sheet_name: string;
+            source_row: number;
+        };
+        BOMWorkbenchSubmission: {
+            /** Format: uuid */
+            bom_revision: string;
+            /** Format: date-time */
+            created_at: string;
+            results: components["schemas"]["BOMRecordWriteResult"][];
+        };
+        BOMRecognitionSheet: {
+            sheet_name: string;
+            /** @enum {string} */
+            state: "pending" | "recognized" | "failed";
+            purpose: string;
+            note: string;
+            error?: string;
+            rows: number;
+            recognized: number;
+            plan?: {
+                /** @enum {string} */
+                purpose?: "table" | "layout" | "reference" | "unknown";
+                note?: string;
+                header_rows?: number[];
+                tables?: {
+                    key?: string;
+                    record_kind?: string;
+                    entity_type?: string;
+                    start_row?: number;
+                    end_row?: number;
+                    fields?: {
+                        [key: string]: number;
+                    };
+                    type_column?: number;
+                    type_values?: {
+                        [key: string]: string;
+                    };
+                    row_keys?: string[];
+                    confidence?: number;
+                }[];
+            };
+        };
+        BOMPlanningAnalysis: {
+            summary: string;
+            sources: {
+                sheet: string;
+                role: string;
+                description: string;
+            }[];
+            identifiers: {
+                meaning: string;
+                source_fields: string;
+                use: string;
+            }[];
+            questions: string[];
+        };
+        BOMAgentStep: {
+            /** @enum {string} */
+            tool: "inspect_workbook" | "analyze_sheet" | "inspect_region" | "extract_entities" | "extract_switches" | "extract_terminations" | "resolve_relationships" | "cross_sheet_resolve" | "audit_coverage";
+            sheet_name?: string;
+            region?: string;
+            state: string;
+            detail: string;
+            /** Format: date-time */
+            at: string;
+        };
+        BOMRegionCoverage: {
+            id: string;
+            sheet_name: string;
+            range: string;
+            start_row: number;
+            end_row: number;
+            first_column: number;
+            last_column: number;
+            cells: number;
+            /** @enum {string} */
+            state: "pending" | "review_required" | "extracted" | "retention_gap";
+            extracted_cells: number;
+            unmapped_cells: number;
+            retained_cells: number;
+            candidates: number;
+            confirmed: number;
+            unrecognized: number;
+            ignored: number;
+        };
+        BOMCoverageAudit: {
+            /** @description Every structural region was analyzed and every source cell retained. Not extraction accuracy or approval. */
+            complete: boolean;
+            total_cells: number;
+            retained_cells: number;
+            extracted_cells: number;
+            regions: components["schemas"]["BOMRegionCoverage"][];
+        };
+        BOMWorkbench: {
+            steps?: components["schemas"]["BOMAgentStep"][];
+            coverage?: components["schemas"]["BOMCoverageAudit"];
+            /** @enum {string} */
+            mode: "ai" | "fixed" | "legacy";
+            revision: number;
+            /** @enum {string} */
+            state: "pending_review" | "recognizing" | "partially_imported" | "imported";
+            error?: string;
+            sheets?: components["schemas"]["BOMRecognitionSheet"][];
+            phase?: string;
+            analysis?: components["schemas"]["BOMPlanningAnalysis"] | null;
+            records: components["schemas"]["BOMWorkbenchRecord"][];
+            entity_types: string[];
+            submissions: components["schemas"]["BOMWorkbenchSubmission"][];
+        };
+        BOMWorkbenchCommand: {
+            /** @description Single-record source-cell mapping to a canonical field, or __reference__ with correction reason. */
+            source_mappings?: {
+                [key: string]: string;
+            };
+            /** @enum {string} */
+            import_mode?: "ai";
+            revision: number;
+            record_ids?: string[];
+            /** @enum {string} */
+            action?: "edit" | "confirm" | "ignore" | "restore";
+            fields?: {
+                [key: string]: string;
+            };
+            reason?: string;
+            acknowledge_warnings?: boolean;
+        };
+        BOMWorkbenchMutation: {
+            revision: number;
+            state?: string;
+        };
+        BOMWorkbenchEnvelope: {
+            data: components["schemas"]["BOMWorkbench"];
+            request_id: string;
+        };
+        BOMWorkbenchMutationEnvelope: {
+            data: components["schemas"]["BOMWorkbenchMutation"];
+            request_id: string;
         };
         BOMDraftItem: {
             status?: string;
@@ -13510,7 +13807,18 @@ export interface operations {
                 "multipart/form-data": {
                     /** Format: binary */
                     file: string;
-                    template_revision_id: string;
+                    /**
+                     * @description Current intake is AI-only. Existing fixed/legacy batches remain readable.
+                     * @default ai
+                     * @enum {string}
+                     */
+                    import_mode?: "ai";
+                    /**
+                     * Format: uuid
+                     * @description Enabled OpenAI-chat provider; empty selects enabled default.
+                     */
+                    provider_id?: string;
+                    template_revision_id?: string;
                     /** @enum {string} */
                     source_domain?: "network" | "server" | "combined";
                     declared_batch_id?: string;
@@ -13536,7 +13844,10 @@ export interface operations {
     };
     getBOMImport: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Omit raw workbook, draft and issues for the workflow shell. */
+                summary?: boolean;
+            };
             header?: never;
             path: {
                 import_id: components["parameters"]["ImportId"];
@@ -28887,6 +29198,277 @@ export interface operations {
             };
             /** @description Input, authorization, revision, configuration or storage error. */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getBOMWorkbench: {
+        parameters: {
+            query?: {
+                /** @description Omit raw source cells from result summaries. */
+                compact?: boolean;
+                /** @description Load the full source detail for one staged object. */
+                record_id?: string;
+            };
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized project staging workspace */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BOMWorkbenchEnvelope"];
+                };
+            };
+            /** @description Project permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Legacy import uses the original workflow */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    initializeLegacyBOMWorkbench: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BOMWorkbenchCommand"];
+            };
+        };
+        responses: {
+            /** @description Migrated staging workspace */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BOMWorkbenchMutationEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Mode or revision immutable */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postBOMWorkbenchRecords: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BOMWorkbenchCommand"];
+            };
+        };
+        responses: {
+            /** @description Workspace revision or queued recognition */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BOMWorkbenchMutationEnvelope"];
+                };
+            };
+            /** @description Scope or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision, immutable record, existing asset difference or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Blockers, unconfirmed rows, incomplete selected dependencies, mixed types or missing correction reason */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postBOMWorkbenchValidate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BOMWorkbenchCommand"];
+            };
+        };
+        responses: {
+            /** @description Workspace revision or queued recognition */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BOMWorkbenchMutationEnvelope"];
+                };
+            };
+            /** @description Scope or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision, immutable record, existing asset difference or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Blockers, unconfirmed rows, incomplete selected dependencies, mixed types or missing correction reason */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postBOMWorkbenchRecognize: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BOMWorkbenchCommand"];
+            };
+        };
+        responses: {
+            /** @description Workspace revision or queued recognition */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BOMWorkbenchMutationEnvelope"];
+                };
+            };
+            /** @description Scope or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision, immutable record, existing asset difference or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Blockers, unconfirmed rows, incomplete selected dependencies, mixed types or missing correction reason */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postBOMWorkbenchSubmit: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BOMWorkbenchCommand"];
+            };
+        };
+        responses: {
+            /** @description Official receipt */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getBOMPublicationEnvelope"];
+                };
+            };
+            /** @description Scope or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision, immutable record, existing asset difference or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Blockers, unconfirmed rows, incomplete selected dependencies, mixed types or missing correction reason */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

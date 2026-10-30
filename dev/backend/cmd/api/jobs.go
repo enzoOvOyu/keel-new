@@ -50,10 +50,17 @@ func (s *Server) queueValidation(w http.ResponseWriter, r *http.Request, id stri
 	respond(w, 202, map[string]any{"id": job, "kind": "validate", "status": "pending", "resource_id": id, "created_at": time.Now().UTC()})
 }
 func (s *Server) runJob(ctx context.Context) {
-	var job, id string
+	var job, id, kind, project string
+	var parameters []byte
 	var rev int
-	e := s.db.QueryRow(ctx, "UPDATE bom_job SET status='running',updated_at=now() WHERE id=(SELECT id FROM bom_job WHERE (status='pending' OR (status='running' AND updated_at<now()-interval '5 minutes')) ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 1) RETURNING id,import_id,revision").Scan(&job, &id, &rev)
+	e := s.db.QueryRow(ctx, "UPDATE bom_job SET status='running',updated_at=now() WHERE id=(SELECT id FROM bom_job WHERE (status='pending' OR (status='running' AND updated_at<now()-interval '5 minutes')) ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 1) RETURNING id,import_id,revision,kind,parameters,project_id").Scan(&job, &id, &rev, &kind, &parameters, &project)
 	if e != nil {
+		return
+	}
+	if kind == "recognize" {
+		scoped := *s
+		scoped.project = project
+		scoped.runRecognition(ctx, job, id, rev, parameters)
 		return
 	}
 	var raw []byte

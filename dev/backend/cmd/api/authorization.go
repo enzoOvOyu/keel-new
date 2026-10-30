@@ -30,7 +30,7 @@ func (s *Server) authorizeRequest(w http.ResponseWriter, r *http.Request) (strin
 			if strings.HasSuffix(path, "/review") {
 				permission = "bom:review"
 			}
-			if strings.HasSuffix(path, "/commit") {
+			if strings.HasSuffix(path, "/commit") || strings.HasSuffix(path, "/workbench/submit") {
 				permission = "bom:execute"
 			}
 		}

@@ -1,0 +1,266 @@
+{
+  "base_version": "keel-cmdb-v2",
+  "version": "keel-cmdb-v3",
+  "type_extensions": [],
+  "new_types": [
+    {
+      "name": "router",
+      "label": "router",
+      "extends": "device",
+      "allow_extensions": false,
+      "attributes": [],
+      "display": {
+        "catalog": true,
+        "columns": [
+          "name",
+          "serial",
+          "model"
+        ]
+      }
+    },
+    {
+      "name": "cpu",
+      "label": "cpu",
+      "extends": "component",
+      "allow_extensions": false,
+      "attributes": [],
+      "display": {
+        "catalog": true,
+        "columns": [
+          "name",
+          "serial",
+          "model"
+        ]
+      }
+    },
+    {
+      "name": "memory",
+      "label": "memory",
+      "extends": "component",
+      "allow_extensions": false,
+      "attributes": [],
+      "display": {
+        "catalog": true,
+        "columns": [
+          "name",
+          "serial",
+          "model"
+        ]
+      }
+    },
+    {
+      "name": "disk",
+      "label": "disk",
+      "extends": "component",
+      "allow_extensions": false,
+      "attributes": [],
+      "display": {
+        "catalog": true,
+        "columns": [
+          "name",
+          "serial",
+          "model"
+        ]
+      }
+    },
+    {
+      "name": "pdu",
+      "label": "pdu",
+      "extends": "component",
+      "allow_extensions": false,
+      "attributes": [],
+      "display": {
+        "catalog": true,
+        "columns": [
+          "name",
+          "serial",
+          "model"
+        ]
+      }
+    },
+    {
+      "name": "patch_panel",
+      "label": "patch_panel",
+      "extends": "component",
+      "allow_extensions": false,
+      "attributes": [],
+      "display": {
+        "catalog": true,
+        "columns": [
+          "name",
+          "serial",
+          "model"
+        ]
+      }
+    },
+    {
+      "name": "connector",
+      "label": "connector",
+      "extends": "component",
+      "allow_extensions": false,
+      "attributes": [],
+      "display": {
+        "catalog": true,
+        "columns": [
+          "name",
+          "serial",
+          "model"
+        ]
+      }
+    },
+    {
+      "name": "electrical_module",
+      "label": "electrical_module",
+      "extends": "component",
+      "allow_extensions": false,
+      "attributes": [],
+      "display": {
+        "catalog": true,
+        "columns": [
+          "name",
+          "serial",
+          "model"
+        ]
+      }
+    },
+    {
+      "name": "power_cable",
+      "label": "power_cable",
+      "extends": "component",
+      "allow_extensions": false,
+      "attributes": [],
+      "display": {
+        "catalog": true,
+        "columns": [
+          "name",
+          "serial",
+          "model"
+        ]
+      }
+    },
+    {
+      "name": "material_plan",
+      "label": "规划物料（非实物）",
+      "extends": "component",
+      "allow_extensions": false,
+      "attributes": [
+        {
+          "name": "quantity",
+          "label": "quantity",
+          "type": "Number",
+          "required": false,
+          "unique": false,
+          "editable": false,
+          "sources": [
+            "bom",
+            "manual"
+          ],
+          "models": [],
+          "group": "规划物料",
+          "rules": {}
+        },
+        {
+          "name": "unit",
+          "label": "unit",
+          "type": "Text",
+          "required": false,
+          "unique": false,
+          "editable": false,
+          "sources": [
+            "bom",
+            "manual"
+          ],
+          "models": [],
+          "group": "规划物料",
+          "rules": {}
+        },
+        {
+          "name": "intended_type",
+          "label": "intended_type",
+          "type": "Text",
+          "required": false,
+          "unique": false,
+          "editable": false,
+          "sources": [
+            "bom",
+            "manual"
+          ],
+          "models": [],
+          "group": "规划物料",
+          "rules": {}
+        },
+        {
+          "name": "planning_identity",
+          "label": "planning_identity",
+          "type": "Text",
+          "required": false,
+          "unique": false,
+          "editable": false,
+          "sources": [
+            "bom",
+            "manual"
+          ],
+          "models": [],
+          "group": "规划物料",
+          "rules": {}
+        },
+        {
+          "name": "brand",
+          "label": "brand",
+          "type": "Text",
+          "required": false,
+          "unique": false,
+          "editable": false,
+          "sources": [
+            "bom",
+            "manual"
+          ],
+          "models": [],
+          "group": "规划物料",
+          "rules": {}
+        },
+        {
+          "name": "specification",
+          "label": "specification",
+          "type": "Text",
+          "required": false,
+          "unique": false,
+          "editable": false,
+          "sources": [
+            "bom",
+            "manual"
+          ],
+          "models": [],
+          "group": "规划物料",
+          "rules": {}
+        },
+        {
+          "name": "description",
+          "label": "description",
+          "type": "Text",
+          "required": false,
+          "unique": false,
+          "editable": false,
+          "sources": [
+            "bom",
+            "manual"
+          ],
+          "models": [],
+          "group": "规划物料",
+          "rules": {}
+        }
+      ],
+      "display": {
+        "catalog": true,
+        "columns": [
+          "name",
+          "intended_type",
+          "model",
+          "quantity",
+          "unit"
+        ]
+      }
+    }
+  ],
+  "new_relationships": []
+}

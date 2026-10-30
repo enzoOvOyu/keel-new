@@ -18,3 +18,6 @@ dev/node_modules
 
 # Backend controlled development secret references; never commit API keys.
 dev/backend/.secrets/
+
+# Private real workbook supplied for local BOM validation.
+bomv1.xlsx

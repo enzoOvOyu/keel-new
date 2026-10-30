@@ -31,20 +31,28 @@ type Profile struct {
 	Parser       string         `json:"parser_version"`
 }
 
-func canonical(s string) string {
-	return strings.ToLower(strings.NewReplacer(" ", "", "_", "", "-", "", "\n", "").Replace(s))
-}
-func Field(s string) string {
-	for _, field := range []string{"category", "serial", "hostname", "model", "management_ip", "mac", "parent_uid", "port_index", "endpoint_a_uid", "endpoint_b_uid", "rack", "u_start", "u_height", "rack_height", "site", "pod", "speed", "mtu", "vlan", "vrf", "vni", "asn", "media_type", "baseline_ref", "model_version_ref", "endpoint_a_speed", "endpoint_b_speed", "port_uid", "optic_type", "breakout", "cpu_model", "cpu_count", "memory_value", "memory_unit", "gpu_count", "nic_count", "os_interface", "os_version", "kernel", "driver", "cuda", "nccl", "network_role", "rail", "role"} {
-		if canonical(s) == canonical(field) {
-			return field
-		}
+var fieldReplacer = strings.NewReplacer(" ", "", "_", "", "-", "", "\n", "")
+
+func canonical(s string) string { return strings.ToLower(fieldReplacer.Replace(s)) }
+
+var canonicalFields = func() map[string]string {
+	out := map[string]string{}
+	for _, f := range []string{"device_alias", "manufacturer", "series", "sku", "device_number", "port_count", "port_type", "uplink_ports", "downlink_ports", "psu_count", "psu_type", "fan", "redundancy", "subnet", "network_domain", "roce", "infiniband", "wavelength", "distance", "fiber_mode", "cable_number", "patch_panel", "patch_port", "termination_a", "termination_b", "sequence", "direction", "purpose", "gpu_model", "nic_model", "disk_spec", "bmc_model", "power_spec", "record_kind", "quantity_required", "quantity_ordered", "quantity_spares", "quantity_total", "endpoint_a_optic", "endpoint_b_optic", "length", "rack_uid", "endpoint_a_device", "endpoint_b_device", "endpoint_a_port", "endpoint_b_port", "name", "description", "brand", "specification", "quantity", "unit", "category", "serial", "hostname", "model", "management_ip", "mac", "parent_uid", "port_index", "endpoint_a_uid", "endpoint_b_uid", "rack", "u_start", "u_height", "rack_height", "site", "pod", "speed", "mtu", "vlan", "vrf", "vni", "asn", "media_type", "baseline_ref", "model_version_ref", "endpoint_a_speed", "endpoint_b_speed", "port_uid", "optic_type", "breakout", "cpu_model", "cpu_count", "memory_value", "memory_unit", "gpu_count", "nic_count", "os_interface", "os_version", "kernel", "driver", "cuda", "nccl", "network_role", "rail", "role"} {
+		out[canonical(f)] = f
 	}
-	if f := aliases[canonical(s)]; f != "" {
+	return out
+}()
+
+func Field(s string) string {
+	key := canonical(s)
+	if f := canonicalFields[key]; f != "" {
 		return f
 	}
-	extra := map[string]string{"asidelablename": "endpoint_a_device", "zsidelablename": "endpoint_b_device", "本端设备名称": "endpoint_a_device", "对端设备名称": "endpoint_b_device", "本端端口名称": "endpoint_a_port", "对端端口名称": "endpoint_b_port", "a端口": "endpoint_a_port", "z端口": "endpoint_b_port", "cabletype": "media_type", "speed": "speed", "带宽": "speed", "u位": "u_start", "u数": "u_height", "parent": "parent_uid", "itemuid": "item_uid", "endpointauid": "endpoint_a_uid", "endpointbuid": "endpoint_b_uid", "modelversionref": "model_version_ref"}
-	return extra[canonical(s)]
+	if f := aliases[key]; f != "" {
+		return f
+	}
+	extra := map[string]string{"物料名称": "name", "名称": "name", "描述": "description", "规格": "specification", "数量": "quantity", "单位": "unit", "品牌": "brand", "manufacturer": "brand", "qty": "quantity", "数量(台)": "quantity", "productname": "name", "物料描述": "description", "asidelablename": "endpoint_a_device", "zsidelablename": "endpoint_b_device", "本端设备名称": "endpoint_a_device", "对端设备名称": "endpoint_b_device", "本端端口名称": "endpoint_a_port", "对端端口名称": "endpoint_b_port", "a端口": "endpoint_a_port", "z端口": "endpoint_b_port", "cabletype": "media_type", "rackunit": "u_start", "uposition": "u_start", "uposiotion": "u_start", "racknumber": "rack", "rackno": "rack", "dcname": "site", "speed": "speed", "带宽": "speed", "u位": "u_start", "u数": "u_height", "parent": "parent_uid", "itemuid": "item_uid", "endpointauid": "endpoint_a_uid", "endpointbuid": "endpoint_b_uid", "modelversionref": "model_version_ref"}
+	return extra[key]
 }
 func Profiles(w Workbook) []Profile {
 	out := []Profile{}
@@ -270,6 +278,9 @@ func Relations(items []Item) []RelationCandidate {
 		if i.Hostname != "" {
 			names[i.Hostname] = append(names[i.Hostname], i.UID)
 		}
+		if alias := i.Fields["device_alias"]; alias != "" && alias != i.Hostname {
+			names[alias] = append(names[alias], i.UID)
+		}
 		if i.Category == "port" {
 			ports[i.Parent+":"+i.Port] = append(ports[i.Parent+":"+i.Port], i.UID)
 		}
@@ -281,8 +292,10 @@ func Relations(items []Item) []RelationCandidate {
 		for _, side := range []string{"a", "b"} {
 			ds := names[i.Fields["endpoint_"+side+"_device"]]
 			c := []string{}
-			for _, d := range ds {
-				c = append(c, ports[d+":"+i.Fields["endpoint_"+side+"_port"]]...)
+			if len(ds) == 1 {
+				for _, d := range ds {
+					c = append(c, ports[d+":"+i.Fields["endpoint_"+side+"_port"]]...)
+				}
 			}
 			out = append(out, RelationCandidate{i.UID + ":" + side, i.UID, "endpoint_" + side + "_uid", c, "needs_review", "Exact explicit device/port reference; confirm before writing physical relation"})
 		}
@@ -324,7 +337,7 @@ func Normalize(items []Item) ([]Item, error) {
 	for j := range out {
 		i := &out[j]
 		i.Status = "imported"
-		if i.Category == "rack" || i.Category == "network_baseline" {
+		if i.Category == "rack" || i.Category == "network_baseline" || i.Category == "material_plan" || (KnownImportType(i.Category) && i.Category != "server" && i.Category != "switch" && i.Category != "gpu" && i.Category != "nic" && i.Category != "bmc" && i.Category != "psu" && i.Category != "optic_module" && i.Category != "port" && i.Category != "cable") {
 			i.Subtype = i.Category
 			i.Category = "other"
 			if i.Subtype == "network_baseline" {
@@ -344,8 +357,13 @@ func Normalize(items []Item) ([]Item, error) {
 		if i.Fields == nil {
 			i.Fields = map[string]string{}
 		}
-		if rack := i.Fields["rack_uid"]; rack != "" {
-			i.Fields["rack_uid"] = ids[rack]
+		for _, field := range []string{"rack_uid", "port_uid"} {
+			if ref := i.Fields[field]; ref != "" {
+				if ids[ref] == "" {
+					return nil, fmt.Errorf("UNRESOLVED_REFERENCE")
+				}
+				i.Fields[field] = ids[ref]
+			}
 		}
 		if i.Parent != "" {
 			i.Fields["parent_uid"] = i.Parent
@@ -420,6 +438,9 @@ func ExpandPorts(items []Item) []Item {
 	for _, i := range items {
 		if i.Category == "server" || i.Category == "switch" {
 			names[i.Hostname] = append(names[i.Hostname], i)
+			if alias := i.Fields["device_alias"]; alias != "" && alias != i.Hostname {
+				names[alias] = append(names[alias], i)
+			}
 		}
 		if i.Category == "port" {
 			ports[i.Parent+":"+i.Port] = true

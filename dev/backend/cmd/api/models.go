@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"github.com/google/uuid"
+	"keel.local/dev/internal/bom"
 	"net/http"
 	"strings"
 )
@@ -45,8 +46,7 @@ func (s *Server) models(w http.ResponseWriter, r *http.Request) bool {
 		fail(w, 422, "MODEL_APPROVAL_REQUIRED")
 		return true
 	}
-	valid := map[string]bool{"server": true, "switch": true, "gpu": true, "nic": true, "bmc": true, "psu": true, "optic_module": true}
-	if !valid[q.Category] {
+	if !bom.RequiresModel(q.Category) {
 		fail(w, 422, "INVALID_CATEGORY")
 		return true
 	}

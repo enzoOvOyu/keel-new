@@ -143,3 +143,8 @@ IA验收分层：OpenAPI schema和分页/权限错误契约；ProjectContext单�
 只验证本次Schema约束/来源权限、关系完整性、版本/ChangeSet事务及API/Adapter集成；受影响共享资产投影增加只读关联检查。保存原UI基线并对比接入截图和关键交互，不重复运行整个平台旧冒烟。生产规模、真实设备采集和时序存储不在本次已验证范围。
 
 接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。
+
+
+## BOM Intelligence Agent 当前实施（2026-10-30）
+
+本轮仅 AI 智能识别：上传→真实分析进度→分类审核→确认入库。交换机/端接优先，单主编排器+Workbook IR 工具+独立 Schema/来源/覆盖校验。当前范围替代此前 BOM 双模式/六步 UI 描述，历史数据不删除；详细字段、状态、API、安全和验证边界统一见 [BOM-WORKBENCH-V2.md](BOM-WORKBENCH-V2.md)。保留 FR-2.1、项目权限、唯一资产身份和原事务 Outbox。完整导入入库闭环由用户验收；不以旧报告宣称当前通过。

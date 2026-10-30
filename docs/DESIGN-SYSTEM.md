@@ -241,3 +241,8 @@ CMDB左树+主工作区，五视图共享asset/filter URL。目录按类型字�
 ## 2026-10-30 · 统一登录与身份管理
 
 /login 直接迁入用户指定旧仓库 LoginPage、Brand、KeelStructure、Preferences 与样式，不重设计。适配 React Router 与当前 shadcn，样式隔离避免覆盖控制台。全局用户菜单提供安全/会话/管理入口；BOM 无二次登录。权限不足显示说明并禁止操作；服务端仍复验。管理对话框内提供真实错误与变更结果，详见 IDENTITY-RBAC.md。
+
+
+## BOM Intelligence Agent 当前实施（2026-10-30）
+
+本轮仅 AI 智能识别：上传→真实分析进度→分类审核→确认入库。交换机/端接优先，单主编排器+Workbook IR 工具+独立 Schema/来源/覆盖校验。当前范围替代此前 BOM 双模式/六步 UI 描述，历史数据不删除；详细字段、状态、API、安全和验证边界统一见 [BOM-WORKBENCH-V2.md](BOM-WORKBENCH-V2.md)。保留 FR-2.1、项目权限、唯一资产身份和原事务 Outbox。完整导入入库闭环由用户验收；不以旧报告宣称当前通过。

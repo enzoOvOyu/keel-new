@@ -435,7 +435,7 @@ func (s Service) ProjectBOM(ctx context.Context, tx pgx.Tx, event, project, revi
 		} else if err != pgx.ErrNoRows {
 			return err
 		} else if item.Serial != "" {
-			err = tx.QueryRow(ctx, "SELECT item_uid FROM cmdb_entity WHERE asset_type=$1 AND serial=$2", canonicalKind(item.Category), item.Serial).Scan(&found)
+			err = tx.QueryRow(ctx, "SELECT item_uid FROM cmdb_entity WHERE asset_type=$1 AND serial=$2", canonicalKind(bom.AssetType(item)), item.Serial).Scan(&found)
 			if err == nil {
 				canonical = found
 			} else if err != pgx.ErrNoRows {
@@ -486,7 +486,7 @@ func (s Service) ProjectBOM(ctx context.Context, tx pgx.Tx, event, project, revi
 	for _, item := range items {
 		attrs := map[string]any{}
 		for k, v := range item.Fields {
-			if a, ok := schema.Attributes(canonicalKind(item.Category))[k]; ok {
+			if a, ok := schema.Attributes(canonicalKind(bom.AssetType(item)))[k]; ok {
 				attrs[k] = v
 				if a.Type == "Number" {
 					if n, e := strconv.ParseFloat(v, 64); e == nil {
@@ -497,7 +497,7 @@ func (s Service) ProjectBOM(ctx context.Context, tx pgx.Tx, event, project, revi
 		}
 		for k, v := range map[string]string{"hostname": item.Hostname, "serial": item.Serial, "model": item.Model, "port_index": item.Port, "parent_uid": resolve(item.Parent), "endpoint_a_uid": resolve(item.A), "endpoint_b_uid": resolve(item.B)} {
 			if v != "" {
-				if a, ok := schema.Attributes(canonicalKind(item.Category))[k]; ok {
+				if a, ok := schema.Attributes(canonicalKind(bom.AssetType(item)))[k]; ok {
 					attrs[k] = v
 					if a.Type == "Number" {
 						if n, e := strconv.ParseFloat(v, 64); e == nil {
@@ -507,9 +507,19 @@ func (s Service) ProjectBOM(ctx context.Context, tx pgx.Tx, event, project, revi
 				}
 			}
 		}
+		// A physical port label is not a numeric ordinal. Preserve its source identity.
+		if bom.AssetType(item) == "physical_port" || item.Category == "port" {
+			attrs["physical_name"] = item.Port
+			if _, err := strconv.ParseFloat(item.Port, 64); err != nil {
+				delete(attrs, "port_index")
+			}
+		}
 		locations := map[string]map[string]any{}
 		for key, c := range item.Sources {
-			locations[key] = map[string]any{"import_id": importID, "document_id": doc, "sheet": item.Sheet, "cell": c.Ref, "row": c.Row, "column": c.Column}
+			locations[key] = map[string]any{"import_id": importID, "document_id": doc, "sheet": c.Sheet, "cell": c.Ref, "row": c.Row, "column": c.Column}
+		}
+		if item.Category == "port" {
+			locations["physical_name"] = locations["port_index"]
 		}
 		// Do not replace newer canonical asset facts when old Outbox events are replayed.
 		var newer bool
@@ -519,7 +529,7 @@ func (s Service) ProjectBOM(ctx context.Context, tx pgx.Tx, event, project, revi
 		}
 		uid := resolve(item.UID)
 		bomUID := item.UID
-		_, e = s.UpsertAsset(ctx, tx, schema, AssetInput{ID: uid, Type: item.Category, Project: project, Attributes: attrs, Source: Source{Type: "bom", Ref: importID, Layer: "planned", Operator: actor, ObservedAt: &when, Approval: "approved", Evidence: []string{revision, doc}}, BOMItemID: &bomUID, BOMRevision: &revision, Locations: locations})
+		_, e = s.UpsertAsset(ctx, tx, schema, AssetInput{ID: uid, Type: bom.AssetType(item), Project: project, Attributes: attrs, Source: Source{Type: "bom", Ref: importID, Layer: "planned", Operator: actor, ObservedAt: &when, Approval: "approved", Evidence: []string{revision, doc}}, BOMItemID: &bomUID, BOMRevision: &revision, Locations: locations})
 		if e != nil {
 			return e
 		}
@@ -537,6 +547,9 @@ func (s Service) ProjectBOM(ctx context.Context, tx pgx.Tx, event, project, revi
 			if end.ID != "" {
 				links = append(links, RelationInput{Definition: end.Name, SourceID: resolve(item.UID), TargetID: resolve(end.ID)})
 			}
+		}
+		if port := item.Fields["port_uid"]; port != "" && bom.AssetType(item) == "optic_module" {
+			links = append(links, RelationInput{Definition: "optic_on_port", SourceID: resolve(port), TargetID: resolve(item.UID)})
 		}
 		if rack := item.Fields["rack_uid"]; rack != "" {
 			links = append(links, RelationInput{Definition: "located_in", SourceID: resolve(item.UID), TargetID: resolve(rack)})

@@ -107,3 +107,8 @@ Argon2id、本地 Session、生产 Secure/HTTPS、HttpOnly/SameSite 与 CSRF、�
 AI Key仅一次性POST到Go，响应不回显，日志与审计不保存值。当前开发使用0700目录/0600文件和local-secret引用，Git/Docker上下文排除该目录；Docker持久卷与宿主目录分别管理。HTTPS为正式服务要求，HTTP只允许开发环境；不自动跟随重定向转发密钥。
 
 唯一详细说明与API对照见 [PROJECT-AI-CONFIGURATION.md](PROJECT-AI-CONFIGURATION.md)。
+
+
+## BOM Intelligence Agent 当前实施（2026-10-30）
+
+本轮仅 AI 智能识别：上传→真实分析进度→分类审核→确认入库。交换机/端接优先，单主编排器+Workbook IR 工具+独立 Schema/来源/覆盖校验。当前范围替代此前 BOM 双模式/六步 UI 描述，历史数据不删除；详细字段、状态、API、安全和验证边界统一见 [BOM-WORKBENCH-V2.md](BOM-WORKBENCH-V2.md)。保留 FR-2.1、项目权限、唯一资产身份和原事务 Outbox。完整导入入库闭环由用户验收；不以旧报告宣称当前通过。

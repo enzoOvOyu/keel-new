@@ -11,7 +11,7 @@ func (s *Server) review(w http.ResponseWriter, r *http.Request, id string, rev i
 	ctx := r.Context()
 	bindings := map[string]string{}
 	for _, item := range items {
-		if item.Model == "" {
+		if item.Model == "" || !bom.RequiresModel(bom.AssetType(item)) {
 			continue
 		}
 		var modelID string

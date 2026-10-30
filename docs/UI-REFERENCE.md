@@ -184,3 +184,8 @@ React Flow承载拓扑的缩放、平移、节点拖动、Minimap与自动布局
 参考Infrahub对象/关系/来源/历史原则，使用原Keel布局、字体、间距、主题与组件。基线位于ui-baselines/cmdb-before；接入后截图位于cmdb-after。此次不修改DESIGN-SYSTEM或全局设计令牌。
 
 接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。
+
+
+## BOM Intelligence Agent 当前实施（2026-10-30）
+
+本轮仅 AI 智能识别：上传→真实分析进度→分类审核→确认入库。交换机/端接优先，单主编排器+Workbook IR 工具+独立 Schema/来源/覆盖校验。当前范围替代此前 BOM 双模式/六步 UI 描述，历史数据不删除；详细字段、状态、API、安全和验证边界统一见 [BOM-WORKBENCH-V2.md](BOM-WORKBENCH-V2.md)。保留 FR-2.1、项目权限、唯一资产身份和原事务 Outbox。完整导入入库闭环由用户验收；不以旧报告宣称当前通过。

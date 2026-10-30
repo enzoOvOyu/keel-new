@@ -1,0 +1,2 @@
+# Contract validation only; workbook parsing remains the existing Go Excelize adapter.
+pydantic==2.14.2

@@ -46,10 +46,15 @@ type Issue struct {
 }
 
 func Identity(i Item) string {
-	if i.Category == "other" && (i.Subtype == "rack" || i.Subtype == "network_baseline") {
+	if i.Category == "other" && i.Subtype != "" {
 		i.Category = i.Subtype
 	}
+	if i.Fields["record_kind"] == "planned_device" && i.Serial == "" && i.Fields["planning_identity"] != "" {
+		return "planned_device:" + i.Fields["planning_identity"]
+	}
 	switch i.Category {
+	case "material_plan":
+		return "material_plan:" + i.Fields["planning_identity"]
 	case "port":
 		return "port:" + i.Parent + ":" + i.Port
 	case "cable":
@@ -94,7 +99,7 @@ func Validate(items []Item) []Issue {
 	}
 	for _, i := range items {
 		identity := Identity(i)
-		identified := i.Serial != "" || (i.Category == "port" && i.Parent != "" && i.Port != "") || (i.Category == "cable" && i.A != "" && i.B != "") || (i.Category == "rack" && i.Fields["rack"] != "")
+		identified := (i.Fields["record_kind"] == "planned_device" && i.Hostname != "") || i.Category == "material_plan" || i.Serial != "" || (i.Category == "port" && i.Parent != "" && i.Port != "") || (i.Category == "cable" && i.A != "" && i.B != "") || (i.Category == "rack" && i.Fields["rack"] != "")
 		if identified && seen[identity] {
 			add(i, "identity", "BOM-IDENTITY", "Duplicate identity requires reconciliation")
 		}
@@ -102,8 +107,10 @@ func Validate(items []Item) []Issue {
 			seen[identity] = true
 		}
 		switch i.Category {
-		case "server", "switch", "gpu", "nic", "bmc", "psu", "optic_module":
-			if i.Serial == "" {
+		case "material_plan":
+			out = append(out, MaterialPlanIssues(i)...)
+		case "server", "switch", "gpu", "nic", "bmc", "psu", "optic_module", "router", "cpu", "memory", "disk", "pdu", "patch_panel", "connector", "electrical_module", "power_cable":
+			if i.Serial == "" && !(i.Fields["record_kind"] == "planned_device" && i.Hostname != "") {
 				add(i, "serial", "BOM-SERIAL", "Serial required for stable identity")
 			}
 			if i.Model == "" {
@@ -126,12 +133,14 @@ func Validate(items []Item) []Issue {
 				if v, ok := ids[p]; !ok || v.Category != "port" {
 					add(i, "endpoints", "BOM-CABLE", "Cable endpoint must reference a physical port")
 				}
-				if occupied[p] {
+				if p != "" && occupied[p] {
 					add(i, "endpoints", "BOM-PORT-OCCUPIED", "Port already used")
 				}
-				occupied[p] = true
+				if p != "" {
+					occupied[p] = true
+				}
 			}
-			if i.A == i.B {
+			if i.A != "" && i.A == i.B {
 				add(i, "endpoints", "BOM-CABLE-SELF", "Cable endpoints must differ")
 			}
 		default:
@@ -200,10 +209,10 @@ func Validate(items []Item) []Issue {
 					add(i, k, "BOM-NETWORK-RANGE", "Invalid numeric network field")
 				}
 			}
-			if strings.Contains(k, "ip") && v != "" && net.ParseIP(v) == nil {
+			if (k == "ip" || strings.HasSuffix(k, "_ip")) && v != "" && net.ParseIP(v) == nil {
 				add(i, k, "BOM-IP", "Invalid IP address")
 			}
-			if strings.Contains(k, "mac") && v != "" {
+			if (k == "mac" || strings.HasSuffix(k, "_mac")) && v != "" {
 				if _, e := net.ParseMAC(v); e != nil {
 					add(i, k, "BOM-MAC", "Invalid MAC")
 				}

@@ -298,3 +298,8 @@ FR-28：CMDB升级全链路资产档案。保留跨项目授权与统一设备�
 项目创建与AI配置（FR-2.1补充）：可创建真实空白项目并直接进入开局配置；系统管理提供真实Provider配置、受控凭据、启停/默认及主动连接测试；BOM使用同一配置源。Rules/人工流程不依赖AI，候选不自动提交。
 
 唯一详细说明与API对照见 [PROJECT-AI-CONFIGURATION.md](PROJECT-AI-CONFIGURATION.md)。
+
+
+## BOM Intelligence Agent 当前实施（2026-10-30）
+
+本轮仅 AI 智能识别：上传→真实分析进度→分类审核→确认入库。交换机/端接优先，单主编排器+Workbook IR 工具+独立 Schema/来源/覆盖校验。当前范围替代此前 BOM 双模式/六步 UI 描述，历史数据不删除；详细字段、状态、API、安全和验证边界统一见 [BOM-WORKBENCH-V2.md](BOM-WORKBENCH-V2.md)。保留 FR-2.1、项目权限、唯一资产身份和原事务 Outbox。完整导入入库闭环由用户验收；不以旧报告宣称当前通过。

@@ -56,11 +56,19 @@ paths:
               type: object
               required:
                 - file
-                - template_revision_id
               properties:
                 file:
                   type: string
                   format: binary
+                import_mode:
+                  type: string
+                  enum: [ai]
+                  default: ai
+                  description: Current intake is AI-only. Existing fixed/legacy batches remain readable.
+                provider_id:
+                  type: string
+                  format: uuid
+                  description: Enabled OpenAI-chat provider; empty selects enabled default.
                 template_revision_id:
                   type: string
                 source_domain:
@@ -115,6 +123,11 @@ paths:
         - BOM Import
       summary: Get import status and summary
       operationId: getBOMImport
+      parameters:
+        - name: summary
+          in: query
+          schema: {type: boolean, default: false}
+          description: Omit raw workbook, draft and issues for the workflow shell.
       responses:
         "200":
           description: Import resource
@@ -13704,6 +13717,170 @@ paths:
         required: true
         schema:
           type: string
+  /bom-imports/{import_id}/workbench:
+    parameters: &id001
+    - $ref: '#/components/parameters/ImportId'
+    get:
+      tags:
+      - BOM Import
+      operationId: getBOMWorkbench
+      summary: Four-step staged records, deterministic checks and per-record submission
+        reports
+      parameters:
+      - {name: compact, in: query, schema: {type: boolean}, description: Omit raw source cells from result summaries.}
+      - {name: record_id, in: query, schema: {type: string}, description: Load the full source detail for one staged object.}
+      responses:
+        '200':
+          description: Authorized project staging workspace
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BOMWorkbenchEnvelope'
+        '403':
+          description: Project permission denied
+        '409':
+          description: Legacy import uses the original workflow
+  /bom-imports/{import_id}/workbench/initialize:
+    parameters:
+    - $ref: '#/components/parameters/ImportId'
+    post:
+      tags:
+      - BOM Import
+      operationId: initializeLegacyBOMWorkbench
+      summary: Explicit mode selection for an uncommitted legacy batch; preserve previous
+        mappings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BOMWorkbenchCommand'
+      responses:
+        '200':
+          description: Migrated staging workspace
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BOMWorkbenchMutationEnvelope'
+        '403':
+          description: Permission denied
+        '409':
+          description: Mode or revision immutable
+  /bom-imports/{import_id}/workbench/records:
+    parameters: *id001
+    post:
+      tags:
+      - BOM Import
+      operationId: postBOMWorkbenchRecords
+      summary: Correct, confirm or explicitly exclude selected staged source rows
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BOMWorkbenchCommand'
+      responses:
+        '200':
+          description: Workspace revision or queued recognition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BOMWorkbenchMutationEnvelope'
+        '403':
+          description: Scope or permission denied
+        '409':
+          description: Revision, immutable record, existing asset difference or idempotency
+            conflict
+        '422':
+          description: Blockers, unconfirmed rows, incomplete selected dependencies,
+            mixed types or missing correction reason
+  /bom-imports/{import_id}/workbench/validate:
+    parameters: *id001
+    post:
+      tags:
+      - BOM Import
+      operationId: postBOMWorkbenchValidate
+      summary: Re-run deterministic checks without AI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BOMWorkbenchCommand'
+      responses:
+        '200':
+          description: Workspace revision or queued recognition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BOMWorkbenchMutationEnvelope'
+        '403':
+          description: Scope or permission denied
+        '409':
+          description: Revision, immutable record, existing asset difference or idempotency
+            conflict
+        '422':
+          description: Blockers, unconfirmed rows, incomplete selected dependencies,
+            mixed types or missing correction reason
+  /bom-imports/{import_id}/workbench/recognize:
+    parameters: *id001
+    post:
+      tags:
+      - BOM Import
+      operationId: postBOMWorkbenchRecognize
+      summary: Queue source-grounded AI extraction for selected rows; never commit assets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BOMWorkbenchCommand'
+      responses:
+        '202':
+          description: Workspace revision or queued recognition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BOMWorkbenchMutationEnvelope'
+        '403':
+          description: Scope or permission denied
+        '409':
+          description: Revision, immutable record, existing asset difference or idempotency
+            conflict
+        '422':
+          description: Blockers, unconfirmed rows, incomplete selected dependencies,
+            mixed types or missing correction reason
+  /bom-imports/{import_id}/workbench/submit:
+    parameters: *id001
+    post:
+      tags:
+      - BOM Import
+      operationId: postBOMWorkbenchSubmit
+      summary: Freeze revision and selected confirmed records; atomically commit unified
+        BOM and Outbox
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BOMWorkbenchCommand'
+      responses:
+        '201':
+          description: Official receipt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getBOMPublicationEnvelope'
+        '403':
+          description: Scope or permission denied
+        '409':
+          description: Revision, immutable record, existing asset difference or idempotency
+            conflict
+        '422':
+          description: Blockers, unconfirmed rows, incomplete selected dependencies,
+            mixed types or missing correction reason
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
 components:
   securitySchemes:
     bearerAuth:
@@ -34512,6 +34689,7 @@ components:
           type: integer
         original_value:
           type: string
+        formula_backed: {type: boolean, description: Cached value originated from a formula; full expression is available in immutable workbook detail.}
         formula:
           type: string
         hidden:
@@ -34527,6 +34705,372 @@ components:
         - original_value
         - hidden
         - sensitive
+    BOMWorkbenchRecord:
+      type: object
+      required:
+      - id
+      - sheet_name
+      - source_row
+      - source_cells
+      - original_description
+      - item
+      - recognition_status
+      - confidence
+      - method
+      - confirmed
+      - ignored
+      - imported
+      - issues
+      properties:
+        ambiguity:
+          type: boolean
+          description: Explicit model ambiguity blocks confirmation until a reasoned manual correction.
+        unmapped_cells:
+          type: array
+          items:
+            $ref: '#/components/schemas/BOMSourceCell'
+        cell_dispositions:
+          type: object
+          additionalProperties:
+            type: string
+        header_context:
+          type: array
+          items:
+            $ref: '#/components/schemas/BOMSourceCell'
+        id:
+          type: string
+        sheet_name:
+          type: string
+        source_row:
+          type: integer
+          minimum: 1
+        source_cells:
+          type: array
+          items:
+            $ref: '#/components/schemas/BOMSourceCell'
+        original_description:
+          type: string
+        item:
+          $ref: '#/components/schemas/BOMDraftItem'
+        recognition_status:
+          type: string
+          enum:
+          - recognized
+          - needs_review
+          - unrecognized
+        confidence:
+          type: number
+          nullable: true
+          minimum: 0
+          maximum: 1
+        method:
+          type: string
+          enum:
+          - rules
+          - pending
+          - source_relation
+          - provider
+          - manual
+        confirmed:
+          type: boolean
+        ignored:
+          type: boolean
+        imported:
+          type: boolean
+        asset_id:
+          type: string
+        reason:
+          type: string
+        before:
+          type: object
+          additionalProperties:
+            type: string
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/BOMWorkbenchIssue'
+    BOMWorkbenchIssue:
+      type: object
+      required:
+      - id
+      - severity
+      - rule_id
+      - version
+      - item_uid
+      - field
+      - reason
+      properties:
+        id:
+          type: string
+        rule_id:
+          type: string
+        version:
+          type: string
+        item_uid:
+          type: string
+        field:
+          type: string
+        reason:
+          type: string
+        severity:
+          type: string
+          enum:
+          - BLOCKER
+          - WARNING
+          - INFO
+    BOMRecordWriteResult:
+      type: object
+      required:
+      - record_id
+      - asset_id
+      - status
+      - sheet_name
+      - source_row
+      properties:
+        record_id:
+          type: string
+        asset_id:
+          type: string
+        status:
+          type: string
+        sheet_name:
+          type: string
+        source_row:
+          type: integer
+    BOMWorkbenchSubmission:
+      type: object
+      required:
+      - bom_revision
+      - created_at
+      - results
+      properties:
+        bom_revision:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BOMRecordWriteResult'
+    BOMRecognitionSheet:
+      type: object
+      required: [sheet_name, state, purpose, note, rows, recognized]
+      properties:
+        sheet_name: {type: string}
+        state: {type: string, enum: [pending, recognized, failed]}
+        purpose: {type: string}
+        note: {type: string}
+        error: {type: string}
+        rows: {type: integer}
+        recognized: {type: integer}
+        plan:
+          type: object
+          properties:
+            purpose: {type: string, enum: [table, layout, reference, unknown]}
+            note: {type: string}
+            header_rows: {type: array, items: {type: integer}}
+            tables:
+              type: array
+              items:
+                type: object
+                properties:
+                  key: {type: string}
+                  record_kind: {type: string}
+                  entity_type: {type: string}
+                  start_row: {type: integer}
+                  end_row: {type: integer}
+                  fields: {type: object, additionalProperties: {type: integer}}
+                  type_column: {type: integer}
+                  type_values: {type: object, additionalProperties: {type: string}}
+                  row_keys: {type: array, items: {type: string}}
+                  confidence: {type: number}
+    BOMPlanningAnalysis:
+      type: object
+      required: [summary, sources, identifiers, questions]
+      properties:
+        summary: {type: string}
+        sources:
+          type: array
+          items:
+            type: object
+            required: [sheet, role, description]
+            properties:
+              sheet: {type: string}
+              role: {type: string}
+              description: {type: string}
+        identifiers:
+          type: array
+          items:
+            type: object
+            required: [meaning, source_fields, use]
+            properties:
+              meaning: {type: string}
+              source_fields: {type: string}
+              use: {type: string}
+        questions: {type: array, items: {type: string}}
+    BOMAgentStep:
+      type: object
+      required: [tool, state, detail, at]
+      properties:
+        tool: {type: string, enum: [inspect_workbook, analyze_sheet, inspect_region, extract_entities, extract_switches, extract_terminations, resolve_relationships, cross_sheet_resolve, audit_coverage]}
+        sheet_name: {type: string}
+        region: {type: string}
+        state: {type: string}
+        detail: {type: string}
+        at: {type: string, format: date-time}
+    BOMRegionCoverage:
+      type: object
+      required: [id, sheet_name, range, start_row, end_row, first_column, last_column, cells, state, extracted_cells, unmapped_cells, retained_cells, candidates, confirmed, unrecognized, ignored]
+      properties:
+        id: {type: string}
+        sheet_name: {type: string}
+        range: {type: string}
+        start_row: {type: integer}
+        end_row: {type: integer}
+        first_column: {type: integer}
+        last_column: {type: integer}
+        cells: {type: integer}
+        state: {type: string, enum: [pending, review_required, extracted, retention_gap]}
+        extracted_cells: {type: integer}
+        unmapped_cells: {type: integer}
+        retained_cells: {type: integer}
+        candidates: {type: integer}
+        confirmed: {type: integer}
+        unrecognized: {type: integer}
+        ignored: {type: integer}
+    BOMCoverageAudit:
+      type: object
+      required: [complete, total_cells, retained_cells, extracted_cells, regions]
+      properties:
+        complete: {type: boolean, description: 'Every structural region was analyzed and every source cell retained. Not extraction accuracy or approval.'}
+        total_cells: {type: integer}
+        retained_cells: {type: integer}
+        extracted_cells: {type: integer}
+        regions:
+          type: array
+          items: {$ref: '#/components/schemas/BOMRegionCoverage'}
+    BOMWorkbench:
+      type: object
+      required:
+      - mode
+      - revision
+      - state
+      - records
+      - entity_types
+      - submissions
+      properties:
+        steps:
+          type: array
+          items: {$ref: "#/components/schemas/BOMAgentStep"}
+        coverage:
+          $ref: "#/components/schemas/BOMCoverageAudit"
+        mode:
+          type: string
+          enum:
+          - ai
+          - fixed
+          - legacy
+        revision:
+          type: integer
+        state:
+          type: string
+          enum:
+          - pending_review
+          - recognizing
+          - partially_imported
+          - imported
+        error:
+          type: string
+        sheets:
+          type: array
+          items:
+            $ref: '#/components/schemas/BOMRecognitionSheet'
+        phase:
+          type: string
+        analysis:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/BOMPlanningAnalysis'
+        records:
+          type: array
+          items:
+            $ref: '#/components/schemas/BOMWorkbenchRecord'
+        entity_types:
+          type: array
+          items:
+            type: string
+        submissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/BOMWorkbenchSubmission'
+    BOMWorkbenchCommand:
+      type: object
+      additionalProperties: false
+      required:
+      - revision
+      properties:
+        source_mappings:
+          type: object
+          description: Single-record source-cell mapping to a canonical field, or __reference__ with correction reason.
+          additionalProperties:
+            type: string
+        import_mode:
+          type: string
+          enum: [ai]
+        revision:
+          type: integer
+          minimum: 1
+        record_ids:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+        action:
+          type: string
+          enum:
+          - edit
+          - confirm
+          - ignore
+          - restore
+        fields:
+          type: object
+          additionalProperties:
+            type: string
+        reason:
+          type: string
+        acknowledge_warnings:
+          type: boolean
+    BOMWorkbenchMutation:
+      type: object
+      required:
+      - revision
+      properties:
+        revision:
+          type: integer
+        state:
+          type: string
+    BOMWorkbenchEnvelope:
+      type: object
+      required:
+      - data
+      - request_id
+      properties:
+        data:
+          $ref: '#/components/schemas/BOMWorkbench'
+        request_id:
+          type: string
+    BOMWorkbenchMutationEnvelope:
+      type: object
+      required:
+      - data
+      - request_id
+      properties:
+        data:
+          $ref: '#/components/schemas/BOMWorkbenchMutation'
+        request_id:
+          type: string
     BOMDraftItem:
       type: object
       properties:

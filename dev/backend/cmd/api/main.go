@@ -136,6 +136,17 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			fail(w, 404, "NOT_FOUND")
 			return
 		}
+		if s.workbenchAPI(w, r, id, rev, status) {
+			return
+		}
+		if r.Method != "GET" {
+			var mode string
+			s.db.QueryRow(ctx, "SELECT import_mode FROM bom_import_batch WHERE id=$1", id).Scan(&mode)
+			if mode != "legacy" {
+				fail(w, 422, "USE_WORKBENCH_ACTION")
+				return
+			}
+		}
 		if s.placements(w, r, id, rev, status, workbook, draft) {
 			return
 		}
@@ -166,6 +177,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			var errorCode *string
 			var created time.Time
 			s.db.QueryRow(ctx, "SELECT content_sha256,created_at,source_document_id,filename,reviewed_revision,error_code FROM bom_import_batch WHERE id=$1", id).Scan(&hash, &created, &sourceDocument, &filename, &reviewed, &errorCode)
+			if r.URL.Query().Get("summary") == "true" {
+				workbook = []byte("null")
+				draft = []byte("[]")
+				issues = []byte("[]")
+			}
 			respond(w, 200, map[string]any{"error_code": errorCode, "reviewed_revision": reviewed, "source_document_id": sourceDocument, "filename": filename, "project_id": project, "content_sha256": hash, "created_at": created, "mapping_revision": rev, "id": id, "status": strings.ToLower(status), "internal_status": status, "revision": rev, "workbook": json.RawMessage(workbook), "draft": json.RawMessage(draft), "issues": json.RawMessage(issues)})
 			return
 		}
@@ -211,6 +227,22 @@ func (s *Server) upload(w http.ResponseWriter, r *http.Request) {
 		fail(w, 400, "INVALID_WORKBOOK")
 		return
 	}
+	mode := r.FormValue("import_mode")
+	if mode == "" {
+		mode = "ai"
+	}
+	if mode != "ai" {
+		fail(w, 400, "INVALID_IMPORT_MODE")
+		return
+	}
+	provider := r.FormValue("provider_id")
+	if provider != "" {
+		var available bool
+		if s.db.QueryRow(r.Context(), "SELECT EXISTS(SELECT 1 FROM ai_provider_config WHERE id::text=$1 AND enabled=true)", provider).Scan(&available) != nil || !available {
+			fail(w, 422, "PROVIDER_NOT_AVAILABLE")
+			return
+		}
+	}
 	id := uuid.NewString()
 	doc := uuid.NewString()
 	hash := sha256.Sum256(data)
@@ -249,7 +281,7 @@ func (s *Server) upload(w http.ResponseWriter, r *http.Request) {
 		fail(w, 503, "OBJECT_STORAGE_UNAVAILABLE")
 		return
 	}
-	e = s.mutate(r.Context(), id, "import.uploaded", hex.EncodeToString(hash[:]), "INSERT INTO bom_import_batch(id,project_id,source_document_id,object_key,filename,content_sha256,status,declared_batch_id,template_revision_id) VALUES($1,$2,$3,$4,$5,$6,'UPLOADED',NULLIF($7,''),$8)", id, s.project, doc, key, h.Filename, hex.EncodeToString(hash[:]), declared, template)
+	e = s.mutate(r.Context(), id, "import.uploaded", hex.EncodeToString(hash[:]), "INSERT INTO bom_import_batch(id,project_id,source_document_id,object_key,filename,content_sha256,status,declared_batch_id,template_revision_id,import_mode,provider_id) VALUES($1,$2,$3,$4,$5,$6,'UPLOADED',NULLIF($7,''),$8,$9,NULLIF($10,'')::uuid)", id, s.project, doc, key, h.Filename, hex.EncodeToString(hash[:]), declared, template, mode, provider)
 	if e != nil {
 		if declared != "" {
 			var existing, oldHash, oldStatus string
@@ -307,8 +339,8 @@ func (s *Server) worker(ctx context.Context) {
 				} else {
 					b, _ := json.Marshal(wb)
 					profileList := bom.Profiles(wb)
-					var template, project string
-					s.db.QueryRow(ctx, "SELECT template_revision_id,project_id FROM bom_import_batch WHERE id=$1", id).Scan(&template, &project)
+					var template, project, importMode string
+					s.db.QueryRow(ctx, "SELECT template_revision_id,project_id,import_mode FROM bom_import_batch WHERE id=$1", id).Scan(&template, &project, &importMode)
 					var templateRaw []byte
 					if template != "manual-v1" && s.db.QueryRow(ctx, "SELECT profiles FROM bom_mapping_template WHERE project_id=$1 AND name||'@'||revision::text=$2", project, template).Scan(&templateRaw) == nil {
 						var approved []bom.Profile
@@ -316,10 +348,14 @@ func (s *Server) worker(ctx context.Context) {
 						profileList = bom.ApplyTemplate(wb, profileList, approved, template)
 					}
 					profiles, _ := json.Marshal(profileList)
-					initialDraft, initialIssues := bom.Generate(wb, profileList)
+					initialDraft, initialIssues := []bom.Item{}, []bom.Issue{}
+					if importMode != "ai" {
+						initialDraft, initialIssues = bom.Generate(wb, profileList)
+					}
 					issueBytes, _ := json.Marshal(initialIssues)
 					draft, _ := json.Marshal(initialDraft)
 					s.db.Exec(ctx, "UPDATE bom_import_batch SET status='MAPPING',workbook=$2,draft=$3,profiles=$4,issues=$5,updated_at=now() WHERE id=$1", id, b, draft, profiles, issueBytes)
+					s.initializeWorkbench(ctx, id, wb)
 				}
 			}
 		}
