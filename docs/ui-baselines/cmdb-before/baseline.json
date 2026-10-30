@@ -1,0 +1,101 @@
+{
+  "captured_at": "2026-10-30T11:16:43.129Z",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "files": {
+    "dev/src/style.css": "8da06ce7adde0a8dc32fdabad758f9967104e0b5f26ab478e9b3b4ca74b3a94c",
+    "dev/src/components/DeviceDrawers.tsx": "09c841bcc6233b16e7d3cb296c4e14dbfc052bc628cc9316191e222ff2dd0240",
+    "dev/src/components/ui.tsx": "9e58114ef3f9b8d292d3969ad3cfcbf95896cc7ea62a2b1a6f0b800356e79a23",
+    "dev/src/app/main.tsx": "5d4ea85ba856c53c36b4eb97e3eab90d50cd787086fa5d0060532eff1feb8e0a",
+    "dev/src/app/registry.ts": "263c4afede452ac74d23d0316a4951f6f7976c46c3ddfa67dceed4627a78283e",
+    "dev/src/app/ProjectContext.tsx": "4132ef6f74b81ad52775dfc77543bb973536e165a1d6d3b499e1e690a9d42610",
+    "dev/src/features/CMDBWorkspace.tsx": "7f7911023d5f686d4f59688eee2a636f140e100b58d2ab49e84ac82f282c4be2"
+  },
+  "notes": [
+    {
+      "view": "assets",
+      "url": "http://localhost:5174/cmdb/assets?asset=srv-0001&project_id=proj-b300-demo",
+      "tabs": [
+        "资产目录",
+        "资产关系",
+        "配置与来源",
+        "生命周期",
+        "数据质量",
+        "项目资料"
+      ]
+    },
+    {
+      "view": "relations",
+      "url": "http://localhost:5174/cmdb/relations?asset=srv-0001&project_id=proj-b300-demo",
+      "tabs": [
+        "资产目录",
+        "资产关系",
+        "配置与来源",
+        "生命周期",
+        "数据质量",
+        "项目资料"
+      ]
+    },
+    {
+      "view": "configuration",
+      "url": "http://localhost:5174/cmdb/configuration?asset=srv-0001&project_id=proj-b300-demo",
+      "tabs": [
+        "资产目录",
+        "资产关系",
+        "配置与来源",
+        "生命周期",
+        "数据质量",
+        "项目资料"
+      ]
+    },
+    {
+      "view": "history",
+      "url": "http://localhost:5174/cmdb/history?asset=srv-0001&project_id=proj-b300-demo",
+      "tabs": [
+        "资产目录",
+        "资产关系",
+        "配置与来源",
+        "生命周期",
+        "数据质量",
+        "项目资料"
+      ]
+    },
+    {
+      "view": "quality",
+      "url": "http://localhost:5174/cmdb/quality?asset=srv-0001&project_id=proj-b300-demo",
+      "tabs": [
+        "资产目录",
+        "资产关系",
+        "配置与来源",
+        "生命周期",
+        "数据质量",
+        "项目资料"
+      ]
+    },
+    {
+      "drawer": "server",
+      "tabs": [
+        "资产台账",
+        "映射详情",
+        "网口面板",
+        "PCIe 拓扑",
+        "监控详情"
+      ]
+    },
+    {
+      "drawer": "network",
+      "tabs": [
+        "基础信息",
+        "配置信息",
+        "配置脚本",
+        "配置事件",
+        "运行状态",
+        "无损网络",
+        "光模块",
+        "日志"
+      ]
+    }
+  ]
+}
