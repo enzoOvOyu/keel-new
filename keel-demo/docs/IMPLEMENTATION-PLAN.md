@@ -143,3 +143,7 @@ IA v2.3 插入前端 Mock 阶段：先冻结 IA-V2.3.md 的页面注册、作用
 无损证据改造提交1631460后实施CMDB档案：现有域/契约读取→五视图与只读关系投影→统一Provider/来源/历史/质量→稳定ID演示补齐→相关构建/契约/交互检查→独立提交keel-new。未实现新CMDB后端、图数据库、通用低代码或真实采集。
 
 唯一详细设计与模型边界见[CMDB-DOSSIER.md](CMDB-DOSSIER.md)。
+
+## 真实开发接入基线
+
+参见 [DESIGN-ALIGNMENT-AUDIT.md](DESIGN-ALIGNMENT-AUDIT.md) 与 [API-OPERATION-INDEX.md](API-OPERATION-INDEX.md)。保持现有页面、Provider 请求/响应和稳定资产身份；先接身份/权限与持久化基础，再按已批准模块顺序替换 HTTP Adapter。Mock 通过不等于真实授权、事务 Outbox、SSE 恢复或设备适配验证通过。资源专用分页、响应 envelope 与幂等字段以 OpenAPI 为准，不统一改写已实现接口。

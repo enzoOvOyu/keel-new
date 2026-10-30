@@ -14,7 +14,7 @@
 {"data": [], "page": {"limit": 50, "next_cursor": null, "has_more": false}, "request_id": "req_01..."}
 ```
 
-错误响应见 `API-CONVENTIONS.md`。时间使用 ISO-8601 UTC；页面按项目时区显示。列表使用 cursor pagination，默认 limit=50、最大 200。所有资源都有稳定 `id`、`project_id`（平台级资源可为空）、`created_at`、`updated_at`、`revision`（可变资源）。
+错误响应见 `API-CONVENTIONS.md`。时间使用 ISO-8601 UTC；页面按项目时区显示。列表使用 cursor pagination，通用默认 limit=50、最大 200；资源专用 OpenAPI 参数优先（如 CMDB dossier 最大100）。持久化领域资源使用稳定身份、项目与版本；聚合投影、证据及只读响应不强制补造 `created_at/updated_at/revision`，实际字段与 envelope 以各资源 OpenAPI schema 为准。
 
 ## 2. 项目与总览
 

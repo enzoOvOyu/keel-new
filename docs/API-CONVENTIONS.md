@@ -327,3 +327,7 @@ workspace/mapping按需返回ports/cables及授权peer_ports/peer_devices；关�
 新增/cmdb/dossier专用catalog/tree/relations/provenance/configuration/lifecycle/quality/manual-fields/saved-views/evidence接口。project_id可清除，仅授权项目；目录cursor+limit 1..100+排序；关系limit最多120、expanded最多10；写入冻结项目/资产/版本且拒绝白名单外字段，403/404/409/422及request_id统一。
 
 唯一详细设计与模型边界见[CMDB-DOSSIER.md](CMDB-DOSSIER.md)。
+
+## 真实开发接入基线
+
+参见 [DESIGN-ALIGNMENT-AUDIT.md](DESIGN-ALIGNMENT-AUDIT.md) 与 [API-OPERATION-INDEX.md](API-OPERATION-INDEX.md)。保持现有页面、Provider 请求/响应和稳定资产身份；先接身份/权限与持久化基础，再按已批准模块顺序替换 HTTP Adapter。Mock 通过不等于真实授权、事务 Outbox、SSE 恢复或设备适配验证通过。资源专用分页、响应 envelope 与幂等字段以 OpenAPI 为准，不统一改写已实现接口。

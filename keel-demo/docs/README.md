@@ -19,7 +19,7 @@
 - `DECISIONS.md`：仅记录尚未决定且会影响实现的事项。
 - `RACK-DIAGRAM.md`：基于 BOM/CMDB 自动生成机柜图的规则、交互、数据模型、API 与验收。
 - `EXCEL-IMPORT-PROFILE.md`：基于 `TX B300 Layout-new.xlsx` 的真实开局资料解析规划。源 Excel 不打包。
-- `MOCK-DATA-CONTRACT.md`：前端 mock 数据和交互行为契约；`fixtures/demo-64-b300/` 提供 64 台 B300 全域演示数据与 PostgreSQL 装载脚本；仅用于隔离演示数据库。
+- `MOCK-DATA-CONTRACT.md`：前端 mock 数据和交互行为契约；`fixtures/demo-full-64-b300/` 提供 64 台 B300 全域演示数据与 PostgreSQL 装载脚本；仅用于隔离演示数据库。
 - `fixtures/bom-evaluation/`：脱敏评测模板，不包含原始工作簿或密码。
 
 ## 权威顺序
@@ -77,6 +77,10 @@ IA v2.3 设计及实施计划入口：[IA-V2.3.md](IA-V2.3.md)。该段为v2.3�
 本轮用户明确废弃数字门禁作为主链。当前唯一业务顺序、状态机、逐目标放行、安全交接、独立BOM菜单与API约束以[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)为准。历史编号只按[DELIVERY-MIGRATION.md](DELIVERY-MIGRATION.md)追溯，不得用于解锁。验机失败关联统一Issues并定向复验；NCCL不反写验机；清理/归档/客户签署齐全后才进入维护态。NP仍是网络内部断言。当前仅前端Mock与契约实现，没有真实设备后端。
 
 
-## 当前待验收变更
+## 分域实施与验证记录
 
-[六阶段主链](DELIVERY-LIFECYCLE.md)、[单柜详情工作区](RACK-WORKSPACE.md)、[Fabric Topology](FABRIC-TOPOLOGY.md)。导航/路由/API见[实施对照](IA24-IMPLEMENTATION-MATRIX.md)，本轮实际运行记录与未执行检查见[状态记录](IMPLEMENTATION-STATUS.json)。不要以旧报告证明本轮UI。
+[六阶段主链](DELIVERY-LIFECYCLE.md)、[单柜详情工作区](RACK-WORKSPACE.md)、[Fabric Topology](FABRIC-TOPOLOGY.md)。导航/路由/API见[实施对照](IA24-IMPLEMENTATION-MATRIX.md)，历史阶段记录见[状态记录](IMPLEMENTATION-STATUS.json)；后续专项结果分别见 LOSSLESS-VALIDATION.json、CMDB-DOSSIER-VALIDATION.json、RACK-MAPPING-RESTORE.json。报告仅证明各自范围，不能以旧 NOT RUN 或局部 PASS 代替当前全平台验收。
+
+## 真实开发前设计核查
+
+当前核查结果与边界见 [DESIGN-ALIGNMENT-AUDIT.md](DESIGN-ALIGNMENT-AUDIT.md)，逐操作契约见 [API-OPERATION-INDEX.md](API-OPERATION-INDEX.md)。本轮只校正文档，无功能或协议载荷变更。

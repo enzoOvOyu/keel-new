@@ -122,7 +122,7 @@ flowchart LR
 ```
 
 - 所有页面先通过同一 API interface 实现；mock/HTTP provider 不改变页面调用方式。
-- mock 数据集中在 `web/src/mocks`，按 domain 组织，支持场景切换；不得在 React 页面组件内写大段静态假数据。
+- 当前 mock 数据集中在 `keel-demo/fixtures/demo-full-64-b300/`，由 `keel-demo/src/lib/api` 按 domain 提供场景；不得在 React 页面组件内写大段静态假数据。
 - OpenAPI 是 wire contract；前端类型由 OpenAPI 生成或通过 CI 校验，不手工维护第二套枚举。
 
 ### 10.2 工作流执行边界
@@ -133,7 +133,9 @@ Flow 首期定位为“面向已纳管服务器/交换机的批量脚本执行�
 
 业务表是写入事实源，CMDB 是统一资产/关系/生命周期查询投影。每个改变资产或交付状态的事务同时写 Outbox event；projector 按 `event_id` 幂等消费并维护 CMDB entity、relationship、timeline 和 provenance。导入任务创建时即记录 source file/import event；之后 BOM、采集、Flow/Execution、GateEvidence、ConfigSet/PushJob、Issue、TestReport、Approval、CleanupRun 全部自动关联。失败可重试/重放；不得要求用户手工把每个模块的数据“再录一次 CMDB”。
 
-### 10.4 推荐仓库结构增补
+### 10.4 规划仓库结构增补（非当前目录迁移要求）
+
+以下 `web/` 与 `api/` 是早期目标结构。当前前端实际位于 `keel-demo/src/`，契约为 `keel-demo/docs/openapi.yaml`，根 `docs/` 为同步镜像；不为了开始 Go 开发移动或重写已实现页面。业务 fixture 只从 `keel-demo/fixtures/demo-full-64-b300/` 读取，Provider 位于 `keel-demo/src/lib/api/`。
 
 ```text
 web/src/

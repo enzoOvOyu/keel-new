@@ -1,6 +1,6 @@
 # IA v2.4 页面、路由、抽屉与API实施对照
 
-本表由 `src/app/registry.ts` 生成；入口覆盖不等于所有业务验收通过。历史结果见 IA24 报告；六阶段迁移后的构建与交互检查按用户安排暂未执行，不沿用历史通过结论。
+本表由 `src/app/registry.ts` 生成；入口覆盖不等于所有业务验收通过。本次导航与契约对齐不重跑业务验收。专项验证以 LOSSLESS-VALIDATION.json、CMDB-DOSSIER-VALIDATION.json、RACK-MAPPING-RESTORE.json 等各自范围为准；历史 NOT RUN 不覆盖后续记录，局部 PASS 不代表全平台验收。逐操作契约见 [API-OPERATION-INDEX.md](API-OPERATION-INDEX.md)。
 
 ## 导航树
 
@@ -40,12 +40,12 @@
 | Fabric 网络底座 | `/p/:projectId/deploy/fabric` | project | fabric:read | poll-60s | FabricWorkspace / NetworkWorkspace | /fabric/switches/*; /push-jobs/*; /network-baselines |
 | Fabric 网络底座 / 网络就绪验收 | `/p/:projectId/deploy/fabric/readiness` | project | fabric:read | on-demand | FabricWorkspace / NetworkWorkspace | /fabric/switches/*; /push-jobs/*; /network-baselines |
 | Fabric 网络底座 / 网络设备 | `/p/:projectId/deploy/fabric/devices` | project | fabric:read | SSE | FabricWorkspace / NetworkWorkspace | /fabric/switches/*; /push-jobs/*; /network-baselines |
-| Fabric 网络底座 / Topology 拓扑与布线 | `/p/:projectId/deploy/fabric/topology` | project | fabric:read | on-demand | FabricWorkspace / NetworkWorkspace | /fabric/switches/*; /push-jobs/*; /network-baselines |
+| Fabric 网络底座 / Topology 拓扑与布线 | `/p/:projectId/deploy/fabric/topology` | project | fabric:read | on-demand | FabricWorkspace / NetworkWorkspace | `/projects/{project_id}/fabric/topology/{physical,logical,filters}`；`/projects/{project_id}/fabric/topology/details/{kind}/{id}` |
 | Fabric 网络底座 / ZTP 开通 | `/p/:projectId/deploy/fabric/ztp` | project | fabric:read | SSE | FabricWorkspace / NetworkWorkspace | /fabric/switches/*; /push-jobs/*; /network-baselines |
 | Fabric 网络底座 / Golden 配置 | `/p/:projectId/deploy/fabric/golden` | project | fabric:read | poll-60s | FabricWorkspace / NetworkWorkspace | /fabric/switches/*; /push-jobs/*; /network-baselines |
 | Fabric 网络底座 / Doublecheck | `/p/:projectId/deploy/fabric/doublecheck` | project | fabric:read | poll-60s | FabricWorkspace / NetworkWorkspace | /fabric/switches/*; /push-jobs/*; /network-baselines |
 | Fabric 网络底座 / PushJob | `/p/:projectId/deploy/fabric/pushjobs` | project | fabric:read | SSE | FabricWorkspace / NetworkWorkspace | /fabric/switches/*; /push-jobs/*; /network-baselines |
-| Fabric 网络底座 / 无损健康 | `/p/:projectId/deploy/fabric/lossless` | project | fabric:read | poll-60s | FabricWorkspace / NetworkWorkspace | /fabric/switches/*; /push-jobs/*; /network-baselines |
+| Fabric 网络底座 / 无损健康 | `/p/:projectId/deploy/fabric/lossless` | project | fabric:read | poll-60s | FabricWorkspace / NetworkWorkspace | `/projects/{project_id}/fabric/devices/{device_id}/lossless/{evidence,conclusion,collect,retests}`；`/lossless/raw/{evidence_id}`（完整前缀同设备路径） |
 | Fabric 网络底座 / 光模块 DDM | `/p/:projectId/deploy/fabric/ddm` | project | fabric:read | poll-60s | FabricWorkspace / NetworkWorkspace | /fabric/switches/*; /push-jobs/*; /network-baselines |
 | Fabric 网络底座 / 网络日志 | `/p/:projectId/deploy/fabric/logs` | project | fabric:read | poll-60s | FabricWorkspace / NetworkWorkspace | /fabric/switches/*; /push-jobs/*; /network-baselines |
 | Fabric 网络底座 / 规则治理 | `/p/:projectId/deploy/fabric/rules` | project | fabric:read | poll-60s | FabricWorkspace / NetworkWorkspace | /fabric/switches/*; /push-jobs/*; /network-baselines |
@@ -86,7 +86,7 @@
 | Fleet 服务器舰队 / 网口健康 | `/fleet/ports` | cross | fleet:read | SSE | DeviceDirectory / DrawerDetail | /fleet/servers/*; /monitor/collections |
 | Fleet 服务器舰队 / 资产台账 | `/fleet/assets` | cross | fleet:read | poll-5s | DeviceDirectory / DrawerDetail | /fleet/servers/*; /monitor/collections |
 | Fleet 服务器舰队 / 采集任务 | `/fleet/collections` | cross | fleet:read | poll-5s | DeviceDirectory / DrawerDetail | /fleet/servers/*; /monitor/collections |
-| RackView 机柜机房 | `/racks` | cross | cmdb:read | on-demand | RoomView / RackWorkspace | /racks/global-map; /racks/*; /rack-diagrams/revisions |
+| RackView 机柜机房 | `/racks` | cross | cmdb:read | on-demand | RoomView / RackWorkspace | `/racks/global-map`；`/projects/{project_id}/racks/{rack_id}/workspace/{tab}`；`/projects/{project_id}/rack-diagrams/*` |
 | Issues 工单 | `/issues` | cross | issues:read | poll-5s | IssueViews / IssuesWorkspace | /issues; /projects/{project_id}/issues; close / assign / retest |
 | Issues 工单 / 全局工单池 | `/issues/pool` | cross | issues:read | poll-5s | IssueViews / IssuesWorkspace | /issues; /projects/{project_id}/issues; close / assign / retest |
 | Issues 工单 / 工单看板 | `/issues/board` | cross | issues:read | poll-5s | IssueViews / IssuesWorkspace | /issues; /projects/{project_id}/issues; close / assign / retest |
@@ -145,7 +145,7 @@ DrawerDetail → 统一头部、权限、URL、滚动记忆、上一台/下一�
 | 交换机 | 配置脚本 | 基线/模板/参数引用；不编造未提供脚本原文 |
 | 交换机 | 配置事件 | PushJob / 审批 / 审计 |
 | 交换机 | 运行状态 | runtime / 物理接口 / breakout / LLDP / FDB / ARP / BGP |
-| 交换机 | 无损网络 | NP与配置一致性；缺少PFC/ECN/CNP原始计数显示unknown |
+| 交换机 | 无损网络 | LosslessEvidencePanel：批准基线/applied/operational/窗口计数与测试证据；同源判定、缺口、工单和定向复验，缺失必需证据BLOCKED |
 | 交换机 | 光模块 | DDM五类单位 / 合成阈值 / 来源与时间；单样本不造趋势 |
 | 交换机 | 日志 | switch_logs / 来源 / 时间 |
 
