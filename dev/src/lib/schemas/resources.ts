@@ -91,7 +91,6 @@ export type FullCollectionMap={
  'mapping_pairs':components['schemas']['FullMappingPairs'];
  'config_sets':components['schemas']['FullConfigSets'];
  'network_assertions':components['schemas']['FullNetworkAssertions'];
- 'scenario_profiles':components['schemas']['FullScenarioProfiles'];
  'monitoring_rules':components['schemas']['FullMonitoringRules'];
  'server_lldp_observations':components['schemas']['FullServerLldpObservations'];
  'task_evidence_archive':components['schemas']['FullTaskEvidenceArchive'];

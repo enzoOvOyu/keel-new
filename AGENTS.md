@@ -180,3 +180,8 @@
 - 用户已授权Go后端持久化项目和AI配置，并由用户填写API服务；AI候选仍需人工审核，不自动提交BOM。
 - 系统管理/admin/ai-provider为配置入口；BOM引用相同Provider，Rules不依赖模型服务。
 - API Key只写入受控秘密引用，不进入普通DB字段、浏览器存储、日志、Git或Docker构建上下文。测试使用本地合成服务时须明确，不能冒充外部模型验收。
+
+## 用户决策：移除全局演示状态场景
+
+- 顶部不再提供场景切换器；禁止恢复全局slow-loading/empty-project/api-error/permission-denied注入、假延迟或重置所有数据的入口。
+- 加载、错误和权限状态由实际API/权限及业务证据决定。尚未接入后端的业务Mock和AI协议Mock模式不属于该全局开关，不借机删除业务能力。

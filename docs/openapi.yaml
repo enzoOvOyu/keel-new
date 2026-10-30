@@ -27805,47 +27805,6 @@ components:
         - page
         - request_id
       additionalProperties: false
-    FullScenarioProfiles:
-      type: object
-      properties:
-        id:
-          type: string
-        project_id:
-          type: string
-        name:
-          type: string
-        label:
-          type: string
-        patches:
-          type: array
-          items:
-            type: string
-        revision:
-          type: integer
-      required:
-        - id
-        - project_id
-        - name
-        - label
-        - patches
-        - revision
-      additionalProperties: false
-    FullScenarioProfilesListEnvelope:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/FullScenarioProfiles"
-        page:
-          $ref: "#/components/schemas/Page"
-        request_id:
-          type: string
-      required:
-        - data
-        - page
-        - request_id
-      additionalProperties: false
     IAMappingLink:
       type: object
       properties:

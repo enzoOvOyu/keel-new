@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "entered_via_sidebar": true,
+  "admin_routes": [
+    "/admin/users",
+    "/admin/members",
+    "/admin/roles",
+    "/admin/sessions",
+    "/admin/logins",
+    "/admin/approvals",
+    "/admin/notifications",
+    "/admin/tokens",
+    "/admin/audit",
+    "/admin/templates",
+    "/admin/models",
+    "/admin/parameters",
+    "/admin/ssh",
+    "/admin/ai-provider"
+  ],
+  "scenario_switcher_removed": true,
+  "page_errors": []
+}

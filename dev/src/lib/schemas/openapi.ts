@@ -9818,19 +9818,6 @@ export interface components {
             page: components["schemas"]["Page"];
             request_id: string;
         };
-        FullScenarioProfiles: {
-            id: string;
-            project_id: string;
-            name: string;
-            label: string;
-            patches: string[];
-            revision: number;
-        };
-        FullScenarioProfilesListEnvelope: {
-            data: components["schemas"]["FullScenarioProfiles"][];
-            page: components["schemas"]["Page"];
-            request_id: string;
-        };
         IAMappingLink: {
             id: string;
             project_id: string;

@@ -179,3 +179,7 @@ CMDB-D-01…06：服务器→部件→端口→线缆→对端；Diff→来源�
 项目创建、授权与BOM入口；Provider真实保存、刷新后密钥不回显、真实后端HTTP调用及BOM共享目录按PROJECT-AI-CONFIG-CHECK.json记录。本地合成服务检查不等于真实外部Provider或真实工作簿准确率验收。
 
 唯一详细说明与API对照见 [PROJECT-AI-CONFIGURATION.md](PROJECT-AI-CONFIGURATION.md)。
+
+## 系统管理导航修复验证
+
+从Sidebar进入系统管理，点击14个子页面并返回AI Provider配置；核对无脚本错误、无全局场景入口。结果见ADMIN-NAVIGATION-CHECK.json。仅覆盖本次菜单和入口，不表示所有管理业务已接真实后端。
