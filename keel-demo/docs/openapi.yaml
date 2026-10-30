@@ -25177,6 +25177,16 @@ components:
             oneOf:
               - $ref: "#/components/schemas/FullPorts"
               - $ref: "#/components/schemas/FullSwitchPorts"
+        peer_ports:
+          type: array
+          items:
+            oneOf:
+              - $ref: "#/components/schemas/FullPorts"
+              - $ref: "#/components/schemas/FullSwitchPorts"
+        peer_devices:
+          type: array
+          items:
+            $ref: "#/components/schemas/RackRelatedDevice"
         cables:
           type: array
           items:
@@ -26335,6 +26345,10 @@ components:
       required:
         - project_id
       additionalProperties: false
+    RackRelatedDevice:
+      oneOf:
+        - $ref: "#/components/schemas/FullServers"
+        - $ref: "#/components/schemas/FullSwitches"
 
 x-implementation-policy:
   frontend-first: true

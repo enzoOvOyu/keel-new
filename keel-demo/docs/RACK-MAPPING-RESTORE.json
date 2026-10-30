@@ -1,11 +1,15 @@
 {
   "status": "PASS",
+  "definition": "Selected rack device asset and cable/port relationships, not GPU-NIC matrix",
   "checks": [
-    "Independent Mapping tab visible",
-    "Server selection keeps Mapping tab and updates matrix",
-    "GPU3/NIC3 matrix cell changes evidence selection",
-    "NIC to switch-port evidence rendered"
+    "asset identity and source/positions visible",
+    "selected server has 10 cables",
+    "changing server clears old device cables",
+    "ports/connections mode switch",
+    "locate peer switch and preserve Mapping context",
+    "peer detail drawer entry available"
   ],
   "browser_page_errors": [],
-  "scope": "Focused browser check only; no full regression or repeated production build"
+  "scope": "Focused affected interaction check; full regression not run",
+  "build": "PASS: TypeScript + Vite production build"
 }

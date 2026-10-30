@@ -308,6 +308,8 @@ IA v2.3：部署请求携带 project_id；跨项目查询服务端从会话授�
 完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。
 
 
-### Rack Mapping 入口恢复
+### Rack Mapping：所选设备关联追溯（当前定义）
 
-机柜右侧保留八个原详情Tab，并增加独立Mapping Tab。workspace/{tab}支持mapping；GPU-NIC矩阵与端口/LLDP追溯共用既有Provider，切换服务器保留Mapping并同步画布选中，不改变配对或线序判据。
+Mapping恢复重构前三列工作区中“设备与连接追溯”的内容，不再作为GPU-NIC矩阵页面。支持服务器和交换机：设备型号/SN/稳定ID/来源BOM、草稿与实际位置、“连接/端口”切换、线缆A/B两端设备/端口/介质/长度、MAC与状态、对端定位和统一设备详情抽屉。切换画布设备或定位对端保留Mapping上下文，清除旧设备的关联内容；连接和端口支持搜索、分批加载，缺失引用显示unknown。GPU-NIC矩阵继续由Topology/Validation承载。
+
+workspace/mapping按需返回ports/cables及授权peer_ports/peer_devices；关联来自原有BOM/CMDB稳定ID，不创建资产副本。Cable双端与端口peer引用不同要明确提示冲突，不以端口状态或历史线序结果伪造当前验证通过。

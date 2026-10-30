@@ -8994,6 +8994,8 @@ export interface components {
             switch_running_configs?: components["schemas"]["FullSwitchRunningConfigs"][];
             switch_config_diffs?: components["schemas"]["FullSwitchConfigDiffs"][];
             ports?: (components["schemas"]["FullPorts"] | components["schemas"]["FullSwitchPorts"])[];
+            peer_ports?: (components["schemas"]["FullPorts"] | components["schemas"]["FullSwitchPorts"])[];
+            peer_devices?: components["schemas"]["RackRelatedDevice"][];
             cables?: components["schemas"]["FullCables"][];
             interfaces?: components["schemas"]["FullSwitchInterfaces"][];
             lldp?: components["schemas"]["FullLldpNeighbors"][];
@@ -9357,6 +9359,7 @@ export interface components {
              */
             comparison: "compare" | "planned" | "observed";
         };
+        RackRelatedDevice: components["schemas"]["FullServers"] | components["schemas"]["FullSwitches"];
     };
     responses: {
         /** @description Invalid request */

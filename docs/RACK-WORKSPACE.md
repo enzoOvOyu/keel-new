@@ -35,6 +35,8 @@
 2026-10-30：生产构建首次通过；Chromium实际打开机柜与Topology，验证单柜/详情宽度、设备选择、环境懒加载/7d范围、精确线缆双端高亮、物理→逻辑与配置Diff，page_errors为空。详见TOPOLOGY-RACK-SMOKE.json。完整业务/权限/历史/导出回归仍NOT RUN，等待用户安排；不把本次最小检查等同全量验收。
 
 
-### Mapping 工作区恢复
+### Rack Mapping：所选设备关联追溯（当前定义）
 
-在原八个详情Tab之外恢复独立 Mapping Tab，复用统一API Provider和既有MappingMatrix/DeviceLinkEvidence。显示可点击8×8 GPU-NIC矩阵、BOM期望/LLDP实际双端、线缆、来源、时间与新鲜度；可选本机柜服务器并保留Mapping Tab，画布同步选中。Topology原有矩阵入口继续保留。API workspace tab枚举增加mapping，按需加载，与Validation审核共用资产/配对和证据，不另建关系副本。
+Mapping恢复重构前三列工作区中“设备与连接追溯”的内容，不再作为GPU-NIC矩阵页面。支持服务器和交换机：设备型号/SN/稳定ID/来源BOM、草稿与实际位置、“连接/端口”切换、线缆A/B两端设备/端口/介质/长度、MAC与状态、对端定位和统一设备详情抽屉。切换画布设备或定位对端保留Mapping上下文，清除旧设备的关联内容；连接和端口支持搜索、分批加载，缺失引用显示unknown。GPU-NIC矩阵继续由Topology/Validation承载。
+
+workspace/mapping按需返回ports/cables及授权peer_ports/peer_devices；关联来自原有BOM/CMDB稳定ID，不创建资产副本。Cable双端与端口peer引用不同要明确提示冲突，不以端口状态或历史线序结果伪造当前验证通过。

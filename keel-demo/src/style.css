@@ -35,3 +35,5 @@
 @media(max-width:1150px){.fabric-topology-workspace{grid-template-columns:minmax(360px,1fr) minmax(300px,1fr)}}@media(max-width:900px){.fabric-topology-workspace{grid-template-columns:1fr}.topology-graph-canvas{height:500px}.topology-view-tabs{flex-wrap:wrap}}
 
 .topology-node-ports button.active-endpoint{background:var(--primary);color:white;border-color:var(--primary);box-shadow:0 0 0 2px #9ab5ef; font-weight:700}
+
+.rack-relation-card{border:1px solid var(--border);border-radius:6px;padding:12px;margin:12px 0}.rack-relation-card small{overflow-wrap:anywhere}.rack-relation-ends{display:grid;grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr);align-items:center;gap:10px;margin:12px 0}.rack-relation-endpoint{min-width:0;overflow-wrap:anywhere;background:var(--accent);border-radius:4px;padding:10px}.rack-relation-endpoint b{font-size:11px}.rack-relation-endpoint .toolbar{margin-bottom:0;gap:4px;flex-wrap:wrap}.rack-relation-endpoint .btn{font-size:10px;padding:5px}.rack-device-relations>input{width:100%;margin-top:12px}@media(max-width:1150px){.rack-relation-ends{grid-template-columns:1fr}.rack-relation-ends>span{text-align:center}}
