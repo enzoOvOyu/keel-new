@@ -246,3 +246,9 @@ CMDB档案只聚合既有领域事实与稳定ID。关系按position/composition
 ## 2026-10-30 · 身份与审批状态
 
 账号 active/disabled，锁定为独立 locked_until；Session 独立 expires_at/revoked_at。项目授权 valid_from/expires_at/revoked_at，每次请求重新求权限并集。审批 pending→approved/rejected，Critical NH 未绑定为 blocked_policy；申请人/签署职责唯一，冻结范围与签署人授权在执行检查再次验证。详见 IDENTITY-RBAC.md。六阶段与 maintained 限制不变。
+
+## CMDB 版本与发布
+
+Schema版本激活前检查兼容性与存量数据。ChangeSet为Draft→Review→Approved→Published或Rejected；申请人不可自批，审核人不发布；发布重查角色有效性、资产版本、Schema版本与双端关系，失败事务回滚且可重试。观测快照不等同正式变更。资产生命周期planned/discovered/provisioned/verified/delivered/maintained/retired与六阶段交付状态独立。
+
+接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。

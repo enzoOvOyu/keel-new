@@ -185,3 +185,9 @@ fixture集中增加lossless_rules/profiles/baselines/evidence/raw_outputs/host_e
 ## BOM 真实开发增补
 
 用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。
+
+## CMDB Mock/真实适配
+
+真实CMDB开发装载复用fixtures/demo-full-64-b300/demo-seed.json的稳定ID，64服务器/512GPU/24交换机/16机柜为合成切片；正式BOM可额外增加独立资产，不能把目录总量伪造为64。重复装载幂等。MinIO合成证据明确synthetic，不冒充真机采集。Mock Adapter仍可切换，React不嵌入另一套资产。
+
+接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。

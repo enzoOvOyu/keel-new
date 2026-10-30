@@ -4,14 +4,14 @@
 启动演示：在 `keel-demo/` 目录执行 `docker compose up -d`。
 下方是基础开发环境说明。
 
-设计规范见 [docs/README.md](docs/README.md)。当前为前端先行的基础环境，业务页面和 Go API 尚未实现。
+设计规范见 [docs/README.md](docs/README.md)。当前开发入口为 dev/，认证、BOM 和 CMDB 已接 Go/PostgreSQL；其余业务页面仍通过统一 Mock Provider 演示。
 
 1. 可选：`cp .env.example .env`，按需调整本地配置。
 2. `docker compose up -d --build` 启动服务；`docker compose ps` 查看状态。
 3. 前端：<http://localhost:5174>；MinIO 控制台：<http://localhost:9001>。PostgreSQL、Redis 和 MinIO API 分别绑定本机 5432、6379、9000 端口。
 4. `docker compose stop` 停止服务；数据保存在独立 Docker volumes 中。不要使用 `down -v`，除非明确要删除本地数据。
 
-默认凭据仅适用于本机开发，正式环境应使用密钥管理。MinIO bucket 在接入对象存储时创建；目前不自动创建。前端依赖更新后重新执行 `docker compose up -d --build`。可在 web 目录运行 `npm ci && npm run lint && npm run build` 验证。
+默认凭据仅适用于本机开发，正式环境应使用密钥管理。MinIO bucket 在接入对象存储时创建；目前不自动创建。前端依赖更新后重新执行 `docker compose up -d --build`。在 dev 目录运行 `npm ci && npm run build` 构建前端；后端启动和迁移见 `docs/DEPLOYMENT.md`。
 
 MinIO 默认使用本机已有的 `keel-minio:2025-10-15-9e49d5e` 镜像；其他机器需提供兼容的 MinIO 镜像并通过 `MINIO_IMAGE` 配置。
 
@@ -21,3 +21,7 @@ MinIO 默认使用本机已有的 `keel-minio:2025-10-15-9e49d5e` 镜像；其�
 
 
 当前执行阶段为用户明确授权的IA v2.4前端Mock实施。OPS“本次只改设计文档”是历史设计阶段限制，不阻止本轮已授权的前端工作；保持IPMI-only及其他业务安全约束。当前导航、页面与真实验证记录见 `docs/IA24-IMPLEMENTATION-MATRIX.md`。不得把历史计划或只通过构建当作已完成业务验收。
+
+## 真实 CMDB 开发切片
+
+开发前端 http://localhost:5174 通过 Adapter 接入 Go/PostgreSQL CMDB；原演示保留5180。模型、接口、迁移、Schema扩展及真实/合成边界见 [CMDB真实设计](docs/CMDB-REAL-DESIGN.md)。保留原导航、主题及服务器五/交换机八Tab抽屉，其他未接入领域仍为明确Mock。

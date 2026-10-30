@@ -192,3 +192,9 @@ CmdbDossier*资源Schema明确目录状态维度、关系类别与规划/观测�
 ## 2026-10-30 · Identity 真实契约
 
 用户、角色/权限、项目成员、Session、登录审计、操作审计及审批的专用 Identity* Schema 与各操作以 openapi.yaml 为唯一 HTTP 定义；不得再以 GenericObject 实现这些接口。全局管理员资格与项目业务签署资格分离；审批检查只校验冻结范围，明确不执行设备。实现/安全边界见 IDENTITY-RBAC.md。
+
+## CMDB 真实领域契约
+
+OpenAPI中的CmdbSchema*、CmdbChange*、CmdbRevision*、CmdbRelationshipRevision与原CmdbDossier*共同构成真实契约。保持五/八Tab抽屉旧数据形状；资产创建/更新/退役/换件、关系新增/结束统一由ChangeSet表达；禁止客户端直接覆盖批准配置与采集字段。
+
+接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。

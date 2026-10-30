@@ -1,0 +1,59 @@
+{
+  "status": "PASS",
+  "scope": "UI and canonical queries only",
+  "checked_at": "2026-10-30T12:48:43.601Z",
+  "checks": [
+    "Canonical IDs/counts and published BOM assets coexist",
+    "Five original CMDB views and server five/network eight tabs load from real API",
+    "Existing theme, layout, navigation, ProjectContext and drawer source hashes unchanged"
+  ],
+  "captures": [
+    "assets",
+    "relations",
+    "configuration",
+    "history",
+    "quality",
+    {
+      "drawer": "server",
+      "tabs": [
+        "资产台账",
+        "映射详情",
+        "网口面板",
+        "PCIe 拓扑",
+        "监控详情"
+      ]
+    },
+    {
+      "drawer": "network",
+      "tabs": [
+        "基础信息",
+        "配置信息",
+        "配置脚本",
+        "配置事件",
+        "运行状态",
+        "无损网络",
+        "光模块",
+        "日志"
+      ]
+    }
+  ],
+  "preserved": {
+    "dev/src/style.css": true,
+    "dev/src/components/DeviceDrawers.tsx": true,
+    "dev/src/components/ui.tsx": true,
+    "dev/src/app/main.tsx": true,
+    "dev/src/app/registry.ts": true,
+    "dev/src/app/ProjectContext.tsx": true
+  },
+  "query_ms": {
+    "/cmdb/schemas": 57,
+    "/cmdb/inventory": 346
+  },
+  "page_errors": [],
+  "failed_requests": [],
+  "limitations": [
+    "Synthetic fixtures are not real device telemetry",
+    "Production scale and hardware execution not tested",
+    "Other business execution modules remain SIMULATION_ONLY"
+  ]
+}

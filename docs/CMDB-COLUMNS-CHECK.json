@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "url": "http://localhost:5174/cmdb/assets?asset=srv-0001&project_id=proj-b300-demo&cols=name%2Casset_type%2Cserial%2Caddress%2Cdelivery_stage%2Cmaintenance_state%2Chealth%2Ccompleteness%2Cmodel&sort=-name",
+  "column_configuration": true,
+  "server_sort": true,
+  "saved_view": true,
+  "page_errors": []
+}

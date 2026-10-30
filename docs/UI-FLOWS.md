@@ -115,3 +115,9 @@ Fabric无损选择设备/反例→端口→rule@version→五层证据→读取�
 ## 2026-10-30 · 认证、成员与审批闭环
 
 访问业务URL→无Session跳统一登录→本地身份验证→加载授权项目→返回原URL；越权project_id返回403。管理员创建用户→项目成员选择角色/范围/有效期→授权审计→对应账号可访问；撤销/禁用后旧Session下一次请求被拒绝。操作申请冻结版本/目标→独立签署→执行前校验；Critical NH待决阻断。BOM保持六步，不出现独立登录表单。详见 IDENTITY-RBAC.md。
+
+## CMDB 接入原交互
+
+资源树/目录→同一资产→关系/来源/生命周期保持原URL上下文；设备仍打开既有ServerDetailDrawer五Tab、NetworkDeviceDrawer八Tab。生命周期增补版本Diff和变更草稿→独立审核→发布；配置区附Schema属性分组。物理/逻辑网络与机柜位置跳转现有模块，禁止重复建详情或拓扑引擎。
+
+接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。

@@ -137,3 +137,9 @@ IA验收分层：OpenAPI schema和分页/权限错误契约；ProjectContext单�
 ## 2026-10-30 · 身份定向检查
 
 运行 internal/identity 与 cmd/api 相关Go测试，identity-check.py 实际HTTP反例，OpenAPI响应校验，及统一登录/BOM/管理页面浏览器检查。复用原BOM工作台回归，不全仓重复测试；合成账号结束禁用，原始工作簿与凭据不进入Git。详见 IDENTITY-RBAC.md 和 IDENTITY-ACCEPTANCE.json。
+
+## CMDB 定向验证范围
+
+只验证本次Schema约束/来源权限、关系完整性、版本/ChangeSet事务及API/Adapter集成；受影响共享资产投影增加只读关联检查。保存原UI基线并对比接入截图和关键交互，不重复运行整个平台旧冒烟。生产规模、真实设备采集和时序存储不在本次已验证范围。
+
+接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。

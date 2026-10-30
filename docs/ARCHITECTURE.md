@@ -208,3 +208,9 @@ Topology查询投影不持有第二套Device事实。物理视图组合BOM/Cable
 ## 2026-10-30 · 统一身份边界
 
 dev 的 Go 模块化单体增加 internal/identity，复用 PostgreSQL 与已有 api_session/audit_event。统一 Cookie Session → 主体加载 → 项目/资源权限 → 业务 Handler；BOM 不再维护独立身份。前端统一 IdentityProvider 在 ProjectContext 之前安装后端授权快照，Mock 只消费该授权的读投影。完整边界见 IDENTITY-RBAC.md；设备域仍为 Mock。
+
+## CMDB 真实服务边界
+
+Go模块化单体中internal/cmdb包含Schema、Domain、Query和ChangeSet服务；演进既有cmdb_entity/cmdb_relationship，不新建平行资产库。PostgreSQL外键/邻接索引实现图关系，GraphRepository仅预留适配边界。MinIO存领域证据原文，CMDB存引用。现有Outbox同事务发布，前端API Adapter不改变组件结构。
+
+接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。

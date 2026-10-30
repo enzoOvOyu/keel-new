@@ -1,3 +1,4 @@
+import {realCmdbApi,realCmdbEnabled} from './cmdb-http';import {mockLatency} from './latency';
 import {mockApi as api,readAuthorized,type Row,type Resource} from './index';
 import {cmdbCatalogRequest,cmdbManualRequest,type CmdbAsset,type CmdbNode,type CmdbRelation,type CmdbSource,type CmdbQuality} from '../schemas/cmdb';
 const collections:Partial<Record<CmdbAsset['asset_type'],Resource[]>>={server:['servers'],switch:['switches'],gpu:['gpus'],nic:['nics'],port:['ports','switch_ports'],optic:['optics'],cable:['cables'],rack:['racks']};
@@ -11,7 +12,7 @@ const page=(rows:unknown[],cursor='0',limit=20)=>{const n=Number(cursor);if(!Num
 export type CmdbConfigVersion={id:string;layer:'baseline'|'intended'|'actual'|'operational';resource:string;revision:string;source:string;observed_at:string|null;freshness:string;support:string;fields:Record<string,string|null>};
 export type CmdbEvent={id:string;asset_id:string;event_type:string;label:string;occurred_at:string|null;status:string;stage_id:string|null;source:string;links:{label:string;href:string}[];historical:boolean};
 function recordLink(resource:string,id:string,assetId:string){return '/cmdb/history?asset='+encodeURIComponent(assetId)+'&resource='+resource+'&evidence='+encodeURIComponent(id)}
-export const cmdbApi={
+export const mockCmdbApi={
  catalog(input:unknown){const q=cmdbCatalogRequest.parse(input);let rows=assetRows(q.project_id);const counts=Object.fromEntries(Object.keys(collections).map(k=>[k,rows.filter(a=>a.asset_type===k).length]));rows=rows.filter(a=>(!q.type||a.asset_type===q.type)&&(!q.rack_id||a.rack_id===q.rack_id)&&(!q.status||[a.health,a.maintenance_state,a.freshness,a.completeness].includes(q.status))&&(!q.q||JSON.stringify(a).toLowerCase().includes(q.q.toLowerCase())));rows.sort((a,b)=>(q.sort.includes('type')?a.asset_type.localeCompare(b.asset_type):a.name.localeCompare(b.name,undefined,{numeric:true}))*(q.sort.startsWith('-')?-1:1));const n=Number(q.cursor);if(!Number.isInteger(n)||n<0)throw Error('400 · 无效游标');return{data:rows.slice(n,n+q.limit),counts,total:rows.length,page:{limit:q.limit,has_more:n+q.limit<rows.length,next_cursor:n+q.limit<rows.length?String(n+q.limit):null},request_id:requestId()}},
  asset(id:string,projectId?:string){raw(id,projectId);return assetRows(projectId).find(a=>a.id===id)!},
  device(id:string,projectId?:string){const d=deviceId(id,projectId);return d?raw(d,projectId).record:null},
@@ -39,3 +40,6 @@ export const cmdbApi={
  savedViews(projectId?:string){return{data:read('cmdb_saved_views',projectId).filter(v=>v.actor===api.actor),request_id:requestId()}},
  saveView(name:string,query:string){if(name.trim().length<2||!query.startsWith('/cmdb/'))throw Error('422 · 视图名称或路由无效');const saved=new URL(query,window.location.origin);if(saved.searchParams.get('project_id'))readAuthorized('projects',saved.searchParams.get('project_id')!);if(saved.searchParams.get('asset'))raw(saved.searchParams.get('asset')!,saved.searchParams.get('project_id')||undefined);return{data:api.create('cmdb_saved_views',{actor:api.actor,name:name.trim(),query,created_at:new Date().toISOString()}),request_id:requestId()}}
 };
+
+const mockProvider={...mockCmdbApi,subscribe:api.subscribe,beforeRequest:mockLatency,deviceRecords:(_project?:string)=>[...api.list('servers'),...api.list('switches')]};
+export const cmdbApi=realCmdbEnabled?realCmdbApi:mockProvider;

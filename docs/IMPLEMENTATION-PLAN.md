@@ -155,3 +155,9 @@ IA v2.3 插入前端 Mock 阶段：先冻结 IA-V2.3.md 的页面注册、作用
 ## 2026-10-30 · 身份切片接入
 
 身份模块按版本迁移→权限目录/主体→Cookie/CSRF登录→管理与审批API→全局IdentityProvider→原登录页迁入→BOM移除独立登录→定向验收完成。BOM已真实接入，其他设备模块继续Mock；后续设备执行API必须消费同一权限与审批校验，不为本任务提前落地设备后端。见 IDENTITY-RBAC.md。
+
+## CMDB 真实切片顺序
+
+先固定UI截图/令牌及契约；随后迁移既有表与Schema Registry；实现资产/关系/来源/版本；接入BOM Outbox；以Adapter替换CMDB Mock；增补现有生命周期内ChangeSet；最后执行定向数据/授权/性能/视觉验证。禁止重写原工作台和设备抽屉。
+
+接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。

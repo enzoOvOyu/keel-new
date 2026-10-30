@@ -204,3 +204,9 @@ CmdbDossierAsset是既有八类物理资源投影（服务器/交换机/GPU/NIC/
 ## 2026-10-30 · 身份数据模型实施
 
 复用 api_session（扩 user_id/session_id/revoked_at/last_seen_at）及 audit_event。新增 app_user、role、permission、role_permission、user_global_role、project、project_membership、login_event、approval_record/approval_signature，见迁移010–013及 IDENTITY-RBAC.md。ProjectMembership 唯一活动键(user_id,project_id,role_id,resource_type,resource_id)；审批同申请中签署人及职责分别唯一。不新增资产身份。
+
+## CMDB 真实持久化映射
+
+cmdb_entity稳定text资产键保持历史UUID原值，bom_item_uid保留唯一物料关联；cmdb_asset_scope为授权投影。Schema使用cmdb_schema_version/schema_asset_type/schema_attribute/relationship_definition；来源用cmdb_field_source；关系用cmdb_relationship及relationship_revision；资产历史用cmdb_revision；变更用cmdb_changeset；生命周期用cmdb_lifecycle_event；外部证据/配置层使用cmdb_external_reference/config_reference。关键关系外键不以JSONB代替，扩展属性由版本化Schema验证。
+
+接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。

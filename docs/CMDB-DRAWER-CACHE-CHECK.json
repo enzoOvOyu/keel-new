@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "device_switch_cache_isolation": true,
+  "first": "srv-0001-gpu-01 → srv-0001-nic-01",
+  "second": "srv-0002-gpu-01 → srv-0002-nic-01",
+  "returned": "srv-0001-gpu-01 → srv-0001-nic-01",
+  "target_changeset_deeplink": true,
+  "page_errors": []
+}

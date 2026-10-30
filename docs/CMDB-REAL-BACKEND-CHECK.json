@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "scope": "Targeted backend integration",
+  "checked_at": "2026-10-30T12:53:06.045Z",
+  "checks": [
+    "Canonical IDs/counts and published BOM assets coexist",
+    "Schema version, typed graph and Excel cell lineage",
+    "Server/component/port/Cable/switch canonical traversal",
+    "Viewer write and cross-project URL denied",
+    "ChangeSet idempotent create, no draft asset, self approval denied, independent review/publish",
+    "Schema extension new type/relation and source ownership enforced",
+    "Replacement new identity, retired old identity, installation history and revision diff"
+  ],
+  "query_ms": {
+    "/cmdb/schemas": 88,
+    "/cmdb/inventory": 436,
+    "/cmdb/dossier/assets/srv-0001?project_id=proj-b300-demo": 73,
+    "/cmdb/dossier/relations?root_id=srv-0001&project_id=proj-b300-demo&limit=120": 29,
+    "/cmdb/dossier/assets/srv-0001/provenance?project_id=proj-b300-demo": 25,
+    "/cmdb/dossier/relations?root_id=cable-srv-0001-01&project_id=proj-b300-demo": 18,
+    "/cmdb/dossier/catalog?project_id=proj-b300-lab": 15,
+    "/cmdb/dossier/assets/sensor-check-959e4d40-242a-4fdb-8d48-46ceeb4d7eb4?project_id=proj-b300-demo": 43,
+    "/cmdb/dossier/relations?root_id=sensor-check-959e4d40-242a-4fdb-8d48-46ceeb4d7eb4&project_id=proj-b300-demo": 20,
+    "/cmdb/dossier/assets/sensor-check-959e4d40-242a-4fdb-8d48-46ceeb4d7eb4-replacement?project_id=proj-b300-demo": 41,
+    "/cmdb/dossier/assets/sensor-check-959e4d40-242a-4fdb-8d48-46ceeb4d7eb4/revisions?project_id=proj-b300-demo": 17,
+    "/cmdb/dossier/assets/sensor-check-959e4d40-242a-4fdb-8d48-46ceeb4d7eb4/diff?project_id=proj-b300-demo&from=1&to=2": 13
+  }
+}

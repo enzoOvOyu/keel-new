@@ -98,3 +98,11 @@
 ## 2026-10-30 · dev 身份启动
 
 执行 dev/backend/migrate.sh（010–013）后设置受控 KEEL_BOOTSTRAP_PASSWORD，首次空用户库初始化 admin；已有密码不在启动时重置。APP_ENV=production 必须 HTTPS，Cookie Secure；开发5174代理8081允许同源。运行 ./dev/backend/run-local.sh 与 cd dev && npm run dev，入口 /login。旧 KEEL_API_TOKEN、KEEL_VIEWER_PASSWORD 与配置角色不再用于认证。见 dev/README.md 与 IDENTITY-RBAC.md。
+
+## CMDB 开发迁移及适配
+
+显式运行dev/backend/migrate.sh应用014–017，保留现存BOM和资产数据。加载backend/.env后在dev/backend运行go run ./cmd/cmdb-seed ../../fixtures/demo-full-64-b300/demo-seed.json；生产环境禁止合成装载。Schema扩展示例通过cmd/cmdb-schema安装。VITE_CMDB_PROVIDER默认真实，mock模式仅用于隔离演示，生产不得以Mock代替服务故障。
+
+接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。
+
+当前本机Go进程由tmux会话`keel-cmdb-api`运行，前端5174。手动启动可在dev/backend执行`./run-local.sh`，前端在dev执行`npm run dev`。如改用`docker compose -f dev/compose.yaml up -d --build`，先停止占用8081的上述本机会话，避免端口冲突。数据库迁移和Schema安装仍需显式执行。

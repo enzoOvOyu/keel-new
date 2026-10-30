@@ -286,3 +286,9 @@ FR-28：CMDB升级全链路资产档案。保留跨项目授权与统一设备�
 ## 2026-10-30 · 身份认证与项目授权实施补充
 
 默认身份角色固定为 viewer、delivery_engineer、delivery_lead、developer_sre、admin、network_engineer；DE/DL/NE/SRE/Viewer 为业务称谓映射，研发与管理员分离。RBAC + Project/Resource Scope 默认拒绝；权限与审批分开，申请人不得自批；NE 无服务器重装/清理执行权限。NH 业务职责保留，资格绑定待决，不映射 Admin，Critical 变更阻断。用户故事、真实范围与验收见 IDENTITY-RBAC.md。此补充细化现有角色/安全要求，不重编号或删除既有 FR。
+
+## FR-29 CMDB 真实资产事实服务
+
+在保留FR-14/FR-28工作台、唯一bom_item及六阶段交付链路的基础上，实现版本化Schema Registry、类型化关系、字段/关系来源、Revision与ChangeSet。CMDB统一当前资产身份与有效关系；BOM、配置、采集及作业仍持有各自领域原文。人工身份/关系变更经独立审核发布，换件新身份、旧历史保留。前端通过同形Adapter接入，禁止因后端重做UI。
+
+接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。

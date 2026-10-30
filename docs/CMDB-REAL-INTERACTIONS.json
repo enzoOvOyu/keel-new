@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "checked_at": "2026-10-30T13:08:58.162Z",
+  "checks": [
+    "SN/Hostname/stable-ID search updates real catalogue",
+    "One-hop component expansion reaches canonical physical port",
+    "Configuration comparison, raw lineage evidence and audited manual field write/restore",
+    "Lifecycle event opens associated validation/NCCL evidence"
+  ],
+  "page_errors": []
+}

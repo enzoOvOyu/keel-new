@@ -167,3 +167,9 @@ CMDB-D-01…06：服务器→部件→端口→线缆→对端；Diff→来源�
 ## 2026-10-30 · 身份与权限验收
 
 以 IDENTITY-ACCEPTANCE.json 为本次实际接口证据：六角色、不同项目不同角色、Viewer写入拒绝、NE/DE隔离、非成员URL越权、撤销立即生效、账号禁用/Session撤销/改密、限流与解锁、申请人不能自批、NE+DE双签、NH未决阻断及审计。BOM浏览器端回归需经统一登录完成原六步与CMDB发布。外部身份服务和真实设备均不在本次通过结论内。
+
+## CMDB 真实实现验收
+
+验收覆盖BOM Outbox幂等、统一ID、服务器→部件→端口→Cable→交换机、字段来源、关系历史、ChangeSet版本/审核/发布、换件历史、Schema扩展、项目和资源隔离。前后截图对照原五/八Tab及设计令牌；构建不能替代浏览器验收。执行结果单独记录，未运行项不得标PASS。
+
+接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。

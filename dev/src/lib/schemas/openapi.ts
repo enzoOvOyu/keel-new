@@ -4866,6 +4866,303 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/cmdb/schemas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown data remains unknown. */
+        get: operations["getCMDBRegistry"];
+        put?: never;
+        /** @description Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown data remains unknown. */
+        post: operations["installCMDBSchema"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/schemas/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown data remains unknown. */
+        post: operations["validateCMDBSchema"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/schemas/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown data remains unknown. */
+        get: operations["listCMDBSchemaVersions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/schemas/{schema_version}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                schema_version: string;
+            };
+            cookie?: never;
+        };
+        /** @description Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown data remains unknown. */
+        get: operations["getCMDBSchemaVersion"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/inventory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown data remains unknown. */
+        get: operations["getCanonicalCMDBInventory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/dossier/assets/{asset_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                asset_id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown data remains unknown. */
+        get: operations["getCMDBDossierAsset"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/dossier/assets/{asset_id}/drawer/{tab}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                asset_id: string;
+                tab: string;
+            };
+            cookie?: never;
+        };
+        /** @description Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown data remains unknown. */
+        get: operations["getCMDBDeviceDrawer"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/dossier/assets/{asset_id}/revisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                asset_id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown data remains unknown. */
+        get: operations["listCMDBAssetRevisions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/dossier/assets/{asset_id}/diff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                asset_id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown data remains unknown. */
+        get: operations["diffCMDBAssetRevisions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/changesets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown data remains unknown. */
+        get: operations["listCMDBChangeSets"];
+        put?: never;
+        /** @description Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown data remains unknown. */
+        post: operations["createCMDBChangeSet"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/changesets/{changeset_id}/diff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                changeset_id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown data remains unknown. */
+        get: operations["previewCMDBChangeSet"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/changesets/{changeset_id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                changeset_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown data remains unknown. */
+        post: operations["submitCMDBChangeSet"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/changesets/{changeset_id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                changeset_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown data remains unknown. */
+        post: operations["approveCMDBChangeSet"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/changesets/{changeset_id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                changeset_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown data remains unknown. */
+        post: operations["rejectCMDBChangeSet"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/changesets/{changeset_id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                changeset_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown data remains unknown. */
+        post: operations["publishCMDBChangeSet"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/relationships/{relationship_id}/revisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                relationship_id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown data remains unknown. */
+        get: operations["listCMDBRelationshipRevisions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -11292,8 +11589,8 @@ export interface components {
         CmdbDossierAsset: {
             id: string;
             project_id: string;
-            /** @enum {string} */
-            asset_type: "server" | "switch" | "gpu" | "nic" | "port" | "optic" | "cable" | "rack";
+            /** @description Registry-defined type; existing server/switch/gpu/nic/port/optic/cable/rack identifiers are preserved. */
+            asset_type: string;
             name: string;
             serial: string | null;
             model: string | null;
@@ -11307,18 +11604,28 @@ export interface components {
             completeness: string;
             source: string;
             revision: number;
+            lifecycle_state?: string;
+            schema_version?: string;
         };
         CmdbDossierRelation: {
             id: string;
             source: string;
             target: string;
             /** @enum {string} */
-            kind: "position" | "composition" | "physical" | "logical" | "business";
+            kind: "position" | "composition" | "physical" | "logical" | "business" | "dependency" | "reference";
             label: string;
             /** @enum {string} */
-            fact: "planned" | "observed" | "recorded";
+            fact: "planned" | "observed" | "recorded" | "baseline" | "intended" | "actual" | "operational";
             source_ref: string;
             revision: string;
+            source_type?: string;
+            direction?: string;
+            cardinality?: string;
+            /** Format: date-time */
+            valid_from?: string;
+            valid_to?: string | null;
+            relationship_status?: string;
+            definition_version?: string | null;
         };
         CmdbDossierNode: {
             id: string;
@@ -11343,6 +11650,24 @@ export interface components {
             cell: string | null;
             status: string;
             href: string | null;
+            source_type?: string;
+            source_ref?: string;
+            source_location?: {
+                import_id?: string | null;
+                document_id?: string | null;
+                sheet?: string | null;
+                cell?: string | null;
+                row?: number;
+                column?: number;
+                artifact_ref?: string;
+                resource?: string;
+                record_id?: string;
+            };
+            fact_layer?: string;
+            operator?: string;
+            /** Format: date-time */
+            updated_at?: string;
+            confidence?: number | null;
         };
         CmdbDossierQuality: {
             id: string;
@@ -11355,6 +11680,7 @@ export interface components {
             severity: "warning" | "critical";
             href: string;
             status: string;
+            project_id?: string;
         };
         CmdbDossierConfigVersion: {
             id: string;
@@ -11369,6 +11695,7 @@ export interface components {
             fields: {
                 [key: string]: string | null;
             };
+            source_ref?: string;
         };
         CmdbDossierEvent: {
             id: string;
@@ -11384,6 +11711,7 @@ export interface components {
                 href: string;
             }[];
             historical: boolean;
+            source_ref?: string;
         };
         CmdbDossierTreeDevice: {
             id: string;
@@ -11433,10 +11761,14 @@ export interface components {
                 optic: number;
                 cable: number;
                 rack: number;
+            } & {
+                [key: string]: number;
             };
             total: number;
             page: components["schemas"]["Page"];
             request_id: string;
+            saved_views?: components["schemas"]["CmdbDossierSavedView"][];
+            schema_summary?: components["schemas"]["CmdbSchemaSummary"];
         };
         CmdbDossierRelationsEnvelope: {
             nodes: components["schemas"]["CmdbDossierNode"][];
@@ -11471,6 +11803,7 @@ export interface components {
         CmdbDossierTreeEnvelope: {
             data: components["schemas"]["CmdbDossierTreeSite"][];
             request_id: string;
+            device_records?: components["schemas"]["CmdbInventoryRecord"][];
         };
         CmdbDossierSourcesEnvelope: {
             data: components["schemas"]["CmdbDossierSource"][];
@@ -11485,7 +11818,7 @@ export interface components {
             request_id: string;
         };
         CmdbDossierEvidenceEnvelope: {
-            data: components["schemas"]["FullBomImports"] | components["schemas"]["FullBomMappingCandidates"] | components["schemas"]["FullBomIssues"] | components["schemas"]["FullCollectionJobs"] | components["schemas"]["FullLifecycleEvents"] | components["schemas"]["FullDeliveryStageEvents"] | components["schemas"]["FullTestReports"] | components["schemas"]["FullExecutions"] | components["schemas"]["FullIssues"] | components["schemas"]["FullServerConfigBaselines"] | components["schemas"]["FullServerObservedConfigs"] | components["schemas"]["FullSwitchRunningConfigs"] | components["schemas"]["FullCmdbFieldProvenance"] | components["schemas"]["CmdbDossierManualAudit"];
+            data: components["schemas"]["FullBomImports"] | components["schemas"]["FullBomMappingCandidates"] | components["schemas"]["FullBomIssues"] | components["schemas"]["FullCollectionJobs"] | components["schemas"]["FullLifecycleEvents"] | components["schemas"]["FullDeliveryStageEvents"] | components["schemas"]["FullTestReports"] | components["schemas"]["FullExecutions"] | components["schemas"]["FullIssues"] | components["schemas"]["FullServerConfigBaselines"] | components["schemas"]["FullServerObservedConfigs"] | components["schemas"]["FullSwitchRunningConfigs"] | components["schemas"]["FullCmdbFieldProvenance"] | components["schemas"]["CmdbDossierManualAudit"] | components["schemas"]["FullServers"] | components["schemas"]["FullSwitches"] | components["schemas"]["FullGpus"] | components["schemas"]["FullNics"] | components["schemas"]["FullPorts"] | components["schemas"]["FullSwitchPorts"] | components["schemas"]["FullCables"] | components["schemas"]["FullRacks"] | components["schemas"]["FullOptics"] | components["schemas"]["FullServerRuntime"] | components["schemas"]["FullSwitchRuntime"] | components["schemas"]["FullSwitchConfigBaselines"] | components["schemas"]["FullDeliveryStageRecords"];
             request_id: string;
         };
         CmdbDossierSavedViewEnvelope: {
@@ -12256,6 +12589,632 @@ export interface components {
                 allowed: boolean;
             };
             request_id: string;
+        };
+        /** @description JSON-serialized value; attribute semantics are validated against the versioned registry. Relationships remain typed foreign-key records. */
+        CmdbJsonValue: null | string | number | boolean | unknown[] | {
+            [key: string]: unknown;
+        };
+        CmdbAttributeDefinition: {
+            name: string;
+            label: string;
+            /** @enum {string} */
+            type: "Text" | "Number" | "Boolean" | "Enum" | "IP" | "MAC" | "DateTime" | "Reference" | "Array" | "Object";
+            unit?: string;
+            required: boolean;
+            unique: boolean;
+            editable: boolean;
+            deprecated?: boolean;
+            sources: ("bom" | "agent" | "bmc" | "switch" | "manual" | "derived")[];
+            models: string[];
+            group: string;
+            enum?: string[];
+            rules: {
+                max_length?: number;
+                pattern?: string;
+                minimum?: number;
+                maximum?: number;
+                integer?: boolean;
+            };
+        };
+        CmdbDisplayProfile: {
+            catalog?: boolean;
+            columns: string[];
+            groups: string[];
+        };
+        CmdbAssetTypeDefinition: {
+            name: string;
+            label: string;
+            extends: string;
+            attributes: components["schemas"]["CmdbAttributeDefinition"][];
+            allow_extensions: boolean;
+            display: components["schemas"]["CmdbDisplayProfile"];
+        };
+        CmdbRelationshipDefinition: {
+            name: string;
+            label: string;
+            /** @enum {unknown} */
+            kind: "position" | "composition" | "physical" | "logical" | "business" | "dependency" | "reference";
+            source_types: string[];
+            target_types: string[];
+            /** @enum {unknown} */
+            direction: "outbound" | "inbound" | "bidirectional";
+            max_targets: number;
+            max_sources: number;
+            sources: string[];
+        };
+        CmdbSchemaDocument: {
+            version: string;
+            types: components["schemas"]["CmdbAssetTypeDefinition"][];
+            relationships: components["schemas"]["CmdbRelationshipDefinition"][];
+        };
+        CmdbSchemaProblem: {
+            code: string;
+            asset_id: string;
+            field: string;
+            reason: string;
+        };
+        CmdbSchemaCommand: {
+            schema: components["schemas"]["CmdbSchemaDocument"];
+            expected_version: string;
+        };
+        CmdbSchemaVersionRecord: {
+            version: string;
+            content_hash: string;
+            /** @enum {unknown} */
+            status: "active" | "retired";
+            created_by: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        CmdbSchemaSummary: {
+            version: string;
+            asset_types: {
+                name: string;
+                label: string;
+                catalog: boolean;
+            }[];
+        };
+        CmdbInventoryRecord: {
+            id: string;
+            project_id: string;
+            category: string;
+            cmdb_asset_type?: string;
+            revision?: number;
+            hostname?: string;
+            name?: string;
+            serial?: string | null;
+            model?: string | null;
+            lifecycle_status?: string;
+            health_status?: string;
+            freshness?: string;
+            rack_id?: string | null;
+            rack_u?: number | null;
+            source?: string;
+        } & {
+            [key: string]: components["schemas"]["CmdbJsonValue"];
+        };
+        CmdbInventorySnapshot: {
+            servers: components["schemas"]["CmdbInventoryRecord"][];
+            switches: components["schemas"]["CmdbInventoryRecord"][];
+            gpus: components["schemas"]["CmdbInventoryRecord"][];
+            nics: components["schemas"]["CmdbInventoryRecord"][];
+            ports: components["schemas"]["CmdbInventoryRecord"][];
+            switch_ports: components["schemas"]["CmdbInventoryRecord"][];
+            optics: components["schemas"]["CmdbInventoryRecord"][];
+            cables: components["schemas"]["CmdbInventoryRecord"][];
+            racks: components["schemas"]["CmdbInventoryRecord"][];
+            rack_placements: components["schemas"]["CmdbRackPlacementRecord"][];
+        };
+        CmdbCanonicalInventoryEnvelope: {
+            data: components["schemas"]["CmdbInventorySnapshot"];
+            schema_version: string;
+            source: string;
+            truncated: boolean;
+            request_id: string;
+        };
+        CmdbAssetDetailsEnvelope: {
+            data: components["schemas"]["CmdbDossierAsset"];
+            /** @description Read/write attributes are validated against the referenced CMDB Schema version. Core identity and typed relationships remain relational; this is not an unvalidated generic entity. */
+            attributes: {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            };
+            owner_device: components["schemas"]["CmdbInventoryRecord"] | null;
+            request_id: string;
+        };
+        CmdbRelationCommand: {
+            id?: string;
+            relationship_type: string;
+            source_asset_id: string;
+            target_asset_id: string;
+            project_id?: string;
+            expected_revision?: number;
+            readonly source?: components["schemas"]["CmdbWriteSource"];
+        };
+        CmdbChange: {
+            /** @enum {unknown} */
+            op: "asset.create" | "asset.update" | "asset.retire" | "asset.replace" | "relationship.upsert" | "relationship.end";
+            asset_id: string;
+            asset_type?: string;
+            expected_revision: number;
+            /** @description Read/write attributes are validated against the referenced CMDB Schema version. Core identity and typed relationships remain relational; this is not an unvalidated generic entity. */
+            attributes?: {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            };
+            relationship?: components["schemas"]["CmdbRelationCommand"];
+            relationship_id?: string;
+            replacement_id?: string;
+            before?: {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            } | null;
+        };
+        CmdbChangeSetCommand: {
+            project_id: string;
+            title: string;
+            reason: string;
+            schema_version: string;
+            changes: components["schemas"]["CmdbChange"][];
+            branch_ref?: string;
+            base_ref?: string;
+        };
+        CmdbChangeSet: {
+            id: string;
+            project_id: string;
+            title: string;
+            reason: string;
+            /** @enum {unknown} */
+            status: "Draft" | "Review" | "Approved" | "Published" | "Rejected";
+            version: number;
+            schema_version: string;
+            changes: components["schemas"]["CmdbChange"][];
+            requester_id: string;
+            reviewer_id: string | null;
+            review_reason: string | null;
+            error_code: string | null;
+            /** Format: date-time */
+            created_at: string;
+            published_at: string | null;
+        };
+        CmdbChangeSetAction: {
+            expected_revision: number;
+            reason: string;
+        };
+        CmdbRevision: {
+            id: string;
+            version: number;
+            schema_version: string;
+            /** @description Read/write attributes are validated against the referenced CMDB Schema version. Core identity and typed relationships remain relational; this is not an unvalidated generic entity. */
+            attributes: {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            };
+            before: {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            } | null;
+            source: string;
+            source_ref: string;
+            operator: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        CmdbRevisionDiff: {
+            asset_id: string;
+            to: number;
+            changes: {
+                field: string;
+                before: components["schemas"]["CmdbJsonValue"];
+                after: components["schemas"]["CmdbJsonValue"];
+            }[];
+            from: number;
+        };
+        CmdbChangeSetDiff: {
+            id: string;
+            changes: {
+                op: string;
+                asset_id: string;
+                expected_revision: number;
+                before: {
+                    [key: string]: components["schemas"]["CmdbJsonValue"];
+                } | null;
+                after: {
+                    [key: string]: components["schemas"]["CmdbJsonValue"];
+                } | null;
+                relationship: components["schemas"]["CmdbRelationCommand"] | null;
+                replacement_id: string;
+            }[];
+            frozen: boolean;
+        };
+        CmdbDrawerResources: {
+            gpus?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            nics?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            ports?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            switch_ports?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            optics?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            bmc_inventory?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            bmc_sensors?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            firmware_inventory?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            server_config_baselines?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            server_observed_configs?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            mapping_pairs?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            server_lldp_observations?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            lldp_neighbors?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            metrics?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            metric_series?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            alerts?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            server_runtime?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            bmc_sel_events?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            network_baselines?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            push_jobs?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            switch_config_baselines?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            switch_running_configs?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            switch_config_diffs?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            parameters?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            audit_events?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            switch_runtime?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            fdb_entries?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            arp_entries?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            switch_bgp_neighbors?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            switch_interfaces?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            monitoring_sources?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            network_assertions?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            lossless_baselines?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            lossless_evidence?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            lossless_checks?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            lossless_profiles?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            lossless_raw_outputs?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            lossless_host_evidence?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            ddm_samples?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            execution_logs?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+            switch_logs?: ({
+                id: string;
+                project_id?: string;
+            } & {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            })[];
+        };
+        CmdbDrawerEnvelope: {
+            data: components["schemas"]["IAServerTab"] | components["schemas"]["IANetworkTab"];
+            resources: components["schemas"]["CmdbDrawerResources"];
+            device: components["schemas"]["CmdbInventoryRecord"];
+            request_id: string;
+        };
+        getCMDBRegistryEnvelope: {
+            data: components["schemas"]["CmdbSchemaDocument"];
+            request_id: string;
+        };
+        installCMDBSchemaEnvelope: {
+            data: {
+                version: string;
+                status: string;
+                historical_assets_validated: boolean;
+            };
+            request_id: string;
+        };
+        validateCMDBSchemaEnvelope: {
+            data: {
+                compatible: boolean;
+                problems: components["schemas"]["CmdbSchemaProblem"][];
+            };
+            request_id: string;
+        };
+        listCMDBSchemaVersionsEnvelope: {
+            data: components["schemas"]["CmdbSchemaVersionRecord"][];
+            request_id: string;
+        };
+        getCMDBSchemaVersionEnvelope: {
+            data: components["schemas"]["CmdbSchemaDocument"];
+            request_id: string;
+        };
+        getCanonicalCMDBInventoryEnvelope: {
+            data: components["schemas"]["CmdbInventorySnapshot"];
+            request_id: string;
+        };
+        getCMDBDossierAssetEnvelope: {
+            data: components["schemas"]["CmdbDossierAsset"];
+            request_id: string;
+        };
+        getCMDBDeviceDrawerEnvelope: {
+            data: components["schemas"]["CmdbDrawerEnvelope"];
+            request_id: string;
+        };
+        listCMDBAssetRevisionsEnvelope: {
+            data: components["schemas"]["CmdbRevision"][];
+            request_id: string;
+        };
+        diffCMDBAssetRevisionsEnvelope: {
+            data: components["schemas"]["CmdbRevisionDiff"];
+            request_id: string;
+        };
+        listCMDBChangeSetsEnvelope: {
+            data: components["schemas"]["CmdbChangeSet"][];
+            request_id: string;
+        };
+        createCMDBChangeSetEnvelope: {
+            data: {
+                id: string;
+                status: string;
+                version?: number;
+            };
+            request_id: string;
+        };
+        previewCMDBChangeSetEnvelope: {
+            data: components["schemas"]["CmdbChangeSetDiff"];
+            request_id: string;
+        };
+        submitCMDBChangeSetEnvelope: {
+            data: {
+                id: string;
+                status: string;
+                version: number;
+            };
+            request_id: string;
+        };
+        approveCMDBChangeSetEnvelope: {
+            data: {
+                id: string;
+                status: string;
+                version: number;
+            };
+            request_id: string;
+        };
+        rejectCMDBChangeSetEnvelope: {
+            data: {
+                id: string;
+                status: string;
+                version: number;
+            };
+            request_id: string;
+        };
+        publishCMDBChangeSetEnvelope: {
+            data: {
+                id: string;
+                status: string;
+                version: number;
+            };
+            request_id: string;
+        };
+        CmdbRackPlacementRecord: {
+            id: string;
+            item_id: string;
+            rack_id: string;
+            u_start: number;
+            u_height: number;
+            face?: string;
+            diagram_revision_id?: string | null;
+            status?: string;
+            source?: string;
+            project_id?: string;
+            revision?: number;
+        } & {
+            [key: string]: components["schemas"]["CmdbJsonValue"];
+        };
+        CmdbRelationshipRevision: {
+            id: string;
+            relationship_id: string;
+            version: number;
+            /** @description Read/write attributes are validated against the referenced CMDB Schema version. Core identity and typed relationships remain relational; this is not an unvalidated generic entity. */
+            attributes: {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            };
+            source_ref: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        listCMDBRelationshipRevisionsEnvelope: {
+            data: components["schemas"]["CmdbRelationshipRevision"][];
+            request_id: string;
+        };
+        CmdbWriteSource: {
+            source_type: string;
+            source_ref: string;
+            fact_layer: string;
+            operator: string;
+            observed_at: string | null;
+            source_location: {
+                [key: string]: components["schemas"]["CmdbJsonValue"];
+            } | null;
+            approval_status: string;
+            freshness: string;
+            support: string;
+            evidence_refs: string[] | null;
         };
     };
     responses: {
@@ -26182,6 +27141,1233 @@ export interface operations {
             };
             /** @description Login rate limited */
             429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCMDBRegistry: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getCMDBRegistryEnvelope"];
+                };
+            };
+            /** @description Invalid query or bounded traversal */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/resource permission or source ownership denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, identity or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Schema, relation cardinality, validation or approval condition not satisfied */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    installCMDBSchema: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header: {
+                "X-CSRF-Token": string;
+                "Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CmdbSchemaCommand"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["installCMDBSchemaEnvelope"];
+                };
+            };
+            /** @description Invalid query or bounded traversal */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/resource permission or source ownership denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, identity or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Schema, relation cardinality, validation or approval condition not satisfied */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    validateCMDBSchema: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header: {
+                "X-CSRF-Token": string;
+                "Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CmdbSchemaCommand"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["validateCMDBSchemaEnvelope"];
+                };
+            };
+            /** @description Invalid query or bounded traversal */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/resource permission or source ownership denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, identity or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Schema, relation cardinality, validation or approval condition not satisfied */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listCMDBSchemaVersions: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listCMDBSchemaVersionsEnvelope"];
+                };
+            };
+            /** @description Invalid query or bounded traversal */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/resource permission or source ownership denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, identity or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Schema, relation cardinality, validation or approval condition not satisfied */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCMDBSchemaVersion: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                schema_version: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getCMDBSchemaVersionEnvelope"];
+                };
+            };
+            /** @description Invalid query or bounded traversal */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/resource permission or source ownership denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, identity or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Schema, relation cardinality, validation or approval condition not satisfied */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCanonicalCMDBInventory: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CmdbCanonicalInventoryEnvelope"];
+                };
+            };
+            /** @description Invalid query or bounded traversal */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/resource permission or source ownership denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, identity or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Schema, relation cardinality, validation or approval condition not satisfied */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCMDBDossierAsset: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                asset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CmdbAssetDetailsEnvelope"];
+                };
+            };
+            /** @description Invalid query or bounded traversal */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/resource permission or source ownership denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, identity or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Schema, relation cardinality, validation or approval condition not satisfied */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCMDBDeviceDrawer: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                asset_id: string;
+                tab: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CmdbDrawerEnvelope"];
+                };
+            };
+            /** @description Invalid query or bounded traversal */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/resource permission or source ownership denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, identity or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Schema, relation cardinality, validation or approval condition not satisfied */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listCMDBAssetRevisions: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                asset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listCMDBAssetRevisionsEnvelope"];
+                };
+            };
+            /** @description Invalid query or bounded traversal */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/resource permission or source ownership denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, identity or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Schema, relation cardinality, validation or approval condition not satisfied */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    diffCMDBAssetRevisions: {
+        parameters: {
+            query: {
+                project_id?: string;
+                from: number;
+                to: number;
+            };
+            header?: never;
+            path: {
+                asset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["diffCMDBAssetRevisionsEnvelope"];
+                };
+            };
+            /** @description Invalid query or bounded traversal */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/resource permission or source ownership denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, identity or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Schema, relation cardinality, validation or approval condition not satisfied */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listCMDBChangeSets: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                asset_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listCMDBChangeSetsEnvelope"];
+                };
+            };
+            /** @description Invalid query or bounded traversal */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/resource permission or source ownership denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, identity or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Schema, relation cardinality, validation or approval condition not satisfied */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createCMDBChangeSet: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header: {
+                "X-CSRF-Token": string;
+                "Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CmdbChangeSetCommand"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["createCMDBChangeSetEnvelope"];
+                };
+            };
+            /** @description Invalid query or bounded traversal */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/resource permission or source ownership denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, identity or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Schema, relation cardinality, validation or approval condition not satisfied */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    previewCMDBChangeSet: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                changeset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["previewCMDBChangeSetEnvelope"];
+                };
+            };
+            /** @description Invalid query or bounded traversal */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/resource permission or source ownership denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, identity or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Schema, relation cardinality, validation or approval condition not satisfied */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    submitCMDBChangeSet: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header: {
+                "X-CSRF-Token": string;
+                "Idempotency-Key"?: string;
+            };
+            path: {
+                changeset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CmdbChangeSetAction"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["submitCMDBChangeSetEnvelope"];
+                };
+            };
+            /** @description Invalid query or bounded traversal */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/resource permission or source ownership denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, identity or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Schema, relation cardinality, validation or approval condition not satisfied */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    approveCMDBChangeSet: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header: {
+                "X-CSRF-Token": string;
+                "Idempotency-Key"?: string;
+            };
+            path: {
+                changeset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CmdbChangeSetAction"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["approveCMDBChangeSetEnvelope"];
+                };
+            };
+            /** @description Invalid query or bounded traversal */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/resource permission or source ownership denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, identity or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Schema, relation cardinality, validation or approval condition not satisfied */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    rejectCMDBChangeSet: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header: {
+                "X-CSRF-Token": string;
+                "Idempotency-Key"?: string;
+            };
+            path: {
+                changeset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CmdbChangeSetAction"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["rejectCMDBChangeSetEnvelope"];
+                };
+            };
+            /** @description Invalid query or bounded traversal */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/resource permission or source ownership denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, identity or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Schema, relation cardinality, validation or approval condition not satisfied */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    publishCMDBChangeSet: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header: {
+                "X-CSRF-Token": string;
+                "Idempotency-Key"?: string;
+            };
+            path: {
+                changeset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CmdbChangeSetAction"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["publishCMDBChangeSetEnvelope"];
+                };
+            };
+            /** @description Invalid query or bounded traversal */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/resource permission or source ownership denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, identity or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Schema, relation cardinality, validation or approval condition not satisfied */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listCMDBRelationshipRevisions: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                relationship_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listCMDBRelationshipRevisionsEnvelope"];
+                };
+            };
+            /** @description Invalid query or bounded traversal */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/resource permission or source ownership denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, identity or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Schema, relation cardinality, validation or approval condition not satisfied */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -12687,6 +12687,818 @@ paths:
         required: true
         schema:
           type: string
+  /cmdb/schemas:
+    parameters: []
+    get:
+      tags:
+      - CMDB
+      operationId: getCMDBRegistry
+      description: Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown
+        data remains unknown.
+      security:
+      - cookieSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getCMDBRegistryEnvelope'
+        '400':
+          description: Invalid query or bounded traversal
+        '401':
+          description: Session expired
+        '403':
+          description: Project/resource permission or source ownership denied
+        '404':
+          description: Resource not found in authorized scope
+        '409':
+          description: Version, identity or idempotency conflict
+        '422':
+          description: Schema, relation cardinality, validation or approval condition not satisfied
+      parameters:
+      - in: query
+        name: project_id
+        required: false
+        schema:
+          type: string
+    post:
+      tags:
+      - CMDB
+      operationId: installCMDBSchema
+      description: Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown
+        data remains unknown.
+      security:
+      - cookieSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/installCMDBSchemaEnvelope'
+        '400':
+          description: Invalid query or bounded traversal
+        '401':
+          description: Session expired
+        '403':
+          description: Project/resource permission or source ownership denied
+        '404':
+          description: Resource not found in authorized scope
+        '409':
+          description: Version, identity or idempotency conflict
+        '422':
+          description: Schema, relation cardinality, validation or approval condition not satisfied
+      parameters:
+      - in: query
+        name: project_id
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: Idempotency-Key
+        required: false
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CmdbSchemaCommand'
+  /cmdb/schemas/validate:
+    parameters: []
+    post:
+      tags:
+      - CMDB
+      operationId: validateCMDBSchema
+      description: Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown
+        data remains unknown.
+      security:
+      - cookieSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/validateCMDBSchemaEnvelope'
+        '400':
+          description: Invalid query or bounded traversal
+        '401':
+          description: Session expired
+        '403':
+          description: Project/resource permission or source ownership denied
+        '404':
+          description: Resource not found in authorized scope
+        '409':
+          description: Version, identity or idempotency conflict
+        '422':
+          description: Schema, relation cardinality, validation or approval condition not satisfied
+      parameters:
+      - in: query
+        name: project_id
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: Idempotency-Key
+        required: false
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CmdbSchemaCommand'
+  /cmdb/schemas/versions:
+    parameters: []
+    get:
+      tags:
+      - CMDB
+      operationId: listCMDBSchemaVersions
+      description: Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown
+        data remains unknown.
+      security:
+      - cookieSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listCMDBSchemaVersionsEnvelope'
+        '400':
+          description: Invalid query or bounded traversal
+        '401':
+          description: Session expired
+        '403':
+          description: Project/resource permission or source ownership denied
+        '404':
+          description: Resource not found in authorized scope
+        '409':
+          description: Version, identity or idempotency conflict
+        '422':
+          description: Schema, relation cardinality, validation or approval condition not satisfied
+      parameters:
+      - in: query
+        name: project_id
+        required: false
+        schema:
+          type: string
+  /cmdb/schemas/{schema_version}:
+    parameters:
+    - in: path
+      name: schema_version
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - CMDB
+      operationId: getCMDBSchemaVersion
+      description: Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown
+        data remains unknown.
+      security:
+      - cookieSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getCMDBSchemaVersionEnvelope'
+        '400':
+          description: Invalid query or bounded traversal
+        '401':
+          description: Session expired
+        '403':
+          description: Project/resource permission or source ownership denied
+        '404':
+          description: Resource not found in authorized scope
+        '409':
+          description: Version, identity or idempotency conflict
+        '422':
+          description: Schema, relation cardinality, validation or approval condition not satisfied
+      parameters:
+      - in: query
+        name: project_id
+        required: false
+        schema:
+          type: string
+  /cmdb/inventory:
+    parameters: []
+    get:
+      tags:
+      - CMDB
+      operationId: getCanonicalCMDBInventory
+      description: Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown
+        data remains unknown.
+      security:
+      - cookieSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CmdbCanonicalInventoryEnvelope'
+        '400':
+          description: Invalid query or bounded traversal
+        '401':
+          description: Session expired
+        '403':
+          description: Project/resource permission or source ownership denied
+        '404':
+          description: Resource not found in authorized scope
+        '409':
+          description: Version, identity or idempotency conflict
+        '422':
+          description: Schema, relation cardinality, validation or approval condition not satisfied
+      parameters:
+      - in: query
+        name: project_id
+        required: false
+        schema:
+          type: string
+  /cmdb/dossier/assets/{asset_id}:
+    parameters:
+    - in: path
+      name: asset_id
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - CMDB
+      operationId: getCMDBDossierAsset
+      description: Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown
+        data remains unknown.
+      security:
+      - cookieSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CmdbAssetDetailsEnvelope'
+        '400':
+          description: Invalid query or bounded traversal
+        '401':
+          description: Session expired
+        '403':
+          description: Project/resource permission or source ownership denied
+        '404':
+          description: Resource not found in authorized scope
+        '409':
+          description: Version, identity or idempotency conflict
+        '422':
+          description: Schema, relation cardinality, validation or approval condition not satisfied
+      parameters:
+      - in: query
+        name: project_id
+        required: false
+        schema:
+          type: string
+  /cmdb/dossier/assets/{asset_id}/drawer/{tab}:
+    parameters:
+    - in: path
+      name: asset_id
+      required: true
+      schema:
+        type: string
+    - in: path
+      name: tab
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - CMDB
+      operationId: getCMDBDeviceDrawer
+      description: Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown
+        data remains unknown.
+      security:
+      - cookieSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CmdbDrawerEnvelope'
+        '400':
+          description: Invalid query or bounded traversal
+        '401':
+          description: Session expired
+        '403':
+          description: Project/resource permission or source ownership denied
+        '404':
+          description: Resource not found in authorized scope
+        '409':
+          description: Version, identity or idempotency conflict
+        '422':
+          description: Schema, relation cardinality, validation or approval condition not satisfied
+      parameters:
+      - in: query
+        name: project_id
+        required: false
+        schema:
+          type: string
+  /cmdb/dossier/assets/{asset_id}/revisions:
+    parameters:
+    - in: path
+      name: asset_id
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - CMDB
+      operationId: listCMDBAssetRevisions
+      description: Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown
+        data remains unknown.
+      security:
+      - cookieSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listCMDBAssetRevisionsEnvelope'
+        '400':
+          description: Invalid query or bounded traversal
+        '401':
+          description: Session expired
+        '403':
+          description: Project/resource permission or source ownership denied
+        '404':
+          description: Resource not found in authorized scope
+        '409':
+          description: Version, identity or idempotency conflict
+        '422':
+          description: Schema, relation cardinality, validation or approval condition not satisfied
+      parameters:
+      - in: query
+        name: project_id
+        required: false
+        schema:
+          type: string
+  /cmdb/dossier/assets/{asset_id}/diff:
+    parameters:
+    - in: path
+      name: asset_id
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - CMDB
+      operationId: diffCMDBAssetRevisions
+      description: Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown
+        data remains unknown.
+      security:
+      - cookieSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/diffCMDBAssetRevisionsEnvelope'
+        '400':
+          description: Invalid query or bounded traversal
+        '401':
+          description: Session expired
+        '403':
+          description: Project/resource permission or source ownership denied
+        '404':
+          description: Resource not found in authorized scope
+        '409':
+          description: Version, identity or idempotency conflict
+        '422':
+          description: Schema, relation cardinality, validation or approval condition not satisfied
+      parameters:
+      - in: query
+        name: project_id
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: from
+        required: true
+        schema:
+          type: integer
+      - in: query
+        name: to
+        required: true
+        schema:
+          type: integer
+  /cmdb/changesets:
+    parameters: []
+    get:
+      tags:
+      - CMDB
+      operationId: listCMDBChangeSets
+      description: Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown
+        data remains unknown.
+      security:
+      - cookieSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listCMDBChangeSetsEnvelope'
+        '400':
+          description: Invalid query or bounded traversal
+        '401':
+          description: Session expired
+        '403':
+          description: Project/resource permission or source ownership denied
+        '404':
+          description: Resource not found in authorized scope
+        '409':
+          description: Version, identity or idempotency conflict
+        '422':
+          description: Schema, relation cardinality, validation or approval condition not satisfied
+      parameters:
+      - in: query
+        name: project_id
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: asset_id
+        schema:
+          type: string
+    post:
+      tags:
+      - CMDB
+      operationId: createCMDBChangeSet
+      description: Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown
+        data remains unknown.
+      security:
+      - cookieSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createCMDBChangeSetEnvelope'
+        '400':
+          description: Invalid query or bounded traversal
+        '401':
+          description: Session expired
+        '403':
+          description: Project/resource permission or source ownership denied
+        '404':
+          description: Resource not found in authorized scope
+        '409':
+          description: Version, identity or idempotency conflict
+        '422':
+          description: Schema, relation cardinality, validation or approval condition not satisfied
+      parameters:
+      - in: query
+        name: project_id
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: Idempotency-Key
+        required: false
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CmdbChangeSetCommand'
+  /cmdb/changesets/{changeset_id}/diff:
+    parameters:
+    - in: path
+      name: changeset_id
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - CMDB
+      operationId: previewCMDBChangeSet
+      description: Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown
+        data remains unknown.
+      security:
+      - cookieSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/previewCMDBChangeSetEnvelope'
+        '400':
+          description: Invalid query or bounded traversal
+        '401':
+          description: Session expired
+        '403':
+          description: Project/resource permission or source ownership denied
+        '404':
+          description: Resource not found in authorized scope
+        '409':
+          description: Version, identity or idempotency conflict
+        '422':
+          description: Schema, relation cardinality, validation or approval condition not satisfied
+      parameters:
+      - in: query
+        name: project_id
+        required: false
+        schema:
+          type: string
+  /cmdb/changesets/{changeset_id}/submit:
+    parameters:
+    - in: path
+      name: changeset_id
+      required: true
+      schema:
+        type: string
+    post:
+      tags:
+      - CMDB
+      operationId: submitCMDBChangeSet
+      description: Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown
+        data remains unknown.
+      security:
+      - cookieSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/submitCMDBChangeSetEnvelope'
+        '400':
+          description: Invalid query or bounded traversal
+        '401':
+          description: Session expired
+        '403':
+          description: Project/resource permission or source ownership denied
+        '404':
+          description: Resource not found in authorized scope
+        '409':
+          description: Version, identity or idempotency conflict
+        '422':
+          description: Schema, relation cardinality, validation or approval condition not satisfied
+      parameters:
+      - in: query
+        name: project_id
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: Idempotency-Key
+        required: false
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CmdbChangeSetAction'
+  /cmdb/changesets/{changeset_id}/approve:
+    parameters:
+    - in: path
+      name: changeset_id
+      required: true
+      schema:
+        type: string
+    post:
+      tags:
+      - CMDB
+      operationId: approveCMDBChangeSet
+      description: Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown
+        data remains unknown.
+      security:
+      - cookieSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/approveCMDBChangeSetEnvelope'
+        '400':
+          description: Invalid query or bounded traversal
+        '401':
+          description: Session expired
+        '403':
+          description: Project/resource permission or source ownership denied
+        '404':
+          description: Resource not found in authorized scope
+        '409':
+          description: Version, identity or idempotency conflict
+        '422':
+          description: Schema, relation cardinality, validation or approval condition not satisfied
+      parameters:
+      - in: query
+        name: project_id
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: Idempotency-Key
+        required: false
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CmdbChangeSetAction'
+  /cmdb/changesets/{changeset_id}/reject:
+    parameters:
+    - in: path
+      name: changeset_id
+      required: true
+      schema:
+        type: string
+    post:
+      tags:
+      - CMDB
+      operationId: rejectCMDBChangeSet
+      description: Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown
+        data remains unknown.
+      security:
+      - cookieSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/rejectCMDBChangeSetEnvelope'
+        '400':
+          description: Invalid query or bounded traversal
+        '401':
+          description: Session expired
+        '403':
+          description: Project/resource permission or source ownership denied
+        '404':
+          description: Resource not found in authorized scope
+        '409':
+          description: Version, identity or idempotency conflict
+        '422':
+          description: Schema, relation cardinality, validation or approval condition not satisfied
+      parameters:
+      - in: query
+        name: project_id
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: Idempotency-Key
+        required: false
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CmdbChangeSetAction'
+  /cmdb/changesets/{changeset_id}/publish:
+    parameters:
+    - in: path
+      name: changeset_id
+      required: true
+      schema:
+        type: string
+    post:
+      tags:
+      - CMDB
+      operationId: publishCMDBChangeSet
+      description: Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown
+        data remains unknown.
+      security:
+      - cookieSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/publishCMDBChangeSetEnvelope'
+        '400':
+          description: Invalid query or bounded traversal
+        '401':
+          description: Session expired
+        '403':
+          description: Project/resource permission or source ownership denied
+        '404':
+          description: Resource not found in authorized scope
+        '409':
+          description: Version, identity or idempotency conflict
+        '422':
+          description: Schema, relation cardinality, validation or approval condition not satisfied
+      parameters:
+      - in: query
+        name: project_id
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: Idempotency-Key
+        required: false
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CmdbChangeSetAction'
+  /cmdb/relationships/{relationship_id}/revisions:
+    parameters:
+    - in: path
+      name: relationship_id
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - CMDB
+      operationId: listCMDBRelationshipRevisions
+      description: Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown
+        data remains unknown.
+      security:
+      - cookieSession: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listCMDBRelationshipRevisionsEnvelope'
+        '400':
+          description: Invalid query or bounded traversal
+        '401':
+          description: Session expired
+        '403':
+          description: Project/resource permission or source ownership denied
+        '404':
+          description: Resource not found in authorized scope
+        '409':
+          description: Version, identity or idempotency conflict
+        '422':
+          description: Schema, relation cardinality, validation or approval condition not satisfied
+      parameters:
+      - in: query
+        name: project_id
+        required: false
+        schema:
+          type: string
 components:
   securitySchemes:
     bearerAuth:
@@ -32733,41 +33545,33 @@ components:
           type: string
         asset_type:
           type: string
-          enum:
-            - server
-            - switch
-            - gpu
-            - nic
-            - port
-            - optic
-            - cable
-            - rack
+          description: Registry-defined type; existing server/switch/gpu/nic/port/optic/cable/rack identifiers are preserved.
         name:
           type: string
         serial:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
         model:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
         address:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
         rack_id:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
         parent_id:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
         delivery_stage:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
         maintenance_state:
           type: string
         health:
@@ -32780,23 +33584,27 @@ components:
           type: string
         revision:
           type: integer
+        lifecycle_state:
+          type: string
+        schema_version:
+          type: string
       required:
-        - id
-        - project_id
-        - asset_type
-        - name
-        - serial
-        - model
-        - address
-        - rack_id
-        - parent_id
-        - delivery_stage
-        - maintenance_state
-        - health
-        - freshness
-        - completeness
-        - source
-        - revision
+      - id
+      - project_id
+      - asset_type
+      - name
+      - serial
+      - model
+      - address
+      - rack_id
+      - parent_id
+      - delivery_stage
+      - maintenance_state
+      - health
+      - freshness
+      - completeness
+      - source
+      - revision
       additionalProperties: false
     CmdbDossierRelation:
       type: object
@@ -32810,32 +33618,57 @@ components:
         kind:
           type: string
           enum:
-            - position
-            - composition
-            - physical
-            - logical
-            - business
+          - position
+          - composition
+          - physical
+          - logical
+          - business
+          - dependency
+          - reference
         label:
           type: string
         fact:
           type: string
           enum:
-            - planned
-            - observed
-            - recorded
+          - planned
+          - observed
+          - recorded
+          - baseline
+          - intended
+          - actual
+          - operational
         source_ref:
           type: string
         revision:
           type: string
+        source_type:
+          type: string
+        direction:
+          type: string
+        cardinality:
+          type: string
+        valid_from:
+          type: string
+          format: date-time
+        valid_to:
+          type:
+          - string
+          - 'null'
+        relationship_status:
+          type: string
+        definition_version:
+          type:
+          - string
+          - 'null'
       required:
-        - id
-        - source
-        - target
-        - kind
-        - label
-        - fact
-        - source_ref
-        - revision
+      - id
+      - source
+      - target
+      - kind
+      - label
+      - fact
+      - source_ref
+      - revision
       additionalProperties: false
     CmdbDossierNode:
       type: object
@@ -32876,8 +33709,8 @@ components:
           type: string
         observed_at:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
         freshness:
           type: string
         support:
@@ -32888,38 +33721,84 @@ components:
             type: string
         import_id:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
         sheet:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
         cell:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
         status:
           type: string
         href:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
+        source_type:
+          type: string
+        source_ref:
+          type: string
+        source_location:
+          type: object
+          properties:
+            import_id:
+              type:
+              - string
+              - 'null'
+            document_id:
+              type:
+              - string
+              - 'null'
+            sheet:
+              type:
+              - string
+              - 'null'
+            cell:
+              type:
+              - string
+              - 'null'
+            row:
+              type: integer
+            column:
+              type: integer
+            artifact_ref:
+              type: string
+            resource:
+              type: string
+            record_id:
+              type: string
+          required: []
+          additionalProperties: false
+        fact_layer:
+          type: string
+        operator:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+        confidence:
+          type:
+          - number
+          - 'null'
       required:
-        - id
-        - asset_id
-        - field
-        - value_json
-        - source
-        - revision
-        - observed_at
-        - freshness
-        - support
-        - evidence_refs
-        - import_id
-        - sheet
-        - cell
-        - status
-        - href
+      - id
+      - asset_id
+      - field
+      - value_json
+      - source
+      - revision
+      - observed_at
+      - freshness
+      - support
+      - evidence_refs
+      - import_id
+      - sheet
+      - cell
+      - status
+      - href
       additionalProperties: false
     CmdbDossierQuality:
       type: object
@@ -32939,22 +33818,24 @@ components:
         severity:
           type: string
           enum:
-            - warning
-            - critical
+          - warning
+          - critical
         href:
           type: string
         status:
           type: string
+        project_id:
+          type: string
       required:
-        - id
-        - asset_id
-        - field
-        - code
-        - summary
-        - source
-        - severity
-        - href
-        - status
+      - id
+      - asset_id
+      - field
+      - code
+      - summary
+      - source
+      - severity
+      - href
+      - status
       additionalProperties: false
     CmdbDossierConfigVersion:
       type: object
@@ -32964,10 +33845,10 @@ components:
         layer:
           type: string
           enum:
-            - baseline
-            - intended
-            - actual
-            - operational
+          - baseline
+          - intended
+          - actual
+          - operational
         resource:
           type: string
         revision:
@@ -32976,8 +33857,8 @@ components:
           type: string
         observed_at:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
         freshness:
           type: string
         support:
@@ -32986,18 +33867,20 @@ components:
           type: object
           additionalProperties:
             type:
-              - string
-              - "null"
+            - string
+            - 'null'
+        source_ref:
+          type: string
       required:
-        - id
-        - layer
-        - resource
-        - revision
-        - source
-        - observed_at
-        - freshness
-        - support
-        - fields
+      - id
+      - layer
+      - resource
+      - revision
+      - source
+      - observed_at
+      - freshness
+      - support
+      - fields
       additionalProperties: false
     CmdbDossierEvent:
       type: object
@@ -33012,14 +33895,14 @@ components:
           type: string
         occurred_at:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
         status:
           type: string
         stage_id:
           type:
-            - string
-            - "null"
+          - string
+          - 'null'
         source:
           type: string
         links:
@@ -33032,22 +33915,24 @@ components:
               href:
                 type: string
             required:
-              - label
-              - href
+            - label
+            - href
             additionalProperties: false
         historical:
           type: boolean
+        source_ref:
+          type: string
       required:
-        - id
-        - asset_id
-        - event_type
-        - label
-        - occurred_at
-        - status
-        - stage_id
-        - source
-        - links
-        - historical
+      - id
+      - asset_id
+      - event_type
+      - label
+      - occurred_at
+      - status
+      - stage_id
+      - source
+      - links
+      - historical
       additionalProperties: false
     CmdbDossierTreeDevice:
       type: object
@@ -33167,7 +34052,7 @@ components:
         data:
           type: array
           items:
-            $ref: "#/components/schemas/CmdbDossierAsset"
+            $ref: '#/components/schemas/CmdbDossierAsset'
         counts:
           type: object
           properties:
@@ -33188,27 +34073,34 @@ components:
             rack:
               type: integer
           required:
-            - server
-            - switch
-            - gpu
-            - nic
-            - port
-            - optic
-            - cable
-            - rack
-          additionalProperties: false
+          - server
+          - switch
+          - gpu
+          - nic
+          - port
+          - optic
+          - cable
+          - rack
+          additionalProperties:
+            type: integer
         total:
           type: integer
         page:
-          $ref: "#/components/schemas/Page"
+          $ref: '#/components/schemas/Page'
         request_id:
           type: string
+        saved_views:
+          type: array
+          items:
+            $ref: '#/components/schemas/CmdbDossierSavedView'
+        schema_summary:
+          $ref: '#/components/schemas/CmdbSchemaSummary'
       required:
-        - data
-        - counts
-        - total
-        - page
-        - request_id
+      - data
+      - counts
+      - total
+      - page
+      - request_id
       additionalProperties: false
     CmdbDossierRelationsEnvelope:
       type: object
@@ -33311,12 +34203,16 @@ components:
         data:
           type: array
           items:
-            $ref: "#/components/schemas/CmdbDossierTreeSite"
+            $ref: '#/components/schemas/CmdbDossierTreeSite'
         request_id:
           type: string
+        device_records:
+          type: array
+          items:
+            $ref: '#/components/schemas/CmdbInventoryRecord'
       required:
-        - data
-        - request_id
+      - data
+      - request_id
       additionalProperties: false
     CmdbDossierSourcesEnvelope:
       type: object
@@ -33362,25 +34258,38 @@ components:
       properties:
         data:
           oneOf:
-            - $ref: "#/components/schemas/FullBomImports"
-            - $ref: "#/components/schemas/FullBomMappingCandidates"
-            - $ref: "#/components/schemas/FullBomIssues"
-            - $ref: "#/components/schemas/FullCollectionJobs"
-            - $ref: "#/components/schemas/FullLifecycleEvents"
-            - $ref: "#/components/schemas/FullDeliveryStageEvents"
-            - $ref: "#/components/schemas/FullTestReports"
-            - $ref: "#/components/schemas/FullExecutions"
-            - $ref: "#/components/schemas/FullIssues"
-            - $ref: "#/components/schemas/FullServerConfigBaselines"
-            - $ref: "#/components/schemas/FullServerObservedConfigs"
-            - $ref: "#/components/schemas/FullSwitchRunningConfigs"
-            - $ref: "#/components/schemas/FullCmdbFieldProvenance"
-            - $ref: "#/components/schemas/CmdbDossierManualAudit"
+          - $ref: '#/components/schemas/FullBomImports'
+          - $ref: '#/components/schemas/FullBomMappingCandidates'
+          - $ref: '#/components/schemas/FullBomIssues'
+          - $ref: '#/components/schemas/FullCollectionJobs'
+          - $ref: '#/components/schemas/FullLifecycleEvents'
+          - $ref: '#/components/schemas/FullDeliveryStageEvents'
+          - $ref: '#/components/schemas/FullTestReports'
+          - $ref: '#/components/schemas/FullExecutions'
+          - $ref: '#/components/schemas/FullIssues'
+          - $ref: '#/components/schemas/FullServerConfigBaselines'
+          - $ref: '#/components/schemas/FullServerObservedConfigs'
+          - $ref: '#/components/schemas/FullSwitchRunningConfigs'
+          - $ref: '#/components/schemas/FullCmdbFieldProvenance'
+          - $ref: '#/components/schemas/CmdbDossierManualAudit'
+          - $ref: '#/components/schemas/FullServers'
+          - $ref: '#/components/schemas/FullSwitches'
+          - $ref: '#/components/schemas/FullGpus'
+          - $ref: '#/components/schemas/FullNics'
+          - $ref: '#/components/schemas/FullPorts'
+          - $ref: '#/components/schemas/FullSwitchPorts'
+          - $ref: '#/components/schemas/FullCables'
+          - $ref: '#/components/schemas/FullRacks'
+          - $ref: '#/components/schemas/FullOptics'
+          - $ref: '#/components/schemas/FullServerRuntime'
+          - $ref: '#/components/schemas/FullSwitchRuntime'
+          - $ref: '#/components/schemas/FullSwitchConfigBaselines'
+          - $ref: '#/components/schemas/FullDeliveryStageRecords'
         request_id:
           type: string
       required:
-        - data
-        - request_id
+      - data
+      - request_id
       additionalProperties: false
     CmdbDossierSavedViewEnvelope:
       type: object
@@ -35496,6 +36405,1672 @@ components:
       required:
       - data
       - request_id
+    CmdbJsonValue:
+      description: JSON-serialized value; attribute semantics are validated against the versioned registry. Relationships remain typed foreign-key records.
+      oneOf:
+      - type: 'null'
+      - type: string
+      - type: number
+      - type: boolean
+      - type: array
+        items: {}
+      - type: object
+        additionalProperties: true
+    CmdbAttributeDefinition:
+      type: object
+      properties:
+        name:
+          type: string
+        label:
+          type: string
+        type:
+          type: string
+          enum:
+          - Text
+          - Number
+          - Boolean
+          - Enum
+          - IP
+          - MAC
+          - DateTime
+          - Reference
+          - Array
+          - Object
+        unit:
+          type: string
+        required:
+          type: boolean
+        unique:
+          type: boolean
+        editable:
+          type: boolean
+        deprecated:
+          type: boolean
+        sources:
+          type: array
+          items:
+            enum:
+            - bom
+            - agent
+            - bmc
+            - switch
+            - manual
+            - derived
+        models:
+          type: array
+          items:
+            type: string
+        group:
+          type: string
+        enum:
+          type: array
+          items:
+            type: string
+        rules:
+          type: object
+          properties:
+            max_length:
+              type: integer
+            pattern:
+              type: string
+            minimum:
+              type: number
+            maximum:
+              type: number
+            integer:
+              type: boolean
+          required: []
+          additionalProperties: false
+      required:
+      - name
+      - label
+      - type
+      - required
+      - unique
+      - editable
+      - sources
+      - models
+      - group
+      - rules
+      additionalProperties: false
+    CmdbDisplayProfile:
+      type: object
+      properties:
+        catalog:
+          type: boolean
+        columns:
+          type: array
+          items:
+            type: string
+        groups:
+          type: array
+          items:
+            type: string
+      required:
+      - columns
+      - groups
+      additionalProperties: false
+    CmdbAssetTypeDefinition:
+      type: object
+      properties:
+        name:
+          type: string
+        label:
+          type: string
+        extends:
+          type: string
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/CmdbAttributeDefinition'
+        allow_extensions:
+          type: boolean
+        display:
+          $ref: '#/components/schemas/CmdbDisplayProfile'
+      required:
+      - name
+      - label
+      - extends
+      - attributes
+      - allow_extensions
+      - display
+      additionalProperties: false
+    CmdbRelationshipDefinition:
+      type: object
+      properties:
+        name:
+          type: string
+        label:
+          type: string
+        kind:
+          enum:
+          - position
+          - composition
+          - physical
+          - logical
+          - business
+          - dependency
+          - reference
+        source_types:
+          type: array
+          items:
+            type: string
+        target_types:
+          type: array
+          items:
+            type: string
+        direction:
+          enum:
+          - outbound
+          - inbound
+          - bidirectional
+        max_targets:
+          type: integer
+          minimum: 0
+        max_sources:
+          type: integer
+          minimum: 0
+        sources:
+          type: array
+          items:
+            type: string
+      required:
+      - name
+      - label
+      - kind
+      - source_types
+      - target_types
+      - direction
+      - max_targets
+      - max_sources
+      - sources
+      additionalProperties: false
+    CmdbSchemaDocument:
+      type: object
+      properties:
+        version:
+          type: string
+        types:
+          type: array
+          items:
+            $ref: '#/components/schemas/CmdbAssetTypeDefinition'
+        relationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/CmdbRelationshipDefinition'
+      required:
+      - version
+      - types
+      - relationships
+      additionalProperties: false
+    CmdbSchemaProblem:
+      type: object
+      properties:
+        code:
+          type: string
+        asset_id:
+          type: string
+        field:
+          type: string
+        reason:
+          type: string
+      required:
+      - code
+      - asset_id
+      - field
+      - reason
+      additionalProperties: false
+    CmdbSchemaCommand:
+      type: object
+      properties:
+        schema:
+          $ref: '#/components/schemas/CmdbSchemaDocument'
+        expected_version:
+          type: string
+      required:
+      - schema
+      - expected_version
+      additionalProperties: false
+    CmdbSchemaVersionRecord:
+      type: object
+      properties:
+        version:
+          type: string
+        content_hash:
+          type: string
+        status:
+          enum:
+          - active
+          - retired
+        created_by:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - version
+      - content_hash
+      - status
+      - created_by
+      - created_at
+      additionalProperties: false
+    CmdbSchemaSummary:
+      type: object
+      properties:
+        version:
+          type: string
+        asset_types:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              label:
+                type: string
+              catalog:
+                type: boolean
+            required:
+            - name
+            - label
+            - catalog
+            additionalProperties: false
+      required:
+      - version
+      - asset_types
+      additionalProperties: false
+    CmdbInventoryRecord:
+      type: object
+      properties:
+        id:
+          type: string
+        project_id:
+          type: string
+        category:
+          type: string
+        cmdb_asset_type:
+          type: string
+        revision:
+          type: integer
+        hostname:
+          type: string
+        name:
+          type: string
+        serial:
+          type:
+          - string
+          - 'null'
+        model:
+          type:
+          - string
+          - 'null'
+        lifecycle_status:
+          type: string
+        health_status:
+          type: string
+        freshness:
+          type: string
+        rack_id:
+          type:
+          - string
+          - 'null'
+        rack_u:
+          type:
+          - number
+          - 'null'
+        source:
+          type: string
+      required:
+      - id
+      - project_id
+      - category
+      additionalProperties:
+        $ref: '#/components/schemas/CmdbJsonValue'
+    CmdbInventorySnapshot:
+      type: object
+      properties:
+        servers:
+          type: array
+          items:
+            $ref: '#/components/schemas/CmdbInventoryRecord'
+        switches:
+          type: array
+          items:
+            $ref: '#/components/schemas/CmdbInventoryRecord'
+        gpus:
+          type: array
+          items:
+            $ref: '#/components/schemas/CmdbInventoryRecord'
+        nics:
+          type: array
+          items:
+            $ref: '#/components/schemas/CmdbInventoryRecord'
+        ports:
+          type: array
+          items:
+            $ref: '#/components/schemas/CmdbInventoryRecord'
+        switch_ports:
+          type: array
+          items:
+            $ref: '#/components/schemas/CmdbInventoryRecord'
+        optics:
+          type: array
+          items:
+            $ref: '#/components/schemas/CmdbInventoryRecord'
+        cables:
+          type: array
+          items:
+            $ref: '#/components/schemas/CmdbInventoryRecord'
+        racks:
+          type: array
+          items:
+            $ref: '#/components/schemas/CmdbInventoryRecord'
+        rack_placements:
+          type: array
+          items:
+            $ref: '#/components/schemas/CmdbRackPlacementRecord'
+      required:
+      - servers
+      - switches
+      - gpus
+      - nics
+      - ports
+      - switch_ports
+      - optics
+      - cables
+      - racks
+      - rack_placements
+      additionalProperties: false
+    CmdbCanonicalInventoryEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CmdbInventorySnapshot'
+        schema_version:
+          type: string
+        source:
+          type: string
+        truncated:
+          type: boolean
+        request_id:
+          type: string
+      required:
+      - data
+      - schema_version
+      - source
+      - truncated
+      - request_id
+      additionalProperties: false
+    CmdbAssetDetailsEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CmdbDossierAsset'
+        attributes:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/CmdbJsonValue'
+          description: Read/write attributes are validated against the referenced CMDB Schema version. Core identity and typed relationships remain relational; this is
+            not an unvalidated generic entity.
+        owner_device:
+          oneOf:
+          - $ref: '#/components/schemas/CmdbInventoryRecord'
+          - type: 'null'
+        request_id:
+          type: string
+      required:
+      - data
+      - attributes
+      - owner_device
+      - request_id
+      additionalProperties: false
+    CmdbRelationCommand:
+      type: object
+      properties:
+        id:
+          type: string
+        relationship_type:
+          type: string
+        source_asset_id:
+          type: string
+        target_asset_id:
+          type: string
+        project_id:
+          type: string
+        expected_revision:
+          type: integer
+        source:
+          $ref: '#/components/schemas/CmdbWriteSource'
+          readOnly: true
+      required:
+      - relationship_type
+      - source_asset_id
+      - target_asset_id
+      additionalProperties: false
+    CmdbChange:
+      type: object
+      properties:
+        op:
+          enum:
+          - asset.create
+          - asset.update
+          - asset.retire
+          - asset.replace
+          - relationship.upsert
+          - relationship.end
+        asset_id:
+          type: string
+        asset_type:
+          type: string
+        expected_revision:
+          type: integer
+        attributes:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/CmdbJsonValue'
+          description: Read/write attributes are validated against the referenced CMDB Schema version. Core identity and typed relationships remain relational; this is
+            not an unvalidated generic entity.
+        relationship:
+          $ref: '#/components/schemas/CmdbRelationCommand'
+        relationship_id:
+          type: string
+        replacement_id:
+          type: string
+        before:
+          oneOf:
+          - type: object
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+            description: Read/write attributes are validated against the referenced CMDB Schema version. Core identity and typed relationships remain relational; this
+              is not an unvalidated generic entity.
+          - type: 'null'
+      required:
+      - op
+      - asset_id
+      - expected_revision
+      additionalProperties: false
+    CmdbChangeSetCommand:
+      type: object
+      properties:
+        project_id:
+          type: string
+        title:
+          type: string
+        reason:
+          type: string
+        schema_version:
+          type: string
+        changes:
+          type: array
+          items:
+            $ref: '#/components/schemas/CmdbChange'
+        branch_ref:
+          type: string
+        base_ref:
+          type: string
+      required:
+      - project_id
+      - title
+      - reason
+      - schema_version
+      - changes
+      additionalProperties: false
+    CmdbChangeSet:
+      type: object
+      properties:
+        id:
+          type: string
+        project_id:
+          type: string
+        title:
+          type: string
+        reason:
+          type: string
+        status:
+          enum:
+          - Draft
+          - Review
+          - Approved
+          - Published
+          - Rejected
+        version:
+          type: integer
+        schema_version:
+          type: string
+        changes:
+          type: array
+          items:
+            $ref: '#/components/schemas/CmdbChange'
+        requester_id:
+          type: string
+        reviewer_id:
+          type:
+          - string
+          - 'null'
+        review_reason:
+          type:
+          - string
+          - 'null'
+        error_code:
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+          format: date-time
+        published_at:
+          type:
+          - string
+          - 'null'
+      required:
+      - id
+      - project_id
+      - title
+      - reason
+      - status
+      - version
+      - schema_version
+      - changes
+      - requester_id
+      - reviewer_id
+      - review_reason
+      - error_code
+      - created_at
+      - published_at
+      additionalProperties: false
+    CmdbChangeSetAction:
+      type: object
+      properties:
+        expected_revision:
+          type: integer
+        reason:
+          type: string
+      required:
+      - expected_revision
+      - reason
+      additionalProperties: false
+    CmdbRevision:
+      type: object
+      properties:
+        id:
+          type: string
+        version:
+          type: integer
+        schema_version:
+          type: string
+        attributes:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/CmdbJsonValue'
+          description: Read/write attributes are validated against the referenced CMDB Schema version. Core identity and typed relationships remain relational; this is
+            not an unvalidated generic entity.
+        before:
+          oneOf:
+          - type: object
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+            description: Read/write attributes are validated against the referenced CMDB Schema version. Core identity and typed relationships remain relational; this
+              is not an unvalidated generic entity.
+          - type: 'null'
+        source:
+          type: string
+        source_ref:
+          type: string
+        operator:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - version
+      - schema_version
+      - attributes
+      - before
+      - source
+      - source_ref
+      - operator
+      - created_at
+      additionalProperties: false
+    CmdbRevisionDiff:
+      type: object
+      properties:
+        asset_id:
+          type: string
+        to:
+          type: integer
+        changes:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              before:
+                $ref: '#/components/schemas/CmdbJsonValue'
+              after:
+                $ref: '#/components/schemas/CmdbJsonValue'
+            required:
+            - field
+            - before
+            - after
+            additionalProperties: false
+        from:
+          type: integer
+      required:
+      - asset_id
+      - to
+      - changes
+      - from
+      additionalProperties: false
+    CmdbChangeSetDiff:
+      type: object
+      properties:
+        id:
+          type: string
+        changes:
+          type: array
+          items:
+            type: object
+            properties:
+              op:
+                type: string
+              asset_id:
+                type: string
+              expected_revision:
+                type: integer
+              before:
+                oneOf:
+                - type: object
+                  additionalProperties:
+                    $ref: '#/components/schemas/CmdbJsonValue'
+                  description: Read/write attributes are validated against the referenced CMDB Schema version. Core identity and typed relationships remain relational;
+                    this is not an unvalidated generic entity.
+                - type: 'null'
+              after:
+                oneOf:
+                - type: object
+                  additionalProperties:
+                    $ref: '#/components/schemas/CmdbJsonValue'
+                  description: Read/write attributes are validated against the referenced CMDB Schema version. Core identity and typed relationships remain relational;
+                    this is not an unvalidated generic entity.
+                - type: 'null'
+              relationship:
+                oneOf:
+                - $ref: '#/components/schemas/CmdbRelationCommand'
+                - type: 'null'
+              replacement_id:
+                type: string
+            required:
+            - op
+            - asset_id
+            - expected_revision
+            - before
+            - after
+            - relationship
+            - replacement_id
+            additionalProperties: false
+        frozen:
+          type: boolean
+      required:
+      - id
+      - changes
+      - frozen
+      additionalProperties: false
+    CmdbDrawerResources:
+      type: object
+      properties:
+        gpus:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        nics:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        ports:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        switch_ports:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        optics:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        bmc_inventory:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        bmc_sensors:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        firmware_inventory:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        server_config_baselines:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        server_observed_configs:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        mapping_pairs:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        server_lldp_observations:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        lldp_neighbors:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        metrics:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        metric_series:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        alerts:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        server_runtime:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        bmc_sel_events:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        network_baselines:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        push_jobs:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        switch_config_baselines:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        switch_running_configs:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        switch_config_diffs:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        parameters:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        audit_events:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        switch_runtime:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        fdb_entries:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        arp_entries:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        switch_bgp_neighbors:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        switch_interfaces:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        monitoring_sources:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        network_assertions:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        lossless_baselines:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        lossless_evidence:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        lossless_checks:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        lossless_profiles:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        lossless_raw_outputs:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        lossless_host_evidence:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        ddm_samples:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        execution_logs:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+        switch_logs:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+            required:
+            - id
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+      additionalProperties: false
+    CmdbDrawerEnvelope:
+      type: object
+      properties:
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/IAServerTab'
+          - $ref: '#/components/schemas/IANetworkTab'
+        resources:
+          $ref: '#/components/schemas/CmdbDrawerResources'
+        device:
+          $ref: '#/components/schemas/CmdbInventoryRecord'
+        request_id:
+          type: string
+      required:
+      - data
+      - resources
+      - device
+      - request_id
+      additionalProperties: false
+    getCMDBRegistryEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CmdbSchemaDocument'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    installCMDBSchemaEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            version:
+              type: string
+            status:
+              type: string
+            historical_assets_validated:
+              type: boolean
+          required:
+          - version
+          - status
+          - historical_assets_validated
+          additionalProperties: false
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    validateCMDBSchemaEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            compatible:
+              type: boolean
+            problems:
+              type: array
+              items:
+                $ref: '#/components/schemas/CmdbSchemaProblem'
+          required:
+          - compatible
+          - problems
+          additionalProperties: false
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    listCMDBSchemaVersionsEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CmdbSchemaVersionRecord'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    getCMDBSchemaVersionEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CmdbSchemaDocument'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    getCanonicalCMDBInventoryEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CmdbInventorySnapshot'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    getCMDBDossierAssetEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CmdbDossierAsset'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    getCMDBDeviceDrawerEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CmdbDrawerEnvelope'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    listCMDBAssetRevisionsEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CmdbRevision'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    diffCMDBAssetRevisionsEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CmdbRevisionDiff'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    listCMDBChangeSetsEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CmdbChangeSet'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    createCMDBChangeSetEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            status:
+              type: string
+            version:
+              type: integer
+          required:
+          - id
+          - status
+          additionalProperties: false
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    previewCMDBChangeSetEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CmdbChangeSetDiff'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    submitCMDBChangeSetEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            status:
+              type: string
+            version:
+              type: integer
+          required:
+          - id
+          - status
+          - version
+          additionalProperties: false
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    approveCMDBChangeSetEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            status:
+              type: string
+            version:
+              type: integer
+          required:
+          - id
+          - status
+          - version
+          additionalProperties: false
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    rejectCMDBChangeSetEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            status:
+              type: string
+            version:
+              type: integer
+          required:
+          - id
+          - status
+          - version
+          additionalProperties: false
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    publishCMDBChangeSetEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            status:
+              type: string
+            version:
+              type: integer
+          required:
+          - id
+          - status
+          - version
+          additionalProperties: false
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    CmdbRackPlacementRecord:
+      type: object
+      properties:
+        id:
+          type: string
+        item_id:
+          type: string
+        rack_id:
+          type: string
+        u_start:
+          type: number
+        u_height:
+          type: number
+        face:
+          type: string
+        diagram_revision_id:
+          type:
+          - string
+          - 'null'
+        status:
+          type: string
+        source:
+          type: string
+        project_id:
+          type: string
+        revision:
+          type: integer
+      required:
+      - id
+      - item_id
+      - rack_id
+      - u_start
+      - u_height
+      additionalProperties:
+        $ref: '#/components/schemas/CmdbJsonValue'
+    CmdbRelationshipRevision:
+      type: object
+      properties:
+        id:
+          type: string
+        relationship_id:
+          type: string
+        version:
+          type: integer
+        attributes:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/CmdbJsonValue'
+          description: Read/write attributes are validated against the referenced CMDB Schema version. Core identity and typed relationships remain relational; this is
+            not an unvalidated generic entity.
+        source_ref:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - relationship_id
+      - version
+      - attributes
+      - source_ref
+      - created_at
+      additionalProperties: false
+    listCMDBRelationshipRevisionsEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CmdbRelationshipRevision'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    CmdbWriteSource:
+      type: object
+      properties:
+        source_type:
+          type: string
+        source_ref:
+          type: string
+        fact_layer:
+          type: string
+        operator:
+          type: string
+        observed_at:
+          type:
+          - string
+          - 'null'
+        source_location:
+          oneOf:
+          - type: object
+            additionalProperties:
+              $ref: '#/components/schemas/CmdbJsonValue'
+            description: Read/write attributes are validated against the referenced CMDB Schema version. Core identity and typed relationships remain relational; this
+              is not an unvalidated generic entity.
+          - type: 'null'
+        approval_status:
+          type: string
+        freshness:
+          type: string
+        support:
+          type: string
+        evidence_refs:
+          oneOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+      required:
+      - source_type
+      - source_ref
+      - fact_layer
+      - operator
+      - observed_at
+      - source_location
+      - approval_status
+      - freshness
+      - support
+      - evidence_refs
+      additionalProperties: false
 x-implementation-policy:
   frontend-first: true
   mock-provider-required: true

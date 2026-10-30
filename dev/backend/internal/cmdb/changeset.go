@@ -32,7 +32,7 @@ type ChangeSetRequest struct {
 }
 
 func (s Service) ChangeSets(ctx context.Context, scope Scope, asset string) ([]map[string]any, error) {
-	rows, e := s.DB.Query(ctx, "SELECT c.id,c.project_id,c.title,c.reason,c.status,c.version,c.schema_version,c.changes,c.requester_id,c.reviewer_id,c.review_reason,c.error_code,c.created_at,c.published_at FROM cmdb_changeset c WHERE c.project_id=ANY($1) AND ($2='' OR EXISTS(SELECT 1 FROM jsonb_array_elements(c.changes) x WHERE x->>'asset_id'=$2 OR x->>'replacement_id'=$2)) ORDER BY c.created_at DESC LIMIT 100", scope.Projects, asset)
+	rows, e := s.DB.Query(ctx, "SELECT c.id,c.project_id,c.title,c.reason,c.status,c.version,c.schema_version,c.changes,c.requester_id,c.reviewer_id,c.review_reason,c.error_code,c.created_at,c.published_at FROM cmdb_changeset c WHERE c.project_id=ANY($1) AND ($2='' OR EXISTS(SELECT 1 FROM jsonb_array_elements(c.changes) x WHERE x->>'asset_id'=$2 OR x->>'replacement_id'=$2 OR x->'relationship'->>'source_asset_id'=$2 OR x->'relationship'->>'target_asset_id'=$2)) ORDER BY c.created_at DESC LIMIT 100", scope.Projects, asset)
 	if e != nil {
 		return nil, e
 	}

@@ -339,3 +339,9 @@ workspace/mapping按需返回ports/cables及授权peer_ports/peer_devices；关�
 ## 2026-10-30 · 真实身份 HTTP 约定
 
 真实 API 使用 cookieSession + 写请求 X-CSRF-Token；旧开发 Bearer 不再作为绕过认证入口。授权从每次数据库主体与资源所属项目解析，不相信前端角色。401 表示会话不可用，403 表示权限/作用域/CSRF拒绝，409 表示身份或冻结快照冲突，422 表示输入/审批策略不满足，429 表示登录限流。真实路径与 Identity* Schema 见 openapi.yaml；业务/管理列表现有200条上限及前端分页边界见 IDENTITY-RBAC.md。
+
+## CMDB 真实接口兼容
+
+保留/cmdb/dossier响应和分页/作用域语义；新增registry、revision/diff、ChangeSet和关系历史专用Schema。资产写入通过ChangeSet操作，不以无审核CRUD绕过Domain Service。手工说明只允许授权注释。固定项目、资产集合、Schema与expected_revision；409表示版本/幂等冲突，422表示Schema或关系校验，403表示授权/职责分离拒绝。
+
+接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。

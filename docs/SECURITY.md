@@ -95,3 +95,9 @@ RetentionPolicy/legal_hold与导出授权覆盖指标、日志、配置快照、
 ## 2026-10-30 · 本地认证真实实施
 
 Argon2id、本地 Session、生产 Secure/HTTPS、HttpOnly/SameSite 与 CSRF、账号/IP限流、禁用/改密撤销、逐请求权限复验及同事务审计已接入 dev。秘密不进入浏览器 localStorage、普通日志或审计快照。LDAP/OIDC未配置不展示入口；不声称外部身份集成已验证。NH资格待决阻断，管理员不得替代。参数、边界与反例见 IDENTITY-RBAC.md。
+
+## CMDB 真实服务授权
+
+目录、来源、图两端与证据均按项目/资源权限重新授权，前端筛选不是安全边界。写操作校验CSRF、来源所有权和并发版本；审核与申请/执行分离，发布重查审核人当前权限。Schema不运行脚本/SQL，原文对象按项目限定，秘密不得进入Schema值/血缘/审计。maintained不恢复带内访问。
+
+接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。

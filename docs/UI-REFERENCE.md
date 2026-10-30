@@ -178,3 +178,9 @@ React Flow承载拓扑的缩放、平移、节点拖动、Minimap与自动布局
 ## 2026-10-30 · 登录页面来源
 
 统一登录直接使用用户仓库 enzoOvOyu/keel main 的 web/src/features/auth/LoginPage.tsx（提交 a2dcb508648330b223ae94151875953c287a8f0a）及其品牌/结构图/偏好/令牌/字体。保留原布局，仅适配路由、组件导入与真实身份API。来源、页面和实际浏览器结果见 IDENTITY-RBAC.md。
+
+## CMDB 真实API接入保护
+
+参考Infrahub对象/关系/来源/历史原则，使用原Keel布局、字体、间距、主题与组件。基线位于ui-baselines/cmdb-before；接入后截图位于cmdb-after。此次不修改DESIGN-SYSTEM或全局设计令牌。
+
+接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。
