@@ -145,3 +145,10 @@ IA24验收：双平面与项目隔离、跨授权项目查询、BOM/机柜关系
 TOPO-01…09：独立双视图；双端稳定引用；Cable选中高亮；Fabric/Pod/Rail/VLAN/VRF/VNI/BGP；双向定位；规划/实际/观测分离；端口/设备/Issue下钻；分组/局部/cursor；Mock与CMDB一致。当前NOT RUN，待用户指定集中测试时间；不得用契约生成替代浏览器验收。
 
 完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。
+
+
+## 无损网络分层证据 v2
+
+LL-EV-01…12验收：适用范围；版本/历史迁移；分层；模式单位；PFC不误报；精确硬件案例；watchdog版本/事件；窗口与reset/wrap；缺测与能力；六阶段无循环依赖；工单当前定向复验；四处消费共享结论。真机/生产阈值/原生parser未验证保持NOT RUN。
+
+规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。

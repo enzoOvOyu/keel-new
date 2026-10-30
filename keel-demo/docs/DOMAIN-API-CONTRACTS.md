@@ -170,3 +170,10 @@ IA v2.3 专用契约：GET /ia/session 返回授权项目、permissions[]、perm
 FabricTopologyGraph返回nodes/edges/total_nodes/total_edges/next_cursor/warnings/snapshot_at/request_id。node/edge引用CMDB UID，物理边必须source_port_id/target_port_id/cable_id。detail返回双端、显式network关联、逐字段Diff、LLDP/FDB/ARP/DDM/BGP及统一Issue/Execution。物理/逻辑查询与节点/边详情均具专用schema，不能退化GenericObject。
 
 完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。
+
+
+## 无损网络分层证据 v2
+
+Lossless* Schema定义scope、适配范围、四层证据、原值/单位/窗口delta、有效期、判据原因、Issue与Execution。list默认当前端口/规则最新观测，历史raw保留；证据冲突或缺口不可PASS。collect仅消费只读Mock帧，不重写采集时间；retest不自动修复、不自动调参。
+
+规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。

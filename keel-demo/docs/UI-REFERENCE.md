@@ -167,3 +167,10 @@ Kestra参考执行、任务、日志和版本；Rackula参考机柜交互；Rack
 React Flow承载拓扑的缩放、平移、节点拖动、Minimap与自动布局；域模型由Keel定义。不能把网络拓扑做成RackView的替代品或一张端口巨表。详情遵循共享Drawer与紧凑DataTable，规划/观测的图例及证据状态始终可见。
 
 完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。
+
+
+## 无损网络分层证据 v2
+
+无损页面以规则/证据工作区承载，物理健康与无损verdict独立，保留拓扑和机柜原交互；不把NVUE配置表复制成全网通过大表，不用计数卡片颜色证明RoCE性能。
+
+规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。

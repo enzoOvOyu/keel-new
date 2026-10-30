@@ -93,3 +93,10 @@ IA v2.3 流程：顶栏或部署项目目录→同一 switchProject→取消旧�
 Fabric→Topology→物理全局分组→机柜/Pod展开→设备/端口/线缆→双端证据；线缆→明确逻辑网络→配置Diff/BGP异常→物理设备/端口→统一Issues→处置/定向复验。逻辑网络无关联时unknown，不能凭物理连线补造。切换视图保留scope/filter/focus，URL支持返回。
 
 完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。
+
+
+## 无损网络分层证据 v2
+
+Fabric无损选择设备/反例→端口→rule@version→五层证据→读取固定Mock快照并自动关联确认异常→整改产生新证据→定向复验→当前证据与绑定版本有效才关闭Issue。人工关闭不恢复PASS，过期/配置变动必须重验。
+
+规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。

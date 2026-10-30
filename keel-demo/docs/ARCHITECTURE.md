@@ -191,3 +191,10 @@ AccessPolicyGate必须在创建、执行、重试、fallback、推送接入和�
 Topology查询投影不持有第二套Device事实。物理视图组合BOM/Cable/PhysicalPort与LLDP/接口/DDM；逻辑视图组合批准规划、独立observed配置、BGP。Typed Mock Provider隔离数据源；按需Query支持AbortSignal、作用域key、分组及cursor渐进展开。Go接入在用户确认前端后逐模块实施。
 
 完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。
+
+
+## 无损网络分层证据 v2
+
+集中LosslessProvider/typed envelope及纯规则器，四处UI共用判据；Go和真实collector尚未接入。当前分层帧解析只认证合成格式，不声明原生NVUE字段解析通过；只读command allowlist不包含clear/set/action。历史拓扑不显示当前无损结果冒充历史。
+
+规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。

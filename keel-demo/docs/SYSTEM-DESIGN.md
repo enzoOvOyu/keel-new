@@ -224,3 +224,10 @@ CollectionJob复用Job/worker与任务尝试机制；状态queued→running→su
 物理Cable边和逻辑membership/BGP/containment边不能合并；关联只由显式稳定设备/端口ID建立。planned/observed两种边样式，health五值独立于交付阶段PASS/FAIL。逻辑异常映射至同一端口/Cable/Issue，不能反向改变验机结果。历史快照不可变，找不到at版本不使用当前数据代替。
 
 完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。
+
+
+## 无损网络分层证据 v2
+
+批准baseline→applied→operational→counter/test分别存储，NVUE列分层解释。Verdict与capability/freshness/applicability分开。设备/端口/方向/SP/TC/PG/pool/路径/流量/窗口不可混同；同窗口增量处理重启/清零/回绕/缺测。配置/拓扑版本变化失效，最新有效窗口不删除历史失败；同时间冲突证据BLOCKED。
+
+规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。

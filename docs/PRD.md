@@ -262,3 +262,10 @@ KICKOFF → NETWORK_READINESS → PROVISIONING → VALIDATION → NCCL_VALIDATIO
 FR-26 Fabric Topology：Fabric独立Topology入口；物理布线与逻辑网络使用独立模型共享CMDB稳定ID。双端线缆/端口、逻辑层级与规划/实际Diff、双视图定位、局部展开与历史查询均按FABRIC-TOPOLOGY实现。观察页面不承担审批或生产变更。原FR与六阶段依赖保持不变。
 
 完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。
+
+
+## 无损网络分层证据 v2
+
+FR-27：无损网络分层证据。每项绑定型号/ASIC/精确NOS/模式/批准基线；版本化新规则代替旧UI标签。PFC非零不直接故障，ECN按absolute/relative单位，watchdog按补丁实际条件。网络就绪不等待主机；验机补齐双端；NCCL消费当前目标有效证据。确认异常关联统一Issue及定向复验。
+
+规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。

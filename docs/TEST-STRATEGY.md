@@ -115,3 +115,10 @@ IA验收分层：OpenAPI schema和分页/权限错误契约；ProjectContext单�
 待执行关键检查：双端引用完整性与资产数量；逻辑关系不依赖Cable推断；healthy需充分新鲜证据、陈旧/缺失不能健康；选择/双视图保留上下文；规划/实际Diff；Issue/Drawer链接；权限/历史缺失；大图初始分组+局部与cursor。只测试受影响交付链/Rack/Topology；当前生产构建和Rack/Topology最小浏览器检查通过；未展开全平台回归，详见TOPOLOGY-RACK-SMOKE.json。
 
 完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。
+
+
+## 无损网络分层证据 v2
+
+本轮仅运行相关无损规则/契约测试及契约TypeScript一致性检查，不做全平台回归/真实设备验证。反例断言见scripts/lossless-rules.test.mjs；OpenAPI枚举/作用域/稳定引用/历史迁移/host窗口见lossless-contract.test.mjs；实际结果见LOSSLESS-VALIDATION.json。
+
+规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。

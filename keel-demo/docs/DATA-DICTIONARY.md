@@ -182,3 +182,10 @@ ProjectContext仅为标签页内状态；资产/端口/线缆/工单/Execution�
 复用Device/PhysicalPort/Cable/Rack稳定ID，不新增Machine/Switch身份。TopologyFabric、TopologyNetwork、TopologyMembership为版本化逻辑规划投影；TopologyObservedNetwork、TopologyBGPSession、TopologyPortObservation为独立观测；TopologySnapshot保存不可变来源切片。network_id、device_id、port_ids、baseline_id、source/time/freshness/support及revision必须可追溯。专用时序/日志仍通过资产关联，不塞入CMDB。
 
 完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。
+
+
+## 无损网络分层证据 v2
+
+LosslessRule@version（历史映射）、LosslessProfile、LosslessBaseline、LosslessEvidence、LosslessRawOutput、LosslessHostEvidence、LosslessRetest引用既有项目/Device/PhysicalPort/Issue/Execution。计数十进制字符串保精度；boot/epoch/width/wrap、窗口、单位和来源显式记录；无原始值不补零。raw/旧窗口保留，新增窗口独立ID。
+
+规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。

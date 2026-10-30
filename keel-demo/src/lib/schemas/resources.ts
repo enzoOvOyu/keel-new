@@ -111,4 +111,11 @@ export type FullCollectionMap={
  'topology_bgp_sessions':components['schemas']['FullTopologyBgpSessions'];
  'topology_snapshots':components['schemas']['FullTopologySnapshots'];
  'topology_port_observations':components['schemas']['FullTopologyPortObservations'];
+ 'lossless_rules':components['schemas']['FullLosslessRules'];
+ 'lossless_profiles':components['schemas']['FullLosslessProfiles'];
+ 'lossless_baselines':components['schemas']['FullLosslessBaselines'];
+ 'lossless_evidence':components['schemas']['FullLosslessEvidence'];
+ 'lossless_raw_outputs':components['schemas']['FullLosslessRawOutputs'];
+ 'lossless_host_evidence':components['schemas']['FullLosslessHostEvidence'];
+ 'lossless_collectors':components['schemas']['FullLosslessCollectors'];
 };

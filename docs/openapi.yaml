@@ -10464,6 +10464,194 @@ paths:
                 $ref: "#/components/schemas/FabricTopologyFilters"
         "403":
           description: Permission denied
+  /projects/{project_id}/fabric/devices/{device_id}/lossless/evidence:
+    get:
+      operationId: listLosslessEvidence
+      tags:
+        - Lossless Evidence
+      description: SIMULATION_ONLY now. Explicit project scope, fabric:read or
+        NE/NDE/DE/SRE write permission. Native NVUE parser certification
+        pending. Never clears device counters or tunes configuration. Missing
+        mandatory evidence BLOCKED. Current configuration/topology changes
+        invalidate previous proof.
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema: &a16
+            type: string
+        - name: device_id
+          in: path
+          required: true
+          schema: *a16
+        - name: port_id
+          in: query
+          schema: *a16
+      responses:
+        "200":
+          description: Scoped evidence result; envelope has request_id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LosslessResultsEnvelope"
+        "403":
+          description: Permission denied
+        "409":
+          description: Frozen revision/idempotency conflict
+        "422":
+          description: Invalid evidence or unverified parser/units
+  /projects/{project_id}/fabric/devices/{device_id}/lossless/conclusion:
+    get:
+      operationId: getLosslessConclusion
+      tags:
+        - Lossless Evidence
+      description: SIMULATION_ONLY now. Explicit project scope, fabric:read or
+        NE/NDE/DE/SRE write permission. Native NVUE parser certification
+        pending. Never clears device counters or tunes configuration. Missing
+        mandatory evidence BLOCKED. Current configuration/topology changes
+        invalidate previous proof.
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema: &a16
+            type: string
+        - name: device_id
+          in: path
+          required: true
+          schema: *a16
+        - name: port_id
+          in: query
+          schema: *a16
+        - name: phase
+          in: query
+          schema:
+            type: string
+            enum:
+              - NETWORK_READINESS
+              - VALIDATION
+      responses:
+        "200":
+          description: Scoped evidence result; envelope has request_id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LosslessConclusionEnvelope"
+        "403":
+          description: Permission denied
+        "409":
+          description: Frozen revision/idempotency conflict
+        "422":
+          description: Invalid evidence or unverified parser/units
+  /projects/{project_id}/fabric/devices/{device_id}/lossless/collect:
+    post:
+      operationId: collectMockLosslessSnapshot
+      tags:
+        - Lossless Evidence
+      description: SIMULATION_ONLY now. Explicit project scope, fabric:read or
+        NE/NDE/DE/SRE write permission. Native NVUE parser certification
+        pending. Never clears device counters or tunes configuration. Missing
+        mandatory evidence BLOCKED. Current configuration/topology changes
+        invalidate previous proof.
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema: &a16
+            type: string
+        - name: device_id
+          in: path
+          required: true
+          schema: *a16
+      responses:
+        "200":
+          description: Scoped evidence result; envelope has request_id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LosslessResultsEnvelope"
+        "403":
+          description: Permission denied
+        "409":
+          description: Frozen revision/idempotency conflict
+        "422":
+          description: Invalid evidence or unverified parser/units
+  /projects/{project_id}/fabric/devices/{device_id}/lossless/retests:
+    post:
+      operationId: retestLosslessEvidence
+      tags:
+        - Lossless Evidence
+      description: SIMULATION_ONLY now. Explicit project scope, fabric:read or
+        NE/NDE/DE/SRE write permission. Native NVUE parser certification
+        pending. Never clears device counters or tunes configuration. Missing
+        mandatory evidence BLOCKED. Current configuration/topology changes
+        invalidate previous proof.
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema: &a16
+            type: string
+        - name: device_id
+          in: path
+          required: true
+          schema: *a16
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LosslessRetestRequest"
+      responses:
+        "200":
+          description: Scoped evidence result; envelope has request_id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LosslessRetestEnvelope"
+        "403":
+          description: Permission denied
+        "409":
+          description: Frozen revision/idempotency conflict
+        "422":
+          description: Invalid evidence or unverified parser/units
+  /projects/{project_id}/fabric/devices/{device_id}/lossless/raw/{evidence_id}:
+    get:
+      operationId: getLosslessRawFrame
+      tags:
+        - Lossless Evidence
+      description: SIMULATION_ONLY now. Explicit project scope, fabric:read or
+        NE/NDE/DE/SRE write permission. Native NVUE parser certification
+        pending. Never clears device counters or tunes configuration. Missing
+        mandatory evidence BLOCKED. Current configuration/topology changes
+        invalidate previous proof.
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema: &a16
+            type: string
+        - name: device_id
+          in: path
+          required: true
+          schema: *a16
+        - name: evidence_id
+          in: path
+          required: true
+          schema: *a16
+      responses:
+        "200":
+          description: Scoped evidence result; envelope has request_id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LosslessRawEnvelope"
+        "403":
+          description: Permission denied
+        "409":
+          description: Frozen revision/idempotency conflict
+        "422":
+          description: Invalid evidence or unverified parser/units
 components:
   securitySchemes:
     bearerAuth:
@@ -17435,17 +17623,22 @@ components:
           type: string
         snapshot_error:
           type: string
+        trigger:
+          type: string
+        success_count:
+          type: integer
+        failed_count:
+          type: integer
+        source_domain:
+          type: string
+        notice:
+          type: string
       required:
         - id
         - flow_id
-        - flow_revision
         - project_id
         - status
-        - trigger_source
-        - started_by
-        - target_snapshot_id
         - target_count
-        - counts
         - started_at
         - finished_at
         - execution_mode
@@ -18047,10 +18240,13 @@ components:
           type: string
         retest_status:
           type: string
+        rule_id:
+          type: string
+        rule_version:
+          type: string
       required:
         - id
         - project_id
-        - issue_type
         - source_domain
         - source_ref
         - severity
@@ -18058,9 +18254,6 @@ components:
         - title
         - affected_entities
         - evidence_refs
-        - resolution
-        - created_at
-        - execution_mode
       additionalProperties: false
     FullIssuesListEnvelope:
       type: object
@@ -25720,67 +25913,1093 @@ components:
             servers:
               type: array
               items:
-                $ref: "#/components/schemas/FullServers"
+                type: object
+                properties:
+                  id:
+                    type: string
+                  project_id:
+                    type: string
+                  category:
+                    type: string
+                  hostname:
+                    type: string
+                  serial:
+                    type: string
+                  model_ref:
+                    type: string
+                  model:
+                    type: string
+                  role:
+                    type: string
+                  site:
+                    type: string
+                  rack_id:
+                    type: string
+                  rack:
+                    type: string
+                  rack_u:
+                    type: integer
+                  u_height:
+                    type: integer
+                  management_address:
+                    type: string
+                  lifecycle_status:
+                    type: string
+                  managed_status:
+                    type: string
+                  health_status:
+                    type: string
+                  last_seen_at:
+                    type: string
+                  freshness:
+                    type: string
+                  source_bom_item_id:
+                    type: string
+                  source:
+                    type: string
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
+                  revision:
+                    type: integer
+                  gpu_count:
+                    type: integer
+                  nic_count:
+                    type: integer
+                  power_kw:
+                    type: integer
+                  execution_mode:
+                    type: string
+                  maintenance_state:
+                    type: string
+                  agent_status:
+                    type: string
+                  bmc_status:
+                    type: string
+                  cpu_utilization_percent:
+                    type: integer
+                  memory_utilization_percent:
+                    type: integer
+                  disk_utilization_percent:
+                    type: integer
+                  gpu_utilization_percent:
+                    type: integer
+                  gpu_power_kw:
+                    type: number
+                  is_demo:
+                    type: boolean
+                required:
+                  - id
+                  - project_id
+                  - category
+                  - hostname
+                  - serial
+                  - model_ref
+                  - model
+                  - role
+                  - site
+                  - rack_id
+                  - rack
+                  - rack_u
+                  - u_height
+                  - management_address
+                  - lifecycle_status
+                  - managed_status
+                  - health_status
+                  - last_seen_at
+                  - freshness
+                  - source_bom_item_id
+                  - source
+                  - created_at
+                  - updated_at
+                  - revision
+                  - gpu_count
+                  - nic_count
+                  - power_kw
+                  - execution_mode
+                  - maintenance_state
+                  - agent_status
+                  - bmc_status
+                  - cpu_utilization_percent
+                  - memory_utilization_percent
+                  - disk_utilization_percent
+                  - gpu_utilization_percent
+                  - gpu_power_kw
+                  - is_demo
+                additionalProperties: false
             switches:
               type: array
               items:
-                $ref: "#/components/schemas/FullSwitches"
+                type: object
+                properties:
+                  id:
+                    type: string
+                  project_id:
+                    type: string
+                  category:
+                    type: string
+                  hostname:
+                    type: string
+                  serial:
+                    type: string
+                  model_ref:
+                    type: string
+                  model:
+                    type: string
+                  role:
+                    type: string
+                  site:
+                    type: string
+                  rack_id:
+                    type: string
+                  rack:
+                    type: string
+                  rack_u:
+                    type: integer
+                  u_height:
+                    type: integer
+                  management_address:
+                    type: string
+                  nos_version:
+                    type: string
+                  ztp_status:
+                    type: string
+                  config_status:
+                    type: string
+                  health_status:
+                    type: string
+                  managed_status:
+                    type: string
+                  last_seen_at:
+                    type: string
+                  freshness:
+                    type: string
+                  source_bom_item_id:
+                    type: string
+                  revision:
+                    type: integer
+                  execution_mode:
+                    type: string
+                  maintenance_state:
+                    type: string
+                  cpu_utilization_percent:
+                    type: integer
+                  memory_utilization_percent:
+                    type: integer
+                  temperature_c:
+                    type: number
+                  is_demo:
+                    type: boolean
+                required:
+                  - id
+                  - project_id
+                  - category
+                  - hostname
+                  - serial
+                  - model_ref
+                  - model
+                  - role
+                  - site
+                  - rack_id
+                  - rack
+                  - rack_u
+                  - u_height
+                  - management_address
+                  - nos_version
+                  - ztp_status
+                  - config_status
+                  - health_status
+                  - managed_status
+                  - last_seen_at
+                  - freshness
+                  - source_bom_item_id
+                  - revision
+                  - execution_mode
+                  - maintenance_state
+                  - cpu_utilization_percent
+                  - memory_utilization_percent
+                  - temperature_c
+                  - is_demo
+                additionalProperties: false
             racks:
               type: array
               items:
-                $ref: "#/components/schemas/FullRacks"
+                type: object
+                properties:
+                  id:
+                    type: string
+                  project_id:
+                    type: string
+                  name:
+                    type: string
+                  site:
+                    type: string
+                  row:
+                    type: string
+                  position:
+                    type: string
+                  u_height:
+                    type: integer
+                  status:
+                    type: string
+                  power_capacity_kw:
+                    type: integer
+                  power_used_kw:
+                    type: number
+                  server_count:
+                    type: integer
+                  switch_count:
+                    type: integer
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
+                  revision:
+                    type: integer
+                  hall_id:
+                    type: string
+                  floor:
+                    type: string
+                  health_status:
+                    type: string
+                  power_status:
+                    type: string
+                  cooling_status:
+                    type: string
+                  temperature_inlet_c:
+                    type: number
+                  temperature_outlet_c:
+                    type: number
+                  occupancy_percent:
+                    type: number
+                  is_demo:
+                    type: boolean
+                  pod_id:
+                    type: string
+                  group_source:
+                    type: string
+                required:
+                  - id
+                  - project_id
+                  - name
+                  - site
+                  - row
+                  - position
+                  - u_height
+                  - status
+                  - power_capacity_kw
+                  - power_used_kw
+                  - server_count
+                  - switch_count
+                  - created_at
+                  - updated_at
+                  - revision
+                  - hall_id
+                  - floor
+                  - health_status
+                  - power_status
+                  - cooling_status
+                  - temperature_inlet_c
+                  - temperature_outlet_c
+                  - occupancy_percent
+                  - is_demo
+                  - pod_id
+                  - group_source
+                additionalProperties: false
             ports:
               type: array
               items:
-                $ref: "#/components/schemas/FullPorts"
+                type: object
+                properties:
+                  id:
+                    type: string
+                  project_id:
+                    type: string
+                  device_id:
+                    type: string
+                  component_id:
+                    type: string
+                  physical_name:
+                    type: string
+                  port_index:
+                    type: integer
+                  network_role:
+                    type: string
+                  speed:
+                    type: string
+                  mac:
+                    type: string
+                  admin_state:
+                    type: string
+                  oper_state:
+                    type: string
+                  peer_port_id:
+                    type: string
+                  source_bom_item_id:
+                    type: string
+                  revision:
+                    type: integer
+                  is_demo:
+                    type: boolean
+                required:
+                  - id
+                  - project_id
+                  - device_id
+                  - component_id
+                  - physical_name
+                  - port_index
+                  - network_role
+                  - speed
+                  - mac
+                  - admin_state
+                  - oper_state
+                  - peer_port_id
+                  - source_bom_item_id
+                  - revision
+                  - is_demo
+                additionalProperties: false
             switch_ports:
               type: array
               items:
-                $ref: "#/components/schemas/FullSwitchPorts"
+                type: object
+                properties:
+                  id:
+                    type: string
+                  project_id:
+                    type: string
+                  device_id:
+                    type: string
+                  physical_name:
+                    type: string
+                  port_index:
+                    type: integer
+                  role:
+                    type: string
+                  speed:
+                    type: string
+                  breakout_mode:
+                    type: string
+                  admin_state:
+                    type: string
+                  oper_state:
+                    type: string
+                  optic_module_id:
+                    type: string
+                  revision:
+                    type: integer
+                  peer_port_id:
+                    type: string
+                  is_demo:
+                    type: boolean
+                required:
+                  - id
+                  - project_id
+                  - device_id
+                  - physical_name
+                  - port_index
+                  - role
+                  - speed
+                  - breakout_mode
+                  - admin_state
+                  - oper_state
+                  - optic_module_id
+                  - revision
+                  - is_demo
+                additionalProperties: false
             cables:
               type: array
               items:
-                $ref: "#/components/schemas/FullCables"
+                type: object
+                properties:
+                  id:
+                    type: string
+                  project_id:
+                    type: string
+                  category:
+                    type: string
+                  endpoint_a_uid:
+                    type: string
+                  endpoint_b_uid:
+                    type: string
+                  endpoint_a_name:
+                    type: string
+                  endpoint_b_name:
+                    type: string
+                  cable_type:
+                    type: string
+                  sub_type:
+                    type: string
+                  length_m:
+                    type: integer
+                  status:
+                    type: string
+                  line_check:
+                    type: string
+                  source:
+                    type: string
+                  revision:
+                    type: integer
+                  is_demo:
+                    type: boolean
+                required:
+                  - id
+                  - project_id
+                  - category
+                  - endpoint_a_uid
+                  - endpoint_b_uid
+                  - endpoint_a_name
+                  - endpoint_b_name
+                  - cable_type
+                  - sub_type
+                  - length_m
+                  - status
+                  - line_check
+                  - source
+                  - revision
+                  - is_demo
+                additionalProperties: false
             switch_interfaces:
               type: array
               items:
-                $ref: "#/components/schemas/FullSwitchInterfaces"
+                type: object
+                properties:
+                  id:
+                    type: string
+                  project_id:
+                    type: string
+                  switch_id:
+                    type: string
+                  switch_port_id:
+                    type: string
+                  name:
+                    type: string
+                  port_index:
+                    type: integer
+                  role:
+                    type: string
+                  admin_state:
+                    type: string
+                  oper_state:
+                    type: string
+                  speed:
+                    type: string
+                  mtu:
+                    type: integer
+                  vlan_ids:
+                    type: array
+                    items:
+                      type: integer
+                  rx_errors:
+                    type: integer
+                  tx_errors:
+                    type: integer
+                  rx_drops:
+                    type: integer
+                  tx_drops:
+                    type: integer
+                  flap_count:
+                    type: integer
+                  observed_at:
+                    type: string
+                  freshness:
+                    type: string
+                  source:
+                    type: string
+                  is_demo:
+                    type: boolean
+                required:
+                  - id
+                  - project_id
+                  - switch_id
+                  - switch_port_id
+                  - name
+                  - port_index
+                  - role
+                  - admin_state
+                  - oper_state
+                  - speed
+                  - mtu
+                  - vlan_ids
+                  - rx_errors
+                  - tx_errors
+                  - rx_drops
+                  - tx_drops
+                  - flap_count
+                  - observed_at
+                  - freshness
+                  - source
+                  - is_demo
+                additionalProperties: false
             lldp_neighbors:
               type: array
               items:
-                $ref: "#/components/schemas/FullLldpNeighbors"
+                type: object
+                properties:
+                  id:
+                    type: string
+                  project_id:
+                    type: string
+                  local_switch_id:
+                    type: string
+                  local_port_id:
+                    type: string
+                  local_port_name:
+                    type: string
+                  remote_device_id:
+                    type: string
+                  remote_device_name:
+                    type: string
+                  remote_port_id:
+                    type: string
+                  remote_port_name:
+                    type: string
+                  chassis_id:
+                    type: string
+                  port_id:
+                    type: string
+                  sys_name:
+                    type: string
+                  sys_desc:
+                    type: string
+                  observed_at:
+                    type: string
+                  freshness:
+                    type: string
+                  source:
+                    type: string
+                  match_status:
+                    type: string
+                  normalization_rule:
+                    type: string
+                  is_demo:
+                    type: boolean
+                required:
+                  - id
+                  - project_id
+                  - local_switch_id
+                  - local_port_id
+                  - local_port_name
+                  - remote_device_id
+                  - remote_device_name
+                  - remote_port_id
+                  - remote_port_name
+                  - chassis_id
+                  - port_id
+                  - sys_name
+                  - sys_desc
+                  - observed_at
+                  - freshness
+                  - source
+                  - match_status
+                  - normalization_rule
+                  - is_demo
+                additionalProperties: false
             server_lldp_observations:
               type: array
               items:
-                $ref: "#/components/schemas/FullServerLldpObservations"
+                type: object
+                properties:
+                  id:
+                    type: string
+                  project_id:
+                    type: string
+                  execution_mode:
+                    type: string
+                  source:
+                    type: string
+                  revision:
+                    type: integer
+                  server_id:
+                    type: string
+                  port_id:
+                    type: string
+                  peer_port_id:
+                    type:
+                      - string
+                      - "null"
+                  observed_at:
+                    type: string
+                  freshness:
+                    type: string
+                  notice:
+                    type: string
+                  evidence_ref:
+                    type: string
+                  support:
+                    type: string
+                required:
+                  - id
+                  - project_id
+                  - execution_mode
+                  - source
+                  - revision
+                  - server_id
+                  - port_id
+                  - peer_port_id
+                  - observed_at
+                  - freshness
+                  - notice
+                additionalProperties: false
             ddm_samples:
               type: array
               items:
-                $ref: "#/components/schemas/FullDdmSamples"
+                type: object
+                properties:
+                  id:
+                    type: string
+                  project_id:
+                    type: string
+                  switch_id:
+                    type: string
+                  switch_port_id:
+                    type: string
+                  optic_module_id:
+                    type: string
+                  model:
+                    type: string
+                  vendor:
+                    type: string
+                  serial:
+                    type: string
+                  rx_power_dbm:
+                    type: number
+                  tx_power_dbm:
+                    type: number
+                  voltage_v:
+                    type: number
+                  temperature_c:
+                    type: number
+                  bias_current_ma:
+                    type: number
+                  thresholds:
+                    type: object
+                    properties:
+                      rx_low_warn_dbm:
+                        type: number
+                      rx_low_crit_dbm:
+                        type: number
+                      tx_low_warn_dbm:
+                        type: number
+                      temperature_high_warn_c:
+                        type: integer
+                      temperature_high_crit_c:
+                        type: integer
+                    required:
+                      - rx_low_warn_dbm
+                      - rx_low_crit_dbm
+                      - tx_low_warn_dbm
+                      - temperature_high_warn_c
+                      - temperature_high_crit_c
+                    additionalProperties: false
+                  status:
+                    type: string
+                  observed_at:
+                    type: string
+                  freshness:
+                    type: string
+                  source:
+                    type: string
+                  is_demo:
+                    type: boolean
+                required:
+                  - id
+                  - project_id
+                  - switch_id
+                  - switch_port_id
+                  - optic_module_id
+                  - model
+                  - vendor
+                  - serial
+                  - rx_power_dbm
+                  - tx_power_dbm
+                  - voltage_v
+                  - temperature_c
+                  - bias_current_ma
+                  - thresholds
+                  - status
+                  - observed_at
+                  - freshness
+                  - source
+                  - is_demo
+                additionalProperties: false
             topology_networks:
               type: array
               items:
-                $ref: "#/components/schemas/FullTopologyNetworks"
+                type: object
+                properties:
+                  project_id:
+                    type: string
+                  source:
+                    type: string
+                  observed_at:
+                    type: string
+                  freshness:
+                    type: string
+                  support:
+                    type: string
+                  revision:
+                    type: integer
+                  execution_mode:
+                    type: string
+                  is_demo:
+                    type: boolean
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  fabric_id:
+                    type: string
+                  pod_id:
+                    type: string
+                  rail:
+                    type: string
+                  network_role:
+                    type: string
+                  vlan_id:
+                    type: integer
+                  vrf:
+                    type: string
+                  vni:
+                    type: integer
+                  baseline_id:
+                    type: string
+                  approval_state:
+                    type: string
+                  planning_source:
+                    type: string
+                required:
+                  - project_id
+                  - source
+                  - observed_at
+                  - freshness
+                  - support
+                  - revision
+                  - execution_mode
+                  - is_demo
+                  - id
+                  - name
+                  - fabric_id
+                  - pod_id
+                  - rail
+                  - network_role
+                  - vlan_id
+                  - vrf
+                  - vni
+                  - baseline_id
+                  - approval_state
+                  - planning_source
+                additionalProperties: false
             topology_memberships:
               type: array
               items:
-                $ref: "#/components/schemas/FullTopologyMemberships"
+                type: object
+                properties:
+                  project_id:
+                    type: string
+                  source:
+                    type: string
+                  observed_at:
+                    type: string
+                  freshness:
+                    type: string
+                  support:
+                    type: string
+                  revision:
+                    type: integer
+                  execution_mode:
+                    type: string
+                  is_demo:
+                    type: boolean
+                  id:
+                    type: string
+                  network_id:
+                    type: string
+                  device_id:
+                    type: string
+                  port_ids:
+                    type: array
+                    items:
+                      type: string
+                  fabric_id:
+                    type: string
+                  pod_id:
+                    type: string
+                  rail:
+                    type: string
+                  baseline_id:
+                    type: string
+                  asn:
+                    type:
+                      - integer
+                      - "null"
+                  vlan_id:
+                    type: integer
+                  vrf:
+                    type: string
+                  vni:
+                    type: integer
+                  pfc_priorities:
+                    type: array
+                    items:
+                      type: integer
+                  ecn_profile:
+                    type: string
+                required:
+                  - project_id
+                  - source
+                  - observed_at
+                  - freshness
+                  - support
+                  - revision
+                  - execution_mode
+                  - is_demo
+                  - id
+                  - network_id
+                  - device_id
+                  - port_ids
+                  - fabric_id
+                  - pod_id
+                  - rail
+                  - baseline_id
+                  - asn
+                  - vlan_id
+                  - vrf
+                  - vni
+                  - pfc_priorities
+                  - ecn_profile
+                additionalProperties: false
             topology_observed_networks:
               type: array
               items:
-                $ref: "#/components/schemas/FullTopologyObservedNetworks"
+                type: object
+                properties:
+                  project_id:
+                    type: string
+                  source:
+                    type: string
+                  observed_at:
+                    type: string
+                  freshness:
+                    type: string
+                  support:
+                    type: string
+                  revision:
+                    type: integer
+                  execution_mode:
+                    type: string
+                  is_demo:
+                    type: boolean
+                  id:
+                    type: string
+                  membership_id:
+                    type: string
+                  network_id:
+                    type: string
+                  device_id:
+                    type: string
+                  running_config_id:
+                    type: string
+                  vlan_id:
+                    type: integer
+                  vrf:
+                    type: string
+                  vni:
+                    type:
+                      - integer
+                      - "null"
+                  asn:
+                    type: integer
+                  pfc_priorities:
+                    type: array
+                    items:
+                      type: integer
+                  ecn_profile:
+                    type: string
+                required:
+                  - project_id
+                  - source
+                  - observed_at
+                  - freshness
+                  - support
+                  - revision
+                  - execution_mode
+                  - is_demo
+                  - id
+                  - membership_id
+                  - network_id
+                  - device_id
+                  - running_config_id
+                  - vlan_id
+                  - vrf
+                  - vni
+                  - asn
+                  - pfc_priorities
+                  - ecn_profile
+                additionalProperties: false
             topology_bgp_sessions:
               type: array
               items:
-                $ref: "#/components/schemas/FullTopologyBgpSessions"
+                type: object
+                properties:
+                  project_id:
+                    type: string
+                  source:
+                    type: string
+                  observed_at:
+                    type: string
+                  freshness:
+                    type: string
+                  support:
+                    type: string
+                  revision:
+                    type: integer
+                  execution_mode:
+                    type: string
+                  is_demo:
+                    type: boolean
+                  id:
+                    type: string
+                  fabric_id:
+                    type: string
+                  pod_id:
+                    type: string
+                  source_device_id:
+                    type: string
+                  target_device_id:
+                    type: string
+                  source_port_id:
+                    type:
+                      - string
+                      - "null"
+                  target_port_id:
+                    type: string
+                  local_asn:
+                    type: integer
+                  remote_asn:
+                    type: integer
+                  state:
+                    type: string
+                  baseline_id:
+                    type: string
+                  planned:
+                    type: boolean
+                  evidence_class:
+                    type: string
+                required:
+                  - project_id
+                  - source
+                  - observed_at
+                  - freshness
+                  - support
+                  - revision
+                  - execution_mode
+                  - is_demo
+                  - id
+                  - fabric_id
+                  - pod_id
+                  - source_device_id
+                  - target_device_id
+                  - source_port_id
+                  - target_port_id
+                  - local_asn
+                  - remote_asn
+                  - state
+                  - baseline_id
+                  - planned
+                  - evidence_class
+                additionalProperties: false
             topology_fabrics:
               type: array
               items:
-                $ref: "#/components/schemas/FullTopologyFabrics"
+                type: object
+                properties:
+                  project_id:
+                    type: string
+                  source:
+                    type: string
+                  observed_at:
+                    type: string
+                  freshness:
+                    type: string
+                  support:
+                    type: string
+                  revision:
+                    type: integer
+                  execution_mode:
+                    type: string
+                  is_demo:
+                    type: boolean
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  baseline_id:
+                    type: string
+                  pod_ids:
+                    type: array
+                    items:
+                      type: string
+                required:
+                  - project_id
+                  - source
+                  - observed_at
+                  - freshness
+                  - support
+                  - revision
+                  - execution_mode
+                  - is_demo
+                  - id
+                  - name
+                  - baseline_id
+                  - pod_ids
+                additionalProperties: false
             topology_port_observations:
               type: array
               items:
-                $ref: "#/components/schemas/FullTopologyPortObservations"
+                type: object
+                properties:
+                  project_id:
+                    type: string
+                  source:
+                    type: string
+                  observed_at:
+                    type: string
+                  freshness:
+                    type: string
+                  support:
+                    type: string
+                  revision:
+                    type: integer
+                  execution_mode:
+                    type: string
+                  is_demo:
+                    type: boolean
+                  id:
+                    type: string
+                  physical_port_id:
+                    type: string
+                  device_id:
+                    type: string
+                  oper_state:
+                    type: string
+                  speed:
+                    type: string
+                required:
+                  - project_id
+                  - source
+                  - observed_at
+                  - freshness
+                  - support
+                  - revision
+                  - execution_mode
+                  - is_demo
+                  - id
+                  - physical_port_id
+                  - device_id
+                  - oper_state
+                  - speed
+                additionalProperties: false
           required:
             - servers
             - switches
@@ -25922,6 +27141,13 @@ components:
             - critical
             - unknown
             - planned
+        lossless_verdict:
+          type: string
+          enum:
+            - PASS
+            - FAIL
+            - BLOCKED
+            - WAIVED
         count:
           type: integer
         network_ids: *a15
@@ -26349,6 +27575,1924 @@ components:
       oneOf:
         - $ref: "#/components/schemas/FullServers"
         - $ref: "#/components/schemas/FullSwitches"
+    LosslessEvidence:
+      type: object
+      properties:
+        id:
+          type: string
+        project_id:
+          type: string
+        device_id:
+          type: string
+        port_id:
+          type: string
+        rule_id:
+          type: string
+          enum:
+            - LL-CLASSIFICATION
+            - LL-PFC-FLOW
+            - LL-ECN-MODE
+            - LL-CNP-HOST
+            - LL-BUFFER-SCOPE
+            - LL-DROP-WINDOW
+            - LL-WATCHDOG
+        rule_version:
+          type: string
+          const: 2.0.0
+        profile_id:
+          type: string
+        model:
+          type: string
+        asic:
+          type: string
+        nos_version:
+          type: string
+        roce_mode:
+          type: string
+          enum:
+            - lossless
+            - lossless-single-ipool
+            - lossy
+        baseline_revision:
+          type: string
+        config_revision:
+          type: string
+        topology_revision:
+          type: string
+        source:
+          type: string
+        command:
+          type: string
+        raw_output_ref:
+          type: string
+        parser_version:
+          type: string
+        observed_at:
+          type: string
+        valid_until:
+          type: string
+        window:
+          type: object
+          properties:
+            start:
+              type: string
+            end:
+              type: string
+          required:
+            - start
+            - end
+          additionalProperties: false
+        scope:
+          type: object
+          properties:
+            direction:
+              type: string
+              enum:
+                - rx
+                - tx
+                - both
+            switch_priority:
+              anyOf:
+                - type: integer
+                  minimum: -9007199254740991
+                  maximum: 9007199254740991
+                - type: "null"
+            traffic_class:
+              anyOf:
+                - type: integer
+                  minimum: -9007199254740991
+                  maximum: 9007199254740991
+                - type: "null"
+            priority_group:
+              type:
+                - string
+                - "null"
+            pool:
+              type:
+                - string
+                - "null"
+            path_ids:
+              type: array
+              items:
+                type: string
+            traffic_type:
+              type: string
+            flow_scope:
+              type: string
+          required:
+            - direction
+            - switch_priority
+            - traffic_class
+            - priority_group
+            - pool
+            - path_ids
+            - traffic_type
+            - flow_scope
+          additionalProperties: false
+        support:
+          type: string
+          enum:
+            - supported
+            - unsupported
+            - unknown
+        freshness:
+          type: string
+          enum:
+            - fresh
+            - stale
+            - unknown
+        coverage:
+          type: string
+          enum:
+            - complete
+            - partial
+            - missing
+        execution_id:
+          type:
+            - string
+            - "null"
+        scenario:
+          type: string
+        applicable:
+          type: boolean
+        not_applicable_reason:
+          type:
+            - string
+            - "null"
+        applied:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties: {}
+        operational:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties: {}
+        counters:
+          type: array
+          items:
+            type: object
+            properties:
+              metric:
+                type: string
+              unit:
+                type:
+                  - string
+                  - "null"
+              direction:
+                type: string
+                enum:
+                  - rx
+                  - tx
+              scope_key:
+                type: string
+              start:
+                type: string
+              end:
+                type: string
+              before:
+                type:
+                  - string
+                  - "null"
+              after:
+                type:
+                  - string
+                  - "null"
+              boot_before:
+                type: string
+              boot_after:
+                type: string
+              epoch_before:
+                type: string
+              epoch_after:
+                type: string
+              width_bits:
+                anyOf:
+                  - type: integer
+                    minimum: -9007199254740991
+                    maximum: 9007199254740991
+                  - type: "null"
+              wrap_confirmed:
+                type: boolean
+            required:
+              - metric
+              - unit
+              - direction
+              - scope_key
+              - start
+              - end
+              - before
+              - after
+              - boot_before
+              - boot_after
+              - epoch_before
+              - epoch_after
+              - width_bits
+              - wrap_confirmed
+            additionalProperties: false
+        test:
+          type: object
+          properties:
+            host_response_observed:
+              type: boolean
+            dual_ended:
+              type: boolean
+            traffic_observed:
+              type: boolean
+            passed:
+              type:
+                - boolean
+                - "null"
+            evidence_refs:
+              type: array
+              items:
+                type: string
+          required:
+            - host_response_observed
+            - dual_ended
+            - traffic_observed
+            - passed
+            - evidence_refs
+          additionalProperties: false
+        watchdog_events:
+          type: array
+          items:
+            type: object
+            properties:
+              event:
+                type: string
+                enum:
+                  - trigger
+                  - mitigate_drop
+                  - recover
+              at:
+                type: string
+              evidence_ref:
+                type: string
+            required:
+              - event
+              - at
+              - evidence_ref
+            additionalProperties: false
+      required:
+        - id
+        - project_id
+        - device_id
+        - port_id
+        - rule_id
+        - rule_version
+        - profile_id
+        - model
+        - asic
+        - nos_version
+        - roce_mode
+        - baseline_revision
+        - config_revision
+        - topology_revision
+        - source
+        - command
+        - raw_output_ref
+        - parser_version
+        - observed_at
+        - valid_until
+        - window
+        - scope
+        - support
+        - freshness
+        - coverage
+        - execution_id
+        - scenario
+        - applicable
+        - not_applicable_reason
+        - applied
+        - operational
+        - counters
+        - test
+        - watchdog_events
+      additionalProperties: false
+    LosslessVerdict:
+      type: string
+      enum:
+        - PASS
+        - FAIL
+        - BLOCKED
+        - WAIVED
+    LosslessWindowDelta:
+      type: object
+      properties:
+        metric: &a17
+          type: string
+        delta: &a16
+          type:
+            - string
+            - "null"
+        unit: *a16
+        reason: *a17
+      required:
+        - metric
+        - delta
+        - unit
+        - reason
+      additionalProperties: false
+    LosslessResult:
+      type: object
+      properties:
+        evidence_id: &a16
+          type: string
+        rule_id: *a16
+        rule_version: *a16
+        verdict:
+          $ref: "#/components/schemas/LosslessVerdict"
+        applicability:
+          type: string
+          enum:
+            - applicable
+            - not_applicable
+        capability:
+          type: string
+          enum:
+            - supported
+            - unsupported
+            - unknown
+        freshness:
+          type: string
+          enum:
+            - fresh
+            - stale
+            - unknown
+        reason: *a16
+        deltas:
+          type: array
+          items:
+            $ref: "#/components/schemas/LosslessWindowDelta"
+        scope:
+          type: object
+          properties:
+            direction:
+              type: string
+              enum:
+                - rx
+                - tx
+                - both
+            switch_priority:
+              anyOf:
+                - type: integer
+                  minimum: -9007199254740991
+                  maximum: 9007199254740991
+                - type: "null"
+            traffic_class:
+              anyOf:
+                - type: integer
+                  minimum: -9007199254740991
+                  maximum: 9007199254740991
+                - type: "null"
+            priority_group:
+              type:
+                - string
+                - "null"
+            pool:
+              type:
+                - string
+                - "null"
+            path_ids:
+              type: array
+              items:
+                type: string
+            traffic_type:
+              type: string
+            flow_scope:
+              type: string
+          required:
+            - direction
+            - switch_priority
+            - traffic_class
+            - priority_group
+            - pool
+            - path_ids
+            - traffic_type
+            - flow_scope
+          additionalProperties: false
+        window:
+          type: object
+          properties:
+            start:
+              type: string
+            end:
+              type: string
+          required:
+            - start
+            - end
+          additionalProperties: false
+        issue_id:
+          type:
+            - string
+            - "null"
+        evidence:
+          $ref: "#/components/schemas/LosslessEvidence"
+      required:
+        - evidence_id
+        - rule_id
+        - rule_version
+        - verdict
+        - applicability
+        - capability
+        - freshness
+        - reason
+        - deltas
+        - scope
+        - window
+        - issue_id
+        - evidence
+      additionalProperties: false
+    LosslessResultsEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/LosslessResult"
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+      additionalProperties: false
+    LosslessConclusion:
+      type: object
+      properties:
+        device_id: &a16
+          type: string
+        port_id:
+          type:
+            - string
+            - "null"
+        phase:
+          type: string
+          enum:
+            - NETWORK_READINESS
+            - VALIDATION
+        verdict:
+          $ref: "#/components/schemas/LosslessVerdict"
+        health:
+          type: string
+          enum:
+            - healthy
+            - critical
+            - unknown
+        covered_ports: &a17
+          type: array
+          items: *a16
+        required_ports:
+          type: integer
+        missing_count:
+          type: integer
+        missing: *a17
+        reason: *a16
+        evidence_ids: *a17
+      required:
+        - device_id
+        - port_id
+        - phase
+        - verdict
+        - health
+        - covered_ports
+        - required_ports
+        - missing_count
+        - missing
+        - reason
+        - evidence_ids
+      additionalProperties: false
+    LosslessConclusionEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/LosslessConclusion"
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+      additionalProperties: false
+    LosslessRetest:
+      type: object
+      properties:
+        id: &a16
+          type: string
+        project_id: *a16
+        evidence_id: *a16
+        rule_id: *a16
+        device_id: *a16
+        port_id: *a16
+        execution_id: *a16
+        verdict:
+          $ref: "#/components/schemas/LosslessVerdict"
+        reason: *a16
+        config_revision: *a16
+        topology_revision: *a16
+        observed_at: *a16
+      required:
+        - id
+        - project_id
+        - evidence_id
+        - rule_id
+        - device_id
+        - port_id
+        - execution_id
+        - verdict
+        - reason
+        - config_revision
+        - topology_revision
+        - observed_at
+      additionalProperties: false
+    LosslessRetestEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/LosslessRetest"
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+      additionalProperties: false
+    LosslessRetestRequest:
+      type: object
+      properties:
+        evidence_id: &a16
+          type: string
+        expected_config_revision: *a16
+        expected_topology_revision: *a16
+        idempotency_key: *a16
+      required:
+        - evidence_id
+        - expected_config_revision
+        - expected_topology_revision
+        - idempotency_key
+      additionalProperties: false
+    LosslessRawFrame:
+      type: object
+      properties:
+        id: &a16
+          type: string
+        project_id: *a16
+        format:
+          type: string
+          const: keel-normalized-nvue-fixture/v1
+        notice: *a16
+        evidence:
+          $ref: "#/components/schemas/LosslessEvidence"
+      required:
+        - id
+        - project_id
+        - format
+        - notice
+        - evidence
+      additionalProperties: false
+    LosslessRawEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/LosslessRawFrame"
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+      additionalProperties: false
+    FullLosslessRules:
+      type: object
+      properties:
+        id:
+          type: string
+        rule_id:
+          type: string
+        version:
+          type: string
+        name:
+          type: string
+        historical_only:
+          type: boolean
+        migration_to:
+          type: array
+          items:
+            type: string
+        source:
+          type: string
+        official_section:
+          type: string
+        command_template:
+          type: string
+        nos_versions:
+          type: array
+          items:
+            type: string
+        stage_use:
+          type: array
+          items:
+            type: string
+        units_unverified:
+          type: array
+          items:
+            type: string
+        threshold_source:
+          type: string
+      required:
+        - id
+        - rule_id
+        - version
+        - name
+        - historical_only
+      additionalProperties: false
+    FullLosslessRulesListEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/FullLosslessRules"
+        page:
+          $ref: "#/components/schemas/Page"
+        request_id:
+          type: string
+      required:
+        - data
+        - page
+        - request_id
+      additionalProperties: false
+    FullLosslessProfiles:
+      type: object
+      properties:
+        id:
+          type: string
+        project_id:
+          type: string
+        device_id:
+          type: string
+        model:
+          type: string
+        asic:
+          type: string
+        nos_version:
+          type: string
+        roce_mode:
+          type: string
+        source:
+          type: string
+        required_port_ids:
+          type: array
+          items:
+            type: string
+        scenario:
+          type: string
+        collector_capabilities:
+          type: object
+          properties:
+            switch_lldp_read:
+              type: object
+              properties:
+                support:
+                  type: string
+                source:
+                  type: string
+                valid_until:
+                  type: string
+              required:
+                - support
+                - source
+                - valid_until
+              additionalProperties: false
+          required:
+            - switch_lldp_read
+          additionalProperties: false
+      required:
+        - id
+        - project_id
+        - device_id
+        - model
+        - asic
+        - nos_version
+        - roce_mode
+        - source
+        - required_port_ids
+        - scenario
+        - collector_capabilities
+      additionalProperties: false
+    FullLosslessProfilesListEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/FullLosslessProfiles"
+        page:
+          $ref: "#/components/schemas/Page"
+        request_id:
+          type: string
+      required:
+        - data
+        - page
+        - request_id
+      additionalProperties: false
+    FullLosslessBaselines:
+      type: object
+      properties:
+        id:
+          type: string
+        project_id:
+          type: string
+        device_id:
+          type: string
+        revision:
+          type: string
+        approved:
+          type: boolean
+        approval_scope:
+          type: string
+        source_baseline_id:
+          type: string
+        source_baseline_revision:
+          type: string
+        model:
+          type: string
+        asic:
+          type: string
+        nos_version:
+          type: string
+        roce_mode:
+          type: string
+        classification:
+          type: array
+          items:
+            type: object
+            properties:
+              dscp:
+                type: integer
+              switch_priority:
+                type: integer
+              traffic_class:
+                type: integer
+              priority_group:
+                type: string
+              pool:
+                type: string
+            required:
+              - dscp
+              - switch_priority
+              - traffic_class
+              - priority_group
+              - pool
+            additionalProperties: false
+        ecn:
+          type: object
+          properties:
+            mode:
+              type: string
+            min:
+              type: integer
+            max:
+              type: integer
+            unit:
+              type: string
+          required:
+            - mode
+            - min
+            - max
+            - unit
+          additionalProperties: false
+        buffer:
+          type: object
+          properties:
+            mode:
+              type: string
+            priority_group:
+              type: string
+            pool:
+              type: string
+            headroom:
+              type: integer
+            unit:
+              type: string
+            small_packet_probability:
+              type: integer
+            probability_unit:
+              type: string
+          required:
+            - mode
+            - priority_group
+            - pool
+            - headroom
+            - unit
+            - small_packet_probability
+            - probability_unit
+          additionalProperties: false
+        cnp_scheduler:
+          type: object
+          properties:
+            traffic_class:
+              type: integer
+            policy:
+              type: string
+          required:
+            - traffic_class
+            - policy
+          additionalProperties: false
+        watchdog:
+          type: object
+          properties:
+            transmit-queue-threshold:
+              type: boolean
+            tx-frames-threshold:
+              type: boolean
+            rx-pause-duration:
+              type: boolean
+          required:
+            - transmit-queue-threshold
+            - tx-frames-threshold
+            - rx-pause-duration
+          additionalProperties: false
+        required_rules:
+          type: array
+          items:
+            type: string
+        source:
+          type: string
+      required:
+        - id
+        - project_id
+        - device_id
+        - revision
+        - approved
+        - approval_scope
+        - source_baseline_id
+        - source_baseline_revision
+        - model
+        - asic
+        - nos_version
+        - roce_mode
+        - classification
+        - ecn
+        - buffer
+        - cnp_scheduler
+        - watchdog
+        - required_rules
+        - source
+      additionalProperties: false
+    FullLosslessBaselinesListEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/FullLosslessBaselines"
+        page:
+          $ref: "#/components/schemas/Page"
+        request_id:
+          type: string
+      required:
+        - data
+        - page
+        - request_id
+      additionalProperties: false
+    FullLosslessEvidence:
+      type: object
+      properties:
+        id:
+          type: string
+        project_id:
+          type: string
+        device_id:
+          type: string
+        port_id:
+          type: string
+        rule_id:
+          type: string
+        rule_version:
+          type: string
+        profile_id:
+          type: string
+        model:
+          type: string
+        asic:
+          type: string
+        nos_version:
+          type: string
+        roce_mode:
+          type: string
+        baseline_revision:
+          type: string
+        config_revision:
+          type: string
+        topology_revision:
+          type: string
+        source:
+          type: string
+        command:
+          type: string
+        raw_output_ref:
+          type: string
+        parser_version:
+          type: string
+        observed_at:
+          type: string
+        valid_until:
+          type: string
+        window:
+          type: object
+          properties:
+            start:
+              type: string
+            end:
+              type: string
+          required:
+            - start
+            - end
+          additionalProperties: false
+        scope:
+          type: object
+          properties:
+            direction:
+              type: string
+            switch_priority:
+              type: integer
+            traffic_class:
+              type: integer
+            priority_group:
+              type: string
+            pool:
+              type: string
+            path_ids:
+              type: array
+              items:
+                type: string
+            traffic_type:
+              type: string
+            flow_scope:
+              type: string
+          required:
+            - direction
+            - switch_priority
+            - traffic_class
+            - priority_group
+            - pool
+            - path_ids
+            - traffic_type
+            - flow_scope
+          additionalProperties: false
+        support:
+          type: string
+        freshness:
+          type: string
+        coverage:
+          type: string
+        execution_id:
+          type: string
+        scenario:
+          type: string
+        applicable:
+          type: boolean
+        not_applicable_reason:
+          type:
+            - string
+            - "null"
+        applied:
+          type: object
+          properties:
+            classification:
+              type: array
+              items:
+                type: object
+                properties:
+                  dscp:
+                    type: integer
+                  switch_priority:
+                    type: integer
+                  traffic_class:
+                    type: integer
+                  priority_group:
+                    type: string
+                  pool:
+                    type: string
+                required:
+                  - dscp
+                  - switch_priority
+                  - traffic_class
+                  - priority_group
+                  - pool
+                additionalProperties: false
+            pfc_enabled:
+              type: boolean
+            ecn_mode:
+              type: string
+            ecn_unit:
+              type: string
+            ecn_min:
+              type: integer
+            ecn_max:
+              type: integer
+            cnp_scheduler:
+              type: object
+              properties:
+                traffic_class:
+                  type: integer
+                policy:
+                  type: string
+              required:
+                - traffic_class
+                - policy
+              additionalProperties: false
+            buffer:
+              type: object
+              properties:
+                mode:
+                  type: string
+                priority_group:
+                  type: string
+                pool:
+                  type: string
+                headroom:
+                  type: integer
+                unit:
+                  type: string
+                small_packet_probability:
+                  type: integer
+                probability_unit:
+                  type: string
+              required:
+                - mode
+                - priority_group
+                - pool
+                - headroom
+                - unit
+                - small_packet_probability
+                - probability_unit
+              additionalProperties: false
+            watchdog_enabled:
+              type: boolean
+            watchdog_conditions:
+              type: object
+              properties:
+                transmit-queue-threshold:
+                  type: boolean
+                tx-frames-threshold:
+                  type: boolean
+                rx-pause-duration:
+                  type: boolean
+              required:
+                - transmit-queue-threshold
+                - tx-frames-threshold
+                - rx-pause-duration
+              additionalProperties: false
+          required:
+            - classification
+            - pfc_enabled
+            - ecn_mode
+            - ecn_unit
+            - ecn_min
+            - ecn_max
+            - cnp_scheduler
+            - buffer
+            - watchdog_enabled
+          additionalProperties: false
+        operational:
+          type: object
+          properties:
+            classification:
+              type: array
+              items:
+                type: object
+                properties:
+                  dscp:
+                    type: integer
+                  switch_priority:
+                    type: integer
+                  traffic_class:
+                    type: integer
+                  priority_group:
+                    type: string
+                  pool:
+                    type: string
+                required:
+                  - dscp
+                  - switch_priority
+                  - traffic_class
+                  - priority_group
+                  - pool
+                additionalProperties: false
+            pfc_enabled:
+              type: boolean
+            ecn_mode:
+              type: string
+            ecn_unit:
+              type: string
+            ecn_min:
+              type: integer
+            ecn_max:
+              type: integer
+            cnp_scheduler:
+              type: object
+              properties:
+                traffic_class:
+                  type: integer
+                policy:
+                  type: string
+              required:
+                - traffic_class
+                - policy
+              additionalProperties: false
+            buffer:
+              type: object
+              properties:
+                mode:
+                  type: string
+                priority_group:
+                  type: string
+                pool:
+                  type: string
+                headroom:
+                  type: integer
+                unit:
+                  type: string
+                small_packet_probability:
+                  type: integer
+                probability_unit:
+                  type: string
+              required:
+                - mode
+                - priority_group
+                - pool
+                - headroom
+                - unit
+                - small_packet_probability
+                - probability_unit
+              additionalProperties: false
+            watchdog_enabled:
+              type: boolean
+            watchdog_conditions:
+              type: object
+              properties:
+                transmit-queue-threshold:
+                  type: boolean
+                tx-frames-threshold:
+                  type: boolean
+                rx-pause-duration:
+                  type: boolean
+              required:
+                - transmit-queue-threshold
+                - tx-frames-threshold
+                - rx-pause-duration
+              additionalProperties: false
+            pfc_rx_enabled:
+              type: boolean
+            pfc_tx_enabled:
+              type: boolean
+            watchdog_state:
+              type: string
+            enabled_detection_conditions:
+              type: array
+              items:
+                type: string
+            normalization_ref:
+              type: string
+          required:
+            - classification
+            - pfc_enabled
+            - ecn_mode
+            - ecn_unit
+            - ecn_min
+            - ecn_max
+            - cnp_scheduler
+            - buffer
+            - watchdog_enabled
+            - watchdog_conditions
+            - pfc_rx_enabled
+            - pfc_tx_enabled
+            - watchdog_state
+          additionalProperties: false
+        counters:
+          type: array
+          items:
+            type: object
+            properties:
+              metric:
+                type: string
+              unit:
+                type: string
+              direction:
+                type: string
+              scope_key:
+                type: string
+              start:
+                type: string
+              end:
+                type: string
+              before:
+                type: string
+              after:
+                type: string
+              boot_before:
+                type: string
+              boot_after:
+                type: string
+              epoch_before:
+                type: string
+              epoch_after:
+                type: string
+              width_bits:
+                type: integer
+              wrap_confirmed:
+                type: boolean
+            required:
+              - metric
+              - unit
+              - direction
+              - scope_key
+              - start
+              - end
+              - before
+              - after
+              - boot_before
+              - boot_after
+              - epoch_before
+              - epoch_after
+              - width_bits
+              - wrap_confirmed
+            additionalProperties: false
+        test:
+          type: object
+          properties:
+            host_response_observed:
+              type: boolean
+            dual_ended:
+              type: boolean
+            traffic_observed:
+              type: boolean
+            passed:
+              type: boolean
+            evidence_refs:
+              type: array
+              items:
+                type: string
+          required:
+            - host_response_observed
+            - dual_ended
+            - traffic_observed
+            - passed
+            - evidence_refs
+          additionalProperties: false
+        watchdog_events:
+          type: array
+          items:
+            type: object
+            properties:
+              event:
+                type: string
+              at:
+                type: string
+              evidence_ref:
+                type: string
+            required:
+              - event
+              - at
+              - evidence_ref
+            additionalProperties: false
+      required:
+        - id
+        - project_id
+        - device_id
+        - port_id
+        - rule_id
+        - rule_version
+        - profile_id
+        - model
+        - asic
+        - nos_version
+        - roce_mode
+        - baseline_revision
+        - config_revision
+        - topology_revision
+        - source
+        - command
+        - raw_output_ref
+        - parser_version
+        - observed_at
+        - valid_until
+        - window
+        - scope
+        - support
+        - freshness
+        - coverage
+        - execution_id
+        - scenario
+        - applicable
+        - not_applicable_reason
+        - applied
+        - operational
+        - counters
+        - test
+        - watchdog_events
+      additionalProperties: false
+    FullLosslessEvidenceListEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/FullLosslessEvidence"
+        page:
+          $ref: "#/components/schemas/Page"
+        request_id:
+          type: string
+      required:
+        - data
+        - page
+        - request_id
+      additionalProperties: false
+    FullLosslessRawOutputs:
+      type: object
+      properties:
+        id:
+          type: string
+        project_id:
+          type: string
+        format:
+          type: string
+        notice:
+          type: string
+        evidence:
+          type: object
+          properties:
+            id:
+              type: string
+            project_id:
+              type: string
+            device_id:
+              type: string
+            port_id:
+              type: string
+            rule_id:
+              type: string
+            rule_version:
+              type: string
+            profile_id:
+              type: string
+            model:
+              type: string
+            asic:
+              type: string
+            nos_version:
+              type: string
+            roce_mode:
+              type: string
+            baseline_revision:
+              type: string
+            config_revision:
+              type: string
+            topology_revision:
+              type: string
+            source:
+              type: string
+            command:
+              type: string
+            raw_output_ref:
+              type: string
+            parser_version:
+              type: string
+            observed_at:
+              type: string
+            valid_until:
+              type: string
+            window:
+              type: object
+              properties:
+                start:
+                  type: string
+                end:
+                  type: string
+              required:
+                - start
+                - end
+              additionalProperties: false
+            scope:
+              type: object
+              properties:
+                direction:
+                  type: string
+                switch_priority:
+                  type: integer
+                traffic_class:
+                  type: integer
+                priority_group:
+                  type: string
+                pool:
+                  type: string
+                path_ids:
+                  type: array
+                  items:
+                    type: string
+                traffic_type:
+                  type: string
+                flow_scope:
+                  type: string
+              required:
+                - direction
+                - switch_priority
+                - traffic_class
+                - priority_group
+                - pool
+                - path_ids
+                - traffic_type
+                - flow_scope
+              additionalProperties: false
+            support:
+              type: string
+            freshness:
+              type: string
+            coverage:
+              type: string
+            execution_id:
+              type: string
+            scenario:
+              type: string
+            applicable:
+              type: boolean
+            not_applicable_reason:
+              type:
+                - string
+                - "null"
+            applied:
+              type: object
+              properties:
+                classification:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      dscp:
+                        type: integer
+                      switch_priority:
+                        type: integer
+                      traffic_class:
+                        type: integer
+                      priority_group:
+                        type: string
+                      pool:
+                        type: string
+                    required:
+                      - dscp
+                      - switch_priority
+                      - traffic_class
+                      - priority_group
+                      - pool
+                    additionalProperties: false
+                pfc_enabled:
+                  type: boolean
+                ecn_mode:
+                  type: string
+                ecn_unit:
+                  type: string
+                ecn_min:
+                  type: integer
+                ecn_max:
+                  type: integer
+                cnp_scheduler:
+                  type: object
+                  properties:
+                    traffic_class:
+                      type: integer
+                    policy:
+                      type: string
+                  required:
+                    - traffic_class
+                    - policy
+                  additionalProperties: false
+                buffer:
+                  type: object
+                  properties:
+                    mode:
+                      type: string
+                    priority_group:
+                      type: string
+                    pool:
+                      type: string
+                    headroom:
+                      type: integer
+                    unit:
+                      type: string
+                    small_packet_probability:
+                      type: integer
+                    probability_unit:
+                      type: string
+                  required:
+                    - mode
+                    - priority_group
+                    - pool
+                    - headroom
+                    - unit
+                    - small_packet_probability
+                    - probability_unit
+                  additionalProperties: false
+                watchdog_enabled:
+                  type: boolean
+                watchdog_conditions:
+                  type: object
+                  properties:
+                    transmit-queue-threshold:
+                      type: boolean
+                    tx-frames-threshold:
+                      type: boolean
+                    rx-pause-duration:
+                      type: boolean
+                  required:
+                    - transmit-queue-threshold
+                    - tx-frames-threshold
+                    - rx-pause-duration
+                  additionalProperties: false
+              required:
+                - classification
+                - pfc_enabled
+                - ecn_mode
+                - ecn_unit
+                - ecn_min
+                - ecn_max
+                - cnp_scheduler
+                - buffer
+                - watchdog_enabled
+              additionalProperties: false
+            operational:
+              type: object
+              properties:
+                classification:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      dscp:
+                        type: integer
+                      switch_priority:
+                        type: integer
+                      traffic_class:
+                        type: integer
+                      priority_group:
+                        type: string
+                      pool:
+                        type: string
+                    required:
+                      - dscp
+                      - switch_priority
+                      - traffic_class
+                      - priority_group
+                      - pool
+                    additionalProperties: false
+                pfc_enabled:
+                  type: boolean
+                ecn_mode:
+                  type: string
+                ecn_unit:
+                  type: string
+                ecn_min:
+                  type: integer
+                ecn_max:
+                  type: integer
+                cnp_scheduler:
+                  type: object
+                  properties:
+                    traffic_class:
+                      type: integer
+                    policy:
+                      type: string
+                  required:
+                    - traffic_class
+                    - policy
+                  additionalProperties: false
+                buffer:
+                  type: object
+                  properties:
+                    mode:
+                      type: string
+                    priority_group:
+                      type: string
+                    pool:
+                      type: string
+                    headroom:
+                      type: integer
+                    unit:
+                      type: string
+                    small_packet_probability:
+                      type: integer
+                    probability_unit:
+                      type: string
+                  required:
+                    - mode
+                    - priority_group
+                    - pool
+                    - headroom
+                    - unit
+                    - small_packet_probability
+                    - probability_unit
+                  additionalProperties: false
+                watchdog_enabled:
+                  type: boolean
+                watchdog_conditions:
+                  type: object
+                  properties:
+                    transmit-queue-threshold:
+                      type: boolean
+                    tx-frames-threshold:
+                      type: boolean
+                    rx-pause-duration:
+                      type: boolean
+                  required:
+                    - transmit-queue-threshold
+                    - tx-frames-threshold
+                    - rx-pause-duration
+                  additionalProperties: false
+                pfc_rx_enabled:
+                  type: boolean
+                pfc_tx_enabled:
+                  type: boolean
+                watchdog_state:
+                  type: string
+                enabled_detection_conditions:
+                  type: array
+                  items:
+                    type: string
+                normalization_ref:
+                  type: string
+              required:
+                - classification
+                - pfc_enabled
+                - ecn_mode
+                - ecn_unit
+                - ecn_min
+                - ecn_max
+                - cnp_scheduler
+                - buffer
+                - watchdog_enabled
+                - watchdog_conditions
+                - pfc_rx_enabled
+                - pfc_tx_enabled
+                - watchdog_state
+              additionalProperties: false
+            counters:
+              type: array
+              items:
+                type: object
+                properties:
+                  metric:
+                    type: string
+                  unit:
+                    type: string
+                  direction:
+                    type: string
+                  scope_key:
+                    type: string
+                  start:
+                    type: string
+                  end:
+                    type: string
+                  before:
+                    type: string
+                  after:
+                    type: string
+                  boot_before:
+                    type: string
+                  boot_after:
+                    type: string
+                  epoch_before:
+                    type: string
+                  epoch_after:
+                    type: string
+                  width_bits:
+                    type: integer
+                  wrap_confirmed:
+                    type: boolean
+                required:
+                  - metric
+                  - unit
+                  - direction
+                  - scope_key
+                  - start
+                  - end
+                  - before
+                  - after
+                  - boot_before
+                  - boot_after
+                  - epoch_before
+                  - epoch_after
+                  - width_bits
+                  - wrap_confirmed
+                additionalProperties: false
+            test:
+              type: object
+              properties:
+                host_response_observed:
+                  type: boolean
+                dual_ended:
+                  type: boolean
+                traffic_observed:
+                  type: boolean
+                passed:
+                  type: boolean
+                evidence_refs:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - host_response_observed
+                - dual_ended
+                - traffic_observed
+                - passed
+                - evidence_refs
+              additionalProperties: false
+            watchdog_events:
+              type: array
+              items:
+                type: object
+                properties:
+                  event:
+                    type: string
+                  at:
+                    type: string
+                  evidence_ref:
+                    type: string
+                required:
+                  - event
+                  - at
+                  - evidence_ref
+                additionalProperties: false
+          required:
+            - id
+            - project_id
+            - device_id
+            - port_id
+            - rule_id
+            - rule_version
+            - profile_id
+            - model
+            - asic
+            - nos_version
+            - roce_mode
+            - baseline_revision
+            - config_revision
+            - topology_revision
+            - source
+            - command
+            - raw_output_ref
+            - parser_version
+            - observed_at
+            - valid_until
+            - window
+            - scope
+            - support
+            - freshness
+            - coverage
+            - execution_id
+            - scenario
+            - applicable
+            - not_applicable_reason
+            - applied
+            - operational
+            - counters
+            - test
+            - watchdog_events
+          additionalProperties: false
+      required:
+        - id
+        - project_id
+        - format
+        - notice
+        - evidence
+      additionalProperties: false
+    FullLosslessRawOutputsListEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/FullLosslessRawOutputs"
+        page:
+          $ref: "#/components/schemas/Page"
+        request_id:
+          type: string
+      required:
+        - data
+        - page
+        - request_id
+      additionalProperties: false
+    FullLosslessHostEvidence:
+      type: object
+      properties:
+        id:
+          type: string
+        project_id:
+          type: string
+        flow_scope:
+          type: string
+        start:
+          type: string
+        end:
+          type: string
+        host_device_id:
+          type: string
+        host_port_id:
+          type: string
+        port_id:
+          type: string
+        observed_response:
+          type: boolean
+        valid_until:
+          type: string
+        source:
+          type: string
+        execution_id:
+          type: string
+      required:
+        - id
+        - project_id
+        - flow_scope
+        - start
+        - end
+        - host_device_id
+        - host_port_id
+        - port_id
+        - observed_response
+        - valid_until
+        - source
+        - execution_id
+      additionalProperties: false
+    FullLosslessHostEvidenceListEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/FullLosslessHostEvidence"
+        page:
+          $ref: "#/components/schemas/Page"
+        request_id:
+          type: string
+      required:
+        - data
+        - page
+        - request_id
+      additionalProperties: false
+    FullLosslessCollectors:
+      type: object
+      properties:
+        id:
+          type: string
+        command_template:
+          type: string
+        source_columns:
+          type: array
+          items:
+            type: string
+        counter_paths:
+          type: array
+          items:
+            type: string
+        supported_profile_versions:
+          type: array
+          items:
+            type: string
+        native_parser_certification:
+          type: string
+        fixture_parser_version:
+          type: string
+        unknown_units:
+          type: array
+          items:
+            type: string
+        read_only:
+          type: boolean
+      required:
+        - id
+        - command_template
+        - source_columns
+        - counter_paths
+        - supported_profile_versions
+        - native_parser_certification
+        - fixture_parser_version
+        - unknown_units
+        - read_only
+      additionalProperties: false
+    FullLosslessCollectorsListEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/FullLosslessCollectors"
+        page:
+          $ref: "#/components/schemas/Page"
+        request_id:
+          type: string
+      required:
+        - data
+        - page
+        - request_id
+      additionalProperties: false
 
 x-implementation-policy:
   frontend-first: true

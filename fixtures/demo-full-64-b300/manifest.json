@@ -24,15 +24,15 @@
     "bom_sheet_regions": 33,
     "bom_mapping_candidates": 6,
     "bom_issues": 5,
-    "flows": 13,
+    "flows": 14,
     "schedules": 3,
-    "executions": 25,
+    "executions": 45,
     "task_runs": 200,
     "execution_logs": 72,
     "execution_outputs": 6,
     "delivery_runs": 1,
     "mapping_revisions": 1,
-    "issues": 50,
+    "issues": 54,
     "alerts": 16,
     "metrics": 48,
     "monitoring_sources": 2,
@@ -128,16 +128,24 @@
     "topology_observed_networks": 432,
     "topology_bgp_sessions": 64,
     "topology_snapshots": 1,
-    "topology_port_observations": 640
+    "topology_port_observations": 640,
+    "lossless_rules": 14,
+    "lossless_profiles": 24,
+    "lossless_baselines": 24,
+    "lossless_evidence": 140,
+    "lossless_raw_outputs": 140,
+    "lossless_retests": 0,
+    "lossless_host_evidence": 105,
+    "lossless_collectors": 8
   },
   "files": {
     "demo-seed.json": {
-      "sha256": "4516f11d15658d280066531bc0d56e941fcc9822e4f716099cbb857bb0c6da27",
-      "size_bytes": 29355665
+      "sha256": "ca69ab2d298efb2e78a11b0bda5d445a5bb974d76a8f9b4c7070e9d7081fee8d",
+      "size_bytes": 31222739
     },
     "seed-demo.sql": {
-      "sha256": "cd2f625582fef777837855cb7e7a903e62b5b9c0e9a89e97ba27955ba2c94077",
-      "size_bytes": 24296127
+      "sha256": "368200f7c55974e8285c8a9dbd5786395861020c4be104f5f73397411d5939bf",
+      "size_bytes": 25607423
     },
     "workbook-profile.json": {
       "sha256": "1c09df32a25e070825ad7eea927dacb44c58161070095866c3ee28f0e4e3b2f1",

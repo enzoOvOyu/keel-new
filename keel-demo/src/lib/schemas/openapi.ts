@@ -4000,6 +4000,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{project_id}/fabric/devices/{device_id}/lossless/evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description SIMULATION_ONLY now. Explicit project scope, fabric:read or NE/NDE/DE/SRE write permission. Native NVUE parser certification pending. Never clears device counters or tunes configuration. Missing mandatory evidence BLOCKED. Current configuration/topology changes invalidate previous proof. */
+        get: operations["listLosslessEvidence"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/fabric/devices/{device_id}/lossless/conclusion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description SIMULATION_ONLY now. Explicit project scope, fabric:read or NE/NDE/DE/SRE write permission. Native NVUE parser certification pending. Never clears device counters or tunes configuration. Missing mandatory evidence BLOCKED. Current configuration/topology changes invalidate previous proof. */
+        get: operations["getLosslessConclusion"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/fabric/devices/{device_id}/lossless/collect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description SIMULATION_ONLY now. Explicit project scope, fabric:read or NE/NDE/DE/SRE write permission. Native NVUE parser certification pending. Never clears device counters or tunes configuration. Missing mandatory evidence BLOCKED. Current configuration/topology changes invalidate previous proof. */
+        post: operations["collectMockLosslessSnapshot"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/fabric/devices/{device_id}/lossless/retests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description SIMULATION_ONLY now. Explicit project scope, fabric:read or NE/NDE/DE/SRE write permission. Native NVUE parser certification pending. Never clears device counters or tunes configuration. Missing mandatory evidence BLOCKED. Current configuration/topology changes invalidate previous proof. */
+        post: operations["retestLosslessEvidence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/fabric/devices/{device_id}/lossless/raw/{evidence_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description SIMULATION_ONLY now. Explicit project scope, fabric:read or NE/NDE/DE/SRE write permission. Native NVUE parser certification pending. Never clears device counters or tunes configuration. Missing mandatory evidence BLOCKED. Current configuration/topology changes invalidate previous proof. */
+        get: operations["getLosslessRawFrame"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -6325,14 +6410,14 @@ export interface components {
         FullExecutions: {
             id: string;
             flow_id: string;
-            flow_revision: number;
+            flow_revision?: number;
             project_id: string;
             status: string;
-            trigger_source: string;
-            started_by: string;
-            target_snapshot_id: string;
+            trigger_source?: string;
+            started_by?: string;
+            target_snapshot_id?: string;
             target_count: number;
-            counts: {
+            counts?: {
                 success?: number;
                 running?: number;
                 failed?: number;
@@ -6370,6 +6455,11 @@ export interface components {
             legacy_stage_association?: boolean;
             reported_status?: string;
             snapshot_error?: string;
+            trigger?: string;
+            success_count?: number;
+            failed_count?: number;
+            source_domain?: string;
+            notice?: string;
         };
         FullExecutionsListEnvelope: {
             data: components["schemas"]["FullExecutions"][];
@@ -6548,7 +6638,7 @@ export interface components {
         FullIssues: {
             id: string;
             project_id: string;
-            issue_type: string;
+            issue_type?: string;
             source_domain: string;
             source_ref: string;
             severity: string;
@@ -6557,11 +6647,11 @@ export interface components {
             affected_entities: string[];
             evidence_refs: string[];
             assignee_id?: string;
-            resolution: string | null;
-            created_at: string;
+            resolution?: string | null;
+            created_at?: string;
             updated_at?: string;
             closed_at?: string | null;
-            execution_mode: string;
+            execution_mode?: string;
             is_demo?: boolean;
             source_check_id?: string;
             stage_id?: string;
@@ -6569,6 +6659,8 @@ export interface components {
             port_ids?: string[];
             execution_id?: string;
             retest_status?: string;
+            rule_id?: string;
+            rule_version?: string;
         };
         FullIssuesListEnvelope: {
             data: components["schemas"]["FullIssues"][];
@@ -9164,22 +9256,359 @@ export interface components {
             network_ids: string[];
             description: string;
             data: {
-                servers: components["schemas"]["FullServers"][];
-                switches: components["schemas"]["FullSwitches"][];
-                racks: components["schemas"]["FullRacks"][];
-                ports: components["schemas"]["FullPorts"][];
-                switch_ports: components["schemas"]["FullSwitchPorts"][];
-                cables: components["schemas"]["FullCables"][];
-                switch_interfaces: components["schemas"]["FullSwitchInterfaces"][];
-                lldp_neighbors: components["schemas"]["FullLldpNeighbors"][];
-                server_lldp_observations: components["schemas"]["FullServerLldpObservations"][];
-                ddm_samples: components["schemas"]["FullDdmSamples"][];
-                topology_networks: components["schemas"]["FullTopologyNetworks"][];
-                topology_memberships: components["schemas"]["FullTopologyMemberships"][];
-                topology_observed_networks: components["schemas"]["FullTopologyObservedNetworks"][];
-                topology_bgp_sessions: components["schemas"]["FullTopologyBgpSessions"][];
-                topology_fabrics: components["schemas"]["FullTopologyFabrics"][];
-                topology_port_observations: components["schemas"]["FullTopologyPortObservations"][];
+                servers: {
+                    id: string;
+                    project_id: string;
+                    category: string;
+                    hostname: string;
+                    serial: string;
+                    model_ref: string;
+                    model: string;
+                    role: string;
+                    site: string;
+                    rack_id: string;
+                    rack: string;
+                    rack_u: number;
+                    u_height: number;
+                    management_address: string;
+                    lifecycle_status: string;
+                    managed_status: string;
+                    health_status: string;
+                    last_seen_at: string;
+                    freshness: string;
+                    source_bom_item_id: string;
+                    source: string;
+                    created_at: string;
+                    updated_at: string;
+                    revision: number;
+                    gpu_count: number;
+                    nic_count: number;
+                    power_kw: number;
+                    execution_mode: string;
+                    maintenance_state: string;
+                    agent_status: string;
+                    bmc_status: string;
+                    cpu_utilization_percent: number;
+                    memory_utilization_percent: number;
+                    disk_utilization_percent: number;
+                    gpu_utilization_percent: number;
+                    gpu_power_kw: number;
+                    is_demo: boolean;
+                }[];
+                switches: {
+                    id: string;
+                    project_id: string;
+                    category: string;
+                    hostname: string;
+                    serial: string;
+                    model_ref: string;
+                    model: string;
+                    role: string;
+                    site: string;
+                    rack_id: string;
+                    rack: string;
+                    rack_u: number;
+                    u_height: number;
+                    management_address: string;
+                    nos_version: string;
+                    ztp_status: string;
+                    config_status: string;
+                    health_status: string;
+                    managed_status: string;
+                    last_seen_at: string;
+                    freshness: string;
+                    source_bom_item_id: string;
+                    revision: number;
+                    execution_mode: string;
+                    maintenance_state: string;
+                    cpu_utilization_percent: number;
+                    memory_utilization_percent: number;
+                    temperature_c: number;
+                    is_demo: boolean;
+                }[];
+                racks: {
+                    id: string;
+                    project_id: string;
+                    name: string;
+                    site: string;
+                    row: string;
+                    position: string;
+                    u_height: number;
+                    status: string;
+                    power_capacity_kw: number;
+                    power_used_kw: number;
+                    server_count: number;
+                    switch_count: number;
+                    created_at: string;
+                    updated_at: string;
+                    revision: number;
+                    hall_id: string;
+                    floor: string;
+                    health_status: string;
+                    power_status: string;
+                    cooling_status: string;
+                    temperature_inlet_c: number;
+                    temperature_outlet_c: number;
+                    occupancy_percent: number;
+                    is_demo: boolean;
+                    pod_id: string;
+                    group_source: string;
+                }[];
+                ports: {
+                    id: string;
+                    project_id: string;
+                    device_id: string;
+                    component_id: string;
+                    physical_name: string;
+                    port_index: number;
+                    network_role: string;
+                    speed: string;
+                    mac: string;
+                    admin_state: string;
+                    oper_state: string;
+                    peer_port_id: string;
+                    source_bom_item_id: string;
+                    revision: number;
+                    is_demo: boolean;
+                }[];
+                switch_ports: {
+                    id: string;
+                    project_id: string;
+                    device_id: string;
+                    physical_name: string;
+                    port_index: number;
+                    role: string;
+                    speed: string;
+                    breakout_mode: string;
+                    admin_state: string;
+                    oper_state: string;
+                    optic_module_id: string;
+                    revision: number;
+                    peer_port_id?: string;
+                    is_demo: boolean;
+                }[];
+                cables: {
+                    id: string;
+                    project_id: string;
+                    category: string;
+                    endpoint_a_uid: string;
+                    endpoint_b_uid: string;
+                    endpoint_a_name: string;
+                    endpoint_b_name: string;
+                    cable_type: string;
+                    sub_type: string;
+                    length_m: number;
+                    status: string;
+                    line_check: string;
+                    source: string;
+                    revision: number;
+                    is_demo: boolean;
+                }[];
+                switch_interfaces: {
+                    id: string;
+                    project_id: string;
+                    switch_id: string;
+                    switch_port_id: string;
+                    name: string;
+                    port_index: number;
+                    role: string;
+                    admin_state: string;
+                    oper_state: string;
+                    speed: string;
+                    mtu: number;
+                    vlan_ids: number[];
+                    rx_errors: number;
+                    tx_errors: number;
+                    rx_drops: number;
+                    tx_drops: number;
+                    flap_count: number;
+                    observed_at: string;
+                    freshness: string;
+                    source: string;
+                    is_demo: boolean;
+                }[];
+                lldp_neighbors: {
+                    id: string;
+                    project_id: string;
+                    local_switch_id: string;
+                    local_port_id: string;
+                    local_port_name: string;
+                    remote_device_id: string;
+                    remote_device_name: string;
+                    remote_port_id: string;
+                    remote_port_name: string;
+                    chassis_id: string;
+                    port_id: string;
+                    sys_name: string;
+                    sys_desc: string;
+                    observed_at: string;
+                    freshness: string;
+                    source: string;
+                    match_status: string;
+                    normalization_rule: string;
+                    is_demo: boolean;
+                }[];
+                server_lldp_observations: {
+                    id: string;
+                    project_id: string;
+                    execution_mode: string;
+                    source: string;
+                    revision: number;
+                    server_id: string;
+                    port_id: string;
+                    peer_port_id: string | null;
+                    observed_at: string;
+                    freshness: string;
+                    notice: string;
+                    evidence_ref?: string;
+                    support?: string;
+                }[];
+                ddm_samples: {
+                    id: string;
+                    project_id: string;
+                    switch_id: string;
+                    switch_port_id: string;
+                    optic_module_id: string;
+                    model: string;
+                    vendor: string;
+                    serial: string;
+                    rx_power_dbm: number;
+                    tx_power_dbm: number;
+                    voltage_v: number;
+                    temperature_c: number;
+                    bias_current_ma: number;
+                    thresholds: {
+                        rx_low_warn_dbm: number;
+                        rx_low_crit_dbm: number;
+                        tx_low_warn_dbm: number;
+                        temperature_high_warn_c: number;
+                        temperature_high_crit_c: number;
+                    };
+                    status: string;
+                    observed_at: string;
+                    freshness: string;
+                    source: string;
+                    is_demo: boolean;
+                }[];
+                topology_networks: {
+                    project_id: string;
+                    source: string;
+                    observed_at: string;
+                    freshness: string;
+                    support: string;
+                    revision: number;
+                    execution_mode: string;
+                    is_demo: boolean;
+                    id: string;
+                    name: string;
+                    fabric_id: string;
+                    pod_id: string;
+                    rail: string;
+                    network_role: string;
+                    vlan_id: number;
+                    vrf: string;
+                    vni: number;
+                    baseline_id: string;
+                    approval_state: string;
+                    planning_source: string;
+                }[];
+                topology_memberships: {
+                    project_id: string;
+                    source: string;
+                    observed_at: string;
+                    freshness: string;
+                    support: string;
+                    revision: number;
+                    execution_mode: string;
+                    is_demo: boolean;
+                    id: string;
+                    network_id: string;
+                    device_id: string;
+                    port_ids: string[];
+                    fabric_id: string;
+                    pod_id: string;
+                    rail: string;
+                    baseline_id: string;
+                    asn: number | null;
+                    vlan_id: number;
+                    vrf: string;
+                    vni: number;
+                    pfc_priorities: number[];
+                    ecn_profile: string;
+                }[];
+                topology_observed_networks: {
+                    project_id: string;
+                    source: string;
+                    observed_at: string;
+                    freshness: string;
+                    support: string;
+                    revision: number;
+                    execution_mode: string;
+                    is_demo: boolean;
+                    id: string;
+                    membership_id: string;
+                    network_id: string;
+                    device_id: string;
+                    running_config_id: string;
+                    vlan_id: number;
+                    vrf: string;
+                    vni: number | null;
+                    asn: number;
+                    pfc_priorities: number[];
+                    ecn_profile: string;
+                }[];
+                topology_bgp_sessions: {
+                    project_id: string;
+                    source: string;
+                    observed_at: string;
+                    freshness: string;
+                    support: string;
+                    revision: number;
+                    execution_mode: string;
+                    is_demo: boolean;
+                    id: string;
+                    fabric_id: string;
+                    pod_id: string;
+                    source_device_id: string;
+                    target_device_id: string;
+                    source_port_id: string | null;
+                    target_port_id: string;
+                    local_asn: number;
+                    remote_asn: number;
+                    state: string;
+                    baseline_id: string;
+                    planned: boolean;
+                    evidence_class: string;
+                }[];
+                topology_fabrics: {
+                    project_id: string;
+                    source: string;
+                    observed_at: string;
+                    freshness: string;
+                    support: string;
+                    revision: number;
+                    execution_mode: string;
+                    is_demo: boolean;
+                    id: string;
+                    name: string;
+                    baseline_id: string;
+                    pod_ids: string[];
+                }[];
+                topology_port_observations: {
+                    project_id: string;
+                    source: string;
+                    observed_at: string;
+                    freshness: string;
+                    support: string;
+                    revision: number;
+                    execution_mode: string;
+                    is_demo: boolean;
+                    id: string;
+                    physical_port_id: string;
+                    device_id: string;
+                    oper_state: string;
+                    speed: string;
+                }[];
             };
         };
         FullTopologySnapshotsListEnvelope: {
@@ -9218,6 +9647,8 @@ export interface components {
             rack_id: string | null;
             /** @enum {string} */
             health: "healthy" | "warning" | "critical" | "unknown" | "planned";
+            /** @enum {string} */
+            lossless_verdict?: "PASS" | "FAIL" | "BLOCKED" | "WAIVED";
             count: number;
             network_ids: string[];
             source: string;
@@ -9360,6 +9791,621 @@ export interface components {
             comparison: "compare" | "planned" | "observed";
         };
         RackRelatedDevice: components["schemas"]["FullServers"] | components["schemas"]["FullSwitches"];
+        LosslessEvidence: {
+            id: string;
+            project_id: string;
+            device_id: string;
+            port_id: string;
+            /** @enum {string} */
+            rule_id: "LL-CLASSIFICATION" | "LL-PFC-FLOW" | "LL-ECN-MODE" | "LL-CNP-HOST" | "LL-BUFFER-SCOPE" | "LL-DROP-WINDOW" | "LL-WATCHDOG";
+            /** @constant */
+            rule_version: "2.0.0";
+            profile_id: string;
+            model: string;
+            asic: string;
+            nos_version: string;
+            /** @enum {string} */
+            roce_mode: "lossless" | "lossless-single-ipool" | "lossy";
+            baseline_revision: string;
+            config_revision: string;
+            topology_revision: string;
+            source: string;
+            command: string;
+            raw_output_ref: string;
+            parser_version: string;
+            observed_at: string;
+            valid_until: string;
+            window: {
+                start: string;
+                end: string;
+            };
+            scope: {
+                /** @enum {string} */
+                direction: "rx" | "tx" | "both";
+                switch_priority: number | null;
+                traffic_class: number | null;
+                priority_group: string | null;
+                pool: string | null;
+                path_ids: string[];
+                traffic_type: string;
+                flow_scope: string;
+            };
+            /** @enum {string} */
+            support: "supported" | "unsupported" | "unknown";
+            /** @enum {string} */
+            freshness: "fresh" | "stale" | "unknown";
+            /** @enum {string} */
+            coverage: "complete" | "partial" | "missing";
+            execution_id: string | null;
+            scenario: string;
+            applicable: boolean;
+            not_applicable_reason: string | null;
+            applied: {
+                [key: string]: unknown;
+            };
+            operational: {
+                [key: string]: unknown;
+            };
+            counters: {
+                metric: string;
+                unit: string | null;
+                /** @enum {string} */
+                direction: "rx" | "tx";
+                scope_key: string;
+                start: string;
+                end: string;
+                before: string | null;
+                after: string | null;
+                boot_before: string;
+                boot_after: string;
+                epoch_before: string;
+                epoch_after: string;
+                width_bits: number | null;
+                wrap_confirmed: boolean;
+            }[];
+            test: {
+                host_response_observed: boolean;
+                dual_ended: boolean;
+                traffic_observed: boolean;
+                passed: boolean | null;
+                evidence_refs: string[];
+            };
+            watchdog_events: {
+                /** @enum {string} */
+                event: "trigger" | "mitigate_drop" | "recover";
+                at: string;
+                evidence_ref: string;
+            }[];
+        };
+        /** @enum {string} */
+        LosslessVerdict: "PASS" | "FAIL" | "BLOCKED" | "WAIVED";
+        LosslessWindowDelta: {
+            metric: string;
+            delta: string | null;
+            unit: string | null;
+            reason: string;
+        };
+        LosslessResult: {
+            evidence_id: string;
+            rule_id: string;
+            rule_version: string;
+            verdict: components["schemas"]["LosslessVerdict"];
+            /** @enum {string} */
+            applicability: "applicable" | "not_applicable";
+            /** @enum {string} */
+            capability: "supported" | "unsupported" | "unknown";
+            /** @enum {string} */
+            freshness: "fresh" | "stale" | "unknown";
+            reason: string;
+            deltas: components["schemas"]["LosslessWindowDelta"][];
+            scope: {
+                /** @enum {string} */
+                direction: "rx" | "tx" | "both";
+                switch_priority: number | null;
+                traffic_class: number | null;
+                priority_group: string | null;
+                pool: string | null;
+                path_ids: string[];
+                traffic_type: string;
+                flow_scope: string;
+            };
+            window: {
+                start: string;
+                end: string;
+            };
+            issue_id: string | null;
+            evidence: components["schemas"]["LosslessEvidence"];
+        };
+        LosslessResultsEnvelope: {
+            data: components["schemas"]["LosslessResult"][];
+            request_id: string;
+        };
+        LosslessConclusion: {
+            device_id: string;
+            port_id: string | null;
+            /** @enum {string} */
+            phase: "NETWORK_READINESS" | "VALIDATION";
+            verdict: components["schemas"]["LosslessVerdict"];
+            /** @enum {string} */
+            health: "healthy" | "critical" | "unknown";
+            covered_ports: string[];
+            required_ports: number;
+            missing_count: number;
+            missing: string[];
+            reason: string;
+            evidence_ids: string[];
+        };
+        LosslessConclusionEnvelope: {
+            data: components["schemas"]["LosslessConclusion"];
+            request_id: string;
+        };
+        LosslessRetest: {
+            id: string;
+            project_id: string;
+            evidence_id: string;
+            rule_id: string;
+            device_id: string;
+            port_id: string;
+            execution_id: string;
+            verdict: components["schemas"]["LosslessVerdict"];
+            reason: string;
+            config_revision: string;
+            topology_revision: string;
+            observed_at: string;
+        };
+        LosslessRetestEnvelope: {
+            data: components["schemas"]["LosslessRetest"];
+            request_id: string;
+        };
+        LosslessRetestRequest: {
+            evidence_id: string;
+            expected_config_revision: string;
+            expected_topology_revision: string;
+            idempotency_key: string;
+        };
+        LosslessRawFrame: {
+            id: string;
+            project_id: string;
+            /** @constant */
+            format: "keel-normalized-nvue-fixture/v1";
+            notice: string;
+            evidence: components["schemas"]["LosslessEvidence"];
+        };
+        LosslessRawEnvelope: {
+            data: components["schemas"]["LosslessRawFrame"];
+            request_id: string;
+        };
+        FullLosslessRules: {
+            id: string;
+            rule_id: string;
+            version: string;
+            name: string;
+            historical_only: boolean;
+            migration_to?: string[];
+            source?: string;
+            official_section?: string;
+            command_template?: string;
+            nos_versions?: string[];
+            stage_use?: string[];
+            units_unverified?: string[];
+            threshold_source?: string;
+        };
+        FullLosslessRulesListEnvelope: {
+            data: components["schemas"]["FullLosslessRules"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullLosslessProfiles: {
+            id: string;
+            project_id: string;
+            device_id: string;
+            model: string;
+            asic: string;
+            nos_version: string;
+            roce_mode: string;
+            source: string;
+            required_port_ids: string[];
+            scenario: string;
+            collector_capabilities: {
+                switch_lldp_read: {
+                    support: string;
+                    source: string;
+                    valid_until: string;
+                };
+            };
+        };
+        FullLosslessProfilesListEnvelope: {
+            data: components["schemas"]["FullLosslessProfiles"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullLosslessBaselines: {
+            id: string;
+            project_id: string;
+            device_id: string;
+            revision: string;
+            approved: boolean;
+            approval_scope: string;
+            source_baseline_id: string;
+            source_baseline_revision: string;
+            model: string;
+            asic: string;
+            nos_version: string;
+            roce_mode: string;
+            classification: {
+                dscp: number;
+                switch_priority: number;
+                traffic_class: number;
+                priority_group: string;
+                pool: string;
+            }[];
+            ecn: {
+                mode: string;
+                min: number;
+                max: number;
+                unit: string;
+            };
+            buffer: {
+                mode: string;
+                priority_group: string;
+                pool: string;
+                headroom: number;
+                unit: string;
+                small_packet_probability: number;
+                probability_unit: string;
+            };
+            cnp_scheduler: {
+                traffic_class: number;
+                policy: string;
+            };
+            watchdog: {
+                "transmit-queue-threshold": boolean;
+                "tx-frames-threshold": boolean;
+                "rx-pause-duration": boolean;
+            };
+            required_rules: string[];
+            source: string;
+        };
+        FullLosslessBaselinesListEnvelope: {
+            data: components["schemas"]["FullLosslessBaselines"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullLosslessEvidence: {
+            id: string;
+            project_id: string;
+            device_id: string;
+            port_id: string;
+            rule_id: string;
+            rule_version: string;
+            profile_id: string;
+            model: string;
+            asic: string;
+            nos_version: string;
+            roce_mode: string;
+            baseline_revision: string;
+            config_revision: string;
+            topology_revision: string;
+            source: string;
+            command: string;
+            raw_output_ref: string;
+            parser_version: string;
+            observed_at: string;
+            valid_until: string;
+            window: {
+                start: string;
+                end: string;
+            };
+            scope: {
+                direction: string;
+                switch_priority: number;
+                traffic_class: number;
+                priority_group: string;
+                pool: string;
+                path_ids: string[];
+                traffic_type: string;
+                flow_scope: string;
+            };
+            support: string;
+            freshness: string;
+            coverage: string;
+            execution_id: string;
+            scenario: string;
+            applicable: boolean;
+            not_applicable_reason: string | null;
+            applied: {
+                classification: {
+                    dscp: number;
+                    switch_priority: number;
+                    traffic_class: number;
+                    priority_group: string;
+                    pool: string;
+                }[];
+                pfc_enabled: boolean;
+                ecn_mode: string;
+                ecn_unit: string;
+                ecn_min: number;
+                ecn_max: number;
+                cnp_scheduler: {
+                    traffic_class: number;
+                    policy: string;
+                };
+                buffer: {
+                    mode: string;
+                    priority_group: string;
+                    pool: string;
+                    headroom: number;
+                    unit: string;
+                    small_packet_probability: number;
+                    probability_unit: string;
+                };
+                watchdog_enabled: boolean;
+                watchdog_conditions?: {
+                    "transmit-queue-threshold": boolean;
+                    "tx-frames-threshold": boolean;
+                    "rx-pause-duration": boolean;
+                };
+            };
+            operational: {
+                classification: {
+                    dscp: number;
+                    switch_priority: number;
+                    traffic_class: number;
+                    priority_group: string;
+                    pool: string;
+                }[];
+                pfc_enabled: boolean;
+                ecn_mode: string;
+                ecn_unit: string;
+                ecn_min: number;
+                ecn_max: number;
+                cnp_scheduler: {
+                    traffic_class: number;
+                    policy: string;
+                };
+                buffer: {
+                    mode: string;
+                    priority_group: string;
+                    pool: string;
+                    headroom: number;
+                    unit: string;
+                    small_packet_probability: number;
+                    probability_unit: string;
+                };
+                watchdog_enabled: boolean;
+                watchdog_conditions: {
+                    "transmit-queue-threshold": boolean;
+                    "tx-frames-threshold": boolean;
+                    "rx-pause-duration": boolean;
+                };
+                pfc_rx_enabled: boolean;
+                pfc_tx_enabled: boolean;
+                watchdog_state: string;
+                enabled_detection_conditions?: string[];
+                normalization_ref?: string;
+            };
+            counters: {
+                metric: string;
+                unit: string;
+                direction: string;
+                scope_key: string;
+                start: string;
+                end: string;
+                before: string;
+                after: string;
+                boot_before: string;
+                boot_after: string;
+                epoch_before: string;
+                epoch_after: string;
+                width_bits: number;
+                wrap_confirmed: boolean;
+            }[];
+            test: {
+                host_response_observed: boolean;
+                dual_ended: boolean;
+                traffic_observed: boolean;
+                passed: boolean;
+                evidence_refs: string[];
+            };
+            watchdog_events: {
+                event: string;
+                at: string;
+                evidence_ref: string;
+            }[];
+        };
+        FullLosslessEvidenceListEnvelope: {
+            data: components["schemas"]["FullLosslessEvidence"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullLosslessRawOutputs: {
+            id: string;
+            project_id: string;
+            format: string;
+            notice: string;
+            evidence: {
+                id: string;
+                project_id: string;
+                device_id: string;
+                port_id: string;
+                rule_id: string;
+                rule_version: string;
+                profile_id: string;
+                model: string;
+                asic: string;
+                nos_version: string;
+                roce_mode: string;
+                baseline_revision: string;
+                config_revision: string;
+                topology_revision: string;
+                source: string;
+                command: string;
+                raw_output_ref: string;
+                parser_version: string;
+                observed_at: string;
+                valid_until: string;
+                window: {
+                    start: string;
+                    end: string;
+                };
+                scope: {
+                    direction: string;
+                    switch_priority: number;
+                    traffic_class: number;
+                    priority_group: string;
+                    pool: string;
+                    path_ids: string[];
+                    traffic_type: string;
+                    flow_scope: string;
+                };
+                support: string;
+                freshness: string;
+                coverage: string;
+                execution_id: string;
+                scenario: string;
+                applicable: boolean;
+                not_applicable_reason: string | null;
+                applied: {
+                    classification: {
+                        dscp: number;
+                        switch_priority: number;
+                        traffic_class: number;
+                        priority_group: string;
+                        pool: string;
+                    }[];
+                    pfc_enabled: boolean;
+                    ecn_mode: string;
+                    ecn_unit: string;
+                    ecn_min: number;
+                    ecn_max: number;
+                    cnp_scheduler: {
+                        traffic_class: number;
+                        policy: string;
+                    };
+                    buffer: {
+                        mode: string;
+                        priority_group: string;
+                        pool: string;
+                        headroom: number;
+                        unit: string;
+                        small_packet_probability: number;
+                        probability_unit: string;
+                    };
+                    watchdog_enabled: boolean;
+                    watchdog_conditions?: {
+                        "transmit-queue-threshold": boolean;
+                        "tx-frames-threshold": boolean;
+                        "rx-pause-duration": boolean;
+                    };
+                };
+                operational: {
+                    classification: {
+                        dscp: number;
+                        switch_priority: number;
+                        traffic_class: number;
+                        priority_group: string;
+                        pool: string;
+                    }[];
+                    pfc_enabled: boolean;
+                    ecn_mode: string;
+                    ecn_unit: string;
+                    ecn_min: number;
+                    ecn_max: number;
+                    cnp_scheduler: {
+                        traffic_class: number;
+                        policy: string;
+                    };
+                    buffer: {
+                        mode: string;
+                        priority_group: string;
+                        pool: string;
+                        headroom: number;
+                        unit: string;
+                        small_packet_probability: number;
+                        probability_unit: string;
+                    };
+                    watchdog_enabled: boolean;
+                    watchdog_conditions: {
+                        "transmit-queue-threshold": boolean;
+                        "tx-frames-threshold": boolean;
+                        "rx-pause-duration": boolean;
+                    };
+                    pfc_rx_enabled: boolean;
+                    pfc_tx_enabled: boolean;
+                    watchdog_state: string;
+                    enabled_detection_conditions?: string[];
+                    normalization_ref?: string;
+                };
+                counters: {
+                    metric: string;
+                    unit: string;
+                    direction: string;
+                    scope_key: string;
+                    start: string;
+                    end: string;
+                    before: string;
+                    after: string;
+                    boot_before: string;
+                    boot_after: string;
+                    epoch_before: string;
+                    epoch_after: string;
+                    width_bits: number;
+                    wrap_confirmed: boolean;
+                }[];
+                test: {
+                    host_response_observed: boolean;
+                    dual_ended: boolean;
+                    traffic_observed: boolean;
+                    passed: boolean;
+                    evidence_refs: string[];
+                };
+                watchdog_events: {
+                    event: string;
+                    at: string;
+                    evidence_ref: string;
+                }[];
+            };
+        };
+        FullLosslessRawOutputsListEnvelope: {
+            data: components["schemas"]["FullLosslessRawOutputs"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullLosslessHostEvidence: {
+            id: string;
+            project_id: string;
+            flow_scope: string;
+            start: string;
+            end: string;
+            host_device_id: string;
+            host_port_id: string;
+            port_id: string;
+            observed_response: boolean;
+            valid_until: string;
+            source: string;
+            execution_id: string;
+        };
+        FullLosslessHostEvidenceListEnvelope: {
+            data: components["schemas"]["FullLosslessHostEvidence"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullLosslessCollectors: {
+            id: string;
+            command_template: string;
+            source_columns: string[];
+            counter_paths: string[];
+            supported_profile_versions: string[];
+            native_parser_certification: string;
+            fixture_parser_version: string;
+            unknown_units: string[];
+            read_only: boolean;
+        };
+        FullLosslessCollectorsListEnvelope: {
+            data: components["schemas"]["FullLosslessCollectors"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
     };
     responses: {
         /** @description Invalid request */
@@ -19688,6 +20734,236 @@ export interface operations {
             };
             /** @description Permission denied */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listLosslessEvidence: {
+        parameters: {
+            query?: {
+                port_id?: string;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped evidence result; envelope has request_id */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LosslessResultsEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Frozen revision/idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid evidence or unverified parser/units */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getLosslessConclusion: {
+        parameters: {
+            query?: {
+                port_id?: string;
+                phase?: "NETWORK_READINESS" | "VALIDATION";
+            };
+            header?: never;
+            path: {
+                project_id: string;
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped evidence result; envelope has request_id */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LosslessConclusionEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Frozen revision/idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid evidence or unverified parser/units */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    collectMockLosslessSnapshot: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped evidence result; envelope has request_id */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LosslessResultsEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Frozen revision/idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid evidence or unverified parser/units */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    retestLosslessEvidence: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                device_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LosslessRetestRequest"];
+            };
+        };
+        responses: {
+            /** @description Scoped evidence result; envelope has request_id */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LosslessRetestEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Frozen revision/idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid evidence or unverified parser/units */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getLosslessRawFrame: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                device_id: string;
+                evidence_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped evidence result; envelope has request_id */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LosslessRawEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Frozen revision/idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid evidence or unverified parser/units */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

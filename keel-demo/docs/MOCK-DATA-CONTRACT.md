@@ -167,3 +167,10 @@ VITE_API_MODE=mock
 权威fixture增加topology_fabrics/networks/memberships/observed_networks/bgp_sessions/port_observations/snapshots；VNI/VRF和路由对端是explicit_synthetic_topology_v1独立演示规划/观测，不是从Cable推断。保留原包数据与source_original，双侧LLDP修复报告见TOPOLOGY-DATA-NORMALIZATION.json。覆盖known fault、降级、stale/unknown和rail-8仅规划。64B300/512GPU/24交换机/16机柜/704Cable不增加设备副本。
 
 完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。
+
+
+## 无损网络分层证据 v2
+
+fixture集中增加lossless_rules/profiles/baselines/evidence/raw_outputs/host_evidence/retests，覆盖正常PFC、无流量、relative、合法精确硬件差异、watchdog触发/处置/恢复、reset、stale、双端缺失、lossy/single-ipool、未知/旧补丁。部分端口覆盖保持BLOCKED；明确合成身份/参数不是官方默认，不修改原资产数量。
+
+规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。

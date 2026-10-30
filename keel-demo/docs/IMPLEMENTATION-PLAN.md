@@ -129,3 +129,10 @@ IA v2.3 插入前端 Mock 阶段：先冻结 IA-V2.3.md 的页面注册、作用
 执行顺序：六阶段+BOM独立入口→Rack三区布局与八Tab→Fabric Topology物理/逻辑交互及显式关联→契约/Mock/文档同步。前三部分只做前端Mock；集中构建/浏览器由用户安排，未验证保持NOT RUN，之后逐模块考虑Go。
 
 完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。
+
+
+## 无损网络分层证据 v2
+
+先官方章节核对/迁移表→规则/证据专用契约→集中Mock反例与只读适配计划→共享组件及六阶段/Issues联动→相关规则/契约检查→提交keel-new。后续需取得真实脱敏NVUE输出、单位/能力/采样误差和主机响应证据后认证collector，不提前实现Go或自动调参。
+
+规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。
