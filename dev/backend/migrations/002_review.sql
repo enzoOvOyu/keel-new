@@ -1,0 +1,10 @@
+ALTER TABLE bom_import_batch ADD COLUMN IF NOT EXISTS profiles jsonb NOT NULL DEFAULT '[]';
+ALTER TABLE bom_import_batch ADD COLUMN IF NOT EXISTS mapping_confirmed boolean NOT NULL DEFAULT false;
+CREATE TABLE IF NOT EXISTS bom_mapping_template(project_id text NOT NULL,name text NOT NULL,revision int NOT NULL,profiles jsonb NOT NULL,approved_by text NOT NULL,created_at timestamptz NOT NULL DEFAULT now(),PRIMARY KEY(project_id,name,revision));
+CREATE TABLE IF NOT EXISTS bom_item_revision(revision_id uuid NOT NULL REFERENCES bom_revision(id),item_uid uuid NOT NULL REFERENCES bom_item(item_uid),payload jsonb NOT NULL,PRIMARY KEY(revision_id,item_uid));
+CREATE TABLE IF NOT EXISTS cmdb_relationship(from_uid uuid NOT NULL REFERENCES bom_item(item_uid),to_uid uuid NOT NULL REFERENCES bom_item(item_uid),kind text NOT NULL,revision_id uuid NOT NULL REFERENCES bom_revision(id),PRIMARY KEY(from_uid,to_uid,kind,revision_id));
+CREATE TABLE IF NOT EXISTS ai_task(id uuid PRIMARY KEY,import_id uuid NOT NULL REFERENCES bom_import_batch(id),mode text NOT NULL,task text NOT NULL,status text NOT NULL,diagnostic jsonb NOT NULL,created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS idempotency_record(project_id text NOT NULL,key text NOT NULL,request_digest text NOT NULL,import_id uuid NOT NULL REFERENCES bom_import_batch(id),PRIMARY KEY(project_id,key));
+INSERT INTO schema_migration(version) VALUES(2) ON CONFLICT DO NOTHING;
+CREATE OR REPLACE VIEW physical_port AS SELECT item_uid AS physical_port_uid,parent_uid,payload->>'port_index' AS port_index,payload FROM bom_item WHERE category='port';
+CREATE OR REPLACE VIEW rack_placement AS SELECT item_uid,payload->'fields'->>'rack' AS rack,payload->'fields'->>'u_start' AS u_start,payload->'fields'->>'u_height' AS u_height FROM bom_item WHERE payload->'fields'->>'rack' IS NOT NULL;

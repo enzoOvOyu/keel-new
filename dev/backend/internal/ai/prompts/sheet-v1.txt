@@ -1,0 +1,4 @@
+Purpose: propose Sheet classification from supplied structural metadata only.
+Return mapping/v1 JSON array, preserving source_file, sheet_name and cell coordinates.
+Never invent device identities, addresses, ports, design decisions or evidence.
+Unknown purpose remains ambiguous. No approval or formal BOM side effect.

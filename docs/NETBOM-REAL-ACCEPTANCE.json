@@ -1,0 +1,21 @@
+{
+  "source": "netbom.xlsx",
+  "mode": "rules",
+  "real_upload_parse": "PASS",
+  "sheet_count": 15,
+  "nonempty_cells": 162715,
+  "merged_regions": 311,
+  "formula_cells": 94353,
+  "source_sha256": "f954180234216185c0e97daeace4fe2a42e6bf90b1657f75a3247308721d32ec",
+  "profile_count": 15,
+  "validation_blocking": "PASS",
+  "commit_rejection": "PASS",
+  "formal_sample_commit": "BLOCKED_PENDING_HUMAN_REVIEW",
+  "issues_by_rule": {
+    "BOM-NONEMPTY": 1,
+    "PROFILE-CONFIRM": 15,
+    "MAPPING-REVIEW": 1
+  },
+  "no_real_ai_call": true,
+  "note": "No automatic approval, fabricated serial/port or publication of unreviewed real customer data."
+}

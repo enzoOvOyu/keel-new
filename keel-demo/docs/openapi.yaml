@@ -2,15 +2,12 @@ openapi: 3.1.0
 info:
   title: keel Delivery Platform API
   version: 2.4.1-six-stage-mock
-  description: UI-first API contract for keel. Domain-specific semantics are
-    documented in docs/DOMAIN-API-CONTRACTS.md. Remaining generic schemas must
-    be replaced with concrete schemas before implementing the corresponding
-    backend domain. Mock and Go implementations must conform to this OpenAPI
-    contract.
+  description: UI-first API contract for keel. Domain-specific semantics are documented in docs/DOMAIN-API-CONTRACTS.md. Remaining generic schemas must be replaced with concrete schemas before implementing the corresponding backend domain. Mock and Go implementations must conform to this OpenAPI contract.
 servers:
   - url: /api/v1
 security:
   - bearerAuth: []
+  - cookieSession: []
 tags:
   - name: BOM Import
   - name: BOM
@@ -90,6 +87,25 @@ paths:
           $ref: "#/components/responses/Conflict"
         "413":
           $ref: "#/components/responses/PayloadTooLarge"
+    get:
+      tags:
+        - BOM Import
+      operationId: listRealProjectBOMImports
+      responses:
+        "200":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listRealProjectBOMImportsEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
   /bom-imports/{import_id}:
     parameters:
       - $ref: "#/components/parameters/ImportId"
@@ -1743,8 +1759,7 @@ paths:
           schema:
             type: string
       deprecated: true
-      description: Legacy gate history only. Old numeric gates never unlock the
-        six-stage delivery pipeline.
+      description: Legacy gate history only. Old numeric gates never unlock the six-stage delivery pipeline.
     post:
       tags:
         - Gates
@@ -1752,8 +1767,7 @@ paths:
       operationId: createGateEvidence
       responses:
         "410":
-          description: Legacy gate writes retired. Use delivery stage commands and
-            validation check operations.
+          description: Legacy gate writes retired. Use delivery stage commands and validation check operations.
       parameters:
         - name: Idempotency-Key
           in: header
@@ -1761,8 +1775,7 @@ paths:
           schema:
             type: string
       deprecated: true
-      description: Legacy gate history only. Old numeric gates never unlock the
-        six-stage delivery pipeline.
+      description: Legacy gate history only. Old numeric gates never unlock the six-stage delivery pipeline.
   /projects/{project_id}/gates/{gate_id}:
     parameters:
       - $ref: "#/components/parameters/ProjectId"
@@ -1790,8 +1803,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       deprecated: true
-      description: Legacy gate history only. Old numeric gates never unlock the
-        six-stage delivery pipeline.
+      description: Legacy gate history only. Old numeric gates never unlock the six-stage delivery pipeline.
     patch:
       tags:
         - Gates
@@ -1799,8 +1811,7 @@ paths:
       operationId: updateGateEvidence
       responses:
         "410":
-          description: Legacy gate writes retired. Use delivery stage commands and
-            validation check operations.
+          description: Legacy gate writes retired. Use delivery stage commands and validation check operations.
       parameters:
         - name: If-Match
           in: header
@@ -1808,8 +1819,7 @@ paths:
           schema:
             type: string
       deprecated: true
-      description: Legacy gate history only. Old numeric gates never unlock the
-        six-stage delivery pipeline.
+      description: Legacy gate history only. Old numeric gates never unlock the six-stage delivery pipeline.
   /projects/{project_id}/issues:
     parameters:
       - name: project_id
@@ -3662,76 +3672,44 @@ paths:
     parameters: []
     get:
       tags:
-        - Auth
-      summary: Get current session
-      operationId: getSession
+        - BOM Import
+      operationId: getBOMLocalSession
       responses:
         "200":
-          description: Success
+          description: Project-authorized versioned BOM operation
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ResourceEnvelope"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+                $ref: "#/components/schemas/getBOMLocalSessionEnvelope"
+        "400":
+          description: Invalid request
         "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      parameters:
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 200
-            default: 50
-        - name: cursor
-          in: query
-          schema:
-            type: string
-        - name: q
-          in: query
-          schema:
-            type: string
-        - name: status
-          in: query
-          schema:
-            type: string
-        - name: sort
-          in: query
-          schema:
-            type: string
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
   /auth/logout:
     parameters: []
     post:
       tags:
-        - Auth
-      summary: Logout and revoke session
-      operationId: logout
+        - BOM Import
+      operationId: logoutBOMLocalSession
       responses:
         "200":
-          description: Success
+          description: Project-authorized versioned BOM operation
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ResourceEnvelope"
+                $ref: "#/components/schemas/logoutBOMLocalSessionEnvelope"
         "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+          description: Invalid request
         "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
+          description: Scope/permission denied
         "409":
-          $ref: "#/components/responses/Conflict"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/EmptyRequest"
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
   /project-permissions:
     parameters: []
     get:
@@ -4234,9 +4212,7 @@ paths:
         - Operations
       operationId: opsListDevices
       summary: List managed devices in delivery and operations scopes
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - name: rack_id
           in: query
@@ -4416,9 +4392,7 @@ paths:
         - Operations
       operationId: opsGetDeviceDetail
       summary: Get unified server or switch operations detail
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters: []
       responses:
         "200":
@@ -4491,9 +4465,7 @@ paths:
         - Operations
       operationId: opsListConfigurations
       summary: Query configurations with provenance, capability, freshness and history
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - name: since
           in: query
@@ -4611,9 +4583,7 @@ paths:
         - Operations
       operationId: opsListConfigDiffs
       summary: Query config-diffs with provenance, capability, freshness and history
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - name: since
           in: query
@@ -4721,9 +4691,7 @@ paths:
         - Operations
       operationId: opsListPorts
       summary: Query ports with provenance, capability, freshness and history
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - name: since
           in: query
@@ -4837,9 +4805,7 @@ paths:
         - Operations
       operationId: opsListTelemetry
       summary: Query telemetry with provenance, capability, freshness and history
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - name: since
           in: query
@@ -4947,9 +4913,7 @@ paths:
         - Operations
       operationId: opsListLLDP
       summary: Query lldp with provenance, capability, freshness and history
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - name: since
           in: query
@@ -5063,9 +5027,7 @@ paths:
         - Operations
       operationId: opsListFDB
       summary: Query fdb with provenance, capability, freshness and history
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - name: since
           in: query
@@ -5179,9 +5141,7 @@ paths:
         - Operations
       operationId: opsListARP
       summary: Query arp with provenance, capability, freshness and history
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - name: since
           in: query
@@ -5295,9 +5255,7 @@ paths:
         - Operations
       operationId: opsListDDM
       summary: Query ddm with provenance, capability, freshness and history
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - name: since
           in: query
@@ -5411,9 +5369,7 @@ paths:
         - Operations
       operationId: opsListMetrics
       summary: Query metrics with provenance, capability, freshness and history
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - name: since
           in: query
@@ -5550,9 +5506,7 @@ paths:
         - Operations
       operationId: opsListLogs
       summary: Query logs with provenance, capability, freshness and history
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - name: since
           in: query
@@ -5672,9 +5626,7 @@ paths:
         - Operations
       operationId: opsListFirmware
       summary: Query firmware with provenance, capability, freshness and history
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - name: since
           in: query
@@ -5782,9 +5734,7 @@ paths:
         - Operations
       operationId: opsGetBmc
       summary: Read BMC capability, allowed IPMI state and historical sensors
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters: []
       responses:
         "200":
@@ -5857,9 +5807,7 @@ paths:
         - Operations
       operationId: opsListBmcSEL
       summary: Query BMC SEL events without widening device access
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - name: since
           in: query
@@ -5967,9 +5915,7 @@ paths:
         - Operations
       operationId: opsGetAssetLinks
       summary: Read linked BOM, CMDB, jobs, alerts, issues and audit IDs
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - name: limit
           in: query
@@ -6057,9 +6003,7 @@ paths:
         - Operations
       operationId: opsCreatePowerJob
       summary: Create an approved, confirmed and leased power operation
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
         - $ref: "#/components/parameters/IfMatch"
@@ -6141,9 +6085,7 @@ paths:
         - Operations
       operationId: opsCreateFirmwareUpgrade
       summary: Create a firmware plan; never flash automatically
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
       responses:
@@ -6224,9 +6166,7 @@ paths:
         - Operations
       operationId: opsGetFirmwareUpgrade
       summary: Read firmware plan, approval, execution and verification
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters: []
       responses:
         "200":
@@ -6299,9 +6239,7 @@ paths:
         - Operations
       operationId: opsApproveFirmwareUpgrade
       summary: Approve a frozen compatible firmware plan
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
         - $ref: "#/components/parameters/IfMatch"
@@ -6383,9 +6321,7 @@ paths:
         - Operations
       operationId: opsExecuteFirmwareUpgrade
       summary: Execute approved firmware plan only on permitted channel
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
         - $ref: "#/components/parameters/IfMatch"
@@ -6463,9 +6399,7 @@ paths:
         - Operations
       operationId: opsListCollectionPolicies
       summary: List periodic collection policies
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - name: limit
           in: query
@@ -6546,9 +6480,7 @@ paths:
         - Operations
       operationId: opsCreateCollectionPolicy
       summary: Create a scoped periodic collection policy
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
       responses:
@@ -6629,9 +6561,7 @@ paths:
         - Operations
       operationId: opsUpdateCollectionPolicy
       summary: Version collection schedule, timeout and freshness policy
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
         - $ref: "#/components/parameters/IfMatch"
@@ -6713,9 +6643,7 @@ paths:
         - Operations
       operationId: opsCreateCollectionJob
       summary: Refresh permitted observations using frozen policy and capabilities
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
       responses:
@@ -6796,9 +6724,7 @@ paths:
         - Operations
       operationId: opsGetCollectionJob
       summary: Read collection state, attempts, timeout and last success
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters: []
       responses:
         "200":
@@ -6871,9 +6797,7 @@ paths:
         - Operations
       operationId: opsRetryCollectionJob
       summary: Retry safe collection after current permission and channel checks
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
         - $ref: "#/components/parameters/IfMatch"
@@ -6955,9 +6879,7 @@ paths:
         - Operations
       operationId: opsListMaintenanceEvents
       summary: Read maintenance, repair and revalidation history
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - name: since
           in: query
@@ -7058,9 +6980,7 @@ paths:
         - Operations
       operationId: opsCreateMaintenanceEvent
       summary: Apply audited maintenance transition without reopening channels
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
         - $ref: "#/components/parameters/IfMatch"
@@ -7142,9 +7062,7 @@ paths:
         - Operations
       operationId: opsCreateRetirementJob
       summary: Retire device with approved retention, stop and revocation plans
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
         - $ref: "#/components/parameters/IfMatch"
@@ -7226,9 +7144,7 @@ paths:
         - Operations
       operationId: opsGetJob
       summary: Read scoped operations job and evidence references
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters: []
       responses:
         "200":
@@ -7301,9 +7217,7 @@ paths:
         - Operations
       operationId: opsGetRetentionPolicy
       summary: Read approved retention and legal hold policy
-      description: OPS-2026-10-29 design contract; not an implementation claim.
-        Enforce project RBAC and maintained/IPMI-only before execution;
-        observations remain immutable.
+      description: OPS-2026-10-29 design contract; not an implementation claim. Enforce project RBAC and maintained/IPMI-only before execution; observations remain immutable.
       parameters: []
       responses:
         "200":
@@ -7522,10 +7436,7 @@ paths:
         - IA
       operationId: streamIAEvents
       summary: Resume authorized execution, port and alert events using Last-Event-ID
-      description: Server authorizes project scope at connect and event delivery,
-        deduplicates by event_id and supports replay after Last-Event-ID.
-        Permission revocation closes or re-authorizes the stream. No real device
-        connection in mock.
+      description: Server authorizes project scope at connect and event delivery, deduplicates by event_id and supports replay after Last-Event-ID. Permission revocation closes or re-authorizes the stream. No real device connection in mock.
       parameters:
         - name: project_id
           in: query
@@ -7573,8 +7484,7 @@ paths:
       tags:
         - IA
       operationId: listIAAIProvider
-      description: Frontend-first resource contract. Authorized project scope; no real
-        execution or secrets.
+      description: Frontend-first resource contract. Authorized project scope; no real execution or secrets.
       parameters:
         - name: project_id
           in: query
@@ -7594,8 +7504,7 @@ paths:
       tags:
         - IA
       operationId: listIAAIJob
-      description: Frontend-first resource contract. Authorized project scope; no real
-        execution or secrets.
+      description: Frontend-first resource contract. Authorized project scope; no real execution or secrets.
       parameters:
         - name: project_id
           in: query
@@ -7615,8 +7524,7 @@ paths:
       tags:
         - IA
       operationId: listIAKnowledgeSource
-      description: Frontend-first resource contract. Authorized project scope; no real
-        execution or secrets.
+      description: Frontend-first resource contract. Authorized project scope; no real execution or secrets.
       parameters:
         - name: project_id
           in: query
@@ -7636,8 +7544,7 @@ paths:
       tags:
         - IA
       operationId: listIAAIFeedback
-      description: Frontend-first resource contract. Authorized project scope; no real
-        execution or secrets.
+      description: Frontend-first resource contract. Authorized project scope; no real execution or secrets.
       parameters:
         - name: project_id
           in: query
@@ -7657,8 +7564,7 @@ paths:
       tags:
         - IA
       operationId: listIANotificationSetting
-      description: Frontend-first resource contract. Authorized project scope; no real
-        execution or secrets.
+      description: Frontend-first resource contract. Authorized project scope; no real execution or secrets.
       parameters:
         - name: project_id
           in: query
@@ -7678,8 +7584,7 @@ paths:
       tags:
         - IA
       operationId: listIAAPIToken
-      description: Frontend-first resource contract. Authorized project scope; no real
-        execution or secrets.
+      description: Frontend-first resource contract. Authorized project scope; no real execution or secrets.
       parameters:
         - name: project_id
           in: query
@@ -7699,8 +7604,7 @@ paths:
       tags:
         - IA
       operationId: listIASshTrust
-      description: Frontend-first resource contract. Authorized project scope; no real
-        execution or secrets.
+      description: Frontend-first resource contract. Authorized project scope; no real execution or secrets.
       parameters:
         - name: project_id
           in: query
@@ -7720,8 +7624,7 @@ paths:
       tags:
         - IA
       operationId: listIACollectionPolicy
-      description: Frontend-first resource contract. Authorized project scope; no real
-        execution or secrets.
+      description: Frontend-first resource contract. Authorized project scope; no real execution or secrets.
       parameters:
         - name: project_id
           in: query
@@ -9720,8 +9623,7 @@ paths:
         "403":
           description: Project or resource permission denied
       deprecated: true
-      description: Legacy gate history only. Old numeric gates never unlock the
-        six-stage delivery pipeline.
+      description: Legacy gate history only. Old numeric gates never unlock the six-stage delivery pipeline.
   /delivery/mapping-revisions:
     get:
       operationId: fullmappingrevisionsdeliverymappingrevisions
@@ -10222,9 +10124,7 @@ paths:
       operationId: listDeliveryStages
       tags:
         - Delivery Lifecycle
-      description: Six ordered delivery stages. Server/provider verifies project,
-        frozen targets, versions, evidence and previous stages. SIMULATION_ONLY
-        in the current frontend.
+      description: Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend.
       parameters:
         - name: project_id
           in: path
@@ -10249,9 +10149,7 @@ paths:
       operationId: getDeliveryStageSummary
       tags:
         - Delivery Lifecycle
-      description: Six ordered delivery stages. Server/provider verifies project,
-        frozen targets, versions, evidence and previous stages. SIMULATION_ONLY
-        in the current frontend.
+      description: Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend.
       parameters:
         - name: project_id
           in: path
@@ -10276,9 +10174,7 @@ paths:
       operationId: startDeliveryStage
       tags:
         - Delivery Lifecycle
-      description: Six ordered delivery stages. Server/provider verifies project,
-        frozen targets, versions, evidence and previous stages. SIMULATION_ONLY
-        in the current frontend.
+      description: Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend.
       parameters:
         - name: project_id
           in: path
@@ -10321,9 +10217,7 @@ paths:
       operationId: completeDeliveryStage
       tags:
         - Delivery Lifecycle
-      description: Six ordered delivery stages. Server/provider verifies project,
-        frozen targets, versions, evidence and previous stages. SIMULATION_ONLY
-        in the current frontend.
+      description: Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend.
       parameters:
         - name: project_id
           in: path
@@ -10366,9 +10260,7 @@ paths:
       operationId: waiveDeliveryStage
       tags:
         - Delivery Lifecycle
-      description: Six ordered delivery stages. Server/provider verifies project,
-        frozen targets, versions, evidence and previous stages. SIMULATION_ONLY
-        in the current frontend.
+      description: Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend.
       parameters:
         - name: project_id
           in: path
@@ -10411,9 +10303,7 @@ paths:
       operationId: listValidationChecks
       tags:
         - Delivery Lifecycle
-      description: Six ordered delivery stages. Server/provider verifies project,
-        frozen targets, versions, evidence and previous stages. SIMULATION_ONLY
-        in the current frontend.
+      description: Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend.
       parameters:
         - name: project_id
           in: path
@@ -10438,9 +10328,7 @@ paths:
       operationId: applyMockValidationRemediation
       tags:
         - Delivery Lifecycle
-      description: Six ordered delivery stages. Server/provider verifies project,
-        frozen targets, versions, evidence and previous stages. SIMULATION_ONLY
-        in the current frontend.
+      description: Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend.
       parameters:
         - name: issue_id
           in: path
@@ -10471,9 +10359,7 @@ paths:
       operationId: startValidationRetest
       tags:
         - Delivery Lifecycle
-      description: Six ordered delivery stages. Server/provider verifies project,
-        frozen targets, versions, evidence and previous stages. SIMULATION_ONLY
-        in the current frontend.
+      description: Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend.
       parameters:
         - name: issue_id
           in: path
@@ -10504,9 +10390,7 @@ paths:
       operationId: listHandoverRecords
       tags:
         - Delivery Lifecycle
-      description: Six ordered delivery stages. Server/provider verifies project,
-        frozen targets, versions, evidence and previous stages. SIMULATION_ONLY
-        in the current frontend.
+      description: Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend.
       parameters:
         - name: project_id
           in: path
@@ -10530,9 +10414,7 @@ paths:
       operationId: prepareHandover
       tags:
         - Delivery Lifecycle
-      description: Six ordered delivery stages. Server/provider verifies project,
-        frozen targets, versions, evidence and previous stages. SIMULATION_ONLY
-        in the current frontend.
+      description: Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend.
       parameters:
         - name: project_id
           in: path
@@ -10563,9 +10445,7 @@ paths:
       operationId: advanceHandoverStep
       tags:
         - Delivery Lifecycle
-      description: Six ordered delivery stages. Server/provider verifies project,
-        frozen targets, versions, evidence and previous stages. SIMULATION_ONLY
-        in the current frontend.
+      description: Six ordered delivery stages. Server/provider verifies project, frozen targets, versions, evidence and previous stages. SIMULATION_ONLY in the current frontend.
       parameters:
         - name: handover_id
           in: path
@@ -10944,8 +10824,7 @@ paths:
           required: false
       responses:
         "200":
-          description: Dual-end evidence, logical/physical association and configuration
-            diff
+          description: Dual-end evidence, logical/physical association and configuration diff
           content:
             application/json:
               schema:
@@ -10979,11 +10858,7 @@ paths:
       operationId: listLosslessEvidence
       tags:
         - Lossless Evidence
-      description: SIMULATION_ONLY now. Explicit project scope, fabric:read or
-        NE/NDE/DE/SRE write permission. Native NVUE parser certification
-        pending. Never clears device counters or tunes configuration. Missing
-        mandatory evidence BLOCKED. Current configuration/topology changes
-        invalidate previous proof.
+      description: SIMULATION_ONLY now. Explicit project scope, fabric:read or NE/NDE/DE/SRE write permission. Native NVUE parser certification pending. Never clears device counters or tunes configuration. Missing mandatory evidence BLOCKED. Current configuration/topology changes invalidate previous proof.
       parameters:
         - name: project_id
           in: path
@@ -11017,11 +10892,7 @@ paths:
       operationId: getLosslessConclusion
       tags:
         - Lossless Evidence
-      description: SIMULATION_ONLY now. Explicit project scope, fabric:read or
-        NE/NDE/DE/SRE write permission. Native NVUE parser certification
-        pending. Never clears device counters or tunes configuration. Missing
-        mandatory evidence BLOCKED. Current configuration/topology changes
-        invalidate previous proof.
+      description: SIMULATION_ONLY now. Explicit project scope, fabric:read or NE/NDE/DE/SRE write permission. Native NVUE parser certification pending. Never clears device counters or tunes configuration. Missing mandatory evidence BLOCKED. Current configuration/topology changes invalidate previous proof.
       parameters:
         - name: project_id
           in: path
@@ -11062,11 +10933,7 @@ paths:
       operationId: collectMockLosslessSnapshot
       tags:
         - Lossless Evidence
-      description: SIMULATION_ONLY now. Explicit project scope, fabric:read or
-        NE/NDE/DE/SRE write permission. Native NVUE parser certification
-        pending. Never clears device counters or tunes configuration. Missing
-        mandatory evidence BLOCKED. Current configuration/topology changes
-        invalidate previous proof.
+      description: SIMULATION_ONLY now. Explicit project scope, fabric:read or NE/NDE/DE/SRE write permission. Native NVUE parser certification pending. Never clears device counters or tunes configuration. Missing mandatory evidence BLOCKED. Current configuration/topology changes invalidate previous proof.
       parameters:
         - name: project_id
           in: path
@@ -11096,11 +10963,7 @@ paths:
       operationId: retestLosslessEvidence
       tags:
         - Lossless Evidence
-      description: SIMULATION_ONLY now. Explicit project scope, fabric:read or
-        NE/NDE/DE/SRE write permission. Native NVUE parser certification
-        pending. Never clears device counters or tunes configuration. Missing
-        mandatory evidence BLOCKED. Current configuration/topology changes
-        invalidate previous proof.
+      description: SIMULATION_ONLY now. Explicit project scope, fabric:read or NE/NDE/DE/SRE write permission. Native NVUE parser certification pending. Never clears device counters or tunes configuration. Missing mandatory evidence BLOCKED. Current configuration/topology changes invalidate previous proof.
       parameters:
         - name: project_id
           in: path
@@ -11136,11 +10999,7 @@ paths:
       operationId: getLosslessRawFrame
       tags:
         - Lossless Evidence
-      description: SIMULATION_ONLY now. Explicit project scope, fabric:read or
-        NE/NDE/DE/SRE write permission. Native NVUE parser certification
-        pending. Never clears device counters or tunes configuration. Missing
-        mandatory evidence BLOCKED. Current configuration/topology changes
-        invalidate previous proof.
+      description: SIMULATION_ONLY now. Explicit project scope, fabric:read or NE/NDE/DE/SRE write permission. Native NVUE parser certification pending. Never clears device counters or tunes configuration. Missing mandatory evidence BLOCKED. Current configuration/topology changes invalidate previous proof.
       parameters:
         - name: project_id
           in: path
@@ -11175,9 +11034,7 @@ paths:
       operationId: queryCmdbDossierCatalog
       tags:
         - CMDB Dossier
-      description: Authorized cross-project projection. No duplicate asset identity.
-        Separate planning and observations. Read queries are on-demand; write
-        only whitelisted manual fields. All synthetic in current demo.
+      description: Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo.
       parameters:
         - name: project_id
           in: query
@@ -11250,9 +11107,7 @@ paths:
       operationId: getCmdbDossierTree
       tags:
         - CMDB Dossier
-      description: Authorized cross-project projection. No duplicate asset identity.
-        Separate planning and observations. Read queries are on-demand; write
-        only whitelisted manual fields. All synthetic in current demo.
+      description: Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo.
       parameters:
         - name: project_id
           in: query
@@ -11280,9 +11135,7 @@ paths:
       operationId: getCmdbDossierRelations
       tags:
         - CMDB Dossier
-      description: Authorized cross-project projection. No duplicate asset identity.
-        Separate planning and observations. Read queries are on-demand; write
-        only whitelisted manual fields. All synthetic in current demo.
+      description: Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo.
       parameters:
         - name: project_id
           in: query
@@ -11337,9 +11190,7 @@ paths:
       operationId: getCmdbDossierprovenance
       tags:
         - CMDB Dossier
-      description: Authorized cross-project projection. No duplicate asset identity.
-        Separate planning and observations. Read queries are on-demand; write
-        only whitelisted manual fields. All synthetic in current demo.
+      description: Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo.
       parameters:
         - name: asset_id
           in: path
@@ -11372,9 +11223,7 @@ paths:
       operationId: getCmdbDossierconfiguration
       tags:
         - CMDB Dossier
-      description: Authorized cross-project projection. No duplicate asset identity.
-        Separate planning and observations. Read queries are on-demand; write
-        only whitelisted manual fields. All synthetic in current demo.
+      description: Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo.
       parameters:
         - name: asset_id
           in: path
@@ -11407,9 +11256,7 @@ paths:
       operationId: getCmdbDossierlifecycle
       tags:
         - CMDB Dossier
-      description: Authorized cross-project projection. No duplicate asset identity.
-        Separate planning and observations. Read queries are on-demand; write
-        only whitelisted manual fields. All synthetic in current demo.
+      description: Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo.
       parameters:
         - name: asset_id
           in: path
@@ -11442,9 +11289,7 @@ paths:
       operationId: getCmdbDossierQuality
       tags:
         - CMDB Dossier
-      description: Authorized cross-project projection. No duplicate asset identity.
-        Separate planning and observations. Read queries are on-demand; write
-        only whitelisted manual fields. All synthetic in current demo.
+      description: Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo.
       parameters:
         - name: project_id
           in: query
@@ -11476,9 +11321,7 @@ paths:
       operationId: patchCmdbManualFields
       tags:
         - CMDB Dossier
-      description: Authorized cross-project projection. No duplicate asset identity.
-        Separate planning and observations. Read queries are on-demand; write
-        only whitelisted manual fields. All synthetic in current demo.
+      description: Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo.
       parameters: []
       responses:
         "200":
@@ -11508,9 +11351,7 @@ paths:
       operationId: listCmdbSavedViews
       tags:
         - CMDB Dossier
-      description: Authorized cross-project projection. No duplicate asset identity.
-        Separate planning and observations. Read queries are on-demand; write
-        only whitelisted manual fields. All synthetic in current demo.
+      description: Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo.
       parameters:
         - name: project_id
           in: query
@@ -11537,9 +11378,7 @@ paths:
       operationId: createCmdbSavedView
       tags:
         - CMDB Dossier
-      description: Authorized cross-project projection. No duplicate asset identity.
-        Separate planning and observations. Read queries are on-demand; write
-        only whitelisted manual fields. All synthetic in current demo.
+      description: Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo.
       parameters: []
       responses:
         "200":
@@ -11569,9 +11408,7 @@ paths:
       operationId: getCmdbDossierEvidence
       tags:
         - CMDB Dossier
-      description: Authorized cross-project projection. No duplicate asset identity.
-        Separate planning and observations. Read queries are on-demand; write
-        only whitelisted manual fields. All synthetic in current demo.
+      description: Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo.
       parameters:
         - name: resource
           in: path
@@ -11604,12 +11441,547 @@ paths:
           description: Frozen project or version conflict
         "422":
           description: Invalid request
+  /bom-imports/{import_id}/profiles:
+    parameters:
+      - $ref: "#/components/parameters/ImportId"
+    get:
+      tags:
+        - BOM Import
+      operationId: getBOMSheetProfiles
+      responses:
+        "200":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getBOMSheetProfilesEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
+    patch:
+      tags:
+        - BOM Import
+      operationId: saveBOMSheetProfiles
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BOMProfileCommand"
+      responses:
+        "200":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/saveBOMSheetProfilesEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
+  /bom-imports/{import_id}/draft:
+    parameters:
+      - $ref: "#/components/parameters/ImportId"
+    get:
+      tags:
+        - BOM Import
+      operationId: getBOMDraft
+      responses:
+        "200":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getBOMDraftEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
+    patch:
+      tags:
+        - BOM Import
+      operationId: saveBOMDraft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BOMDraftCommand"
+      responses:
+        "200":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/saveBOMDraftEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
+  /bom-imports/{import_id}/relations:
+    parameters:
+      - $ref: "#/components/parameters/ImportId"
+    get:
+      tags:
+        - BOM Import
+      operationId: getBOMRelationCandidates
+      responses:
+        "200":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getBOMRelationCandidatesEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
+  /bom-imports/{import_id}/review:
+    parameters:
+      - $ref: "#/components/parameters/ImportId"
+    post:
+      tags:
+        - BOM Import
+      operationId: reviewBOMDraft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BOMRevisionCommand"
+      responses:
+        "200":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/reviewBOMDraftEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
+  /bom-imports/{import_id}/retry:
+    parameters:
+      - $ref: "#/components/parameters/ImportId"
+    post:
+      tags:
+        - BOM Import
+      operationId: retryBOMParsing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BOMRevisionCommand"
+      responses:
+        "202":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/retryBOMParsingEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
+  /bom-imports/{import_id}/ai-tasks:
+    parameters:
+      - $ref: "#/components/parameters/ImportId"
+    get:
+      tags:
+        - BOM Import
+      operationId: listBOMAITasks
+      responses:
+        "200":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listBOMAITasksEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
+    post:
+      tags:
+        - BOM Import
+      operationId: runBOMAIRecognition
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BOMAICommand"
+      responses:
+        "200":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/runBOMAIRecognitionEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
+  /bom-imports/{import_id}/publication:
+    parameters:
+      - $ref: "#/components/parameters/ImportId"
+    get:
+      tags:
+        - BOM Import
+      operationId: getBOMPublication
+      responses:
+        "200":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getBOMPublicationEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
+  /bom-models:
+    parameters: []
+    get:
+      tags:
+        - BOM Import
+      operationId: listApprovedBOMModels
+      responses:
+        "200":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listApprovedBOMModelsEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
+    post:
+      tags:
+        - BOM Import
+      operationId: approveBOMModel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BOMModelCommand"
+      responses:
+        "201":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/approveBOMModelEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
+  /bom-mapping-templates:
+    parameters: []
+    get:
+      tags:
+        - BOM Import
+      operationId: listProjectBOMTemplates
+      responses:
+        "200":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listProjectBOMTemplatesEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
+    post:
+      tags:
+        - BOM Import
+      operationId: approveProjectBOMTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BOMTemplateCommand"
+      responses:
+        "201":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/approveProjectBOMTemplateEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
+  /bom-imports/{import_id}/evaluate:
+    parameters:
+      - $ref: "#/components/parameters/ImportId"
+    post:
+      tags:
+        - BOM Import
+      operationId: evaluateBOMRecognition
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BOMAICommand"
+      responses:
+        "200":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/evaluateBOMRecognitionEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
+  /bom-imports/{import_id}/history:
+    parameters:
+      - $ref: "#/components/parameters/ImportId"
+    get:
+      tags:
+        - BOM Import
+      operationId: getBOMReviewHistory
+      responses:
+        "200":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getBOMReviewHistoryEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
+  /bom-imports/{import_id}/package:
+    parameters:
+      - $ref: "#/components/parameters/ImportId"
+    get:
+      tags:
+        - BOM Import
+      operationId: downloadBOMPackage
+      responses:
+        "200":
+          description: Immutable standard CSV ZIP package
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+        "422":
+          description: Unresolved import blockers
+  /cmdb/published-assets:
+    parameters: []
+    get:
+      tags:
+        - BOM Import
+      operationId: listPublishedBOMAssets
+      responses:
+        "200":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listPublishedBOMAssetsEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
+  /auth/login:
+    parameters: []
+    post:
+      tags:
+        - BOM Import
+      operationId: loginBOMLocalSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BOMLogin"
+      responses:
+        "200":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/loginBOMLocalSessionEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
+      security: []
+  /bom-rules:
+    parameters: []
+    get:
+      tags:
+        - BOM Import
+      operationId: listBOMEngineeringRules
+      responses:
+        "200":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listBOMEngineeringRulesEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
+  /bom-imports/{import_id}/ai-candidates/{task_id}/apply:
+    parameters:
+      - $ref: "#/components/parameters/ImportId"
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      tags:
+        - BOM Import
+      operationId: confirmBOMAICandidates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BOMApplyCandidateCommand"
+      responses:
+        "200":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/confirmBOMAICandidatesEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
+  /bom-imports/{import_id}/placements:
+    parameters:
+      - $ref: "#/components/parameters/ImportId"
+    patch:
+      tags:
+        - BOM Import
+      operationId: confirmBOMPlacement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BOMPlacementCommand"
+      responses:
+        "200":
+          description: Project-authorized versioned BOM operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/confirmBOMPlacementEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Scope/permission denied
+        "409":
+          description: Revision/state conflict
+        "422":
+          description: Unresolved engineering or review precondition
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    cookieSession:
+      type: apiKey
+      in: cookie
+      name: keel_session
   parameters:
     ProjectId:
       in: path
@@ -11838,6 +12210,90 @@ components:
         created_at:
           type: string
           format: date-time
+        revision:
+          type: integer
+        internal_status:
+          type: string
+        draft:
+          type: array
+          items:
+            $ref: "#/components/schemas/BOMDraftItem"
+        workbook:
+          type: object
+          properties:
+            sheets:
+              type: array
+              items:
+                type: object
+                properties:
+                  sheet_name:
+                    type: string
+                  order:
+                    type: integer
+                  hidden:
+                    type: boolean
+                  purpose:
+                    type: string
+                  dimension:
+                    type: string
+                  merged_cells:
+                    type: array
+                    items:
+                      type: string
+                  source_cells:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/BOMSourceCell"
+                  parser_version:
+                    type: string
+                required:
+                  - sheet_name
+                  - order
+                  - hidden
+                  - purpose
+                  - dimension
+                  - merged_cells
+                  - source_cells
+                  - parser_version
+            mode:
+              type: string
+            ai_configured:
+              type: boolean
+        issues:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              severity:
+                type: string
+              rule_id:
+                type: string
+              version:
+                type: string
+              item_uid:
+                type: string
+              field:
+                type: string
+              reason:
+                type: string
+            required:
+              - id
+              - severity
+              - rule_id
+              - version
+              - item_uid
+              - field
+              - reason
+        reviewed_revision:
+          type:
+            - integer
+            - "null"
+        error_code:
+          type:
+            - string
+            - "null"
     BOMImportEnvelope:
       type: object
       required:
@@ -12123,6 +12579,10 @@ components:
         created_at:
           type: string
           format: date-time
+        bom_revision:
+          type: string
+        cmdb_status:
+          type: string
     BOMBatchEnvelope:
       type: object
       required:
@@ -12229,6 +12689,10 @@ components:
             - verified
             - installed
             - retired
+        manual_corrections:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/BOMManualCorrection"
     BOMItemListEnvelope:
       type: object
       required:
@@ -12246,9 +12710,7 @@ components:
           type: string
     GenericObject:
       type: object
-      description: Domain-specific request body; fields are defined in
-        docs/DOMAIN-API-CONTRACTS.md and must be tightened per resource before
-        production implementation.
+      description: Domain-specific request body; fields are defined in docs/DOMAIN-API-CONTRACTS.md and must be tightened per resource before production implementation.
       additionalProperties: true
     EmptyRequest:
       type: object
@@ -14028,10 +14490,7 @@ components:
             - string
             - "null"
       additionalProperties: false
-      description: maintained MUST use ipmi_only and allow only approved IPMI
-        purposes. SSH/Agent/Redfish and proxy bypass forbidden;
-        external_readonly is a separately approved observation source, never a
-        device executor.
+      description: maintained MUST use ipmi_only and allow only approved IPMI purposes. SSH/Agent/Redfish and proxy bypass forbidden; external_readonly is a separately approved observation source, never a device executor.
       allOf:
         - if:
             properties:
@@ -14170,9 +14629,7 @@ components:
             - string
             - "null"
       additionalProperties: false
-      description: A successful zero is numeric 0; missing/unsupported value is null
-        with reason. Failed collection never advances last successful
-        collected_at. Verdict is separate from capability/freshness/quality.
+      description: A successful zero is numeric 0; missing/unsupported value is null with reason. Failed collection never advances last successful collected_at. Verdict is separate from capability/freshness/quality.
     OpsDataAvailability:
       type: string
       enum:
@@ -14585,8 +15042,7 @@ components:
             - network
         existing_revision_ref:
           type: string
-          description: NetworkBaselineRevision / ConfigSetRevision or immutable snapshot
-            identity
+          description: NetworkBaselineRevision / ConfigSetRevision or immutable snapshot identity
         baseline_revision_id:
           type:
             - string
@@ -15984,8 +16440,7 @@ components:
         - expected_revision
       properties:
         to_state:
-          description: Retired is terminal and can only be produced by an approved
-            retirement job; direct transition requests cannot select it.
+          description: Retired is terminal and can only be produced by an approved retirement job; direct transition requests cannot select it.
           type: string
           enum:
             - normal
@@ -16811,8 +17266,7 @@ components:
           type: string
         resource_type:
           type: string
-          description: Canonical collection resource name; project authorization is
-            rechecked per event.
+          description: Canonical collection resource name; project authorization is rechecked per event.
         resource_id:
           type: string
         event_type:
@@ -32259,6 +32713,1053 @@ components:
         - before_notes
         - after_notes
       additionalProperties: false
+    BOMSourceCell:
+      type: object
+      properties:
+        source_cell:
+          type: string
+        source_row:
+          type: integer
+        source_column:
+          type: integer
+        original_value:
+          type: string
+        formula:
+          type: string
+        hidden:
+          type: boolean
+        sensitive:
+          type: boolean
+        sheet_name:
+          type: string
+      required:
+        - source_cell
+        - source_row
+        - source_column
+        - original_value
+        - hidden
+        - sensitive
+    BOMDraftItem:
+      type: object
+      properties:
+        status:
+          type: string
+        item_uid:
+          type: string
+        category:
+          type: string
+        serial:
+          type: string
+        hostname:
+          type: string
+        model:
+          type: string
+        parent_uid:
+          type: string
+        port_index:
+          type: string
+        endpoint_a_uid:
+          type: string
+        endpoint_b_uid:
+          type: string
+        fields:
+          type: object
+          additionalProperties:
+            type: string
+        sources:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/BOMSourceCell"
+        sheet_name:
+          type: string
+        manual_corrections:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/BOMManualCorrection"
+        sub_type:
+          type: string
+      required:
+        - item_uid
+        - category
+        - serial
+        - hostname
+        - model
+        - parent_uid
+        - port_index
+        - endpoint_a_uid
+        - endpoint_b_uid
+        - fields
+        - sources
+        - sheet_name
+    BOMProfileColumn:
+      type: object
+      properties:
+        index:
+          type: integer
+        header:
+          type: string
+        field:
+          type: string
+        ignored:
+          type: boolean
+        reason:
+          type: string
+        transform:
+          type: string
+          enum:
+            - identity
+            - trim
+            - join
+        separator:
+          type: string
+        fill_down:
+          type: boolean
+      required:
+        - index
+        - header
+        - field
+        - ignored
+    BOMSheetProfile:
+      type: object
+      properties:
+        sheet_name:
+          type: string
+        purpose:
+          type: string
+          enum:
+            - unclassified
+            - assets
+            - cabling
+            - baseline
+            - layout
+            - summary
+            - reference
+        candidate_entity:
+          type: string
+        header_regions:
+          type: array
+          items:
+            type: integer
+        data_start:
+          type: integer
+        data_end:
+          type: integer
+        column_definitions:
+          type: array
+          items:
+            $ref: "#/components/schemas/BOMProfileColumn"
+        confirmed:
+          type: boolean
+        reason:
+          type: string
+        parser_version:
+          type: string
+        excluded_rows:
+          type: object
+          additionalProperties:
+            type: string
+      required:
+        - sheet_name
+        - purpose
+        - candidate_entity
+        - header_regions
+        - data_start
+        - data_end
+        - column_definitions
+        - confirmed
+        - reason
+        - parser_version
+    BOMProfileCommand:
+      type: object
+      properties:
+        revision:
+          type: integer
+        profiles:
+          type: array
+          items:
+            $ref: "#/components/schemas/BOMSheetProfile"
+        reason:
+          type: string
+          minLength: 1
+      required:
+        - revision
+        - profiles
+        - reason
+    BOMDraftCommand:
+      type: object
+      properties:
+        revision:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/BOMDraftItem"
+        reason:
+          type: string
+          minLength: 1
+      required:
+        - revision
+        - items
+        - reason
+    BOMRevisionCommand:
+      type: object
+      properties:
+        revision:
+          type: integer
+        reason:
+          type: string
+        acknowledge_warnings:
+          type: boolean
+      required:
+        - revision
+    BOMRelationCandidate:
+      type: object
+      properties:
+        id:
+          type: string
+        item_uid:
+          type: string
+        field:
+          type: string
+        candidates:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+        reason:
+          type: string
+      required:
+        - id
+        - item_uid
+        - field
+        - candidates
+        - status
+        - reason
+    BOMAICommand:
+      type: object
+      properties:
+        mode:
+          type: string
+          enum:
+            - rules
+            - mock
+            - provider
+        task:
+          type: string
+          enum:
+            - sheet
+            - field
+            - relation
+        scenario:
+          type: string
+      required:
+        - mode
+        - task
+    BOMAICandidate:
+      type: object
+      properties:
+        source_file:
+          type: string
+        sheet_name:
+          type: string
+        source_row:
+          type: integer
+        source_column:
+          type: integer
+        source_cell:
+          type: string
+        original_value:
+          type: string
+        candidate_field:
+          type: string
+        normalized_value:
+          type: string
+        reasoning:
+          type: string
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        ambiguity:
+          type: boolean
+        model:
+          type: string
+        prompt_version:
+          type: string
+        schema_version:
+          type: string
+      required:
+        - source_file
+        - sheet_name
+        - source_row
+        - source_column
+        - source_cell
+        - original_value
+        - candidate_field
+        - normalized_value
+        - reasoning
+        - confidence
+        - ambiguity
+        - model
+        - prompt_version
+        - schema_version
+    BOMAIDiagnostic:
+      type: object
+      properties:
+        prompt_version:
+          type: string
+        schema_version:
+          type: string
+        request_sha256:
+          type: string
+        duration_ms:
+          type: integer
+        schema_valid:
+          type:
+            - boolean
+            - "null"
+        schema_status:
+          type: string
+        error_code:
+          type: string
+        model:
+          type: string
+        candidates:
+          type:
+            - array
+            - "null"
+          items:
+            $ref: "#/components/schemas/BOMAICandidate"
+        simulation_only:
+          type: boolean
+        token_input:
+          type:
+            - integer
+            - "null"
+        token_output:
+          type:
+            - integer
+            - "null"
+        token_cost:
+          type:
+            - number
+            - "null"
+        token_support:
+          type: string
+        merged_into_bom:
+          type: boolean
+        raw_response_ref:
+          type: string
+      required:
+        - prompt_version
+        - schema_version
+        - request_sha256
+        - duration_ms
+        - schema_valid
+        - schema_status
+        - error_code
+        - model
+        - candidates
+        - simulation_only
+        - token_input
+        - token_output
+        - token_cost
+        - token_support
+        - merged_into_bom
+    BOMAITask:
+      type: object
+      properties:
+        id:
+          type: string
+        mode:
+          type: string
+        task:
+          type: string
+        status:
+          type: string
+        diagnostic:
+          $ref: "#/components/schemas/BOMAIDiagnostic"
+        created_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - mode
+        - task
+        - status
+        - diagnostic
+        - created_at
+    getBOMSheetProfilesEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/BOMSheetProfile"
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    saveBOMSheetProfilesEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            revision:
+              type: integer
+            candidates:
+              type: integer
+          required:
+            - revision
+            - candidates
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    getBOMDraftEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/BOMDraftItem"
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    saveBOMDraftEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            revision:
+              type: integer
+          required:
+            - revision
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    getBOMRelationCandidatesEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/BOMRelationCandidate"
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    reviewBOMDraftEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            reviewed_revision:
+              type: integer
+          required:
+            - reviewed_revision
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    retryBOMParsingEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            status:
+              type: string
+          required:
+            - id
+            - status
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    listBOMAITasksEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/BOMAITask"
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    runBOMAIRecognitionEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            status:
+              type: string
+            diagnostic:
+              $ref: "#/components/schemas/BOMAIDiagnostic"
+          required:
+            - id
+            - status
+            - diagnostic
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    getBOMPublicationEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/BOMPublication"
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    BOMApprovedModel:
+      type: object
+      properties:
+        id:
+          type: string
+        model:
+          type: string
+        category:
+          type: string
+        capabilities:
+          type: object
+          properties:
+            breakout:
+              type: array
+              items:
+                type: string
+            port_speeds:
+              type: array
+              items:
+                type: string
+            u_height:
+              type: integer
+        approved_by:
+          type: string
+      required:
+        - id
+        - model
+        - category
+        - capabilities
+        - approved_by
+    BOMModelCommand:
+      type: object
+      properties:
+        model:
+          type: string
+        category:
+          type: string
+        capabilities:
+          type: object
+          properties:
+            breakout:
+              type: array
+              items:
+                type: string
+            port_speeds:
+              type: array
+              items:
+                type: string
+            u_height:
+              type: integer
+        reason:
+          type: string
+      required:
+        - model
+        - category
+        - capabilities
+        - reason
+    BOMTemplateCommand:
+      type: object
+      properties:
+        import_id:
+          type: string
+        name:
+          type: string
+        revision:
+          type: integer
+        reason:
+          type: string
+      required:
+        - import_id
+        - name
+        - revision
+        - reason
+    BOMMappingTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+        revision:
+          type: integer
+        profiles:
+          type: array
+          items:
+            $ref: "#/components/schemas/BOMSheetProfile"
+        approved_by:
+          type: string
+      required:
+        - name
+        - revision
+        - profiles
+        - approved_by
+    listApprovedBOMModelsEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/BOMApprovedModel"
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    approveBOMModelEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+          required:
+            - id
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    listProjectBOMTemplatesEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/BOMMappingTemplate"
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    approveProjectBOMTemplateEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            name:
+              type: string
+            revision:
+              type: integer
+          required:
+            - name
+            - revision
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    BOMEvaluation:
+      type: object
+      properties:
+        mode:
+          type: string
+        dataset:
+          type: string
+        field_accuracy:
+          type:
+            - number
+            - "null"
+        key_field_recall:
+          type:
+            - number
+            - "null"
+        sheet_accuracy:
+          type:
+            - number
+            - "null"
+        relation_accuracy:
+          type:
+            - number
+            - "null"
+        manual_correction_rate:
+          type:
+            - number
+            - "null"
+        duration_ms:
+          type: integer
+        token_cost:
+          type:
+            - number
+            - "null"
+        errors:
+          type: array
+          items:
+            type: string
+        notes:
+          type: string
+      required:
+        - mode
+        - dataset
+        - field_accuracy
+        - key_field_recall
+        - sheet_accuracy
+        - relation_accuracy
+        - manual_correction_rate
+        - duration_ms
+        - token_cost
+        - errors
+        - notes
+    evaluateBOMRecognitionEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/BOMEvaluation"
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    BOMHistory:
+      type: object
+      properties:
+        revisions:
+          type: array
+          items:
+            type: object
+            properties:
+              revision:
+                type: integer
+              reason:
+                type: string
+              actor:
+                type: string
+              created_at:
+                type: string
+                format: date-time
+            required:
+              - revision
+              - reason
+              - actor
+              - created_at
+        events:
+          type: array
+          items:
+            type: object
+            properties:
+              action:
+                type: string
+              details:
+                type: object
+                properties:
+                  reason:
+                    type: string
+                required: []
+              created_at:
+                type: string
+                format: date-time
+            required:
+              - action
+              - details
+              - created_at
+      required:
+        - revisions
+        - events
+    getBOMReviewHistoryEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/BOMHistory"
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    listPublishedBOMAssetsEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              asset:
+                $ref: "#/components/schemas/BOMItem"
+              source:
+                type: string
+            required:
+              - id
+              - asset
+              - source
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    BOMLogin:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+      required:
+        - username
+        - password
+    BOMSession:
+      type: object
+      properties:
+        actor:
+          type: string
+        role:
+          type: string
+        project_id:
+          type: string
+        csrf_token:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string
+        ai_configured:
+          type: boolean
+      required:
+        - actor
+        - role
+        - project_id
+        - csrf_token
+        - permissions
+    loginBOMLocalSessionEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/BOMSession"
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    getBOMLocalSessionEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/BOMSession"
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    BOMPublication:
+      type: object
+      properties:
+        id:
+          type: string
+        cmdb_status:
+          type: string
+          enum:
+            - not_committed
+            - pending
+            - retrying
+            - published
+        bom_revision:
+          type: string
+      required:
+        - id
+        - cmdb_status
+    listRealProjectBOMImportsEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/BOMImport"
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    BOMRuleDefinition:
+      type: object
+      properties:
+        rule_id:
+          type: string
+        version:
+          type: string
+        scope:
+          type: string
+        severity:
+          type: string
+        basis:
+          type: string
+        remediation:
+          type: string
+      required:
+        - rule_id
+        - version
+        - scope
+        - severity
+        - basis
+        - remediation
+    listBOMEngineeringRulesEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/BOMRuleDefinition"
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    BOMApplyCandidateCommand:
+      type: object
+      properties:
+        revision:
+          type: integer
+        indices:
+          type: array
+          items:
+            type: integer
+        reason:
+          type: string
+      required:
+        - revision
+        - indices
+        - reason
+    confirmBOMAICandidatesEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            revision:
+              type: integer
+          required:
+            - revision
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    logoutBOMLocalSessionEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            status:
+              type: string
+          required:
+            - status
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    BOMPlacementCommand:
+      type: object
+      properties:
+        revision:
+          type: integer
+        item_uid:
+          type: string
+        site:
+          type: string
+        rack:
+          type: string
+        u_start:
+          type: integer
+        u_height:
+          type: integer
+        rack_height:
+          type: integer
+        sheet_name:
+          type: string
+        source_cell:
+          type: string
+        reason:
+          type: string
+      required:
+        - revision
+        - item_uid
+        - site
+        - rack
+        - u_start
+        - u_height
+        - rack_height
+        - sheet_name
+        - source_cell
+        - reason
+    confirmBOMPlacementEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            revision:
+              type: integer
+          required:
+            - revision
+        request_id:
+          type: string
+      required:
+        - data
+        - request_id
+    BOMManualCorrection:
+      type: object
+      properties:
+        source_file:
+          type: string
+        actor:
+          type: string
+        reason:
+          type: string
+        before:
+          type: string
+        after:
+          type: string
+        observed_at:
+          type: string
+          format: date-time
+        source_kind:
+          type: string
+          const: manual
+      required:
+        - source_file
+        - actor
+        - reason
+        - before
+        - after
+        - observed_at
+        - source_kind
 x-implementation-policy:
   frontend-first: true
   mock-provider-required: true

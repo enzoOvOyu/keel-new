@@ -1,0 +1,9 @@
+name: keel-real-dev
+services:
+  api:
+    build: ./backend
+    network_mode: host
+    env_file: ./backend/.env
+    environment:
+      LISTEN_ADDR: 127.0.0.1:8081
+    restart: unless-stopped

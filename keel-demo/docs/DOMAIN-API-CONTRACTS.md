@@ -184,3 +184,7 @@ Lossless* Schema定义scope、适配范围、四层证据、原值/单位/窗口
 CmdbDossier*资源Schema明确目录状态维度、关系类别与规划/观测、字段来源、配置版本、生命周期和质量。raw evidence为允许领域资源的专用schema union，禁止任意集合访问。实际浏览器返回的十类response（含人工审计证据）另用JSON Schema逐项验证，结果见CMDB-DOSSIER-VALIDATION.json。
 
 唯一详细设计与模型边界见[CMDB-DOSSIER.md](CMDB-DOSSIER.md)。
+
+## BOM 真实开发增补
+
+用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。

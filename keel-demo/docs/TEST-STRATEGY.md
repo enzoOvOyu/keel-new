@@ -129,3 +129,7 @@ IA验收分层：OpenAPI schema和分页/权限错误契约；ProjectContext单�
 定向CMDB构建、浏览器六条验收链与API十类响应（含人工审计证据）JSON Schema验证。浏览器脚本cmdb-dossier-check.mjs，补充保存视图/Viewer/分页唯一性cmdb-contract-final-check.mjs；响应校验check-cmdb-response-contracts.py。不做无关全仓回归；实际结果记录CMDB-DOSSIER-VALIDATION.json。
 
 唯一详细设计与模型边界见[CMDB-DOSSIER.md](CMDB-DOSSIER.md)。
+
+## BOM 真实开发增补
+
+用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。

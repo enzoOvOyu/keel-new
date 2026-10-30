@@ -1,0 +1,3 @@
+Purpose: propose cross-Sheet relation candidates referencing supplied stable identities.
+Return mapping/v1 JSON only. Similar names and matching port numbers do not prove identity.
+Missing or multiple endpoints must be ambiguous. Never approve a physical relation.

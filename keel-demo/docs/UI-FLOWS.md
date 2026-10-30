@@ -107,3 +107,7 @@ Fabric无损选择设备/反例→端口→rule@version→五层证据→读取�
 资产搜索→统一抽屉；目录/树选中→关系展开NIC→端口→Cable→对端交换机→既有八Tab抽屉。配置版本Diff→字段来源→原领域快照/采集/Execution/Issue；生命周期→验机/NCCL/历史退场归档；质量→待审核导入或采集；人工备注白名单/版本校验→审计。保存视图恢复过滤与选中上下文。
 
 唯一详细设计与模型边界见[CMDB-DOSSIER.md](CMDB-DOSSIER.md)。
+
+## BOM 真实开发增补
+
+用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。

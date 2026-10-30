@@ -233,3 +233,7 @@ Fabric无损、交换机无损抽屉、Topology健康详情、机柜Network共�
 CMDB左树+主工作区，五视图共享asset/filter URL。目录按类型字段呈现独立交付/维护/健康/完整性；关系采用React Flow+右侧来源/逐层展开面板，不重建拓扑引擎。设备沿用唯一五/八Tab抽屉，原始证据用Dialog。质量条目直接定位来源，不堆统计卡。
 
 唯一详细设计与模型边界见[CMDB-DOSSIER.md](CMDB-DOSSIER.md)。
+
+## BOM 真实开发增补
+
+用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。

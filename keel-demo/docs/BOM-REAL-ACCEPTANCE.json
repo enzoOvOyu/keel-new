@@ -1,0 +1,85 @@
+{
+  "scope": "BOM real local development",
+  "frontend_url": "http://localhost:5174/p/proj-b300-demo/deploy/bom",
+  "backend_health": "http://localhost:8081/healthz",
+  "go_tests": "PASS",
+  "production_build": "PASS",
+  "api_end_to_end": {
+    "status": "PASS",
+    "rules_without_provider": true,
+    "blocker_rejection": true,
+    "source_backed_review": true,
+    "normalized_cable_references": true,
+    "idempotent_commit": true,
+    "cmdb_outbox_published": true,
+    "ai_failure_isolation": true,
+    "project_isolation": true,
+    "import_id": "ed218b38-4053-4175-a64e-9305f9adbc67"
+  },
+  "response_contracts": {
+    "response_schema_validation": "PASS",
+    "responses": 51,
+    "distinct_calls": 22
+  },
+  "browser_workbench": {
+    "status": "PASS",
+    "six_step_workbench": true,
+    "profile_edit": true,
+    "manual_endpoint_selection": true,
+    "validation": true,
+    "review_state": true,
+    "real_commit": true,
+    "cmdb_published": true,
+    "page_errors": [],
+    "import_id": "6713009a-6e54-45e9-be4a-800a50611a6f"
+  },
+  "browser_permissions": {
+    "login": true,
+    "upload": true,
+    "profile_workspace": true,
+    "ai_diagnostics": true,
+    "viewer_write_denied": true,
+    "page_errors": []
+  },
+  "outbox_recovery": {
+    "outbox_fault_recovery": "PASS",
+    "failure_recorded": true,
+    "failed_projection_atomic": true,
+    "repaired_event_replayed": true,
+    "cmdb_version_did_not_regress": true,
+    "scope": "synthetic event only"
+  },
+  "real_excel": {
+    "source": "netbom.xlsx",
+    "mode": "rules",
+    "real_upload_parse": "PASS",
+    "sheet_count": 15,
+    "nonempty_cells": 162715,
+    "merged_regions": 311,
+    "formula_cells": 94353,
+    "source_sha256": "f954180234216185c0e97daeace4fe2a42e6bf90b1657f75a3247308721d32ec",
+    "profile_count": 15,
+    "validation_blocking": "PASS",
+    "commit_rejection": "PASS",
+    "formal_sample_commit": "BLOCKED_PENDING_HUMAN_REVIEW",
+    "issues_by_rule": {
+      "BOM-NONEMPTY": 1,
+      "PROFILE-CONFIRM": 15,
+      "MAPPING-REVIEW": 1
+    },
+    "no_real_ai_call": true,
+    "note": "No automatic approval, fabricated serial/port or publication of unreviewed real customer data."
+  },
+  "standard_package": "PASS: seven CSVs, manifest digests, imported status and frozen model reference",
+  "provider_protocol": "PASS with synthetic HTTPS service only; real vendor NOT RUN",
+  "limits": [
+    "Real netbom Sheet/identity/connection approval remains human work; no automatic formal publication.",
+    "No real vendor credentials configured; Rules/Mock evaluation is not real AI accuracy.",
+    "Other platform modules remain their existing Mock implementation.",
+    "Historical external CSV appendix compatibility and Docker image build not verified."
+  ],
+  "batch_digest_policy": "PASS: same declared batch/same digest reuses import; changed digest rejected",
+  "approved_template_priority": "PASS: source profile reuse and column-order test",
+  "manual_grid_placement": "IMPLEMENTED; standalone placement endpoint not covered by browser acceptance",
+  "historical_package_export": "PASS: committed revision snapshot and frozen model reference"
+}

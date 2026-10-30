@@ -1,8 +1,10 @@
 package bom
 
 import (
+	"archive/zip"
 	"bytes"
 	"github.com/xuri/excelize/v2"
+	"io"
 	"testing"
 )
 
@@ -40,5 +42,89 @@ func TestValidationRejectsUnsafeRelations(t *testing.T) {
 	}
 	if StableID("switch:SN") != StableID("switch:SN") {
 		t.Fatal("unstable identity")
+	}
+}
+func TestNormalizePreservesEndpointGraph(t *testing.T) {
+	items := []Item{{UID: "d1", Category: "server", Serial: "S1"}, {UID: "d2", Category: "switch", Serial: "S2"}, {UID: "p1", Category: "port", Parent: "d1", Port: "1"}, {UID: "p2", Category: "port", Parent: "d2", Port: "1"}, {UID: "c", Category: "cable", A: "p1", B: "p2"}}
+	out, e := Normalize(items)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if out[2].Parent != out[0].UID || out[4].A != out[2].UID || out[4].B != out[3].UID {
+		t.Fatal("reference graph broken")
+	}
+}
+func TestUnknownSheetBlocksAndReconcileUsesSerial(t *testing.T) {
+	w := Workbook{Sheets: []Sheet{{Name: "unknown"}}}
+	_, issues := Build(w, Profiles(w))
+	if len(issues) == 0 {
+		t.Fatal("unknown Sheet silently dropped")
+	}
+	items := []Item{{UID: "a", Category: "server", Serial: "S", Fields: map[string]string{"serial": "S"}, Sources: map[string]Cell{}}, {UID: "b", Category: "server", Serial: "S", Fields: map[string]string{"serial": "S"}, Sources: map[string]Cell{}}}
+	merged, issues := Reconcile(items)
+	if len(merged) != 1 || len(issues) > 0 {
+		t.Fatal("stable identity not merged")
+	}
+}
+func TestUncachedFormulaIsPreservedNotExecuted(t *testing.T) {
+	f := excelize.NewFile()
+	f.SetCellFormula("Sheet1", "A1", "1+2")
+	var b bytes.Buffer
+	f.Write(&b)
+	w, e := Parse(b.Bytes())
+	if e != nil {
+		t.Fatal(e)
+	}
+	if len(w.Sheets[0].Cells) != 1 || w.Sheets[0].Cells[0].Formula != "1+2" || w.Sheets[0].Cells[0].Value != "" {
+		t.Fatal("formula evaluated or missing-cache source lost")
+	}
+}
+func TestSpeedsUseExplicitUnits(t *testing.T) {
+	a, oa := Speed("100G")
+	b, ob := Speed("100000 Mbps")
+	if !oa || !ob || a != b {
+		t.Fatal("unit conversion failed")
+	}
+	if _, ok := Speed("100"); ok {
+		t.Fatal("unknown unit guessed")
+	}
+}
+func TestUnknownIdentityIsNotDuplicateEvidence(t *testing.T) {
+	issues := Validate([]Item{{UID: "a", Category: "other"}, {UID: "b", Category: "other"}})
+	for _, i := range issues {
+		if i.Rule == "BOM-IDENTITY" {
+			t.Fatal("missing identity masqueraded as duplicate evidence")
+		}
+	}
+}
+func TestStandardPackageIncludesRequiredBOMFields(t *testing.T) {
+	data, e := Package([]Item{{UID: "synthetic", Category: "server", Serial: "S", Status: "imported", Fields: map[string]string{}, Sources: map[string]Cell{}}}, "batch", "project")
+	if e != nil {
+		t.Fatal(e)
+	}
+	z, e := zip.NewReader(bytes.NewReader(data), int64(len(data)))
+	if e != nil {
+		t.Fatal(e)
+	}
+	if len(z.File) != 8 {
+		t.Fatal("seven CSV files and manifest required")
+	}
+	for _, f := range z.File {
+		if f.Name == "server/servers.csv" {
+			r, _ := f.Open()
+			b, _ := io.ReadAll(r)
+			r.Close()
+			if !bytes.Contains(b, []byte("source_of_record,status")) {
+				t.Fatal("required BOM status missing")
+			}
+		}
+	}
+}
+func TestApprovedTemplateTracksReorderedHeaders(t *testing.T) {
+	w := Workbook{Sheets: []Sheet{{Name: "assets", Cells: []Cell{{Ref: "A1", Row: 1, Column: 1, Value: "Hostname", Sheet: "assets"}, {Ref: "B1", Row: 1, Column: 2, Value: "SN", Sheet: "assets"}, {Ref: "A2", Row: 2, Column: 1, Value: "synthetic-host", Sheet: "assets"}, {Ref: "B2", Row: 2, Column: 2, Value: "synthetic-serial", Sheet: "assets"}}}}}
+	saved := Profile{Sheet: "assets", Purpose: "assets", Entity: "server", Columns: []Column{{Index: 1, Header: "SN", Field: "serial"}, {Index: 2, Header: "Hostname", Field: "hostname"}}, Confirmed: true}
+	out := ApplyTemplate(w, Profiles(w), []Profile{saved}, "synthetic/v1")
+	if !out[0].Confirmed || out[0].Columns[0].Index != 2 || out[0].Columns[1].Index != 1 {
+		t.Fatal("template was tied to original column position")
 	}
 }

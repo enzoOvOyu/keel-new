@@ -39,5 +39,5 @@ func main() {
 		}
 		out = append(out, x)
 	}
-	json.NewEncoder(os.Stdout).Encode(map[string]any{"parser": "excelize-structure/v1", "sheets": out, "candidate_count": len(bom.Draft(w)), "mode": "rules", "formal_commit": "NOT_RUN"})
+	json.NewEncoder(os.Stdout).Encode(map[string]any{"parser": "excelize-structure/v2", "sheets": out, "header_alias_matches": len(bom.Rules(w)), "candidate_status": "awaiting_sheet_profile_confirmation", "mode": "rules", "formal_commit": "NOT_RUN"})
 }

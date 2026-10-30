@@ -1,0 +1,4 @@
+Purpose: propose standard field semantics from allowlisted headers.
+Output mapping/v1 JSON only. Preserve original values and source coordinates.
+Do not create missing SN/MAC/IP/model/port values. Ambiguity must remain explicit.
+Candidates require human review; no official BOM submission or network configuration.

@@ -13,7 +13,7 @@ export interface paths {
             };
             cookie?: never;
         };
-        get?: never;
+        get: operations["listRealProjectBOMImports"];
         put?: never;
         /** Upload raw workbook or standard BOM package */
         post: operations["createBOMImport"];
@@ -1527,8 +1527,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get current session */
-        get: operations["getSession"];
+        get: operations["getBOMLocalSession"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1546,8 +1545,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Logout and revoke session */
-        post: operations["logout"];
+        post: operations["logoutBOMLocalSession"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4256,6 +4254,303 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/bom-imports/{import_id}/profiles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        get: operations["getBOMSheetProfiles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["saveBOMSheetProfiles"];
+        trace?: never;
+    };
+    "/bom-imports/{import_id}/draft": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        get: operations["getBOMDraft"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["saveBOMDraft"];
+        trace?: never;
+    };
+    "/bom-imports/{import_id}/relations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        get: operations["getBOMRelationCandidates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bom-imports/{import_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["reviewBOMDraft"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bom-imports/{import_id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["retryBOMParsing"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bom-imports/{import_id}/ai-tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        get: operations["listBOMAITasks"];
+        put?: never;
+        post: operations["runBOMAIRecognition"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bom-imports/{import_id}/publication": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        get: operations["getBOMPublication"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bom-models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listApprovedBOMModels"];
+        put?: never;
+        post: operations["approveBOMModel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bom-mapping-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listProjectBOMTemplates"];
+        put?: never;
+        post: operations["approveProjectBOMTemplate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bom-imports/{import_id}/evaluate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["evaluateBOMRecognition"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bom-imports/{import_id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        get: operations["getBOMReviewHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bom-imports/{import_id}/package": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        get: operations["downloadBOMPackage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/published-assets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listPublishedBOMAssets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["loginBOMLocalSession"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bom-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listBOMEngineeringRules"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bom-imports/{import_id}/ai-candidates/{task_id}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["confirmBOMAICandidates"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bom-imports/{import_id}/placements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["confirmBOMPlacement"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -4320,6 +4615,34 @@ export interface components {
             };
             /** Format: date-time */
             created_at: string;
+            revision?: number;
+            internal_status?: string;
+            draft?: components["schemas"]["BOMDraftItem"][];
+            workbook?: {
+                sheets?: {
+                    sheet_name: string;
+                    order: number;
+                    hidden: boolean;
+                    purpose: string;
+                    dimension: string;
+                    merged_cells: string[];
+                    source_cells: components["schemas"]["BOMSourceCell"][];
+                    parser_version: string;
+                }[];
+                mode?: string;
+                ai_configured?: boolean;
+            };
+            issues?: {
+                id: string;
+                severity: string;
+                rule_id: string;
+                version: string;
+                item_uid: string;
+                field: string;
+                reason: string;
+            }[];
+            reviewed_revision?: number | null;
+            error_code?: string | null;
         };
         BOMImportEnvelope: {
             data: components["schemas"]["BOMImport"];
@@ -4427,6 +4750,8 @@ export interface components {
             item_count?: number;
             /** Format: date-time */
             created_at: string;
+            bom_revision?: string;
+            cmdb_status?: string;
         };
         BOMBatchEnvelope: {
             data: components["schemas"]["BOMBatch"];
@@ -4456,6 +4781,9 @@ export interface components {
             source_of_record?: "design_bom" | "discovered" | "manual";
             /** @enum {string} */
             status: "planned" | "imported" | "verified" | "installed" | "retired";
+            manual_corrections?: {
+                [key: string]: components["schemas"]["BOMManualCorrection"];
+            };
         };
         BOMItemListEnvelope: {
             data: components["schemas"]["BOMItem"][];
@@ -10861,6 +11189,381 @@ export interface components {
             before_notes: string | null;
             after_notes: string;
         };
+        BOMSourceCell: {
+            source_cell: string;
+            source_row: number;
+            source_column: number;
+            original_value: string;
+            formula?: string;
+            hidden: boolean;
+            sensitive: boolean;
+            sheet_name?: string;
+        };
+        BOMDraftItem: {
+            status?: string;
+            item_uid: string;
+            category: string;
+            serial: string;
+            hostname: string;
+            model: string;
+            parent_uid: string;
+            port_index: string;
+            endpoint_a_uid: string;
+            endpoint_b_uid: string;
+            fields: {
+                [key: string]: string;
+            };
+            sources: {
+                [key: string]: components["schemas"]["BOMSourceCell"];
+            };
+            sheet_name: string;
+            manual_corrections?: {
+                [key: string]: components["schemas"]["BOMManualCorrection"];
+            };
+            sub_type?: string;
+        };
+        BOMProfileColumn: {
+            index: number;
+            header: string;
+            field: string;
+            ignored: boolean;
+            reason?: string;
+            /** @enum {string} */
+            transform?: "identity" | "trim" | "join";
+            separator?: string;
+            fill_down?: boolean;
+        };
+        BOMSheetProfile: {
+            sheet_name: string;
+            /** @enum {string} */
+            purpose: "unclassified" | "assets" | "cabling" | "baseline" | "layout" | "summary" | "reference";
+            candidate_entity: string;
+            header_regions: number[];
+            data_start: number;
+            data_end: number;
+            column_definitions: components["schemas"]["BOMProfileColumn"][];
+            confirmed: boolean;
+            reason: string;
+            parser_version: string;
+            excluded_rows?: {
+                [key: string]: string;
+            };
+        };
+        BOMProfileCommand: {
+            revision: number;
+            profiles: components["schemas"]["BOMSheetProfile"][];
+            reason: string;
+        };
+        BOMDraftCommand: {
+            revision: number;
+            items: components["schemas"]["BOMDraftItem"][];
+            reason: string;
+        };
+        BOMRevisionCommand: {
+            revision: number;
+            reason?: string;
+            acknowledge_warnings?: boolean;
+        };
+        BOMRelationCandidate: {
+            id: string;
+            item_uid: string;
+            field: string;
+            candidates: string[];
+            status: string;
+            reason: string;
+        };
+        BOMAICommand: {
+            /** @enum {string} */
+            mode: "rules" | "mock" | "provider";
+            /** @enum {string} */
+            task: "sheet" | "field" | "relation";
+            scenario?: string;
+        };
+        BOMAICandidate: {
+            source_file: string;
+            sheet_name: string;
+            source_row: number;
+            source_column: number;
+            source_cell: string;
+            original_value: string;
+            candidate_field: string;
+            normalized_value: string;
+            reasoning: string;
+            confidence: number;
+            ambiguity: boolean;
+            model: string;
+            prompt_version: string;
+            schema_version: string;
+        };
+        BOMAIDiagnostic: {
+            prompt_version: string;
+            schema_version: string;
+            request_sha256: string;
+            duration_ms: number;
+            schema_valid: boolean | null;
+            schema_status: string;
+            error_code: string;
+            model: string;
+            candidates: components["schemas"]["BOMAICandidate"][] | null;
+            simulation_only: boolean;
+            token_input: number | null;
+            token_output: number | null;
+            token_cost: number | null;
+            token_support: string;
+            merged_into_bom: boolean;
+            raw_response_ref?: string;
+        };
+        BOMAITask: {
+            id: string;
+            mode: string;
+            task: string;
+            status: string;
+            diagnostic: components["schemas"]["BOMAIDiagnostic"];
+            /** Format: date-time */
+            created_at: string;
+        };
+        getBOMSheetProfilesEnvelope: {
+            data: components["schemas"]["BOMSheetProfile"][];
+            request_id: string;
+        };
+        saveBOMSheetProfilesEnvelope: {
+            data: {
+                revision: number;
+                candidates: number;
+            };
+            request_id: string;
+        };
+        getBOMDraftEnvelope: {
+            data: components["schemas"]["BOMDraftItem"][];
+            request_id: string;
+        };
+        saveBOMDraftEnvelope: {
+            data: {
+                revision: number;
+            };
+            request_id: string;
+        };
+        getBOMRelationCandidatesEnvelope: {
+            data: components["schemas"]["BOMRelationCandidate"][];
+            request_id: string;
+        };
+        reviewBOMDraftEnvelope: {
+            data: {
+                reviewed_revision: number;
+            };
+            request_id: string;
+        };
+        retryBOMParsingEnvelope: {
+            data: {
+                id: string;
+                status: string;
+            };
+            request_id: string;
+        };
+        listBOMAITasksEnvelope: {
+            data: components["schemas"]["BOMAITask"][];
+            request_id: string;
+        };
+        runBOMAIRecognitionEnvelope: {
+            data: {
+                id: string;
+                status: string;
+                diagnostic: components["schemas"]["BOMAIDiagnostic"];
+            };
+            request_id: string;
+        };
+        getBOMPublicationEnvelope: {
+            data: components["schemas"]["BOMPublication"];
+            request_id: string;
+        };
+        BOMApprovedModel: {
+            id: string;
+            model: string;
+            category: string;
+            capabilities: {
+                breakout?: string[];
+                port_speeds?: string[];
+                u_height?: number;
+            };
+            approved_by: string;
+        };
+        BOMModelCommand: {
+            model: string;
+            category: string;
+            capabilities: {
+                breakout?: string[];
+                port_speeds?: string[];
+                u_height?: number;
+            };
+            reason: string;
+        };
+        BOMTemplateCommand: {
+            import_id: string;
+            name: string;
+            revision: number;
+            reason: string;
+        };
+        BOMMappingTemplate: {
+            name: string;
+            revision: number;
+            profiles: components["schemas"]["BOMSheetProfile"][];
+            approved_by: string;
+        };
+        listApprovedBOMModelsEnvelope: {
+            data: components["schemas"]["BOMApprovedModel"][];
+            request_id: string;
+        };
+        approveBOMModelEnvelope: {
+            data: {
+                id: string;
+            };
+            request_id: string;
+        };
+        listProjectBOMTemplatesEnvelope: {
+            data: components["schemas"]["BOMMappingTemplate"][];
+            request_id: string;
+        };
+        approveProjectBOMTemplateEnvelope: {
+            data: {
+                name: string;
+                revision: number;
+            };
+            request_id: string;
+        };
+        BOMEvaluation: {
+            mode: string;
+            dataset: string;
+            field_accuracy: number | null;
+            key_field_recall: number | null;
+            sheet_accuracy: number | null;
+            relation_accuracy: number | null;
+            manual_correction_rate: number | null;
+            duration_ms: number;
+            token_cost: number | null;
+            errors: string[];
+            notes: string;
+        };
+        evaluateBOMRecognitionEnvelope: {
+            data: components["schemas"]["BOMEvaluation"];
+            request_id: string;
+        };
+        BOMHistory: {
+            revisions: {
+                revision: number;
+                reason: string;
+                actor: string;
+                /** Format: date-time */
+                created_at: string;
+            }[];
+            events: {
+                action: string;
+                details: {
+                    reason?: string;
+                };
+                /** Format: date-time */
+                created_at: string;
+            }[];
+        };
+        getBOMReviewHistoryEnvelope: {
+            data: components["schemas"]["BOMHistory"];
+            request_id: string;
+        };
+        listPublishedBOMAssetsEnvelope: {
+            data: {
+                id: string;
+                asset: components["schemas"]["BOMItem"];
+                source: string;
+            }[];
+            request_id: string;
+        };
+        BOMLogin: {
+            username: string;
+            password: string;
+        };
+        BOMSession: {
+            actor: string;
+            role: string;
+            project_id: string;
+            csrf_token: string;
+            permissions: string[];
+            ai_configured?: boolean;
+        };
+        loginBOMLocalSessionEnvelope: {
+            data: components["schemas"]["BOMSession"];
+            request_id: string;
+        };
+        getBOMLocalSessionEnvelope: {
+            data: components["schemas"]["BOMSession"];
+            request_id: string;
+        };
+        BOMPublication: {
+            id: string;
+            /** @enum {string} */
+            cmdb_status: "not_committed" | "pending" | "retrying" | "published";
+            bom_revision?: string;
+        };
+        listRealProjectBOMImportsEnvelope: {
+            data: components["schemas"]["BOMImport"][];
+            request_id: string;
+        };
+        BOMRuleDefinition: {
+            rule_id: string;
+            version: string;
+            scope: string;
+            severity: string;
+            basis: string;
+            remediation: string;
+        };
+        listBOMEngineeringRulesEnvelope: {
+            data: components["schemas"]["BOMRuleDefinition"][];
+            request_id: string;
+        };
+        BOMApplyCandidateCommand: {
+            revision: number;
+            indices: number[];
+            reason: string;
+        };
+        confirmBOMAICandidatesEnvelope: {
+            data: {
+                revision: number;
+            };
+            request_id: string;
+        };
+        logoutBOMLocalSessionEnvelope: {
+            data: {
+                status: string;
+            };
+            request_id: string;
+        };
+        BOMPlacementCommand: {
+            revision: number;
+            item_uid: string;
+            site: string;
+            rack: string;
+            u_start: number;
+            u_height: number;
+            rack_height: number;
+            sheet_name: string;
+            source_cell: string;
+            reason: string;
+        };
+        confirmBOMPlacementEnvelope: {
+            data: {
+                revision: number;
+            };
+            request_id: string;
+        };
+        BOMManualCorrection: {
+            source_file: string;
+            actor: string;
+            reason: string;
+            before: string;
+            after: string;
+            /** Format: date-time */
+            observed_at: string;
+            /** @constant */
+            source_kind: "manual";
+        };
     };
     responses: {
         /** @description Invalid request */
@@ -10939,6 +11642,56 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    listRealProjectBOMImports: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listRealProjectBOMImportsEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     createBOMImport: {
         parameters: {
             query?: never;
@@ -14187,62 +14940,100 @@ export interface operations {
             409: components["responses"]["Conflict"];
         };
     };
-    getSession: {
-        parameters: {
-            query?: {
-                limit?: number;
-                cursor?: string;
-                q?: string;
-                status?: string;
-                sort?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ResourceEnvelope"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    logout: {
+    getBOMLocalSession: {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["EmptyRequest"];
-            };
-        };
+        requestBody?: never;
         responses: {
-            /** @description Success */
+            /** @description Project-authorized versioned BOM operation */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ResourceEnvelope"];
+                    "application/json": components["schemas"]["getBOMLocalSessionEnvelope"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    logoutBOMLocalSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["logoutBOMLocalSessionEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     listProjectPermissions: {
@@ -22070,6 +22861,1116 @@ export interface operations {
                 content?: never;
             };
             /** @description Invalid request */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getBOMSheetProfiles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getBOMSheetProfilesEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    saveBOMSheetProfiles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BOMProfileCommand"];
+            };
+        };
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["saveBOMSheetProfilesEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getBOMDraft: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getBOMDraftEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    saveBOMDraft: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BOMDraftCommand"];
+            };
+        };
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["saveBOMDraftEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getBOMRelationCandidates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getBOMRelationCandidatesEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    reviewBOMDraft: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BOMRevisionCommand"];
+            };
+        };
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["reviewBOMDraftEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    retryBOMParsing: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BOMRevisionCommand"];
+            };
+        };
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["retryBOMParsingEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listBOMAITasks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listBOMAITasksEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    runBOMAIRecognition: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BOMAICommand"];
+            };
+        };
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["runBOMAIRecognitionEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getBOMPublication: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getBOMPublicationEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listApprovedBOMModels: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listApprovedBOMModelsEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    approveBOMModel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BOMModelCommand"];
+            };
+        };
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["approveBOMModelEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listProjectBOMTemplates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listProjectBOMTemplatesEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    approveProjectBOMTemplate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BOMTemplateCommand"];
+            };
+        };
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["approveProjectBOMTemplateEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    evaluateBOMRecognition: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BOMAICommand"];
+            };
+        };
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["evaluateBOMRecognitionEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getBOMReviewHistory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getBOMReviewHistoryEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    downloadBOMPackage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Immutable standard CSV ZIP package */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/zip": string;
+                };
+            };
+            /** @description Unresolved import blockers */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listPublishedBOMAssets: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listPublishedBOMAssetsEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    loginBOMLocalSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BOMLogin"];
+            };
+        };
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["loginBOMLocalSessionEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listBOMEngineeringRules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listBOMEngineeringRulesEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    confirmBOMAICandidates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BOMApplyCandidateCommand"];
+            };
+        };
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["confirmBOMAICandidatesEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    confirmBOMPlacement: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BOMPlacementCommand"];
+            };
+        };
+        responses: {
+            /** @description Project-authorized versioned BOM operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["confirmBOMPlacementEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision/state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unresolved engineering or review precondition */
             422: {
                 headers: {
                     [name: string]: unknown;

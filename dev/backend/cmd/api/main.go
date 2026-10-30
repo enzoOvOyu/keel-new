@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha256"
-	"crypto/subtle"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -49,13 +49,61 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		respond(w, 200, map[string]string{"status": "ok"})
 		return
 	}
-	auth := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
-	if subtle.ConstantTimeCompare([]byte(auth), []byte(s.token)) != 1 {
-		fail(w, 401, "UNAUTHENTICATED")
+	if s.authRoute(w, r) {
 		return
 	}
-	if r.Method != "GET" && r.Header.Get("Origin") != "" && r.Header.Get("Origin") != env("DEV_ORIGIN", "http://localhost:5174") {
+	authenticated, ok := s.authenticate(w, r)
+	if !ok {
+		return
+	}
+	r = authenticated
+	role := r.Context().Value(principalKey{}).(principal).Role
+	if r.URL.Path == "/api/v1/auth/logout" && r.Method == "POST" {
+		if cookie, e := r.Cookie("keel_session"); e == nil {
+			if _, e = s.db.Exec(r.Context(), "DELETE FROM api_session WHERE token_hash=$1", digestToken(cookie.Value)); e != nil {
+				fail(w, 503, "SESSION_STORE_UNAVAILABLE")
+				return
+			}
+		}
+		http.SetCookie(w, &http.Cookie{Name: "keel_session", Value: "", Path: "/api/v1", HttpOnly: true, SameSite: http.SameSiteStrictMode, MaxAge: -1})
+		respond(w, 200, map[string]string{"status": "signed_out"})
+		return
+	}
+	if r.URL.Path == "/api/v1/auth/session" && r.Method == "GET" {
+		p := r.Context().Value(principalKey{}).(principal)
+		var csrf string
+		if cookie, e := r.Cookie("keel_session"); e == nil {
+			s.db.QueryRow(r.Context(), "SELECT csrf_token FROM api_session WHERE token_hash=$1", digestToken(cookie.Value)).Scan(&csrf)
+		}
+		respond(w, 200, map[string]any{"actor": p.Actor, "role": p.Role, "project_id": p.Project, "csrf_token": csrf, "permissions": authPermissions(p.Role), "ai_configured": os.Getenv("AI_ENDPOINT") != "" && os.Getenv("AI_API_KEY") != ""})
+		return
+	}
+	if r.Method != "GET" && r.Header.Get("Origin") != "" && !allowedOrigin(r, r.Header.Get("Origin")) {
 		fail(w, 403, "ORIGIN_DENIED")
+		return
+	}
+	if role == "viewer" && r.Method != "GET" {
+		fail(w, 403, "FORBIDDEN")
+		return
+	}
+	if r.URL.Path == "/api/v1/bom-rules" && r.Method == "GET" {
+		respond(w, 200, bom.RuleCatalog())
+		return
+	}
+	if s.jobs(w, r) {
+		return
+	}
+	if s.templates(w, r) {
+		return
+	}
+	if s.models(w, r) {
+		return
+	}
+	if s.published(w, r) {
+		return
+	}
+	if role == "viewer" && r.Method != "GET" {
+		fail(w, 403, "FORBIDDEN")
 		return
 	}
 	ctx := r.Context()
@@ -70,7 +118,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if r.Method == "GET" {
-			rows, e := s.db.Query(ctx, "SELECT id,status,filename,revision,created_at FROM bom_import_batch WHERE project_id=$1 ORDER BY created_at DESC LIMIT 100", s.project)
+			rows, e := s.db.Query(ctx, "SELECT id,status,filename,revision,created_at,content_sha256 FROM bom_import_batch WHERE project_id=$1 ORDER BY created_at DESC LIMIT 100", s.project)
 			if e != nil {
 				fail(w, 500, "DATABASE_ERROR")
 				return
@@ -78,17 +126,17 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			defer rows.Close()
 			out := []any{}
 			for rows.Next() {
-				var id, status, name string
+				var id, status, name, hash string
 				var rev int
 				var at time.Time
-				rows.Scan(&id, &status, &name, &rev, &at)
-				out = append(out, map[string]any{"id": id, "status": status, "filename": name, "revision": rev, "created_at": at})
+				rows.Scan(&id, &status, &name, &rev, &at, &hash)
+				out = append(out, map[string]any{"id": id, "project_id": s.project, "content_sha256": hash, "status": strings.ToLower(status), "filename": name, "revision": rev, "created_at": at})
 			}
 			respond(w, 200, out)
 			return
 		}
 	}
-	if len(p) >= 4 && p[2] == "bom-imports" {
+	if len(p) >= 4 && p[0] == "api" && p[1] == "v1" && p[2] == "bom-imports" {
 		id := p[3]
 		var project, status string
 		var rev int
@@ -98,15 +146,50 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			fail(w, 404, "NOT_FOUND")
 			return
 		}
+		if s.placements(w, r, id, rev, status, workbook, draft) {
+			return
+		}
+		if s.applyAI(w, r, id, rev, status, workbook) {
+			return
+		}
+		if s.mappingPatch(w, r, id, rev, status, workbook) {
+			return
+		}
+		if s.issues(w, r, id, rev) {
+			return
+		}
+		if s.packageAPI(w, r, id, rev, draft) {
+			return
+		}
+		if s.history(w, r, id) {
+			return
+		}
+		if s.aiAPI(w, r, id, rev, status, workbook) {
+			return
+		}
+		if s.profiles(w, r, id, rev, status, workbook) {
+			return
+		}
 		if len(p) == 4 && r.Method == "GET" {
-			respond(w, 200, map[string]any{"id": id, "status": status, "revision": rev, "workbook": json.RawMessage(workbook), "draft": json.RawMessage(draft), "issues": json.RawMessage(issues)})
+			var hash, sourceDocument, filename string
+			var reviewed *int
+			var errorCode *string
+			var created time.Time
+			s.db.QueryRow(ctx, "SELECT content_sha256,created_at,source_document_id,filename,reviewed_revision,error_code FROM bom_import_batch WHERE id=$1", id).Scan(&hash, &created, &sourceDocument, &filename, &reviewed, &errorCode)
+			respond(w, 200, map[string]any{"error_code": errorCode, "reviewed_revision": reviewed, "source_document_id": sourceDocument, "filename": filename, "project_id": project, "content_sha256": hash, "created_at": created, "mapping_revision": rev, "id": id, "status": strings.ToLower(status), "internal_status": status, "revision": rev, "workbook": json.RawMessage(workbook), "draft": json.RawMessage(draft), "issues": json.RawMessage(issues)})
 			return
 		}
 		if len(p) == 5 && s.action(w, r, id, p[4], rev, status, workbook, draft) {
 			return
 		}
 		if len(p) == 5 && p[4] == "sheets" && r.Method == "GET" {
-			respond(w, 200, json.RawMessage(workbook))
+			var wb bom.Workbook
+			json.Unmarshal(workbook, &wb)
+			rows := []any{}
+			for _, sh := range wb.Sheets {
+				rows = append(rows, map[string]any{"sheet_name": sh.Name, "index": sh.Order, "hidden": sh.Hidden, "detected_regions": []any{map[string]any{"region_id": sh.Name, "range": sh.Dimension}}, "merged_cells": sh.Merges})
+			}
+			respond(w, 200, rows)
 			return
 		}
 	}
@@ -125,7 +208,7 @@ func (s *Server) upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
-	if !strings.HasSuffix(strings.ToLower(h.Filename), ".xlsx") {
+	if !strings.HasSuffix(strings.ToLower(h.Filename), ".xlsx") && !strings.HasSuffix(strings.ToLower(h.Filename), ".xlsm") {
 		fail(w, 400, "UNSUPPORTED_FILE_TYPE")
 		return
 	}
@@ -141,18 +224,59 @@ func (s *Server) upload(w http.ResponseWriter, r *http.Request) {
 	id := uuid.NewString()
 	doc := uuid.NewString()
 	hash := sha256.Sum256(data)
+	declared := strings.TrimSpace(r.FormValue("declared_batch_id"))
+	template := strings.TrimSpace(r.FormValue("template_revision_id"))
+	if template == "" {
+		template = "manual-v1"
+	}
+	if len(declared) > 128 {
+		fail(w, 400, "INVALID_BATCH_ID")
+		return
+	}
+	if template != "manual-v1" {
+		var exists bool
+		if s.db.QueryRow(r.Context(), "SELECT EXISTS(SELECT 1 FROM bom_mapping_template WHERE project_id=$1 AND name||'@'||revision::text=$2)", s.project, template).Scan(&exists) != nil || !exists {
+			fail(w, 422, "TEMPLATE_NOT_FOUND")
+			return
+		}
+	}
+	if declared != "" {
+		var existing, oldHash, source, oldStatus string
+		var created time.Time
+		e = s.db.QueryRow(r.Context(), "SELECT id,content_sha256,source_document_id,status,created_at FROM bom_import_batch WHERE project_id=$1 AND declared_batch_id=$2", s.project, declared).Scan(&existing, &oldHash, &source, &oldStatus, &created)
+		if e == nil {
+			if oldHash != hex.EncodeToString(hash[:]) {
+				fail(w, 409, "BATCH_DIGEST_CONFLICT")
+				return
+			}
+			respond(w, 202, map[string]any{"id": existing, "project_id": s.project, "source_document_id": source, "content_sha256": oldHash, "status": strings.ToLower(oldStatus), "created_at": created})
+			return
+		}
+	}
 	key := s.project + "/sources/" + doc + ".xlsx"
 	_, e = s.objects.PutObject(r.Context(), s.bucket, key, bytes.NewReader(data), int64(len(data)), minio.PutObjectOptions{ContentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"})
 	if e != nil {
 		fail(w, 503, "OBJECT_STORAGE_UNAVAILABLE")
 		return
 	}
-	_, e = s.db.Exec(r.Context(), "INSERT INTO bom_import_batch(id,project_id,source_document_id,object_key,filename,content_sha256,status) VALUES($1,$2,$3,$4,$5,$6,'UPLOADED')", id, s.project, doc, key, h.Filename, hex.EncodeToString(hash[:]))
+	e = s.mutate(r.Context(), id, "import.uploaded", hex.EncodeToString(hash[:]), "INSERT INTO bom_import_batch(id,project_id,source_document_id,object_key,filename,content_sha256,status,declared_batch_id,template_revision_id) VALUES($1,$2,$3,$4,$5,$6,'UPLOADED',NULLIF($7,''),$8)", id, s.project, doc, key, h.Filename, hex.EncodeToString(hash[:]), declared, template)
 	if e != nil {
+		if declared != "" {
+			var existing, oldHash, oldStatus string
+			var created time.Time
+			if s.db.QueryRow(r.Context(), "SELECT id,content_sha256,status,created_at FROM bom_import_batch WHERE project_id=$1 AND declared_batch_id=$2", s.project, declared).Scan(&existing, &oldHash, &oldStatus, &created) == nil {
+				if oldHash != hex.EncodeToString(hash[:]) {
+					fail(w, 409, "BATCH_DIGEST_CONFLICT")
+					return
+				}
+				respond(w, 202, map[string]any{"id": existing, "project_id": s.project, "content_sha256": oldHash, "status": strings.ToLower(oldStatus), "created_at": created})
+				return
+			}
+		}
 		fail(w, 500, "DATABASE_ERROR")
 		return
 	}
-	respond(w, 202, map[string]any{"id": id, "status": "UPLOADED", "source_document_id": doc, "content_sha256": hex.EncodeToString(hash[:])})
+	respond(w, 202, map[string]any{"id": id, "status": "uploaded", "project_id": s.project, "created_at": time.Now().UTC(), "source_document_id": doc, "content_sha256": hex.EncodeToString(hash[:])})
 }
 func (s *Server) worker(ctx context.Context) {
 	tick := time.NewTicker(time.Second)
@@ -163,8 +287,9 @@ func (s *Server) worker(ctx context.Context) {
 			return
 		case <-tick.C:
 			s.publish(ctx)
-			var id, key string
-			e := s.db.QueryRow(ctx, "UPDATE bom_import_batch SET status='PARSING',updated_at=now() WHERE id=(SELECT id FROM bom_import_batch WHERE status='UPLOADED' OR (status='PARSING' AND updated_at<now()-interval '5 minutes') ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 1) RETURNING id,object_key").Scan(&id, &key)
+			s.runJob(ctx)
+			var id, key, expectedHash string
+			e := s.db.QueryRow(ctx, "UPDATE bom_import_batch SET status='PARSING',updated_at=now() WHERE id=(SELECT id FROM bom_import_batch WHERE project_id=$1 AND (status='UPLOADED' OR (status='PARSING' AND updated_at<now()-interval '5 minutes')) ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 1) RETURNING id,object_key,content_sha256", s.project).Scan(&id, &key, &expectedHash)
 			if e == nil {
 				obj, err := s.objects.GetObject(ctx, s.bucket, key, minio.GetObjectOptions{})
 				var wb bom.Workbook
@@ -173,15 +298,38 @@ func (s *Server) worker(ctx context.Context) {
 					b, err = io.ReadAll(io.LimitReader(obj, 20<<20+1))
 					obj.Close()
 					if err == nil {
-						wb, err = bom.Parse(b)
+						digest := sha256.Sum256(b)
+						if hex.EncodeToString(digest[:]) != expectedHash {
+							err = errors.New("SOURCE_HASH_MISMATCH")
+						} else {
+							wb, err = bom.Parse(b)
+						}
 					}
 				}
 				if err != nil {
-					s.db.Exec(ctx, "UPDATE bom_import_batch SET status='FAILED',error_code='PARSE_FAILED',updated_at=now() WHERE id=$1", id)
+					code := "PARSE_FAILED"
+					for _, allowed := range []string{"SOURCE_HASH_MISMATCH", "UNSAFE_ARCHIVE", "ROW_LIMIT", "COLUMN_LIMIT", "SHEET_LIMIT", "INVALID_WORKBOOK"} {
+						if err.Error() == allowed {
+							code = allowed
+						}
+					}
+					s.db.Exec(ctx, "UPDATE bom_import_batch SET status='FAILED',error_code=$2,updated_at=now() WHERE id=$1", id, code)
 				} else {
 					b, _ := json.Marshal(wb)
-					draft, _ := json.Marshal(bom.Draft(wb))
-					s.db.Exec(ctx, "UPDATE bom_import_batch SET status='MAPPING',workbook=$2,draft=$3,updated_at=now() WHERE id=$1", id, b, draft)
+					profileList := bom.Profiles(wb)
+					var template, project string
+					s.db.QueryRow(ctx, "SELECT template_revision_id,project_id FROM bom_import_batch WHERE id=$1", id).Scan(&template, &project)
+					var templateRaw []byte
+					if template != "manual-v1" && s.db.QueryRow(ctx, "SELECT profiles FROM bom_mapping_template WHERE project_id=$1 AND name||'@'||revision::text=$2", project, template).Scan(&templateRaw) == nil {
+						var approved []bom.Profile
+						json.Unmarshal(templateRaw, &approved)
+						profileList = bom.ApplyTemplate(wb, profileList, approved, template)
+					}
+					profiles, _ := json.Marshal(profileList)
+					initialDraft, initialIssues := bom.Generate(wb, profileList)
+					issueBytes, _ := json.Marshal(initialIssues)
+					draft, _ := json.Marshal(initialDraft)
+					s.db.Exec(ctx, "UPDATE bom_import_batch SET status='MAPPING',workbook=$2,draft=$3,profiles=$4,issues=$5,updated_at=now() WHERE id=$1", id, b, draft, profiles, issueBytes)
 				}
 			}
 		}

@@ -238,3 +238,7 @@ CollectionJob复用Job/worker与任务尝试机制；状态queued→running→su
 CMDB档案只聚合既有领域事实与稳定ID。关系按position/composition/physical/logical/business分类，planned/observed独立；一跳/渐进展开且节点有上限。配置基线、Intended、actual、operational分开，未知不代填。生命周期六阶段后继续维护/换件/退役，历史实体不当作当前库存重复项。
 
 唯一详细设计与模型边界见[CMDB-DOSSIER.md](CMDB-DOSSIER.md)。
+
+## BOM 真实开发增补
+
+用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。

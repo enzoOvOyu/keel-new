@@ -147,3 +147,7 @@ IA v2.3 插入前端 Mock 阶段：先冻结 IA-V2.3.md 的页面注册、作用
 ## 真实开发接入基线
 
 参见 [DESIGN-ALIGNMENT-AUDIT.md](DESIGN-ALIGNMENT-AUDIT.md) 与 [API-OPERATION-INDEX.md](API-OPERATION-INDEX.md)。保持现有页面、Provider 请求/响应和稳定资产身份；先接身份/权限与持久化基础，再按已批准模块顺序替换 HTTP Adapter。Mock 通过不等于真实授权、事务 Outbox、SSE 恢复或设备适配验证通过。资源专用分页、响应 envelope 与幂等字段以 OpenAPI 为准，不统一改写已实现接口。
+
+## BOM 真实开发增补
+
+用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。

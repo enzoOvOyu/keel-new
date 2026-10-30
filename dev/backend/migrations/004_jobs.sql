@@ -1,0 +1,2 @@
+CREATE TABLE IF NOT EXISTS bom_job(id uuid PRIMARY KEY,import_id uuid NOT NULL REFERENCES bom_import_batch(id),project_id text NOT NULL,kind text NOT NULL,revision int NOT NULL,status text NOT NULL DEFAULT 'pending',result jsonb NOT NULL DEFAULT '{}',error_code text,created_at timestamptz NOT NULL DEFAULT now(),updated_at timestamptz NOT NULL DEFAULT now());
+INSERT INTO schema_migration(version) VALUES(4) ON CONFLICT DO NOTHING;

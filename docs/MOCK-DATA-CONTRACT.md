@@ -181,3 +181,7 @@ fixture集中增加lossless_rules/profiles/baselines/evidence/raw_outputs/host_e
 沿用原64服务器/512GPU/24交换机及稳定端口/Cable/Rack ID；只补cmdb_field_provenance、cmdb_quality_findings、cmdb_saved_views及原领域配置历史/待审核BOM/生命周期/报告。Sheet/Cell映射明确synthetic，非真实工作簿解析。草稿U冲突不覆盖现场位置，pending缺端点不覆盖正式Cable，换件事件保存旧身份与不同的新NIC身份，退场归档示例不解锁当前阶段。
 
 唯一详细设计与模型边界见[CMDB-DOSSIER.md](CMDB-DOSSIER.md)。
+
+## BOM 真实开发增补
+
+用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。

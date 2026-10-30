@@ -200,3 +200,7 @@ Topology查询投影不持有第二套Device事实。物理视图组合BOM/Cable
 集中LosslessProvider/typed envelope及纯规则器，四处UI共用判据；Go和真实collector尚未接入。当前分层帧解析只认证合成格式，不声明原生NVUE字段解析通过；只读command allowlist不包含clear/set/action。历史拓扑不显示当前无损结果冒充历史。
 
 规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。
+
+## BOM 真实开发增补
+
+用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。

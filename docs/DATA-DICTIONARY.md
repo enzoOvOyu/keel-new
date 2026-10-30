@@ -196,3 +196,7 @@ LosslessRule@version（历史映射）、LosslessProfile、LosslessBaseline、Lo
 CmdbDossierAsset是既有八类物理资源投影（服务器/交换机/GPU/NIC/端口/光模块/Cable/Rack），不是新资产表。CmdbDossierRelation保留kind/fact/source_ref/revision；Source含字段值JSON、Sheet/单元格/批次/采集引用及freshness/support；Quality是数据问题，不能自动等同硬件故障。只新增演示字段来源/质量证据与保存视图，历史实际配置仍在原配置域集合。
 
 唯一详细设计与模型边界见[CMDB-DOSSIER.md](CMDB-DOSSIER.md)。
+
+## BOM 真实开发增补
+
+用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。

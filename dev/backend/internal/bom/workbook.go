@@ -18,6 +18,7 @@ type Cell struct {
 	Formula   string `json:"formula,omitempty"`
 	Hidden    bool   `json:"hidden"`
 	Sensitive bool   `json:"sensitive"`
+	Sheet     string `json:"sheet_name"`
 }
 type Sheet struct {
 	Name      string   `json:"sheet_name"`
@@ -70,7 +71,7 @@ func Parse(data []byte) (Workbook, error) {
 	for idx, name := range f.GetSheetList() {
 		visible, _ := f.GetSheetVisible(name)
 		dim, _ := f.GetSheetDimension(name)
-		s := Sheet{Name: name, Order: idx, Hidden: !visible, Dimension: dim, Purpose: "unclassified", Parser: "excelize-structure/v1", Cells: []Cell{}, Merges: []string{}}
+		s := Sheet{Name: name, Order: idx, Hidden: !visible, Dimension: dim, Purpose: "unclassified", Parser: "excelize-structure/v2", Cells: []Cell{}, Merges: []string{}}
 		merges, e := f.GetMergeCells(name)
 		if e != nil {
 			return result, e
@@ -100,15 +101,15 @@ func Parse(data []byte) (Workbook, error) {
 				return result, fmt.Errorf("COLUMN_LIMIT")
 			}
 			for c, v := range cols {
-				if v == "" {
+				ref, _ := excelize.CoordinatesToCellName(c+1, r)
+				formula, _ := f.GetCellFormula(name, ref)
+				if v == "" && formula == "" {
 					continue
 				}
-				ref, _ := excelize.CoordinatesToCellName(c+1, r)
 				if Sensitive(v) {
 					sensitiveCols[c+1] = true
 				}
 				redact := sensitiveCols[c+1] || Sensitive(v)
-				formula, _ := f.GetCellFormula(name, ref)
 				rv, _ := f.GetRowVisible(name, r)
 				cn, _ := excelize.ColumnNumberToName(c + 1)
 				cv, _ := f.GetColVisible(name, cn)
@@ -116,7 +117,7 @@ func Parse(data []byte) (Workbook, error) {
 					v = "[REDACTED]"
 					formula = ""
 				}
-				s.Cells = append(s.Cells, Cell{ref, r, c + 1, v, formula, !rv || !cv, redact})
+				s.Cells = append(s.Cells, Cell{ref, r, c + 1, v, formula, !rv || !cv, redact, name})
 			}
 		}
 		if e := rows.Error(); e != nil {
@@ -124,6 +125,21 @@ func Parse(data []byte) (Workbook, error) {
 			return result, e
 		}
 		rows.Close()
+		// Apply late-discovered sensitive columns to earlier rows too; cover key/value layouts.
+		blocked := map[string]bool{}
+		for _, c := range s.Cells {
+			if c.Sensitive {
+				blocked[fmt.Sprintf("%d:%d", c.Row, c.Column+1)] = true
+			}
+		}
+		for j := range s.Cells {
+			c := &s.Cells[j]
+			if sensitiveCols[c.Column] || (blocked[fmt.Sprintf("%d:%d", c.Row, c.Column)] && Field(c.Value) == "") {
+				c.Value = "[REDACTED]"
+				c.Formula = ""
+				c.Sensitive = true
+			}
+		}
 		result.Sheets = append(result.Sheets, s)
 	}
 	return result, nil

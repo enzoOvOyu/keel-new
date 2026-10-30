@@ -159,3 +159,7 @@ LL-EV-01…12验收：适用范围；版本/历史迁移；分层；模式单位
 CMDB-D-01…06：服务器→部件→端口→线缆→对端；Diff→来源→作业/工单；六阶段生命周期到验机/NCCL/退场证据；质量定位导入/采集；维护/unknown/stale/权限；跨列表/抽屉/机柜/拓扑同稳定ID。另验保存视图、人工备注审计/版本与只读权限。真机和正式Go仍NOT RUN。
 
 唯一详细设计与模型边界见[CMDB-DOSSIER.md](CMDB-DOSSIER.md)。
+
+## BOM 真实开发增补
+
+用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。
