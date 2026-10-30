@@ -9,3 +9,9 @@ web/node_modules/
 web/dist/
 *.tsbuildinfo
 AGENTS.v3.4-pack.md
+netbom.xlsx
+dev/node_modules/
+dev/dist/
+dev/backend/keel-api
+
+dev/node_modules
