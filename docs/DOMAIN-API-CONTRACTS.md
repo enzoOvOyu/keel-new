@@ -1,0 +1,138 @@
+# DOMAIN-API-CONTRACTS.md — 前端全量 API 资源契约
+
+> 本文定义 mock-first 阶段前端所需的核心资源模型和操作语义。`openapi.yaml` 是 HTTP wire contract；本文是资源字段/行为的补充说明。若字段冲突，以经审核后的 OpenAPI schema 为准，并同步修订本文。
+
+## 1. 通用响应
+
+```json
+{"data": {}, "request_id": "req_01..."}
+```
+
+列表响应：
+
+```json
+{"data": [], "page": {"limit": 50, "next_cursor": null, "has_more": false}, "request_id": "req_01..."}
+```
+
+错误响应见 `API-CONVENTIONS.md`。时间使用 ISO-8601 UTC；页面按项目时区显示。列表使用 cursor pagination，默认 limit=50、最大 200。所有资源都有稳定 `id`、`project_id`（平台级资源可为空）、`created_at`、`updated_at`、`revision`（可变资源）。
+
+## 2. 项目与总览
+
+`Project`: `id, code, name, status, template_id, region/site, owner, created_at, updated_at`。
+
+`ProjectOverview`: `project, bom_summary, device_summary, network_stage_summary, gate_summary, active_executions, open_issues, recent_events, cmdb_projection_status`。
+
+接口：`GET/POST /projects`、`GET/PATCH /projects/{project_id}`、`GET /projects/{project_id}/overview`。
+
+## 3. BOM 导入
+
+现有 BOM API 保持；核心资源：
+- `BOMImport`: `id, project_id, source_file_ref, content_sha256, template_revision_id, status, sheet_count, entity_counts, issue_counts, mapping_revision, validation_revision, cmdb_projection_status, created_by, created_at`。
+- `SheetRegion`: `sheet_name, region_id, range, detected_kind, header_rows, row_count, column_count, confidence, sensitive_columns_detected`。
+- `FieldMappingCandidate`: `id, source{sheet,cell,row,column,header,value_redacted}, target_entity, target_field, normalized_value, rule_source(template|deterministic|ai|manual), confidence, status, rationale, revision`。
+- `ValidationIssue`: `id, severity(BLOCK|WARN|INFO), code, message, source_location, entity_ref, field, expected, actual_redacted, resolution_status, rule_version`。
+- `BOMPreview`: `batch_id, content_hash, creates, updates, unchanged, conflicts, entity_counts, issue_counts, cmdb_effects, base_revision`。
+
+必须支持上传、读取解析状态、Sheet/region 列表、映射候选、修正映射、校验、issues、preview、build standard package、commit。commit 使用 Idempotency-Key；BLOCK 未清零返回 422；同批次异摘要返回 409；敏感值永不返回。
+
+## 4. CMDB
+
+`CMDBEntity`: `id, entity_type, stable_ref, project_id, display_name, current_status, source_event_id, source_refs[], relationships_summary, freshness, projection_status, created_at, updated_at, revision`。
+`CMDBRelationship`: `id, from_entity_id, relation_type, to_entity_id, source_event_id, valid_from, valid_to`。
+`LifecycleEvent`: `id, entity_id, event_type, occurred_at, actor, source_domain, source_ref, revision_ref, summary_redacted, status`。
+
+接口：实体搜索/详情/relationships/timeline/event 详情。CMDB 从 BOM 导入任务即开始投影。CMDB 不提供重复“手动创建同一资产”的写入口；需要修正资产时调用权威业务域 API，并由事件投影更新 CMDB。投影状态 `pending|complete|failed` 可见。
+
+## 5. Flow
+
+`Flow`: `id, project_id, name, description, status(draft|active|disabled|archived), revision, target_types(server|switch|both), script_ref, script_language, parameter_schema, timeout_seconds, retry_policy, concurrency_limit, failure_policy, schedule_summary, last_execution, success_rate, created_by, updated_at`。
+
+`TargetSelector`: `target_type, explicit_device_ids[], filters{site,rack,role,tags,status}, resolved_count, target_snapshot_id`。运行前必须预览解析目标并冻结快照，执行后不因资产筛选变化而改变目标集合。
+
+`Schedule`: `id, flow_id, enabled, expression, expression_type(cron|interval), timezone, next_run_at, last_run_at, misfire_policy, revision`。
+
+操作：list/detail/create/update/revisions/validate/run/schedules/enable/disable。脚本执行只允许针对已纳管、项目授权且符合目标状态的设备；敏感参数使用 secret reference，不返回 secret value。生产网络写操作需要单独审批/PushJob，不允许普通 Flow 绕过网络变更主链路。
+
+## 6. Execution
+
+`Execution`: `id, flow_id, flow_revision, project_id, status, trigger_source, started_by, target_snapshot_id, target_count, counts{queued,running,success,warning,failed,killed,result_unknown}, started_at, finished_at, duration_ms, schedule_id, parameter_snapshot_redacted, cmdb_projection_status, request_id`。
+`TaskRun`: `id, execution_id, task_key, target_id, status, attempt_count, started_at, finished_at, duration_ms, exit_code, error_summary, retryable`。
+`ExecutionLog`: `id, execution_id, task_run_id, target_id, attempt, timestamp, level, message_redacted, cursor`。
+`ExecutionOutput`: `id, execution_id, target_id, name, media_type, size_bytes, sha256, artifact_ref, created_at`。
+
+控制接口：pause/resume/kill/retry-failed。返回值说明是已接受命令还是已完成动作；kill 不得在尚无终止回执时返回最终 KILLED。日志支持 `cursor`, `target_id`, `level`, `since`, `until`。实时更新使用 SSE；断线后从 cursor 恢复。
+
+## 7. Device / Fabric
+
+`Device`: `id, project_id, category(server|switch), hostname, serial_redacted, model_ref, role, site, rack, rack_u, management_address_redacted, lifecycle_status, managed_status, health_status, last_seen_at, freshness, source_bom_item_id`。
+`PhysicalPort`: `id, device_id, physical_name, port_index, breakout_parent_id, role, speed, mac_redacted, admin_state, oper_state, peer_port_id, source_bom_item_id`。
+`NetworkBaseline`: `id, project_id, version, status(draft|tested|released|deprecated), source_ref, approved_by[], content_hash, created_at`。
+`PushJob`: `id, project_id, status, target_snapshot_id, baseline_revision, diff_summary, precheck, approvals, progress, started_at, finished_at, rollback_state`。
+
+网络配置下发操作必须先 diff/precheck/approval；无数据或不支持的能力返回 `unknown`，不能用空列表表示正常。
+
+## 8. Gates / Delivery
+
+`GateEvidence`: `id, subject_type, subject_id, gate_id, verdict(PASS|FAIL|BLOCKED|WAIVED), evidence_refs[], rule_versions[], collected_at, valid_until, waiver, revision`。
+`DeliveryRun`: `id, project_id, target_snapshot_id, current_stage, status, gate_summary, started_at, finished_at, blocked_reasons[], cmdb_projection_status`。
+
+所有证据必须带来源、采集时间、有效期和版本依赖。WAIVED 必须含审批人、理由、范围、有效期和整改计划。
+
+## 9. Issues / Monitoring
+
+`Issue`: `id, project_id, issue_type(T1..T7), source_domain, source_ref, severity, status, title, affected_entities[], evidence_refs[], assignee_id, resolution, created_at, updated_at, closed_at`。
+`Alert`: `id, project_id, rule_id, severity, status, source, subject_ref, first_seen_at, last_seen_at, count, summary, evidence_refs[]`。
+
+处置后可发起定向重验；关闭工单必须填写 resolution 和证据引用。工单与告警变化自动投影到 CMDB timeline。
+
+## 10. Templates / Media / Parameters / Audit
+
+- `ProjectTemplate`: 型号/网络/服务器基线、BOM 字段映射 revision、参数目录默认值、Flow blueprints、门禁策略、状态与审批。
+- `MediaArtifact`: 名称、类型、版本、架构/型号兼容、SHA256、approval state、retirement state；真实二进制使用 artifact ref，不在 JSON 内传输。
+- `Parameter`: key、type、allowed values、default、scope、template refs、compatibility constraints、revision。
+- `AuditEvent`: actor、action、resource、project scope、request_id、before/after redacted diff、timestamp、approval refs。
+
+所有写操作按权限/项目范围检查并审计；秘密不得进入 `before/after`、日志或 API 响应。
+
+## 11. Mock/真实 API 兼容验收
+
+1. 每个前端页面至少绑定一个 API contract 和固定 fixture。
+2. mock 响应必须通过 OpenAPI schema 验证。
+3. mock 与真实 API 在同一场景下具有相同字段、状态和错误码。
+4. API 字段改动先更新 OpenAPI，再更新 mock、Go handler 和页面类型；禁止只改其中一处。
+5. 所有长任务和执行控制接口测试 accepted/running/terminal/error 状态；所有 CMDB projection 测试 pending/complete/failed/replay。
+
+## Rack Diagram API 域
+
+- Rack/Diagram 查询只读；生成创建新 draft revision，不修改当前 published revision。
+- Placement 编辑只作用于指定 draft revision，必须传 `If-Match` 或 `revision_id`；冲突返回 409。
+- Publish 请求指定 `revision_id`，服务端重新校验 BOM/model/policy 版本与阻断问题；不允许仅凭前端校验状态发布。
+- Export 必须指定 revision 和 format（svg/png/pdf），并返回文件任务/下载引用；敏感字段不进入图纸标签或文件。
+- Schema 详情见 `RACK-DIAGRAM.md` 与 `openapi.yaml`。
+
+机柜图的生成、revision、placement、校验、发布与导出由 `RACK-DIAGRAM.md` 定义；布局发布和位置变更必须产生 CMDB 生命周期事件，不允许只更新前端 SVG。
+
+## OPS-2026-10-29 · 交付后运维设计增补
+
+### 复用域接口与页面绑定
+| 页面 / 交互 | API | 专用返回类型与行为 |
+|---|---|---|
+| 运维服务器/交换机列表 | GET /projects/{project_id}/operations/devices | OpsDeviceListEnvelope；category/机柜/型号/交付/维护/健康/告警及fabric/pod/role/nos/config过滤；复用Device稳定ID |
+| 服务器/交换机详情 | GET /devices/{device_id}/operations/detail | OpsDeviceDetailEnvelope；公共身份/维护/通道/观测context，server或switch专属详情；缺能力字段null+原因 |
+| 基线/意图/实测 | GET /devices/{device_id}/operations/configurations；GET .../config-diffs | OpsConfigurationListEnvelope / OpsConfigDiffListEnvelope；明确fact_kind与不可变revision；不提供直接写actual入口 |
+| 端口/LLDP/FDB/ARP/DDM | GET /devices/{device_id}/operations/ports；.../lldp；.../fdb；.../arp；.../ddm | 对应OpsPort/LLDP/FDB/ARP/DDMListEnvelope；分页、时间范围、来源与阈值；breakout指向既有port父子关系 |
+| 监控/硬件/健康/无损 | GET .../metrics；.../telemetry；.../logs | OpsMetric/Telemetry/LogListEnvelope；指标单位、nullable值、counter reset；历史快照不可变；日志按cursor检索 |
+| BMC传感器/SEL/电源 | GET .../bmc；GET .../bmc/sel；POST .../power-jobs | OpsBmcEnvelope / OpsLogListEnvelope / OpsJobEnvelope；maintained下Redfish policy_denied，IPMI允许性仍独立校验 |
+| 固件库存/升级 | GET .../firmware；POST .../firmware-upgrade-jobs；GET /firmware-upgrade-jobs/{job_id}；POST .../approve；POST .../execute | OpsFirmwareListEnvelope / OpsFirmwareUpgradeJobEnvelope；兼容、批准介质、策略、租约、审批/回读；不自动刷写 |
+| 采集策略/任务 | GET/POST /projects/{project_id}/collection-policies；PATCH /collection-policies/{policy_id}；POST /devices/{device_id}/collection-jobs；GET /collection-jobs/{job_id}；POST .../retry | OpsCollectionPolicyList/Envelope、OpsJobEnvelope；周期/手动、timeout、safe retry、last_success、状态保留 |
+| 维护/维修/复验/退役 | GET/POST /devices/{device_id}/maintenance-events；POST /devices/{device_id}/retirement-jobs | OpsMaintenanceEventList/Envelope、OpsJobEnvelope；绑定Issue/审批/验证，不能改变ipmi_only或恢复通道 |
+| 告警/工单/作业/审计关联 | GET /devices/{device_id}/operations/links | OpsAssetLinksEnvelope；关联现有Alert/Issue/Execution/PushJob/Approval/Audit IDs与时间，不复制平行工单或告警系统 |
+
+### 操作语义
+ObservationContext是所有新观测的必需字段。ConfigBaseline映射既有NetworkBaselineRevision或ConfigSetRevision；ConfigRevision为统一引用。FirmwareInventory按component_asset_id关联BOM子件；CollectionJob/FirmwareUpgradeJob复用Job/Execution/Lease，所有命令写审计和Outbox。
+
+维护状态变更事件附reason、window、issue/change/approval/verification refs和expected_revision；状态非法或版本冲突拒绝。retirement_jobs必须确认legal_hold/保留策略、采集停止、凭据撤销及关联历史保留；结果未知必须对账。
+
+全局device路径仍按资源所属project授权；list/detail/history/export/job/subscribe同策略。维护态限制与能力状态独立：supported并不代表policy_allowed。ops Mock与HTTP实现使用同一OpenAPI类型；新增设计schema不代表Handler已经实现。
+
+运维退役终态写入只允许已批准 RetirementJob 完成其停止采集、凭据撤销与保留检查后产生；MaintenanceRequest 不允许直接选择 retired，禁止通过普通维护事件绕过退役审批。

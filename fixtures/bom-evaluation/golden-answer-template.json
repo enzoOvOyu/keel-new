@@ -1,0 +1,27 @@
+{
+  "dataset_id": "synthetic-bom-v1",
+  "source_hash": "sha256:replace-with-fixture-hash",
+  "sheets": [
+    {
+      "name": "Device Information",
+      "kind": "asset_inventory",
+      "rows": [
+        {
+          "source": {
+            "sheet": "Device Information",
+            "row": 2,
+            "cell": "A2"
+          },
+          "entity": "device",
+          "field": "asset_code",
+          "value": "ASSET-TEST-001"
+        }
+      ]
+    }
+  ],
+  "canonical_entities": [],
+  "relationships": [],
+  "validation_issues": [],
+  "sensitive_columns_detected": [],
+  "notes": "Synthetic example only. Do not place real credentials or production identifiers here."
+}

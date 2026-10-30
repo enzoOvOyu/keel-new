@@ -1,0 +1,137 @@
+{
+  "routes": [
+    {
+      "path": "dashboard",
+      "status": "PASS"
+    },
+    {
+      "path": "project",
+      "status": "PASS"
+    },
+    {
+      "path": "bom",
+      "status": "PASS"
+    },
+    {
+      "path": "cmdb",
+      "status": "PASS"
+    },
+    {
+      "path": "inventory",
+      "status": "PASS"
+    },
+    {
+      "path": "racks",
+      "status": "PASS"
+    },
+    {
+      "path": "fabric",
+      "status": "PASS"
+    },
+    {
+      "path": "delivery",
+      "status": "PASS"
+    },
+    {
+      "path": "workflows",
+      "status": "PASS"
+    },
+    {
+      "path": "issues",
+      "status": "PASS"
+    },
+    {
+      "path": "monitoring",
+      "status": "PASS"
+    },
+    {
+      "path": "templates",
+      "status": "PASS"
+    },
+    {
+      "path": "media",
+      "status": "PASS"
+    },
+    {
+      "path": "parameters",
+      "status": "PASS"
+    },
+    {
+      "path": "users",
+      "status": "PASS"
+    },
+    {
+      "path": "audit",
+      "status": "PASS"
+    },
+    {
+      "path": "settings",
+      "status": "PASS"
+    },
+    {
+      "path": "/fabric?view=baseline",
+      "status": "PASS"
+    },
+    {
+      "path": "/fabric?view=push",
+      "status": "PASS"
+    },
+    {
+      "path": "/fabric?view=cables",
+      "status": "PASS"
+    },
+    {
+      "path": "/fabric?view=health",
+      "status": "PASS"
+    },
+    {
+      "path": "/delivery?view=lldp",
+      "status": "PASS"
+    },
+    {
+      "path": "/delivery?view=mapping",
+      "status": "PASS"
+    },
+    {
+      "path": "/delivery?view=config",
+      "status": "PASS"
+    },
+    {
+      "path": "/delivery?view=tests",
+      "status": "PASS"
+    },
+    {
+      "path": "/inventory?kind=operations",
+      "status": "PASS"
+    },
+    {
+      "path": "/inventory?kind=models",
+      "status": "PASS"
+    },
+    {
+      "path": "/monitoring?view=alerts",
+      "status": "PASS"
+    },
+    {
+      "path": "/monitoring?view=sources",
+      "status": "PASS"
+    },
+    {
+      "path": "/monitoring?view=rules",
+      "status": "PASS"
+    },
+    {
+      "path": "unknown → reconcile → failed-target retry → success",
+      "status": "PASS"
+    },
+    {
+      "path": "loading → loaded",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "widths": [
+    1440,
+    1280
+  ]
+}

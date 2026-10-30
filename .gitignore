@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+deploy_key
+deploy_key.pub
+*.zip
+keel-v3.2-codex-pack/
+web/node_modules/
+web/dist/
+*.tsbuildinfo
+AGENTS.v3.4-pack.md

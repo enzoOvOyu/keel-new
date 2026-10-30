@@ -1,0 +1,3 @@
+source_file,sheet,source_cell,source_header,source_value_redacted,target_entity,target_field,normalized_value,rule_source,review_status,issue_code
+synthetic.xlsx,Device Information,A2,资产编号,ASSET-TEST-001,device,asset_code,ASSET-TEST-001,template,approved,
+synthetic.xlsx,P2P design,A4,A设备名,DEVICE-A-TEST,cable,endpoint_a_device_ref,DEVICE-A-TEST,deterministic,approved,
