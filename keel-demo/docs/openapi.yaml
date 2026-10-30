@@ -6,9 +6,10 @@ info:
 servers:
   - url: /api/v1
 security:
-  - bearerAuth: []
   - cookieSession: []
 tags:
+  - name: Identity
+    description: Local authentication, project/resource RBAC and approvals
   - name: BOM Import
   - name: BOM
   - name: Jobs
@@ -480,80 +481,68 @@ paths:
     parameters: []
     get:
       tags:
-        - Projects
-      summary: List 项目与项目上下文
-      operationId: listProjects
+      - Identity
+      operationId: listIdentityProjects
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
       responses:
-        "200":
+        '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ListEnvelope"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      parameters:
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 200
-            default: 50
-        - name: cursor
-          in: query
-          schema:
-            type: string
-        - name: q
-          in: query
-          schema:
-            type: string
-        - name: status
-          in: query
-          schema:
-            type: string
-        - name: sort
-          in: query
-          schema:
-            type: string
+                $ref: '#/components/schemas/listIdentityProjectsEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
     post:
       tags:
-        - Projects
-      summary: Create 项目与项目上下文
-      operationId: createProject
+      - Identity
+      operationId: createIdentityProject
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
       responses:
-        "200":
+        '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ResourceEnvelope"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/Conflict"
-      parameters:
-        - name: Idempotency-Key
-          in: header
-          required: false
-          schema:
-            type: string
+                $ref: '#/components/schemas/createIdentityProjectEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ProjectWriteRequest"
+              $ref: '#/components/schemas/IdentityCreateProject'
+      parameters:
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
   /projects/{project_id}:
     parameters:
       - name: project_id
@@ -2521,139 +2510,139 @@ paths:
     parameters: []
     get:
       tags:
-        - Users
-      summary: List 用户与权限
-      operationId: listUsers
+      - Identity
+      operationId: listIdentityUsers
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
       responses:
-        "200":
+        '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ListEnvelope"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      parameters:
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 200
-            default: 50
-        - name: cursor
-          in: query
-          schema:
-            type: string
-        - name: q
-          in: query
-          schema:
-            type: string
-        - name: status
-          in: query
-          schema:
-            type: string
-        - name: sort
-          in: query
-          schema:
-            type: string
+                $ref: '#/components/schemas/listIdentityUsersEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
     post:
       tags:
-        - Users
-      summary: Create 用户与权限
-      operationId: createUser
+      - Identity
+      operationId: createIdentityUser
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
       responses:
-        "200":
+        '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ResourceEnvelope"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/Conflict"
-      parameters:
-        - name: Idempotency-Key
-          in: header
-          required: false
-          schema:
-            type: string
+                $ref: '#/components/schemas/createIdentityUserEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UserWriteRequest"
-  /users/{user_id}:
-    parameters:
-      - name: user_id
-        in: path
+              $ref: '#/components/schemas/IdentityCreateUser'
+      parameters:
+      - in: header
+        name: X-CSRF-Token
         required: true
         schema:
           type: string
+  /users/{user_id}:
+    parameters:
+    - in: path
+      name: user_id
+      required: true
+      schema:
+        type: string
     get:
       tags:
-        - Users
-      summary: Get 用户与权限
-      operationId: getUser
+      - Identity
+      operationId: getIdentityUser
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
       responses:
-        "200":
+        '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ResourceEnvelope"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/getIdentityUserEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
     patch:
       tags:
-        - Users
-      summary: Update 用户与权限
-      operationId: updateUser
+      - Identity
+      operationId: updateIdentityUser
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
       responses:
-        "200":
+        '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ResourceEnvelope"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/Conflict"
-      parameters:
-        - name: If-Match
-          in: header
-          required: false
-          schema:
-            type: string
+                $ref: '#/components/schemas/updateIdentityUserEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UserPatchRequest"
+              $ref: '#/components/schemas/IdentityUpdateUser'
+      parameters:
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
   /audit-events:
     parameters: []
     get:
@@ -3672,44 +3661,64 @@ paths:
     parameters: []
     get:
       tags:
-        - BOM Import
-      operationId: getBOMLocalSession
+      - Identity
+      operationId: getIdentitySession
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
       responses:
-        "200":
-          description: Project-authorized versioned BOM operation
+        '200':
+          description: Success
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/getBOMLocalSessionEnvelope"
-        "400":
+                $ref: '#/components/schemas/getIdentitySessionEnvelope'
+        '400':
           description: Invalid request
-        "403":
-          description: Scope/permission denied
-        "409":
-          description: Revision/state conflict
-        "422":
-          description: Unresolved engineering or review precondition
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
   /auth/logout:
     parameters: []
     post:
       tags:
-        - BOM Import
-      operationId: logoutBOMLocalSession
+      - Identity
+      operationId: logoutIdentity
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
       responses:
-        "200":
-          description: Project-authorized versioned BOM operation
+        '200':
+          description: Success
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/logoutBOMLocalSessionEnvelope"
-        "400":
+                $ref: '#/components/schemas/logoutIdentityEnvelope'
+        '400':
           description: Invalid request
-        "403":
-          description: Scope/permission denied
-        "409":
-          description: Revision/state conflict
-        "422":
-          description: Unresolved engineering or review precondition
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
+      parameters:
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
   /project-permissions:
     parameters: []
     get:
@@ -11866,30 +11875,35 @@ paths:
     parameters: []
     post:
       tags:
-        - BOM Import
-      operationId: loginBOMLocalSession
+      - Identity
+      operationId: loginIdentity
+      security: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/loginIdentityEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/BOMLogin"
-      responses:
-        "200":
-          description: Project-authorized versioned BOM operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/loginBOMLocalSessionEnvelope"
-        "400":
-          description: Invalid request
-        "403":
-          description: Scope/permission denied
-        "409":
-          description: Revision/state conflict
-        "422":
-          description: Unresolved engineering or review precondition
-      security: []
+              $ref: '#/components/schemas/IdentityLogin'
   /bom-rules:
     parameters: []
     get:
@@ -11972,6 +11986,707 @@ paths:
           description: Revision/state conflict
         "422":
           description: Unresolved engineering or review precondition
+  /auth/providers:
+    parameters: []
+    get:
+      tags:
+      - Identity
+      operationId: getIdentityProviders
+      security: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getIdentityProvidersEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
+  /auth/password:
+    parameters: []
+    post:
+      tags:
+      - Identity
+      operationId: changeIdentityPassword
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/changeIdentityPasswordEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityPassword'
+      parameters:
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
+  /roles:
+    parameters: []
+    get:
+      tags:
+      - Identity
+      operationId: listIdentityRoles
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listIdentityRolesEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
+  /permissions:
+    parameters: []
+    get:
+      tags:
+      - Identity
+      operationId: listIdentityPermissions
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listIdentityPermissionsEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
+  /sessions:
+    parameters: []
+    get:
+      tags:
+      - Identity
+      operationId: listIdentitySessions
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listIdentitySessionsEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
+  /login-events:
+    parameters: []
+    get:
+      tags:
+      - Identity
+      operationId: listIdentityLoginEvents
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listIdentityLoginEventsEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
+  /identity-audits:
+    parameters: []
+    get:
+      tags:
+      - Identity
+      operationId: listIdentityAudits
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listIdentityAuditsEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
+  /projects/{project_id}/members:
+    parameters:
+    - in: path
+      name: project_id
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - Identity
+      operationId: listIdentityMembers
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listIdentityMembersEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
+    post:
+      tags:
+      - Identity
+      operationId: grantIdentityMembership
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/grantIdentityMembershipEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityMembershipCommand'
+      parameters:
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
+  /projects/{project_id}/approvals:
+    parameters:
+    - in: path
+      name: project_id
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - Identity
+      operationId: listIdentityApprovals
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listIdentityApprovalsEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
+    post:
+      tags:
+      - Identity
+      operationId: requestIdentityApproval
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/requestIdentityApprovalEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityApprovalCommand'
+      parameters:
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
+  /users/{user_id}/reset-password:
+    parameters:
+    - in: path
+      name: user_id
+      required: true
+      schema:
+        type: string
+    post:
+      tags:
+      - Identity
+      operationId: resetIdentityPassword
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resetIdentityPasswordEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityResetPassword'
+      parameters:
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
+  /users/{user_id}/unlock:
+    parameters:
+    - in: path
+      name: user_id
+      required: true
+      schema:
+        type: string
+    post:
+      tags:
+      - Identity
+      operationId: unlockIdentityUser
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/unlockIdentityUserEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
+      parameters:
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
+  /users/{user_id}/global-roles:
+    parameters:
+    - in: path
+      name: user_id
+      required: true
+      schema:
+        type: string
+    post:
+      tags:
+      - Identity
+      operationId: grantIdentityGlobalRole
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/grantIdentityGlobalRoleEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityGlobalRoleCommand'
+      parameters:
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
+  /sessions/{session_id}:
+    parameters:
+    - in: path
+      name: session_id
+      required: true
+      schema:
+        type: string
+    delete:
+      tags:
+      - Identity
+      operationId: revokeIdentitySession
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/revokeIdentitySessionEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
+      parameters:
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
+  /projects/{project_id}/members/{membership_id}:
+    parameters:
+    - in: path
+      name: project_id
+      required: true
+      schema:
+        type: string
+    - in: path
+      name: membership_id
+      required: true
+      schema:
+        type: string
+    delete:
+      tags:
+      - Identity
+      operationId: revokeIdentityMembership
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/revokeIdentityMembershipEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
+      parameters:
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
+  /projects/{project_id}/approvals/{approval_id}/sign:
+    parameters:
+    - in: path
+      name: project_id
+      required: true
+      schema:
+        type: string
+    - in: path
+      name: approval_id
+      required: true
+      schema:
+        type: string
+    post:
+      tags:
+      - Identity
+      operationId: signIdentityApproval
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/signIdentityApprovalEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentitySignCommand'
+      parameters:
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
+  /projects/{project_id}/approvals/{approval_id}/check:
+    parameters:
+    - in: path
+      name: project_id
+      required: true
+      schema:
+        type: string
+    - in: path
+      name: approval_id
+      required: true
+      schema:
+        type: string
+    post:
+      tags:
+      - Identity
+      operationId: checkIdentityApproval
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/checkIdentityApprovalEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityApprovalCheck'
+      parameters:
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
+  /authorization/check:
+    parameters: []
+    post:
+      tags:
+      - Identity
+      operationId: checkIdentityAuthorization
+      security:
+      - cookieSession: []
+      description: Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/checkIdentityAuthorizationEnvelope'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthenticated or session expired
+        '403':
+          description: Scope, CSRF or permission denied
+        '409':
+          description: Identity state conflict
+        '422':
+          description: Invalid input or approval policy unresolved
+        '429':
+          description: Login rate limited
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityAuthorizationCheck'
+      parameters:
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
 components:
   securitySchemes:
     bearerAuth:
@@ -33534,28 +34249,7 @@ components:
         - username
         - password
     BOMSession:
-      type: object
-      properties:
-        actor:
-          type: string
-        role:
-          type: string
-        project_id:
-          type: string
-        csrf_token:
-          type: string
-        permissions:
-          type: array
-          items:
-            type: string
-        ai_configured:
-          type: boolean
-      required:
-        - actor
-        - role
-        - project_id
-        - csrf_token
-        - permissions
+      $ref: '#/components/schemas/IdentitySession'
     loginBOMLocalSessionEnvelope:
       type: object
       properties:
@@ -33760,6 +34454,1048 @@ components:
         - after
         - observed_at
         - source_kind
+    IdentityRoleId:
+      type: string
+      enum:
+      - viewer
+      - delivery_engineer
+      - delivery_lead
+      - developer_sre
+      - admin
+      - network_engineer
+    IdentityUser:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        display_name:
+          type: string
+        status:
+          type: string
+          enum:
+          - active
+          - disabled
+        locked_until:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        permission_version:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - username
+      - display_name
+      - status
+      - locked_until
+    IdentityProject:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        code:
+          type: string
+        status:
+          type: string
+        template_id:
+          type: string
+      required:
+      - id
+      - name
+      - code
+      - status
+    IdentityPermission:
+      type: object
+      properties:
+        id:
+          type: string
+        module:
+          type: string
+        action:
+          type: string
+        description:
+          type: string
+      required:
+      - id
+      - module
+      - action
+      - description
+    IdentityRole:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/IdentityRoleId'
+        name:
+          type: string
+        description:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string
+        assignable_to_project:
+          type: boolean
+      required:
+      - id
+      - name
+      - description
+      - permissions
+      - assignable_to_project
+    IdentityGrant:
+      type: object
+      properties:
+        id:
+          type: string
+        project_id:
+          type: string
+        role_id:
+          $ref: '#/components/schemas/IdentityRoleId'
+        resource_type:
+          type: string
+        resource_id:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string
+      required:
+      - id
+      - project_id
+      - role_id
+      - resource_type
+      - resource_id
+      - permissions
+    IdentitySession:
+      type: object
+      properties:
+        actor:
+          type: string
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+            username:
+              type: string
+            display_name:
+              type: string
+          required:
+          - id
+          - username
+          - display_name
+        role:
+          type: string
+        project_id:
+          type: string
+        csrf_token:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string
+        ai_configured:
+          type: boolean
+        global_permissions:
+          type: array
+          items:
+            type: string
+        global_roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentityRoleId'
+        project_permissions:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+        project_roles:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/IdentityRoleId'
+        grants:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentityGrant'
+        authorized_projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentityProject'
+        permission_revision:
+          type: integer
+      required:
+      - actor
+      - user
+      - role
+      - project_id
+      - csrf_token
+      - permissions
+      - ai_configured
+      - global_permissions
+      - global_roles
+      - project_permissions
+      - project_roles
+      - grants
+      - authorized_projects
+      - permission_revision
+    IdentityProviders:
+      type: object
+      properties:
+        status:
+          const: ready
+        methods:
+          type: array
+          items:
+            const: local
+        environment:
+          type: string
+      required:
+      - status
+      - methods
+      - environment
+    IdentityLogin:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+        method:
+          const: local
+      required:
+      - username
+      - password
+    IdentityMutation:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          const: updated
+      required:
+      - id
+      - status
+    IdentityStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+      - status
+    IdentityCreateUser:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 64
+        display_name:
+          type: string
+        password:
+          type: string
+          minLength: 12
+          maxLength: 256
+          writeOnly: true
+      required:
+      - username
+      - display_name
+      - password
+    IdentityUpdateUser:
+      type: object
+      properties:
+        display_name:
+          type: string
+        status:
+          type: string
+          enum:
+          - active
+          - disabled
+      required: []
+    IdentityPassword:
+      type: object
+      properties:
+        current_password:
+          type: string
+          writeOnly: true
+        new_password:
+          type: string
+          minLength: 12
+          maxLength: 256
+          writeOnly: true
+      required:
+      - current_password
+      - new_password
+    IdentityResetPassword:
+      type: object
+      properties:
+        new_password:
+          type: string
+          minLength: 12
+          maxLength: 256
+          writeOnly: true
+      required:
+      - new_password
+    IdentityGlobalRoleCommand:
+      type: object
+      properties:
+        role_id:
+          const: admin
+        revoke:
+          type: boolean
+        expires_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+      required:
+      - role_id
+    IdentityMembership:
+      type: object
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        username:
+          type: string
+        display_name:
+          type: string
+        role_id:
+          $ref: '#/components/schemas/IdentityRoleId'
+        resource_type:
+          type: string
+        resource_id:
+          type: string
+        valid_from:
+          type: string
+          format: date-time
+        expires_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        revoked_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+      required:
+      - id
+      - user_id
+      - username
+      - display_name
+      - role_id
+      - resource_type
+      - resource_id
+      - valid_from
+      - expires_at
+      - revoked_at
+    IdentityMembershipCommand:
+      type: object
+      properties:
+        user_id:
+          type: string
+        username:
+          type: string
+        role_id:
+          type: string
+          enum:
+          - viewer
+          - delivery_engineer
+          - delivery_lead
+          - developer_sre
+          - network_engineer
+        resource_type:
+          type: string
+        resource_id:
+          type: string
+        expires_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - role_id
+      - reason
+    IdentitySessionRecord:
+      type: object
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        username:
+          type: string
+        ip:
+          type: string
+        user_agent:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        expires_at:
+          type: string
+          format: date-time
+        revoked_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        last_seen_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - user_id
+      - username
+      - ip
+      - user_agent
+      - created_at
+      - expires_at
+      - revoked_at
+      - last_seen_at
+    IdentityLoginEvent:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        outcome:
+          type: string
+        ip:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - username
+      - outcome
+      - ip
+      - created_at
+    IdentityAuditSnapshot:
+      type: object
+      properties:
+        user:
+          type:
+          - object
+          - 'null'
+          properties:
+            id:
+              type: string
+            username:
+              type: string
+            display_name:
+              type: string
+            status:
+              type: string
+              enum:
+              - active
+              - disabled
+            locked_until:
+              type:
+              - string
+              - 'null'
+              format: date-time
+            permission_version:
+              type: integer
+            created_at:
+              type: string
+              format: date-time
+        global_roles:
+          type: array
+          items:
+            type: object
+            properties:
+              role_id:
+                type: string
+              expires_at:
+                type:
+                - string
+                - 'null'
+                format: date-time
+              revoked_at:
+                type:
+                - string
+                - 'null'
+                format: date-time
+            required:
+            - role_id
+            - expires_at
+            - revoked_at
+        memberships:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              project_id:
+                type: string
+              role_id:
+                type: string
+              resource_type:
+                type: string
+              resource_id:
+                type: string
+              expires_at:
+                type:
+                - string
+                - 'null'
+                format: date-time
+              revoked_at:
+                type:
+                - string
+                - 'null'
+                format: date-time
+            required:
+            - id
+            - project_id
+            - role_id
+            - resource_type
+            - resource_id
+            - expires_at
+            - revoked_at
+        active_sessions:
+          type: integer
+      required:
+      - user
+      - global_roles
+      - memberships
+      - active_sessions
+    IdentityAuditEvent:
+      type: object
+      properties:
+        id:
+          type: string
+        actor:
+          type: string
+        action:
+          type: string
+        resource_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        details:
+          type: object
+          properties:
+            method:
+              type: string
+            path:
+              type: string
+            before:
+              $ref: '#/components/schemas/IdentityAuditSnapshot'
+            after:
+              $ref: '#/components/schemas/IdentityAuditSnapshot'
+            group:
+              type: string
+            decision:
+              type: string
+            reason:
+              type: string
+          required: []
+      required:
+      - id
+      - actor
+      - action
+      - resource_id
+      - created_at
+      - details
+    IdentityApproval:
+      type: object
+      properties:
+        id:
+          type: string
+        requester_id:
+          type: string
+        action:
+          type: string
+        resource_type:
+          type: string
+        resource_id:
+          type: string
+        snapshot_version:
+          type: string
+        risk:
+          enum:
+          - normal
+          - critical
+        state:
+          enum:
+          - pending
+          - approved
+          - rejected
+          - blocked_policy
+        required_groups:
+          type: array
+          items:
+            enum:
+            - NE
+            - DE
+            - DL
+            - NH
+        target_ids:
+          type: array
+          items:
+            type: string
+        reason:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - requester_id
+      - action
+      - resource_type
+      - resource_id
+      - snapshot_version
+      - risk
+      - state
+      - required_groups
+      - target_ids
+      - reason
+      - expires_at
+    IdentityApprovalCommand:
+      type: object
+      properties:
+        action:
+          enum:
+          - network_config
+          - bios
+          - firmware
+          - bmc_power
+          - reinstall
+          - cleanup
+        resource_type:
+          type: string
+        resource_id:
+          type: string
+        snapshot_version:
+          type: string
+        risk:
+          enum:
+          - normal
+          - critical
+        target_ids:
+          type: array
+          items:
+            type: string
+        reason:
+          type: string
+        expires_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+      required:
+      - action
+      - resource_type
+      - resource_id
+      - snapshot_version
+      - risk
+      - target_ids
+      - reason
+    IdentitySignCommand:
+      type: object
+      properties:
+        group:
+          enum:
+          - NE
+          - DE
+          - DL
+          - NH
+        decision:
+          enum:
+          - approve
+          - reject
+        reason:
+          type: string
+      required:
+      - group
+      - decision
+      - reason
+    IdentityApprovalCheck:
+      type: object
+      properties:
+        resource_id:
+          type: string
+        snapshot_version:
+          type: string
+        target_ids:
+          type: array
+          items:
+            type: string
+      required:
+      - resource_id
+      - snapshot_version
+      - target_ids
+    IdentityAuthorizationCheck:
+      type: object
+      properties:
+        permission:
+          type: string
+        project_id:
+          type: string
+        resource_type:
+          type: string
+        resource_id:
+          type: string
+      required:
+      - permission
+      - project_id
+    IdentityCreateProject:
+      type: object
+      properties:
+        name:
+          type: string
+        code:
+          type: string
+        template_id:
+          type: string
+      required:
+      - name
+      - code
+    getIdentityProvidersEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IdentityProviders'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    loginIdentityEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IdentitySession'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getIdentitySessionEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IdentitySession'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    logoutIdentityEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IdentityStatus'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    changeIdentityPasswordEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IdentityMutation'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    listIdentityUsersEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentityUser'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    listIdentityRolesEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentityRole'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    listIdentityPermissionsEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentityPermission'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    listIdentitySessionsEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentitySessionRecord'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    listIdentityLoginEventsEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentityLoginEvent'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    listIdentityAuditsEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentityAuditEvent'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    listIdentityProjectsEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentityProject'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    listIdentityMembersEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentityMembership'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    listIdentityApprovalsEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentityApproval'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    createIdentityUserEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IdentityMutation'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getIdentityUserEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IdentityUser'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    updateIdentityUserEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IdentityMutation'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    resetIdentityPasswordEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IdentityMutation'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    unlockIdentityUserEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IdentityMutation'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    grantIdentityGlobalRoleEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IdentityMutation'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    revokeIdentitySessionEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IdentityMutation'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    createIdentityProjectEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IdentityMutation'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    grantIdentityMembershipEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IdentityMutation'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    revokeIdentityMembershipEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IdentityMutation'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    requestIdentityApprovalEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IdentityMutation'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    signIdentityApprovalEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            state:
+              type: string
+          required:
+          - id
+          - state
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    checkIdentityApprovalEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            allowed:
+              type: boolean
+            permission_allowed:
+              type: boolean
+            approval_satisfied:
+              type: boolean
+            device_execution:
+              const: not_performed
+          required:
+          - allowed
+          - permission_allowed
+          - approval_satisfied
+          - device_execution
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    checkIdentityAuthorizationEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            allowed:
+              type: boolean
+          required:
+          - allowed
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
 x-implementation-policy:
   frontend-first: true
   mock-provider-required: true

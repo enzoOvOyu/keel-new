@@ -52,7 +52,7 @@ func (s *Server) queueValidation(w http.ResponseWriter, r *http.Request, id stri
 func (s *Server) runJob(ctx context.Context) {
 	var job, id string
 	var rev int
-	e := s.db.QueryRow(ctx, "UPDATE bom_job SET status='running',updated_at=now() WHERE id=(SELECT id FROM bom_job WHERE project_id=$1 AND (status='pending' OR (status='running' AND updated_at<now()-interval '5 minutes')) ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 1) RETURNING id,import_id,revision", s.project).Scan(&job, &id, &rev)
+	e := s.db.QueryRow(ctx, "UPDATE bom_job SET status='running',updated_at=now() WHERE id=(SELECT id FROM bom_job WHERE (status='pending' OR (status='running' AND updated_at<now()-interval '5 minutes')) ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 1) RETURNING id,import_id,revision").Scan(&job, &id, &rev)
 	if e != nil {
 		return
 	}

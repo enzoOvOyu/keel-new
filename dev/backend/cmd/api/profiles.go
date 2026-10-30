@@ -110,7 +110,7 @@ func (s *Server) profiles(w http.ResponseWriter, r *http.Request, id string, rev
 		fail(w, 409, "REVISION_CONFLICT")
 		return true
 	}
-	_, e = tx.Exec(r.Context(), "INSERT INTO audit_event(id,project_id,actor,action,resource_id,details) VALUES(gen_random_uuid(),$1,'local-developer','profiles.corrected',$2,jsonb_build_object('reason',$3::text))", s.project, id, req.Reason)
+	_, e = tx.Exec(r.Context(), "INSERT INTO audit_event(id,project_id,actor,action,resource_id,details) VALUES(gen_random_uuid(),$1,$4,'profiles.corrected',$2,jsonb_build_object('reason',$3::text))", s.project, id, req.Reason, actorName(r.Context()))
 	if e != nil || tx.Commit(r.Context()) != nil {
 		fail(w, 500, "SAVE_FAILED")
 		return true

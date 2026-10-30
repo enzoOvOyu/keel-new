@@ -151,3 +151,7 @@ IA v2.3 插入前端 Mock 阶段：先冻结 IA-V2.3.md 的页面注册、作用
 ## BOM 真实开发增补
 
 用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。
+
+## 2026-10-30 · 身份切片接入
+
+身份模块按版本迁移→权限目录/主体→Cookie/CSRF登录→管理与审批API→全局IdentityProvider→原登录页迁入→BOM移除独立登录→定向验收完成。BOM已真实接入，其他设备模块继续Mock；后续设备执行API必须消费同一权限与审批校验，不为本任务提前落地设备后端。见 IDENTITY-RBAC.md。

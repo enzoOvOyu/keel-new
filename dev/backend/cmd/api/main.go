@@ -14,6 +14,7 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"io"
 	"keel.local/dev/internal/bom"
+	"keel.local/dev/internal/identity"
 	"log"
 	"net/http"
 	"os"
@@ -23,9 +24,9 @@ import (
 )
 
 type Server struct {
-	db                     *pgxpool.Pool
-	objects                *minio.Client
-	bucket, token, project string
+	db              *pgxpool.Pool
+	objects         *minio.Client
+	bucket, project string
 }
 
 func env(k, d string) string {
@@ -57,35 +58,20 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	r = authenticated
-	role := r.Context().Value(principalKey{}).(principal).Role
-	if r.URL.Path == "/api/v1/auth/logout" && r.Method == "POST" {
-		if cookie, e := r.Cookie("keel_session"); e == nil {
-			if _, e = s.db.Exec(r.Context(), "DELETE FROM api_session WHERE token_hash=$1", digestToken(cookie.Value)); e != nil {
-				fail(w, 503, "SESSION_STORE_UNAVAILABLE")
-				return
-			}
-		}
-		http.SetCookie(w, &http.Cookie{Name: "keel_session", Value: "", Path: "/api/v1", HttpOnly: true, SameSite: http.SameSiteStrictMode, MaxAge: -1})
-		respond(w, 200, map[string]string{"status": "signed_out"})
-		return
-	}
-	if r.URL.Path == "/api/v1/auth/session" && r.Method == "GET" {
-		p := r.Context().Value(principalKey{}).(principal)
-		var csrf string
-		if cookie, e := r.Cookie("keel_session"); e == nil {
-			s.db.QueryRow(r.Context(), "SELECT csrf_token FROM api_session WHERE token_hash=$1", digestToken(cookie.Value)).Scan(&csrf)
-		}
-		respond(w, 200, map[string]any{"actor": p.Actor, "role": p.Role, "project_id": p.Project, "csrf_token": csrf, "permissions": authPermissions(p.Role), "ai_configured": os.Getenv("AI_ENDPOINT") != "" && os.Getenv("AI_API_KEY") != ""})
-		return
-	}
 	if r.Method != "GET" && r.Header.Get("Origin") != "" && !allowedOrigin(r, r.Header.Get("Origin")) {
 		fail(w, 403, "ORIGIN_DENIED")
 		return
 	}
-	if role == "viewer" && r.Method != "GET" {
-		fail(w, 403, "FORBIDDEN")
+	if s.identityRoutes(w, r) {
 		return
 	}
+	project, ok := s.authorizeRequest(w, r)
+	if !ok {
+		return
+	}
+	scoped := *s
+	scoped.project = project
+	s = &scoped
 	if r.URL.Path == "/api/v1/bom-rules" && r.Method == "GET" {
 		respond(w, 200, bom.RuleCatalog())
 		return
@@ -102,10 +88,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if s.published(w, r) {
 		return
 	}
-	if role == "viewer" && r.Method != "GET" {
-		fail(w, 403, "FORBIDDEN")
-		return
-	}
+
 	ctx := r.Context()
 	p := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
 	if len(p) == 5 && p[0] == "api" && p[1] == "v1" && p[2] == "projects" && p[4] == "bom-imports" {
@@ -289,7 +272,7 @@ func (s *Server) worker(ctx context.Context) {
 			s.publish(ctx)
 			s.runJob(ctx)
 			var id, key, expectedHash string
-			e := s.db.QueryRow(ctx, "UPDATE bom_import_batch SET status='PARSING',updated_at=now() WHERE id=(SELECT id FROM bom_import_batch WHERE project_id=$1 AND (status='UPLOADED' OR (status='PARSING' AND updated_at<now()-interval '5 minutes')) ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 1) RETURNING id,object_key,content_sha256", s.project).Scan(&id, &key, &expectedHash)
+			e := s.db.QueryRow(ctx, "UPDATE bom_import_batch SET status='PARSING',updated_at=now() WHERE id=(SELECT id FROM bom_import_batch WHERE (status='UPLOADED' OR (status='PARSING' AND updated_at<now()-interval '5 minutes')) ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 1) RETURNING id,object_key,content_sha256").Scan(&id, &key, &expectedHash)
 			if e == nil {
 				obj, err := s.objects.GetObject(ctx, s.bucket, key, minio.GetObjectOptions{})
 				var wb bom.Workbook
@@ -338,10 +321,6 @@ func (s *Server) worker(ctx context.Context) {
 func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
-	token := os.Getenv("KEEL_API_TOKEN")
-	if len(token) < 32 {
-		log.Fatal("KEEL_API_TOKEN must be configured, minimum 32 characters")
-	}
 	db, e := pgxpool.New(ctx, os.Getenv("DATABASE_URL"))
 	if e != nil {
 		log.Fatal("database configuration invalid")
@@ -349,6 +328,9 @@ func main() {
 	defer db.Close()
 	if e = db.Ping(ctx); e != nil {
 		log.Fatal("database unavailable")
+	}
+	if e = (identity.Service{DB: db}).Initialize(ctx, os.Getenv("KEEL_BOOTSTRAP_PASSWORD")); e != nil {
+		log.Fatal("identity initialization failed: ", e)
 	}
 	objects, e := minio.New(env("S3_ENDPOINT", "127.0.0.1:9000"), &minio.Options{Creds: credentials.NewStaticV4(os.Getenv("S3_ACCESS_KEY"), os.Getenv("S3_SECRET_KEY"), ""), Secure: false})
 	if e != nil {
@@ -364,7 +346,7 @@ func main() {
 			log.Fatal("bucket initialization failed")
 		}
 	}
-	s := &Server{db, objects, bucket, token, env("KEEL_PROJECT_ID", "proj-b300-demo")}
+	s := &Server{db, objects, bucket, env("KEEL_PROJECT_ID", "proj-b300-demo")}
 	go s.worker(ctx)
 	srv := &http.Server{Addr: env("LISTEN_ADDR", "127.0.0.1:8081"), Handler: s, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 60 * time.Second, WriteTimeout: 60 * time.Second, MaxHeaderBytes: 1 << 20}
 	go func() {

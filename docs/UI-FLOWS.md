@@ -111,3 +111,7 @@ Fabric无损选择设备/反例→端口→rule@version→五层证据→读取�
 ## BOM 真实开发增补
 
 用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。
+
+## 2026-10-30 · 认证、成员与审批闭环
+
+访问业务URL→无Session跳统一登录→本地身份验证→加载授权项目→返回原URL；越权project_id返回403。管理员创建用户→项目成员选择角色/范围/有效期→授权审计→对应账号可访问；撤销/禁用后旧Session下一次请求被拒绝。操作申请冻结版本/目标→独立签署→执行前校验；Critical NH待决阻断。BOM保持六步，不出现独立登录表单。详见 IDENTITY-RBAC.md。

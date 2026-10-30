@@ -12,6 +12,8 @@
 
 ## 2. 角色
 
+以下为业务职责称谓；默认认证角色与映射以本文件“身份认证与项目授权实施补充”和 IDENTITY-RBAC.md 为准。业务签署职责不自动授予平台权限。
+
 - `DE` 交付工程师：装机、验机、配置、测试和异常处理。
 - `DL` 交付组长：门禁审核、豁免、项目放行。
 - `NE` 网络工程师：网络资料、配置基线、网络故障处置。
@@ -280,3 +282,7 @@ FR-28：CMDB升级全链路资产档案。保留跨项目授权与统一设备�
 ## BOM 真实开发增补
 
 用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。
+
+## 2026-10-30 · 身份认证与项目授权实施补充
+
+默认身份角色固定为 viewer、delivery_engineer、delivery_lead、developer_sre、admin、network_engineer；DE/DL/NE/SRE/Viewer 为业务称谓映射，研发与管理员分离。RBAC + Project/Resource Scope 默认拒绝；权限与审批分开，申请人不得自批；NE 无服务器重装/清理执行权限。NH 业务职责保留，资格绑定待决，不映射 Admin，Critical 变更阻断。用户故事、真实范围与验收见 IDENTITY-RBAC.md。此补充细化现有角色/安全要求，不重编号或删除既有 FR。

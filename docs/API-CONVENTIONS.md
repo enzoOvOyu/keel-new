@@ -335,3 +335,7 @@ workspace/mapping按需返回ports/cables及授权peer_ports/peer_devices；关�
 ## BOM 真实开发增补
 
 用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。
+
+## 2026-10-30 · 真实身份 HTTP 约定
+
+真实 API 使用 cookieSession + 写请求 X-CSRF-Token；旧开发 Bearer 不再作为绕过认证入口。授权从每次数据库主体与资源所属项目解析，不相信前端角色。401 表示会话不可用，403 表示权限/作用域/CSRF拒绝，409 表示身份或冻结快照冲突，422 表示输入/审批策略不满足，429 表示登录限流。真实路径与 Identity* Schema 见 openapi.yaml；业务/管理列表现有200条上限及前端分页边界见 IDENTITY-RBAC.md。

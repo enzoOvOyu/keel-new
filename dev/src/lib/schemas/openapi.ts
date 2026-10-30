@@ -293,11 +293,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List 项目与项目上下文 */
-        get: operations["listProjects"];
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        get: operations["listIdentityProjects"];
         put?: never;
-        /** Create 项目与项目上下文 */
-        post: operations["createProject"];
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        post: operations["createIdentityProject"];
         delete?: never;
         options?: never;
         head?: never;
@@ -902,11 +902,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List 用户与权限 */
-        get: operations["listUsers"];
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        get: operations["listIdentityUsers"];
         put?: never;
-        /** Create 用户与权限 */
-        post: operations["createUser"];
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        post: operations["createIdentityUser"];
         delete?: never;
         options?: never;
         head?: never;
@@ -922,15 +922,15 @@ export interface paths {
             };
             cookie?: never;
         };
-        /** Get 用户与权限 */
-        get: operations["getUser"];
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        get: operations["getIdentityUser"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        /** Update 用户与权限 */
-        patch: operations["updateUser"];
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        patch: operations["updateIdentityUser"];
         trace?: never;
     };
     "/audit-events": {
@@ -1527,7 +1527,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["getBOMLocalSession"];
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        get: operations["getIdentitySession"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1545,7 +1546,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["logoutBOMLocalSession"];
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        post: operations["logoutIdentity"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4491,7 +4493,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["loginBOMLocalSession"];
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        post: operations["loginIdentity"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4549,6 +4552,318 @@ export interface paths {
         options?: never;
         head?: never;
         patch: operations["confirmBOMPlacement"];
+        trace?: never;
+    };
+    "/auth/providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        get: operations["getIdentityProviders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        post: operations["changeIdentityPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        get: operations["listIdentityRoles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        get: operations["listIdentityPermissions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        get: operations["listIdentitySessions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/login-events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        get: operations["listIdentityLoginEvents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/identity-audits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        get: operations["listIdentityAudits"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        get: operations["listIdentityMembers"];
+        put?: never;
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        post: operations["grantIdentityMembership"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/approvals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        get: operations["listIdentityApprovals"];
+        put?: never;
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        post: operations["requestIdentityApproval"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{user_id}/reset-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        post: operations["resetIdentityPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{user_id}/unlock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        post: operations["unlockIdentityUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{user_id}/global-roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        post: operations["grantIdentityGlobalRole"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        delete: operations["revokeIdentitySession"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/members/{membership_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                membership_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        delete: operations["revokeIdentityMembership"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/approvals/{approval_id}/sign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                approval_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        post: operations["signIdentityApproval"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/approvals/{approval_id}/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                approval_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        post: operations["checkIdentityApproval"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/authorization/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Real identity API. Project grants are checked server-side on every request. Mutations use X-CSRF-Token; permissions and approval are separate checks. */
+        post: operations["checkIdentityAuthorization"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
 }
@@ -11480,14 +11795,7 @@ export interface components {
             username: string;
             password: string;
         };
-        BOMSession: {
-            actor: string;
-            role: string;
-            project_id: string;
-            csrf_token: string;
-            permissions: string[];
-            ai_configured?: boolean;
-        };
+        BOMSession: components["schemas"]["IdentitySession"];
         loginBOMLocalSessionEnvelope: {
             data: components["schemas"]["BOMSession"];
             request_id: string;
@@ -11563,6 +11871,391 @@ export interface components {
             observed_at: string;
             /** @constant */
             source_kind: "manual";
+        };
+        /** @enum {string} */
+        IdentityRoleId: "viewer" | "delivery_engineer" | "delivery_lead" | "developer_sre" | "admin" | "network_engineer";
+        IdentityUser: {
+            id: string;
+            username: string;
+            display_name: string;
+            /** @enum {string} */
+            status: "active" | "disabled";
+            /** Format: date-time */
+            locked_until: string | null;
+            permission_version?: number;
+            /** Format: date-time */
+            created_at?: string;
+        };
+        IdentityProject: {
+            id: string;
+            name: string;
+            code: string;
+            status: string;
+            template_id?: string;
+        };
+        IdentityPermission: {
+            id: string;
+            module: string;
+            action: string;
+            description: string;
+        };
+        IdentityRole: {
+            id: components["schemas"]["IdentityRoleId"];
+            name: string;
+            description: string;
+            permissions: string[];
+            assignable_to_project: boolean;
+        };
+        IdentityGrant: {
+            id: string;
+            project_id: string;
+            role_id: components["schemas"]["IdentityRoleId"];
+            resource_type: string;
+            resource_id: string;
+            permissions: string[];
+        };
+        IdentitySession: {
+            actor: string;
+            user: {
+                id: string;
+                username: string;
+                display_name: string;
+            };
+            role: string;
+            project_id: string;
+            csrf_token: string;
+            permissions: string[];
+            ai_configured: boolean;
+            global_permissions: string[];
+            global_roles: components["schemas"]["IdentityRoleId"][];
+            project_permissions: {
+                [key: string]: string[];
+            };
+            project_roles: {
+                [key: string]: components["schemas"]["IdentityRoleId"][];
+            };
+            grants: components["schemas"]["IdentityGrant"][];
+            authorized_projects: components["schemas"]["IdentityProject"][];
+            permission_revision: number;
+        };
+        IdentityProviders: {
+            /** @constant */
+            status: "ready";
+            methods: "local"[];
+            environment: string;
+        };
+        IdentityLogin: {
+            username: string;
+            password: string;
+            /** @constant */
+            method?: "local";
+        };
+        IdentityMutation: {
+            id: string;
+            /** @constant */
+            status: "updated";
+        };
+        IdentityStatus: {
+            status: string;
+        };
+        IdentityCreateUser: {
+            username: string;
+            display_name: string;
+            password: string;
+        };
+        IdentityUpdateUser: {
+            display_name?: string;
+            /** @enum {string} */
+            status?: "active" | "disabled";
+        };
+        IdentityPassword: {
+            current_password: string;
+            new_password: string;
+        };
+        IdentityResetPassword: {
+            new_password: string;
+        };
+        IdentityGlobalRoleCommand: {
+            /** @constant */
+            role_id: "admin";
+            revoke?: boolean;
+            /** Format: date-time */
+            expires_at?: string | null;
+        };
+        IdentityMembership: {
+            id: string;
+            user_id: string;
+            username: string;
+            display_name: string;
+            role_id: components["schemas"]["IdentityRoleId"];
+            resource_type: string;
+            resource_id: string;
+            /** Format: date-time */
+            valid_from: string;
+            /** Format: date-time */
+            expires_at: string | null;
+            /** Format: date-time */
+            revoked_at: string | null;
+        };
+        IdentityMembershipCommand: {
+            user_id?: string;
+            username?: string;
+            /** @enum {string} */
+            role_id: "viewer" | "delivery_engineer" | "delivery_lead" | "developer_sre" | "network_engineer";
+            resource_type?: string;
+            resource_id?: string;
+            /** Format: date-time */
+            expires_at?: string | null;
+            reason: string;
+        };
+        IdentitySessionRecord: {
+            id: string;
+            user_id: string;
+            username: string;
+            ip: string;
+            user_agent: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            expires_at: string;
+            /** Format: date-time */
+            revoked_at: string | null;
+            /** Format: date-time */
+            last_seen_at: string;
+        };
+        IdentityLoginEvent: {
+            id: string;
+            username: string;
+            outcome: string;
+            ip: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        IdentityAuditSnapshot: {
+            user: {
+                id?: string;
+                username?: string;
+                display_name?: string;
+                /** @enum {string} */
+                status?: "active" | "disabled";
+                /** Format: date-time */
+                locked_until?: string | null;
+                permission_version?: number;
+                /** Format: date-time */
+                created_at?: string;
+            } | null;
+            global_roles: {
+                role_id: string;
+                /** Format: date-time */
+                expires_at: string | null;
+                /** Format: date-time */
+                revoked_at: string | null;
+            }[];
+            memberships: {
+                id: string;
+                project_id: string;
+                role_id: string;
+                resource_type: string;
+                resource_id: string;
+                /** Format: date-time */
+                expires_at: string | null;
+                /** Format: date-time */
+                revoked_at: string | null;
+            }[];
+            active_sessions: number;
+        };
+        IdentityAuditEvent: {
+            id: string;
+            actor: string;
+            action: string;
+            resource_id: string;
+            /** Format: date-time */
+            created_at: string;
+            details: {
+                method?: string;
+                path?: string;
+                before?: components["schemas"]["IdentityAuditSnapshot"];
+                after?: components["schemas"]["IdentityAuditSnapshot"];
+                group?: string;
+                decision?: string;
+                reason?: string;
+            };
+        };
+        IdentityApproval: {
+            id: string;
+            requester_id: string;
+            action: string;
+            resource_type: string;
+            resource_id: string;
+            snapshot_version: string;
+            /** @enum {unknown} */
+            risk: "normal" | "critical";
+            /** @enum {unknown} */
+            state: "pending" | "approved" | "rejected" | "blocked_policy";
+            required_groups: ("NE" | "DE" | "DL" | "NH")[];
+            target_ids: string[];
+            reason: string;
+            /** Format: date-time */
+            expires_at: string;
+        };
+        IdentityApprovalCommand: {
+            /** @enum {unknown} */
+            action: "network_config" | "bios" | "firmware" | "bmc_power" | "reinstall" | "cleanup";
+            resource_type: string;
+            resource_id: string;
+            snapshot_version: string;
+            /** @enum {unknown} */
+            risk: "normal" | "critical";
+            target_ids: string[];
+            reason: string;
+            /** Format: date-time */
+            expires_at?: string | null;
+        };
+        IdentitySignCommand: {
+            /** @enum {unknown} */
+            group: "NE" | "DE" | "DL" | "NH";
+            /** @enum {unknown} */
+            decision: "approve" | "reject";
+            reason: string;
+        };
+        IdentityApprovalCheck: {
+            resource_id: string;
+            snapshot_version: string;
+            target_ids: string[];
+        };
+        IdentityAuthorizationCheck: {
+            permission: string;
+            project_id: string;
+            resource_type?: string;
+            resource_id?: string;
+        };
+        IdentityCreateProject: {
+            name: string;
+            code: string;
+            template_id?: string;
+        };
+        getIdentityProvidersEnvelope: {
+            data: components["schemas"]["IdentityProviders"];
+            request_id: string;
+        };
+        loginIdentityEnvelope: {
+            data: components["schemas"]["IdentitySession"];
+            request_id: string;
+        };
+        getIdentitySessionEnvelope: {
+            data: components["schemas"]["IdentitySession"];
+            request_id: string;
+        };
+        logoutIdentityEnvelope: {
+            data: components["schemas"]["IdentityStatus"];
+            request_id: string;
+        };
+        changeIdentityPasswordEnvelope: {
+            data: components["schemas"]["IdentityMutation"];
+            request_id: string;
+        };
+        listIdentityUsersEnvelope: {
+            data: components["schemas"]["IdentityUser"][];
+            request_id: string;
+        };
+        listIdentityRolesEnvelope: {
+            data: components["schemas"]["IdentityRole"][];
+            request_id: string;
+        };
+        listIdentityPermissionsEnvelope: {
+            data: components["schemas"]["IdentityPermission"][];
+            request_id: string;
+        };
+        listIdentitySessionsEnvelope: {
+            data: components["schemas"]["IdentitySessionRecord"][];
+            request_id: string;
+        };
+        listIdentityLoginEventsEnvelope: {
+            data: components["schemas"]["IdentityLoginEvent"][];
+            request_id: string;
+        };
+        listIdentityAuditsEnvelope: {
+            data: components["schemas"]["IdentityAuditEvent"][];
+            request_id: string;
+        };
+        listIdentityProjectsEnvelope: {
+            data: components["schemas"]["IdentityProject"][];
+            request_id: string;
+        };
+        listIdentityMembersEnvelope: {
+            data: components["schemas"]["IdentityMembership"][];
+            request_id: string;
+        };
+        listIdentityApprovalsEnvelope: {
+            data: components["schemas"]["IdentityApproval"][];
+            request_id: string;
+        };
+        createIdentityUserEnvelope: {
+            data: components["schemas"]["IdentityMutation"];
+            request_id: string;
+        };
+        getIdentityUserEnvelope: {
+            data: components["schemas"]["IdentityUser"];
+            request_id: string;
+        };
+        updateIdentityUserEnvelope: {
+            data: components["schemas"]["IdentityMutation"];
+            request_id: string;
+        };
+        resetIdentityPasswordEnvelope: {
+            data: components["schemas"]["IdentityMutation"];
+            request_id: string;
+        };
+        unlockIdentityUserEnvelope: {
+            data: components["schemas"]["IdentityMutation"];
+            request_id: string;
+        };
+        grantIdentityGlobalRoleEnvelope: {
+            data: components["schemas"]["IdentityMutation"];
+            request_id: string;
+        };
+        revokeIdentitySessionEnvelope: {
+            data: components["schemas"]["IdentityMutation"];
+            request_id: string;
+        };
+        createIdentityProjectEnvelope: {
+            data: components["schemas"]["IdentityMutation"];
+            request_id: string;
+        };
+        grantIdentityMembershipEnvelope: {
+            data: components["schemas"]["IdentityMutation"];
+            request_id: string;
+        };
+        revokeIdentityMembershipEnvelope: {
+            data: components["schemas"]["IdentityMutation"];
+            request_id: string;
+        };
+        requestIdentityApprovalEnvelope: {
+            data: components["schemas"]["IdentityMutation"];
+            request_id: string;
+        };
+        signIdentityApprovalEnvelope: {
+            data: {
+                id: string;
+                state: string;
+            };
+            request_id: string;
+        };
+        checkIdentityApprovalEnvelope: {
+            data: {
+                allowed: boolean;
+                permission_allowed: boolean;
+                approval_satisfied: boolean;
+                /** @constant */
+                device_execution: "not_performed";
+            };
+            request_id: string;
+        };
+        checkIdentityAuthorizationEnvelope: {
+            data: {
+                allowed: boolean;
+            };
+            request_id: string;
         };
     };
     responses: {
@@ -12106,15 +12799,9 @@ export interface operations {
             };
         };
     };
-    listProjects: {
+    listIdentityProjects: {
         parameters: {
-            query?: {
-                limit?: number;
-                cursor?: string;
-                q?: string;
-                status?: string;
-                sort?: string;
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -12127,26 +12814,65 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ListEnvelope"];
+                    "application/json": components["schemas"]["listIdentityProjectsEnvelope"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
-    createProject: {
+    createIdentityProject: {
         parameters: {
             query?: never;
-            header?: {
-                "Idempotency-Key"?: string;
+            header: {
+                "X-CSRF-Token": string;
             };
             path?: never;
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ProjectWriteRequest"];
+                "application/json": components["schemas"]["IdentityCreateProject"];
             };
         };
         responses: {
@@ -12156,14 +12882,51 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ResourceEnvelope"];
+                    "application/json": components["schemas"]["createIdentityProjectEnvelope"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     getProject: {
@@ -13869,15 +14632,9 @@ export interface operations {
             409: components["responses"]["Conflict"];
         };
     };
-    listUsers: {
+    listIdentityUsers: {
         parameters: {
-            query?: {
-                limit?: number;
-                cursor?: string;
-                q?: string;
-                status?: string;
-                sort?: string;
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -13890,26 +14647,65 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ListEnvelope"];
+                    "application/json": components["schemas"]["listIdentityUsersEnvelope"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
-    createUser: {
+    createIdentityUser: {
         parameters: {
             query?: never;
-            header?: {
-                "Idempotency-Key"?: string;
+            header: {
+                "X-CSRF-Token": string;
             };
             path?: never;
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["UserWriteRequest"];
+                "application/json": components["schemas"]["IdentityCreateUser"];
             };
         };
         responses: {
@@ -13919,17 +14715,54 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ResourceEnvelope"];
+                    "application/json": components["schemas"]["createIdentityUserEnvelope"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
-    getUser: {
+    getIdentityUser: {
         parameters: {
             query?: never;
             header?: never;
@@ -13946,19 +14779,58 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ResourceEnvelope"];
+                    "application/json": components["schemas"]["getIdentityUserEnvelope"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
-    updateUser: {
+    updateIdentityUser: {
         parameters: {
             query?: never;
-            header?: {
-                "If-Match"?: string;
+            header: {
+                "X-CSRF-Token": string;
             };
             path: {
                 user_id: string;
@@ -13967,7 +14839,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["UserPatchRequest"];
+                "application/json": components["schemas"]["IdentityUpdateUser"];
             };
         };
         responses: {
@@ -13977,14 +14849,51 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ResourceEnvelope"];
+                    "application/json": components["schemas"]["updateIdentityUserEnvelope"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     listAuditEvents: {
@@ -14940,7 +15849,7 @@ export interface operations {
             409: components["responses"]["Conflict"];
         };
     };
-    getBOMLocalSession: {
+    getIdentitySession: {
         parameters: {
             query?: never;
             header?: never;
@@ -14949,13 +15858,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Project-authorized versioned BOM operation */
+            /** @description Success */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["getBOMLocalSessionEnvelope"];
+                    "application/json": components["schemas"]["getIdentitySessionEnvelope"];
                 };
             };
             /** @description Invalid request */
@@ -14965,22 +15874,36 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Scope/permission denied */
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Revision/state conflict */
+            /** @description Identity state conflict */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Unresolved engineering or review precondition */
+            /** @description Invalid input or approval policy unresolved */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -14988,22 +15911,24 @@ export interface operations {
             };
         };
     };
-    logoutBOMLocalSession: {
+    logoutIdentity: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "X-CSRF-Token": string;
+            };
             path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Project-authorized versioned BOM operation */
+            /** @description Success */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["logoutBOMLocalSessionEnvelope"];
+                    "application/json": components["schemas"]["logoutIdentityEnvelope"];
                 };
             };
             /** @description Invalid request */
@@ -15013,22 +15938,36 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Scope/permission denied */
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Revision/state conflict */
+            /** @description Identity state conflict */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Unresolved engineering or review precondition */
+            /** @description Invalid input or approval policy unresolved */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23770,7 +24709,7 @@ export interface operations {
             };
         };
     };
-    loginBOMLocalSession: {
+    loginIdentity: {
         parameters: {
             query?: never;
             header?: never;
@@ -23779,17 +24718,17 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["BOMLogin"];
+                "application/json": components["schemas"]["IdentityLogin"];
             };
         };
         responses: {
-            /** @description Project-authorized versioned BOM operation */
+            /** @description Success */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["loginBOMLocalSessionEnvelope"];
+                    "application/json": components["schemas"]["loginIdentityEnvelope"];
                 };
             };
             /** @description Invalid request */
@@ -23799,22 +24738,36 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Scope/permission denied */
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Revision/state conflict */
+            /** @description Identity state conflict */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Unresolved engineering or review precondition */
+            /** @description Invalid input or approval policy unresolved */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23972,6 +24925,1263 @@ export interface operations {
             };
             /** @description Unresolved engineering or review precondition */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getIdentityProviders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getIdentityProvidersEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    changeIdentityPassword: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-Token": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IdentityPassword"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["changeIdentityPasswordEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listIdentityRoles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listIdentityRolesEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listIdentityPermissions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listIdentityPermissionsEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listIdentitySessions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listIdentitySessionsEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listIdentityLoginEvents: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listIdentityLoginEventsEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listIdentityAudits: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listIdentityAuditsEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listIdentityMembers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listIdentityMembersEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    grantIdentityMembership: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-Token": string;
+            };
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IdentityMembershipCommand"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["grantIdentityMembershipEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listIdentityApprovals: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listIdentityApprovalsEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    requestIdentityApproval: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-Token": string;
+            };
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IdentityApprovalCommand"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["requestIdentityApprovalEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    resetIdentityPassword: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-Token": string;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IdentityResetPassword"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["resetIdentityPasswordEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    unlockIdentityUser: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-Token": string;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["unlockIdentityUserEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    grantIdentityGlobalRole: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-Token": string;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IdentityGlobalRoleCommand"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["grantIdentityGlobalRoleEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    revokeIdentitySession: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-Token": string;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["revokeIdentitySessionEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    revokeIdentityMembership: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-Token": string;
+            };
+            path: {
+                project_id: string;
+                membership_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["revokeIdentityMembershipEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    signIdentityApproval: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-Token": string;
+            };
+            path: {
+                project_id: string;
+                approval_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IdentitySignCommand"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["signIdentityApprovalEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    checkIdentityApproval: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-Token": string;
+            };
+            path: {
+                project_id: string;
+                approval_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IdentityApprovalCheck"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["checkIdentityApprovalEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    checkIdentityAuthorization: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-Token": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IdentityAuthorizationCheck"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["checkIdentityAuthorizationEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthenticated or session expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope, CSRF or permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Identity state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input or approval policy unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Login rate limited */
+            429: {
                 headers: {
                     [name: string]: unknown;
                 };

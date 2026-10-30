@@ -1,0 +1,1 @@
+import {useLocation,useNavigate} from 'react-router-dom';export {useNavigate};export function useSearch(_:unknown){return Object.fromEntries(new URLSearchParams(useLocation().search)) as {next?:string;reason?:string}}

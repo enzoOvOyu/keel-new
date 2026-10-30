@@ -200,3 +200,7 @@ CmdbDossierAsset是既有八类物理资源投影（服务器/交换机/GPU/NIC/
 ## BOM 真实开发增补
 
 用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。
+
+## 2026-10-30 · 身份数据模型实施
+
+复用 api_session（扩 user_id/session_id/revoked_at/last_seen_at）及 audit_event。新增 app_user、role、permission、role_permission、user_global_role、project、project_membership、login_event、approval_record/approval_signature，见迁移010–013及 IDENTITY-RBAC.md。ProjectMembership 唯一活动键(user_id,project_id,role_id,resource_type,resource_id)；审批同申请中签署人及职责分别唯一。不新增资产身份。

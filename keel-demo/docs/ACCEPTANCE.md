@@ -163,3 +163,7 @@ CMDB-D-01…06：服务器→部件→端口→线缆→对端；Diff→来源�
 ## BOM 真实开发增补
 
 用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。
+
+## 2026-10-30 · 身份与权限验收
+
+以 IDENTITY-ACCEPTANCE.json 为本次实际接口证据：六角色、不同项目不同角色、Viewer写入拒绝、NE/DE隔离、非成员URL越权、撤销立即生效、账号禁用/Session撤销/改密、限流与解锁、申请人不能自批、NE+DE双签、NH未决阻断及审计。BOM浏览器端回归需经统一登录完成原六步与CMDB发布。外部身份服务和真实设备均不在本次通过结论内。

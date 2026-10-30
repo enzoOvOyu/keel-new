@@ -204,3 +204,7 @@ Topology查询投影不持有第二套Device事实。物理视图组合BOM/Cable
 ## BOM 真实开发增补
 
 用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。
+
+## 2026-10-30 · 统一身份边界
+
+dev 的 Go 模块化单体增加 internal/identity，复用 PostgreSQL 与已有 api_session/audit_event。统一 Cookie Session → 主体加载 → 项目/资源权限 → 业务 Handler；BOM 不再维护独立身份。前端统一 IdentityProvider 在 ProjectContext 之前安装后端授权快照，Mock 只消费该授权的读投影。完整边界见 IDENTITY-RBAC.md；设备域仍为 Mock。

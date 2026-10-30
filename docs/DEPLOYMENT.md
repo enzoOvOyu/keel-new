@@ -94,3 +94,7 @@
 ## BOM 真实开发增补
 
 用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。
+
+## 2026-10-30 · dev 身份启动
+
+执行 dev/backend/migrate.sh（010–013）后设置受控 KEEL_BOOTSTRAP_PASSWORD，首次空用户库初始化 admin；已有密码不在启动时重置。APP_ENV=production 必须 HTTPS，Cookie Secure；开发5174代理8081允许同源。运行 ./dev/backend/run-local.sh 与 cd dev && npm run dev，入口 /login。旧 KEEL_API_TOKEN、KEEL_VIEWER_PASSWORD 与配置角色不再用于认证。见 dev/README.md 与 IDENTITY-RBAC.md。

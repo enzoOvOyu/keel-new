@@ -1,0 +1,126 @@
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("/fonts/jetbrains-mono/JetBrainsMono-Regular.woff2") format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 500; font-display: swap; src: url("/fonts/jetbrains-mono/JetBrainsMono-Medium.woff2") format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 600; font-display: swap; src: url("/fonts/jetbrains-mono/JetBrainsMono-SemiBold.woff2") format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 700; font-display: swap; src: url("/fonts/jetbrains-mono/JetBrainsMono-Bold.woff2") format("woff2"); }
+.login-shell * { box-sizing: border-box; }
+.login-shell { font-family: var(--font-sans); font-synthesis: none; font-variant-ligatures: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; color-scheme: light; }
+html[data-theme="dark"] .login-shell { color-scheme: dark; }
+.login-shell { margin: 0; color: var(--color-text-primary); background: var(--color-bg-base); }
+.login-shell button, .login-shell input, .login-shell textarea, .login-shell select, .login-shell option, .login-shell optgroup { font: inherit; }
+.login-shell pre, .login-shell code, .login-shell kbd, .login-shell samp { font-family: var(--font-mono); }
+.login-shell button, .login-shell a, .login-shell input, .login-shell textarea { -webkit-tap-highlight-color: transparent; }
+.login-shell button { cursor: pointer; }
+.login-shell button:disabled { cursor: not-allowed; }
+.login-shell a { color: inherit; }
+.login-shell button:focus-visible, .login-shell a:focus-visible, .login-shell input:focus-visible, .login-shell textarea:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
+.login-shell button, .login-shell a { touch-action: manipulation; }
+.login-shell .icon { width: var(--size-icon); height: var(--size-icon); flex-shrink: 0; }
+.login-shell { max-width: var(--size-page-max); min-height: 100svh; margin-inline: auto; display: flex; flex-direction: column; padding-inline: var(--space-16); }
+.login-shell .login-header { height: var(--size-header); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.login-shell .brand { display: flex; align-items: center; gap: var(--space-3); }
+.login-shell .brand-mark { width: var(--size-mark); height: var(--size-mark); }
+.login-shell .wordmark { font-size: 32px; letter-spacing: -1.8px; line-height: 1; font-weight: 750; display: block; }
+.login-shell .brand-caption { margin-top: var(--space-1); display: block; font-size: var(--font-size-xs); color: var(--color-text-secondary); letter-spacing: .8px; }
+.login-shell .preferences { display: flex; align-items: center; gap: var(--space-2); }
+.login-shell .icon-button, .login-shell .language-button { border: 0; border-radius: var(--radius-sm); height: var(--size-control); background: transparent; color: var(--color-text-secondary); display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); }
+.login-shell .icon-button { width: var(--size-control); }
+.login-shell .language-button { padding-inline: var(--space-3); font-size: var(--font-size-sm); font-weight: 600; }
+.login-shell .icon-button:hover, .login-shell .language-button:hover { background: var(--color-bg-muted); color: var(--color-text-primary); }
+.login-shell .preference-divider { width: 1px; height: var(--space-4); background: var(--color-border); }
+.login-shell .login-main { display: grid; grid-template-columns: 55% 45%; flex: 1; min-height: 640px; border: 1px solid var(--color-border); border-radius: var(--radius-xl); overflow: hidden; }
+.login-shell .brand-panel { position: relative; padding: var(--space-16) var(--space-14) var(--space-10); background: var(--color-brand-panel); display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
+.login-shell .brand-copy { position: relative; z-index: 1; }
+.login-shell .eyebrow, .login-shell .workspace-label { color: var(--color-primary-readable); font-size: var(--font-size-xs); font-weight: 650; letter-spacing: 1.7px; }
+.login-shell .eyebrow { margin: 0 0 var(--space-5); }
+.login-shell .brand-copy h2 { font-size: clamp(26px, 2.55vw, 36px); line-height: 1.3; letter-spacing: -.9px; font-weight: 650; margin: 0; }
+.login-shell .brand-copy h2 span { display: block; }
+.login-shell .mobile-slogan { display: none; }
+.login-shell .brand-description { max-width: 420px; font-size: var(--font-size-lg); line-height: 1.9; color: var(--color-text-secondary); margin: var(--space-5) 0 0; }
+/* A ship's structural keel with transverse ribs; no moving status semantics. */
+.login-shell .keel-diagram { position: relative; height: 265px; margin: var(--space-6) calc(var(--space-8) * -1) 0; flex: 0 0 auto; }
+.login-shell .diagram-grid { position: absolute; inset: 0; background-image: linear-gradient(var(--color-brand-grid) 1px, transparent 1px), linear-gradient(90deg, var(--color-brand-grid) 1px, transparent 1px); background-size: var(--space-8) var(--space-8); mask-image: radial-gradient(ellipse at center, black, transparent 68%); opacity: .6; }
+.login-shell .hull-structure { width: 100%; height: 100%; position: relative; overflow: visible; stroke-linecap: round; stroke-linejoin: round; }
+.login-shell .hull-shadow { stroke: var(--color-primary-500); stroke-width: 15; opacity: .055; }
+.login-shell .hull-gunwale { stroke: var(--color-primary-400); stroke-width: 1.3; opacity: .8; }
+.login-shell .hull-far { opacity: .5; }
+.login-shell .hull-ribs { stroke: var(--color-brand-line); stroke-width: 1.25; }
+.login-shell .hull-keel { stroke-width: 2.8; }
+.login-shell .hull-rib-light { stroke-width: 1.15; opacity: .7; }
+.login-shell .hull-rib-light path { stroke-dasharray: 100; stroke-dashoffset: 100; animation: hull-rib-trace 8s ease-in-out infinite; }
+.login-shell .hull-rib-light .rib-phase-1 { animation-delay: .7s; }
+.login-shell .hull-rib-light .rib-phase-2 { animation-delay: 1.4s; }
+.login-shell .hull-rib-light .rib-phase-3 { animation-delay: 2.1s; }
+.login-shell .hull-keel-light { stroke: var(--color-surface-raised); stroke-width: 1.2; stroke-dasharray: 7 93; stroke-dashoffset: 7; opacity: .9; animation: hull-keel-trace 8s linear infinite; }
+.login-shell .hull-stem { stroke-width: 2; }
+.login-shell .hull-annotation { stroke: var(--color-brand-line); stroke-width: 1; }
+.login-shell .hull-label { fill: var(--color-text-secondary); font-family: var(--font-mono); font-size: 8px; letter-spacing: 1.5px; }
+.login-shell .diagram-caption { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; font-family: var(--font-mono); font-size: 8px; letter-spacing: 1.8px; color: var(--color-text-secondary); }
+@keyframes hull-keel-trace { from { stroke-dashoffset: 7; } to { stroke-dashoffset: -100; } }
+@keyframes hull-rib-trace { 0%, 12% { stroke-dashoffset: 100; opacity: 0; } 42%, 65% { stroke-dashoffset: 0; opacity: .75; } 90%, 100% { stroke-dashoffset: 0; opacity: 0; } }
+.login-shell .lifecycle { display: flex; margin-top: var(--space-3); gap: var(--space-4); }
+.login-shell .lifecycle-stage { display: flex; align-items: center; flex: 1; gap: var(--space-2); font-size: var(--font-size-sm); color: var(--color-text-primary); white-space: nowrap; }
+.login-shell .stage-number { font-family: var(--font-mono); color: var(--color-primary-readable); font-size: 10px; }
+.login-shell .stage-connector { flex: 1; height: 1px; background: var(--color-brand-line); min-width: var(--space-3); margin-left: var(--space-1); }
+.login-shell .lifecycle-stage:last-child { flex: 0; }
+.login-shell .brand-assurance { margin: var(--space-8) 0 0; display: flex; align-items: center; gap: var(--space-2); font-size: var(--font-size-sm); color: var(--color-text-secondary); }
+.login-shell .brand-assurance .icon { width: var(--space-4); height: var(--space-4); }
+.login-shell .form-panel { display: flex; align-items: center; justify-content: center; padding: var(--space-14) var(--space-10); background: var(--color-surface); }
+.login-shell .login-card { width: 100%; max-width: var(--size-login-form); }
+.login-shell .form-heading { margin-bottom: var(--space-8); }
+.login-shell .workspace-label { letter-spacing: 2px; }
+.login-shell .form-heading h1 { font-size: 30px; letter-spacing: -.5px; font-weight: 650; margin: var(--space-3) 0 var(--space-2); }
+.login-shell .form-heading p { color: var(--color-text-secondary); font-size: var(--font-size-base); line-height: 1.8; margin: 0; }
+.login-shell .identity-notice { display: flex; align-items: flex-start; gap: var(--space-3); background: var(--color-notice-background); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-4); margin-bottom: var(--space-6); font-size: var(--font-size-sm); }
+.login-shell .notice-icon { color: var(--color-primary-readable); margin-top: 1px; }
+.login-shell .identity-notice strong { font-size: var(--font-size-base); font-weight: 600; line-height: 1.5; }
+.login-shell .identity-notice p { margin: var(--space-2) 0 0; color: var(--color-text-secondary); line-height: 1.75; }
+.login-shell .notice-error .notice-icon { color: var(--color-danger); }
+.login-shell .text-button { min-height: var(--size-control); display: inline-flex; align-items: center; gap: var(--space-2); padding: 0; margin-bottom: calc(var(--space-2) * -1); border: 0; background: none; color: var(--color-primary-readable); font-size: var(--font-size-sm); font-weight: 600; }
+.login-shell .text-button .icon { width: var(--space-3); height: var(--space-3); }
+.login-shell .text-button:disabled { color: var(--color-text-secondary); }
+.login-shell .field { display: flex; flex-direction: column; gap: var(--space-2); margin-bottom: var(--space-5); }
+.login-shell .field label { font-size: var(--font-size-base); font-weight: 550; }
+.login-shell .field input { width: 100%; min-width: 0; height: 48px; padding: 0 var(--space-4); border: 1px solid var(--color-border-strong); border-radius: var(--radius-sm); background: var(--color-bg-base); color: var(--color-text-primary); font-size: 16px; transition: border-color .15s ease; }
+.login-shell .field input::placeholder { color: var(--color-text-secondary); font-size: var(--font-size-base); }
+.login-shell .field input:hover { border-color: var(--color-primary-400); }
+.login-shell .password-field { position: relative; }
+.login-shell .password-field input { padding-right: var(--space-14); }
+.login-shell .password-toggle { position: absolute; top: 2px; right: 2px; width: var(--size-control); height: var(--size-control); border: 0; background: none; color: var(--color-text-secondary); display: grid; place-items: center; border-radius: var(--radius-sm); }
+.login-shell .password-toggle:hover { color: var(--color-primary-readable); }
+.login-shell .submit-button { display: flex; width: 100%; height: 48px; justify-content: center; align-items: center; gap: var(--space-3); border: 1px solid var(--color-border-strong); border-radius: var(--radius-sm); background: var(--color-bg-muted); color: var(--color-text-secondary); font-size: var(--font-size-lg); font-weight: 600; margin-top: var(--space-6); }
+.login-shell .admin-help { color: var(--color-text-secondary); font-size: var(--font-size-sm); text-align: center; margin: var(--space-6) 0; }
+.login-shell .form-bottom { border-top: 1px solid var(--color-border); padding-top: var(--space-6); display: flex; align-items: center; justify-content: center; gap: var(--space-2); color: var(--color-text-secondary); font-size: var(--font-size-xs); }
+.login-shell .form-bottom .icon { width: var(--space-4); height: var(--space-4); }
+.login-shell .login-footer { min-height: var(--size-footer); display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); color: var(--color-text-secondary); font-size: var(--font-size-xs); }
+.login-shell .footer-dot { margin-inline: var(--space-2); }
+.login-shell .login-footer a { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--size-control); text-decoration: none; }
+.login-shell .login-footer a:hover { color: var(--color-primary-readable); }
+.login-shell .login-footer .icon { width: var(--space-3); height: var(--space-3); }
+.login-shell .skip-link { position: absolute; top: var(--space-2); left: var(--space-4); transform: translateY(-160%); background: var(--color-surface-raised); padding: var(--space-3); border: 1px solid var(--color-focus); border-radius: var(--radius-sm); z-index: 10; }
+.login-shell .skip-link:focus { transform: translateY(0); }
+.login-shell .fallback { max-width: var(--size-login-form); margin: var(--space-24) auto; padding: var(--space-6); }
+.login-shell .rotating { animation: rotate .8s linear infinite; }
+@keyframes rotate { to { transform: rotate(360deg); } }
+@media (min-width: 1600px) { .login-shell { padding-inline: var(--space-20); }.login-shell .login-main { min-height: 730px; }.login-shell .brand-panel { padding-inline: var(--space-18); }.login-shell .keel-diagram { height: 285px; } }
+@media (max-width: 1100px) { .login-shell { padding-inline: var(--space-8); }.login-shell .brand-panel { padding-inline: var(--space-8); }.login-shell .form-panel { padding-inline: var(--space-8); }.login-shell .lifecycle { gap: var(--space-2); }.login-shell .lifecycle-stage { gap: var(--space-1); }.login-shell .stage-connector { margin: 0; } }
+@media (max-width: 767px) { .login-shell { padding-inline: var(--space-6); }.login-shell .login-header { height: 88px; }.login-shell .brand-caption { font-size: 10px; }.login-shell .login-main { display: block; min-height: auto; flex: 1; border: 0; overflow: visible; }.login-shell .brand-panel { display: none; }.login-shell .mobile-slogan { display: block; margin: var(--space-3) 0 var(--space-8); font-size: clamp(17px, 5vw, 23px); line-height: 1.45; letter-spacing: -.3px; font-weight: 600; color: var(--color-primary-readable); }.login-shell .form-panel { padding: var(--space-4) 0 var(--space-12); background: transparent; }.login-shell .login-card { max-width: var(--size-login-form); }.login-shell .form-heading { margin-bottom: var(--space-6); }.login-shell .form-heading h1 { font-size: 28px; }.login-shell .login-footer { flex-wrap: wrap; gap: 0; padding-bottom: var(--space-4); min-height: 64px; }.login-shell .preferences { gap: 0; } }
+@media (prefers-reduced-motion: reduce) { .login-shell *, .login-shell *::before, .login-shell *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+/* Authenticated project workspace. All values come from the authorized API. */
+.login-shell .environment-label { display: inline-flex; margin-top: var(--space-3); font-size: var(--font-size-xs); color: var(--color-text-secondary); padding: var(--space-1) var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+.login-shell .submit-button:not(:disabled), .login-shell .primary-button { background: var(--color-primary-600); color: var(--color-text-inverse); border-color: var(--color-primary-600); }
+html[data-theme="dark"] .login-shell .submit-button:not(:disabled), html[data-theme="dark"] .login-shell .primary-button { color: var(--color-text-inverse); background: var(--color-primary-700); border-color: var(--color-primary-700); }
+.login-shell .submit-button:not(:disabled):hover, .login-shell .primary-button:not(:disabled):hover { filter: brightness(.94); }
+.login-shell .primary-button, .login-shell .secondary-button { min-height: 44px; display: inline-flex; justify-content: center; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-4); border: 1px solid var(--color-primary-600); border-radius: var(--radius-sm); font-size: var(--font-size-base); font-weight: 600; white-space: nowrap; text-decoration: none; }
+.login-shell .secondary-button { background: var(--color-surface); color: var(--color-text-primary); border-color: var(--color-border-strong); }
+.login-shell .secondary-button:not(:disabled):hover { background: var(--color-bg-muted); }
+.login-shell .primary-button:disabled { background: var(--color-bg-muted); color: var(--color-text-secondary); border-color: var(--color-border); }
+.login-shell .form-error { margin-bottom: var(--space-5); padding: var(--space-4); border: 1px solid var(--color-danger); border-radius: var(--radius-sm); font-size: var(--font-size-base); line-height: 1.65; }
+.login-shell .form-error strong { font-weight: 550; }
+.login-shell .form-error p { margin: var(--space-2) 0 0; }
+.login-shell .form-error small { display: block; color: var(--color-text-secondary); margin-top: var(--space-2); overflow-wrap: anywhere; }
+.login-shell .field-error { color: var(--color-danger); font-size: var(--font-size-sm); line-height: 1.5; }
+.login-shell .field [aria-invalid="true"] { border-color: var(--color-danger); }
+.login-shell .session-notice { color: var(--color-text-secondary); font-size: var(--font-size-base); line-height: 1.75; padding-left: var(--space-3); border-left: 2px solid var(--color-primary-400); margin: 0 0 var(--space-5); }
+.login-shell .workspace-loading { padding: var(--space-20) var(--space-6); max-width: 680px; margin: auto; color: var(--color-text-secondary); }
+.login-shell .login-header{position:static;padding:0;border:0;background:transparent}.login-shell .login-main{padding:0;margin:0;width:auto;max-width:none}.login-shell{font-family:var(--font-sans);color:var(--color-text-primary);background:var(--color-bg-base)}.login-shell .brand{padding:0;margin:0}.login-shell .preferences button{height:var(--size-control)}

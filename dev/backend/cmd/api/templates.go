@@ -64,7 +64,7 @@ func (s *Server) templates(w http.ResponseWriter, r *http.Request) bool {
 		}
 	}
 	var next int
-	e := s.db.QueryRow(ctx, "INSERT INTO bom_mapping_template(project_id,name,revision,profiles,approved_by) SELECT $1,$2,COALESCE(MAX(revision),0)+1,$3,'local-developer' FROM bom_mapping_template WHERE project_id=$1 AND name=$2 RETURNING revision", s.project, q.Name, raw).Scan(&next)
+	e := s.db.QueryRow(ctx, "INSERT INTO bom_mapping_template(project_id,name,revision,profiles,approved_by) SELECT $1,$2,COALESCE(MAX(revision),0)+1,$3,$4 FROM bom_mapping_template WHERE project_id=$1 AND name=$2 RETURNING revision", s.project, q.Name, raw, actorName(ctx)).Scan(&next)
 	if e != nil {
 		fail(w, 409, "TEMPLATE_REVISION_CONFLICT")
 		return true

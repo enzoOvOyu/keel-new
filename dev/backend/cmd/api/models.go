@@ -52,7 +52,7 @@ func (s *Server) models(w http.ResponseWriter, r *http.Request) bool {
 	}
 	caps, _ := json.Marshal(q.Capabilities)
 	id := uuid.NewString()
-	e := s.db.QueryRow(ctx, "INSERT INTO device_model_revision(id,model,category,capabilities,approved_by,approval_reason) VALUES($1,$2,$3,$4,'local-developer',$5) ON CONFLICT(model,category,capabilities) DO UPDATE SET model=excluded.model RETURNING id", id, q.Model, q.Category, caps, q.Reason).Scan(&id)
+	e := s.db.QueryRow(ctx, "INSERT INTO device_model_revision(id,model,category,capabilities,approved_by,approval_reason) VALUES($1,$2,$3,$4,$6,$5) ON CONFLICT(model,category,capabilities) DO UPDATE SET model=excluded.model RETURNING id", id, q.Model, q.Category, caps, q.Reason, actorName(ctx)).Scan(&id)
 	if e != nil {
 		fail(w, 500, "DATABASE_ERROR")
 		return true

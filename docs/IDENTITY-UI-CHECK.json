@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "checked": [
+    "copied login -> authorized projects",
+    "real user creation and search",
+    "project role grant and revoke",
+    "role/session/login/audit/approval views",
+    "BOM no second login and second-project parser completes",
+    "account password/session view",
+    "revoked current session clears app and redirects to login"
+  ],
+  "page_errors": []
+}

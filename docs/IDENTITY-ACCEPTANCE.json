@@ -1,0 +1,23 @@
+{
+  "passed": [
+    "six role identities and cross-project isolation",
+    "resource scoped grant cannot read sibling import",
+    "viewer direct write denied",
+    "NE cannot reinstall/cleanup",
+    "one user, different project roles",
+    "non-member URL access denied",
+    "membership revoke immediate for old session",
+    "requester cannot approve own high risk operation",
+    "distinct DL approval and frozen scope check",
+    "network NE + DE distinct signatures",
+    "Critical blocked pending NH decision",
+    "disabled user old session revoked",
+    "explicit session revoke",
+    "admin reset and own password change revoke sessions",
+    "login lock and admin unlock",
+    "login and transactional permission audit"
+  ],
+  "count": 16,
+  "contract_responses": 63,
+  "scope": "synthetic HTTP acceptance; no device execution"
+}

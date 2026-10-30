@@ -174,3 +174,7 @@ React Flow承载拓扑的缩放、平移、节点拖动、Minimap与自动布局
 无损页面以规则/证据工作区承载，物理健康与无损verdict独立，保留拓扑和机柜原交互；不把NVUE配置表复制成全网通过大表，不用计数卡片颜色证明RoCE性能。
 
 规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。
+
+## 2026-10-30 · 登录页面来源
+
+统一登录直接使用用户仓库 enzoOvOyu/keel main 的 web/src/features/auth/LoginPage.tsx（提交 a2dcb508648330b223ae94151875953c287a8f0a）及其品牌/结构图/偏好/令牌/字体。保留原布局，仅适配路由、组件导入与真实身份API。来源、页面和实际浏览器结果见 IDENTITY-RBAC.md。

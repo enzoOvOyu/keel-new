@@ -348,9 +348,9 @@ func (s *Server) publish(ctx context.Context) {
 		return
 	}
 	defer tx.Rollback(ctx)
-	var id string
+	var id, project string
 	var raw []byte
-	e = tx.QueryRow(ctx, "SELECT id,payload FROM outbox_event WHERE project_id=$1 AND published_at IS NULL AND next_attempt_at<=now() ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 1", s.project).Scan(&id, &raw)
+	e = tx.QueryRow(ctx, "SELECT id,project_id,payload FROM outbox_event WHERE published_at IS NULL AND next_attempt_at<=now() ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 1").Scan(&id, &project, &raw)
 	if e != nil {
 		return
 	}
@@ -396,7 +396,7 @@ func (s *Server) publish(ctx context.Context) {
 			}
 		}
 	}
-	if _, e = tx.Exec(ctx, "INSERT INTO audit_event(id,project_id,actor,action,resource_id) VALUES($1,$2,'cmdb-projector','cmdb.published',$3)", uuid.NewString(), s.project, id); e != nil {
+	if _, e = tx.Exec(ctx, "INSERT INTO audit_event(id,project_id,actor,action,resource_id) VALUES($1,$2,'cmdb-projector','cmdb.published',$3)", uuid.NewString(), project, id); e != nil {
 		return
 	}
 	if _, e = tx.Exec(ctx, "UPDATE outbox_event SET published_at=now(),last_error_code=NULL WHERE id=$1", id); e == nil {

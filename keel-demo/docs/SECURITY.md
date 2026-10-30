@@ -91,3 +91,7 @@ RetentionPolicy/legal_hold与导出授权覆盖指标、日志、配置快照、
 ## BOM 真实开发增补
 
 用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。
+
+## 2026-10-30 · 本地认证真实实施
+
+Argon2id、本地 Session、生产 Secure/HTTPS、HttpOnly/SameSite 与 CSRF、账号/IP限流、禁用/改密撤销、逐请求权限复验及同事务审计已接入 dev。秘密不进入浏览器 localStorage、普通日志或审计快照。LDAP/OIDC未配置不展示入口；不声称外部身份集成已验证。NH资格待决阻断，管理员不得替代。参数、边界与反例见 IDENTITY-RBAC.md。

@@ -1,6 +1,6 @@
 import urllib.request,urllib.error,http.cookiejar,pathlib,json,time,hashlib,uuid,collections
 config=dict(l.split('=',1) for l in pathlib.Path('dev/backend/.env').read_text().splitlines() if '=' in l);jar=http.cookiejar.CookieJar();urllib.request.install_opener(urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar)));base='http://127.0.0.1:5174/api/v1/'
-req=urllib.request.Request(base+'auth/login',data=json.dumps({'username':'developer','password':config['KEEL_LOGIN_PASSWORD']}).encode(),headers={'Content-Type':'application/json'},method='POST');csrf=json.load(urllib.request.urlopen(req))['data']['csrf_token']
+req=urllib.request.Request(base+'auth/login',data=json.dumps({'username':config.get('KEEL_LOGIN_USER','admin'),'password':config['KEEL_LOGIN_PASSWORD']}).encode(),headers={'Content-Type':'application/json'},method='POST');csrf=json.load(urllib.request.urlopen(req))['data']['csrf_token']
 def call(p,body=None):
  req=urllib.request.Request(base+p,data=None if body is None else json.dumps(body).encode(),headers={'Content-Type':'application/json','X-CSRF-Token':csrf,'Idempotency-Key':str(uuid.uuid4())},method='GET' if body is None else 'POST')
  try:

@@ -188,3 +188,7 @@ CmdbDossier*资源Schema明确目录状态维度、关系类别与规划/观测�
 ## BOM 真实开发增补
 
 用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。
+
+## 2026-10-30 · Identity 真实契约
+
+用户、角色/权限、项目成员、Session、登录审计、操作审计及审批的专用 Identity* Schema 与各操作以 openapi.yaml 为唯一 HTTP 定义；不得再以 GenericObject 实现这些接口。全局管理员资格与项目业务签署资格分离；审批检查只校验冻结范围，明确不执行设备。实现/安全边界见 IDENTITY-RBAC.md。

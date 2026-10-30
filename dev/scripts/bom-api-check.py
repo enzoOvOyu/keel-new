@@ -1,7 +1,7 @@
 import urllib.request,urllib.error,json,time,pathlib,http.cookiejar,os,uuid
 jar=http.cookiejar.CookieJar();urllib.request.install_opener(urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar)))
 config=dict(line.split("=",1) for line in pathlib.Path("dev/backend/.env").read_text().splitlines() if "=" in line)
-login=urllib.request.Request("http://127.0.0.1:5174/api/v1/auth/login",data=json.dumps({"username":"developer","password":config["KEEL_LOGIN_PASSWORD"]}).encode(),headers={"Content-Type":"application/json"},method="POST")
+login=urllib.request.Request("http://127.0.0.1:5174/api/v1/auth/login",data=json.dumps({"username":config.get("KEEL_LOGIN_USER","admin"),"password":config["KEEL_LOGIN_PASSWORD"]}).encode(),headers={"Content-Type":"application/json"},method="POST")
 csrf=json.load(urllib.request.urlopen(login))["data"]["csrf_token"]
 RUN_KEY='bom-acceptance-'+str(uuid.uuid4())
 CAPTURES=[]

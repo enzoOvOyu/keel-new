@@ -65,3 +65,7 @@
 ## BOM-REAL-01 · 历史 CSV 附录兼容范围
 
 当前 PRD 明确七 CSV 目录，并指向 API Schema，但仓库与已检查文档包未提供独立完整附录 A 列清单。本轮按现有 BOMItem Schema 输出，版本标记 keel-bom-openapi/v1；不声明未提供的旧外部包格式已经认证。真实 API 提交与 CMDB 发布不依赖该旧格式，不阻塞当前 Excel 闭环。
+
+## IDENTITY-NH-2026-10-30 · 待确认：Critical 网络签署资格
+
+PRD §2 已定义 NH 业务职责，但本次要求的六个稳定默认身份角色中没有 NH，也没有规定哪种角色/资源授权可获得 NH 签署资格。保留 NE+DE+NH 三签；实现 blocked_policy，禁止 admin 替代。待产品选择：增加独立签署资格（不改变六个默认角色），或明确新增 NH 角色及分配范围。仅阻断 Critical 网络审批，不影响普通 NE+DE 双签、本地登录和 BOM。
