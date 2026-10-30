@@ -1,214 +1,56 @@
-name: keel
+name: keel-dev
 services:
-  api:
-    image: ${KEEL_IMAGE:-keel:local}
-    build:
-      context: .
-    restart: unless-stopped
-    init: true
-    environment:
-      KEEL_ENV: ${KEEL_ENV:-development}
-      KEEL_DATABASE_URL: ${KEEL_DATABASE_URL:-}
-      KEEL_PROVISION_PREPARE_ENABLED: ${KEEL_PROVISION_PREPARE_ENABLED:-false}
-      KEEL_PUBLIC_ORIGINS: ${KEEL_PUBLIC_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
-      KEEL_INSECURE_DEV_COOKIE: ${KEEL_INSECURE_DEV_COOKIE:-false}
-      KEEL_MEDIA_ENDPOINT: ${KEEL_MEDIA_ENDPOINT:-}
-      KEEL_MEDIA_ACCESS_KEY: ${KEEL_MEDIA_ACCESS_KEY:-}
-      KEEL_MEDIA_SECRET_KEY: ${KEEL_MEDIA_SECRET_KEY:-}
-      KEEL_MEDIA_BUCKET: ${KEEL_MEDIA_BUCKET:-media}
-      KEEL_MEDIA_FETCH_ORIGINS: ${KEEL_MEDIA_FETCH_ORIGINS:-}
-      KEEL_MEDIA_SIGNING_KEY_FILE: ${KEEL_MEDIA_SIGNING_KEY_FILE:-}
-      KEEL_OIDC_PROVIDERS_FILE: ${KEEL_OIDC_PROVIDERS_FILE:-}
-      KEEL_LDAP_CONFIG_FILE: ${KEEL_LDAP_CONFIG_FILE:-}
-      KEEL_AGENT_IDENTITY_FILE: ${KEEL_AGENT_IDENTITY_FILE:-}
-      KEEL_AGENT_TASKS_ENABLED: ${KEEL_AGENT_TASKS_ENABLED:-false}
-      KEEL_SSH_RUNNER_FILE: ${KEEL_SSH_RUNNER_FILE:-}
-      KEEL_PRECOLLECT_ENABLED: ${KEEL_PRECOLLECT_ENABLED:-false}
-      KEEL_WIRING_ENABLED: ${KEEL_WIRING_ENABLED:-false}
-      KEEL_MONITOR_ENABLED: ${KEEL_MONITOR_ENABLED:-false}
-      KEEL_BMC_INVENTORY_ENABLED: ${KEEL_BMC_INVENTORY_ENABLED:-false}
-      KEEL_BMC_INVENTORY_FILE: ${KEEL_BMC_INVENTORY_FILE:-}
-      KEEL_DEVICE_CREDENTIAL_MASTER_KEY_FILE: ${KEEL_DEVICE_CREDENTIAL_MASTER_KEY_FILE:-}
-      KEEL_FABRIC_PROBES_FILE: ${KEEL_FABRIC_PROBES_FILE:-}
-      KEEL_FABRIC_ISSUE_VERIFY_ENABLED: ${KEEL_FABRIC_ISSUE_VERIFY_ENABLED:-false}
-      KEEL_TOPOLOGY_FIRMWARE_MOCK_ENABLED: ${KEEL_TOPOLOGY_FIRMWARE_MOCK_ENABLED:-false}
-      KEEL_SSH_SCRIPTS_ENABLED: ${KEEL_SSH_SCRIPTS_ENABLED:-false}
-      KEEL_AGENT_SCRIPTS_ENABLED: ${KEEL_AGENT_SCRIPTS_ENABLED:-false}
-      KEEL_AGENT_NETWORK_INVENTORY_ENABLED: ${KEEL_AGENT_NETWORK_INVENTORY_ENABLED:-false}
-      KEEL_TASK_ARTIFACT_TRANSFERS_ENABLED: ${KEEL_TASK_ARTIFACT_TRANSFERS_ENABLED:-false}
-      KEEL_TASK_CACHE_INVENTORY_ENABLED: ${KEEL_TASK_CACHE_INVENTORY_ENABLED:-false}
-      KEEL_CREDENTIAL_MASTER_KEY_FILE: ${KEEL_CREDENTIAL_MASTER_KEY_FILE:-}
+  web:
+    build: ./web
     ports:
-      - "${BIND_ADDRESS:-127.0.0.1}:${HTTP_PORT:-3000}:3000"
-    volumes:
-      - type: bind
-        source: ${KEEL_AGENT_IDENTITY_DIRECTORY:-./infra/agent-disabled}
-        target: /run/keel/agent
-        read_only: true
-        bind:
-          create_host_path: false
-      - type: bind
-        source: ${KEEL_LDAP_DIRECTORY:-./infra/ldap-disabled}
-        target: /run/keel/ldap
-        read_only: true
-        bind:
-          create_host_path: false
-      - type: bind
-        source: ${KEEL_OIDC_DIRECTORY:-./infra/oidc-disabled}
-        target: /run/keel/oidc
-        read_only: true
-        bind:
-          create_host_path: false
-      - type: bind
-        source: ${KEEL_MEDIA_SIGNING_DIRECTORY:-./infra/media-signing-disabled}
-        target: /run/keel/media-signing
-        read_only: true
-        bind:
-          create_host_path: false
-      - type: bind
-        source: ${KEEL_SSH_RUNNER_DIRECTORY:-./infra/ssh-runner-disabled}
-        target: /run/keel/ssh
-        read_only: true
-        bind:
-          create_host_path: false
-    read_only: true
-    tmpfs:
-      - /tmp
-    cap_drop:
-      - ALL
-    security_opt:
-      - no-new-privileges:true
-    logging:
-      driver: json-file
-      options:
-        max-size: 10m
-        max-file: "3"
-  worker:
-    profiles: [execution]
-    image: ${KEEL_IMAGE:-keel:local}
-    command: [/app/keel-worker]
-    restart: unless-stopped
-    init: true
-    stop_grace_period: 70s
+      - "127.0.0.1:5174:5173"
     environment:
-      KEEL_ENV: ${KEEL_ENV:-development}
-      KEEL_DATABASE_URL: ${KEEL_DATABASE_URL:-}
-      KEEL_PROVISION_PREPARE_ENABLED: ${KEEL_PROVISION_PREPARE_ENABLED:-false}
-      KEEL_MEDIA_ENDPOINT: ${KEEL_MEDIA_ENDPOINT:-}
-      KEEL_MEDIA_ACCESS_KEY: ${KEEL_MEDIA_ACCESS_KEY:-}
-      KEEL_MEDIA_SECRET_KEY: ${KEEL_MEDIA_SECRET_KEY:-}
-      KEEL_MEDIA_BUCKET: ${KEEL_MEDIA_BUCKET:-media}
-      KEEL_WORKER_ID: ${KEEL_WORKER_ID:-keel-sim-worker}
-      KEEL_WORKER_CONCURRENCY: ${KEEL_WORKER_CONCURRENCY:-8}
-      KEEL_WORKER_LEASE: ${KEEL_WORKER_LEASE:-5s}
-      KEEL_EXECUTION_QUEUE_FILE: ${KEEL_EXECUTION_QUEUE_FILE:-}
-      KEEL_AGENT_WORKER_FILE: ${KEEL_AGENT_WORKER_FILE:-}
-      KEEL_WEBHOOK_SINKS_FILE: ${KEEL_WEBHOOK_SINKS_FILE:-}
-      KEEL_SSH_RUNNER_FILE: ${KEEL_SSH_RUNNER_FILE:-}
-      KEEL_PRECOLLECT_ENABLED: ${KEEL_PRECOLLECT_ENABLED:-false}
-      KEEL_WIRING_ENABLED: ${KEEL_WIRING_ENABLED:-false}
-      KEEL_MONITOR_ENABLED: ${KEEL_MONITOR_ENABLED:-false}
-      KEEL_BMC_INVENTORY_ENABLED: ${KEEL_BMC_INVENTORY_ENABLED:-false}
-      KEEL_BMC_INVENTORY_FILE: ${KEEL_BMC_INVENTORY_FILE:-}
-      KEEL_DEVICE_CREDENTIAL_MASTER_KEY_FILE: ${KEEL_DEVICE_CREDENTIAL_MASTER_KEY_FILE:-}
-      KEEL_FABRIC_PROBES_FILE: ${KEEL_FABRIC_PROBES_FILE:-}
-      KEEL_FABRIC_ISSUE_VERIFY_ENABLED: ${KEEL_FABRIC_ISSUE_VERIFY_ENABLED:-false}
-      KEEL_TOPOLOGY_FIRMWARE_MOCK_ENABLED: ${KEEL_TOPOLOGY_FIRMWARE_MOCK_ENABLED:-false}
-      KEEL_SSH_SCRIPTS_ENABLED: ${KEEL_SSH_SCRIPTS_ENABLED:-false}
-      KEEL_AGENT_SCRIPTS_ENABLED: ${KEEL_AGENT_SCRIPTS_ENABLED:-false}
-      KEEL_AGENT_NETWORK_INVENTORY_ENABLED: ${KEEL_AGENT_NETWORK_INVENTORY_ENABLED:-false}
-      KEEL_TASK_ARTIFACT_TRANSFERS_ENABLED: ${KEEL_TASK_ARTIFACT_TRANSFERS_ENABLED:-false}
-      KEEL_TASK_CACHE_INVENTORY_ENABLED: ${KEEL_TASK_CACHE_INVENTORY_ENABLED:-false}
-      KEEL_CREDENTIAL_MASTER_KEY_FILE: ${KEEL_CREDENTIAL_MASTER_KEY_FILE:-}
+      VITE_API_MODE: ${VITE_API_MODE:-mock}
+      VITE_MOCK_SCENARIO: ${VITE_MOCK_SCENARIO:-happy-path}
     volumes:
-      - type: bind
-        source: ${KEEL_EXECUTION_QUEUE_DIRECTORY:-./infra/execution-queue-disabled}
-        target: /run/keel/execution-queue
-        read_only: true
-        bind:
-          create_host_path: false
-      - type: bind
-        source: ${KEEL_WEBHOOK_DIRECTORY:-./infra/webhook-disabled}
-        target: /run/keel/webhooks
-        read_only: true
-        bind:
-          create_host_path: false
-      - type: bind
-        source: ${KEEL_AGENT_WORKER_DIRECTORY:-./infra/agent-disabled}
-        target: /run/keel/agent-worker
-        read_only: true
-        bind:
-          create_host_path: false
-      - type: bind
-        source: ${KEEL_SSH_RUNNER_DIRECTORY:-./infra/ssh-runner-disabled}
-        target: /run/keel/ssh
-        read_only: true
-        bind:
-          create_host_path: false
-    read_only: true
-    tmpfs: [/tmp]
-    cap_drop: [ALL]
-    security_opt: [no-new-privileges:true]
-    healthcheck:
-      test: [CMD, /app/keel-worker, --healthcheck]
-      interval: 5s
-      timeout: 4s
-      start_period: 10s
-      retries: 3
-    logging:
-      driver: json-file
-      options:
-        max-size: 10m
-        max-file: "3"
+      - ./web:/app
+      - web_node_modules:/app/node_modules
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0"
   postgres:
-    profiles: [data]
-    image: postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
-    restart: unless-stopped
+    image: postgres:16-alpine
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-keel}
       POSTGRES_DB: ${POSTGRES_DB:-keel}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
+      POSTGRES_USER: ${POSTGRES_USER:-keel}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-keel_local_dev}
     ports:
-      - "127.0.0.1:15432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
   redis:
-    profiles: [data]
-    image: redis:7-alpine@sha256:858f009f9709ce576febc734aa78b8f6d624b82571f9ddb6bda4377c833b3499
-    restart: unless-stopped
-    command: [redis-server, --appendonly, 'yes']
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "127.0.0.1:6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:
-      test: [CMD, redis-cli, ping]
-      interval: 10s
-      timeout: 3s
-      retries: 5
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
   minio:
-    profiles: [data]
-    image: keel-minio:2025-10-15-9e49d5e
-    command: [server, /data, --console-address, ":9001", --certs-dir, /tmp/certs]
-    build:
-      context: ./infra/minio
-    restart: unless-stopped
+    image: ${MINIO_IMAGE:-keel-minio:2025-10-15-9e49d5e}
+    command: server /data --console-address :9001
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-}
-    volumes:
-      - minio_data:/data
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-keel_local}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-keel_local_password}
     ports:
       - "127.0.0.1:9000:9000"
       - "127.0.0.1:9001:9001"
-    cap_drop: [ALL]
-    security_opt: [no-new-privileges:true]
-    read_only: true
-    tmpfs: [/tmp]
+    volumes:
+      - minio_data:/data
 volumes:
   postgres_data:
   redis_data:
   minio_data:
+  web_node_modules:

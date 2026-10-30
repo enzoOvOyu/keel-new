@@ -1,0 +1,1214 @@
+{
+  "change_id": "OPS-2026-10-29",
+  "scope": "design and mock contract only",
+  "new_paths": 30,
+  "new_operations": 32,
+  "new_schemas": 66,
+  "valid_examples": 7,
+  "negative_cases": 5,
+  "checks": [
+    {
+      "check": "all local OpenAPI references resolve",
+      "status": "PASS"
+    },
+    {
+      "check": "operationId globally unique",
+      "status": "PASS"
+    },
+    {
+      "check": "66 dedicated Ops schemas pass JSON Schema meta-validation",
+      "status": "PASS"
+    },
+    {
+      "check": "new Ops schemas do not depend on GenericObject",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /projects/{project_id}/bom-imports",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /bom-imports/{import_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /bom-imports/{import_id}/sheets",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /bom-imports/{import_id}/map",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /bom-imports/{import_id}/mappings",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved patch /bom-imports/{import_id}/mappings/{mapping_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /bom-imports/{import_id}/validate",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /bom-imports/{import_id}/issues",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /bom-imports/{import_id}/preview",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /bom-imports/{import_id}/build-package",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /bom-imports/{import_id}/commit",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /bom-batches/{batch_id}/items",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /jobs/{job_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /health/live",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /health/ready",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /projects",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved patch /projects/{project_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /cmdb/entities",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /cmdb/entities",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /cmdb/entities/{entity_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/devices",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /projects/{project_id}/devices",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/devices/{device_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved patch /projects/{project_id}/devices/{device_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/flows",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /projects/{project_id}/flows",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/flows/{flow_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved patch /projects/{project_id}/flows/{flow_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /executions",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /executions",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /executions/{execution_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved patch /executions/{execution_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /flows/{flow_id}/schedules",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /flows/{flow_id}/schedules",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /flows/{flow_id}/schedules/{schedule_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved patch /flows/{flow_id}/schedules/{schedule_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/fabric/devices",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /projects/{project_id}/fabric/devices",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/fabric/devices/{device_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved patch /projects/{project_id}/fabric/devices/{device_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/network-baselines",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /projects/{project_id}/network-baselines",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/network-baselines/{baseline_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved patch /projects/{project_id}/network-baselines/{baseline_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /push-jobs",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /push-jobs",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /push-jobs/{push_job_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved patch /push-jobs/{push_job_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/gates",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /projects/{project_id}/gates",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/gates/{gate_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved patch /projects/{project_id}/gates/{gate_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/issues",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /projects/{project_id}/issues",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/issues/{issue_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved patch /projects/{project_id}/issues/{issue_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/alerts",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /projects/{project_id}/alerts",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/alerts/{alert_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved patch /projects/{project_id}/alerts/{alert_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /project-templates",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /project-templates",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /project-templates/{template_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved patch /project-templates/{template_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /media",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /media",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /media/{media_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved patch /media/{media_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /parameter-catalog",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /parameter-catalog",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /parameter-catalog/{parameter_key}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved patch /parameter-catalog/{parameter_key}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /users",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /users",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /users/{user_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved patch /users/{user_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /audit-events",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /audit-events",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /audit-events/{event_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /cmdb/entities/{entity_id}/relationships",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /cmdb/entities/{entity_id}/timeline",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /cmdb/events/{event_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/overview",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /devices/{device_id}/ports",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /devices/{device_id}/snapshots",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /flows/{flow_id}/revisions",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /flows/{flow_id}/validate",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /flows/{flow_id}/run",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /schedules/{schedule_id}/enable",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /schedules/{schedule_id}/disable",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /executions/{execution_id}/targets",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /executions/{execution_id}/tasks",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /executions/{execution_id}/logs",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /executions/{execution_id}/outputs",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /executions/{execution_id}/pause",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /executions/{execution_id}/resume",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /executions/{execution_id}/kill",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /executions/{execution_id}/retry-failed",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/fabric/devices/{device_id}/ports",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /push-jobs/{push_job_id}/approve",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /push-jobs/{push_job_id}/execute",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /push-jobs/{push_job_id}/rollback",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /devices/{device_id}/gate-evidence",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /delivery-runs",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /delivery-runs/{run_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /issues/{issue_id}/revalidate",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /issues/{issue_id}/close",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /alerts/{alert_id}/acknowledge",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /auth/session",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /auth/logout",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /project-permissions",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /project-templates/{template_id}/approve",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /media/{media_id}/approve",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /media/{media_id}/retire",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /issues/{issue_id}/assign",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/racks",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/rack-diagrams",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /projects/{project_id}/rack-diagrams",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /projects/{project_id}/rack-diagrams/generate",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/rack-diagrams/generations/{job_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/rack-diagrams/{diagram_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/rack-diagrams/{diagram_id}/revisions/{revision_id}",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /projects/{project_id}/rack-diagrams/{diagram_id}/revisions/{revision_id}/validate",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /projects/{project_id}/rack-diagrams/{diagram_id}/revisions/{revision_id}/placements",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved post /projects/{project_id}/rack-diagrams/{diagram_id}/publish",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved get /projects/{project_id}/rack-diagrams/{diagram_id}/export",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema ErrorEnvelope",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema Page",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema Job",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema JobEnvelope",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema BOMImport",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema BOMImportEnvelope",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema SheetInfo",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema SheetListEnvelope",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema MappingCandidate",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema MappingEnvelope",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema MappingListEnvelope",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema ValidationIssue",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema IssueListEnvelope",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema PreviewEnvelope",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema BOMBatch",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema BOMBatchEnvelope",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema BOMItem",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema BOMItemListEnvelope",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema GenericObject",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema EmptyRequest",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema RunFlowRequest",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema ExecutionControlRequest",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema ApprovalRequest",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema CloseIssueRequest",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema AcknowledgeRequest",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema AssignIssueRequest",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema ResourceEnvelope",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema ListEnvelope",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema Project",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema CMDBEntity",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema Device",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema Flow",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema Execution",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema Schedule",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema FabricDevice",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema PhysicalPort",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema NetworkBaseline",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema PushJob",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema GateEvidence",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema Issue",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema Alert",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema ProjectTemplate",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema MediaArtifact",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema Parameter",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema User",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema AuditEvent",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema TaskRun",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema ExecutionLog",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema ExecutionOutput",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema Session",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema FlowWriteRequest",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema Rack",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema RackPlacement",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema RackDiagram",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema RackDiagramIssue",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema RackDiagramRevision",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema CreateRackDiagramRequest",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema GenerateRackDiagramRequest",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema UpsertRackPlacementRequest",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema RackDiagramEnvelope",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema RackDiagramRevisionEnvelope",
+      "status": "PASS"
+    },
+    {
+      "check": "preserved schema RackDiagramGenerationEnvelope",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsListDevices",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsListDevices",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsGetDeviceDetail",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsGetDeviceDetail",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsListConfigurations",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsListConfigurations",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsListConfigDiffs",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsListConfigDiffs",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsListPorts",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsListPorts",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsListTelemetry",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsListTelemetry",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsListLLDP",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsListLLDP",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsListFDB",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsListFDB",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsListARP",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsListARP",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsListDDM",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsListDDM",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsListMetrics",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsListMetrics",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsListLogs",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsListLogs",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsListFirmware",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsListFirmware",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsGetBmc",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsGetBmc",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsListBmcSEL",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsListBmcSEL",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsGetAssetLinks",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsGetAssetLinks",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsCreatePowerJob",
+      "status": "PASS"
+    },
+    {
+      "check": "idempotency and audit opsCreatePowerJob",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsCreatePowerJob",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsCreateFirmwareUpgrade",
+      "status": "PASS"
+    },
+    {
+      "check": "idempotency and audit opsCreateFirmwareUpgrade",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsCreateFirmwareUpgrade",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsGetFirmwareUpgrade",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsGetFirmwareUpgrade",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsApproveFirmwareUpgrade",
+      "status": "PASS"
+    },
+    {
+      "check": "idempotency and audit opsApproveFirmwareUpgrade",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsApproveFirmwareUpgrade",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsExecuteFirmwareUpgrade",
+      "status": "PASS"
+    },
+    {
+      "check": "idempotency and audit opsExecuteFirmwareUpgrade",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsExecuteFirmwareUpgrade",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsListCollectionPolicies",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsListCollectionPolicies",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsCreateCollectionPolicy",
+      "status": "PASS"
+    },
+    {
+      "check": "idempotency and audit opsCreateCollectionPolicy",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsCreateCollectionPolicy",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsUpdateCollectionPolicy",
+      "status": "PASS"
+    },
+    {
+      "check": "idempotency and audit opsUpdateCollectionPolicy",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsUpdateCollectionPolicy",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsCreateCollectionJob",
+      "status": "PASS"
+    },
+    {
+      "check": "idempotency and audit opsCreateCollectionJob",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsCreateCollectionJob",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsGetCollectionJob",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsGetCollectionJob",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsRetryCollectionJob",
+      "status": "PASS"
+    },
+    {
+      "check": "idempotency and audit opsRetryCollectionJob",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsRetryCollectionJob",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsListMaintenanceEvents",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsListMaintenanceEvents",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsCreateMaintenanceEvent",
+      "status": "PASS"
+    },
+    {
+      "check": "idempotency and audit opsCreateMaintenanceEvent",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsCreateMaintenanceEvent",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsCreateRetirementJob",
+      "status": "PASS"
+    },
+    {
+      "check": "idempotency and audit opsCreateRetirementJob",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsCreateRetirementJob",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsGetJob",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsGetJob",
+      "status": "PASS"
+    },
+    {
+      "check": "path parameters opsGetRetentionPolicy",
+      "status": "PASS"
+    },
+    {
+      "check": "channel policy opsGetRetentionPolicy",
+      "status": "PASS"
+    },
+    {
+      "check": "valid example maintained-ipmi-only",
+      "status": "PASS"
+    },
+    {
+      "check": "valid example successful-zero-value",
+      "status": "PASS"
+    },
+    {
+      "check": "valid example unsupported-is-null",
+      "status": "PASS"
+    },
+    {
+      "check": "valid example ddm-no-permitted-current-source",
+      "status": "PASS"
+    },
+    {
+      "check": "valid example missing-observed-blocks-diff",
+      "status": "PASS"
+    },
+    {
+      "check": "valid example approved-baseline-reference",
+      "status": "PASS"
+    },
+    {
+      "check": "valid example firmware-plan-no-execution",
+      "status": "PASS"
+    },
+    {
+      "check": "negative: forbid SSH in maintained",
+      "status": "PASS"
+    },
+    {
+      "check": "negative: forbid Redfish fallback",
+      "status": "PASS"
+    },
+    {
+      "check": "negative: unsupported cannot have zero-value success",
+      "status": "PASS"
+    },
+    {
+      "check": "negative: missing observed cannot PASS",
+      "status": "PASS"
+    },
+    {
+      "check": "negative: approved baseline needs approval",
+      "status": "PASS"
+    },
+    {
+      "check": "all 17 affected design documents include OPS marker",
+      "status": "PASS"
+    },
+    {
+      "check": "AGENTS applies operations requirements",
+      "status": "PASS"
+    },
+    {
+      "check": "FR-0 through FR-22 retained and present",
+      "status": "PASS"
+    },
+    {
+      "check": "maintained/IPMI-only explicitly specified in PRD",
+      "status": "PASS"
+    },
+    {
+      "check": "new runtime acceptance remains NOT RUN",
+      "status": "PASS"
+    }
+  ],
+  "runtime_operations_tests": "NOT RUN — new operations design is not implemented",
+  "openapi_lint": {
+    "tool": "@redocly/cli 2.72.1",
+    "errors": 0,
+    "warnings": 35,
+    "ignored": 0
+  },
+  "legacy_parameter_fixes": [
+    {
+      "path": "/projects/{project_id}/devices/{device_id}",
+      "added_path_parameters": [
+        "project_id"
+      ]
+    },
+    {
+      "path": "/projects/{project_id}/flows/{flow_id}",
+      "added_path_parameters": [
+        "project_id"
+      ]
+    },
+    {
+      "path": "/flows/{flow_id}/schedules",
+      "added_path_parameters": [
+        "flow_id"
+      ]
+    },
+    {
+      "path": "/flows/{flow_id}/schedules/{schedule_id}",
+      "added_path_parameters": [
+        "flow_id"
+      ]
+    },
+    {
+      "path": "/projects/{project_id}/fabric/devices/{device_id}",
+      "added_path_parameters": [
+        "project_id"
+      ]
+    },
+    {
+      "path": "/projects/{project_id}/network-baselines/{baseline_id}",
+      "added_path_parameters": [
+        "project_id"
+      ]
+    },
+    {
+      "path": "/projects/{project_id}/gates/{gate_id}",
+      "added_path_parameters": [
+        "project_id"
+      ]
+    },
+    {
+      "path": "/projects/{project_id}/issues/{issue_id}",
+      "added_path_parameters": [
+        "project_id"
+      ]
+    },
+    {
+      "path": "/projects/{project_id}/alerts/{alert_id}",
+      "added_path_parameters": [
+        "project_id"
+      ]
+    }
+  ]
+}

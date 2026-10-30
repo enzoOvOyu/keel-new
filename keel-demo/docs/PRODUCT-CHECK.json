@@ -1,0 +1,13 @@
+{
+  "passed": [
+    "BOM: blocked commit / source corrections / review / commit / idempotency",
+    "Network: critical change requires independent NE+DE+NH; verify before completed",
+    "Gate prerequisites and Viewer write rejection enforced by provider",
+    "Inventory drawer separates components / ports / lifecycle; CMDB relations resolve",
+    "Issue closure requires evidence and creates lifecycle/audit",
+    "Governance: constrained parameter change, media approval and immutable template derivation",
+    "Empty / API error / permission states recover without losing navigation"
+  ],
+  "failures": [],
+  "page_errors": []
+}

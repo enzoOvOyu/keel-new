@@ -1,35 +1,7 @@
-import {setNonce} from 'get-nonce'
-import {TooltipProvider} from '@/components/ui/tooltip'
-import { StrictMode } from 'react'
+import React from 'react'
 import { createRoot } from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { createRouter, RouterProvider } from '@tanstack/react-router'
-import { routeTree } from './routeTree.gen'
-import { readPreference } from './lib/preferences'
-import './lib/i18n'
-import './styles/tokens.css'
-import './styles/app.css'
-import './styles/management.css'
-import './styles/workspace.css'
-import './styles/shadcn.css'
-
-const styleNonce=document.querySelector<HTMLMetaElement>('meta[name="keel-style-nonce"]')?.content
-if(styleNonce)setNonce(styleNonce)
-
-const storedTheme = readPreference('keel.theme')
-document.documentElement.dataset.theme = storedTheme === 'dark' || storedTheme === 'light'
-  ? storedTheme : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-
-const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false, refetchOnWindowFocus: false } } })
-const router = createRouter({ routeTree, defaultPreload: 'intent', scrollRestoration: true })
-declare module '@tanstack/react-router' { interface Register { router: typeof router } }
-
-const mount = document.getElementById('root')
-if (!mount) throw new Error('Missing application root')
-createRoot(mount).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}><TooltipProvider delayDuration={300}><RouterProvider router={router} /></TooltipProvider></QueryClientProvider>
-  </StrictMode>,
-)
-
-import './styles/ztp-planning.css'
+import './index.css'
+const queryClient = new QueryClient()
+createRoot(document.getElementById('root')!).render(<React.StrictMode><QueryClientProvider client={queryClient}><BrowserRouter><main className="mx-auto max-w-4xl p-10"><p className="text-sm font-semibold text-slate-500">KEEL · 开发环境</p><h1 className="mt-3 text-2xl font-semibold">前端基础环境已就绪</h1><p className="mt-3 text-slate-600">按设计文档从 P0 全局壳层和 mock API 开始开发。</p></main></BrowserRouter></QueryClientProvider></React.StrictMode>)

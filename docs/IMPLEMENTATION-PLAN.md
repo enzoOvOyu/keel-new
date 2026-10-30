@@ -1,0 +1,101 @@
+# keel Implementation Plan
+
+## 1. 执行规则
+
+- 以 `PRD.md` 为业务验收依据、`SYSTEM-DESIGN.md` 为领域流程依据、`ARCHITECTURE.md` 为技术边界、`DESIGN-SYSTEM.md` 为前端规范、`API-CONVENTIONS.md` 为接口唯一契约。
+- 先检查仓库现状、复用可用代码，不先重写无关模块；不要反复全仓 review 或把工作过度拆碎。
+- 每个阶段只做与阶段目标相关的测试；完成后输出改动文件、关键实现、验证命令与未解决阻塞。
+- 不伪造真实硬件验证。无设备时使用 `sim/device-sim` 和 golden contract；不可模拟的能力标 `unknown`。
+- 任何未定义的权限、安全、删除、状态、性能和数据一致性规则，先登记决策，不以 TODO 绕过门禁。
+
+## 2. P0 — 全量前端骨架、API 契约与 Mock Runtime（先做）
+
+**目标**：用户可在浏览器中完整点选所有主要模块；每个页面消费统一 API 接口，数据由 mock provider 提供。
+
+1. 建 React + TypeScript + Vite + shadcn/ui 应用壳、响应式 Sidebar/Header、项目上下文、路由、面包屑、权限占位。
+2. 建 `api` interfaces + OpenAPI TypeScript types + `ApiProvider`；提供 `mock` / `http` 两种 provider，通过环境变量切换。
+3. 先补全全平台 API 契约（BOM、CMDB、资产、Flow、Executions、日志、任务、网络底座、PXE、G1-G6、工单、监控、模板、介质、参数、审计、项目/权限）。
+4. 建统一 DataTable、StatusBadge、IssuePanel、DiffViewer、SourceCellViewer、EvidenceList、ExecutionTimeline、LogViewer、TargetMatrix、ConfirmDialog。
+5. 根据 DESIGN-SYSTEM 和 UI-REFERENCE 完成全部主菜单页面的 mock 版；模拟成功、空、错误、权限拒绝、部分失败、未知/过期数据和长任务状态。
+6. 不接真实设备，不写生产执行后端；mock 任务按固定状态时间线可手动暂停、继续、重试、终止（明确标记 mock）。
+
+**完成标准**：全导航无死链；所有主操作可交互；组件无散落硬编码假数据；所有页面通过统一 API provider 取数据；OpenAPI lint、TS 类型检查和前端 build 通过；桌面端关键页面视觉检查通过。
+
+## 3. P1 — 真实 BOM 导入闭环（前端先行后接 Go）
+
+1. 依据 `EXCEL-IMPORT-PROFILE.md` 实现工作簿解析：多 Sheet、非统一表头、横向 P2P 表、设备资产表、OOB 地址表、机柜布局网格和汇总表分型。
+2. 原始文件安全保存、hash、单元格溯源；识别敏感列并禁止将密码/令牌传给 LLM 或写入输出。
+3. 映射优先级：已批准项目模板规则 → 确定性解析器 → AI 候选；AI 不直接提交 BOM。
+4. 建标准实体候选、三段校验、人工审核、修正记录、标准 BOM 包预览和确认提交。
+5. 提交统一 `bom_item` 并在同一事务写 Outbox；CMDB 记录/关系由消费者幂等创建。失败可重放，不能出现 BOM 成功但 CMDB 永久缺失。
+6. 用真实工作簿制作脱敏后的测试样本与人工标准答案；原文件不进入仓库，不复制明文凭据。
+
+**完成标准**：所有识别项可回溯至文件/Sheet/单元格；未知列不丢弃；关键歧义阻断；密码不进入日志、AI 请求、mock fixture、CMDB 或导出；server/fabric 同批次提交；CMDB 自动关联导入源和标准物料。
+
+## 4. P2 — Go 后端基础与 CMDB 全链投影
+
+1. Go API、PostgreSQL migrations、对象存储、身份/RBAC、审计、统一错误、request_id。
+2. 定义 CMDB 权威实体、关系、事件与来源追溯；各业务域写自身权威表，事务 Outbox 产生领域事件，CMDB projector 幂等更新视图。
+3. 统一查询 API 支持资产详情、关系图、来源链、生命周期时间线和数据新鲜度。
+4. 接入前端 `http` provider，保留同一接口类型和页面行为。
+
+**完成标准**：迁移可重复部署；事件重放不产生重复记录；权限隔离生效；BOM、采集、执行、门禁、工单等记录均可追溯至 CMDB。
+
+## 5. P3 — 纳管资产与批量脚本工作流（Kestra 风格）
+
+1. 实现已纳管目标查询与分组：服务器/交换机、项目、机柜、角色、标签、状态；执行前冻结目标快照。
+2. Flow 以“脚本/命令 + 目标选择 + 参数 + 频率/触发 + 超时/重试 + 并发/失败策略”为核心；支持一次执行、定时执行、启停定时器、版本历史。
+3. Execution 页面参照 Kestra：Overview/Gantt、Topology、Targets 矩阵、Logs、Outputs、关联对象；显示状态、频次、生命周期、开始/结束、耗时、重试 attempt、退出码和失败原因。
+4. 实现 Pause/Resume/Kill/Retry Failed Targets；执行状态以 DB 为准，断连/超时副作用结果未知时先对账，不盲目重放。
+5. 首期采用 Go worker + 持久化队列/任务表；只有实际性能或隔离需求出现时才拆分 worker 服务。
+
+**完成标准**：对 mock 设备可完整演示；对真实纳管设备仅在授权和审批范围内执行；单目标与批量状态、日志、频次、生命周期一致；操作审计和 CMDB 关联自动生成。
+
+## 6. P4 — 自动机柜图（与资产/CMDB 数据接通）
+
+1. 前端 Mock 阶段先完成机柜图工作区：多机柜选择、正反视图、SVG、U 刻度、设备详情、问题面板、生成预览、diff、人工调整、撤销/重做、发布和导出状态。
+2. 基于 `EXCEL-IMPORT-PROFILE.md` 的 `Device Information`、`Layout`、`Layout 110-120`、功耗/工作量汇总及 P2P/端口 Sheet，生成标准化候选。不要把端口连线表误当机柜 U 位布局表。
+3. Go 端实现 `RackGenerator`、`RackValidator`、`RackDiagramRevision` 和异步导出；先使用明确 rack/U/设备高度生成，缺失值输出 issue。
+4. 关联 CMDB 中 Rack、BOMItem、PhysicalPort、Cable 和生命周期事件；布局发布后的位置修改走审批/版本事件。
+5. 再生成必须展示 diff、默认保留人工覆盖；不得覆盖当前 published revision。
+
+**完成标准**：详见 `RACK-DIAGRAM.md` §7；与 mock/真实 API 使用相同 OpenAPI schema。
+
+## 7. P5 — 网络底座与服务器交付
+
+按 PRD 实现网络基线/模板、ZTP、配置 Doublecheck、审批下发闭环、LLDP 三方校验、G1–G6、Mapping、工单、监控。每个域先完成 mock UI/API 契约，再逐模块接 Go 后端和 simulator。不得因 mock 缺少真实设备而将 unknown 伪装 PASS。
+
+## 8. P6 — 端到端交付、退场与交付后维护
+
+实现 Flow 编排、G4/G5/G6、报告、优雅退出、凭据撤销、CMDB maintained 状态。所有执行、报告、门禁、审批和资产生命周期事件自动沉淀并互相关联。
+
+## 9. 每阶段最小验证集
+
+- Go：`go test ./...`、`go vet ./...`、关键领域规则/状态机测试。
+- API：OpenAPI lint、成功/权限拒绝/参数错误/状态冲突/幂等/并发冲突契约测试。
+- DB：空库迁移、约束、事务回滚、并发提交与唯一键测试。
+- 前端：`tsc`、lint、build；关键表单和状态视图组件测试。
+- E2E：只覆盖关键用户路径，不对每个静态组件重复做无价值测试。
+- 网络：simulator + golden-file；真机仅在授权 PoC 环境执行。
+
+## 10. Codex 每次任务输出格式
+
+```text
+完成：<具体能力>
+修改：<关键文件列表>
+验证：<执行的命令与结果>
+未解决：<仅列真实阻塞；无则写无>
+下一步：<最小必要动作>
+```
+
+## OPS-2026-10-29 · 交付后运维设计增补
+
+本次仅更新设计与Mock契约，新增运维能力尚未开发。交付前端现有工作不因本设计被删改。
+
+1. OPS-D0：冻结FR-18…22、实体复用/所有权、IPMI-only、观察上下文和专用OpenAPI；完成跨文档检查。
+2. OPS-M1：在既有前端新增独立服务器/交换机运维目录与统一设备详情；先完整Mock API和上述集合，再做配置三方diff、硬件/端口/DDM趋势、采集Job、维护/升级/退役确认流程。
+3. OPS-M2：固定异常场景与浏览器闭环：历史只读→策略拒绝→允许采集→漂移工单→允许通道变更→精确范围复验；Viewer/跨项目/禁用通道拒绝在provider层验证。
+4. 用户确认页面后，OPS-G1逐模块Go接入：只读身份/配置/快照查询→采集策略/Job→监控日志存储适配→审批/固件/BMC→维修复验/退役。禁止为了并行后端改变前端先行。
+5. maintained任务恢复、重试/fallback、外部来源接入和凭据吊销先做安全验收，再允许真实适配器。未定阈值/存储产品/保留数值记录DECISIONS，不用假成功绕过。
+
+阶段完成条件以ACCEPTANCE的OPS项为准；文档通过不等于Mock/真机通过。

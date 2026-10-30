@@ -1,4 +1,0 @@
-{
-  "description": "All business controls migrated to components/ui. Zero native-element budget; hidden form inputs remain allowed.",
-  "files": {}
-}

@@ -1,0 +1,238 @@
+{
+  "notice": "Design-only synthetic examples; not installed into running Mock Provider",
+  "examples": [
+    {
+      "name": "maintained-ipmi-only",
+      "schema": "OpsAccessPolicy",
+      "value": {
+        "revision": 1,
+        "mode": "ipmi_only",
+        "allowed_protocols": [
+          "ipmi"
+        ],
+        "policy_allowed": true,
+        "policy_reason": "approved IPMI use only"
+      }
+    },
+    {
+      "name": "successful-zero-value",
+      "schema": "OpsMetricSample",
+      "value": {
+        "metric_key": "cpu.utilization",
+        "value": 0,
+        "unit": "percent",
+        "labels": [],
+        "counter_reset": false,
+        "snapshot_id": "demo-snapshot-001",
+        "threshold_revision_id": null,
+        "context": {
+          "project_id": "proj-b300-demo",
+          "asset_id": "srv-0001",
+          "source": "synthetic-ops-contract-example",
+          "adapter_version": "demo-contract-v1",
+          "collected_at": "2026-10-29T14:00:00Z",
+          "received_at": "2026-10-29T14:00:00Z",
+          "capability_status": "supported",
+          "freshness_status": "fresh",
+          "quality_status": "good",
+          "policy_allowed": true,
+          "policy_reason": "approved IPMI read-only sensor purpose",
+          "threshold_revision_id": null,
+          "retention_policy_id": "retention-synthetic-reference",
+          "collection_job_id": null,
+          "reason": null
+        }
+      }
+    },
+    {
+      "name": "unsupported-is-null",
+      "schema": "OpsMetricSample",
+      "value": {
+        "metric_key": "gpu.utilization",
+        "value": null,
+        "unit": "percent",
+        "labels": [],
+        "counter_reset": false,
+        "snapshot_id": "demo-snapshot-001",
+        "threshold_revision_id": null,
+        "context": {
+          "project_id": "proj-b300-demo",
+          "asset_id": "srv-0001",
+          "source": "synthetic-ops-contract-example",
+          "adapter_version": "demo-contract-v1",
+          "collected_at": "2026-10-29T14:00:00Z",
+          "received_at": "2026-10-29T14:00:00Z",
+          "capability_status": "unsupported",
+          "freshness_status": "unknown",
+          "quality_status": "unknown",
+          "policy_allowed": false,
+          "policy_reason": "IPMI-only does not permit an SSH/Agent collector",
+          "threshold_revision_id": null,
+          "retention_policy_id": "retention-synthetic-reference",
+          "collection_job_id": null,
+          "reason": "No supported allowed source"
+        }
+      }
+    },
+    {
+      "name": "ddm-no-permitted-current-source",
+      "schema": "OpsDDMEntry",
+      "value": {
+        "port_id": "sw-leaf-0001-port-01",
+        "optic_asset_id": "sw-leaf-0001-port-01-optic",
+        "channel": "lane-1",
+        "rx_dbm": null,
+        "tx_dbm": null,
+        "temperature_c": null,
+        "voltage_v": null,
+        "bias_ma": null,
+        "model": "synthetic-optic",
+        "vendor": "synthetic-vendor",
+        "serial_redacted": "DEMO-REDACTED",
+        "thresholds": [],
+        "snapshot_id": "demo-ddm-001",
+        "context": {
+          "project_id": "proj-b300-demo",
+          "asset_id": "sw-leaf-0001",
+          "source": "synthetic-ops-contract-example",
+          "adapter_version": "demo-contract-v1",
+          "collected_at": "2026-10-29T14:00:00Z",
+          "received_at": "2026-10-29T14:00:00Z",
+          "capability_status": "unknown",
+          "freshness_status": "unknown",
+          "quality_status": "unknown",
+          "policy_allowed": false,
+          "policy_reason": "No approved current source",
+          "threshold_revision_id": null,
+          "retention_policy_id": "retention-synthetic-reference",
+          "collection_job_id": null,
+          "reason": "Historical metadata only"
+        }
+      }
+    },
+    {
+      "name": "missing-observed-blocks-diff",
+      "schema": "OpsConfigDiff",
+      "value": {
+        "id": "example-1",
+        "project_id": "proj-b300-demo",
+        "asset_id": "srv-0001",
+        "revision": 1,
+        "created_at": "2026-10-29T14:00:00Z",
+        "source": "synthetic-ops-contract-example",
+        "baseline_revision_id": "netbase-demo-v1",
+        "intended_revision_id": "intended-demo-v1",
+        "observed_revision_id": null,
+        "rule_revision_id": "demo-rule-v1",
+        "drift_level": "unknown",
+        "verdict": "BLOCKED",
+        "items": [],
+        "approval_valid": false,
+        "context": {
+          "project_id": "proj-b300-demo",
+          "asset_id": "srv-0001",
+          "source": "synthetic-ops-contract-example",
+          "adapter_version": "demo-contract-v1",
+          "collected_at": "2026-10-29T14:00:00Z",
+          "received_at": "2026-10-29T14:00:00Z",
+          "capability_status": "supported",
+          "freshness_status": "unknown",
+          "quality_status": "unknown",
+          "policy_allowed": true,
+          "policy_reason": "approved IPMI read-only sensor purpose",
+          "threshold_revision_id": null,
+          "retention_policy_id": "retention-synthetic-reference",
+          "collection_job_id": null,
+          "reason": "Missing actual configuration"
+        }
+      }
+    },
+    {
+      "name": "approved-baseline-reference",
+      "schema": "OpsConfigurationRevision",
+      "value": {
+        "id": "example-1",
+        "project_id": "proj-b300-demo",
+        "asset_id": "srv-0001",
+        "revision": 1,
+        "created_at": "2026-10-29T14:00:00Z",
+        "source": "synthetic-ops-contract-example",
+        "fact_kind": "approved_baseline",
+        "domain": "server",
+        "existing_revision_ref": "config-demo-v1",
+        "baseline_revision_id": null,
+        "template_revision_id": "tpl-b300-hgx-demo-v1",
+        "target_snapshot_id": "target-demo-001",
+        "collection_snapshot_id": null,
+        "format": "reference",
+        "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "payload_ref": null,
+        "approval_refs": [
+          "approval-demo-001"
+        ],
+        "data_availability": "not_collected",
+        "context": {
+          "project_id": "proj-b300-demo",
+          "asset_id": "srv-0001",
+          "source": "synthetic-ops-contract-example",
+          "adapter_version": "demo-contract-v1",
+          "collected_at": "2026-10-29T14:00:00Z",
+          "received_at": "2026-10-29T14:00:00Z",
+          "capability_status": "supported",
+          "freshness_status": "fresh",
+          "quality_status": "good",
+          "policy_allowed": true,
+          "policy_reason": "approved IPMI read-only sensor purpose",
+          "threshold_revision_id": null,
+          "retention_policy_id": "retention-synthetic-reference",
+          "collection_job_id": null,
+          "reason": null
+        }
+      }
+    },
+    {
+      "name": "firmware-plan-no-execution",
+      "schema": "OpsFirmwareUpgradeRequest",
+      "value": {
+        "component_asset_ids": [
+          "srv-0001-nic-01"
+        ],
+        "media_artifact_id": "media-003",
+        "baseline_revision_id": "config-demo-v1",
+        "before_inventory_revision_ids": [
+          "fw-inventory-demo-001"
+        ],
+        "maintenance_window_ref": "window-demo-001",
+        "reason": "Synthetic firmware planning only",
+        "access_policy_revision": 1
+      }
+    }
+  ],
+  "negative_checks": [
+    {
+      "case": "forbid SSH in maintained",
+      "expected": "REJECT",
+      "actual": "REJECT"
+    },
+    {
+      "case": "forbid Redfish fallback",
+      "expected": "REJECT",
+      "actual": "REJECT"
+    },
+    {
+      "case": "unsupported cannot have zero-value success",
+      "expected": "REJECT",
+      "actual": "REJECT"
+    },
+    {
+      "case": "missing observed cannot PASS",
+      "expected": "REJECT",
+      "actual": "REJECT"
+    },
+    {
+      "case": "approved baseline needs approval",
+      "expected": "REJECT",
+      "actual": "REJECT"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "data": {
+    "revision_id":"rackrev-demo-001","diagram_id":"rackdiag-demo-001","bom_revision_id":"bomrev-demo-012","model_catalog_revision":"models-2026-10","placement_policy_revision":"rack-policy-v1","generator_version":"keel-rackgen-0.1.0","content_hash":"sha256:demo-layout-001","status":"review_required",
+    "placements":[
+      {"placement_id":"place-demo-1","rack_id":"rack-s110-01","item_uid":"item-switch-demo-1","u_start":40,"u_height":2,"face":"front","placement_status":"approved","manual_override":false,"source_ref":{"sheet":"Device Information","cell":"A2"}},
+      {"placement_id":"place-demo-2","rack_id":"rack-s110-01","item_uid":"item-server-demo-1","u_start":10,"u_height":6,"face":"both","placement_status":"planned","manual_override":true,"source_ref":{"sheet":"Layout","cell":"B5"}},
+      {"placement_id":"place-demo-3","rack_id":"rack-s110-01","item_uid":"item-server-demo-2","u_start":null,"u_height":null,"face":"both","placement_status":"unassigned","manual_override":false,"source_ref":{"sheet":"Device Information","cell":"A12"}}
+    ],
+    "issues":[
+      {"issue_id":"rackissue-demo-1","item_uid":"item-server-demo-2","severity":"WARN","rule_id":"RACK-UNKNOWN-HEIGHT","source_ref":{"sheet":"Device Information","cell":"G12"},"message":"设备高度未能从已发布型号库或确认 BOM 中解析","resolution_status":"open"}
+    ],
+    "diff":[]
+  },
+  "request_id":"req-demo-rack-001"
+}

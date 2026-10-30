@@ -1,0 +1,6 @@
+{
+  "items": [
+    {"rack_id":"rack-s110-01","project_id":"proj-b300-demo","site_id":"site-demo","room_id":"room-s110","rack_name":"S110-R01","u_height":42,"position":"Row A / Bay 01","status":"approved","used_u":34,"free_u":8},
+    {"rack_id":"rack-s110-02","project_id":"proj-b300-demo","site_id":"site-demo","room_id":"room-s110","rack_name":"S110-R02","u_height":42,"position":"Row A / Bay 02","status":"planned","used_u":27,"free_u":15}
+  ]
+}

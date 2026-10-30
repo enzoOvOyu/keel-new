@@ -1,0 +1,1 @@
+sample_id,relation_type,source_entity_ref,source_port_ref,target_entity_ref,target_port_ref,expected_relation,criticality,expected_action,rule_id,reviewer,reviewed_at,notes
