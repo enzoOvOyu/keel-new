@@ -100,3 +100,10 @@ Fabric→Topology→物理全局分组→机柜/Pod展开→设备/端口/线缆
 Fabric无损选择设备/反例→端口→rule@version→五层证据→读取固定Mock快照并自动关联确认异常→整改产生新证据→定向复验→当前证据与绑定版本有效才关闭Issue。人工关闭不恢复PASS，过期/配置变动必须重验。
 
 规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。
+
+
+## CMDB 全链路资产档案增补
+
+资产搜索→统一抽屉；目录/树选中→关系展开NIC→端口→Cable→对端交换机→既有八Tab抽屉。配置版本Diff→字段来源→原领域快照/采集/Execution/Issue；生命周期→验机/NCCL/历史退场归档；质量→待审核导入或采集；人工备注白名单/版本校验→审计。保存视图恢复过滤与选中上下文。
+
+唯一详细设计与模型边界见[CMDB-DOSSIER.md](CMDB-DOSSIER.md)。

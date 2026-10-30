@@ -33,10 +33,10 @@
       "switch_ports": 1024,
       "optics": 1024,
       "cables": 704,
-      "bom_imports": 1,
+      "bom_imports": 2,
       "bom_sheet_regions": 33,
-      "bom_mapping_candidates": 6,
-      "bom_issues": 5,
+      "bom_mapping_candidates": 7,
+      "bom_issues": 6,
       "flows": 14,
       "schedules": 3,
       "executions": 45,
@@ -51,9 +51,9 @@
       "monitoring_sources": 2,
       "cmdb_entities": 5344,
       "cmdb_relationships": 6628,
-      "lifecycle_events": 96,
+      "lifecycle_events": 97,
       "rack_diagrams": 1,
-      "rack_diagram_revisions": 3,
+      "rack_diagram_revisions": 4,
       "rack_placements": 88,
       "media": 8,
       "parameters": 8,
@@ -73,10 +73,10 @@
       "bmc_sel_events": 6,
       "firmware_inventory": 256,
       "server_config_baselines": 64,
-      "server_observed_configs": 64,
+      "server_observed_configs": 65,
       "switch_runtime": 24,
       "switch_config_baselines": 24,
-      "switch_running_configs": 24,
+      "switch_running_configs": 25,
       "switch_config_diffs": 4,
       "switch_interfaces": 1024,
       "lldp_neighbors": 512,
@@ -131,7 +131,7 @@
       "delivery_stage_events": 264,
       "delivery_batches": 16,
       "handover_records": 0,
-      "test_reports": 128,
+      "test_reports": 131,
       "provisioning_receipts": 0,
       "port_models": 0,
       "validation_remediations": 0,
@@ -149,7 +149,10 @@
       "lossless_raw_outputs": 140,
       "lossless_retests": 0,
       "lossless_host_evidence": 105,
-      "lossless_collectors": 8
+      "lossless_collectors": 8,
+      "cmdb_saved_views": 0,
+      "cmdb_field_provenance": 5,
+      "cmdb_quality_findings": 5
     },
     "version": "2.4-full-demo",
     "dataset_name": "Keel IA v2.4 Full Demo Dataset",
@@ -169,10 +172,10 @@
       "switch_ports": 1024,
       "optics": 1024,
       "cables": 704,
-      "bom_imports": 1,
+      "bom_imports": 2,
       "bom_sheet_regions": 33,
-      "bom_mapping_candidates": 6,
-      "bom_issues": 5,
+      "bom_mapping_candidates": 7,
+      "bom_issues": 6,
       "flows": 14,
       "schedules": 3,
       "executions": 45,
@@ -187,9 +190,9 @@
       "monitoring_sources": 2,
       "cmdb_entities": 5344,
       "cmdb_relationships": 6628,
-      "lifecycle_events": 96,
+      "lifecycle_events": 97,
       "rack_diagrams": 1,
-      "rack_diagram_revisions": 3,
+      "rack_diagram_revisions": 4,
       "rack_placements": 88,
       "media": 8,
       "parameters": 8,
@@ -209,10 +212,10 @@
       "bmc_sel_events": 6,
       "firmware_inventory": 256,
       "server_config_baselines": 64,
-      "server_observed_configs": 64,
+      "server_observed_configs": 65,
       "switch_runtime": 24,
       "switch_config_baselines": 24,
-      "switch_running_configs": 24,
+      "switch_running_configs": 25,
       "switch_config_diffs": 4,
       "switch_interfaces": 1024,
       "lldp_neighbors": 512,
@@ -267,7 +270,7 @@
       "delivery_stage_events": 264,
       "delivery_batches": 16,
       "handover_records": 0,
-      "test_reports": 128,
+      "test_reports": 131,
       "provisioning_receipts": 0,
       "port_models": 0,
       "validation_remediations": 0,
@@ -285,7 +288,10 @@
       "lossless_raw_outputs": 140,
       "lossless_retests": 0,
       "lossless_host_evidence": 105,
-      "lossless_collectors": 8
+      "lossless_collectors": 8,
+      "cmdb_saved_views": 0,
+      "cmdb_field_provenance": 5,
+      "cmdb_quality_findings": 5
     },
     "runtime_extensions_notice": "User-confirmed GPU1-8 to NIC1-8 default; 512 pairs. LLDP normalized with source_original retained and 28 fault scenarios. All executions and observations remain synthetic.",
     "delivery_model": "ordered-six-stage-v1"
@@ -77890,6 +77896,35 @@
         "created_at": "2026-10-27T12:00:00Z",
         "revision": 1,
         "is_demo": true
+      },
+      {
+        "id": "bom-cmdb-review-demo",
+        "project_id": "proj-b300-demo",
+        "source_file_name": "synthetic-cmdb-review.xlsx",
+        "content_sha256": "sha256:synthetic-cmdb-review-distinct",
+        "template_revision_id": "tpl-b300-hgx-demo-v1",
+        "status": "review_pending",
+        "sheet_count": 33,
+        "entity_counts": {
+          "server": 64,
+          "gpu": 512,
+          "nic": 640,
+          "port": 1280,
+          "switch": 24,
+          "optic_module": 1024,
+          "cable": 704
+        },
+        "issue_counts": {
+          "BLOCK": 1,
+          "WARN": 1
+        },
+        "mapping_revision": "map-demo-v1",
+        "validation_revision": "validation-demo-v1",
+        "cmdb_projection_status": "not_committed",
+        "created_by": "demo.network.engineer",
+        "created_at": "2026-10-27T12:00:00Z",
+        "revision": 1,
+        "is_demo": true
       }
     ],
     "bom_sheet_regions": [
@@ -78635,6 +78670,19 @@
         "rationale": "检测到敏感列，不导入明文凭据",
         "revision": 1,
         "is_demo": true
+      },
+      {
+        "id": "cmdb-pending-mapping",
+        "project_id": "proj-b300-demo",
+        "import_id": "bom-cmdb-review-demo",
+        "source_header": "设备标识（合成歧义）",
+        "standard_field": "serial",
+        "confidence": 0.42,
+        "status": "pending",
+        "source_sheet": "Synthetic Review",
+        "source_cell": "C5",
+        "raw_value": "DEMO-AMBIGUOUS-IDENTITY",
+        "source": "explicit_synthetic_pending_candidate"
       }
     ],
     "bom_issues": [
@@ -78812,6 +78860,22 @@
           "is_demo": true
         },
         "resolution_reason": "初始合成标准BOM已确认，源审核问题保留为历史；新导入重新审核"
+      },
+      {
+        "id": "cmdb-pending-endpoint",
+        "project_id": "proj-b300-demo",
+        "import_id": "bom-cmdb-review-demo",
+        "severity": "BLOCK",
+        "code": "MISSING_ENDPOINT_B",
+        "message": "待审核线缆候选缺少B端，不是正式Cable事实",
+        "source_location": {
+          "sheet": "Synthetic Review",
+          "cell": "F8"
+        },
+        "entity_ref": "cable-srv-0001-01",
+        "field": "endpoint_b_uid",
+        "resolution_status": "open",
+        "source": "explicit_synthetic_review_gap"
       }
     ],
     "flows": [
@@ -284380,6 +284444,31 @@
         "status": "recorded",
         "request_id": "req-sw-24",
         "is_demo": true
+      },
+      {
+        "id": "cmdb-dossier-replacement",
+        "project_id": "proj-b300-demo",
+        "entity_id": "srv-0002",
+        "event_type": "component.replaced",
+        "occurred_at": "2026-10-28T08:00:00Z",
+        "summary": "合成换件记录：NIC1旧实物退役，新实物使用不同身份",
+        "source_domain": "component_inventory",
+        "source": "explicit_synthetic_replacement_history",
+        "related_asset_ids": [
+          "srv-0002-nic-01"
+        ],
+        "old_physical_identity": {
+          "id": "retired-demo-nic-0002-01",
+          "serial": "DEMO-RETIRED-NIC-002",
+          "valid_to": "2026-10-28T08:00:00Z",
+          "status": "retired"
+        },
+        "new_physical_identity": {
+          "id": "srv-0002-nic-01",
+          "valid_from": "2026-10-28T08:00:00Z"
+        },
+        "status": "recorded",
+        "historical_only": true
       }
     ],
     "rack_diagrams": [
@@ -288445,6 +288534,94 @@
         "published_at": "2026-10-29T23:00:00Z",
         "execution_mode": "mock",
         "is_demo": true
+      },
+      {
+        "id": "cmdb-quality-draft",
+        "project_id": "proj-b300-demo",
+        "diagram_id": "rack-diagram-demo-001",
+        "status": "draft",
+        "source_bom_revision": "bom-import-demo-001",
+        "placements": [
+          {
+            "id": "placement-srv-0061",
+            "diagram_revision_id": "rack-diagram-rev-demo-v1",
+            "rack_id": "rack-0016",
+            "item_id": "srv-0061",
+            "u_start": 33,
+            "u_height": 6,
+            "face": "front",
+            "orientation": "front",
+            "source": "auto_generated",
+            "manual_override": false,
+            "status": "valid",
+            "revision": 1,
+            "is_demo": true
+          },
+          {
+            "id": "placement-srv-0062",
+            "diagram_revision_id": "rack-diagram-rev-demo-v1",
+            "rack_id": "rack-0016",
+            "item_id": "srv-0062",
+            "u_start": 27,
+            "u_height": 6,
+            "face": "front",
+            "orientation": "front",
+            "source": "auto_generated",
+            "manual_override": false,
+            "status": "valid",
+            "revision": 1,
+            "is_demo": true
+          },
+          {
+            "id": "placement-srv-0063",
+            "diagram_revision_id": "rack-diagram-rev-demo-v1",
+            "rack_id": "rack-0016",
+            "item_id": "srv-0063",
+            "u_start": 21,
+            "u_height": 6,
+            "face": "front",
+            "orientation": "front",
+            "source": "auto_generated",
+            "manual_override": false,
+            "status": "valid",
+            "revision": 1,
+            "is_demo": true
+          },
+          {
+            "id": "placement-srv-0064",
+            "diagram_revision_id": "rack-diagram-rev-demo-v1",
+            "rack_id": "rack-0016",
+            "item_id": "srv-0064",
+            "u_start": 33,
+            "u_height": 6,
+            "face": "front",
+            "orientation": "front",
+            "source": "auto_generated",
+            "manual_override": false,
+            "status": "valid",
+            "revision": 1,
+            "is_demo": true
+          },
+          {
+            "id": "placement-sw-leaf-0016",
+            "diagram_revision_id": "rack-diagram-rev-demo-v1",
+            "rack_id": "rack-0016",
+            "item_id": "sw-leaf-0016",
+            "u_start": 2,
+            "u_height": 2,
+            "face": "front",
+            "orientation": "front",
+            "source": "auto_generated",
+            "manual_override": false,
+            "status": "valid",
+            "revision": 1,
+            "is_demo": true
+          }
+        ],
+        "generation_engine_version": "synthetic-conflict-draft",
+        "created_at": "2026-10-30T01:00:00Z",
+        "created_by": "demo.delivery.engineer",
+        "revision": 1
       }
     ],
     "rack_placements": [
@@ -302972,6 +303149,25 @@
         "source": "agent+redfish",
         "freshness": "fresh",
         "is_demo": true
+      },
+      {
+        "id": "soc-001-history",
+        "project_id": "proj-b300-demo",
+        "server_id": "srv-0001",
+        "observed_at": "2026-10-28T00:00:00Z",
+        "os": "Ubuntu 24.04 LTS",
+        "kernel": "6.8.0-45-generic",
+        "driver": "570.100.demo",
+        "cuda": "12.8",
+        "nccl": "2.27.7",
+        "bios": "2.3.8",
+        "bmc": "3.2.1",
+        "roce_profile": "roce-lossless-v2",
+        "diff_status": "drift",
+        "source": "synthetic_previous_domain_snapshot",
+        "freshness": "stale",
+        "is_demo": true,
+        "revision": 0
       }
     ],
     "switch_runtime": [
@@ -304634,6 +304830,34 @@
         "baseline_id": "swb-24",
         "observed_at": "2026-10-29T23:34:00Z",
         "is_demo": true
+      },
+      {
+        "id": "swrc-01-history",
+        "project_id": "proj-b300-demo",
+        "switch_id": "sw-leaf-0001",
+        "revision": 0,
+        "approved": true,
+        "hostname": "leaf-01.demo.keel.invalid",
+        "nos_version": "Cumulus Linux 5.x (demo)",
+        "asn": 65100,
+        "vlans": [
+          100,
+          110,
+          120,
+          130
+        ],
+        "mtu": 1500,
+        "pfc_priorities": [
+          3
+        ],
+        "ecn_profile": "roce-ecn-v2",
+        "qos_profile": "lossless-800g-v2",
+        "source": "synthetic_previous_domain_snapshot",
+        "created_at": "2026-10-29T07:20:00Z",
+        "baseline_id": "swb-01",
+        "observed_at": "2026-10-28T00:00:00Z",
+        "is_demo": true,
+        "freshness": "stale"
       }
     ],
     "switch_config_diffs": [
@@ -656813,6 +657037,79 @@
         },
         "stage_id": "NCCL_VALIDATION",
         "test_kind": "nccl"
+      },
+      {
+        "id": "cmdb-dossier-validation",
+        "project_id": "proj-b300-demo",
+        "subject_id": "srv-0001",
+        "name": "验机报告（合成）",
+        "test_kind": "validation",
+        "stage_id": "VALIDATION",
+        "verdict": "FAIL",
+        "source": "explicit_synthetic_dossier_report",
+        "collected_at": "2026-10-30T01:00:00Z",
+        "valid_until": "2026-10-31T00:00:00Z",
+        "historical_only": false,
+        "source_refs": [
+          "srv-0001",
+          "bom-import-demo-001"
+        ],
+        "evidence_summary": {
+          "coverage": "synthetic demo only",
+          "cleanup_steps": [],
+          "current_stage_unlocked": false
+        }
+      },
+      {
+        "id": "cmdb-dossier-nccl",
+        "project_id": "proj-b300-demo",
+        "subject_id": "srv-0001",
+        "name": "NCCL报告：前置证据不足（合成）",
+        "test_kind": "nccl",
+        "stage_id": "NCCL_VALIDATION",
+        "verdict": "BLOCKED",
+        "source": "explicit_synthetic_dossier_report",
+        "collected_at": "2026-10-30T01:00:00Z",
+        "valid_until": "2026-10-31T00:00:00Z",
+        "historical_only": false,
+        "source_refs": [
+          "srv-0001",
+          "bom-import-demo-001"
+        ],
+        "evidence_summary": {
+          "coverage": "synthetic demo only",
+          "cleanup_steps": [],
+          "current_stage_unlocked": false
+        }
+      },
+      {
+        "id": "cmdb-dossier-handover_archive",
+        "project_id": "proj-b300-demo",
+        "subject_id": "srv-0001",
+        "name": "优雅退场归档示例（历史合成，不作当前放行）",
+        "test_kind": "handover_archive",
+        "stage_id": "CLEANUP_HANDOVER",
+        "verdict": "BLOCKED",
+        "source": "explicit_synthetic_dossier_report",
+        "collected_at": "2026-10-30T01:00:00Z",
+        "valid_until": "2026-10-31T00:00:00Z",
+        "historical_only": true,
+        "source_refs": [
+          "srv-0001",
+          "bom-import-demo-001"
+        ],
+        "evidence_summary": {
+          "coverage": "synthetic demo only",
+          "cleanup_steps": [
+            "stop_executions",
+            "revoke_agent",
+            "revoke_ssh",
+            "credential_handling",
+            "archive",
+            "customer_signoff"
+          ],
+          "current_stage_unlocked": false
+        }
       }
     ],
     "provisioning_receipts": [],
@@ -925532,6 +925829,169 @@
           "pause-duration"
         ],
         "read_only": true
+      }
+    ],
+    "cmdb_saved_views": [],
+    "cmdb_field_provenance": [
+      {
+        "id": "cmdb-source-srv1-hostname",
+        "project_id": "proj-b300-demo",
+        "asset_id": "srv-0001",
+        "field": "hostname",
+        "value_json": "\"b300-001.demo.keel.invalid\"",
+        "source": "synthetic_BOM_field_lineage_not_real_Excel",
+        "revision": "mapping-demo-confirmed-v1",
+        "observed_at": "2026-10-29T12:00:00Z",
+        "freshness": "fresh",
+        "support": "supported",
+        "evidence_refs": [
+          "bomitem-0001",
+          "bom-import-demo-001"
+        ],
+        "import_id": "bom-import-demo-001",
+        "sheet": "Device Information (synthetic)",
+        "cell": "B2",
+        "status": "confirmed_synthetic_mapping",
+        "href": "/p/proj-b300-demo/deploy/bom/bom-import-demo-001"
+      },
+      {
+        "id": "cmdb-source-srv1-serial",
+        "project_id": "proj-b300-demo",
+        "asset_id": "srv-0001",
+        "field": "serial",
+        "value_json": "\"DEMO-B300-SN-0001\"",
+        "source": "synthetic_BOM_field_lineage_not_real_Excel",
+        "revision": "mapping-demo-confirmed-v1",
+        "observed_at": "2026-10-29T12:00:00Z",
+        "freshness": "fresh",
+        "support": "supported",
+        "evidence_refs": [
+          "bomitem-0001",
+          "bom-import-demo-001"
+        ],
+        "import_id": "bom-import-demo-001",
+        "sheet": "Device Information (synthetic)",
+        "cell": "C2",
+        "status": "confirmed_synthetic_mapping",
+        "href": "/p/proj-b300-demo/deploy/bom/bom-import-demo-001"
+      },
+      {
+        "id": "cmdb-source-srv1-rack_id",
+        "project_id": "proj-b300-demo",
+        "asset_id": "srv-0001",
+        "field": "rack_id",
+        "value_json": "\"rack-0001\"",
+        "source": "synthetic_BOM_field_lineage_not_real_Excel",
+        "revision": "mapping-demo-confirmed-v1",
+        "observed_at": "2026-10-29T12:00:00Z",
+        "freshness": "fresh",
+        "support": "supported",
+        "evidence_refs": [
+          "bomitem-0001",
+          "bom-import-demo-001"
+        ],
+        "import_id": "bom-import-demo-001",
+        "sheet": "Device Information (synthetic)",
+        "cell": "D2",
+        "status": "confirmed_synthetic_mapping",
+        "href": "/p/proj-b300-demo/deploy/bom/bom-import-demo-001"
+      },
+      {
+        "id": "cmdb-source-srv63-observed.serial",
+        "project_id": "proj-b300-demo",
+        "asset_id": "srv-0063",
+        "field": "observed.serial",
+        "value_json": "null",
+        "source": "synthetic_identity_collection",
+        "revision": "identity-demo-1",
+        "observed_at": "2026-10-29T00:00:00Z",
+        "freshness": "stale",
+        "support": "unknown",
+        "evidence_refs": [
+          "collect-srv-063"
+        ],
+        "import_id": null,
+        "sheet": null,
+        "cell": null,
+        "status": "observed_gap_not_hardware_fault",
+        "href": "/cmdb/configuration?asset=srv-0063&resource=collection_jobs&evidence=collect-srv-063"
+      },
+      {
+        "id": "cmdb-source-srv63-observed.model_ref",
+        "project_id": "proj-b300-demo",
+        "asset_id": "srv-0063",
+        "field": "observed.model_ref",
+        "value_json": "null",
+        "source": "synthetic_identity_collection",
+        "revision": "identity-demo-1",
+        "observed_at": "2026-10-29T00:00:00Z",
+        "freshness": "stale",
+        "support": "unknown",
+        "evidence_refs": [
+          "collect-srv-063"
+        ],
+        "import_id": null,
+        "sheet": null,
+        "cell": null,
+        "status": "observed_gap_not_hardware_fault",
+        "href": "/cmdb/configuration?asset=srv-0063&resource=collection_jobs&evidence=collect-srv-063"
+      }
+    ],
+    "cmdb_quality_findings": [
+      {
+        "id": "cmdb-quality-pending",
+        "project_id": "proj-b300-demo",
+        "asset_id": "cable-srv-0001-01",
+        "field": "candidate.endpoint_b_uid",
+        "code": "PENDING_ENDPOINT_MISSING",
+        "summary": "待审核导入候选缺少线缆B端；正式Cable未被覆盖",
+        "source": "bom-cmdb-review-demo / Synthetic Review!F8",
+        "severity": "warning",
+        "href": "/p/proj-b300-demo/deploy/bom/bom-cmdb-review-demo"
+      },
+      {
+        "id": "cmdb-quality-ambiguity",
+        "project_id": "proj-b300-demo",
+        "asset_id": "srv-0001",
+        "field": "candidate.serial",
+        "code": "AMBIGUOUS_MAPPING",
+        "summary": "新导入身份映射待确认，不覆盖当前设备",
+        "source": "cmdb-pending-mapping / Synthetic Review!C5",
+        "severity": "warning",
+        "href": "/cmdb/configuration?asset=srv-0001&resource=bom_mapping_candidates&evidence=cmdb-pending-mapping"
+      },
+      {
+        "id": "cmdb-quality-observed-sn",
+        "project_id": "proj-b300-demo",
+        "asset_id": "srv-0063",
+        "field": "observed.serial",
+        "code": "OBSERVED_SERIAL_MISSING",
+        "summary": "合成身份采集中未取得SN；BOM规划SN仍保留，不归类硬件故障",
+        "source": "synthetic_identity_collection",
+        "severity": "warning",
+        "href": "/cmdb/configuration?asset=srv-0063"
+      },
+      {
+        "id": "cmdb-quality-observed-model",
+        "project_id": "proj-b300-demo",
+        "asset_id": "srv-0063",
+        "field": "observed.model_ref",
+        "code": "OBSERVED_MODEL_UNBOUND",
+        "summary": "采集身份型号未绑定；BOM规划型号仍保留，不直接覆盖",
+        "source": "synthetic_identity_collection",
+        "severity": "warning",
+        "href": "/cmdb/configuration?asset=srv-0063"
+      },
+      {
+        "id": "cmdb-quality-layout",
+        "project_id": "proj-b300-demo",
+        "asset_id": "srv-0064",
+        "field": "draft.rack_u",
+        "code": "DRAFT_U_CONFLICT",
+        "summary": "未发布布局草稿与同柜设备U位冲突；不改变现场位置",
+        "source": "cmdb-quality-draft",
+        "severity": "critical",
+        "href": "/racks/rack-0016?rack=rack-0016"
       }
     ]
   }

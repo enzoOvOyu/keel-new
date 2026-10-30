@@ -226,3 +226,10 @@ workspace/mapping按需返回ports/cables及授权peer_ports/peer_devices；关�
 Fabric无损、交换机无损抽屉、Topology健康详情、机柜Network共用LosslessEvidencePanel。规则与端口可选，五层Tab展示baseline/applied/operational/counters-test/provenance；显示缺口、来源、有效期及工单，配置匹配与运行测试结论分开。缺测/不适用不可用绿色替代。
 
 规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。
+
+
+## CMDB 全链路资产档案增补
+
+CMDB左树+主工作区，五视图共享asset/filter URL。目录按类型字段呈现独立交付/维护/健康/完整性；关系采用React Flow+右侧来源/逐层展开面板，不重建拓扑引擎。设备沿用唯一五/八Tab抽屉，原始证据用Dialog。质量条目直接定位来源，不堆统计卡。
+
+唯一详细设计与模型边界见[CMDB-DOSSIER.md](CMDB-DOSSIER.md)。

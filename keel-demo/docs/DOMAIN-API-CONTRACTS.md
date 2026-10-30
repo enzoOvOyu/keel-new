@@ -177,3 +177,10 @@ FabricTopologyGraph返回nodes/edges/total_nodes/total_edges/next_cursor/warning
 Lossless* Schema定义scope、适配范围、四层证据、原值/单位/窗口delta、有效期、判据原因、Issue与Execution。list默认当前端口/规则最新观测，历史raw保留；证据冲突或缺口不可PASS。collect仅消费只读Mock帧，不重写采集时间；retest不自动修复、不自动调参。
 
 规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。
+
+
+## CMDB 全链路资产档案增补
+
+CmdbDossier*资源Schema明确目录状态维度、关系类别与规划/观测、字段来源、配置版本、生命周期和质量。raw evidence为允许领域资源的专用schema union，禁止任意集合访问。实际浏览器返回的十类response（含人工审计证据）另用JSON Schema逐项验证，结果见CMDB-DOSSIER-VALIDATION.json。
+
+唯一详细设计与模型边界见[CMDB-DOSSIER.md](CMDB-DOSSIER.md)。

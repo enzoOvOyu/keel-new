@@ -1,0 +1,53 @@
+{
+  "status": "PASS",
+  "scope": "CMDB targeted frontend Mock acceptance, not full-platform or real-device validation",
+  "browser": {
+    "status": "PASS",
+    "checks": [
+      "Search server and open existing five-tab drawer",
+      "Device -> NIC -> port -> Cable -> switch-port -> peer switch with shared eight-tab drawer",
+      "Configuration version comparison -> field provenance -> source domain record",
+      "Lifecycle opens validation/NCCL and historical cleanup evidence without changing stages",
+      "Lifecycle links to original Execution",
+      "Quality finding opens pending BOM import; formal cable remains unchanged",
+      "Manual notes write produces visible revision/audit change",
+      "Saved view restores route/filters/selected asset",
+      "Viewer write explicitly denied by provider and displayed as 403",
+      "Catalog full pagination has unique stable IDs, maintained/stale/unknown and unauthorized-project denial",
+      "Unauthorized project URL shows 403; stale manual revision denied; manual field provenance links audit",
+      "Single CMDB view navigation verified after removing duplicate module tabs"
+    ],
+    "page_errors": []
+  },
+  "response_contracts": {
+    "status": "PASS",
+    "responses": 10,
+    "failures": []
+  },
+  "build": "PASS: final TypeScript + Vite production build",
+  "counts": {
+    "servers": 64,
+    "gpus": 512,
+    "nics": 640,
+    "switches": 24,
+    "ports": 640,
+    "switch_ports": 1024,
+    "optics": 1024,
+    "cables": 704,
+    "racks": 16
+  },
+  "implementation_files": [
+    "src/features/CMDBWorkspace.tsx",
+    "src/lib/api/cmdb.ts",
+    "src/lib/schemas/cmdb.ts",
+    "docs/CMDB-DOSSIER.md",
+    "docs/openapi.yaml"
+  ],
+  "limitations": [
+    "No new CMDB/graph backend or real device collection",
+    "Independent rendered Intended configuration not supplied: shown unknown",
+    "Synthetic field/cell lineage is not actual original Excel parsing",
+    "Cleanup archive sample is historical and does not unlock current delivery stages",
+    "Historical retired NIC retained in replacement event; current NIC inventory remains 640"
+  ]
+}

@@ -189,3 +189,10 @@ ProjectContext仅为标签页内状态；资产/端口/线缆/工单/Execution�
 LosslessRule@version（历史映射）、LosslessProfile、LosslessBaseline、LosslessEvidence、LosslessRawOutput、LosslessHostEvidence、LosslessRetest引用既有项目/Device/PhysicalPort/Issue/Execution。计数十进制字符串保精度；boot/epoch/width/wrap、窗口、单位和来源显式记录；无原始值不补零。raw/旧窗口保留，新增窗口独立ID。
 
 规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。
+
+
+## CMDB 全链路资产档案增补
+
+CmdbDossierAsset是既有八类物理资源投影（服务器/交换机/GPU/NIC/端口/光模块/Cable/Rack），不是新资产表。CmdbDossierRelation保留kind/fact/source_ref/revision；Source含字段值JSON、Sheet/单元格/批次/采集引用及freshness/support；Quality是数据问题，不能自动等同硬件故障。只新增演示字段来源/质量证据与保存视图，历史实际配置仍在原配置域集合。
+
+唯一详细设计与模型边界见[CMDB-DOSSIER.md](CMDB-DOSSIER.md)。

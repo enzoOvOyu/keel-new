@@ -269,3 +269,10 @@ FR-26 Fabric Topology：Fabric独立Topology入口；物理布线与逻辑网络
 FR-27：无损网络分层证据。每项绑定型号/ASIC/精确NOS/模式/批准基线；版本化新规则代替旧UI标签。PFC非零不直接故障，ECN按absolute/relative单位，watchdog按补丁实际条件。网络就绪不等待主机；验机补齐双端；NCCL消费当前目标有效证据。确认异常关联统一Issue及定向复验。
 
 规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。
+
+
+## CMDB 全链路资产档案增补
+
+FR-28：CMDB升级全链路资产档案。保留跨项目授权与统一设备抽屉；左侧资源树，目录/关系/配置来源/生命周期/质量五视图，项目资料辅助入口保留。搜索/过滤/保存视图/URL上下文；当前资产、规划与候选分别呈现，维护态不恢复带内通道。
+
+唯一详细设计与模型边界见[CMDB-DOSSIER.md](CMDB-DOSSIER.md)。

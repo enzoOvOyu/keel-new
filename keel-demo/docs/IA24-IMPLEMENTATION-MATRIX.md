@@ -24,7 +24,7 @@
   Issues 工单 → 全局工单池 / 工单看板 / 处置统计 / 故障复测
   Monitor 监控中心 → 告警中心 / 采集策略 / 上报观测 / 维护期 BMC 监控
   Flows 工作流中心 → Flow 管理 / Execution 执行 / 蓝图库 / 介质库
-  CMDB → 资产目录 / 资产关系 / 项目资料 / 生命周期
+  CMDB → 资产目录 / 资产关系 / 配置与来源 / 数据质量 / 项目资料 / 生命周期
   AI 助手 → AI 对话 / Provider 管理 / 知识库 / 识别任务 / 识别与反馈 / 评测报告
 系统管理
   系统管理 → 用户与权限 / 通知设置 / API Token / 审计日志 / 项目模板 / 型号库 / 参数目录 / SSH 信任管理 / AI Provider 配置
@@ -102,11 +102,13 @@
 | Flows 工作流中心 / Execution 执行 | `/flows/executions` | cross | flows:read | SSE | FlowWorkspace / BlueprintWorkspace / MediaWorkspace | /flows/*; /executions/*; /flow-blueprints; /media |
 | Flows 工作流中心 / 蓝图库 | `/flows/blueprints` | cross | flows:read | SSE | FlowWorkspace / BlueprintWorkspace / MediaWorkspace | /flows/*; /executions/*; /flow-blueprints; /media |
 | Flows 工作流中心 / 介质库 | `/flows/media` | cross | flows:read | SSE | FlowWorkspace / BlueprintWorkspace / MediaWorkspace | /flows/*; /executions/*; /flow-blueprints; /media |
-| CMDB | `/cmdb` | cross | cmdb:read | poll-60s | CMDBWorkspace | /cmdb/entities; relationships; timeline |
-| CMDB / 资产目录 | `/cmdb/assets` | cross | cmdb:read | poll-60s | CMDBWorkspace | /cmdb/entities; relationships; timeline |
-| CMDB / 资产关系 | `/cmdb/relations` | cross | cmdb:read | poll-60s | CMDBWorkspace | /cmdb/entities; relationships; timeline |
-| CMDB / 项目资料 | `/cmdb/projects` | cross | cmdb:read | poll-60s | CMDBWorkspace | /cmdb/entities; relationships; timeline |
-| CMDB / 生命周期 | `/cmdb/history` | cross | cmdb:read | poll-60s | CMDBWorkspace | /cmdb/entities; relationships; timeline |
+| CMDB | `/cmdb` | cross | cmdb:read | on-demand | CMDBWorkspace | /cmdb/dossier/catalog; tree; relations; provenance; configuration; lifecycle; quality; manual-fields; saved-views |
+| CMDB / 资产目录 | `/cmdb/assets` | cross | cmdb:read | on-demand | CMDBWorkspace | /cmdb/dossier/catalog; tree; relations; provenance; configuration; lifecycle; quality; manual-fields; saved-views |
+| CMDB / 资产关系 | `/cmdb/relations` | cross | cmdb:read | on-demand | CMDBWorkspace | /cmdb/dossier/catalog; tree; relations; provenance; configuration; lifecycle; quality; manual-fields; saved-views |
+| CMDB / 配置与来源 | `/cmdb/configuration` | cross | cmdb:read | on-demand | CMDBWorkspace | /cmdb/dossier/catalog; tree; relations; provenance; configuration; lifecycle; quality; manual-fields; saved-views |
+| CMDB / 数据质量 | `/cmdb/quality` | cross | cmdb:read | on-demand | CMDBWorkspace | /cmdb/dossier/catalog; tree; relations; provenance; configuration; lifecycle; quality; manual-fields; saved-views |
+| CMDB / 项目资料 | `/cmdb/projects` | cross | cmdb:read | on-demand | CMDBWorkspace | /cmdb/dossier/catalog; tree; relations; provenance; configuration; lifecycle; quality; manual-fields; saved-views |
+| CMDB / 生命周期 | `/cmdb/history` | cross | cmdb:read | on-demand | CMDBWorkspace | /cmdb/dossier/catalog; tree; relations; provenance; configuration; lifecycle; quality; manual-fields; saved-views |
 | AI 助手 | `/ai` | cross | ai:read | on-demand | AIManagement / AIWorkspace | /ai/providers; /ai/tasks; /ai/evaluations |
 | AI 助手 / AI 对话 | `/ai/chat` | cross | ai:read | on-demand | AIManagement / AIWorkspace | /ai/providers; /ai/tasks; /ai/evaluations |
 | AI 助手 / Provider 管理 | `/ai/providers` | cross | ai:read | on-demand | AIManagement / AIWorkspace | /ai/providers; /ai/tasks; /ai/evaluations |

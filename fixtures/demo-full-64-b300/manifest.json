@@ -20,10 +20,10 @@
     "switch_ports": 1024,
     "optics": 1024,
     "cables": 704,
-    "bom_imports": 1,
+    "bom_imports": 2,
     "bom_sheet_regions": 33,
-    "bom_mapping_candidates": 6,
-    "bom_issues": 5,
+    "bom_mapping_candidates": 7,
+    "bom_issues": 6,
     "flows": 14,
     "schedules": 3,
     "executions": 45,
@@ -38,9 +38,9 @@
     "monitoring_sources": 2,
     "cmdb_entities": 5344,
     "cmdb_relationships": 6628,
-    "lifecycle_events": 96,
+    "lifecycle_events": 97,
     "rack_diagrams": 1,
-    "rack_diagram_revisions": 3,
+    "rack_diagram_revisions": 4,
     "rack_placements": 88,
     "media": 8,
     "parameters": 8,
@@ -60,10 +60,10 @@
     "bmc_sel_events": 6,
     "firmware_inventory": 256,
     "server_config_baselines": 64,
-    "server_observed_configs": 64,
+    "server_observed_configs": 65,
     "switch_runtime": 24,
     "switch_config_baselines": 24,
-    "switch_running_configs": 24,
+    "switch_running_configs": 25,
     "switch_config_diffs": 4,
     "switch_interfaces": 1024,
     "lldp_neighbors": 512,
@@ -118,7 +118,7 @@
     "delivery_stage_events": 264,
     "delivery_batches": 16,
     "handover_records": 0,
-    "test_reports": 128,
+    "test_reports": 131,
     "provisioning_receipts": 0,
     "port_models": 0,
     "validation_remediations": 0,
@@ -136,16 +136,19 @@
     "lossless_raw_outputs": 140,
     "lossless_retests": 0,
     "lossless_host_evidence": 105,
-    "lossless_collectors": 8
+    "lossless_collectors": 8,
+    "cmdb_saved_views": 0,
+    "cmdb_field_provenance": 5,
+    "cmdb_quality_findings": 5
   },
   "files": {
     "demo-seed.json": {
-      "sha256": "ca69ab2d298efb2e78a11b0bda5d445a5bb974d76a8f9b4c7070e9d7081fee8d",
-      "size_bytes": 31222739
+      "sha256": "71d15dfb16f097c93ef79b46c9b8a1dc8380b954edec9b8b4647f51e481c1646",
+      "size_bytes": 31238390
     },
     "seed-demo.sql": {
-      "sha256": "368200f7c55974e8285c8a9dbd5786395861020c4be104f5f73397411d5939bf",
-      "size_bytes": 25607423
+      "sha256": "c2148b63b3994cb40a577771d431dfd055dff26f23e6161768c6277e463be609",
+      "size_bytes": 25620634
     },
     "workbook-profile.json": {
       "sha256": "1c09df32a25e070825ad7eea927dacb44c58161070095866c3ee28f0e4e3b2f1",

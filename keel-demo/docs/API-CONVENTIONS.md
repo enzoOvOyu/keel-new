@@ -320,3 +320,10 @@ workspace/mapping按需返回ports/cables及授权peer_ports/peer_devices；关�
 新增项目显式lossless evidence/conclusion/collect/retests/raw资源专用Schema和LosslessProvider。查询on-demand+AbortSignal；复验冻结config/topology revision与幂等键；403/409/422独立；raw只返回授权设备合成帧，后续生产raw必须脱敏。
 
 规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。
+
+
+## CMDB 全链路资产档案增补
+
+新增/cmdb/dossier专用catalog/tree/relations/provenance/configuration/lifecycle/quality/manual-fields/saved-views/evidence接口。project_id可清除，仅授权项目；目录cursor+limit 1..100+排序；关系limit最多120、expanded最多10；写入冻结项目/资产/版本且拒绝白名单外字段，403/404/409/422及request_id统一。
+
+唯一详细设计与模型边界见[CMDB-DOSSIER.md](CMDB-DOSSIER.md)。

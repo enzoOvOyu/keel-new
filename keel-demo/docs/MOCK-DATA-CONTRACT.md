@@ -174,3 +174,10 @@ VITE_API_MODE=mock
 fixture集中增加lossless_rules/profiles/baselines/evidence/raw_outputs/host_evidence/retests，覆盖正常PFC、无流量、relative、合法精确硬件差异、watchdog触发/处置/恢复、reset、stale、双端缺失、lossy/single-ipool、未知/旧补丁。部分端口覆盖保持BLOCKED；明确合成身份/参数不是官方默认，不修改原资产数量。
 
 规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。
+
+
+## CMDB 全链路资产档案增补
+
+沿用原64服务器/512GPU/24交换机及稳定端口/Cable/Rack ID；只补cmdb_field_provenance、cmdb_quality_findings、cmdb_saved_views及原领域配置历史/待审核BOM/生命周期/报告。Sheet/Cell映射明确synthetic，非真实工作簿解析。草稿U冲突不覆盖现场位置，pending缺端点不覆盖正式Cable，换件事件保存旧身份与不同的新NIC身份，退场归档示例不解锁当前阶段。
+
+唯一详细设计与模型边界见[CMDB-DOSSIER.md](CMDB-DOSSIER.md)。

@@ -4085,6 +4085,177 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/cmdb/dossier/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo. */
+        get: operations["queryCmdbDossierCatalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/dossier/tree": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo. */
+        get: operations["getCmdbDossierTree"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/dossier/relations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo. */
+        get: operations["getCmdbDossierRelations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/dossier/assets/{asset_id}/provenance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo. */
+        get: operations["getCmdbDossierprovenance"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/dossier/assets/{asset_id}/configuration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo. */
+        get: operations["getCmdbDossierconfiguration"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/dossier/assets/{asset_id}/lifecycle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo. */
+        get: operations["getCmdbDossierlifecycle"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/dossier/quality": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo. */
+        get: operations["getCmdbDossierQuality"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/dossier/manual-fields": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo. */
+        patch: operations["patchCmdbManualFields"];
+        trace?: never;
+    };
+    "/cmdb/dossier/saved-views": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo. */
+        get: operations["listCmdbSavedViews"];
+        put?: never;
+        /** @description Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo. */
+        post: operations["createCmdbSavedView"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/dossier/evidence/{resource}/{record_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Authorized cross-project projection. No duplicate asset identity. Separate planning and observations. Read queries are on-demand; write only whitelisted manual fields. All synthetic in current demo. */
+        get: operations["getCmdbDossierEvidence"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -6222,7 +6393,7 @@ export interface components {
             issue_counts: {
                 BLOCK: number;
                 WARN: number;
-                INFO: number;
+                INFO?: number;
             };
             mapping_revision: string;
             validation_revision: string;
@@ -6269,16 +6440,22 @@ export interface components {
                 cell: string;
                 header: string;
                 value_redacted: string;
-            };
-            target_entity: string;
-            target_field: string;
-            normalized_value: string | number | null;
-            rule_source: string;
+            } | string;
+            target_entity?: string;
+            target_field?: string;
+            normalized_value?: string | number | null;
+            rule_source?: string;
             confidence: number;
             status: string;
-            rationale: string;
-            revision: number;
-            is_demo: boolean;
+            rationale?: string;
+            revision?: number;
+            is_demo?: boolean;
+            project_id?: string;
+            source_header?: string;
+            standard_field?: string;
+            source_sheet?: string;
+            source_cell?: string;
+            raw_value?: string;
         };
         FullBomMappingCandidatesListEnvelope: {
             data: components["schemas"]["FullBomMappingCandidates"][];
@@ -6299,9 +6476,9 @@ export interface components {
             entity_ref: string;
             field: string;
             resolution_status: string;
-            rule_version: string;
-            is_demo: boolean;
-            source_original: {
+            rule_version?: string;
+            is_demo?: boolean;
+            source_original?: {
                 id: string;
                 project_id: string;
                 import_id: string;
@@ -6318,7 +6495,8 @@ export interface components {
                 rule_version: string;
                 is_demo: boolean;
             };
-            resolution_reason: string;
+            resolution_reason?: string;
+            source?: string;
         };
         FullBomIssuesListEnvelope: {
             data: components["schemas"]["FullBomIssues"][];
@@ -6800,14 +6978,29 @@ export interface components {
             entity_id: string;
             event_type: string;
             occurred_at: string;
-            actor: string;
+            actor?: string;
             source_domain: string;
-            source_ref: string;
-            revision_ref: string | null;
-            summary_redacted: string;
+            source_ref?: string;
+            revision_ref?: string | null;
+            summary_redacted?: string;
             status: string;
-            request_id: string;
-            is_demo: boolean;
+            request_id?: string;
+            is_demo?: boolean;
+            project_id?: string;
+            summary?: string;
+            source?: string;
+            related_asset_ids?: string[];
+            old_physical_identity?: {
+                id: string;
+                serial: string;
+                valid_to: string;
+                status: string;
+            };
+            new_physical_identity?: {
+                id: string;
+                valid_from: string;
+            };
+            historical_only?: boolean;
         };
         FullLifecycleEventsListEnvelope: {
             data: components["schemas"]["FullLifecycleEvents"][];
@@ -6844,9 +7037,9 @@ export interface components {
             revision: number;
             status: string;
             source_bom_revision: string;
-            source_model_revision: string;
+            source_model_revision?: string;
             generation_engine_version: string;
-            content_hash: string;
+            content_hash?: string;
             placements: {
                 id: string;
                 diagram_revision_id: string;
@@ -6862,7 +7055,7 @@ export interface components {
                 revision: number;
                 is_demo: boolean;
             }[];
-            issues: {
+            issues?: {
                 id: string;
                 severity: string;
                 code: string;
@@ -6873,7 +7066,7 @@ export interface components {
             created_by: string;
             created_at: string;
             published_at?: string;
-            execution_mode: string;
+            execution_mode?: string;
             global_map_ref?: string;
             generation_inputs?: {
                 bom_revision: string;
@@ -6882,7 +7075,8 @@ export interface components {
                 algorithm: string;
                 strategy: string;
             };
-            is_demo: boolean;
+            is_demo?: boolean;
+            project_id?: string;
         };
         FullRackDiagramRevisionsListEnvelope: {
             data: components["schemas"]["FullRackDiagramRevisions"][];
@@ -7345,6 +7539,7 @@ export interface components {
             source: string;
             freshness: string;
             is_demo: boolean;
+            revision?: number;
         };
         FullServerObservedConfigsListEnvelope: {
             data: components["schemas"]["FullServerObservedConfigs"][];
@@ -7400,7 +7595,7 @@ export interface components {
             id: string;
             project_id: string;
             switch_id: string;
-            revision: string;
+            revision: string | number;
             approved: boolean;
             hostname: string;
             nos_version: string;
@@ -7415,6 +7610,7 @@ export interface components {
             baseline_id: string;
             observed_at: string;
             is_demo: boolean;
+            freshness?: string;
         };
         FullSwitchRunningConfigsListEnvelope: {
             data: components["schemas"]["FullSwitchRunningConfigs"][];
@@ -9037,20 +9233,20 @@ export interface components {
             subject_id: string;
             name: string;
             verdict: string;
-            metrics: {
+            metrics?: {
                 scenario_index?: number;
                 evidence_kind?: string;
             };
             collected_at: string;
             valid_until: string;
-            rule_versions: string[];
+            rule_versions?: string[];
             source_refs: string[];
             source: string;
-            test_scope: string;
-            execution_mode: string;
+            test_scope?: string;
+            execution_mode?: string;
             historical_only: boolean;
-            legacy_gate_id: string;
-            migration_target: {
+            legacy_gate_id?: string;
+            migration_target?: {
                 stage_id: string;
                 check_key: string;
             };
@@ -9058,6 +9254,11 @@ export interface components {
             test_kind: string;
             revision?: number;
             notice?: string;
+            evidence_summary?: {
+                coverage: string;
+                cleanup_steps: string[];
+                current_stage_unlocked: boolean;
+            };
         };
         FullTestReportsListEnvelope: {
             data: components["schemas"]["FullTestReports"][];
@@ -10405,6 +10606,260 @@ export interface components {
             data: components["schemas"]["FullLosslessCollectors"][];
             page: components["schemas"]["Page"];
             request_id: string;
+        };
+        FullCmdbFieldProvenance: {
+            id: string;
+            project_id: string;
+            asset_id: string;
+            field: string;
+            value_json: string;
+            source: string;
+            revision: string;
+            observed_at: string;
+            freshness: string;
+            support: string;
+            evidence_refs: string[];
+            import_id: string | null;
+            sheet: string | null;
+            cell: string | null;
+            status: string;
+            href: string;
+        };
+        FullCmdbFieldProvenanceListEnvelope: {
+            data: components["schemas"]["FullCmdbFieldProvenance"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        FullCmdbQualityFindings: {
+            id: string;
+            project_id: string;
+            asset_id: string;
+            field: string;
+            code: string;
+            summary: string;
+            source: string;
+            severity: string;
+            href: string;
+        };
+        FullCmdbQualityFindingsListEnvelope: {
+            data: components["schemas"]["FullCmdbQualityFindings"][];
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        CmdbDossierAsset: {
+            id: string;
+            project_id: string;
+            /** @enum {string} */
+            asset_type: "server" | "switch" | "gpu" | "nic" | "port" | "optic" | "cable" | "rack";
+            name: string;
+            serial: string | null;
+            model: string | null;
+            address: string | null;
+            rack_id: string | null;
+            parent_id: string | null;
+            delivery_stage: string | null;
+            maintenance_state: string;
+            health: string;
+            freshness: string;
+            completeness: string;
+            source: string;
+            revision: number;
+        };
+        CmdbDossierRelation: {
+            id: string;
+            source: string;
+            target: string;
+            /** @enum {string} */
+            kind: "position" | "composition" | "physical" | "logical" | "business";
+            label: string;
+            /** @enum {string} */
+            fact: "planned" | "observed" | "recorded";
+            source_ref: string;
+            revision: string;
+        };
+        CmdbDossierNode: {
+            id: string;
+            label: string;
+            asset_type: string;
+            project_id: string;
+            href: string | null;
+        };
+        CmdbDossierSource: {
+            id: string;
+            asset_id: string;
+            field: string;
+            value_json: string;
+            source: string;
+            revision: string;
+            observed_at: string | null;
+            freshness: string;
+            support: string;
+            evidence_refs: string[];
+            import_id: string | null;
+            sheet: string | null;
+            cell: string | null;
+            status: string;
+            href: string | null;
+        };
+        CmdbDossierQuality: {
+            id: string;
+            asset_id: string;
+            field: string;
+            code: string;
+            summary: string;
+            source: string;
+            /** @enum {string} */
+            severity: "warning" | "critical";
+            href: string;
+            status: string;
+        };
+        CmdbDossierConfigVersion: {
+            id: string;
+            /** @enum {string} */
+            layer: "baseline" | "intended" | "actual" | "operational";
+            resource: string;
+            revision: string;
+            source: string;
+            observed_at: string | null;
+            freshness: string;
+            support: string;
+            fields: {
+                [key: string]: string | null;
+            };
+        };
+        CmdbDossierEvent: {
+            id: string;
+            asset_id: string;
+            event_type: string;
+            label: string;
+            occurred_at: string | null;
+            status: string;
+            stage_id: string | null;
+            source: string;
+            links: {
+                label: string;
+                href: string;
+            }[];
+            historical: boolean;
+        };
+        CmdbDossierTreeDevice: {
+            id: string;
+            label: string;
+            type: string;
+            health: string;
+        };
+        CmdbDossierSavedView: {
+            id: string;
+            project_id: string;
+            actor: string;
+            name: string;
+            query: string;
+            created_at: string;
+            execution_mode: string;
+        };
+        CmdbDossierManualRequest: {
+            project_id: string;
+            asset_id: string;
+            expected_revision: number;
+            operator_notes: string;
+        };
+        CmdbDossierTreeRack: {
+            id: string;
+            label: string;
+            health: string;
+            devices: components["schemas"]["CmdbDossierTreeDevice"][];
+        };
+        CmdbDossierTreePod: {
+            id: string;
+            label: string;
+            racks: components["schemas"]["CmdbDossierTreeRack"][];
+        };
+        CmdbDossierTreeSite: {
+            id: string;
+            label: string;
+            pods: components["schemas"]["CmdbDossierTreePod"][];
+        };
+        CmdbDossierCatalogEnvelope: {
+            data: components["schemas"]["CmdbDossierAsset"][];
+            counts: {
+                server: number;
+                switch: number;
+                gpu: number;
+                nic: number;
+                port: number;
+                optic: number;
+                cable: number;
+                rack: number;
+            };
+            total: number;
+            page: components["schemas"]["Page"];
+            request_id: string;
+        };
+        CmdbDossierRelationsEnvelope: {
+            nodes: components["schemas"]["CmdbDossierNode"][];
+            edges: components["schemas"]["CmdbDossierRelation"][];
+            total_nodes: number;
+            truncated: boolean;
+            request_id: string;
+        };
+        CmdbDossierConfigEnvelope: {
+            data: components["schemas"]["CmdbDossierConfigVersion"][];
+            intended_availability: string;
+            intended_reason: string;
+            request_id: string;
+        };
+        CmdbDossierLifecycleEnvelope: {
+            data: components["schemas"]["CmdbDossierEvent"][];
+            stages: components["schemas"]["DeliveryStageRecord"][];
+            request_id: string;
+        };
+        CmdbDossierManualEnvelope: {
+            data: {
+                asset_id: string;
+                operator_notes: string;
+                revision: number;
+            };
+            request_id: string;
+        };
+        CmdbDossierSaveViewRequest: {
+            name: string;
+            query: string;
+        };
+        CmdbDossierTreeEnvelope: {
+            data: components["schemas"]["CmdbDossierTreeSite"][];
+            request_id: string;
+        };
+        CmdbDossierSourcesEnvelope: {
+            data: components["schemas"]["CmdbDossierSource"][];
+            request_id: string;
+        };
+        CmdbDossierQualityEnvelope: {
+            data: components["schemas"]["CmdbDossierQuality"][];
+            request_id: string;
+        };
+        CmdbDossierViewsEnvelope: {
+            data: components["schemas"]["CmdbDossierSavedView"][];
+            request_id: string;
+        };
+        CmdbDossierEvidenceEnvelope: {
+            data: components["schemas"]["FullBomImports"] | components["schemas"]["FullBomMappingCandidates"] | components["schemas"]["FullBomIssues"] | components["schemas"]["FullCollectionJobs"] | components["schemas"]["FullLifecycleEvents"] | components["schemas"]["FullDeliveryStageEvents"] | components["schemas"]["FullTestReports"] | components["schemas"]["FullExecutions"] | components["schemas"]["FullIssues"] | components["schemas"]["FullServerConfigBaselines"] | components["schemas"]["FullServerObservedConfigs"] | components["schemas"]["FullSwitchRunningConfigs"] | components["schemas"]["FullCmdbFieldProvenance"] | components["schemas"]["CmdbDossierManualAudit"];
+            request_id: string;
+        };
+        CmdbDossierSavedViewEnvelope: {
+            data: components["schemas"]["CmdbDossierSavedView"];
+            request_id: string;
+        };
+        CmdbDossierManualAudit: {
+            id: string;
+            project_id: string;
+            /** @constant */
+            record_kind: "manual_audit";
+            actor: string;
+            action: string;
+            resource: string;
+            timestamp: string;
+            before_notes: string | null;
+            after_notes: string;
         };
     };
     responses: {
@@ -20963,6 +21418,658 @@ export interface operations {
                 content?: never;
             };
             /** @description Invalid evidence or unverified parser/units */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    queryCmdbDossierCatalog: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                q?: string;
+                type?: "server" | "switch" | "gpu" | "nic" | "port" | "optic" | "cable" | "rack";
+                status?: string;
+                rack_id?: string;
+                sort?: "name" | "-name" | "type" | "-type";
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped result with request_id */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CmdbDossierCatalogEnvelope"];
+                };
+            };
+            /** @description Invalid filters/cursor */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/field permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Object/record not in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Frozen project or version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid request */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCmdbDossierTree: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped result with request_id */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CmdbDossierTreeEnvelope"];
+                };
+            };
+            /** @description Invalid filters/cursor */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/field permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Object/record not in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Frozen project or version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid request */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCmdbDossierRelations: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                root_id?: string;
+                expanded_ids?: string[];
+                kind?: "position" | "composition" | "physical" | "logical" | "business";
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped result with request_id */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CmdbDossierRelationsEnvelope"];
+                };
+            };
+            /** @description Invalid filters/cursor */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/field permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Object/record not in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Frozen project or version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid request */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCmdbDossierprovenance: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                asset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped result with request_id */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CmdbDossierSourcesEnvelope"];
+                };
+            };
+            /** @description Invalid filters/cursor */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/field permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Object/record not in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Frozen project or version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid request */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCmdbDossierconfiguration: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                asset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped result with request_id */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CmdbDossierConfigEnvelope"];
+                };
+            };
+            /** @description Invalid filters/cursor */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/field permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Object/record not in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Frozen project or version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid request */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCmdbDossierlifecycle: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                asset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped result with request_id */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CmdbDossierLifecycleEnvelope"];
+                };
+            };
+            /** @description Invalid filters/cursor */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/field permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Object/record not in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Frozen project or version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid request */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCmdbDossierQuality: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                asset_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped result with request_id */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CmdbDossierQualityEnvelope"];
+                };
+            };
+            /** @description Invalid filters/cursor */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/field permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Object/record not in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Frozen project or version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid request */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    patchCmdbManualFields: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CmdbDossierManualRequest"];
+            };
+        };
+        responses: {
+            /** @description Scoped result with request_id */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CmdbDossierManualEnvelope"];
+                };
+            };
+            /** @description Invalid filters/cursor */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/field permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Object/record not in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Frozen project or version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid request */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listCmdbSavedViews: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped result with request_id */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CmdbDossierViewsEnvelope"];
+                };
+            };
+            /** @description Invalid filters/cursor */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/field permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Object/record not in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Frozen project or version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid request */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createCmdbSavedView: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CmdbDossierSaveViewRequest"];
+            };
+        };
+        responses: {
+            /** @description Scoped result with request_id */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CmdbDossierSavedViewEnvelope"];
+                };
+            };
+            /** @description Invalid filters/cursor */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/field permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Object/record not in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Frozen project or version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid request */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCmdbDossierEvidence: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                resource: string;
+                record_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped result with request_id */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CmdbDossierEvidenceEnvelope"];
+                };
+            };
+            /** @description Invalid filters/cursor */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Project/field permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Object/record not in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Frozen project or version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid request */
             422: {
                 headers: {
                     [name: string]: unknown;

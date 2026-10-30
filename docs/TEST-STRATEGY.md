@@ -122,3 +122,10 @@ IA验收分层：OpenAPI schema和分页/权限错误契约；ProjectContext单�
 本轮仅运行相关无损规则/契约测试及契约TypeScript一致性检查，不做全平台回归/真实设备验证。反例断言见scripts/lossless-rules.test.mjs；OpenAPI枚举/作用域/稳定引用/历史迁移/host窗口见lossless-contract.test.mjs；实际结果见LOSSLESS-VALIDATION.json。
 
 规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。
+
+
+## CMDB 全链路资产档案增补
+
+定向CMDB构建、浏览器六条验收链与API十类响应（含人工审计证据）JSON Schema验证。浏览器脚本cmdb-dossier-check.mjs，补充保存视图/Viewer/分页唯一性cmdb-contract-final-check.mjs；响应校验check-cmdb-response-contracts.py。不做无关全仓回归；实际结果记录CMDB-DOSSIER-VALIDATION.json。
+
+唯一详细设计与模型边界见[CMDB-DOSSIER.md](CMDB-DOSSIER.md)。

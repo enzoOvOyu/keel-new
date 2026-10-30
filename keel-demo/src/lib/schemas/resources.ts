@@ -118,4 +118,6 @@ export type FullCollectionMap={
  'lossless_raw_outputs':components['schemas']['FullLosslessRawOutputs'];
  'lossless_host_evidence':components['schemas']['FullLosslessHostEvidence'];
  'lossless_collectors':components['schemas']['FullLosslessCollectors'];
+ 'cmdb_field_provenance':components['schemas']['FullCmdbFieldProvenance'];
+ 'cmdb_quality_findings':components['schemas']['FullCmdbQualityFindings'];
 };

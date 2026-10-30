@@ -152,3 +152,10 @@ TOPO-01…09：独立双视图；双端稳定引用；Cable选中高亮；Fabric
 LL-EV-01…12验收：适用范围；版本/历史迁移；分层；模式单位；PFC不误报；精确硬件案例；watchdog版本/事件；窗口与reset/wrap；缺测与能力；六阶段无循环依赖；工单当前定向复验；四处消费共享结论。真机/生产阈值/原生parser未验证保持NOT RUN。
 
 规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。
+
+
+## CMDB 全链路资产档案增补
+
+CMDB-D-01…06：服务器→部件→端口→线缆→对端；Diff→来源→作业/工单；六阶段生命周期到验机/NCCL/退场证据；质量定位导入/采集；维护/unknown/stale/权限；跨列表/抽屉/机柜/拓扑同稳定ID。另验保存视图、人工备注审计/版本与只读权限。真机和正式Go仍NOT RUN。
+
+唯一详细设计与模型边界见[CMDB-DOSSIER.md](CMDB-DOSSIER.md)。

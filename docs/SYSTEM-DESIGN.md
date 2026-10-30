@@ -231,3 +231,10 @@ CollectionJob复用Job/worker与任务尝试机制；状态queued→running→su
 批准baseline→applied→operational→counter/test分别存储，NVUE列分层解释。Verdict与capability/freshness/applicability分开。设备/端口/方向/SP/TC/PG/pool/路径/流量/窗口不可混同；同窗口增量处理重启/清零/回绕/缺测。配置/拓扑版本变化失效，最新有效窗口不删除历史失败；同时间冲突证据BLOCKED。
 
 规则/官方章节/命令/版本/判据/证据对照、历史迁移、真实缺口见[LOSSLESS-EVIDENCE.md](LOSSLESS-EVIDENCE.md)。
+
+
+## CMDB 全链路资产档案增补
+
+CMDB档案只聚合既有领域事实与稳定ID。关系按position/composition/physical/logical/business分类，planned/observed独立；一跳/渐进展开且节点有上限。配置基线、Intended、actual、operational分开，未知不代填。生命周期六阶段后继续维护/换件/退役，历史实体不当作当前库存重复项。
+
+唯一详细设计与模型边界见[CMDB-DOSSIER.md](CMDB-DOSSIER.md)。
