@@ -1,0 +1,7 @@
+{
+  "base_version": "keel-cmdb-v1",
+  "version": "keel-cmdb-v2",
+  "type_extensions": [{"name":"server","attributes":[{"name":"maintenance_ticket","label":"维护关联编号","type":"Text","required":false,"unique":false,"editable":true,"sources":["manual"],"models":[],"group":"自定义运维属性","rules":{"max_length":120}}]}],
+  "new_types": [{"name":"environment_sensor","label":"环境传感器","extends":"component","allow_extensions":false,"attributes":[{"name":"service_label","label":"服务标签","type":"Text","required":false,"unique":false,"editable":true,"sources":["manual"],"models":[],"group":"自定义运维属性","rules":{"max_length":120}},{"name":"temperature_c","label":"温度","type":"Number","unit":"°C","required":false,"unique":false,"editable":false,"sources":["agent","bmc","derived"],"models":[],"group":"观测属性","rules":{}}],"display":{"catalog":true,"columns":["name","serial","model","health"],"groups":["基础属性","自定义运维属性","观测属性"]}}],
+  "new_relationships": [{"name":"service_reference","label":"服务关联","kind":"reference","source_types":["server","component"],"target_types":["switch","device"],"direction":"outbound","max_targets":0,"max_sources":0,"sources":["manual","derived"]}]
+}

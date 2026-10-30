@@ -14,6 +14,7 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"io"
 	"keel.local/dev/internal/bom"
+	"keel.local/dev/internal/cmdb"
 	"keel.local/dev/internal/identity"
 	"log"
 	"net/http"
@@ -63,6 +64,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if s.identityRoutes(w, r) {
+		return
+	}
+	if s.cmdbRoutes(w, r) {
 		return
 	}
 	project, ok := s.authorizeRequest(w, r)
@@ -331,6 +335,9 @@ func main() {
 	}
 	if e = (identity.Service{DB: db}).Initialize(ctx, os.Getenv("KEEL_BOOTSTRAP_PASSWORD")); e != nil {
 		log.Fatal("identity initialization failed: ", e)
+	}
+	if e = (cmdb.Service{DB: db}).Initialize(ctx); e != nil {
+		log.Fatal("CMDB schema initialization failed: ", e)
 	}
 	objects, e := minio.New(env("S3_ENDPOINT", "127.0.0.1:9000"), &minio.Options{Creds: credentials.NewStaticV4(os.Getenv("S3_ACCESS_KEY"), os.Getenv("S3_SECRET_KEY"), ""), Secure: false})
 	if e != nil {

@@ -348,9 +348,9 @@ func (s *Server) publish(ctx context.Context) {
 		return
 	}
 	defer tx.Rollback(ctx)
-	var id, project string
+	var id, project, eventType string
 	var raw []byte
-	e = tx.QueryRow(ctx, "SELECT id,project_id,payload FROM outbox_event WHERE published_at IS NULL AND next_attempt_at<=now() ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 1").Scan(&id, &project, &raw)
+	e = tx.QueryRow(ctx, "SELECT id,project_id,event_type,payload FROM outbox_event WHERE published_at IS NULL AND next_attempt_at<=now() ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 1").Scan(&id, &project, &eventType, &raw)
 	if e != nil {
 		return
 	}
@@ -363,6 +363,15 @@ func (s *Server) publish(ctx context.Context) {
 			s.db.Exec(recovery, "UPDATE outbox_event SET retry_count=retry_count+1,last_error_code='CMDB_PROJECTION_FAILED',next_attempt_at=now()+make_interval(secs=>LEAST(60,POWER(2,LEAST(retry_count,6)))::int) WHERE id=$1 AND published_at IS NULL", id)
 		}
 	}()
+	if eventType == "cmdb.changeset.published" {
+		if _, e = tx.Exec(ctx, "INSERT INTO cmdb_ingest_event(event_id,source_type,source_ref) VALUES($1,'manual',$1) ON CONFLICT DO NOTHING", id); e != nil {
+			return
+		}
+		if _, e = tx.Exec(ctx, "UPDATE outbox_event SET published_at=now(),last_error_code=NULL WHERE id=$1", id); e == nil {
+			completed = tx.Commit(ctx) == nil
+		}
+		return
+	}
 	var event struct {
 		Items    []bom.Item `json:"items"`
 		Revision string     `json:"revision_id"`
@@ -370,32 +379,10 @@ func (s *Server) publish(ctx context.Context) {
 	if json.Unmarshal(raw, &event) != nil {
 		return
 	}
-	for _, i := range event.Items {
-		b, _ := json.Marshal(i)
-		if _, e = tx.Exec(ctx, "INSERT INTO cmdb_entity(item_uid,payload,revision_id) VALUES($1,$2,$3) ON CONFLICT(item_uid) DO UPDATE SET payload=excluded.payload,revision_id=excluded.revision_id,updated_at=now() WHERE cmdb_entity.revision_id IS NULL OR (SELECT created_at FROM bom_revision WHERE id=cmdb_entity.revision_id)<=(SELECT created_at FROM bom_revision WHERE id=excluded.revision_id)", i.UID, b, event.Revision); e != nil {
-			return
-		}
+	if e = cmdbService(s).ProjectBOM(ctx, tx, id, project, event.Revision, event.Items); e != nil {
+		return
 	}
-	for _, i := range event.Items {
-		edges := map[string]string{}
-		if rack := i.Fields["rack_uid"]; rack != "" {
-			edges[rack] = "located_in"
-		}
-		if i.Parent != "" {
-			edges[i.Parent] = "contained_by"
-		}
-		if i.A != "" {
-			edges[i.A] = "cable_endpoint_a"
-		}
-		if i.B != "" {
-			edges[i.B] = "cable_endpoint_b"
-		}
-		for target, kind := range edges {
-			if _, e = tx.Exec(ctx, "INSERT INTO cmdb_relationship(from_uid,to_uid,kind,revision_id) VALUES($1,$2,$3,$4) ON CONFLICT DO NOTHING", i.UID, target, kind, event.Revision); e != nil {
-				return
-			}
-		}
-	}
+
 	if _, e = tx.Exec(ctx, "INSERT INTO audit_event(id,project_id,actor,action,resource_id) VALUES($1,$2,'cmdb-projector','cmdb.published',$3)", uuid.NewString(), project, id); e != nil {
 		return
 	}

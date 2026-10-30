@@ -1,0 +1,17 @@
+CREATE TABLE cmdb_schema_asset_type(schema_version text NOT NULL REFERENCES cmdb_schema_version(id),name text NOT NULL,definition jsonb NOT NULL,PRIMARY KEY(schema_version,name));
+INSERT INTO cmdb_schema_asset_type SELECT v.id,t->>'name',t FROM cmdb_schema_version v CROSS JOIN LATERAL jsonb_array_elements(v.document->'types') t;
+ALTER TABLE cmdb_schema_attribute ADD FOREIGN KEY(schema_version,asset_type) REFERENCES cmdb_schema_asset_type(schema_version,name);
+ALTER TABLE cmdb_entity ADD FOREIGN KEY(schema_version,asset_type) REFERENCES cmdb_schema_asset_type(schema_version,name);
+ALTER TABLE cmdb_relationship ADD COLUMN definition_version text;
+UPDATE cmdb_relationship SET definition_version='keel-cmdb-v1' WHERE EXISTS(SELECT 1 FROM cmdb_relationship_definition WHERE schema_version='keel-cmdb-v1' AND name=definition_id);
+ALTER TABLE cmdb_relationship ADD FOREIGN KEY(definition_version,definition_id) REFERENCES cmdb_relationship_definition(schema_version,name);
+UPDATE cmdb_relationship e SET project_id=r.project_id FROM bom_revision r WHERE e.revision_id=r.id AND e.project_id='';
+UPDATE cmdb_relationship SET valid_to=COALESCE(valid_to,now()),relationship_status='historical' WHERE kind IN('contained_by','cable_endpoint_a','cable_endpoint_b','located_in');
+ALTER TABLE cmdb_relationship ADD FOREIGN KEY(project_id) REFERENCES project(id);
+ALTER TABLE cmdb_field_source ADD COLUMN project_id text REFERENCES project(id);
+UPDATE cmdb_field_source f SET project_id=(SELECT min(project_id) FROM cmdb_asset_scope s WHERE s.asset_id=f.asset_id);
+CREATE INDEX cmdb_field_source_scope ON cmdb_field_source(project_id,asset_id,field_name);
+ALTER TABLE cmdb_revision ADD COLUMN project_id text REFERENCES project(id);
+UPDATE cmdb_revision r SET project_id=(SELECT min(project_id) FROM cmdb_asset_scope s WHERE s.asset_id=r.asset_id);
+CREATE INDEX cmdb_revision_scope ON cmdb_revision(project_id,asset_id,version);
+INSERT INTO schema_migration(version) VALUES(17);

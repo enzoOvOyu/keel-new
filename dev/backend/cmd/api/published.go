@@ -67,7 +67,7 @@ func (s *Server) published(w http.ResponseWriter, r *http.Request) bool {
 		return true
 	}
 	if len(p) == 4 && p[2] == "cmdb" && p[3] == "published-assets" {
-		rows, e := s.db.Query(ctx, "SELECT DISTINCT e.item_uid,e.payload FROM cmdb_entity e JOIN project_asset p ON p.item_uid=e.item_uid WHERE p.project_id=$1 ORDER BY e.item_uid LIMIT 200", s.project)
+		rows, e := s.db.Query(ctx, "SELECT DISTINCT e.item_uid,b.payload FROM cmdb_entity e JOIN bom_item b ON b.item_uid=e.bom_item_uid JOIN project_asset p ON p.item_uid=b.item_uid WHERE p.project_id=$1 ORDER BY e.item_uid LIMIT 200", s.project)
 		if e != nil {
 			fail(w, 500, "DATABASE_ERROR")
 			return true
