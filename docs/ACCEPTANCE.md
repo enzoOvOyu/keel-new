@@ -173,3 +173,9 @@ CMDB-D-01…06：服务器→部件→端口→线缆→对端；Diff→来源�
 验收覆盖BOM Outbox幂等、统一ID、服务器→部件→端口→Cable→交换机、字段来源、关系历史、ChangeSet版本/审核/发布、换件历史、Schema扩展、项目和资源隔离。前后截图对照原五/八Tab及设计令牌；构建不能替代浏览器验收。执行结果单独记录，未运行项不得标PASS。
 
 接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。
+
+## 项目与 AI 配置真实落地
+
+项目创建、授权与BOM入口；Provider真实保存、刷新后密钥不回显、真实后端HTTP调用及BOM共享目录按PROJECT-AI-CONFIG-CHECK.json记录。本地合成服务检查不等于真实外部Provider或真实工作簿准确率验收。
+
+唯一详细说明与API对照见 [PROJECT-AI-CONFIGURATION.md](PROJECT-AI-CONFIGURATION.md)。

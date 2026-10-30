@@ -101,3 +101,9 @@ Argon2id、本地 Session、生产 Secure/HTTPS、HttpOnly/SameSite 与 CSRF、�
 目录、来源、图两端与证据均按项目/资源权限重新授权，前端筛选不是安全边界。写操作校验CSRF、来源所有权和并发版本；审核与申请/执行分离，发布重查审核人当前权限。Schema不运行脚本/SQL，原文对象按项目限定，秘密不得进入Schema值/血缘/审计。maintained不恢复带内访问。
 
 接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。
+
+## 项目与 AI 配置真实落地
+
+AI Key仅一次性POST到Go，响应不回显，日志与审计不保存值。当前开发使用0700目录/0600文件和local-secret引用，Git/Docker上下文排除该目录；Docker持久卷与宿主目录分别管理。HTTPS为正式服务要求，HTTP只允许开发环境；不自动跟随重定向转发密钥。
+
+唯一详细说明与API对照见 [PROJECT-AI-CONFIGURATION.md](PROJECT-AI-CONFIGURATION.md)。

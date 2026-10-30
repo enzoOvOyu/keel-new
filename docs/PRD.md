@@ -292,3 +292,9 @@ FR-28：CMDB升级全链路资产档案。保留跨项目授权与统一设备�
 在保留FR-14/FR-28工作台、唯一bom_item及六阶段交付链路的基础上，实现版本化Schema Registry、类型化关系、字段/关系来源、Revision与ChangeSet。CMDB统一当前资产身份与有效关系；BOM、配置、采集及作业仍持有各自领域原文。人工身份/关系变更经独立审核发布，换件新身份、旧历史保留。前端通过同形Adapter接入，禁止因后端重做UI。
 
 接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。
+
+## 项目与 AI 配置真实落地
+
+项目创建与AI配置（FR-2.1补充）：可创建真实空白项目并直接进入开局配置；系统管理提供真实Provider配置、受控凭据、启停/默认及主动连接测试；BOM使用同一配置源。Rules/人工流程不依赖AI，候选不自动提交。
+
+唯一详细说明与API对照见 [PROJECT-AI-CONFIGURATION.md](PROJECT-AI-CONFIGURATION.md)。

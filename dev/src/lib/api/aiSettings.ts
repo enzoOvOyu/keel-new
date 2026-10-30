@@ -1,0 +1,3 @@
+import {bomRequest} from './realBom';
+export type AIProvider=import('../schemas/openapi').components['schemas']['AIProviderConfiguration'];
+export const aiSettings={list:()=>bomRequest<AIProvider[]>('admin/ai-providers'),save:(id:string|undefined,body:unknown)=>bomRequest<{id:string;status:string}>('admin/ai-providers'+(id?'/'+id:''),id?'PUT':'POST',body),test:(id:string,revision:number)=>bomRequest<{status:string;error_code:string;http_status:number;duration_ms:number;synthetic:boolean}>('admin/ai-providers/'+id+'/test','POST',{revision}),options:(project:string)=>bomRequest<Pick<AIProvider,'id'|'name'|'model'|'protocol'|'is_default'>[]>('ai/provider-options?project_id='+encodeURIComponent(project))};

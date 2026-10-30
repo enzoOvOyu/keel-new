@@ -121,3 +121,9 @@ Fabric无损选择设备/反例→端口→rule@version→五层证据→读取�
 资源树/目录→同一资产→关系/来源/生命周期保持原URL上下文；设备仍打开既有ServerDetailDrawer五Tab、NetworkDeviceDrawer八Tab。生命周期增补版本Diff和变更草稿→独立审核→发布；配置区附Schema属性分组。物理/逻辑网络与机柜位置跳转现有模块，禁止重复建详情或拓扑引擎。
 
 接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。
+
+## 项目与 AI 配置真实落地
+
+部署项目创建成功→新项目BOM工作台；系统管理AI Provider→选择协议/地址/模型/密钥→保存→主动连接与JSON测试→启用/默认；智能开局选择Provider或Rules。字段分行、配置列表与表单分栏，复用既有样式，不嵌套详情对话框。
+
+唯一详细说明与API对照见 [PROJECT-AI-CONFIGURATION.md](PROJECT-AI-CONFIGURATION.md)。

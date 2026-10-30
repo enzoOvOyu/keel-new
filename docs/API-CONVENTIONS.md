@@ -345,3 +345,9 @@ workspace/mapping按需返回ports/cables及授权peer_ports/peer_devices；关�
 保留/cmdb/dossier响应和分页/作用域语义；新增registry、revision/diff、ChangeSet和关系历史专用Schema。资产写入通过ChangeSet操作，不以无审核CRUD绕过Domain Service。手工说明只允许授权注释。固定项目、资产集合、Schema与expected_revision；409表示版本/幂等冲突，422表示Schema或关系校验，403表示授权/职责分离拒绝。
 
 接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。
+
+## 项目与 AI 配置真实落地
+
+项目与Provider专用请求/响应Schema已登记openapi.yaml；配置写入需全局admin:edit、CSRF及更新revision。Provider选项按项目ai:read读取；BOM AI任务增加可选provider_id，默认引用平台服务，不从浏览器传凭据。
+
+唯一详细说明与API对照见 [PROJECT-AI-CONFIGURATION.md](PROJECT-AI-CONFIGURATION.md)。

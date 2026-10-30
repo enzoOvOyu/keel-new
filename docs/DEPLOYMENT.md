@@ -106,3 +106,9 @@
 接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。
 
 当前本机Go进程由tmux会话`keel-cmdb-api`运行，前端5174。手动启动可在dev/backend执行`./run-local.sh`，前端在dev执行`npm run dev`。如改用`docker compose -f dev/compose.yaml up -d --build`，先停止占用8081的上述本机会话，避免端口冲突。数据库迁移和Schema安装仍需显式执行。
+
+## 项目与 AI 配置真实落地
+
+执行018、019迁移；宿主Go使用backend/.secrets或KEEL_SECRET_DIR。Docker使用ai-secrets卷；重建镜像不应包含凭据。现有宿主进程8081与前端5174继续运行，本轮未执行生产部署。
+
+唯一详细说明与API对照见 [PROJECT-AI-CONFIGURATION.md](PROJECT-AI-CONFIGURATION.md)。

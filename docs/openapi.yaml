@@ -13499,6 +13499,211 @@ paths:
         required: false
         schema:
           type: string
+  /admin/ai-providers:
+    parameters: []
+    get:
+      tags:
+      - AI Configuration
+      operationId: listAIProviderConfigurations
+      security:
+      - cookieSession: []
+      description: Real configuration. Platform admin required except authorized project provider options. Test sends synthetic data only. Credentials never appear
+        in reads or audit.
+      responses:
+        '200':
+          description: Result; failed model connection is represented by test status=failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listAIProviderConfigurationsEnvelope'
+        '400':
+          description: Input, authorization, revision, configuration or storage error.
+        '401':
+          description: Input, authorization, revision, configuration or storage error.
+        '403':
+          description: Input, authorization, revision, configuration or storage error.
+        '404':
+          description: Input, authorization, revision, configuration or storage error.
+        '409':
+          description: Input, authorization, revision, configuration or storage error.
+        '422':
+          description: Input, authorization, revision, configuration or storage error.
+        '500':
+          description: Input, authorization, revision, configuration or storage error.
+    post:
+      tags:
+      - AI Configuration
+      operationId: createAIProviderConfiguration
+      security:
+      - cookieSession: []
+      description: Real configuration. Platform admin required except authorized project provider options. Test sends synthetic data only. Credentials never appear
+        in reads or audit.
+      responses:
+        '200':
+          description: Result; failed model connection is represented by test status=failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createAIProviderConfigurationEnvelope'
+        '400':
+          description: Input, authorization, revision, configuration or storage error.
+        '401':
+          description: Input, authorization, revision, configuration or storage error.
+        '403':
+          description: Input, authorization, revision, configuration or storage error.
+        '404':
+          description: Input, authorization, revision, configuration or storage error.
+        '409':
+          description: Input, authorization, revision, configuration or storage error.
+        '422':
+          description: Input, authorization, revision, configuration or storage error.
+        '500':
+          description: Input, authorization, revision, configuration or storage error.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AIProviderConfigurationCommand'
+      parameters:
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
+  /admin/ai-providers/{provider_id}:
+    parameters:
+    - in: path
+      name: provider_id
+      required: true
+      schema:
+        type: string
+    put:
+      tags:
+      - AI Configuration
+      operationId: updateAIProviderConfiguration
+      security:
+      - cookieSession: []
+      description: Real configuration. Platform admin required except authorized project provider options. Test sends synthetic data only. Credentials never appear
+        in reads or audit.
+      responses:
+        '200':
+          description: Result; failed model connection is represented by test status=failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/updateAIProviderConfigurationEnvelope'
+        '400':
+          description: Input, authorization, revision, configuration or storage error.
+        '401':
+          description: Input, authorization, revision, configuration or storage error.
+        '403':
+          description: Input, authorization, revision, configuration or storage error.
+        '404':
+          description: Input, authorization, revision, configuration or storage error.
+        '409':
+          description: Input, authorization, revision, configuration or storage error.
+        '422':
+          description: Input, authorization, revision, configuration or storage error.
+        '500':
+          description: Input, authorization, revision, configuration or storage error.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AIProviderConfigurationCommand'
+      parameters:
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
+  /admin/ai-providers/{provider_id}/test:
+    parameters:
+    - in: path
+      name: provider_id
+      required: true
+      schema:
+        type: string
+    post:
+      tags:
+      - AI Configuration
+      operationId: testAIProviderConfiguration
+      security:
+      - cookieSession: []
+      description: Real configuration. Platform admin required except authorized project provider options. Test sends synthetic data only. Credentials never appear
+        in reads or audit.
+      responses:
+        '200':
+          description: Result; failed model connection is represented by test status=failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/testAIProviderConfigurationEnvelope'
+        '400':
+          description: Input, authorization, revision, configuration or storage error.
+        '401':
+          description: Input, authorization, revision, configuration or storage error.
+        '403':
+          description: Input, authorization, revision, configuration or storage error.
+        '404':
+          description: Input, authorization, revision, configuration or storage error.
+        '409':
+          description: Input, authorization, revision, configuration or storage error.
+        '422':
+          description: Input, authorization, revision, configuration or storage error.
+        '500':
+          description: Input, authorization, revision, configuration or storage error.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AIProviderTestCommand'
+      parameters:
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema:
+          type: string
+  /ai/provider-options:
+    parameters: []
+    get:
+      tags:
+      - AI Configuration
+      operationId: listBOMProviderOptions
+      security:
+      - cookieSession: []
+      description: Real configuration. Platform admin required except authorized project provider options. Test sends synthetic data only. Credentials never appear
+        in reads or audit.
+      responses:
+        '200':
+          description: Result; failed model connection is represented by test status=failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listBOMProviderOptionsEnvelope'
+        '400':
+          description: Input, authorization, revision, configuration or storage error.
+        '401':
+          description: Input, authorization, revision, configuration or storage error.
+        '403':
+          description: Input, authorization, revision, configuration or storage error.
+        '404':
+          description: Input, authorization, revision, configuration or storage error.
+        '409':
+          description: Input, authorization, revision, configuration or storage error.
+        '422':
+          description: Input, authorization, revision, configuration or storage error.
+        '500':
+          description: Input, authorization, revision, configuration or storage error.
+      parameters:
+      - in: query
+        name: project_id
+        required: true
+        schema:
+          type: string
 components:
   securitySchemes:
     bearerAuth:
@@ -34566,20 +34771,22 @@ components:
         mode:
           type: string
           enum:
-            - rules
-            - mock
-            - provider
+          - rules
+          - mock
+          - provider
         task:
           type: string
           enum:
-            - sheet
-            - field
-            - relation
+          - sheet
+          - field
+          - relation
         scenario:
           type: string
+        provider_id:
+          type: string
       required:
-        - mode
-        - task
+      - mode
+      - task
     BOMAICandidate:
       type: object
       properties:
@@ -34641,8 +34848,8 @@ components:
           type: integer
         schema_valid:
           type:
-            - boolean
-            - "null"
+          - boolean
+          - 'null'
         schema_status:
           type: string
         error_code:
@@ -34651,46 +34858,52 @@ components:
           type: string
         candidates:
           type:
-            - array
-            - "null"
+          - array
+          - 'null'
           items:
-            $ref: "#/components/schemas/BOMAICandidate"
+            $ref: '#/components/schemas/BOMAICandidate'
         simulation_only:
           type: boolean
         token_input:
           type:
-            - integer
-            - "null"
+          - integer
+          - 'null'
         token_output:
           type:
-            - integer
-            - "null"
+          - integer
+          - 'null'
         token_cost:
           type:
-            - number
-            - "null"
+          - number
+          - 'null'
         token_support:
           type: string
         merged_into_bom:
           type: boolean
         raw_response_ref:
           type: string
+        provider_id:
+          type: string
+        provider_revision:
+          type: integer
+        protocol:
+          type: string
       required:
-        - prompt_version
-        - schema_version
-        - request_sha256
-        - duration_ms
-        - schema_valid
-        - schema_status
-        - error_code
-        - model
-        - candidates
-        - simulation_only
-        - token_input
-        - token_output
-        - token_cost
-        - token_support
-        - merged_into_bom
+      - prompt_version
+      - schema_version
+      - request_sha256
+      - duration_ms
+      - schema_valid
+      - schema_status
+      - error_code
+      - model
+      - candidates
+      - simulation_only
+      - token_input
+      - token_output
+      - token_cost
+      - token_support
+      - merged_into_bom
     BOMAITask:
       type: object
       properties:
@@ -34703,17 +34916,19 @@ components:
         status:
           type: string
         diagnostic:
-          $ref: "#/components/schemas/BOMAIDiagnostic"
+          $ref: '#/components/schemas/BOMAIDiagnostic'
         created_at:
           type: string
           format: date-time
+        provider_id:
+          type: string
       required:
-        - id
-        - mode
-        - task
-        - status
-        - diagnostic
-        - created_at
+      - id
+      - mode
+      - task
+      - status
+      - diagnostic
+      - created_at
     getBOMSheetProfilesEnvelope:
       type: object
       properties:
@@ -36073,8 +36288,11 @@ components:
       properties:
         name:
           type: string
+          minLength: 2
+          maxLength: 240
         code:
           type: string
+          pattern: ^[A-Za-z0-9_-]{3,32}$
         template_id:
           type: string
       required:
@@ -38070,6 +38288,262 @@ components:
       - freshness
       - support
       - evidence_refs
+      additionalProperties: false
+    AIProviderConfiguration:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          minLength: 2
+          maxLength: 120
+        protocol:
+          enum:
+          - openai-chat
+          - keel-mapping
+        endpoint:
+          type: string
+          format: uri
+        model:
+          type: string
+        timeout_seconds:
+          type: integer
+          minimum: 1
+          maximum: 120
+        token_budget:
+          type: integer
+          minimum: 128
+          maximum: 32768
+        token_parameter:
+          enum:
+          - max_tokens
+          - max_completion_tokens
+        json_mode:
+          type: boolean
+        enabled:
+          type: boolean
+        is_default:
+          type: boolean
+        credential_ref:
+          type: string
+        has_credential:
+          type: boolean
+        revision:
+          type: integer
+        last_test_status:
+          enum:
+          - not_tested
+          - passed
+          - failed
+        last_test_code:
+          type:
+          - string
+          - 'null'
+        last_test_http_status:
+          type:
+          - integer
+          - 'null'
+        last_test_at:
+          type:
+          - string
+          - 'null'
+        last_test_ms:
+          type:
+          - integer
+          - 'null'
+      required:
+      - id
+      - name
+      - protocol
+      - endpoint
+      - model
+      - timeout_seconds
+      - token_budget
+      - token_parameter
+      - json_mode
+      - enabled
+      - is_default
+      - credential_ref
+      - has_credential
+      - revision
+      - last_test_status
+      - last_test_code
+      - last_test_http_status
+      - last_test_at
+      - last_test_ms
+      additionalProperties: false
+    AIProviderConfigurationCommand:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 120
+        protocol:
+          enum:
+          - openai-chat
+          - keel-mapping
+        endpoint:
+          type: string
+          format: uri
+        model:
+          type: string
+        timeout_seconds:
+          type: integer
+          minimum: 1
+          maximum: 120
+        token_budget:
+          type: integer
+          minimum: 128
+          maximum: 32768
+        token_parameter:
+          enum:
+          - max_tokens
+          - max_completion_tokens
+        json_mode:
+          type: boolean
+        enabled:
+          type: boolean
+        is_default:
+          type: boolean
+        revision:
+          type: integer
+        api_key:
+          type: string
+          writeOnly: true
+          description: Sent once to controlled server secret storage. Empty retains an existing key. Never returned or audited.
+      required:
+      - name
+      - protocol
+      - endpoint
+      - model
+      - timeout_seconds
+      - token_budget
+      - token_parameter
+      - json_mode
+      - enabled
+      - is_default
+      additionalProperties: false
+    AIProviderTestCommand:
+      type: object
+      properties:
+        revision:
+          type: integer
+      required:
+      - revision
+      additionalProperties: false
+    AIProviderTestResult:
+      type: object
+      properties:
+        provider_id:
+          type: string
+        revision:
+          type: integer
+        status:
+          enum:
+          - passed
+          - failed
+        error_code:
+          type: string
+        http_status:
+          type: integer
+        duration_ms:
+          type: integer
+        synthetic:
+          type: boolean
+        observed_at:
+          type: string
+      required:
+      - provider_id
+      - revision
+      - status
+      - error_code
+      - http_status
+      - duration_ms
+      - synthetic
+      - observed_at
+      additionalProperties: false
+    AIProviderOption:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        model:
+          type: string
+        protocol:
+          enum:
+          - openai-chat
+          - keel-mapping
+        is_default:
+          type: boolean
+      required:
+      - id
+      - name
+      - model
+      - protocol
+      - is_default
+      additionalProperties: false
+    listAIProviderConfigurationsEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AIProviderConfiguration'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    createAIProviderConfigurationEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IdentityMutation'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    updateAIProviderConfigurationEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IdentityMutation'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    testAIProviderConfigurationEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AIProviderTestResult'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+      additionalProperties: false
+    listBOMProviderOptionsEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AIProviderOption'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
       additionalProperties: false
 x-implementation-policy:
   frontend-first: true

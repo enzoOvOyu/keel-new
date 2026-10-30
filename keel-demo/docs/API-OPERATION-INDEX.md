@@ -328,3 +328,8 @@
 | POST | `/cmdb/changesets/{changeset_id}/reject` | `rejectCMDBChangeSet` | 当前契约 |
 | POST | `/cmdb/changesets/{changeset_id}/publish` | `publishCMDBChangeSet` | 当前契约 |
 | GET | `/cmdb/relationships/{relationship_id}/revisions` | `listCMDBRelationshipRevisions` | 当前契约 |
+| GET | `/admin/ai-providers` | `listAIProviderConfigurations` | 当前契约 |
+| POST | `/admin/ai-providers` | `createAIProviderConfiguration` | 当前契约 |
+| PUT | `/admin/ai-providers/{provider_id}` | `updateAIProviderConfiguration` | 当前契约 |
+| POST | `/admin/ai-providers/{provider_id}/test` | `testAIProviderConfiguration` | 当前契约 |
+| GET | `/ai/provider-options` | `listBOMProviderOptions` | 当前契约 |

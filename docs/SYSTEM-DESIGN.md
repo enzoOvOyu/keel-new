@@ -252,3 +252,9 @@ CMDB档案只聚合既有领域事实与稳定ID。关系按position/composition
 Schema版本激活前检查兼容性与存量数据。ChangeSet为Draft→Review→Approved→Published或Rejected；申请人不可自批，审核人不发布；发布重查角色有效性、资产版本、Schema版本与双端关系，失败事务回滚且可重试。观测快照不等同正式变更。资产生命周期planned/discovered/provisioned/verified/delivered/maintained/retired与六阶段交付状态独立。
 
 接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。
+
+## 项目与 AI 配置真实落地
+
+项目创建事务包含项目、创建者项目成员关系、权限版本与审计。AI配置采用revision并发校验和单一启用默认；BOM诊断冻结Provider ID/配置版本。配置测试只发送合成字段，不改变交付六阶段。
+
+唯一详细说明与API对照见 [PROJECT-AI-CONFIGURATION.md](PROJECT-AI-CONFIGURATION.md)。

@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "project_id": "proj-efe952e3-9797-4f84-bff4-8ae368c87ee4",
+  "checks": [
+    "真实创建项目、创建者授权、进入空白项目BOM工作台",
+    "保存真实数据库配置，API Key引用持久化且读取不回显",
+    "后端实际调用本地合成OpenAI兼容服务并校验候选JSON",
+    "刷新保留元数据且密钥输入为空；BOM使用同一Provider目录"
+  ],
+  "synthetic_provider_calls": 1,
+  "page_errors": [],
+  "real_external_provider": "NOT CONFIGURED / NOT TESTED"
+}

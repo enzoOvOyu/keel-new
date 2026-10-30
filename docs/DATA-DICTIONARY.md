@@ -210,3 +210,9 @@ CmdbDossierAsset是既有八类物理资源投影（服务器/交换机/GPU/NIC/
 cmdb_entity稳定text资产键保持历史UUID原值，bom_item_uid保留唯一物料关联；cmdb_asset_scope为授权投影。Schema使用cmdb_schema_version/schema_asset_type/schema_attribute/relationship_definition；来源用cmdb_field_source；关系用cmdb_relationship及relationship_revision；资产历史用cmdb_revision；变更用cmdb_changeset；生命周期用cmdb_lifecycle_event；外部证据/配置层使用cmdb_external_reference/config_reference。关键关系外键不以JSONB代替，扩展属性由版本化Schema验证。
 
 接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。
+
+## 项目与 AI 配置真实落地
+
+复用project/project_membership/audit_event；ai_provider_config保存protocol/endpoint/model/credential_ref、timeout_seconds/token_budget/token_parameter/json_mode、enabled/is_default/revision和最近测试状态、HTTP状态与耗时。api_key只写，不进入数据库普通字段或读取响应。
+
+唯一详细说明与API对照见 [PROJECT-AI-CONFIGURATION.md](PROJECT-AI-CONFIGURATION.md)。

@@ -214,3 +214,9 @@ dev 的 Go 模块化单体增加 internal/identity，复用 PostgreSQL 与已有
 Go模块化单体中internal/cmdb包含Schema、Domain、Query和ChangeSet服务；演进既有cmdb_entity/cmdb_relationship，不新建平行资产库。PostgreSQL外键/邻接索引实现图关系，GraphRepository仅预留适配边界。MinIO存领域证据原文，CMDB存引用。现有Outbox同事务发布，前端API Adapter不改变组件结构。
 
 接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。
+
+## 项目与 AI 配置真实落地
+
+项目与AI配置由既有Go模块化单体实现。Provider元数据在PostgreSQL、凭据为独立受控引用；统一Adapter支持openai-chat与keel-mapping，前端不直连供应商。
+
+唯一详细说明与API对照见 [PROJECT-AI-CONFIGURATION.md](PROJECT-AI-CONFIGURATION.md)。

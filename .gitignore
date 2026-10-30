@@ -15,3 +15,6 @@ dev/dist/
 dev/backend/keel-api
 
 dev/node_modules
+
+# Backend controlled development secret references; never commit API keys.
+dev/backend/.secrets/

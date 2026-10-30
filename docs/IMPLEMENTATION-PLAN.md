@@ -161,3 +161,9 @@ IA v2.3 插入前端 Mock 阶段：先冻结 IA-V2.3.md 的页面注册、作用
 先固定UI截图/令牌及契约；随后迁移既有表与Schema Registry；实现资产/关系/来源/版本；接入BOM Outbox；以Adapter替换CMDB Mock；增补现有生命周期内ChangeSet；最后执行定向数据/授权/性能/视觉验证。禁止重写原工作台和设备抽屉。
 
 接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。
+
+## 项目与 AI 配置真实落地
+
+项目创建和系统级AI配置作为开局/CMDB优先真实切片交付；先验证空白项目与规则导入，再由用户配置并验证外部API，不提前实现其他真实设备执行。
+
+唯一详细说明与API对照见 [PROJECT-AI-CONFIGURATION.md](PROJECT-AI-CONFIGURATION.md)。

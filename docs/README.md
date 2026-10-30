@@ -90,3 +90,5 @@ IA v2.3 设计及实施计划入口：[IA-V2.3.md](IA-V2.3.md)。该段为v2.3�
 用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。
 
 - [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)：真实CMDB模型、接口对照、Adapter保护与迁移边界。
+
+- [PROJECT-AI-CONFIGURATION.md](PROJECT-AI-CONFIGURATION.md)：真实项目创建、系统管理AI配置和BOM接入。

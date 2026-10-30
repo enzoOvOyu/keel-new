@@ -5163,6 +5163,79 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/ai-providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Real configuration. Platform admin required except authorized project provider options. Test sends synthetic data only. Credentials never appear in reads or audit. */
+        get: operations["listAIProviderConfigurations"];
+        put?: never;
+        /** @description Real configuration. Platform admin required except authorized project provider options. Test sends synthetic data only. Credentials never appear in reads or audit. */
+        post: operations["createAIProviderConfiguration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/ai-providers/{provider_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /** @description Real configuration. Platform admin required except authorized project provider options. Test sends synthetic data only. Credentials never appear in reads or audit. */
+        put: operations["updateAIProviderConfiguration"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/ai-providers/{provider_id}/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider_id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Real configuration. Platform admin required except authorized project provider options. Test sends synthetic data only. Credentials never appear in reads or audit. */
+        post: operations["testAIProviderConfiguration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/provider-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Real configuration. Platform admin required except authorized project provider options. Test sends synthetic data only. Credentials never appear in reads or audit. */
+        get: operations["listBOMProviderOptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -11926,6 +11999,7 @@ export interface components {
             /** @enum {string} */
             task: "sheet" | "field" | "relation";
             scenario?: string;
+            provider_id?: string;
         };
         BOMAICandidate: {
             source_file: string;
@@ -11960,6 +12034,9 @@ export interface components {
             token_support: string;
             merged_into_bom: boolean;
             raw_response_ref?: string;
+            provider_id?: string;
+            provider_revision?: number;
+            protocol?: string;
         };
         BOMAITask: {
             id: string;
@@ -11969,6 +12046,7 @@ export interface components {
             diagnostic: components["schemas"]["BOMAIDiagnostic"];
             /** Format: date-time */
             created_at: string;
+            provider_id?: string;
         };
         getBOMSheetProfilesEnvelope: {
             data: components["schemas"]["BOMSheetProfile"][];
@@ -13215,6 +13293,91 @@ export interface components {
             freshness: string;
             support: string;
             evidence_refs: string[] | null;
+        };
+        AIProviderConfiguration: {
+            id: string;
+            name: string;
+            /** @enum {unknown} */
+            protocol: "openai-chat" | "keel-mapping";
+            /** Format: uri */
+            endpoint: string;
+            model: string;
+            timeout_seconds: number;
+            token_budget: number;
+            /** @enum {unknown} */
+            token_parameter: "max_tokens" | "max_completion_tokens";
+            json_mode: boolean;
+            enabled: boolean;
+            is_default: boolean;
+            credential_ref: string;
+            has_credential: boolean;
+            revision: number;
+            /** @enum {unknown} */
+            last_test_status: "not_tested" | "passed" | "failed";
+            last_test_code: string | null;
+            last_test_http_status: number | null;
+            last_test_at: string | null;
+            last_test_ms: number | null;
+        };
+        AIProviderConfigurationCommand: {
+            name: string;
+            /** @enum {unknown} */
+            protocol: "openai-chat" | "keel-mapping";
+            /** Format: uri */
+            endpoint: string;
+            model: string;
+            timeout_seconds: number;
+            token_budget: number;
+            /** @enum {unknown} */
+            token_parameter: "max_tokens" | "max_completion_tokens";
+            json_mode: boolean;
+            enabled: boolean;
+            is_default: boolean;
+            revision?: number;
+            /** @description Sent once to controlled server secret storage. Empty retains an existing key. Never returned or audited. */
+            api_key?: string;
+        };
+        AIProviderTestCommand: {
+            revision: number;
+        };
+        AIProviderTestResult: {
+            provider_id: string;
+            revision: number;
+            /** @enum {unknown} */
+            status: "passed" | "failed";
+            error_code: string;
+            http_status: number;
+            duration_ms: number;
+            synthetic: boolean;
+            observed_at: string;
+        };
+        AIProviderOption: {
+            id: string;
+            name: string;
+            model: string;
+            /** @enum {unknown} */
+            protocol: "openai-chat" | "keel-mapping";
+            is_default: boolean;
+        };
+        listAIProviderConfigurationsEnvelope: {
+            data: components["schemas"]["AIProviderConfiguration"][];
+            request_id: string;
+        };
+        createAIProviderConfigurationEnvelope: {
+            data: components["schemas"]["IdentityMutation"];
+            request_id: string;
+        };
+        updateAIProviderConfigurationEnvelope: {
+            data: components["schemas"]["IdentityMutation"];
+            request_id: string;
+        };
+        testAIProviderConfigurationEnvelope: {
+            data: components["schemas"]["AIProviderTestResult"];
+            request_id: string;
+        };
+        listBOMProviderOptionsEnvelope: {
+            data: components["schemas"]["AIProviderOption"][];
+            request_id: string;
         };
     };
     responses: {
@@ -28368,6 +28531,375 @@ export interface operations {
             };
             /** @description Schema, relation cardinality, validation or approval condition not satisfied */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listAIProviderConfigurations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Result; failed model connection is represented by test status=failed. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listAIProviderConfigurationsEnvelope"];
+                };
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createAIProviderConfiguration: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-Token": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AIProviderConfigurationCommand"];
+            };
+        };
+        responses: {
+            /** @description Result; failed model connection is represented by test status=failed. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["createAIProviderConfigurationEnvelope"];
+                };
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateAIProviderConfiguration: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-Token": string;
+            };
+            path: {
+                provider_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AIProviderConfigurationCommand"];
+            };
+        };
+        responses: {
+            /** @description Result; failed model connection is represented by test status=failed. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["updateAIProviderConfigurationEnvelope"];
+                };
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    testAIProviderConfiguration: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-CSRF-Token": string;
+            };
+            path: {
+                provider_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AIProviderTestCommand"];
+            };
+        };
+        responses: {
+            /** @description Result; failed model connection is represented by test status=failed. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["testAIProviderConfigurationEnvelope"];
+                };
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listBOMProviderOptions: {
+        parameters: {
+            query: {
+                project_id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Result; failed model connection is represented by test status=failed. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listBOMProviderOptionsEnvelope"];
+                };
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, authorization, revision, configuration or storage error. */
+            500: {
                 headers: {
                     [name: string]: unknown;
                 };

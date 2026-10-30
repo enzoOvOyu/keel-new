@@ -66,6 +66,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if s.identityRoutes(w, r) {
 		return
 	}
+	if s.aiProviderRoutes(w, r) {
+		return
+	}
 	if s.cmdbRoutes(w, r) {
 		return
 	}

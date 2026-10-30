@@ -25,3 +25,6 @@ MinIO 默认使用本机已有的 `keel-minio:2025-10-15-9e49d5e` 镜像；其�
 ## 真实 CMDB 开发切片
 
 开发前端 http://localhost:5174 通过 Adapter 接入 Go/PostgreSQL CMDB；原演示保留5180。模型、接口、迁移、Schema扩展及真实/合成边界见 [CMDB真实设计](docs/CMDB-REAL-DESIGN.md)。保留原导航、主题及服务器五/交换机八Tab抽屉，其他未接入领域仍为明确Mock。
+
+
+真实项目创建入口：`/projects`，创建后进入该项目BOM。AI接入配置入口：`/admin/ai-provider`，支持OpenAI兼容Chat Completions和Keel mapping协议，配置由Go持久化，密钥不回显。说明见 [项目与AI配置](docs/PROJECT-AI-CONFIGURATION.md)。

@@ -13,7 +13,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 	"unicode"
@@ -50,9 +49,10 @@ func (s *Server) aiAPI(w http.ResponseWriter, r *http.Request, id string, rev in
 		return false
 	}
 	var req struct {
-		Mode     string `json:"mode"`
-		Task     string `json:"task"`
-		Scenario string `json:"scenario"`
+		Mode       string `json:"mode"`
+		Task       string `json:"task"`
+		Scenario   string `json:"scenario"`
+		ProviderID string `json:"provider_id"`
 	}
 	r.Body = http.MaxBytesReader(w, r.Body, 64<<10)
 	if json.NewDecoder(r.Body).Decode(&req) != nil {
@@ -74,19 +74,22 @@ func (s *Server) aiAPI(w http.ResponseWriter, r *http.Request, id string, rev in
 	case "mock":
 		adapter = ai.Mock{Scenario: req.Scenario}
 	case "provider":
-		endpoint := os.Getenv("AI_ENDPOINT")
-		key := os.Getenv("AI_API_KEY")
-		if endpoint == "" || key == "" {
-			fail(w, 422, "AI_PROVIDER_NOT_CONFIGURED")
+		configured, _, e := s.defaultAI(ctx)
+		if req.ProviderID != "" {
+			var c aiConfig
+			c, e = scanAI(s.db.QueryRow(ctx, aiConfigSelect+"WHERE id::text=$1 AND enabled", req.ProviderID))
+			if e == nil {
+				configured, _, e = s.aiAdapter(c)
+			} else {
+				fail(w, 422, "AI_PROVIDER_UNAVAILABLE")
+				return true
+			}
+		}
+		if e != nil {
+			fail(w, 422, e.Error())
 			return true
 		}
-		seconds, _ := strconv.Atoi(env("AI_TIMEOUT_SECONDS", "30"))
-		budget, _ := strconv.Atoi(env("AI_TOKEN_BUDGET", "2048"))
-		if seconds < 1 || seconds > 120 || budget < 1 || budget > 32768 {
-			fail(w, 422, "INVALID_AI_CONFIGURATION")
-			return true
-		}
-		adapter = &ai.Provider{Endpoint: endpoint, Model: os.Getenv("AI_MODEL"), Key: key, Timeout: time.Duration(seconds) * time.Second, TokenBudget: budget}
+		adapter = configured
 	default:
 		fail(w, 400, "INVALID_AI_MODE")
 		return true
@@ -201,8 +204,12 @@ func (s *Server) aiAPI(w http.ResponseWriter, r *http.Request, id string, rev in
 			schemaValid = false
 		}
 	}
-	diagnostic := map[string]any{"schema_status": schemaStatus, "raw_response_ref": rawRef, "prompt_version": input.PromptVersion, "schema_version": input.SchemaVersion, "request_sha256": hex.EncodeToString(hash[:]), "duration_ms": time.Since(start).Milliseconds(), "schema_valid": schemaValid, "error_code": errCode, "model": os.Getenv("AI_MODEL"), "candidates": candidates, "simulation_only": req.Mode == "mock", "token_input": nil, "token_output": nil, "token_cost": nil, "token_support": "unknown", "merged_into_bom": false}
+	diagnostic := map[string]any{"schema_status": schemaStatus, "raw_response_ref": rawRef, "prompt_version": input.PromptVersion, "schema_version": input.SchemaVersion, "request_sha256": hex.EncodeToString(hash[:]), "duration_ms": time.Since(start).Milliseconds(), "schema_valid": schemaValid, "error_code": errCode, "model": "rules", "candidates": candidates, "simulation_only": req.Mode == "mock", "token_input": nil, "token_output": nil, "token_cost": nil, "token_support": "unknown", "merged_into_bom": false}
 	if provider, ok := adapter.(*ai.Provider); ok {
+		diagnostic["provider_id"] = provider.ConfigID
+		diagnostic["provider_revision"] = provider.ConfigRevision
+		diagnostic["protocol"] = provider.Protocol
+		diagnostic["model"] = provider.Model
 		diagnostic["token_input"] = provider.InputTokens
 		diagnostic["token_output"] = provider.OutputTokens
 		if provider.InputTokens != nil && provider.OutputTokens != nil {

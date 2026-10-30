@@ -11,7 +11,6 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"os"
 	"time"
 )
 
@@ -145,7 +144,7 @@ func (s *Server) sessionResponse(w http.ResponseWriter, r *http.Request, p ident
 	if len(p.Projects) > 0 {
 		selected = p.Projects[0].ID
 	}
-	respond(w, 200, map[string]any{"actor": p.Username, "user": map[string]any{"id": p.ID, "username": p.Username, "display_name": p.DisplayName}, "role": p.RoleLabel(), "global_roles": p.GlobalRoles, "global_permissions": p.GlobalPermissions, "project_permissions": projectPermissions, "project_roles": projectRoles, "grants": p.Grants, "authorized_projects": p.Projects, "permissions": p.Permissions(selected), "project_id": selected, "permission_revision": p.Version, "csrf_token": csrf, "ai_configured": os.Getenv("AI_ENDPOINT") != "" && os.Getenv("AI_API_KEY") != ""})
+	respond(w, 200, map[string]any{"actor": p.Username, "user": map[string]any{"id": p.ID, "username": p.Username, "display_name": p.DisplayName}, "role": p.RoleLabel(), "global_roles": p.GlobalRoles, "global_permissions": p.GlobalPermissions, "project_permissions": projectPermissions, "project_roles": projectRoles, "grants": p.Grants, "authorized_projects": p.Projects, "permissions": p.Permissions(selected), "project_id": selected, "permission_revision": p.Version, "csrf_token": csrf, "ai_configured": s.aiConfigured(r.Context())})
 }
 func allowedOrigin(r *http.Request, origin string) bool {
 	if origin == env("DEV_ORIGIN", "http://localhost:5174") {

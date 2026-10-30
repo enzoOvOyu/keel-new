@@ -6,4 +6,9 @@ services:
     env_file: ./backend/.env
     environment:
       LISTEN_ADDR: 127.0.0.1:8081
+    volumes:
+      - ai-secrets:/app/.secrets
     restart: unless-stopped
+
+volumes:
+  ai-secrets:

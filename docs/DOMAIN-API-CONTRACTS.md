@@ -198,3 +198,9 @@ CmdbDossier*资源Schema明确目录状态维度、关系类别与规划/观测�
 OpenAPI中的CmdbSchema*、CmdbChange*、CmdbRevision*、CmdbRelationshipRevision与原CmdbDossier*共同构成真实契约。保持五/八Tab抽屉旧数据形状；资产创建/更新/退役/换件、关系新增/结束统一由ChangeSet表达；禁止客户端直接覆盖批准配置与采集字段。
 
 接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。
+
+## 项目与 AI 配置真实落地
+
+AIProviderConfiguration/Command/TestCommand/TestResult/Option是系统配置与BOM共享契约。连接失败由status=failed及error_code/http_status表达，不伪造成功；AI任务继续使用mapping/v1候选与人工审核契约。
+
+唯一详细说明与API对照见 [PROJECT-AI-CONFIGURATION.md](PROJECT-AI-CONFIGURATION.md)。

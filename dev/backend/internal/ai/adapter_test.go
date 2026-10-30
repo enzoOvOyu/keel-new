@@ -44,3 +44,25 @@ func TestRulesGoldenIsExplicitlySynthetic(t *testing.T) {
 		t.Fatal("golden results or unknown token cost incorrect")
 	}
 }
+
+func TestOpenAICompatibleMappingUsesStandardMessages(t *testing.T) {
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var body struct {
+			Model    string                           `json:"model"`
+			Messages []struct{ Role, Content string } `json:"messages"`
+			Budget   int                              `json:"max_completion_tokens"`
+			Format   map[string]string                `json:"response_format"`
+		}
+		if json.NewDecoder(r.Body).Decode(&body) != nil || len(body.Messages) != 2 || body.Budget != 512 || body.Format["type"] != "json_object" {
+			t.Error("standard chat request not emitted")
+		}
+		candidates, _ := json.Marshal(map[string]any{"candidates": []Candidate{{SourceFile: "synthetic", Sheet: "synthetic", Row: 1, Column: 1, Cell: "A1", Original: "SN", Field: "serial", Reason: "synthetic candidate", Confidence: 1, Model: "synthetic", Prompt: "field/v1", Schema: "mapping/v1"}}})
+		json.NewEncoder(w).Encode(map[string]any{"choices": []any{map[string]any{"finish_reason": "stop", "message": map[string]string{"content": string(candidates)}}}, "usage": map[string]int{"prompt_tokens": 12, "completion_tokens": 25}})
+	}))
+	defer server.Close()
+	p := Provider{Endpoint: server.URL, Model: "synthetic", Key: "synthetic-only", Protocol: "openai-chat", JSONMode: true, TokenParameter: "max_completion_tokens", TokenBudget: 512, Timeout: time.Second, Client: server.Client()}
+	out, e := p.Suggest(context.Background(), Request{Task: "field", Headers: []string{"SN"}, PromptVersion: "field/v1", SchemaVersion: "mapping/v1"})
+	if e != nil || len(out) != 1 || p.OutputTokens == nil || *p.OutputTokens != 25 {
+		t.Fatalf("compatible response decoding failed: %v", e)
+	}
+}

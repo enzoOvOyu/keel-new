@@ -5,6 +5,7 @@ import (
 	"github.com/google/uuid"
 	"keel.local/dev/internal/identity"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -94,13 +95,28 @@ func (s *Server) identityRoutes(w http.ResponseWriter, r *http.Request) bool {
 		if !decodeIdentity(w, r, &q) {
 			return true
 		}
-		if q.Name == "" || q.Code == "" {
+		q.Name = strings.TrimSpace(q.Name)
+		q.Code = strings.TrimSpace(q.Code)
+		if len([]rune(q.Name)) < 2 || len([]rune(q.Name)) > 240 || !regexp.MustCompile(`^[A-Za-z0-9_-]{3,32}$`).MatchString(q.Code) {
 			fail(w, 422, "PROJECT_FIELDS_REQUIRED")
+			return true
+		}
+		if q.TemplateID != "" {
+			fail(w, 422, "PROJECT_TEMPLATE_NOT_AVAILABLE")
 			return true
 		}
 		id := "proj-" + uuid.NewString()
 		s.identityMutation(w, r, "project.created", id, func(tx identityTx) error {
-			_, e := tx.Exec(ctx, "INSERT INTO project(id,name,code,template_id) VALUES($1,$2,$3,$4)", id, q.Name, q.Code, q.TemplateID)
+			_, e := tx.Exec(ctx, "INSERT INTO project(id,name,code,template_id,status) VALUES($1,$2,$3,$4,'planned')", id, q.Name, q.Code, q.TemplateID)
+			if e != nil {
+				return e
+			}
+			for _, role := range []string{identity.DeliveryEngineer, identity.DeliveryLead} {
+				if _, e = tx.Exec(ctx, "INSERT INTO project_membership(id,user_id,project_id,role_id,created_by) VALUES($1,$2,$3,$4,$2)", uuid.NewString(), u.ID, id, role); e != nil {
+					return e
+				}
+			}
+			_, e = tx.Exec(ctx, "UPDATE app_user SET permission_version=permission_version+1 WHERE id=$1", u.ID)
 			return e
 		})
 		return true

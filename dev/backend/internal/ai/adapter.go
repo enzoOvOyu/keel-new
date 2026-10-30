@@ -227,8 +227,15 @@ func Decode(b []byte) ([]Candidate, error) {
 }
 
 type Provider struct {
+	ConfigID             string
+	ConfigRevision       int64
+	TokenParameter       string
 	Client               *http.Client
 	Endpoint, Model, Key string
+	Protocol             string
+	JSONMode             bool
+	AllowHTTP            bool
+	HTTPStatus           int
 	Raw                  []byte
 	TokenBudget          int
 	InputTokens          *int
@@ -238,7 +245,7 @@ type Provider struct {
 
 func (p *Provider) Suggest(ctx context.Context, r Request) ([]Candidate, error) {
 	u, e := url.Parse(p.Endpoint)
-	if e != nil || u.Scheme != "https" || u.Host == "" || u.User != nil {
+	if e != nil || (u.Scheme != "https" && !(p.AllowHTTP && u.Scheme == "http")) || u.Host == "" || u.User != nil {
 		return nil, errors.New("INVALID_PROVIDER_ENDPOINT")
 	}
 	prompt, e := Prompt(r.Task)
@@ -249,7 +256,22 @@ func (p *Provider) Suggest(ctx context.Context, r Request) ([]Candidate, error) 
 	if budget < 1 {
 		budget = 2048
 	}
-	b, _ := json.Marshal(map[string]any{"model": p.Model, "input": r, "response_format": "mapping/v1", "system": prompt, "max_output_tokens": budget})
+	var body any = map[string]any{"model": p.Model, "input": r, "response_format": "mapping/v1", "system": prompt, "max_output_tokens": budget}
+	if p.Protocol == "openai-chat" {
+		input, _ := json.Marshal(r)
+		example, _ := json.Marshal(Candidate{SourceFile: "source_file", Sheet: "sheet_name", Row: 1, Column: 1, Cell: "A1", Original: "SN", Field: "serial", Reason: "source-based mapping", Confidence: 0.9, Model: p.Model, Prompt: r.PromptVersion, Schema: r.SchemaVersion})
+		instructions := prompt + "\nReturn only a JSON object {\"candidates\":[...]}. Each candidate must contain exactly the keys/types in this example: " + string(example) + ". Use actual source metadata from the supplied input, not example values. Return an empty candidates array when evidence is insufficient."
+		payload := map[string]any{"model": p.Model, "messages": []map[string]string{{"role": "system", "content": instructions}, {"role": "user", "content": string(input)}}, "max_tokens": budget, "stream": false}
+		if p.TokenParameter == "max_completion_tokens" {
+			delete(payload, "max_tokens")
+			payload["max_completion_tokens"] = budget
+		}
+		if p.JSONMode {
+			payload["response_format"] = map[string]string{"type": "json_object"}
+		}
+		body = payload
+	}
+	b, _ := json.Marshal(body)
 	req, e := http.NewRequestWithContext(ctx, "POST", p.Endpoint, bytes.NewReader(b))
 	if e != nil {
 		return nil, e
@@ -267,6 +289,7 @@ func (p *Provider) Suggest(ctx context.Context, r Request) ([]Candidate, error) 
 		return nil, errors.New("PROVIDER_UNAVAILABLE")
 	}
 	defer res.Body.Close()
+	p.HTTPStatus = res.StatusCode
 	if res.StatusCode != 200 {
 		return nil, errors.New("PROVIDER_ERROR")
 	}
@@ -276,6 +299,36 @@ func (p *Provider) Suggest(ctx context.Context, r Request) ([]Candidate, error) 
 	}
 	if len(data) > 1<<20 {
 		return nil, errors.New("PROVIDER_RESPONSE_TOO_LARGE")
+	}
+	if p.Protocol == "openai-chat" {
+		var response struct {
+			Choices []struct {
+				Message struct {
+					Content string `json:"content"`
+				} `json:"message"`
+				Finish string `json:"finish_reason"`
+			} `json:"choices"`
+			Usage struct {
+				Input  *int `json:"prompt_tokens"`
+				Output *int `json:"completion_tokens"`
+			} `json:"usage"`
+		}
+		if json.Unmarshal(data, &response) != nil || len(response.Choices) == 0 {
+			return nil, errors.New("SCHEMA_VALIDATION_FAILED")
+		}
+		if response.Choices[0].Finish == "length" {
+			return nil, errors.New("PROVIDER_OUTPUT_TRUNCATED")
+		}
+		p.InputTokens = response.Usage.Input
+		p.OutputTokens = response.Usage.Output
+		p.Raw = append([]byte{}, data...)
+		var result struct {
+			Candidates json.RawMessage `json:"candidates"`
+		}
+		if json.Unmarshal([]byte(response.Choices[0].Message.Content), &result) != nil || len(result.Candidates) == 0 {
+			return nil, errors.New("SCHEMA_VALIDATION_FAILED")
+		}
+		return Decode(result.Candidates)
 	}
 	p.Raw = append([]byte{}, data...)
 	if len(data) > 0 && data[0] == '{' {
