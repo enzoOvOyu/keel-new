@@ -1,5 +1,7 @@
 # Keel 本地开发
 
+继续开发或切换环境先读 [HANDOFF.md](HANDOFF.md)：当前真实开发目录、启动方式、进度、未完成项与迁移说明。
+
 当前交付演示项目位于 [`keel-demo/`](keel-demo/README.md)，访问地址为 <http://localhost:5180>。
 启动演示：在 `keel-demo/` 目录执行 `docker compose up -d`。
 下方是基础开发环境说明。
