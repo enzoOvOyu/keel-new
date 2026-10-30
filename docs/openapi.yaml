@@ -13740,6 +13740,24 @@ paths:
           description: Project permission denied
         '409':
           description: Legacy import uses the original workflow
+  /bom-imports/{import_id}/workbench/progress:
+    parameters:
+    - $ref: '#/components/parameters/ImportId'
+    get:
+      tags: [BOM Import]
+      operationId: getBOMWorkbenchProgress
+      summary: Persisted analysis progress without candidate records or validation side effects
+      description: Requires bom:read on the import project. Poll every 4s only while recognizing. Results and source details load on demand; never use the full workbench for progress polling.
+      parameters:
+      - {name: project_id, in: query, required: true, schema: {type: string}}
+      responses:
+        '200':
+          description: Task state, sheet status, coverage, candidate count and latest 16 execution steps
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/BOMWorkbenchProgressEnvelope'}
+        '403': {description: Project permission denied}
+        '404': {description: Import not found}
   /bom-imports/{import_id}/workbench/initialize:
     parameters:
     - $ref: '#/components/parameters/ImportId'
@@ -34951,6 +34969,39 @@ components:
         regions:
           type: array
           items: {$ref: '#/components/schemas/BOMRegionCoverage'}
+    BOMWorkbenchProgress:
+      type: object
+      additionalProperties: false
+      required: [mode, revision, state, phase, error, record_count, sheets, steps]
+      properties:
+        mode: {type: string, enum: [ai, fixed, legacy]}
+        revision: {type: integer}
+        state: {type: string, enum: [pending_review, recognizing, partially_imported, imported]}
+        phase: {type: string}
+        error: {type: string}
+        record_count: {type: integer, minimum: 0}
+        sheets:
+          type: array
+          description: Recognition status only; extraction plans are not returned.
+          items: {$ref: '#/components/schemas/BOMRecognitionSheet'}
+        steps:
+          type: array
+          maxItems: 16
+          items: {$ref: '#/components/schemas/BOMAgentStep'}
+        analysis:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/BOMPlanningAnalysis'
+        coverage:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/BOMCoverageAudit'
+    BOMWorkbenchProgressEnvelope:
+      type: object
+      required: [data, request_id]
+      properties:
+        data: {$ref: '#/components/schemas/BOMWorkbenchProgress'}
+        request_id: {type: string}
     BOMWorkbench:
       type: object
       required:

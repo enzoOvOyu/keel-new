@@ -45,14 +45,15 @@
 沿用 bom_import_batch.workbook/workbench、bom_job、ai_task、bom_submission。`workbench.steps` 记录真实工具调用；`workbench.coverage` 为独立扫描对账，详见 OpenAPI BOMAgentStep/BOMRegionCoverage/BOMCoverageAudit。记录仍引用现有 BOMDraftItem/BOMSourceCell，不建另一套资产表。
 
 - 上传：`POST /projects/{project_id}/bom-imports`，当前页面仅发送 import_mode=ai。
-- 查询：`GET /bom-imports/{id}/workbench?compact=true`，单条完整证据用 record_id。列表原始描述缩略，原文不修改。
+- 进度：`GET /bom-imports/{id}/workbench/progress`，只返回持久化任务元数据、候选数量、Sheet 状态、覆盖清单及最近 16 条步骤；不返回候选/源单元格，不运行工程校验。
+- 结果：用户进入第三步时按需读取 `GET /bom-imports/{id}/workbench?compact=true`，单条完整证据用 record_id。列表原始描述缩略，原文不修改。分析完成后保留当前页面，由用户点击进入审核。
 - 修正：`POST .../workbench/records`，revision/record_ids/action=edit|confirm|ignore|restore，修正/排除必须理由；修正撤销原确认。
 - 校验：`POST .../workbench/validate`。
 - 分析：`POST .../workbench/recognize`，空 record_ids 继续未完成任务；指定记录重新分析其来源。成功方案重新读取原始单元格，不重复请求模型；无效方案携带具体错误反馈修正一次。人工修正和已导入记录不得被恢复覆盖。
 - 提交：`POST .../workbench/submit`，revision/record_ids/acknowledge_warnings/Idempotency-Key；后端复验权限、依赖和当前事实，原事务 BOM+CMDB+Outbox。
 - 发布：现有 publication 查询；提交和发布状态分开，失败可重放。
 
-加载：上传结构解析和 Outbox 期间 Poll 2s，识别期间 Poll 4s；其他按需。项目由资源和后端授权确定，不相信前端筛选。AI 失败不自动切换固定模式，不写正式 CMDB。
+加载：上传结构解析和 Outbox 期间 Poll 2s，识别期间仅 progress 接口 Poll 4s，禁止轮询整份候选；其他按需。项目由资源和后端授权确定，不相信前端筛选。AI 失败不自动切换固定模式，不写正式 CMDB。
 
 ## 运行与验证边界
 
@@ -61,3 +62,5 @@ Pydantic 环境安装 `dev/backend/tools/requirements.txt`，设置 `KEEL_BOM_PY
 当前验证范围：必要编译、公式/合并来源/覆盖遗漏/重复提取的定向检查，以及用户两份真实文件的候选结果核对。用户已明确接管完整导入、CMDB 发布和跨模块闭环测试，不重复执行端到端脚本，不以历史报告作为本轮通过证据。尚无人工标注完整基准，不报告模型准确率。
 
 当前边界：自由文本/图形颜色表达而无法形成可靠来源绑定的内容保留为待识别；未实现视觉模型区域截图、LibreOffice 重算及自由绘图路径提取。未知内容不可宣称已完整识别。
+
+当前实现边界：已有主任务编排、真实 Workbook IR 工具、语义方案提取与覆盖对账。工具调用顺序仍由程序编排；模型自主选择工具、根据遗漏自适应深入区域的完整 Agent 循环尚未完成，不能以步骤名称或覆盖对账冒充该能力。

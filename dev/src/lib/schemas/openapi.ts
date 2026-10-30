@@ -5255,6 +5255,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/bom-imports/{import_id}/workbench/progress": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Persisted analysis progress without candidate records or validation side effects
+         * @description Requires bom:read on the import project. Poll every 4s only while recognizing. Results and source details load on demand; never use the full workbench for progress polling.
+         */
+        get: operations["getBOMWorkbenchProgress"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/bom-imports/{import_id}/workbench/initialize": {
         parameters: {
             query?: never;
@@ -12158,6 +12180,25 @@ export interface components {
             retained_cells: number;
             extracted_cells: number;
             regions: components["schemas"]["BOMRegionCoverage"][];
+        };
+        BOMWorkbenchProgress: {
+            /** @enum {string} */
+            mode: "ai" | "fixed" | "legacy";
+            revision: number;
+            /** @enum {string} */
+            state: "pending_review" | "recognizing" | "partially_imported" | "imported";
+            phase: string;
+            error: string;
+            record_count: number;
+            /** @description Recognition status only; extraction plans are not returned. */
+            sheets: components["schemas"]["BOMRecognitionSheet"][];
+            steps: components["schemas"]["BOMAgentStep"][];
+            analysis?: components["schemas"]["BOMPlanningAnalysis"] | null;
+            coverage?: components["schemas"]["BOMCoverageAudit"] | null;
+        };
+        BOMWorkbenchProgressEnvelope: {
+            data: components["schemas"]["BOMWorkbenchProgress"];
+            request_id: string;
         };
         BOMWorkbench: {
             steps?: components["schemas"]["BOMAgentStep"][];
@@ -29239,6 +29280,44 @@ export interface operations {
             };
             /** @description Legacy import uses the original workflow */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getBOMWorkbenchProgress: {
+        parameters: {
+            query: {
+                project_id: string;
+            };
+            header?: never;
+            path: {
+                import_id: components["parameters"]["ImportId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Task state, sheet status, coverage, candidate count and latest 16 execution steps */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BOMWorkbenchProgressEnvelope"];
+                };
+            };
+            /** @description Project permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Import not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

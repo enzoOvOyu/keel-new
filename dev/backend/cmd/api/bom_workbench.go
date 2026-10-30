@@ -99,6 +99,35 @@ func (s *Server) workbenchAPI(w http.ResponseWriter, r *http.Request, id string,
 	}
 	action := strings.TrimPrefix(r.URL.Path, prefix)
 	ctx := r.Context()
+	if r.Method == "GET" && action == "/progress" {
+		// Poll persisted task metadata only. Never decode candidates, Workbook IR,
+		// or rerun engineering validation to render a progress screen.
+		var progress []byte
+		err := s.db.QueryRow(ctx, `WITH snapshot AS MATERIALIZED (
+			SELECT import_mode,revision,
+				workbench-ARRAY['records','classifications'] AS workbench,
+				COALESCE(jsonb_array_length(NULLIF(workbench->'records','null'::jsonb)),0) AS record_count
+			FROM bom_import_batch WHERE id=$1
+		) SELECT jsonb_build_object(
+			'mode',import_mode,'revision',revision,
+			'state',COALESCE(workbench->>'state','pending_review'),
+			'phase',COALESCE(workbench->>'phase',''),
+			'error',COALESCE(workbench->>'error',''),
+			'analysis',workbench->'analysis','coverage',workbench->'coverage',
+			'record_count',record_count,
+			'steps',COALESCE((SELECT jsonb_agg(event ORDER BY position)
+				FROM jsonb_array_elements(COALESCE(workbench->'steps','[]'::jsonb)) WITH ORDINALITY AS e(event,position)
+				WHERE position > COALESCE(jsonb_array_length(workbench->'steps'),0)-16),'[]'::jsonb),
+			'sheets',COALESCE((SELECT jsonb_agg(sheet-'plan')
+				FROM jsonb_array_elements(COALESCE(workbench->'sheets','[]'::jsonb)) AS sheet),'[]'::jsonb)
+		) FROM snapshot`, id).Scan(&progress)
+		if err != nil {
+			fail(w, 500, "DATABASE_ERROR")
+		} else {
+			respond(w, 200, json.RawMessage(progress))
+		}
+		return true
+	}
 	b, mode, e := s.loadWorkbench(ctx, id)
 	if e != nil {
 		fail(w, 500, "DATABASE_ERROR")

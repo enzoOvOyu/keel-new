@@ -131,12 +131,18 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		var project, status string
 		var rev int
 		var workbook, draft, issues []byte
-		e := s.db.QueryRow(ctx, "SELECT project_id,status,revision,workbook,draft,issues FROM bom_import_batch WHERE id::text=$1", id).Scan(&project, &status, &rev, &workbook, &draft, &issues)
+		e := s.db.QueryRow(ctx, "SELECT project_id,status,revision FROM bom_import_batch WHERE id::text=$1", id).Scan(&project, &status, &rev)
 		if e != nil || project != s.project {
 			fail(w, 404, "NOT_FOUND")
 			return
 		}
 		if s.workbenchAPI(w, r, id, rev, status) {
+			return
+		}
+		if len(p) == 4 && r.Method == "GET" && r.URL.Query().Get("summary") == "true" {
+			workbook, draft, issues = []byte("null"), []byte("[]"), []byte("[]")
+		} else if s.db.QueryRow(ctx, "SELECT workbook,draft,issues FROM bom_import_batch WHERE id=$1", id).Scan(&workbook, &draft, &issues) != nil {
+			fail(w, 500, "DATABASE_ERROR")
 			return
 		}
 		if r.Method != "GET" {
@@ -177,11 +183,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			var errorCode *string
 			var created time.Time
 			s.db.QueryRow(ctx, "SELECT content_sha256,created_at,source_document_id,filename,reviewed_revision,error_code FROM bom_import_batch WHERE id=$1", id).Scan(&hash, &created, &sourceDocument, &filename, &reviewed, &errorCode)
-			if r.URL.Query().Get("summary") == "true" {
-				workbook = []byte("null")
-				draft = []byte("[]")
-				issues = []byte("[]")
-			}
 			respond(w, 200, map[string]any{"error_code": errorCode, "reviewed_revision": reviewed, "source_document_id": sourceDocument, "filename": filename, "project_id": project, "content_sha256": hash, "created_at": created, "mapping_revision": rev, "id": id, "status": strings.ToLower(status), "internal_status": status, "revision": rev, "workbook": json.RawMessage(workbook), "draft": json.RawMessage(draft), "issues": json.RawMessage(issues)})
 			return
 		}
