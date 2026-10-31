@@ -102,3 +102,7 @@ IA v2.3 设计及实施计划入口：[IA-V2.3.md](IA-V2.3.md)。该段为v2.3�
 
 
 Flows 功能分支：见 [实施与运行记录](flows-redesign/implementation.md)；原运行环境保持不变。
+
+## 当前智能开局工程重构
+
+用户已批准从P0进入P1及分批重构。架构与模型见 [P1设计](intelligent-deployment/P1-DESIGN.txt)，已实现/未实现与检查见 [实施记录](intelligent-deployment/implementation.json)。本次只完成模型契约和内核，原Agent/页面/运行环境没有切换；不能按设计存在推定新能力已上线。

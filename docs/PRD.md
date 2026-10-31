@@ -322,3 +322,8 @@ FR-7 当前实施补充：Flows是CMDB目标批量作业入口；仅Executions�
 详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。
 
 Flows开发补齐（afe8cb9）：作用域Schedule、多步骤/输出绑定、Namespace二进制版本/分发、持久事件游标、审批单次绑定与任务取消已实现；规则和真实证据统一见[实施记录](flows-redesign/implementation.md)及[契约](api/flows.md)，不在本文件重定义。生产设备验收仍单列。
+
+
+## IDE P1 · 通用智能开局工程模型
+
+当前用户批准通用智能开局工程方向：资料理解→统一工程模型→确定性计算→跨域校验→独立审核→分域发布。历史FR-2.1的BOM中心流程继续用于原导入与物理发布适配，不能限制独立工程域。 详细模型及逻辑表设计见 [P1设计](intelligent-deployment/P1-DESIGN.txt)，机器可读模型在OpenAPI的IDE* Schema。实际状态见 [实施记录](intelligent-deployment/implementation.json)；P1完成不等于新Agent、数据库或发布链已接入。

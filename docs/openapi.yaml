@@ -42464,6 +42464,2338 @@ components:
       - data
       - request_id
       additionalProperties: false
+    IDEAdaptiveRoutingPlan:
+      additionalProperties: false
+      properties:
+        enabled:
+          type: boolean
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        fabric_id:
+          type: string
+        policy_ref:
+          type: string
+      required:
+      - fabric_id
+      - enabled
+      - policy_ref
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDEAttributeDefinition:
+      additionalProperties: false
+      properties:
+        approval_status:
+          type: string
+          enum:
+          - draft
+          - approved
+          - retired
+        entity_kind:
+          type: string
+        enum_values:
+          items:
+            type: string
+          type: array
+        id:
+          type: string
+        key:
+          type: string
+        required:
+          type: boolean
+        unit:
+          type: string
+        value_type:
+          type: string
+          enum:
+          - text
+          - decimal
+          - boolean
+          - reference
+        version:
+          type: integer
+          minimum: 1
+      required:
+      - id
+      - version
+      - entity_kind
+      - key
+      - value_type
+      - enum_values
+      - required
+      - approval_status
+      type: object
+      x-implementation-status: model-contract-only
+    IDEAttributeValue:
+      additionalProperties: false
+      properties:
+        definition_id:
+          type: string
+        definition_version:
+          type: integer
+          minimum: 1
+        value:
+          $ref: '#/components/schemas/IDETypedValue'
+      required:
+      - definition_id
+      - definition_version
+      - value
+      type: object
+      x-implementation-status: model-contract-only
+    IDEBFDPlan:
+      additionalProperties: false
+      properties:
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        min_rx_milliseconds:
+          type: integer
+        min_tx_milliseconds:
+          type: integer
+        multiplier:
+          type: integer
+        session_id:
+          type: string
+      required:
+      - session_id
+      - min_tx_milliseconds
+      - min_rx_milliseconds
+      - multiplier
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDEBGPPlan:
+      additionalProperties: false
+      properties:
+        a_interface_id:
+          type: string
+        afi:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        id:
+          type: string
+        local_asn_allocation_id:
+          type: string
+        peer_asn_allocation_id:
+          type: string
+        policy_ref:
+          type: string
+        safi:
+          type: string
+        z_interface_id:
+          type: string
+      required:
+      - id
+      - a_interface_id
+      - z_interface_id
+      - local_asn_allocation_id
+      - peer_asn_allocation_id
+      - afi
+      - safi
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDEBounds:
+      additionalProperties: false
+      properties:
+        end_column:
+          type: integer
+          minimum: 1
+        end_row:
+          type: integer
+          minimum: 1
+        start_column:
+          type: integer
+          minimum: 1
+        start_row:
+          type: integer
+          minimum: 1
+      required:
+      - start_row
+      - end_row
+      - start_column
+      - end_column
+      type: object
+      x-implementation-status: model-contract-only
+    IDECablePlan:
+      additionalProperties: false
+      properties:
+        as_built:
+          $ref: '#/components/schemas/IDELengthEvidence'
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        calculated:
+          $ref: '#/components/schemas/IDELengthEvidence'
+        confirmed:
+          $ref: '#/components/schemas/IDELengthEvidence'
+        connection_id:
+          type: string
+        entity_id:
+          type: string
+        estimated:
+          $ref: '#/components/schemas/IDELengthEvidence'
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        provenance_id:
+          type: string
+        revision_id:
+          type: string
+        route:
+          items:
+            $ref: '#/components/schemas/IDERouteSegment'
+          type: array
+        rule_version:
+          $ref: '#/components/schemas/IDEVersionReference'
+        selected_stock:
+          $ref: '#/components/schemas/IDELengthEvidence'
+        spec:
+          $ref: '#/components/schemas/IDECableSpec'
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - connection_id
+      - spec
+      - route
+      type: object
+      x-implementation-status: model-contract-only
+    IDECableSpec:
+      additionalProperties: false
+      properties:
+        connector_a:
+          type: string
+        connector_z:
+          type: string
+        id:
+          type: string
+        medium:
+          type: string
+        rate_bps:
+          type: integer
+      required:
+      - id
+      - medium
+      - connector_a
+      - connector_z
+      type: object
+      x-implementation-status: model-contract-only
+    IDECalculationCapabilities:
+      additionalProperties: false
+      properties:
+        available:
+          type: boolean
+        formulas:
+          items:
+            type: string
+          type: array
+        id:
+          type: string
+        supports_external_links:
+          type: boolean
+        supports_named_ranges:
+          type: boolean
+        version:
+          type: string
+      required:
+      - id
+      - version
+      - available
+      - formulas
+      - supports_named_ranges
+      - supports_external_links
+      type: object
+      x-implementation-status: model-contract-only
+    IDECalculationError:
+      additionalProperties: false
+      properties:
+        cell:
+          $ref: '#/components/schemas/IDEFormulaCell'
+        code:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
+      type: object
+      x-implementation-status: model-contract-only
+    IDECalculationRule:
+      additionalProperties: false
+      properties:
+        approval_status:
+          type: string
+          enum:
+          - draft
+          - validated
+          - approved
+          - retired
+        dependencies:
+          items:
+            $ref: '#/components/schemas/IDEVersionReference'
+          type: array
+        domain:
+          enum:
+          - source
+          - equipment
+          - facility_placement
+          - power_cooling
+          - connectivity_cabling
+          - material_workload
+          - network_design
+          - validation_release
+          type: string
+        expression:
+          $ref: '#/components/schemas/IDERuleExpression'
+        id:
+          type: string
+        inputs:
+          items:
+            $ref: '#/components/schemas/IDERuleIO'
+          type: array
+        outputs:
+          items:
+            $ref: '#/components/schemas/IDERuleIO'
+          type: array
+        review_decision_id:
+          type: string
+        scope_id:
+          type: string
+        scope_type:
+          type: string
+          enum:
+          - project
+          - customer
+          - domain
+        validation_cases:
+          items:
+            $ref: '#/components/schemas/IDERuleCase'
+          type: array
+        version:
+          type: integer
+          minimum: 1
+      required:
+      - id
+      - version
+      - domain
+      - scope_type
+      - scope_id
+      - inputs
+      - outputs
+      - expression
+      - dependencies
+      - validation_cases
+      - approval_status
+      type: object
+      x-implementation-status: model-contract-only
+    IDECalculationRun:
+      additionalProperties: false
+      properties:
+        compatibility:
+          type: string
+          enum:
+          - compatible
+          - partial
+          - unsupported
+          - unknown
+        errors:
+          items:
+            $ref: '#/components/schemas/IDECalculationError'
+          type: array
+        finished_at:
+          format: date-time
+          type: string
+        formulas:
+          items:
+            $ref: '#/components/schemas/IDEFormulaEvidence'
+          type: array
+        id:
+          type: string
+        input_digest:
+          type: string
+        inputs:
+          items:
+            $ref: '#/components/schemas/IDENamedValue'
+          type: array
+        module_instance_id:
+          type: string
+        outputs:
+          items:
+            $ref: '#/components/schemas/IDENamedValue'
+          type: array
+        project_id:
+          type: string
+        provider_id:
+          type: string
+        provider_version:
+          type: string
+        revision_id:
+          type: string
+        rule:
+          $ref: '#/components/schemas/IDEVersionReference'
+        source_sha256:
+          type: string
+        started_at:
+          format: date-time
+          type: string
+        status:
+          type: string
+          enum:
+          - pending
+          - running
+          - succeeded
+          - partial
+          - failed
+          - unsupported
+      required:
+      - id
+      - project_id
+      - module_instance_id
+      - revision_id
+      - provider_id
+      - provider_version
+      - source_sha256
+      - input_digest
+      - status
+      - compatibility
+      - inputs
+      - outputs
+      - formulas
+      - errors
+      - started_at
+      type: object
+      x-implementation-status: model-contract-only
+      description: An existing formula cache is not a successful recalculation. No calculation provider is implemented by the
+        P1 contract.
+    IDECanonicalEntity:
+      additionalProperties: false
+      properties:
+        bom_item_id:
+          type: string
+        cmdb_asset_id:
+          type: string
+        domain:
+          enum:
+          - source
+          - equipment
+          - facility_placement
+          - power_cooling
+          - connectivity_cabling
+          - material_workload
+          - network_design
+          - validation_release
+          type: string
+        id:
+          type: string
+        kind:
+          type: string
+        planning_key:
+          type: string
+        project_id:
+          type: string
+      required:
+      - id
+      - project_id
+      - domain
+      - kind
+      - planning_key
+      type: object
+      x-implementation-status: model-contract-only
+    IDEConnectivityPlan:
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        connections:
+          items:
+            $ref: '#/components/schemas/IDEPlannedConnection'
+          type: array
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        ports:
+          items:
+            $ref: '#/components/schemas/IDEPlannedPort'
+          type: array
+        provenance_id:
+          type: string
+        revision_id:
+          type: string
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - ports
+      - connections
+      type: object
+      x-implementation-status: model-contract-only
+    IDEDeviceAssembly:
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        child_id:
+          type: string
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        parent_id:
+          type: string
+        provenance_id:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+        relation_type:
+          type: string
+          enum:
+          - contains
+          - installed_in
+          - assembly_member
+        revision_id:
+          type: string
+        slot_label:
+          type: string
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - parent_id
+      - child_id
+      - relation_type
+      - quantity
+      type: object
+      x-implementation-status: model-contract-only
+    IDEDeviceRole:
+      additionalProperties: false
+      properties:
+        equipment_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        plane_id:
+          type: string
+        role:
+          type: string
+      required:
+      - equipment_id
+      - plane_id
+      - role
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDEEVPNVXLANPlan:
+      additionalProperties: false
+      properties:
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        export_targets:
+          items:
+            type: string
+          type: array
+        fabric_id:
+          type: string
+        id:
+          type: string
+        import_targets:
+          items:
+            type: string
+          type: array
+        route_distinguisher:
+          type: string
+        vlan:
+          type: integer
+        vni:
+          type: integer
+        vrf_ref:
+          type: string
+        vtep_allocation_ids:
+          items:
+            type: string
+          type: array
+      required:
+      - id
+      - fabric_id
+      - vni
+      - vtep_allocation_ids
+      - route_distinguisher
+      - import_targets
+      - export_targets
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDEEngineeringModule:
+      additionalProperties: false
+      properties:
+        applicability:
+          type: string
+        calculations:
+          items:
+            type: string
+          type: array
+        dependencies:
+          items:
+            $ref: '#/components/schemas/IDEModuleDependency'
+          type: array
+        domain:
+          enum:
+          - source
+          - equipment
+          - facility_placement
+          - power_cooling
+          - connectivity_cabling
+          - material_workload
+          - network_design
+          - validation_release
+          type: string
+        id:
+          type: string
+        implementation_status:
+          type: string
+          enum:
+          - planned
+          - model_and_validation
+          - implemented
+        inputs:
+          items:
+            $ref: '#/components/schemas/IDEModuleIO'
+          type: array
+        outputs:
+          items:
+            $ref: '#/components/schemas/IDEModuleIO'
+          type: array
+        publish_targets:
+          items:
+            type: string
+          type: array
+        review_gates:
+          items:
+            $ref: '#/components/schemas/IDEReviewGate'
+          type: array
+        title:
+          type: string
+        validations:
+          items:
+            type: string
+          type: array
+        version:
+          type: integer
+          minimum: 1
+      required:
+      - id
+      - version
+      - domain
+      - title
+      - inputs
+      - outputs
+      - dependencies
+      - applicability
+      - calculations
+      - validations
+      - review_gates
+      - publish_targets
+      - implementation_status
+      type: object
+      x-implementation-status: model-contract-only
+    IDEEntityVersion:
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        provenance_id:
+          type: string
+        revision_id:
+          type: string
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      type: object
+      x-implementation-status: model-contract-only
+    IDEEquipmentPlan:
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        entity_id:
+          type: string
+        equipment_type:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        identity_kind:
+          type: string
+          enum:
+          - group
+          - planned_instance
+          - observed_reference
+        label:
+          type: string
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        model_ref:
+          type: string
+        provenance_id:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+        revision_id:
+          type: string
+        serial:
+          type: string
+        source_model_label:
+          type: string
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - equipment_type
+      - source_model_label
+      - quantity
+      - identity_kind
+      - label
+      type: object
+      x-implementation-status: model-contract-only
+    IDEEquipmentPowerProfile:
+      additionalProperties: false
+      properties:
+        basis:
+          type: string
+          enum:
+          - planned
+          - nameplate
+          - measured
+        cooling_type:
+          type: string
+        equipment_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        power:
+          $ref: '#/components/schemas/IDEQuantity'
+      required:
+      - equipment_id
+      - basis
+      - power
+      - cooling_type
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDEEvidenceReference:
+      additionalProperties: false
+      properties:
+        bounds:
+          $ref: '#/components/schemas/IDEBounds'
+        calculation_run_id:
+          type: string
+        id:
+          type: string
+        kind:
+          type: string
+          enum:
+          - input
+          - formula
+          - cached_result
+          - recalculated_result
+          - manual
+          - reference
+        sheet_id:
+          type: string
+        source_id:
+          type: string
+        source_sha256:
+          type: string
+      required:
+      - id
+      - source_id
+      - sheet_id
+      - bounds
+      - kind
+      - source_sha256
+      type: object
+      x-implementation-status: model-contract-only
+    IDEFacilityModel:
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        capacity_u:
+          type: integer
+          minimum: 1
+        coordinate_frame_id:
+          type: string
+        depth_mm:
+          type: string
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        height_mm:
+          type: string
+        kind:
+          type: string
+          enum:
+          - site
+          - room
+          - rack
+        label:
+          type: string
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        orientation_degrees:
+          type: string
+        parent_id:
+          type: string
+        provenance_id:
+          type: string
+        revision_id:
+          type: string
+        width_mm:
+          type: string
+        x_mm:
+          type: string
+        y_mm:
+          type: string
+        z_mm:
+          type: string
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - kind
+      - label
+      type: object
+      x-implementation-status: model-contract-only
+    IDEFormulaCell:
+      additionalProperties: false
+      properties:
+        address:
+          type: string
+        sheet_id:
+          type: string
+      required:
+      - sheet_id
+      - address
+      type: object
+      x-implementation-status: model-contract-only
+    IDEFormulaDependency:
+      additionalProperties: false
+      properties:
+        from:
+          $ref: '#/components/schemas/IDEFormulaCell'
+        kind:
+          type: string
+          enum:
+          - cell
+          - range
+          - named_range
+          - external
+          - dynamic
+        to_range:
+          type: string
+        to_sheet_id:
+          type: string
+      required:
+      - from
+      - to_sheet_id
+      - to_range
+      - kind
+      type: object
+      x-implementation-status: model-contract-only
+    IDEFormulaEvidence:
+      additionalProperties: false
+      properties:
+        cached_value:
+          $ref: '#/components/schemas/IDETypedValue'
+        cell:
+          $ref: '#/components/schemas/IDEFormulaCell'
+        compatibility:
+          type: string
+          enum:
+          - compatible
+          - partial
+          - unsupported
+          - unknown
+        dependencies:
+          items:
+            $ref: '#/components/schemas/IDEFormulaDependency'
+          type: array
+        dependency_status:
+          type: string
+          enum:
+          - complete
+          - partial
+          - unsupported
+        error_code:
+          type: string
+        expression:
+          type: string
+        recalculated_value:
+          $ref: '#/components/schemas/IDETypedValue'
+      required:
+      - cell
+      - expression
+      - dependencies
+      - dependency_status
+      - compatibility
+      type: object
+      x-implementation-status: model-contract-only
+    IDEHeaderCell:
+      additionalProperties: false
+      properties:
+        column:
+          type: integer
+          minimum: 1
+        level:
+          type: integer
+          minimum: 1
+        parent:
+          type: string
+        row:
+          type: integer
+          minimum: 1
+      required:
+      - row
+      - column
+      - level
+      type: object
+      x-implementation-status: model-contract-only
+    IDEImportPlan:
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        modules:
+          items:
+            $ref: '#/components/schemas/IDEModuleInstance'
+          type: array
+        previous_plan_id:
+          type: string
+        project_id:
+          type: string
+        source_id:
+          type: string
+        summary:
+          type: string
+        version:
+          type: integer
+          minimum: 1
+      required:
+      - id
+      - project_id
+      - source_id
+      - version
+      - summary
+      - modules
+      type: object
+      x-implementation-status: model-contract-only
+    IDEInputBinding:
+      additionalProperties: false
+      properties:
+        available:
+          type: boolean
+        digest:
+          type: string
+        name:
+          type: string
+        output:
+          type: string
+        producer_instance_id:
+          type: string
+        required:
+          type: boolean
+        revision_id:
+          type: string
+      required:
+      - name
+      - output
+      - required
+      - available
+      type: object
+      x-implementation-status: model-contract-only
+    IDEInterfaceMapping:
+      additionalProperties: false
+      properties:
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        id:
+          type: string
+        logical_name:
+          type: string
+        physical_port_id:
+          type: string
+        plane_id:
+          type: string
+      required:
+      - id
+      - physical_port_id
+      - plane_id
+      - logical_name
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDELengthEvidence:
+      additionalProperties: false
+      properties:
+        calculation_run_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        length:
+          $ref: '#/components/schemas/IDEQuantity'
+      required:
+      - length
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDEMaterialEstimate:
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        calculation_run_id:
+          type: string
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        provenance_id:
+          type: string
+        purchase_gap:
+          $ref: '#/components/schemas/IDEQuantity'
+        purchased:
+          $ref: '#/components/schemas/IDEQuantity'
+        required:
+          $ref: '#/components/schemas/IDEQuantity'
+        revision_id:
+          type: string
+        spares:
+          $ref: '#/components/schemas/IDEQuantity'
+        spec_ref:
+          type: string
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - spec_ref
+      - required
+      type: object
+      x-implementation-status: model-contract-only
+    IDEModelRevision:
+      additionalProperties: false
+      properties:
+        author_id:
+          type: string
+        author_type:
+          type: string
+          enum:
+          - agent
+          - human
+          - calculation
+          - migration
+        content_digest:
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        id:
+          type: string
+        input_digest:
+          type: string
+        inputs:
+          items:
+            $ref: '#/components/schemas/IDERevisionInput'
+          type: array
+        module_instance_id:
+          type: string
+        parent_id:
+          type: string
+        project_id:
+          type: string
+        sequence:
+          type: integer
+          minimum: 1
+      required:
+      - id
+      - project_id
+      - module_instance_id
+      - sequence
+      - input_digest
+      - content_digest
+      - author_type
+      - author_id
+      - inputs
+      - created_at
+      type: object
+      x-implementation-status: model-contract-only
+    IDEModuleDependency:
+      additionalProperties: false
+      properties:
+        module_id:
+          type: string
+        output:
+          type: string
+        required:
+          type: boolean
+        stage:
+          type: string
+          enum:
+          - process
+          - review
+          - publish
+      required:
+      - module_id
+      - output
+      - required
+      - stage
+      type: object
+      x-implementation-status: model-contract-only
+    IDEModuleIO:
+      additionalProperties: false
+      properties:
+        entity_type:
+          type: string
+        name:
+          type: string
+        required:
+          type: boolean
+      required:
+      - name
+      - entity_type
+      - required
+      type: object
+      x-implementation-status: model-contract-only
+    IDEModuleInstance:
+      additionalProperties: false
+      properties:
+        applicability_reason:
+          type: string
+        definition_id:
+          type: string
+        definition_version:
+          type: integer
+          minimum: 1
+        head_revision_id:
+          type: string
+        id:
+          type: string
+        inputs:
+          items:
+            $ref: '#/components/schemas/IDEInputBinding'
+          type: array
+        state:
+          enum:
+          - NOT_APPLICABLE
+          - DETECTED
+          - NEEDS_INPUT
+          - READY
+          - PROCESSING
+          - IN_REVIEW
+          - APPROVED
+          - PUBLISHED
+          - BLOCKED
+          - STALE
+          type: string
+      required:
+      - id
+      - definition_id
+      - definition_version
+      - state
+      - applicability_reason
+      - inputs
+      type: object
+      x-implementation-status: model-contract-only
+    IDENamedValue:
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+        value:
+          $ref: '#/components/schemas/IDETypedValue'
+      required:
+      - name
+      - value
+      type: object
+      x-implementation-status: model-contract-only
+    IDENetworkAllocation:
+      additionalProperties: false
+      properties:
+        address:
+          type: string
+        asn:
+          type: integer
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        id:
+          type: string
+        interface_id:
+          type: string
+        kind:
+          type: string
+          enum:
+          - ip
+          - asn
+        prefix_length:
+          type: integer
+      required:
+      - id
+      - kind
+      - entity_id
+      - evidence_ids
+      type: object
+      oneOf:
+      - properties:
+          kind:
+            const: ip
+        required:
+        - address
+        - prefix_length
+        - interface_id
+        not:
+          required:
+          - asn
+      - properties:
+          kind:
+            const: asn
+        required:
+        - asn
+        not:
+          anyOf:
+          - required:
+            - address
+          - required:
+            - prefix_length
+      x-implementation-status: model-contract-only
+    IDENetworkFabric:
+      additionalProperties: false
+      properties:
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        id:
+          type: string
+        kind:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
+      - kind
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDENetworkPlan:
+      additionalProperties: false
+      properties:
+        adaptive_routing:
+          items:
+            $ref: '#/components/schemas/IDEAdaptiveRoutingPlan'
+          type: array
+        allocations:
+          items:
+            $ref: '#/components/schemas/IDENetworkAllocation'
+          type: array
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        bfd:
+          items:
+            $ref: '#/components/schemas/IDEBFDPlan'
+          type: array
+        bgp:
+          items:
+            $ref: '#/components/schemas/IDEBGPPlan'
+          type: array
+        device_roles:
+          items:
+            $ref: '#/components/schemas/IDEDeviceRole'
+          type: array
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        evpn_vxlan:
+          items:
+            $ref: '#/components/schemas/IDEEVPNVXLANPlan'
+          type: array
+        fabrics:
+          items:
+            $ref: '#/components/schemas/IDENetworkFabric'
+          type: array
+        interface_mappings:
+          items:
+            $ref: '#/components/schemas/IDEInterfaceMapping'
+          type: array
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        physical_revision_id:
+          type: string
+        planes:
+          items:
+            $ref: '#/components/schemas/IDENetworkPlane'
+          type: array
+        provenance_id:
+          type: string
+        qos:
+          items:
+            $ref: '#/components/schemas/IDEQoSPlan'
+          type: array
+        revision_id:
+          type: string
+        source_ids:
+          items:
+            type: string
+          type: array
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - physical_revision_id
+      - source_ids
+      - fabrics
+      - planes
+      - device_roles
+      - interface_mappings
+      - allocations
+      - bgp
+      - bfd
+      - qos
+      - adaptive_routing
+      - evpn_vxlan
+      type: object
+      x-implementation-status: model-contract-only
+    IDENetworkPlane:
+      additionalProperties: false
+      properties:
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        fabric_id:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - fabric_id
+      - name
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDEPhysicalModel:
+      additionalProperties: false
+      properties:
+        assemblies:
+          items:
+            $ref: '#/components/schemas/IDEDeviceAssembly'
+          type: array
+        equipment:
+          items:
+            $ref: '#/components/schemas/IDEEquipmentPlan'
+          type: array
+        facilities:
+          items:
+            $ref: '#/components/schemas/IDEFacilityModel'
+          type: array
+        placements:
+          items:
+            $ref: '#/components/schemas/IDERackPlacement'
+          type: array
+        project_id:
+          type: string
+      required:
+      - equipment
+      - assemblies
+      - facilities
+      - placements
+      - project_id
+      type: object
+      x-implementation-status: model-contract-only
+      description: 'Read aggregate assembled from typed domain tables. Not a persistence
+        JSON payload. First vertical slice: equipment, assemblies, facilities and placements.'
+    IDEPlannedConnection:
+      additionalProperties: false
+      properties:
+        a_port_id:
+          type: string
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        patch_port_ids:
+          items:
+            type: string
+          type: array
+        provenance_id:
+          type: string
+        revision_id:
+          type: string
+        z_port_id:
+          type: string
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - a_port_id
+      - z_port_id
+      - patch_port_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDEPlannedPort:
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        breakout_index:
+          type: integer
+        entity_id:
+          type: string
+        equipment_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        medium:
+          type: string
+        name:
+          type: string
+        parent_port_id:
+          type: string
+        provenance_id:
+          type: string
+        rate_bps:
+          type: integer
+        revision_id:
+          type: string
+        role:
+          type: string
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - equipment_id
+      - name
+      - role
+      - medium
+      type: object
+      x-implementation-status: model-contract-only
+    IDEPowerPlan:
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        entity_id:
+          type: string
+        equipment_profiles:
+          items:
+            $ref: '#/components/schemas/IDEEquipmentPowerProfile'
+          type: array
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        provenance_id:
+          type: string
+        racks:
+          items:
+            $ref: '#/components/schemas/IDERackPowerPlan'
+          type: array
+        revision_id:
+          type: string
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - equipment_profiles
+      - racks
+      type: object
+      x-implementation-status: model-contract-only
+    IDEProvenance:
+      additionalProperties: false
+      properties:
+        actor_id:
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        id:
+          type: string
+        inputs:
+          items:
+            $ref: '#/components/schemas/IDEProvenanceInput'
+          type: array
+        producer_id:
+          type: string
+        producer_type:
+          type: string
+          enum:
+          - parser
+          - agent
+          - human
+          - calculation
+          - validation
+        producer_version:
+          type: string
+        run_id:
+          type: string
+      required:
+      - id
+      - producer_type
+      - producer_id
+      - producer_version
+      - run_id
+      - inputs
+      - created_at
+      type: object
+      x-implementation-status: model-contract-only
+    IDEProvenanceInput:
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        kind:
+          type: string
+          enum:
+          - evidence
+          - fact
+          - entity
+        revision_id:
+          type: string
+      required:
+      - kind
+      - id
+      type: object
+      x-implementation-status: model-contract-only
+    IDEPublishRecord:
+      additionalProperties: false
+      properties:
+        created_at:
+          format: date-time
+          type: string
+        digest:
+          type: string
+        error_code:
+          type: string
+        id:
+          type: string
+        idempotency_key:
+          type: string
+        module_instance_id:
+          type: string
+        outbox_event_id:
+          type: string
+        project_id:
+          type: string
+        published_at:
+          format: date-time
+          type: string
+        receipt:
+          type: string
+        review_id:
+          type: string
+        revision_id:
+          type: string
+        state:
+          type: string
+          enum:
+          - pending
+          - published
+          - failed
+        target:
+          type: string
+      required:
+      - id
+      - project_id
+      - module_instance_id
+      - revision_id
+      - review_id
+      - target
+      - idempotency_key
+      - digest
+      - state
+      - outbox_event_id
+      - created_at
+      type: object
+      x-implementation-status: model-contract-only
+    IDEQoSPlan:
+      additionalProperties: false
+      properties:
+        ecn_enabled:
+          type: boolean
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        id:
+          type: string
+        interface_ids:
+          items:
+            type: string
+          type: array
+        lossless_priorities:
+          items:
+            type: integer
+          type: array
+        pfc_enabled:
+          type: boolean
+        policy_ref:
+          type: string
+        roce_version:
+          type: integer
+      required:
+      - id
+      - interface_ids
+      - lossless_priorities
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDEQuantity:
+      additionalProperties: false
+      properties:
+        unit:
+          type: string
+          minLength: 1
+        value:
+          type: string
+          pattern: ^-?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)$
+      required:
+      - value
+      - unit
+      type: object
+      x-implementation-status: model-contract-only
+    IDERackPlacement:
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        depth_mm:
+          type: string
+        entity_id:
+          type: string
+        equipment_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        height_u:
+          type: integer
+          minimum: 1
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        mount_face:
+          type: string
+          enum:
+          - front
+          - rear
+          - both
+          - unknown
+        provenance_id:
+          type: string
+        rack_id:
+          type: string
+        revision_id:
+          type: string
+        start_u:
+          type: integer
+          minimum: 1
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - equipment_id
+      - rack_id
+      - mount_face
+      type: object
+      x-implementation-status: model-contract-only
+    IDERackPowerPlan:
+      additionalProperties: false
+      properties:
+        calculation_run_id:
+          type: string
+        capacity:
+          $ref: '#/components/schemas/IDEQuantity'
+        planned_load:
+          $ref: '#/components/schemas/IDEQuantity'
+        rack_id:
+          type: string
+        remaining:
+          $ref: '#/components/schemas/IDEQuantity'
+      required:
+      - rack_id
+      - capacity
+      type: object
+      x-implementation-status: model-contract-only
+    IDEReviewDecision:
+      additionalProperties: false
+      properties:
+        actor_id:
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        decision:
+          type: string
+          enum:
+          - approve
+          - reject
+        digest:
+          type: string
+        id:
+          type: string
+        module_instance_id:
+          type: string
+        project_id:
+          type: string
+        reason:
+          type: string
+        revision_id:
+          type: string
+      required:
+      - id
+      - project_id
+      - module_instance_id
+      - revision_id
+      - digest
+      - decision
+      - actor_id
+      - reason
+      - created_at
+      type: object
+      x-implementation-status: model-contract-only
+    IDEReviewGate:
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        permission:
+          type: string
+        target:
+          type: string
+      required:
+      - id
+      - permission
+      - target
+      type: object
+      x-implementation-status: model-contract-only
+    IDERevisionInput:
+      additionalProperties: false
+      properties:
+        digest:
+          type: string
+        id:
+          type: string
+        kind:
+          type: string
+        revision_id:
+          type: string
+      required:
+      - kind
+      - id
+      - revision_id
+      - digest
+      type: object
+      x-implementation-status: model-contract-only
+    IDERouteSegment:
+      additionalProperties: false
+      properties:
+        calculation_run_id:
+          type: string
+        distance:
+          $ref: '#/components/schemas/IDEQuantity'
+        from_id:
+          type: string
+        to_id:
+          type: string
+      required:
+      - from_id
+      - to_id
+      type: object
+      x-implementation-status: model-contract-only
+    IDERuleCase:
+      additionalProperties: false
+      properties:
+        expected:
+          items:
+            $ref: '#/components/schemas/IDENamedValue'
+          type: array
+        id:
+          type: string
+        inputs:
+          items:
+            $ref: '#/components/schemas/IDENamedValue'
+          type: array
+        tolerance:
+          type: string
+      required:
+      - id
+      - inputs
+      - expected
+      - tolerance
+      type: object
+      x-implementation-status: model-contract-only
+    IDERuleExpression:
+      additionalProperties: false
+      properties:
+        arguments:
+          items:
+            $ref: '#/components/schemas/IDERuleExpression'
+          type: array
+        input:
+          type: string
+        literal:
+          $ref: '#/components/schemas/IDEQuantity'
+        operator:
+          type: string
+          enum:
+          - input
+          - literal
+          - add
+          - subtract
+          - multiply
+          - divide
+          - min
+          - max
+          - ceil
+          - floor
+      required:
+      - operator
+      - arguments
+      type: object
+      x-implementation-status: model-contract-only
+    IDERuleIO:
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+        required:
+          type: boolean
+        unit:
+          type: string
+        value_type:
+          type: string
+          enum:
+          - text
+          - decimal
+          - boolean
+          - reference
+      required:
+      - name
+      - value_type
+      - unit
+      - required
+      type: object
+      x-implementation-status: model-contract-only
+    IDESemanticFact:
+      additionalProperties: false
+      properties:
+        claim_status:
+          type: string
+          enum:
+          - proposed
+          - accepted
+          - rejected
+        id:
+          type: string
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        predicate:
+          type: string
+        project_id:
+          type: string
+        provenance_id:
+          type: string
+        region_id:
+          type: string
+        revision_id:
+          type: string
+        subject_id:
+          type: string
+        value:
+          $ref: '#/components/schemas/IDETypedValue'
+      required:
+      - id
+      - project_id
+      - revision_id
+      - region_id
+      - predicate
+      - value
+      - claim_status
+      - maturity
+      - provenance_id
+      type: object
+      x-implementation-status: model-contract-only
+    IDETypedValue:
+      additionalProperties: false
+      properties:
+        boolean:
+          type: boolean
+        decimal:
+          type: string
+          pattern: ^-?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)$
+        kind:
+          type: string
+          enum:
+          - text
+          - decimal
+          - boolean
+          - reference
+        reference:
+          type: string
+        text:
+          type: string
+        unit:
+          type: string
+          minLength: 1
+      required:
+      - kind
+      type: object
+      oneOf:
+      - properties:
+          kind:
+            const: text
+        required:
+        - kind
+        - text
+        not:
+          anyOf:
+          - required:
+            - decimal
+          - required:
+            - boolean
+          - required:
+            - reference
+          - required:
+            - unit
+      - properties:
+          kind:
+            const: decimal
+        required:
+        - kind
+        - decimal
+        - unit
+        not:
+          anyOf:
+          - required:
+            - text
+          - required:
+            - boolean
+          - required:
+            - reference
+      - properties:
+          kind:
+            const: boolean
+        required:
+        - kind
+        - boolean
+        not:
+          anyOf:
+          - required:
+            - text
+          - required:
+            - decimal
+          - required:
+            - reference
+          - required:
+            - unit
+      - properties:
+          kind:
+            const: reference
+        required:
+        - kind
+        - reference
+        not:
+          anyOf:
+          - required:
+            - text
+          - required:
+            - decimal
+          - required:
+            - boolean
+          - required:
+            - unit
+      x-implementation-status: model-contract-only
+    IDEValidationIssue:
+      additionalProperties: false
+      properties:
+        code:
+          type: string
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        field:
+          type: string
+        message:
+          type: string
+        module_id:
+          type: string
+        publish_target:
+          type: string
+        severity:
+          type: string
+          enum:
+          - BLOCK
+          - WARNING
+          - INFO
+        id:
+          type: string
+        project_id:
+          type: string
+        revision_id:
+          type: string
+        resolution:
+          type: string
+          enum:
+          - open
+          - resolved
+          - waived
+        rule_version:
+          $ref: '#/components/schemas/IDEVersionReference'
+      required:
+      - code
+      - severity
+      - module_id
+      - entity_id
+      - field
+      - message
+      - publish_target
+      - evidence_ids
+      - id
+      - project_id
+      - revision_id
+      - resolution
+      type: object
+      x-implementation-status: model-contract-only
+    IDEVersionReference:
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        version:
+          type: integer
+          minimum: 1
+      required:
+      - id
+      - version
+      type: object
+      x-implementation-status: model-contract-only
+    IDEWorkbookRegion:
+      additionalProperties: false
+      properties:
+        bounds:
+          $ref: '#/components/schemas/IDEBounds'
+        headers:
+          items:
+            $ref: '#/components/schemas/IDEHeaderCell'
+          type: array
+        id:
+          type: string
+        kind:
+          type: string
+          enum:
+          - table
+          - grid
+          - parameters
+          - narrative
+          - unknown
+        merges:
+          items:
+            $ref: '#/components/schemas/IDEBounds'
+          type: array
+        semantic_label:
+          type: string
+        sheet_id:
+          type: string
+        source_id:
+          type: string
+      required:
+      - id
+      - source_id
+      - sheet_id
+      - bounds
+      - kind
+      - semantic_label
+      - headers
+      - merges
+      type: object
+      x-implementation-status: model-contract-only
+    IDEWorkbookSource:
+      additionalProperties: false
+      properties:
+        byte_size:
+          type: integer
+        created_at:
+          format: date-time
+          type: string
+        document_id:
+          type: string
+        filename:
+          type: string
+        id:
+          type: string
+        import_id:
+          type: string
+        parser_version:
+          type: string
+        project_id:
+          type: string
+        sha256:
+          type: string
+      required:
+      - id
+      - project_id
+      - import_id
+      - document_id
+      - sha256
+      - filename
+      - byte_size
+      - parser_version
+      - created_at
+      type: object
+      x-implementation-status: model-contract-only
+      description: Metadata only. Object credentials and the complete source workbook are never exposed to the model or committed
+        to Git.
+    IDEWorkloadEstimate:
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        calculation_run_id:
+          type: string
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        labor_hours:
+          $ref: '#/components/schemas/IDEQuantity'
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        provenance_id:
+          type: string
+        quantity:
+          $ref: '#/components/schemas/IDEQuantity'
+        revision_id:
+          type: string
+        spec_ref:
+          type: string
+        standard_length:
+          $ref: '#/components/schemas/IDEQuantity'
+        work_type:
+          type: string
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - work_type
+      - quantity
+      type: object
+      x-implementation-status: model-contract-only
 x-implementation-policy:
   frontend-first: true
   mock-provider-required: true

@@ -1,0 +1,33 @@
+// P1 model contracts only. HTTP operations/providers are introduced with their
+// implemented vertical slice; these exports do not imply a deployed endpoint.
+import type {components} from '../schemas/openapi';
+type Models = components['schemas'];
+export type WorkbookSource = Models['IDEWorkbookSource'];
+export type WorkbookRegion = Models['IDEWorkbookRegion'];
+export type SemanticFact = Models['IDESemanticFact'];
+export type EvidenceReference = Models['IDEEvidenceReference'];
+export type Provenance = Models['IDEProvenance'];
+export type ImportPlan = Models['IDEImportPlan'];
+export type EngineeringModule = Models['IDEEngineeringModule'];
+export type ModuleInstance = Models['IDEModuleInstance'];
+export type ModuleState = ModuleInstance['state'];
+export type CanonicalEntity = Models['IDECanonicalEntity'];
+export type CalculationRule = Models['IDECalculationRule'];
+export type CalculationRun = Models['IDECalculationRun'];
+export type ValidationIssue = Models['IDEValidationIssue'];
+export type ReviewDecision = Models['IDEReviewDecision'];
+export type ModelRevision = Models['IDEModelRevision'];
+export type PublishRecord = Models['IDEPublishRecord'];
+export type EquipmentPlan = Models['IDEEquipmentPlan'];
+export type DeviceAssembly = Models['IDEDeviceAssembly'];
+export type FacilityModel = Models['IDEFacilityModel'];
+export type RackPlacement = Models['IDERackPlacement'];
+export type PowerPlan = Models['IDEPowerPlan'];
+export type ConnectivityPlan = Models['IDEConnectivityPlan'];
+export type CablePlan = Models['IDECablePlan'];
+export type MaterialEstimate = Models['IDEMaterialEstimate'];
+export type WorkloadEstimate = Models['IDEWorkloadEstimate'];
+export type NetworkPlan = Models['IDENetworkPlan'];
+export type PhysicalModel = Models['IDEPhysicalModel'];
+export type AttributeDefinition = Models['IDEAttributeDefinition'];
+export type AttributeValue = Models['IDEAttributeValue'];

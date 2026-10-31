@@ -15182,6 +15182,701 @@ export interface components {
             data: components["schemas"]["AIProviderOption"][];
             request_id: string;
         };
+        IDEAdaptiveRoutingPlan: {
+            enabled: boolean;
+            evidence_ids: string[];
+            fabric_id: string;
+            policy_ref: string;
+        };
+        IDEAttributeDefinition: {
+            /** @enum {string} */
+            approval_status: "draft" | "approved" | "retired";
+            entity_kind: string;
+            enum_values: string[];
+            id: string;
+            key: string;
+            required: boolean;
+            unit?: string;
+            /** @enum {string} */
+            value_type: "text" | "decimal" | "boolean" | "reference";
+            version: number;
+        };
+        IDEAttributeValue: {
+            definition_id: string;
+            definition_version: number;
+            value: components["schemas"]["IDETypedValue"];
+        };
+        IDEBFDPlan: {
+            evidence_ids: string[];
+            min_rx_milliseconds: number;
+            min_tx_milliseconds: number;
+            multiplier: number;
+            session_id: string;
+        };
+        IDEBGPPlan: {
+            a_interface_id: string;
+            afi: string;
+            evidence_ids: string[];
+            id: string;
+            local_asn_allocation_id: string;
+            peer_asn_allocation_id: string;
+            policy_ref?: string;
+            safi: string;
+            z_interface_id: string;
+        };
+        IDEBounds: {
+            end_column: number;
+            end_row: number;
+            start_column: number;
+            start_row: number;
+        };
+        IDECablePlan: {
+            as_built?: components["schemas"]["IDELengthEvidence"];
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            calculated?: components["schemas"]["IDELengthEvidence"];
+            confirmed?: components["schemas"]["IDELengthEvidence"];
+            connection_id: string;
+            entity_id: string;
+            estimated?: components["schemas"]["IDELengthEvidence"];
+            evidence_ids: string[];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            provenance_id: string;
+            revision_id: string;
+            route: components["schemas"]["IDERouteSegment"][];
+            rule_version?: components["schemas"]["IDEVersionReference"];
+            selected_stock?: components["schemas"]["IDELengthEvidence"];
+            spec: components["schemas"]["IDECableSpec"];
+        };
+        IDECableSpec: {
+            connector_a: string;
+            connector_z: string;
+            id: string;
+            medium: string;
+            rate_bps?: number;
+        };
+        IDECalculationCapabilities: {
+            available: boolean;
+            formulas: string[];
+            id: string;
+            supports_external_links: boolean;
+            supports_named_ranges: boolean;
+            version: string;
+        };
+        IDECalculationError: {
+            cell?: components["schemas"]["IDEFormulaCell"];
+            code: string;
+            message: string;
+        };
+        IDECalculationRule: {
+            /** @enum {string} */
+            approval_status: "draft" | "validated" | "approved" | "retired";
+            dependencies: components["schemas"]["IDEVersionReference"][];
+            /** @enum {string} */
+            domain: "source" | "equipment" | "facility_placement" | "power_cooling" | "connectivity_cabling" | "material_workload" | "network_design" | "validation_release";
+            expression: components["schemas"]["IDERuleExpression"];
+            id: string;
+            inputs: components["schemas"]["IDERuleIO"][];
+            outputs: components["schemas"]["IDERuleIO"][];
+            review_decision_id?: string;
+            scope_id: string;
+            /** @enum {string} */
+            scope_type: "project" | "customer" | "domain";
+            validation_cases: components["schemas"]["IDERuleCase"][];
+            version: number;
+        };
+        /** @description An existing formula cache is not a successful recalculation. No calculation provider is implemented by the P1 contract. */
+        IDECalculationRun: {
+            /** @enum {string} */
+            compatibility: "compatible" | "partial" | "unsupported" | "unknown";
+            errors: components["schemas"]["IDECalculationError"][];
+            /** Format: date-time */
+            finished_at?: string;
+            formulas: components["schemas"]["IDEFormulaEvidence"][];
+            id: string;
+            input_digest: string;
+            inputs: components["schemas"]["IDENamedValue"][];
+            module_instance_id: string;
+            outputs: components["schemas"]["IDENamedValue"][];
+            project_id: string;
+            provider_id: string;
+            provider_version: string;
+            revision_id: string;
+            rule?: components["schemas"]["IDEVersionReference"];
+            source_sha256: string;
+            /** Format: date-time */
+            started_at: string;
+            /** @enum {string} */
+            status: "pending" | "running" | "succeeded" | "partial" | "failed" | "unsupported";
+        };
+        IDECanonicalEntity: {
+            bom_item_id?: string;
+            cmdb_asset_id?: string;
+            /** @enum {string} */
+            domain: "source" | "equipment" | "facility_placement" | "power_cooling" | "connectivity_cabling" | "material_workload" | "network_design" | "validation_release";
+            id: string;
+            kind: string;
+            planning_key: string;
+            project_id: string;
+        };
+        IDEConnectivityPlan: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            connections: components["schemas"]["IDEPlannedConnection"][];
+            entity_id: string;
+            evidence_ids: string[];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            ports: components["schemas"]["IDEPlannedPort"][];
+            provenance_id: string;
+            revision_id: string;
+        };
+        IDEDeviceAssembly: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            child_id: string;
+            entity_id: string;
+            evidence_ids: string[];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            parent_id: string;
+            provenance_id: string;
+            quantity: number;
+            /** @enum {string} */
+            relation_type: "contains" | "installed_in" | "assembly_member";
+            revision_id: string;
+            slot_label?: string;
+        };
+        IDEDeviceRole: {
+            equipment_id: string;
+            evidence_ids: string[];
+            plane_id: string;
+            role: string;
+        };
+        IDEEVPNVXLANPlan: {
+            evidence_ids: string[];
+            export_targets: string[];
+            fabric_id: string;
+            id: string;
+            import_targets: string[];
+            route_distinguisher: string;
+            vlan?: number;
+            vni: number;
+            vrf_ref?: string;
+            vtep_allocation_ids: string[];
+        };
+        IDEEngineeringModule: {
+            applicability: string;
+            calculations: string[];
+            dependencies: components["schemas"]["IDEModuleDependency"][];
+            /** @enum {string} */
+            domain: "source" | "equipment" | "facility_placement" | "power_cooling" | "connectivity_cabling" | "material_workload" | "network_design" | "validation_release";
+            id: string;
+            /** @enum {string} */
+            implementation_status: "planned" | "model_and_validation" | "implemented";
+            inputs: components["schemas"]["IDEModuleIO"][];
+            outputs: components["schemas"]["IDEModuleIO"][];
+            publish_targets: string[];
+            review_gates: components["schemas"]["IDEReviewGate"][];
+            title: string;
+            validations: string[];
+            version: number;
+        };
+        IDEEntityVersion: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            entity_id: string;
+            evidence_ids: string[];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            provenance_id: string;
+            revision_id: string;
+        };
+        IDEEquipmentPlan: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            entity_id: string;
+            equipment_type: string;
+            evidence_ids: string[];
+            /** @enum {string} */
+            identity_kind: "group" | "planned_instance" | "observed_reference";
+            label: string;
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            model_ref?: string;
+            provenance_id: string;
+            quantity: number;
+            revision_id: string;
+            serial?: string;
+            source_model_label: string;
+        };
+        IDEEquipmentPowerProfile: {
+            /** @enum {string} */
+            basis: "planned" | "nameplate" | "measured";
+            cooling_type: string;
+            equipment_id: string;
+            evidence_ids: string[];
+            power: components["schemas"]["IDEQuantity"];
+        };
+        IDEEvidenceReference: {
+            bounds: components["schemas"]["IDEBounds"];
+            calculation_run_id?: string;
+            id: string;
+            /** @enum {string} */
+            kind: "input" | "formula" | "cached_result" | "recalculated_result" | "manual" | "reference";
+            sheet_id: string;
+            source_id: string;
+            source_sha256: string;
+        };
+        IDEFacilityModel: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            capacity_u?: number;
+            coordinate_frame_id?: string;
+            depth_mm?: string;
+            entity_id: string;
+            evidence_ids: string[];
+            height_mm?: string;
+            /** @enum {string} */
+            kind: "site" | "room" | "rack";
+            label: string;
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            orientation_degrees?: string;
+            parent_id?: string;
+            provenance_id: string;
+            revision_id: string;
+            width_mm?: string;
+            x_mm?: string;
+            y_mm?: string;
+            z_mm?: string;
+        };
+        IDEFormulaCell: {
+            address: string;
+            sheet_id: string;
+        };
+        IDEFormulaDependency: {
+            from: components["schemas"]["IDEFormulaCell"];
+            /** @enum {string} */
+            kind: "cell" | "range" | "named_range" | "external" | "dynamic";
+            to_range: string;
+            to_sheet_id: string;
+        };
+        IDEFormulaEvidence: {
+            cached_value?: components["schemas"]["IDETypedValue"];
+            cell: components["schemas"]["IDEFormulaCell"];
+            /** @enum {string} */
+            compatibility: "compatible" | "partial" | "unsupported" | "unknown";
+            dependencies: components["schemas"]["IDEFormulaDependency"][];
+            /** @enum {string} */
+            dependency_status: "complete" | "partial" | "unsupported";
+            error_code?: string;
+            expression: string;
+            recalculated_value?: components["schemas"]["IDETypedValue"];
+        };
+        IDEHeaderCell: {
+            column: number;
+            level: number;
+            parent?: string;
+            row: number;
+        };
+        IDEImportPlan: {
+            id: string;
+            modules: components["schemas"]["IDEModuleInstance"][];
+            previous_plan_id?: string;
+            project_id: string;
+            source_id: string;
+            summary: string;
+            version: number;
+        };
+        IDEInputBinding: {
+            available: boolean;
+            digest?: string;
+            name: string;
+            output: string;
+            producer_instance_id?: string;
+            required: boolean;
+            revision_id?: string;
+        };
+        IDEInterfaceMapping: {
+            evidence_ids: string[];
+            id: string;
+            logical_name: string;
+            physical_port_id: string;
+            plane_id: string;
+        };
+        IDELengthEvidence: {
+            calculation_run_id?: string;
+            evidence_ids: string[];
+            length: components["schemas"]["IDEQuantity"];
+        };
+        IDEMaterialEstimate: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            calculation_run_id?: string;
+            entity_id: string;
+            evidence_ids: string[];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            provenance_id: string;
+            purchase_gap?: components["schemas"]["IDEQuantity"];
+            purchased?: components["schemas"]["IDEQuantity"];
+            required: components["schemas"]["IDEQuantity"];
+            revision_id: string;
+            spares?: components["schemas"]["IDEQuantity"];
+            spec_ref: string;
+        };
+        IDEModelRevision: {
+            author_id: string;
+            /** @enum {string} */
+            author_type: "agent" | "human" | "calculation" | "migration";
+            content_digest: string;
+            /** Format: date-time */
+            created_at: string;
+            id: string;
+            input_digest: string;
+            inputs: components["schemas"]["IDERevisionInput"][];
+            module_instance_id: string;
+            parent_id?: string;
+            project_id: string;
+            sequence: number;
+        };
+        IDEModuleDependency: {
+            module_id: string;
+            output: string;
+            required: boolean;
+            /** @enum {string} */
+            stage: "process" | "review" | "publish";
+        };
+        IDEModuleIO: {
+            entity_type: string;
+            name: string;
+            required: boolean;
+        };
+        IDEModuleInstance: {
+            applicability_reason: string;
+            definition_id: string;
+            definition_version: number;
+            head_revision_id?: string;
+            id: string;
+            inputs: components["schemas"]["IDEInputBinding"][];
+            /** @enum {string} */
+            state: "NOT_APPLICABLE" | "DETECTED" | "NEEDS_INPUT" | "READY" | "PROCESSING" | "IN_REVIEW" | "APPROVED" | "PUBLISHED" | "BLOCKED" | "STALE";
+        };
+        IDENamedValue: {
+            name: string;
+            value: components["schemas"]["IDETypedValue"];
+        };
+        IDENetworkAllocation: {
+            address?: string;
+            asn?: number;
+            entity_id: string;
+            evidence_ids: string[];
+            id: string;
+            interface_id?: string;
+            /** @enum {string} */
+            kind: "ip" | "asn";
+            prefix_length?: number;
+        } & ({
+            /** @constant */
+            kind?: "ip";
+        } | {
+            /** @constant */
+            kind?: "asn";
+        });
+        IDENetworkFabric: {
+            evidence_ids: string[];
+            id: string;
+            kind: string;
+            name: string;
+        };
+        IDENetworkPlan: {
+            adaptive_routing: components["schemas"]["IDEAdaptiveRoutingPlan"][];
+            allocations: components["schemas"]["IDENetworkAllocation"][];
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            bfd: components["schemas"]["IDEBFDPlan"][];
+            bgp: components["schemas"]["IDEBGPPlan"][];
+            device_roles: components["schemas"]["IDEDeviceRole"][];
+            entity_id: string;
+            evidence_ids: string[];
+            evpn_vxlan: components["schemas"]["IDEEVPNVXLANPlan"][];
+            fabrics: components["schemas"]["IDENetworkFabric"][];
+            interface_mappings: components["schemas"]["IDEInterfaceMapping"][];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            physical_revision_id: string;
+            planes: components["schemas"]["IDENetworkPlane"][];
+            provenance_id: string;
+            qos: components["schemas"]["IDEQoSPlan"][];
+            revision_id: string;
+            source_ids: string[];
+        };
+        IDENetworkPlane: {
+            evidence_ids: string[];
+            fabric_id: string;
+            id: string;
+            name: string;
+        };
+        /** @description Read aggregate assembled from typed domain tables. Not a persistence JSON payload. First vertical slice: equipment, assemblies, facilities and placements. */
+        IDEPhysicalModel: {
+            assemblies: components["schemas"]["IDEDeviceAssembly"][];
+            equipment: components["schemas"]["IDEEquipmentPlan"][];
+            facilities: components["schemas"]["IDEFacilityModel"][];
+            placements: components["schemas"]["IDERackPlacement"][];
+            project_id: string;
+        };
+        IDEPlannedConnection: {
+            a_port_id: string;
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            entity_id: string;
+            evidence_ids: string[];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            patch_port_ids: string[];
+            provenance_id: string;
+            revision_id: string;
+            z_port_id: string;
+        };
+        IDEPlannedPort: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            breakout_index?: number;
+            entity_id: string;
+            equipment_id: string;
+            evidence_ids: string[];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            medium: string;
+            name: string;
+            parent_port_id?: string;
+            provenance_id: string;
+            rate_bps?: number;
+            revision_id: string;
+            role: string;
+        };
+        IDEPowerPlan: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            entity_id: string;
+            equipment_profiles: components["schemas"]["IDEEquipmentPowerProfile"][];
+            evidence_ids: string[];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            provenance_id: string;
+            racks: components["schemas"]["IDERackPowerPlan"][];
+            revision_id: string;
+        };
+        IDEProvenance: {
+            actor_id?: string;
+            /** Format: date-time */
+            created_at: string;
+            id: string;
+            inputs: components["schemas"]["IDEProvenanceInput"][];
+            producer_id: string;
+            /** @enum {string} */
+            producer_type: "parser" | "agent" | "human" | "calculation" | "validation";
+            producer_version: string;
+            run_id: string;
+        };
+        IDEProvenanceInput: {
+            id: string;
+            /** @enum {string} */
+            kind: "evidence" | "fact" | "entity";
+            revision_id?: string;
+        };
+        IDEPublishRecord: {
+            /** Format: date-time */
+            created_at: string;
+            digest: string;
+            error_code?: string;
+            id: string;
+            idempotency_key: string;
+            module_instance_id: string;
+            outbox_event_id: string;
+            project_id: string;
+            /** Format: date-time */
+            published_at?: string;
+            receipt?: string;
+            review_id: string;
+            revision_id: string;
+            /** @enum {string} */
+            state: "pending" | "published" | "failed";
+            target: string;
+        };
+        IDEQoSPlan: {
+            ecn_enabled?: boolean;
+            evidence_ids: string[];
+            id: string;
+            interface_ids: string[];
+            lossless_priorities: number[];
+            pfc_enabled?: boolean;
+            policy_ref?: string;
+            roce_version?: number;
+        };
+        IDEQuantity: {
+            unit: string;
+            value: string;
+        };
+        IDERackPlacement: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            depth_mm?: string;
+            entity_id: string;
+            equipment_id: string;
+            evidence_ids: string[];
+            height_u?: number;
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            /** @enum {string} */
+            mount_face: "front" | "rear" | "both" | "unknown";
+            provenance_id: string;
+            rack_id: string;
+            revision_id: string;
+            start_u?: number;
+        };
+        IDERackPowerPlan: {
+            calculation_run_id?: string;
+            capacity: components["schemas"]["IDEQuantity"];
+            planned_load?: components["schemas"]["IDEQuantity"];
+            rack_id: string;
+            remaining?: components["schemas"]["IDEQuantity"];
+        };
+        IDEReviewDecision: {
+            actor_id: string;
+            /** Format: date-time */
+            created_at: string;
+            /** @enum {string} */
+            decision: "approve" | "reject";
+            digest: string;
+            id: string;
+            module_instance_id: string;
+            project_id: string;
+            reason: string;
+            revision_id: string;
+        };
+        IDEReviewGate: {
+            id: string;
+            permission: string;
+            target: string;
+        };
+        IDERevisionInput: {
+            digest: string;
+            id: string;
+            kind: string;
+            revision_id: string;
+        };
+        IDERouteSegment: {
+            calculation_run_id?: string;
+            distance?: components["schemas"]["IDEQuantity"];
+            from_id: string;
+            to_id: string;
+        };
+        IDERuleCase: {
+            expected: components["schemas"]["IDENamedValue"][];
+            id: string;
+            inputs: components["schemas"]["IDENamedValue"][];
+            tolerance: string;
+        };
+        IDERuleExpression: {
+            arguments: components["schemas"]["IDERuleExpression"][];
+            input?: string;
+            literal?: components["schemas"]["IDEQuantity"];
+            /** @enum {string} */
+            operator: "input" | "literal" | "add" | "subtract" | "multiply" | "divide" | "min" | "max" | "ceil" | "floor";
+        };
+        IDERuleIO: {
+            name: string;
+            required: boolean;
+            unit: string;
+            /** @enum {string} */
+            value_type: "text" | "decimal" | "boolean" | "reference";
+        };
+        IDESemanticFact: {
+            /** @enum {string} */
+            claim_status: "proposed" | "accepted" | "rejected";
+            id: string;
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            predicate: string;
+            project_id: string;
+            provenance_id: string;
+            region_id: string;
+            revision_id: string;
+            subject_id?: string;
+            value: components["schemas"]["IDETypedValue"];
+        };
+        IDETypedValue: {
+            boolean?: boolean;
+            decimal?: string;
+            /** @enum {string} */
+            kind: "text" | "decimal" | "boolean" | "reference";
+            reference?: string;
+            text?: string;
+            unit?: string;
+        } & ({
+            /** @constant */
+            kind: "text";
+        } | {
+            /** @constant */
+            kind: "decimal";
+        } | {
+            /** @constant */
+            kind: "boolean";
+        } | {
+            /** @constant */
+            kind: "reference";
+        });
+        IDEValidationIssue: {
+            code: string;
+            entity_id: string;
+            evidence_ids: string[];
+            field: string;
+            message: string;
+            module_id: string;
+            publish_target: string;
+            /** @enum {string} */
+            severity: "BLOCK" | "WARNING" | "INFO";
+            id: string;
+            project_id: string;
+            revision_id: string;
+            /** @enum {string} */
+            resolution: "open" | "resolved" | "waived";
+            rule_version?: components["schemas"]["IDEVersionReference"];
+        };
+        IDEVersionReference: {
+            id: string;
+            version: number;
+        };
+        IDEWorkbookRegion: {
+            bounds: components["schemas"]["IDEBounds"];
+            headers: components["schemas"]["IDEHeaderCell"][];
+            id: string;
+            /** @enum {string} */
+            kind: "table" | "grid" | "parameters" | "narrative" | "unknown";
+            merges: components["schemas"]["IDEBounds"][];
+            semantic_label: string;
+            sheet_id: string;
+            source_id: string;
+        };
+        /** @description Metadata only. Object credentials and the complete source workbook are never exposed to the model or committed to Git. */
+        IDEWorkbookSource: {
+            byte_size: number;
+            /** Format: date-time */
+            created_at: string;
+            document_id: string;
+            filename: string;
+            id: string;
+            import_id: string;
+            parser_version: string;
+            project_id: string;
+            sha256: string;
+        };
+        IDEWorkloadEstimate: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            calculation_run_id?: string;
+            entity_id: string;
+            evidence_ids: string[];
+            labor_hours?: components["schemas"]["IDEQuantity"];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            provenance_id: string;
+            quantity: components["schemas"]["IDEQuantity"];
+            revision_id: string;
+            spec_ref?: string;
+            standard_length?: components["schemas"]["IDEQuantity"];
+            work_type: string;
+        };
     };
     responses: {
         /** @description Invalid request */

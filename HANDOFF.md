@@ -1,8 +1,12 @@
 # Keel 当前开发交接
 
-## 当前任务：通用智能开局工程重构（P1）
+## 当前任务：通用智能开局工程重构（P1已完成）
 
-用户已批准在 `audit/intelligent-deployment-p0` 继续P1及按批次重构，工作树 `/home/ubuntu/keel-engineering-p0`。P0已提交314126d并推送同名远程分支。P1三层、14个通用模型、10个领域模型、模块状态/依赖、公式Provider、独立审核与planned发布边界已冻结，入口 `docs/intelligent-deployment/P1-DESIGN.txt`。按首批设备/组合→机房/落位纵向链实施；不得恢复旧Agent补丁、复制机柜图或同时实现全部工程域。当前只完成设计，业务实现/迁移/部署未改变；没有进行外部AI或冒烟/回归。后续实施状态单独登记。
+用户批准在 `audit/intelligent-deployment-p0` 继续，工作树 `/home/ubuntu/keel-engineering-p0`。P0审计314126d；P1设计提交582b19e。入口 `docs/intelligent-deployment/P1-DESIGN.txt`，实际实施/检查状态 `docs/intelligent-deployment/implementation.json`。
+
+本次新增66个闭合OpenAPI模型Schema、Go类型、前端类型导出；`internal/engineering`实现可信模块注册、10状态门禁、依赖分批/局部阻断、消费者STALE传播，以及设备/组合/位置确定性校验。Formula Provider仅接口，未实现Calc或规则执行器。9项内核单元检查、go vet、契约Schema/增量TS/文档检查通过；没有跑冒烟、回归、真实AI或导入。
+
+**当前业务行为未切换。** 新内核尚未接入现有Agent、HTTP、数据库和工作台，首条设备→落位→发布→CMDB链尚未完成；不能将本次P1交付称为新Agent已可用。没有迁移/部署/线上数据变化。下一完整纵向链按实施记录接入来源、持久任务、分域审核与Outbox planned投影，保护Observed并复用原机柜图。不恢复旧Agent修补或同时实施全部工程域。
 
 
 ## 用户决定：停止旧Agent补丁并重新开发开局配置
