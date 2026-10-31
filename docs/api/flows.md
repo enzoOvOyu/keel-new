@@ -7,7 +7,7 @@
 - HTTP 前缀 `/api/v1`；页面只调用 `dev/src/lib/api/flows.ts`。Go 路由 `cmd/api/flows.go`，领域服务 `internal/flows/`，迁移021…024。完整实施与限制见 [实施记录](../flows-redesign/implementation.md)。
 - Kestra **2.0.7** 是 Flow/YAML/Revision/Trigger/Execution/TaskRun 的权威；PostgreSQL 保存项目授权、绑定、冻结目标、通道结果、Agent、SSH受控引用、审计与 Outbox，不复制 CMDB 资产。
 - CMDB稳定ID与`cmdb_asset_scope`是目标/项目归属来源。执行快照不随CMDB后续改名变化。Outbox向既有CMDB生命周期追加引用，不改变六阶段结论。
-- 当前仅部署于隔离开发地址5190/API8096/Kestra8095；原5180/8081不含本次实现，不能拿旧部署版本推定此模块可用。
+- 当前经用户授权部署于原入口5180/API8081，运行源码9f16065（含已有BOM修复）；临时5190/8096已关闭。Kestra8095为内部依赖，运行与回退见HANDOFF发布节。
 
 ## 授权、请求与一致性
 

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "updated_at": "2026-10-31",
-  "coverage": "Visualization entries retain their original deployment evidence. Flows entries describe this feature branch and isolated development environment only; module evidence is not per-endpoint acceptance.",
+  "coverage": "Visualization retains its historical evidence. Flows is deployed to existing5180/8081 at9f16065; verification covers the recorded read-only/page subset, not every endpoint or production devices.",
   "schema_authority": "docs/openapi.yaml",
   "code_revision": "4541850",
   "deployed_revision": "4541850",
@@ -80,12 +80,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "listRealFlowsEnvelope"
+      "response_schema": "listRealFlowsEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "post",
@@ -94,13 +96,15 @@
       "response_status": "201",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "createRealFlowEnvelope",
-      "request_schema": "FlowsSave"
+      "request_schema": "FlowsSave",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -109,12 +113,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "getFlowRevisionsEnvelope"
+      "response_schema": "getFlowRevisionsEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -123,12 +129,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "getFlowsCapabilitiesEnvelope"
+      "response_schema": "getFlowsCapabilitiesEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -137,12 +145,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "listFlowsTargetsEnvelope"
+      "response_schema": "listFlowsTargetsEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -151,12 +161,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "listRealExecutionsEnvelope"
+      "response_schema": "listRealExecutionsEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -165,12 +177,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "listRealAgentsEnvelope"
+      "response_schema": "listRealAgentsEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -179,12 +193,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "listFlowsSSHTrustEnvelope"
+      "response_schema": "listFlowsSSHTrustEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "post",
@@ -193,13 +209,15 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "saveFlowsSSHTrustEnvelope",
-      "request_schema": "FlowsSSHTrustInput"
+      "request_schema": "FlowsSSHTrustInput",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "post",
@@ -208,13 +226,15 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "preflightFlowsTargetsEnvelope",
-      "request_schema": "FlowsRun"
+      "request_schema": "FlowsRun",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "post",
@@ -223,13 +243,15 @@
       "response_status": "201",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "createQuickRunEnvelope",
-      "request_schema": "FlowsRun"
+      "request_schema": "FlowsRun",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -238,12 +260,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "getRealFlowEnvelope"
+      "response_schema": "getRealFlowEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "put",
@@ -252,13 +276,15 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "updateRealFlowEnvelope",
-      "request_schema": "FlowsSave"
+      "request_schema": "FlowsSave",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "post",
@@ -267,13 +293,15 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "validateRealFlowEnvelope",
-      "request_schema": "FlowsValidationRequest"
+      "request_schema": "FlowsValidationRequest",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "post",
@@ -282,13 +310,15 @@
       "response_status": "201",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "executeRealFlowEnvelope",
-      "request_schema": "FlowsRun"
+      "request_schema": "FlowsRun",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -297,12 +327,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "getFlowDependenciesEnvelope"
+      "response_schema": "getFlowDependenciesEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -311,12 +343,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "getFlowFilesEnvelope"
+      "response_schema": "getFlowFilesEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -325,12 +359,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "getRealExecutionEnvelope"
+      "response_schema": "getRealExecutionEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -339,12 +375,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "getExecutionTargetsEnvelope"
+      "response_schema": "getExecutionTargetsEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -353,12 +391,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "getExecutionLogsEnvelope"
+      "response_schema": "getExecutionLogsEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -367,12 +407,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "getExecutionOutputsEnvelope"
+      "response_schema": "getExecutionOutputsEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -381,12 +423,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "getExecutionAuditEnvelope"
+      "response_schema": "getExecutionAuditEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "post",
@@ -395,12 +439,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "actionExecutionPauseEnvelope"
+      "response_schema": "actionExecutionPauseEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "post",
@@ -409,12 +455,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "actionExecutionResumeEnvelope"
+      "response_schema": "actionExecutionResumeEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "post",
@@ -423,12 +471,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "actionExecutionKillEnvelope"
+      "response_schema": "actionExecutionKillEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "post",
@@ -437,12 +487,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "actionExecutionRetryfailedtargetsEnvelope"
+      "response_schema": "actionExecutionRetryfailedtargetsEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -451,12 +503,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "getRealAgentEnvelope"
+      "response_schema": "getRealAgentEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "post",
@@ -465,13 +519,15 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "issueAgentEnrollmentEnvelope",
-      "request_schema": "FlowsTokenRequest"
+      "request_schema": "FlowsTokenRequest",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "post",
@@ -480,13 +536,15 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "agentApproveEnvelope",
-      "request_schema": "FlowsReason"
+      "request_schema": "FlowsReason",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "post",
@@ -495,13 +553,15 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "agentQuarantineEnvelope",
-      "request_schema": "FlowsReason"
+      "request_schema": "FlowsReason",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "post",
@@ -510,13 +570,15 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "agentRevokeEnvelope",
-      "request_schema": "FlowsReason"
+      "request_schema": "FlowsReason",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -525,12 +587,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "agentTasksEnvelope"
+      "response_schema": "agentTasksEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -539,12 +603,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "agentAuditEnvelope"
+      "response_schema": "agentAuditEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -553,12 +619,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "FlowsEventPageEnvelope"
+      "response_schema": "FlowsEventPageEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -567,12 +635,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "getFlowsTemplateEnvelope"
+      "response_schema": "getFlowsTemplateEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -581,12 +651,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "getNamespaceFileEnvelope"
+      "response_schema": "getNamespaceFileEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "put",
@@ -595,13 +667,15 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "saveNamespaceFileEnvelope",
-      "request_schema": "FlowsNamespaceFile"
+      "request_schema": "FlowsNamespaceFile",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "post",
@@ -610,13 +684,15 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "bootstrapFlowsAgentEnvelope",
-      "request_schema": "FlowsBootstrap"
+      "request_schema": "FlowsBootstrap",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "post",
@@ -625,12 +701,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "actionExecutionRestartEnvelope"
+      "response_schema": "actionExecutionRestartEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -639,11 +717,13 @@
       "response_status": "200",
       "response_media_type": "application/octet-stream",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
-      "documentation": "docs/api/flows.md"
+      "documentation": "docs/api/flows.md",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "post",
@@ -652,13 +732,15 @@
       "response_status": "201",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "registerFlowsAgentEnvelope",
-      "request_schema": "FlowsEnrollmentInput"
+      "request_schema": "FlowsEnrollmentInput",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -667,12 +749,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows_completion.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "getTargetScheduleEnvelope"
+      "response_schema": "getTargetScheduleEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "put",
@@ -681,13 +765,15 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows_completion.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "saveTargetScheduleEnvelope",
-      "request_schema": "FlowsSchedule"
+      "request_schema": "FlowsSchedule",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -696,12 +782,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows_completion.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "listNamespaceFileVersionsEnvelope"
+      "response_schema": "listNamespaceFileVersionsEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "post",
@@ -710,13 +798,15 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows_completion.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "uploadNamespaceBinaryEnvelope",
-      "request_schema": "FlowsFileUpload"
+      "request_schema": "FlowsFileUpload",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "post",
@@ -725,13 +815,15 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows_completion.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "distributeNamespaceRevisionEnvelope",
-      "request_schema": "FlowsRun"
+      "request_schema": "FlowsRun",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -740,11 +832,13 @@
       "response_status": "200",
       "response_media_type": "application/octet-stream",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows_completion.go",
       "source": "dev/backend/internal/flows",
-      "documentation": "docs/api/flows.md"
+      "documentation": "docs/api/flows.md",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "post",
@@ -753,13 +847,15 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows_completion.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "requestFlowsApprovalEnvelope",
-      "request_schema": "FlowsApprovalRequest"
+      "request_schema": "FlowsApprovalRequest",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     },
     {
       "method": "get",
@@ -768,12 +864,14 @@
       "response_status": "200",
       "response_media_type": "application/json",
       "implementation": "implemented",
-      "deployment": "isolated_development_only",
-      "verification": "module_evidence_not_individual_endpoint_coverage",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows_completion.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "response_schema": "getDeviceStepsEnvelope"
+      "response_schema": "getDeviceStepsEnvelope",
+      "deployed_revision": "9f16065",
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
     }
   ]
 }

@@ -1,0 +1,68 @@
+{
+  "at": "2026-10-31T09:22:37.627Z",
+  "code_revision": "9f16065",
+  "environment": "http://127.0.0.1:5180",
+  "api": "127.0.0.1:8081",
+  "source_worktree": "/home/ubuntu/keel-flows-dev",
+  "checks": [
+    {
+      "check": "existing_admin_login",
+      "status": 200
+    },
+    {
+      "endpoint": "/api/v1/flows/capabilities",
+      "status": 200
+    },
+    {
+      "endpoint": "/api/v1/flows",
+      "status": 200,
+      "count": 0
+    },
+    {
+      "endpoint": "/api/v1/flows/agents",
+      "status": 200,
+      "count": 0
+    },
+    {
+      "endpoint": "/api/v1/flows/executions",
+      "status": 200
+    },
+    {
+      "endpoint": "/api/v1/flows/targets",
+      "status": 200,
+      "count": 0
+    },
+    {
+      "route": "/flows",
+      "rendered": true
+    },
+    {
+      "route": "/flows/executions",
+      "rendered": true
+    },
+    {
+      "route": "/flows/agents",
+      "rendered": true
+    }
+  ],
+  "errors": [],
+  "scope": "Deployment/login/read-only APIs/page rendering only; no device execution, no BOM AI calls, no synthetic data imported into original database",
+  "temporary_entries_closed": [
+    5190,
+    8096
+  ],
+  "migrations_applied_to_existing_database": [
+    21,
+    22,
+    23,
+    24
+  ],
+  "bom_compatibility_commits": [
+    "4403c63",
+    "9f16065"
+  ],
+  "existing_bom_source_comparison": "no differences versus deploy/bom-agent-topology-1031 for BOM/AI implementation",
+  "engine_callback_health_status": 200,
+  "engine_callback_without_ticket_status": 403,
+  "backup_path": "/tmp/keel-flows-deploy-backup-20261031-091907"
+}

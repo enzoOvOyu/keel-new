@@ -134,3 +134,14 @@ Flows只启用独立开发服务，不覆盖5180/8081。部署、迁移021/022�
 详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。
 
 Flows开发补齐（afe8cb9）：作用域Schedule、多步骤/输出绑定、Namespace二进制版本/分发、持久事件游标、审批单次绑定与任务取消已实现；规则和真实证据统一见[实施记录](flows-redesign/implementation.md)及[契约](api/flows.md)，不在本文件重定义。生产设备验收仍单列。
+
+
+## Flows 发布到现有开发环境 · 2026-10-31
+
+本节覆盖前述Flows“仅独立环境”状态。用户已授权发布。运行源码9f16065，在原5180/8081提供服务，未合并main；原BOM Agent两项修复已兼容纳入。原业务库迁移021…024，仅增量建表/字段，不导入合成数据，不重置账号。
+
+前端：tmux `keel-dev-5180`，工作目录`/home/ubuntu/keel-flows-dev/dev`，`KEEL_API_URL=http://127.0.0.1:8081 npm run dev -- --host 0.0.0.0 --port 5180 --strictPort`。
+
+API：tmux `keel-cmdb-api`，工作目录`/home/ubuntu/keel/dev/backend`，启动`python3 /tmp/keel-flows-run-deployed-api.py`，二进制`/tmp/keel-api-flows-combined-1031`。启动器使用原私有进程环境与忽略的`.env.deployed`引擎配置；秘密不写本文。Worker URL通过172.22.0.1:5180回调已有前端代理，API保持localhost绑定。
+
+临时5190/8096和合成Agent关闭；不停止正在使用的Kestra/PostgreSQL依赖。发布证据与回退入口见[HANDOFF](../HANDOFF.md)、[deployment-validation](flows-redesign/deployment-validation.json)。本次只读启动检查不等于真实设备验收，不重复运行闭环测试。
