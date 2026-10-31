@@ -4,7 +4,7 @@
 
 ## 2026-10-31 批准原型转正式实现（本轮）
 
-本轮可视化开发隔离到分支 `feat/datacenter-visualization-approved`、worktree `/home/ubuntu/keel-visualization-dev`，不得自动合并/发布；主目录保持开发前 `978db7f`。代码为 `dev/src/features/infrastructure/approved/`，规划独立入口 5182 的 `/topology?view=global/network/cabling/trace` 和 `/racks`；5181 保留批准原型。接口扩展为 `GET /api/v1/cmdb/visualization?detail=full`，复用 CMDB/授权/稳定 ID，无新资产表。具体实现、契约、验证与真实限制见 [实施报告](docs/topology/implementation-report.md)。本轮不导入新数据，不做真机调用；用户后续统一安排真实导入和完整联调。
+本轮可视化开发隔离到分支 `feat/datacenter-visualization-approved`、worktree `/home/ubuntu/keel-visualization-dev`，不得自动合并/发布；主目录保持开发前 `978db7f`。代码为 `dev/src/features/infrastructure/approved/`，独立入口 `http://127.0.0.1:5182` 的 `/topology?view=global/network/cabling/trace` 和 `/racks`；5181 保留批准原型。接口扩展为 `GET /api/v1/cmdb/visualization?detail=full`，复用 CMDB/授权/稳定 ID，无新资产表。具体实现、契约、验证与真实限制见 [实施报告](docs/topology/implementation-report.md)。本轮不导入新数据，不做真机调用；5182/8082 独立服务目前复用原 DB 只读查询，尚未物理隔离数据库，身份 Session/审计正常产生。用户后续统一安排真实导入和完整联调，实际写入前应配置独立数据库。
 
 ## 2026-10-31 后续任务变更
 

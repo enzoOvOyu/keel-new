@@ -1,0 +1,32 @@
+{
+  "at": "2026-10-31T05:11:28.459Z",
+  "scope": "read-only contract/UI integration; no data import or CMDB writes",
+  "status": "PASS",
+  "checks": [
+    "Dual elevation same asset; Mapping tab context survives refresh",
+    "PNG export uses current shared Dual SVG",
+    "Real rack set drives Three.js room, camera URL and same-ID Dual drilldown",
+    "Unauthorized project URL rejected in workspace"
+  ],
+  "timings": [
+    {
+      "kind": "HTTP full projection",
+      "ms": 333,
+      "bytes": 5385365,
+      "assets": 4703,
+      "cables": 705,
+      "relationships": 6356
+    },
+    {
+      "kind": "rack",
+      "visible_ms": 3177
+    }
+  ],
+  "page_errors": [],
+  "limits": [
+    "Current database includes synthetic-origin records; not real device evidence",
+    "No production-scale FPS or real import acceptance"
+  ],
+  "subset": "rack-only plus unauthorized-project URL; earlier four-module assertions/screenshots recorded separately in implementation-report.md",
+  "base_url": "http://127.0.0.1:5182"
+}

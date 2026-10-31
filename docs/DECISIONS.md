@@ -73,3 +73,10 @@ PRD §2 已定义 NH 业务职责，但本次要求的六个稳定默认身份�
 ## RACK-VIS-2026-10-31 · 安装面、几何与实装来源
 
 实查 CMDB 88 条 active located_in 为 planned/bom，安装面与深度未记录；旧 synthetic fixture 有 front 默认值和布局版本。决定不跨来源补写、不把登记规划冒充实装。独立原型双面显示明确标注的虚线占位，Comparison 等待批准规划与实装快照；不阻塞 Gallery、U 立面与 Mapping。现场安装确认责任人/权限、可接受实装证据、规划比较版本的选择需后续业务确认；沿用既有 ChangeSet 审批，不自行授予新签署权。完整数据审计与设计见 [rack-visualization.md](rack-visualization.md)。
+
+
+## VIS-2026-10-31 · 批准可视化落地与分支隔离
+
+用户批准 topology.md V3 与机房原型进入正式前端；先落查询契约和页面逻辑，真实导入由用户后续统一联调。沿用批准 SVG/矩阵/Metro，不为模仿技术名称强制重写为 G6；Three.js 只用于已批准的机房空间模式。规划/观测位置保留分层来源，局部直接物理段不推导交换转发。
+
+开发固定在 `feat/datacenter-visualization-approved` 独立 worktree 和 5182/8082，未经用户指令不合并/发布 main。原 5180/8081 恢复至开发前版本；本轮无 migration 或资产导入。独立服务暂复用原数据库读取，真实写入联调需后续独立配置。实现和未实现边界统一记录于 `docs/topology/implementation-report.md`，不创建第二主设计。

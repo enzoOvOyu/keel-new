@@ -1,6 +1,6 @@
 # 数据中心可视化 · 正式实施记录
 
-更新：2026-10-31。状态：开发中，未完成交付。工作分支 `feat/datacenter-visualization-approved`，独立 worktree `/home/ubuntu/keel-visualization-dev`；未经用户要求不合并 main、不发布到当前测试环境。批准依据：`docs/topology.md` V3、`docs/rack-visualization/room-validation.md` 及其机柜原型引用。前端为 `dev/`，服务 5180；5181 独立设计原型保留。本报告不将原型历史验证算作正式实现验证。
+更新：2026-10-31。状态：前端与查询契约已接入，真实导入及业务验收待用户统一联调。工作分支 `feat/datacenter-visualization-approved`，独立 worktree `/home/ubuntu/keel-visualization-dev`；未经用户要求不合并 main、不发布到当前测试环境。批准依据：`docs/topology.md` V3、`docs/rack-visualization/room-validation.md` 及其机柜原型引用。前端为独立 worktree 的 `dev/`，服务 `http://127.0.0.1:5182`、API `127.0.0.1:8082`；5181 独立设计原型保留，原 5180/8081 已恢复开发前版本。本报告不将原型历史验证算作正式实现验证。
 
 ## 本轮范围与入口
 
@@ -47,7 +47,15 @@ Sidebar 沿用现有唯一入口，内容区没有重复模块切换导航。服
 
 ## 验证与性能
 
-本轮仅必要契约、构建和只读关键交互检查，不进行真实数据导入、不提交测试资产、不连接设备。TypeScript 与生产构建已通过；四拓扑及双面/Mapping/PNG 的只读关键交互已执行。连续切换至 3D 模式出现等待超时，但直接打开 3D 入口可渲染，仍需在独立环境修复并完成验证。未执行的能力不得视为通过。
+本轮仅必要契约、构建和只读关键交互检查，不进行真实数据导入、不提交测试资产、不连接设备。TypeScript 与生产构建已通过；四拓扑的搜索、抽屉、束成员展开、矩阵到 BioFabric、物理追踪与逻辑能力阻断在初轮只读检查中实际操作。随后仅在独立环境检查受影响的机柜/范围交互，没有重复全平台检查。
+
+独立环境定向检查通过：双面同 ID、Mapping 与刷新恢复、PNG 导出、Gallery→Three.js→双面下钻、相机 URL、未授权项目拒绝；无 pageerror。见 [交互记录](interaction-validation.json)、[机柜](screenshots-implementation/rack.png)、[机房](screenshots-implementation/room.png)。四拓扑截图是隔离前同次实现的只读检查记录，不将其说成隔离后完整回归。
+
+本轮修复两处真实状态问题：快速连续切换使用旧 URL 覆盖新视图，改为基于当前地址合并；无权限 project_id 不再被默认项目过滤重写，保留拒绝状态。
+
+最终响应示例 4703 资产 / 705 Cable / 6356 关系，约 5.385 MB，单次 HTTP 333ms；冷页面含身份/目录同步与渲染约 3.177s。均为当前机器单次记录，不是 p95、生产 SLO 或千卡性能。
+
+构建仍有大于 500kB 的分包提示；Three.js 与设备抽屉按需加载。既有其他业务的演示资源打包保持原状，本工作区不读 fixture。PDF 使用浏览器打印机柜图，未自动验收系统打印对话框。未执行的能力不得视为通过。
 
 - [API 查询记录](api-validation.json)：当前本地库 4703 资产、705 Cable、6356 类型化关系，约 4.294 MB；三次 Domain Service 查询约 655–829ms（来源元数据扩展前记录，最终响应大小以后续记录为准）。它不是 HTTP 或浏览器 FPS。
 - 数据来源包含 4697 条 synthetic_fixture，另有 BOM/人工数据；“真实 API”不代表真机采集。页面不以 fixture 填补缺测。
@@ -59,3 +67,13 @@ Sidebar 沿用现有唯一入口，内容区没有重复模块切换导航。服
 2. 无已确认配线架内部贯通数据，物理追踪在直接物理段终止；无 FIB/VRF/同窗口转发证据，不提供实际 Logical Trace 或业务故障影响结论。
 3. 测绘 XY、宽深、精确设备面板、实时遥测、PDU 端接未补造。完整规划/实装对比依赖真实快照，仍属于待接入能力。
 4. 真实数据导入、端到端业务联调与生产规模性能由用户后续统一安排。
+5. 新服务目前复用现有数据库连接，只对 CMDB 做只读验证，无迁移/资产写入；身份登录仍会记录正常 Session/登录审计。数据库尚未物理隔离，后续真实写入联调前应配置独立数据库。
+
+## 分支、环境与继续开发
+
+- 原目录 `/home/ubuntu/keel`：`keel-new-main` / `978db7f`，代码干净，原 API binary `/tmp/keel-cmdb-api`；5180/8081 与原构建产物已恢复。
+- 新目录 `/home/ubuntu/keel-visualization-dev`：`feat/datacenter-visualization-approved`，独立 npm 依赖与 Vite 缓存。未经用户要求不合并或发布 main。
+- 独立 tmux：`keel-visualization-ui-5182`、`keel-visualization-api-8082`。原设计原型继续 5181。
+- 新前端命令：`KEEL_API_URL=http://127.0.0.1:8082 npm run dev -- --host 127.0.0.1 --port 5182 --strictPort`（在新目录 dev 下）。
+- 后端以自己的受控配置启动，`LISTEN_ADDR=127.0.0.1:8082`、`DEV_ORIGIN=http://127.0.0.1:5182`；本地目前引用原环境配置但覆盖端口。秘密不随分支/Git 迁移。
+- 用户后续授权合并后再更新既有测试环境，不自动部署。
