@@ -4,7 +4,7 @@
   "branch": "fix/bom-acceptance-root-causes",
   "base_commit": "148b88d",
   "agent_version": "workbook-agent/v5",
-  "deployment": "NOT_DEPLOYED; existing service and test batches unchanged",
+  "deployment": "DEPLOYED_AS_FLOWS_INTEGRATION fdffbcb; see bom-v5-deployment-20261031.json",
   "findings": [
     {
       "id": "BT-001",
@@ -123,5 +123,10 @@
     "path": "/tmp/keel-api-agent-root-fix-1031",
     "sha256": "9741d4507f58f00379cfea472ad97b07a95ec34f87de42253e8cb5d6bd819dc8",
     "running": false
+  },
+  "running_binary": {
+    "path": "/tmp/keel-api-bom-v5-flows-1031",
+    "sha256": "42704175d721ecc7a994acaaf14359a98cb349bb49b1bd71bfd2663a22fcd664",
+    "source_commit": "fdffbcb"
   }
 }
