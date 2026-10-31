@@ -214,3 +214,18 @@ AIProviderConfiguration/Command/TestCommand/TestResult/Option是系统配置与B
 ## 2026-10-31 数据中心可视化增补
 
 新增运维 `/topology` 与真实 CMDB 机柜工作台；投影接口、布局/事实边界、asset.relocate 审核发布、验证记录和未完成项统一见 [DATACENTER-VISUALIZATION.md](DATACENTER-VISUALIZATION.md)，HTTP schema 见 openapi.yaml。沿用原资产身份和权限，不把计划连接或 synthetic 数据视为真机验证。
+
+## VISUAL-REAL-2026-10-31 · 已批准可视化的真实只读投影
+
+`GET /api/v1/cmdb/visualization` 保留原摘要查询，增加 `detail=full`；类型定义以 OpenAPI `InfrastructureSnapshot` 为唯一 HTTP 定义。正式五个可视化页面通过 `infrastructureApi.fullSnapshot` 读取 PostgreSQL 中既有资产和类型化关系，不导入原型 fixture。
+
+- `project_id` 是会话授权范围的过滤条件；缺省为当前用户所有获授权项目，而不是所有项目。资源级授权时关系两端均须可见。不可见/不存在端点用空引用保留缺口，禁止回显隐藏 ID。
+- full 默认最多 5000 个源资产，可用 `limit=1..5000` 降低；关系最多 20000 条，均限定于本次可见源资产集合。超限 `truncated=true`、`coverage.complete=false`；客户端须提示缩小项目/机柜/focus，不能宣称全量或完整路径。旧摘要默认源资产上限 20000 保持兼容。本轮未实现 cursor 分页、历史快照保留或无限范围下载。
+- `assets` 包含已登记机柜/设备/部件/端口/网络实体；`relationships` 保留类型、方向端点、fact_layer、source/source_ref/revision，不把 logical_membership 变成 Cable。`cables` 来自现有 Cable 与双端 port 关系，保留缺端记录。`owner_device_id` 仅沿明确设备/组成关系受控解析；不按显示名配对。
+- 同次查询使用 PostgreSQL repeatable-read 只读事务。`snapshot_id` 是范围和资产/关系修订指纹，不是可回查的历史版本；`read_at` 只是查询时间，不能替代观测采集时间。`source_ref` 保留实际来源；数据库中源为 synthetic/fixture 的记录不能因接入真实 API 被标成真实采集。
+- `coverage.total_assets` 是授权源集合数量，`returned_assets` 为本次实际返回数量。机柜/focus 查询仍可返回触及该范围的对端，因此查询数量不是该机柜实物数量。设备、端口、线缆与机柜的正式主键保持不变。
+- 物理贯通不能通过任意交换机端口自动拼接。当前无显式 patch-through 时只证明 Cable 双端；缺少 FIB/VRF/BGP 等逻辑转发证据应显示 unsupported，不能用设备级 BFS 冒充逻辑路径。
+
+投影复核补充：缺失的 `gpu_count`/`nic_count` 仅在源查询未截断且有明确 `contains` 成员时，以唯一组件 ID 确定性计数，并附 `*_count_source` 和关系 ID；没有成员不补零，不覆盖已登记数量。位置附 `position_fact_layer`、`position_source_ref`、`position_revision` 与完整 `located_in_sources`。规划/观测引用不同时保留分层候选并报数据质量提示，不将最后一条随机排序关系当成实际安装；同层多目标不自动选中。Cable 双端事实层不一致使用 `mixed`，两端独立来源仍可查。
+
+`findings[].severity/category` 表达数据质量提示，不是 PASS/FAIL。端口占用、速率不一致、未采集面板等均不能直接宣称设备故障或验机失败；必须通过原业务规则和适用证据判断。可视化不得把所有 warning 统一转换成硬件 FAIL。

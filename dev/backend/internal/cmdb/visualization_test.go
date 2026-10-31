@@ -74,3 +74,63 @@ func TestVisualizationAndRelocationBoundaries(t *testing.T) {
 		})
 	}
 }
+
+// Exercise the production read adapter only; no writes or fixture loading.
+func TestVisualizationFullProjectionBoundaries(t *testing.T) {
+	if os.Getenv("KEEL_CMDB_INTEGRATION") != "1" {
+		t.Skip("explicit local database run required")
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	db, err := pgxpool.New(ctx, os.Getenv("DATABASE_URL"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	service := Service{DB: db}
+	scope := Scope{Projects: []string{"proj-b300-demo"}}
+	full, err := service.VisualizationDetail(ctx, scope, "", "", true, 5000)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if full.SnapshotID == "" || full.ReadAt.IsZero() || full.Truncated || !full.Coverage.Complete {
+		t.Fatalf("unexpected coverage: %+v", full.Coverage)
+	}
+	byID := map[string]VisualAsset{}
+	ports := 0
+	for _, asset := range full.Assets {
+		byID[asset.ID] = asset
+		if asset.Type == "port" {
+			ports++
+		}
+	}
+	if ports == 0 || len(full.Relationships) == 0 {
+		t.Fatal("full projection omitted ports or typed relationships")
+	}
+	for _, relation := range full.Relationships {
+		if byID[relation.From].ID == "" || byID[relation.To].ID == "" {
+			t.Fatal("relationship exposed outside projection")
+		}
+	}
+	for _, cable := range full.Cables {
+		for _, id := range []string{cable.A, cable.B, cable.DeviceA, cable.DeviceB} {
+			if id != "" && byID[id].ID == "" {
+				t.Fatal("endpoint exposed outside authorized projection")
+			}
+		}
+	}
+	capped, err := service.VisualizationDetail(ctx, scope, "", "", true, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !capped.Truncated || capped.Coverage.Complete || len(capped.Assets) > 1 || capped.Total <= 1 {
+		t.Fatal("source cap not reported")
+	}
+	hidden, err := service.VisualizationDetail(ctx, Scope{Projects: []string{"not-authorized"}}, "", "", true, 5000)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(hidden.Assets)+len(hidden.Cables)+len(hidden.Relationships) > 0 {
+		t.Fatal("cross-project data leaked")
+	}
+}

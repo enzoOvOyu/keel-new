@@ -43,11 +43,13 @@ paths:
       operationId: getCMDBVisualization
       tags: [CMDB]
       summary: Authorized physical infrastructure projection from existing assets and typed relationships
-      description: On demand. Default returns rack/device summaries and cable device endpoints; rack_id loads local ports/components and touching cables; focus expands up to two physical cable hops. Maximum 20000 source assets; truncated is explicit. No layout writes or logical-to-physical inference.
+      description: On demand. Default returns rack/device summaries and cable device endpoints; rack_id loads local ports/components and touching cables; focus expands up to two physical cable hops. Default summary retains compatibility; detail=full includes authorized ports/components and typed relationships. full defaults to at most 5000 source assets and 20000 relationships, limit accepts 1..5000. coverage/truncated explicitly report incomplete results; narrow project/rack/focus when partial. Snapshot reads use one repeatable-read transaction. No layout writes or logical-to-physical inference.
       parameters:
       - {name: project_id, in: query, schema: {type: string}}
       - {name: rack_id, in: query, schema: {type: string}}
       - {name: focus, in: query, schema: {type: string}}
+      - {name: detail, in: query, schema: {type: string, enum: [summary, full], default: summary}}
+      - {name: limit, in: query, schema: {type: integer, minimum: 1, maximum: 5000}, description: Explicit source asset cap; shrink project/rack/focus when coverage is partial.}
       responses:
         '200':
           description: Scope-filtered CMDB facts, physical cable endpoints and quality findings
@@ -14012,7 +14014,7 @@ components:
         project_id: {type: string}
         revision: {type: integer}
         source: {type: string}
-        fields: {type: object, description: 'Allowlisted sparse CMDB attributes; missing means unknown, never inferred.', additionalProperties: true}
+        fields: {type: object, description: 'Allowlisted sparse CMDB attributes. Missing means unknown. Optional GPU/NIC counts may be derived only from unique explicit contains members on an untruncated scope; *_count_source retains relationship IDs. position_fact_layer/position_source_ref/position_revision and located_in_sources preserve location provenance. Endpoint sources remain layered; divergent references are findings, never silently confirmed as-built.', additionalProperties: true}
     InfrastructureCable:
       type: object
       required: [id, a, b, device_a, device_b, fact, source, fields]
@@ -14025,10 +14027,34 @@ components:
         fact: {type: string}
         source: {type: string}
         fields: {type: object, additionalProperties: true}
+    InfrastructureRelationship:
+      type: object
+      required: [id, source_asset_id, target_asset_id, relationship_type, fact_layer, source, source_ref, revision]
+      properties:
+        id: {type: string}
+        source_asset_id: {type: string}
+        target_asset_id: {type: string}
+        relationship_type: {type: string}
+        fact_layer: {type: string}
+        source: {type: string}
+        source_ref: {type: string}
+        revision: {type: integer}
+    InfrastructureCoverage:
+      type: object
+      required: [returned_assets, total_assets, limit, complete]
+      properties:
+        returned_assets: {type: integer}
+        total_assets: {type: integer}
+        limit: {type: integer}
+        complete: {type: boolean}
     InfrastructureSnapshot:
       type: object
-      required: [assets, cables, findings, total_assets, truncated]
+      required: [assets, cables, findings, total_assets, truncated, snapshot_id, read_at, relationships, coverage]
       properties:
+        snapshot_id: {type: string, description: Scope/revision fingerprint, not a retained historical snapshot.}
+        read_at: {type: string, format: date-time, description: Query time, never a telemetry observed_at.}
+        relationships: {type: array, items: {$ref: '#/components/schemas/InfrastructureRelationship'}}
+        coverage: {$ref: '#/components/schemas/InfrastructureCoverage'}
         assets: {type: array, items: {$ref: '#/components/schemas/InfrastructureAsset'}}
         cables: {type: array, items: {$ref: '#/components/schemas/InfrastructureCable'}}
         findings:
@@ -14040,6 +14066,8 @@ components:
               asset_id: {type: string}
               code: {type: string}
               message: {type: string}
+              severity: {type: string, enum: [info, warning, error], description: Data-quality significance, never a hardware gate verdict.}
+              category: {type: string, enum: [data_quality]}
         total_assets: {type: integer}
         truncated: {type: boolean}
     ErrorEnvelope:

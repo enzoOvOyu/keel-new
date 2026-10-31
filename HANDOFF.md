@@ -2,6 +2,10 @@
 
 更新：2026-10-30（UTC）。本文件用于切换机器或 Agent 后快速接续，记录实际状态，不代替 PRD，也不代表全平台验收通过。
 
+## 2026-10-31 批准原型转正式实现（本轮）
+
+本轮可视化开发隔离到分支 `feat/datacenter-visualization-approved`、worktree `/home/ubuntu/keel-visualization-dev`，不得自动合并/发布；主目录保持开发前 `978db7f`。代码为 `dev/src/features/infrastructure/approved/`，规划独立入口 5182 的 `/topology?view=global/network/cabling/trace` 和 `/racks`；5181 保留批准原型。接口扩展为 `GET /api/v1/cmdb/visualization?detail=full`，复用 CMDB/授权/稳定 ID，无新资产表。具体实现、契约、验证与真实限制见 [实施报告](docs/topology/implementation-report.md)。本轮不导入新数据，不做真机调用；用户后续统一安排真实导入和完整联调。
+
 ## 2026-10-31 后续任务变更
 
 用户本轮转向数据中心拓扑与机柜一体化，当前优先级据此更新。Sidebar 已将 `/racks` 收入数据中心拓扑，废弃 Rack 页面与 legacy 分支已移除；新入口 `/topology`、`/racks`，实现/验证/缺口见 `docs/DATACENTER-VISUALIZATION.md`；代码在 `dev/src/features/infrastructure/`、`internal/cmdb/visualization.go`。BOM Agent 未完成状态保持，不因本次可视化开发声称已解决。

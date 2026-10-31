@@ -13,7 +13,7 @@ export interface paths {
         };
         /**
          * Authorized physical infrastructure projection from existing assets and typed relationships
-         * @description On demand. Default returns rack/device summaries and cable device endpoints; rack_id loads local ports/components and touching cables; focus expands up to two physical cable hops. Maximum 20000 source assets; truncated is explicit. No layout writes or logical-to-physical inference.
+         * @description On demand. Default returns rack/device summaries and cable device endpoints; rack_id loads local ports/components and touching cables; focus expands up to two physical cable hops. Default summary retains compatibility; detail=full includes authorized ports/components and typed relationships. full defaults to at most 5000 source assets and 20000 relationships, limit accepts 1..5000. coverage/truncated explicitly report incomplete results; narrow project/rack/focus when partial. Snapshot reads use one repeatable-read transaction. No layout writes or logical-to-physical inference.
          */
         get: operations["getCMDBVisualization"];
         put?: never;
@@ -5403,7 +5403,7 @@ export interface components {
             project_id: string;
             revision: number;
             source: string;
-            /** @description Allowlisted sparse CMDB attributes; missing means unknown, never inferred. */
+            /** @description Allowlisted sparse CMDB attributes. Missing means unknown. Optional GPU/NIC counts may be derived only from unique explicit contains members on an untruncated scope; *_count_source retains relationship IDs. position_fact_layer/position_source_ref/position_revision and located_in_sources preserve location provenance. Endpoint sources remain layered; divergent references are findings, never silently confirmed as-built. */
             fields: {
                 [key: string]: unknown;
             };
@@ -5420,13 +5420,45 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        InfrastructureRelationship: {
+            id: string;
+            source_asset_id: string;
+            target_asset_id: string;
+            relationship_type: string;
+            fact_layer: string;
+            source: string;
+            source_ref: string;
+            revision: number;
+        };
+        InfrastructureCoverage: {
+            returned_assets: number;
+            total_assets: number;
+            limit: number;
+            complete: boolean;
+        };
         InfrastructureSnapshot: {
+            /** @description Scope/revision fingerprint */
+            snapshot_id: string;
+            /**
+             * Format: date-time
+             * @description Query time
+             */
+            read_at: string;
+            relationships: components["schemas"]["InfrastructureRelationship"][];
+            coverage: components["schemas"]["InfrastructureCoverage"];
             assets: components["schemas"]["InfrastructureAsset"][];
             cables: components["schemas"]["InfrastructureCable"][];
             findings: {
                 asset_id: string;
                 code: string;
                 message: string;
+                /**
+                 * @description Data-quality significance
+                 * @enum {string}
+                 */
+                severity?: "info" | "warning" | "error";
+                /** @enum {string} */
+                category?: "data_quality";
             }[];
             total_assets: number;
             truncated: boolean;
@@ -13843,6 +13875,9 @@ export interface operations {
                 project_id?: string;
                 rack_id?: string;
                 focus?: string;
+                detail?: "summary" | "full";
+                /** @description Explicit source asset cap; shrink project/rack/focus when coverage is partial. */
+                limit?: number;
             };
             header?: never;
             path?: never;

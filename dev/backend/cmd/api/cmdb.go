@@ -74,7 +74,20 @@ func (s *Server) cmdbRoutes(w http.ResponseWriter, r *http.Request) bool {
 	r = r.WithContext(ctx)
 	service := cmdbService(s)
 	if path == "cmdb/visualization" && r.Method == "GET" {
-		result, err := service.Visualization(ctx, scope, r.URL.Query().Get("rack_id"), r.URL.Query().Get("focus"))
+		full := r.URL.Query().Get("detail") == "full"
+		limit := 20000
+		if full {
+			limit = 5000
+		}
+		if value := r.URL.Query().Get("limit"); value != "" {
+			parsed, err := strconv.Atoi(value)
+			if err != nil || parsed < 1 || parsed > 5000 {
+				fail(w, 400, "VISUALIZATION_LIMIT_INVALID")
+				return true
+			}
+			limit = parsed
+		}
+		result, err := service.VisualizationDetail(ctx, scope, r.URL.Query().Get("rack_id"), r.URL.Query().Get("focus"), full, limit)
 		if err != nil {
 			cmdbFailure(w, err)
 		} else {

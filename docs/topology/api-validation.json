@@ -1,0 +1,133 @@
+{
+  "limits": {
+    "assets": 5000,
+    "relationships": 20000
+  },
+  "method": "3 direct Go Domain Service full projection reads (first connection then warm pool); monotonic elapsed wall time; JSON marshal bytes measured after query",
+  "not_tested": [
+    "HTTP network/serialization latency",
+    "browser render/frame rate",
+    "1000/5000/10000-node production scale",
+    "history snapshots and pagination",
+    "real device collection"
+  ],
+  "recorded_at": "2026-10-31T04:53:01.836640725Z",
+  "runs": [
+    {
+      "assets": 4703,
+      "cables": 705,
+      "coverage": {
+        "returned_assets": 4703,
+        "total_assets": 4703,
+        "limit": 5000,
+        "complete": true
+      },
+      "findings": 100,
+      "json_bytes": 4293950,
+      "query_ms": 729.32,
+      "read_at": "2026-10-31T04:52:59.06120159Z",
+      "relationships": 6356,
+      "run": 1,
+      "snapshot_id": "d33211fed058999d32999431",
+      "sources": {
+        "bom": 5,
+        "manual": 1,
+        "synthetic_fixture": 4697
+      },
+      "truncated": false,
+      "types": {
+        "cable": 705,
+        "data_center": 1,
+        "fabric": 1,
+        "gpu": 512,
+        "network_segment": 40,
+        "nic": 640,
+        "optic": 1024,
+        "pod": 4,
+        "port": 1666,
+        "rack": 16,
+        "region": 4,
+        "server": 65,
+        "switch": 25
+      }
+    },
+    {
+      "assets": 4703,
+      "cables": 705,
+      "coverage": {
+        "returned_assets": 4703,
+        "total_assets": 4703,
+        "limit": 5000,
+        "complete": true
+      },
+      "findings": 100,
+      "json_bytes": 4293951,
+      "query_ms": 654.627,
+      "read_at": "2026-10-31T04:52:59.957878427Z",
+      "relationships": 6356,
+      "run": 2,
+      "snapshot_id": "d33211fed058999d32999431",
+      "sources": {
+        "bom": 5,
+        "manual": 1,
+        "synthetic_fixture": 4697
+      },
+      "truncated": false,
+      "types": {
+        "cable": 705,
+        "data_center": 1,
+        "fabric": 1,
+        "gpu": 512,
+        "network_segment": 40,
+        "nic": 640,
+        "optic": 1024,
+        "pod": 4,
+        "port": 1666,
+        "rack": 16,
+        "region": 4,
+        "server": 65,
+        "switch": 25
+      }
+    },
+    {
+      "assets": 4703,
+      "cables": 705,
+      "coverage": {
+        "returned_assets": 4703,
+        "total_assets": 4703,
+        "limit": 5000,
+        "complete": true
+      },
+      "findings": 100,
+      "json_bytes": 4293951,
+      "query_ms": 829.339,
+      "read_at": "2026-10-31T04:53:00.778412667Z",
+      "relationships": 6356,
+      "run": 3,
+      "snapshot_id": "d33211fed058999d32999431",
+      "sources": {
+        "bom": 5,
+        "manual": 1,
+        "synthetic_fixture": 4697
+      },
+      "truncated": false,
+      "types": {
+        "cable": 705,
+        "data_center": 1,
+        "fabric": 1,
+        "gpu": 512,
+        "network_segment": 40,
+        "nic": 640,
+        "optic": 1024,
+        "pod": 4,
+        "port": 1666,
+        "rack": 16,
+        "region": 4,
+        "server": 65,
+        "switch": 25
+      }
+    }
+  ],
+  "scope": "proj-b300-demo",
+  "source": "Existing local PostgreSQL CMDB; no data created or modified"
+}

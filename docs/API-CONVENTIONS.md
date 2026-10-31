@@ -361,3 +361,7 @@ workspace/mapping按需返回ports/cables及授权peer_ports/peer_devices；关�
 ## 2026-10-31 数据中心可视化增补
 
 新增运维 `/topology` 与真实 CMDB 机柜工作台；投影接口、布局/事实边界、asset.relocate 审核发布、验证记录和未完成项统一见 [DATACENTER-VISUALIZATION.md](DATACENTER-VISUALIZATION.md)，HTTP schema 见 openapi.yaml。沿用原资产身份和权限，不把计划连接或 synthetic 数据视为真机验证。
+
+### 可视化查询的完整度（2026-10-31）
+
+CMDB 可视化扩展复用 `/cmdb/visualization?detail=full`，不建立第二套资产服务。响应 `coverage` 与 `truncated` 是查询完整度，不是设备健康或门禁结果；超限必须缩小范围。`read_at` 不是观测时间，`snapshot_id` 修订指纹不是历史查询游标。详细行为统一见 DOMAIN-API-CONTRACTS 的 VISUAL-REAL-2026-10-31 和 OpenAPI，前端统一使用 `src/lib/api/infrastructure.ts`。

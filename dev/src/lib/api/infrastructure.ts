@@ -4,6 +4,9 @@ export type InfraAsset=Omit<components['schemas']['InfrastructureAsset'],'fields
 export type InfraCable=Omit<components['schemas']['InfrastructureCable'],'fields'>&{fields:Record<string,any>};
 export type InfraSnapshot=Omit<components['schemas']['InfrastructureSnapshot'],'assets'|'cables'>&{assets:InfraAsset[];cables:InfraCable[]};
 export const infrastructureApi = {
+  fullSnapshot(project: string | null, signal?: AbortSignal, scope: {rack_id?:string;focus?:string;limit?:number} = {}) {
+    return cmdbFetch<{data:InfraSnapshot}>("visualization?"+new URLSearchParams({detail:"full",limit:String(scope.limit??5000),...(project?{project_id:project}:{}),...(scope.rack_id?{rack_id:scope.rack_id}:{}),...(scope.focus?{focus:scope.focus}:{})}),"GET",undefined,signal).then(r=>r.data);
+  },
   snapshot(
     project: string | null,
     rack: string,
@@ -61,47 +64,10 @@ export function locationIssues(
   }
   return issues;
 }
+// Physical continuity stops at a device port. A switch is not evidence of a
+// patch-through connection or a forwarding path between arbitrary ports.
 export function physicalPath(cables: InfraCable[], from: string, to: string) {
-  const endpoints = (id: string) => {
-    const port = cables.find((c) => c.a === id || c.b === id);
-    return port ? (port.a === id ? port.device_a : port.device_b) : id;
-  };
-  const start = endpoints(from),
-    target = endpoints(to);
-  if (!start || !target || !from || !to) return null;
-  const adjacency = new Map<string, InfraCable[]>();
-  for (const c of cables) {
-    if (!c.device_a || !c.device_b) continue;
-    for (const id of [c.device_a, c.device_b]) {
-      if (!adjacency.has(id)) adjacency.set(id, []);
-      adjacency.get(id)!.push(c);
-    }
-  }
-  const queue = [start],
-    seen = new Set([start]),
-    prev = new Map<string, { node: string; cable: InfraCable }>();
-  for (let i = 0; i < queue.length && i < 10000; i++) {
-    const node = queue[i];
-    if (node === target) break;
-    for (const c of adjacency.get(node) || []) {
-      if (node === start && from !== start && c.a !== from && c.b !== from)
-        continue;
-      const next = c.device_a === node ? c.device_b : c.device_a;
-      if (next === target && to !== target && c.a !== to && c.b !== to)
-        continue;
-      if (seen.has(next)) continue;
-      seen.add(next);
-      prev.set(next, { node, cable: c });
-      queue.push(next);
-    }
-  }
-  if (!seen.has(target)) return null;
-  const path: InfraCable[] = [];
-  let current = target;
-  while (current !== start) {
-    const item = prev.get(current)!;
-    path.push(item.cable);
-    current = item.node;
-  }
-  return path.reverse();
+  if (!from || !to || from === to) return null;
+  const cable = cables.find(c=>c.a && c.b && ((c.a===from && c.b===to)||(c.b===from && c.a===to)));
+  return cable ? [cable] : null;
 }
