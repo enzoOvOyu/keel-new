@@ -1,7 +1,85 @@
-import {useMemo,useState} from 'react';
-import {TopologyCanvas} from '../graph';
-import {api,data,racks,devices,name,status,exportFile,type Go} from '../model';
-import {Button,Tabs,SearchBox,Detail,CableTable,Badge} from '../shared';
-export default function Cabling({params,set,go}:{params:URLSearchParams;set:(v:Record<string,string>)=>void;go:Go}){const mode=params.get('mode')||'Connection Map',selected=params.get('cable')||params.get('port')||params.get('asset')||'',asset=params.get('asset')||'sw-leaf-0001',q=params.get('q')||'',state=params.get('state')||'';const [pair,setPair]=useState<string[]>([]);const rows=data.cables.filter(c=>(!state||status(c)===state)&&(!q||[c.id,name(c.device_a),name(c.device_b),name(c.a),name(c.b)].join(' ').toLowerCase().includes(q.toLowerCase())));const local=rows.filter(c=>c.device_a===asset||c.device_b===asset);const groups=new Map<string,typeof local>();for(const c of local){const peer=c.device_a===asset?c.device_b:c.device_a;const rack=api.asset(peer)?.fields.rack_id;if(rack)groups.set(rack,[...(groups.get(rack)||[]),c]);}
-const graph=useMemo(()=>({nodes:[{id:asset,label:name(asset),type:api.asset(asset)?.type||'switch'},...[...groups].map(([id,cs])=>({id,label:name(id)+' · '+cs.length+' 条记录',type:'rack'}))],edges:[...groups].map(([id,cs])=>({id:'bundle:'+id,source:asset,target:id,label:cs.length+' 条端接'}))}),[asset,q,state]);
-function matrixRows(a:string,b:string){return rows.filter(c=>{const x=api.asset(c.device_a)?.fields.rack_id,y=api.asset(c.device_b)?.fields.rack_id;return(x===a&&y===b)||(x===b&&y===a)})}return <><div className="toolbar"><SearchBox value={q} onChange={q=>set({q})}/><select aria-label="证据筛选" value={state} onChange={e=>set({state:e.target.value})}><option value="">所有证据</option><option value="incomplete">端点缺失</option><option value="conflict">证据冲突</option><option value="stale">观测过期</option><option value="unverified">待验证</option></select><Button onClick={()=>exportFile('synthetic-cables.csv','id,a,b,status\n'+rows.map(c=>[c.id,c.a,c.b,status(c)].join(',')).join('\n'))}>导出当前结果</Button></div><Tabs items={['Connection Map','Connection Matrix','Port Panel','Cable Inventory']} value={mode} onChange={mode=>set({mode})}/><div className="workspace"><section className="work-surface">{(mode==='Connection Map'||mode==='Port Panel')&&<div className="section-head"><label>设备 <select aria-label="布线设备" value={asset} onChange={e=>set({asset:e.target.value,cable:'',port:''})}>{devices.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select></label><span>{local.length} 条连接 · {api.ports(asset).length} 个登记端口</span></div>}{mode==='Connection Map'?<><TopologyCanvas nodes={graph.nodes} edges={graph.edges} selected={params.get('bundle')?'bundle:'+params.get('bundle'):asset} onSelect={(id,edge)=>edge?set({bundle:id.replace('bundle:','')}):id!==asset?go('rack-detail',{rack:id}):set({asset:id})}/><div className='section-head'><b>{params.get('bundle')?name(params.get('bundle')!)+' · 连接束成员':'设备连接清单'}</b>{params.get('bundle')&&<Button onClick={()=>set({bundle:''})}>全部连接</Button>}</div><CableTable rows={params.get('bundle')?groups.get(params.get('bundle')!)||[]:local} selected={selected} onSelect={cable=>set({cable})}/></>:mode==='Connection Matrix'?<><div className="section-head"><b>Rack × Rack</b><span>双端完整记录；缺端内容仍在 Inventory</span></div><div className="matrix-scroll"><table className="matrix"><thead><tr><th>机柜</th>{racks.map(r=><th key={r.id}>{r.name.replace('RACK-','R')}</th>)}</tr></thead><tbody>{racks.map(r=><tr key={r.id}><th>{r.name.replace('RACK-','R')}</th>{racks.map(t=>{const n=matrixRows(r.id,t.id).length;return <td key={t.id}><button className={n?'filled':''} onClick={()=>setPair([r.id,t.id])}>{n||'—'}</button></td>})}</tr>)}</tbody></table></div>{pair.length>0&&<><h3 className="pad">{name(pair[0])} ↔ {name(pair[1])}</h3><CableTable rows={matrixRows(pair[0],pair[1])} onSelect={cable=>set({cable})}/></>}</>:mode==='Port Panel'?<><div className="port-panel"><h3>{name(asset)}</h3><small>编号示意 · 未提供型号面板几何，不代表实际插槽位置</small><div className="ports">{api.ports(asset).map(p=>{const c=api.connections(p.id)[0];return <button aria-label={'端口 '+p.name} className={(selected===p.id?'selected ':'')+(c?status(c):'unknown')} key={p.id} onClick={()=>set({port:p.id,cable:''})}><span className="socket"/><strong>{p.name}</strong><small>{p.fields.speed||'未知'}</small><small>{c?'有端接记录':'无端接记录'}</small></button>})}</div></div><CableTable rows={params.get('port')?api.connections(params.get('port')!):local} onSelect={cable=>set({cable})}/></>:<CableTable rows={rows} selected={selected} onSelect={cable=>set({cable})}/>}</section><Detail id={selected} go={go} onClose={()=>set({cable:'',port:'',asset:''})}/></div></>}
+import {useState} from 'react';
+import {Download, Filter, ArrowRight} from 'lucide-react';
+import {api, data, devices, name, status, exportFile} from '../model';
+import {Button, Tabs, SearchBox, Empty, Badge, CableTable} from '../shared';
+import {ConnectionMatrix, FigureHead, Legend, MemberLedger, ObjectPanel, PodSelect, between, cableSearch, complete, incident, keyActivate, podOf, servers, sw, type ViewProps} from '../visual';
+
+export default function Cabling({params, set, go}: ViewProps) {
+  const mode = params.get('mode') || 'Connection Matrix';
+  const q = params.get('q') || '', state = params.get('state') || '';
+  const selection = params.get('cable') || params.get('port') || '';
+  const target = api.cable(params.get('cable') || '');
+  const asset = params.get('asset') || target?.device_a || 'srv-0001';
+  const pod = params.has('pod') ? params.get('pod')! : String(podOf(asset) || 'demo-pod-1');
+  const axis = params.get('axis') || 'servers';
+  const row = params.get('row') || '', col = params.get('col') || '';
+  const [bioPage, setBioPage] = useState(0);
+  const rows = data.cables.filter(c => (!pod || [podOf(c.device_a), podOf(c.device_b)].includes(pod)) && (!state || status(c) === state) && cableSearch(c, q));
+  const matrixRows = (axis === 'servers' ? servers : sw.filter(s => s.fields.role === 'leaf')).filter(d => (!pod || podOf(d.id) === pod) && (!q || [d.id, d.name, ...api.connections(d.id).map(c => [c.id, name(c.device_a), name(c.device_b)].join(' '))].join(' ').toLowerCase().includes(q.toLowerCase())));
+  const ordering = params.get('order') || 'rack';
+  matrixRows.sort((a, b) => ordering === 'connections' ? api.connections(b.id).length - api.connections(a.id).length || a.id.localeCompare(b.id) : ordering === 'name' ? a.name.localeCompare(b.name) : String(a.fields.rack_id).localeCompare(String(b.fields.rack_id)) || a.id.localeCompare(b.id));
+  const matrixCols = sw.filter(s => (axis === 'servers' ? s.fields.role !== 'spine' : s.fields.role === 'spine') && rows.some(c => complete(c) && incident(c, s.id) && matrixRows.some(d => incident(c, d.id))));
+  const matrixIds = new Set(rows.filter(c => complete(c) && matrixRows.some(d => incident(c, d.id)) && matrixCols.some(d => incident(c, d.id))).map(c => c.id));
+  const incomplete = rows.filter(c => !complete(c));
+  const members = row && col ? between(rows.filter(complete), row, col) : [];
+  const local = rows.filter(c => incident(c, asset));
+  const bioAll = row && col ? members : local;
+  const page = Math.min(bioPage, Math.max(0, Math.ceil(bioAll.length / 24) - 1));
+  const bio = bioAll.slice(page * 24, page * 24 + 24);
+  const portIds = [...new Set(bio.flatMap(c => [c.a, c.b]).filter(Boolean))].sort((a, b) => {
+    const ownerA = api.asset(a)?.fields.owner_device_id, ownerB = api.asset(b)?.fields.owner_device_id;
+    return name(ownerA).localeCompare(name(ownerB)) || name(a).localeCompare(name(b), undefined, {numeric: true});
+  });
+  function pick(id: string) { set({cable: id, port: ''}); }
+  function clearCell() { set({row: '', col: ''}); setBioPage(0); }
+  const inventory = params.get('coverage') === 'outside' ? rows.filter(c => !matrixIds.has(c.id)) : rows;
+  return <div className="viz-v3">
+    <div className="v-command"><PodSelect value={pod} onChange={pod => {set({pod, row: '', col: '', cable: '', port: ''}); setBioPage(0);}}/><SearchBox value={q} onChange={q => {set({q}); setBioPage(0);}}/><select aria-label="证据筛选" value={state} onChange={e => {set({state: e.target.value}); setBioPage(0);}}><option value="">全部证据</option><option value="incomplete">端点缺失</option><option value="conflict">证据冲突</option><option value="stale">观测过期</option><option value="unverified">待验证</option></select><span className="spacer"/><Button onClick={() => exportFile('synthetic-connections.csv', 'id,a_port,b_port,evidence\n' + rows.map(c => [c.id, c.a, c.b, status(c)].join(',')).join('\n'))}><Download size={14}/>导出 {rows.length} 条</Button></div>
+    <div className="v-viewline"><Tabs items={['Connection Matrix', 'BioFabric', 'Port Panel', 'Cable Inventory']} value={mode} onChange={mode => set({mode})}/><span className="spacer"/><span>{mode === 'Connection Matrix' ? matrixIds.size + ' 条进入矩阵 / ' : ''}{rows.length} 条范围记录</span></div>
+    <div className={'v-workspace ' + (selection ? 'with-detail' : '')}>
+      <div className="v-main-panel">
+        <FigureHead title={mode === 'Connection Matrix' ? 'Connection Matrix / 端点核对' : mode === 'BioFabric' ? 'BioFabric / 端口—线缆索引' : mode === 'Port Panel' ? 'Port Panel / 登记端口' : 'Cable Inventory / 物理记录'}>
+          {mode === 'Connection Matrix' && <><select aria-label="矩阵排序" value={ordering} onChange={e => set({order: e.target.value})}><option value="rack">按位置排序</option><option value="name">按设备名称</option><option value="connections">按登记连接数</option></select><select aria-label="矩阵层级" value={axis} onChange={e => set({axis: e.target.value, row: '', col: ''})}><option value="servers">Server × Switch</option><option value="switches">Leaf × Spine</option></select></>}
+          {(mode === 'BioFabric' || mode === 'Port Panel') && <select aria-label="布线设备" value={asset} onChange={e => {set({asset: e.target.value, row: '', col: '', port: '', cable: ''}); setBioPage(0);}}>{devices.filter(d => !pod || podOf(d.id) === pod || d.fields.role === 'spine').map(d => <option key={d.id} value={d.id}>{d.name}</option>)}</select>}
+        </FigureHead>
+        {mode === 'Connection Matrix' ? <>
+          <ConnectionMatrix rows={matrixRows} cols={matrixCols} cables={rows} selected={row + ':' + col} onCell={(row, col) => {set({row, col, cable: '', port: ''}); setBioPage(0);}}/>
+          <div className="v-matrix-key"><i/>数字 = 完整线缆条数<span>· = 无登记记录</span><span>! = 存在证据异常</span><span className="spacer"/><button className="text-link" onClick={() => set({mode: 'Cable Inventory', coverage: 'outside'})}>其他类型 / 缺端 {rows.length - matrixIds.size} 条</button><span>{matrixRows.length} 行 × {matrixCols.length} 列</span></div>
+          {incomplete.length > 0 && <div className="v-incomplete-tray"><strong>未落入矩阵</strong>{incomplete.map(c => <button key={c.id} onClick={() => pick(c.id)}>{name(c.device_a)} / {name(c.a)} <ArrowRight size={12}/> B 端缺失 <code>{c.id}</code></button>)}</div>}
+          {row && col && <><div className="v-selection-actions"><span>{name(row)} ↔ {name(col)}</span><span className="spacer"/><Button onClick={() => set({mode: 'BioFabric'})}>展开端口关系</Button><Button variant="ghost" onClick={clearCell}>清除单元格</Button></div><MemberLedger rows={members} selected={selection} onSelect={pick}/></>}
+        </> : mode === 'BioFabric' ? <>
+          <div className="v-inline-control"><span>横线 = 唯一端口 · 竖线 = 唯一线缆 · 方点 = 真实端接</span>{row && col && <Button onClick={clearCell}>清除矩阵范围</Button>}<span className="spacer"/><Button disabled={!page} onClick={() => setBioPage(page - 1)}>上一组</Button><span>{page + 1}/{Math.max(1, Math.ceil(bioAll.length / 24))}</span><Button disabled={(page + 1) * 24 >= bioAll.length} onClick={() => setBioPage(page + 1)}>下一组</Button></div>
+          {!bio.length ? <Empty>该设备在当前筛选下没有记录，请切换设备或清除筛选。</Empty> : <div className="v-bio-scroll"><svg width="100%" style={{minWidth: Math.max(750, 300 + bio.length * 27)}} height={92 + portIds.length * 25} role="img" aria-label="BioFabric 端口线缆矩阵">
+            {portIds.map((id, i) => {
+              const y = 76 + i * 25, owner = api.asset(id)?.fields.owner_device_id;
+              return <g key={id} role="button" tabIndex={0} className="bio-port" aria-label={'查看端口 ' + id} onClick={() => set({port: id, cable: ''})} onKeyDown={keyActivate(() => set({port: id, cable: ''}))}>
+                <text x="16" y={y + 4} className="svg-label">{name(owner)} <tspan className="svg-small">/ {name(id)}</tspan></text><line x1="264" x2="98%" y1={y} y2={y} className="bio-row"/>
+              </g>;
+            })}
+            {bio.map((c, i) => {
+              const x = 289 + i * 27, a = portIds.indexOf(c.a), b = portIds.indexOf(c.b);
+              const y1 = 76 + a * 25, y2 = b < 0 ? 43 : 76 + b * 25;
+              return <g key={c.id} className={'bio-cable ' + (selection === c.id ? 'selected' : selection ? 'dimmed' : '')} role="button" tabIndex={0} aria-label={'线缆列 ' + c.id} onClick={() => pick(c.id)} onKeyDown={keyActivate(() => pick(c.id))}>
+                <title>{c.id}: {name(c.a)} → {name(c.b)}</title><text x={x} y="29" textAnchor="middle" className="svg-small">{String(page * 24 + i + 1).padStart(2, '0')}</text>
+                <line x1={x} x2={x} y1="38" y2={Math.max(y1, y2)} className="bio-guide"/><line x1={x} x2={x} y1={y1} y2={y2} className={'bio-edge ' + (!complete(c) ? 'broken' : '')}/>
+                <rect x={x - 4} y={y1 - 4} width="8" height="8" className="bio-terminal" data-port-id={c.a}/>{b >= 0 ? <rect x={x - 4} y={y2 - 4} width="8" height="8" className="bio-terminal" data-port-id={c.b}/> : <text x={x} y="47" textAnchor="middle" className="break-mark">?</text>}
+                <rect x={x - 10} y="16" width="20" height={Math.max(y1, y2)} fill="transparent"/>
+              </g>;
+            })}
+          </svg></div>}
+          <div className="v-matrix-key">穿过横线不代表端接；只有两个方点才是该线缆端点。<span className="spacer"/>{bio.length} / {bioAll.length} 条</div>
+          <MemberLedger rows={bio} selected={selection} onSelect={pick} title="当前线缆列 / 可追溯原记录"/>
+        </> : mode === 'Port Panel' ? <>
+          <div className="v-port-header"><b>{name(asset)}</b><span>{api.ports(asset).length} 个登记端口 · 编号示意，非设备面板几何</span></div>
+          <div className="v-port-grid">{api.ports(asset).map(p => {
+            const cs = api.connections(p.id); return <button key={p.id} className={selection === p.id ? 'selected' : ''} aria-label={'端口 ' + p.name} onClick={() => set({port: p.id, cable: ''})}><span className="port-socket"/><b>{p.name}</b><small>{p.fields.speed || '速率未知'}</small><span>{cs.length ? cs.length + ' 条记录' : '未登记端接'}</span>{cs.some(c => status(c) !== 'unverified') && <Badge value={status(cs.find(c => status(c) !== 'unverified')!)}/>}</button>;
+          })}</div>
+          <MemberLedger rows={params.get('port') ? rows.filter(c => incident(c, params.get('port')!)) : local} selected={selection} onSelect={pick}/>
+        </> : <>{params.get('coverage') === 'outside' && <div className="v-selection-actions">仅显示未进入当前矩阵的记录<span className="spacer"/><Button onClick={() => set({coverage: ''})}>显示全部范围</Button></div>}<CableTable rows={inventory} selected={selection} onSelect={pick}/></>}
+        <Legend/>
+      </div>
+      <ObjectPanel id={selection} go={go} close={() => set({cable: '', port: ''})}/>
+    </div>
+    <div className="v-statusline"><Filter size={13}/><span>所有数值来自当前筛选的 Cable 集合，未登记关系不会补成正常链路。</span></div>
+  </div>;
+}

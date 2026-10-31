@@ -177,3 +177,7 @@ IA v2.3 插入前端 Mock 阶段：先冻结 IA-V2.3.md 的页面注册、作用
 ## 2026-10-31 数据中心可视化增补
 
 新增运维 `/topology` 与真实 CMDB 机柜工作台；投影接口、布局/事实边界、asset.relocate 审核发布、验证记录和未完成项统一见 [DATACENTER-VISUALIZATION.md](DATACENTER-VISUALIZATION.md)，HTTP schema 见 openapi.yaml。沿用原资产身份和权限，不把计划连接或 synthetic 数据视为真机验证。
+
+## 2026-10-31 · 可视化 V3 阶段边界
+
+当前先完成 [topology.md](topology.md) 四页研究型设计与 `docs/topology/prototype/` 交互原型，机柜冻结。顺序：Cluster/Hybrid → Fabric Flow/Bipartite → Matrix/BioFabric → Metro/Tree/Table → 定向浏览器检查与文档一致性。完成后等待用户设计评审；未经确认不改正式页面、Go API或数据库，不将G6/ELK引擎替换作为本轮前置任务。

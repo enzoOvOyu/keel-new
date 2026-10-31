@@ -193,3 +193,7 @@ CMDB-D-01…06：服务器→部件→端口→线缆→对端；Diff→来源�
 ## 2026-10-31 数据中心可视化增补
 
 新增运维 `/topology` 与真实 CMDB 机柜工作台；投影接口、布局/事实边界、asset.relocate 审核发布、验证记录和未完成项统一见 [DATACENTER-VISUALIZATION.md](DATACENTER-VISUALIZATION.md)，HTTP schema 见 openapi.yaml。沿用原资产身份和权限，不把计划连接或 synthetic 数据视为真机验证。
+
+## 2026-10-31 · 数据中心可视化 V3 设计验收
+
+本轮只验收四页隔离原型：Cluster/Hybrid聚合可展开原始成员；Fabric Flow束可转双端检查；Matrix默认可定位Cable且缺端不丢失；BioFabric只有端点方点构成连接；Metro遇缺端停止、Tree关联不冒称冗余。URL刷新恢复对象，原型不请求业务API，不修改机柜与正式系统。研究引用、度量定义与未测项以 [topology.md §13–14](topology.md#13-验收与实际结果) 为准。实际运行记录见 [validation-v3.md](topology/prototype/validation-v3.md)，不得从原型可运行推导千卡规模或真机验收通过。

@@ -1,5 +1,61 @@
 import {useState} from 'react';
-import {ArrowDown,GitBranch,Unplug,ArrowUpRight} from 'lucide-react';
-import {api,data,devices,name,status,type Go} from '../model';
-import {Button,Tabs,Detail,Badge,Empty} from '../shared';
-export default function Trace({params,set,go}:{params:URLSearchParams;set:(v:Record<string,string>)=>void;go:Go}){const port=params.get('port')||'srv-0001-nic-01-p1',mode=params.get('mode')||'Physical Trace',owner=api.asset(port)?.fields.owner_device_id||'srv-0001';const [run,setRun]=useState(!!params.get('cable')),[tab,setTab]=useState('路径视图'),[detail,setDetail]=useState('');const candidates=api.connections(port);const c=candidates.find(c=>c.id===params.get('cable'))||candidates[0];const logical=mode==='Logical Trace';const end=c?(c.a===port?c.b:c.a):'';const steps=c?[{id:port,title:'起始端口',name:name(owner)+' / '+name(port)},{id:c.id,title:'物理线缆',name:c.id},{id:end,title:end?'目标端口':'路径断点',name:end?name(api.asset(end)?.fields.owner_device_id)+' / '+name(end):'未登记 B 端 · 不自动补全'}]:[];return <><div className="toolbar"><select aria-label="追踪模式" value={mode} onChange={e=>{set({mode:e.target.value});setRun(false)}}><option>Physical Trace</option><option>Logical Trace</option></select><select aria-label="起始设备" value={owner} onChange={e=>{set({port:api.ports(e.target.value)[0]?.id||'',cable:''});setRun(false)}}>{devices.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select><select aria-label="起始端口" value={port} onChange={e=>{set({port:e.target.value,cable:''});setRun(false)}}>{api.ports(owner).map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select><Button variant="default" disabled={logical||!port} onClick={()=>{setRun(true);setDetail(c?.id||port)}}>开始追踪</Button><Button onClick={()=>{setRun(false);setDetail('');set({cable:''})}}>清空结果</Button></div><div className="workspace"><section className="work-surface">{logical?<Empty><GitBranch size={32}/><h2>Logical Trace 暂不可用</h2><p>缺少指定 VRF、方向和采集窗口的 FIB / 转发表证据。</p><p>已有物理线缆或 BGP 邻居不能证明真实转发路径。</p><Button onClick={()=>go('network-architecture')}>查看已知网络架构</Button></Empty>:!run?<Empty><Unplug size={32}/><h2>从一个真实登记端口开始</h2><p>选择设备与端口，追踪已记录的物理端接。</p></Empty>:<><div className="section-head"><b>{name(owner)} / {name(port)}</b><Badge value={c?status(c):'unknown'}/></div><Tabs items={['路径视图','路径明细','冗余证据','关联范围']} value={tab} onChange={setTab}/>{!c?<Empty>该端口没有线缆记录。无法确认路径，不代表端口故障。</Empty>:tab==='路径视图'?<div className="trace-path">{steps.map((s,i)=><div key={i}>{i>0&&<ArrowDown className="trace-arrow" size={24}/>}<button className={'path-step '+(!s.id?'breakpoint':'')} onClick={()=>setDetail(s.id||c.id)}><span className="step-index">0{i+1}</span><div><small>{s.title}</small><strong>{s.name}</strong><small>{s.id?'来源：synthetic / CMDB 规划记录':'缺少端点证据；停止追踪'}</small></div><ArrowUpRight size={16}/></button></div>)}<p className="trace-stop">{end?'到此物理段终止。未推断穿过交换机的转发路径；尚无验收证据。':'记录不完整，保留断点等待核查。'}</p></div>:tab==='路径明细'?<table><thead><tr><th>段</th><th>对象</th><th>来源</th><th>核验</th></tr></thead><tbody>{steps.map((s,i)=><tr key={i}><td>{i+1}</td><td><button className="text-link" onClick={()=>setDetail(s.id||c.id)}>{s.name}</button></td><td>synthetic</td><td>未验证</td></tr>)}</tbody></table>:tab==='冗余证据'?<Empty><GitBranch size={30}/><h2>冗余关系未知</h2><p>没有已批准的第二路径与共享故障域证据，不能证明高可用。</p></Empty>:<div className="pad"><h3>直接物理关联（不是业务故障影响）</h3>{[c.device_a,c.device_b].filter(Boolean).map(id=><div className="relation-row" key={id}><b>{name(id)}</b><Button onClick={()=>go('rack-detail',{rack:api.asset(id)?.fields.rack_id,asset:id})}>定位机柜</Button></div>)}<p>缺少业务依赖证据，不统计“受影响 GPU”数量。</p></div>}</>}</section><Detail id={detail||params.get('cable')||''} go={go} onClose={()=>{setDetail('');set({cable:''})}}/></div></>}
+import {ArrowRight, ChevronDown, ChevronRight, GitBranch, Play} from 'lucide-react';
+import {api, data, devices, name, status} from '../model';
+import {Button, Badge, Empty} from '../shared';
+import {FigureHead, GoTo, MemberLedger, ObjectPanel, complete, keyActivate, type ViewProps} from '../visual';
+
+export default function Trace({params, set, go}: ViewProps) {
+  const port = params.get('port') || 'srv-0001-nic-01-p1', owner = api.asset(port)?.fields.owner_device_id || 'srv-0001';
+  const mode = params.get('mode') || 'Physical Trace', run = params.get('run') !== '0';
+  const selected = params.get('detail') || '';
+  const candidates = api.connections(port);
+  const requested = candidates.find(c => c.id === params.get('cable'));
+  const cable = requested || (candidates.length === 1 ? candidates[0] : undefined);
+  const end = cable ? (cable.a === port ? cable.b : cable.a) : '';
+  const endOwner = api.asset(end)?.fields.owner_device_id;
+  const [expanded, setExpanded] = useState(true);
+  const local = api.connections(owner);
+  const logical = mode === 'Logical Trace';
+  function start(p: string, c = '') { set({port: p, cable: c, run: '1', detail: ''}); }
+  const station = (x: number, title: string, subtitle: string, id: string, kind: string) => <g className={'metro-station ' + (!id ? 'missing' : '')} tabIndex={0} role="button" aria-label={title + ' ' + subtitle} onClick={() => set({detail: id || cable?.id || port})} onKeyDown={keyActivate(() => set({detail: id || cable?.id || port}))}>
+    <rect x={x - 130} y="59" width="260" height="155" fill="transparent"/>
+    <circle className="station-ring" cx={x} cy="134" r={kind === 'cable' ? 10 : 14}/>{id && <circle cx={x} cy="134" r="4" className="station-core"/>}
+    <text x={x} y="83" textAnchor="middle" className="column-title">{title}</text><text x={x} y="183" textAnchor="middle" className="node-title">{subtitle}</text><text x={x} y="204" textAnchor="middle" className="svg-small">{id ? kind === 'cable' ? cable?.fields.cable_type + ' · ' + (cable?.fields.length_m ?? '未知') + ' m' : name(api.asset(id)?.fields.owner_device_id) : '未登记 · 停止追踪'}</text>
+  </g>;
+  return <div className="viz-v3">
+    <div className="v-command"><select aria-label="追踪模式" value={mode} onChange={e => set({mode: e.target.value, detail: ''})}><option>Physical Trace</option><option>Logical Trace</option></select><select aria-label="起始设备" value={owner} onChange={e => set({port: api.ports(e.target.value)[0]?.id || '', cable: '', run: '0', detail: ''})}>{devices.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}</select><select aria-label="起始端口" value={port} onChange={e => set({port: e.target.value, cable: '', run: '0', detail: ''})}>{api.ports(owner).map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select><Button variant="default" disabled={logical || !port} onClick={() => start(port, params.get('cable') || '')}><Play size={13}/>开始追踪</Button><Button onClick={() => set({run: '0', detail: '', cable: ''})}>清空</Button><span className="spacer"/><span className="v-outline-label">按端口追踪 · 不穿越交换芯片</span></div>
+    <div className={'v-workspace ' + (selected ? 'with-detail' : '')}>
+      <div className="v-main-panel">
+        {logical ? <div className="v-capability"><GitBranch size={24}/><div><h2>逻辑路径：缺少转发证据</h2><p>需要同一时间窗口的 VRF、FIB、方向及目标地址。当前物理记录不能替代它们。</p><GoTo go={go} page="network-architecture">查看已有网络架构</GoTo></div><Badge value="unsupported"/></div> : !run ? <Empty><h2>选择端口后开始追踪</h2><p>只查询已登记端接，不执行设备操作。</p></Empty> : <>
+          <FigureHead title="Metro Route / 物理段"><span>{cable ? '1 个已记录物理段' : '待定位物理段'}</span><span className="spacer"/>{cable && <><span className={'v-integrity ' + (!complete(cable) ? 'issue' : '')}>{complete(cable) ? '记录完整' : '记录有缺口'}</span><Badge value={status(cable)}/></>}</FigureHead>
+          {candidates.length > 1 && !requested ? <div className="v-branch-choice"><h3>同一端口存在 {candidates.length} 条记录，请选择要核查的分支。</h3><MemberLedger rows={candidates} onSelect={cable => set({cable})}/></div> : !cable ? <Empty>该端口没有线缆记录。不能确认路径，也不能据此判为故障。</Empty> : <>
+            <div className="v-metro-wrap"><svg viewBox="0 0 1000 260" role="img" aria-label="Metro Route 端口线缆路径">
+              <path d="M150 134 H500" className="metro-track"/><path d="M500 134 H850" className={'metro-track ' + (!end ? 'missing' : '')}/>
+              <path d="M335 128 l8 6 -8 6 M660 128 l8 6 -8 6" className="metro-arrow"/>
+              {station(150, '01 / 起始端口', name(port), port, 'port')}{station(500, '02 / 物理线缆', cable.id, cable.id, 'cable')}{station(850, '03 / 对端端口', end ? name(end) : 'B 端缺失', end, 'port')}
+              {!end && <text x="850" y="140" textAnchor="middle" className="break-mark">?</text>}
+              <text x="500" y="239" textAnchor="middle" className="svg-small">{end ? '物理段在交换机端口终止；没有贯通或转发证据，不继续绘制下一跳。' : '缺端记录保留原身份，不自动补齐设备、端口或中间段。'}</text>
+            </svg></div>
+            <div className="v-trace-context"><span><b>{name(owner)}</b> / {name(api.asset(owner)?.fields.rack_id)}</span><ArrowRight size={14}/><span>{end ? <><b>{name(endOwner)}</b> / {name(api.asset(endOwner)?.fields.rack_id)}</> : '待核查终点'}</span><span className="spacer"/><GoTo go={go} page="physical-cabling" params={{cable: cable.id, asset: owner}}>定位布线记录</GoTo></div>
+            <div className="v-trace-bottom">
+              <section className="v-tree"><FigureHead title="Tree / 设备关联支路"><button aria-label="折叠关联支路" onClick={() => setExpanded(!expanded)}>{expanded ? <ChevronDown size={15}/> : <ChevronRight size={15}/>}</button></FigureHead><div className="tree-root"><GitBranch size={15}/><b>{name(owner)}</b><small>{local.length} 条独立端接</small></div>
+                {expanded && local.map(c => { const p = c.device_a === owner ? c.a : c.b, target = c.device_a === owner ? c.device_b : c.device_a; return <button key={c.id} className={'tree-branch ' + (c.id === cable.id ? 'selected' : '')} onClick={() => start(p, c.id)}><span className="tree-elbow"/><strong>{name(p)}</strong><span className="spacer"/><small>{name(target)}</small>{!complete(c) && <span className="issue-dot">!</span>}</button>; })}
+                <div className="v-tree-note">关联支路不等于备用路径。冗余与故障影响需要额外证据。</div>
+              </section>
+              <section className="v-evidence-table"><FigureHead title="Table / 路径证据"><span>规划 / 观测 / 验收分层</span></FigureHead><table><thead><tr><th>检查对象</th><th>登记事实</th><th>当前观测 / 判定</th></tr></thead><tbody>
+                <tr><td>物理双端</td><td><button className="text-link" onClick={() => set({detail: cable.id})}>{cable.id}</button></td><td>{complete(cable) ? '完整 / 尚未验证' : '缺端 / 无法验证'}</td></tr>
+                <tr><td>A 端引用</td><td><button className="text-link" onClick={() => set({detail: port})}>{port}</button></td><td>当前双端 LLDP 未提供</td></tr>
+                <tr><td>B 端引用</td><td>{end || '缺失'}</td><td>{end ? '端口存在 / 运行状态待采集' : '停止追踪'}</td></tr>
+                <tr><td>介质 / 长度</td><td>{cable.fields.cable_type} / {cable.fields.length_m ?? '未知'} m</td><td>计划值，非实测衰减</td></tr>
+                <tr><td>配置 / 转发</td><td>本次物理追踪不推导</td><td>FIB / VRF 证据缺失</td></tr>
+                <tr><td>冗余 / 影响</td><td>仅直接关联的双端设备</td><td>未证明业务影响与高可用</td></tr>
+              </tbody></table><div className="v-source-strip">synthetic · {data.meta.observed_at} · 历史示例，非实时采集</div></section>
+            </div>
+          </>}
+        </>}
+      </div>
+      <ObjectPanel id={selected} go={go} close={() => set({detail: ''})}/>
+    </div>
+    <div className="v-statusline"><span>路线箭头仅表示阅读顺序，非流量方向；关联支路不等于备用路径。</span></div>
+  </div>;
+}

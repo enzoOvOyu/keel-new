@@ -189,3 +189,7 @@ React Flow承载拓扑的缩放、平移、节点拖动、Minimap与自动布局
 ## BOM Intelligence Agent 当前实施（2026-10-30）
 
 本轮仅 AI 智能识别：上传→真实分析进度→分类审核→确认入库。交换机/端接优先，单主编排器+Workbook IR 工具+独立 Schema/来源/覆盖校验。当前范围替代此前 BOM 双模式/六步 UI 描述，历史数据不删除；详细字段、状态、API、安全和验证边界统一见 [BOM-WORKBENCH-V2.md](BOM-WORKBENCH-V2.md)。保留 FR-2.1、项目权限、唯一资产身份和原事务 Outbox。完整导入入库闭环由用户验收；不以旧报告宣称当前通过。
+
+## 2026-10-31 · 四页图表研究与原型 V3
+
+全局拓扑借鉴 Cluster Map / Hybrid Graph；网络架构借鉴角色骨架与语义束线；物理布线默认 Connection Matrix，Bipartite/BioFabric服务精确端点检查；追踪使用 Metro Route + Tree/Table。六篇研究的链接、实际阅读范围、采用理由及限制统一见 [topology.md §14](topology.md#14-研究依据方法取舍与视觉质量评价)，不把论文实验或算法名称冒充 Keel 能力。原型入口见该文 §7；机柜维持现状。此增补仅约束运维拓扑设计，不改变既有 Fabric 业务模块。
