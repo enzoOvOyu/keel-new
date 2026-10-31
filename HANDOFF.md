@@ -3,7 +3,8 @@
 ## 当前任务接续入口：Kestra原生作业平台（已按用户要求暂停）
 
 - **状态**：用户最新要求“记录handoff然后暂停”。已停止后续开发；当前整体完成度约20%（功能估算），不是完整交付。恢复时从本节继续，不重扫全部代码。
-- **分支/目录**：`feat/jobs-kestra-ui` / `/home/ubuntu/keel-kestra-ui-dev`。原生列表/时间线`a9ae943`；原生代码/多面板壳层`3df73d7`；QuickRun/模板修复`564a1e5`。本次暂停提交还包含下述Outputs增量。未合并main、未推送、未部署。
+- **分支/目录**：`feat/jobs-kestra-ui` / `/home/ubuntu/keel-kestra-ui-dev`。原生列表/时间线`a9ae943`；原生代码/多面板壳层`3df73d7`；QuickRun/模板修复`564a1e5`。本次暂停提交还包含下述Outputs增量。已推送到`enzoOvOyu/keel-new`对应分支；未合并main、未部署。
+- **Git推送认证已核实**：使用原项目私钥路径`/home/ubuntu/keel/deploy_key`（公钥`deploy_key.pub`），不是`~/.ssh/id_ed25519`或`keel_github_ed25519`。本仓库local `core.sshCommand`已固定该IdentityFile和IdentitiesOnly；不要打印/复制私钥到Git。当前功能分支及其余本地已提交分支均已成功推送origin，remote仍为`git@github.com:enzoOvOyu/keel-new.git`，main未合并/覆盖。开发仍按用户要求暂停。
 - **唯一方案**：[KESTRA-UI-REPLACEMENT.md](docs/flows-redesign/KESTRA-UI-REPLACEMENT.md)，包括用户新增的LC-01…14生命周期范围。直接复用固定Kestra commit `49b62a2c820d37e98a1c7b63aa35fd83f960d4ec` 的Vue组件；Keel保留React外壳、项目/权限/CMDB/审批/Agent与SSH边界。
 - **实际完成**：原生design-system与React/Vue桥、样式隔离；两列表基础接线、搜索/状态URL恢复；RunTimeline接线；KsEditor/Monaco与原生多面板壳层（YAML+只读结构）；Outputs原生SidebarList搜索、选择、预览、复制/下载接线。结构摘要不是No-code，Outputs侧栏不是完整变量/表达式调试器。
 - **实际验证**：列表构建与三个浏览器检查通过；编辑器构建与三个浏览器检查通过（挂载、键盘输入同步、Visual/YAML切换保留）；Outputs构建与三个浏览器检查通过（挂载、搜索选择更新详情、JSON下载）。Outputs检查仅为浏览器注入的明确synthetic执行，未写业务库，不能当真实引擎产物验收。证据：[native-ui目录](docs/flows-redesign/native-ui/)。
