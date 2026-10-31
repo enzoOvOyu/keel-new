@@ -120,3 +120,13 @@ export function definitionGraph(doc: Definition) {
   }
   return { nodes, edges };
 }
+
+/** Native starts are complete documents, never mutations of a controlled device template. */
+export function nativeTemplate(current: Definition, kind: string): Definition {
+ const core='io.kestra.plugin.core.';
+ const child={id:'log_result',type:core+'log.Log',message:'Flow started'};
+ const task:Task=kind==='Log'?child:kind==='Loop'
+  ?{id:'loop',type:core+'flow.Loop',values:'{{ inputs.items }}',concurrencyLimit:1,tasks:[child]}
+  :{id:'parallel',type:core+'flow.Parallel',tasks:[child]};
+ return {id:current.id,namespace:current.namespace,tasks:[task],...(kind==='Loop'?{inputs:[{id:'items',type:'JSON',defaults:[]}]}:{})};
+}

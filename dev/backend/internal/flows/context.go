@@ -94,11 +94,29 @@ type ExecutionDefinition struct {
 
 func (s *Service) ExecutionDefinition(ctx context.Context, p Scope, id string) (ExecutionDefinition, error) {
 	var out ExecutionDefinition
-	if err := s.DB.QueryRow(ctx, `SELECT namespace,engine_flow_id,flow_revision FROM flow_execution_binding WHERE id::text=$1 AND project_id=ANY($2)`, id, p.Projects).Scan(&out.Namespace, &out.FlowID, &out.Revision); err != nil {
+	var executionID *string
+	if err := s.DB.QueryRow(ctx, `SELECT namespace,engine_flow_id,flow_revision,kestra_id FROM flow_execution_binding WHERE id::text=$1 AND project_id=ANY($2)`, id, p.Projects).Scan(&out.Namespace, &out.FlowID, &out.Revision, &executionID); err != nil {
 		return out, problem(404, "EXECUTION_NOT_FOUND")
 	}
 	if out.Revision < 1 {
-		return out, problem(409, "EXECUTION_DEFINITION_NOT_FROZEN")
+		if executionID == nil {
+			return out, problem(409, "EXECUTION_DEFINITION_NOT_FROZEN")
+		}
+		var execution map[string]any
+		if err := s.Engine.JSON(ctx, "GET", "/executions/"+url.PathEscape(*executionID), &execution); err != nil {
+			return out, err
+		}
+		if execution["namespace"] != out.Namespace || execution["flowId"] != out.FlowID {
+			return out, problem(409, "EXECUTION_DEFINITION_IDENTITY_MISMATCH")
+		}
+		revision, err := engineRevision(map[string]any{"revision": execution["flowRevision"]})
+		if err != nil {
+			return out, problem(409, "EXECUTION_DEFINITION_NOT_FROZEN")
+		}
+		out.Revision = revision
+		if _, err = s.DB.Exec(ctx, `UPDATE flow_execution_binding SET flow_revision=$2 WHERE id::text=$1 AND flow_revision=0`, id, revision); err != nil {
+			return out, err
+		}
 	}
 	var versions []map[string]any
 	if err := s.Engine.JSON(ctx, "GET", "/flows/"+url.PathEscape(out.Namespace)+"/"+url.PathEscape(out.FlowID)+"/revisions", &versions); err != nil {

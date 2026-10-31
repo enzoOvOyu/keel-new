@@ -143,3 +143,12 @@ func bridgeSource(ns, id, base string, r RunRequest) string {
 	b, _ := yaml.Marshal(doc)
 	return string(b)
 }
+
+// A created definition must be pinned before it can start an execution.
+func engineRevision(definition map[string]any) (int, error) {
+	revision, ok := definition["revision"].(float64)
+	if !ok || revision < 1 || revision != float64(int(revision)) {
+		return 0, problem(502, "KESTRA_FLOW_REVISION_MISSING")
+	}
+	return int(revision), nil
+}
