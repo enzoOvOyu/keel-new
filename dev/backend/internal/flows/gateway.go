@@ -23,13 +23,18 @@ type AgentLog struct {
 	Stream string `json:"stream"`
 	Chunk  string `json:"chunk"`
 }
+type AgentStep struct {
+	TaskID string     `json:"task_id"`
+	Result StepResult `json:"result"`
+}
 type AgentMessage struct {
-	Log          *AgentLog `json:"log,omitempty"`
-	Kind         string    `json:"kind"`
-	Task         *Task     `json:"task,omitempty"`
-	Result       *Result   `json:"result,omitempty"`
-	Version      string    `json:"version,omitempty"`
-	Capabilities []string  `json:"capabilities,omitempty"`
+	Step         *AgentStep `json:"step,omitempty"`
+	Log          *AgentLog  `json:"log,omitempty"`
+	Kind         string     `json:"kind"`
+	Task         *Task      `json:"task,omitempty"`
+	Result       *Result    `json:"result,omitempty"`
+	Version      string     `json:"version,omitempty"`
+	Capabilities []string   `json:"capabilities,omitempty"`
 }
 
 func Wire(m AgentMessage) *structpb.Struct {
@@ -115,8 +120,21 @@ func (g *Gateway) Connect(stream grpc.ServerStream) error {
 					}
 				}
 			}
+			if m.Step != nil {
+				parts := strings.SplitN(m.Step.TaskID, ":", 2)
+				if len(parts) == 2 {
+					var valid bool
+					g.DB.QueryRow(stream.Context(), `SELECT EXISTS(SELECT 1 FROM flow_agent_task WHERE agent_id::text=$1 AND execution_id::text=$2 AND asset_id=$3)`, id, parts[0], parts[1]).Scan(&valid)
+					if valid {
+						(&Service{DB: g.DB}).SaveStepResults(stream.Context(), parts[0], parts[1], []StepResult{m.Step.Result})
+					}
+				}
+			}
 			if m.Result != nil {
 				parts := strings.SplitN(m.Result.ID, ":", 2)
+				if len(parts) == 2 && len(m.Result.Steps) > 0 {
+					(&Service{DB: g.DB}).SaveStepResults(stream.Context(), parts[0], parts[1], m.Result.Steps)
+				}
 				if len(parts) == 2 && contains([]string{"SUCCESS", "FAILED", "RECONCILING"}, m.Result.State) {
 					g.DB.Exec(stream.Context(), `WITH valid AS(SELECT t.execution_id,t.asset_id FROM flow_agent_task t WHERE t.agent_id::text=$1 AND t.execution_id::text=$2 AND t.asset_id=$3), changed AS(UPDATE flow_execution_target t SET state=$4,exit_code=$5,stdout=$6,stderr=$7,ended_at=now() FROM valid v WHERE t.execution_id=v.execution_id AND t.asset_id=v.asset_id AND t.state IN('RUNNING','RECONCILING') RETURNING t.execution_id,t.asset_id) UPDATE flow_agent_task a SET state=$4,result=$8,updated_at=now() FROM changed c WHERE a.execution_id=c.execution_id AND a.asset_id=c.asset_id`, id, parts[0], parts[1], m.Result.State, m.Result.Exit, redactOutput(m.Result.Stdout), redactOutput(m.Result.Stderr), raw(m.Result))
 				}
@@ -187,4 +205,21 @@ func (g *Gateway) Serve(ctx context.Context, address string, cert tls.Certificat
 	server.RegisterService(&grpc.ServiceDesc{ServiceName: "keel.agent.v1.Gateway", HandlerType: (*gatewayServer)(nil), Streams: []grpc.StreamDesc{{StreamName: "Connect", Handler: func(s any, stream grpc.ServerStream) error { return s.(gatewayServer).Connect(stream) }, ServerStreams: true, ClientStreams: true}}}, g)
 	go func() { <-ctx.Done(); server.Stop() }()
 	return server.Serve(listener)
+}
+
+// Cancel only the exact accepted task; lack of a live connection is not proof of termination.
+func (g *Gateway) Cancel(agent, task string) {
+	if g == nil {
+		return
+	}
+	g.mu.Lock()
+	c := g.connections[agent]
+	g.mu.Unlock()
+	if c == nil {
+		return
+	}
+	select {
+	case c.send <- AgentMessage{Kind: "cancel", Task: &Task{ID: task}}:
+	default:
+	}
 }

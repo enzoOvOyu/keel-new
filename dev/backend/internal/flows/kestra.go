@@ -136,7 +136,7 @@ func bridgeSource(ns, id, base string, r RunRequest) string {
 	}
 	doc := map[string]any{"id": id, "namespace": ns, "labels": []any{map[string]any{"key": "keel_job_contract", "value": "v2"}}, "inputs": []any{map[string]any{"id": "targets", "type": "JSON"}, map[string]any{"id": "ticket", "type": "SECRET"}}, "tasks": []any{
 		map[string]any{"id": "frozen_targets", "type": "io.kestra.plugin.core.debug.Return", "format": "{{ inputs.targets | toJson }}"},
-		map[string]any{"id": "targets", "type": "io.kestra.plugin.core.flow.Loop", "values": "{{ inputs.targets }}", "concurrencyLimit": r.Concurrency, "tasks": []any{map[string]any{"id": "transport", "type": "io.kestra.plugin.core.flow.If", "condition": "{{ fromJson(item.value).transport == 'AGENT' }}", "then": []any{request("agent_task", "AGENT")}, "else": []any{request("ssh_task", "SSH")}}}},
+		map[string]any{"id": "targets", "type": "io.kestra.plugin.core.flow.Loop", "values": "{{ inputs.targets }}", "concurrencyLimit": r.Concurrency, "transmitFailed": false, "tasks": []any{map[string]any{"id": "transport", "type": "io.kestra.plugin.core.flow.If", "condition": "{{ fromJson(item.value).transport == 'AGENT' }}", "then": []any{request("agent_task", "AGENT")}, "else": []any{request("ssh_task", "SSH")}}}},
 	}, "finally": []any{map[string]any{"id": "collect_results", "type": "io.kestra.plugin.core.http.Request", "uri": base + "/api/v1/flows/internal/results", "method": "GET", "headers": map[string]any{"Authorization": "Bearer {{ inputs.ticket }}"}, "timeout": "PT30S"}}}
 	// The graph consumes frozen preflight decisions; native branches cannot change the selected transport.
 

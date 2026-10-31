@@ -11,6 +11,7 @@ import (
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/knownhosts"
 	"io"
+	"keel.local/dev/internal/identity"
 	"net"
 	"os"
 	"path/filepath"
@@ -20,19 +21,22 @@ import (
 )
 
 type Task struct {
-	ID      string `json:"id"`
-	Kind    string `json:"kind"`
-	Command string `json:"command"`
-	SHA256  string `json:"sha256"`
-	Timeout int    `json:"timeout_seconds"`
+	Steps   []JobStep         `json:"steps,omitempty"`
+	Env     map[string]string `json:"env,omitempty"`
+	ID      string            `json:"id"`
+	Kind    string            `json:"kind"`
+	Command string            `json:"command"`
+	SHA256  string            `json:"sha256"`
+	Timeout int               `json:"timeout_seconds"`
 }
 type Result struct {
-	Digest string `json:"request_digest,omitempty"`
-	ID     string `json:"id"`
-	State  string `json:"state"`
-	Exit   int    `json:"exit_code"`
-	Stdout string `json:"stdout"`
-	Stderr string `json:"stderr"`
+	Steps  []StepResult `json:"steps,omitempty"`
+	Digest string       `json:"request_digest,omitempty"`
+	ID     string       `json:"id"`
+	State  string       `json:"state"`
+	Exit   int          `json:"exit_code"`
+	Stdout string       `json:"stdout"`
+	Stderr string       `json:"stderr"`
 }
 
 func ResolveSecret(ref string) (string, error) {
@@ -112,6 +116,13 @@ func RunSSH(ctx context.Context, host string, port int, user, keyRef, knownRef s
 	stdout, stderr := &bounded{limit: 1 << 20}, &bounded{limit: 1 << 20}
 	session.Stdout = stdout
 	session.Stderr = stderr
+	if len(task.Env) > 0 {
+		prefix := ""
+		for k, v := range task.Env {
+			prefix += "export " + k + "='" + strings.ReplaceAll(v, "'", "'\"'\"'") + "'\n"
+		}
+		task.Command = prefix + task.Command
+	}
 	script := "sh -s"
 	if task.Kind == "bash" {
 		script = "bash -s"
@@ -177,6 +188,17 @@ func (s *Service) Dispatch(ctx context.Context, token, asset string, required ..
 	}
 	var r RunRequest
 	json.Unmarshal(b, &r)
+	var owner string
+	if e = tx.QueryRow(ctx, `SELECT requester_id::text FROM flow_execution_binding WHERE id=$1`, id).Scan(&owner); e != nil {
+		return Result{}, e
+	}
+	subject, authErr := (identity.Service{DB: s.DB}).Load(ctx, owner)
+	if authErr != nil || !subject.Can("flows:execute", r.Project, "", "") {
+		return Result{}, problem(403, "EXECUTOR_AUTHORIZATION_REVOKED")
+	}
+	if e = s.CheckJobApproval(ctx, Scope{User: owner, Actor: subject.Username, Projects: []string{r.Project}}, r); e != nil {
+		return Result{}, e
+	}
 	var t Target
 	json.Unmarshal(snapshot, &t)
 	// Recheck live lifecycle/identity before dispatch, not only the frozen selection.
@@ -198,9 +220,12 @@ func (s *Service) Dispatch(ctx context.Context, token, asset string, required ..
 	if e = tx.Commit(ctx); e != nil {
 		return Result{}, e
 	}
-	task := Task{ID: id + ":" + asset, Kind: r.Kind, Command: r.Command, SHA256: hash(r.Command), Timeout: r.Timeout}
+	task := Task{ID: id + ":" + asset, Kind: r.Kind, Command: r.Command, SHA256: hash(string(raw(map[string]any{"command": r.Command, "steps": r.Steps}))), Timeout: r.Timeout, Steps: r.Steps}
+	task.SHA256 = TaskDigest(task)
 	taskCtx, cancel := context.WithTimeout(ctx, time.Duration(r.Timeout)*time.Second)
 	defer cancel()
+	activeJobs.Store(task.ID, cancel)
+	defer activeJobs.Delete(task.ID)
 	var result Result
 	if transport == "AGENT" {
 		agentTask := uuid.NewString()
@@ -215,11 +240,11 @@ func (s *Service) Dispatch(ctx context.Context, token, asset string, required ..
 		var port int
 		e = s.DB.QueryRow(ctx, `SELECT host,port,username,secret_ref,known_hosts_ref FROM flow_ssh_trust WHERE id::text=$1 AND project_id=$2 AND asset_id=$3 AND status='approved'`, t.SSH, t.Project, t.ID).Scan(&host, &port, &user, &key, &known)
 		if e == nil {
-			result, e = RunSSH(taskCtx, host, port, user, key, known, task)
+			result, e = RunSSHPipeline(taskCtx, host, port, user, key, known, task, func(v StepResult) { s.SaveStepResults(context.WithoutCancel(ctx), id, asset, []StepResult{v}) })
 		}
 	}
 	if transport == "AGENT" {
-		s.DB.Exec(context.WithoutCancel(ctx), `UPDATE flow_agent_task SET state=$3,result=$4,updated_at=now() WHERE execution_id=$1 AND asset_id=$2`, id, asset, result.State, raw(result))
+		s.DB.Exec(context.WithoutCancel(ctx), `UPDATE flow_agent_task SET state=$3,result=$4,updated_at=now() WHERE execution_id=$1 AND asset_id=$2 AND NOT(state IN('SUCCESS','FAILED') AND $3='RECONCILING')`, id, asset, result.State, raw(result))
 	}
 	if e != nil {
 		result = Result{ID: task.ID, State: "FAILED", Exit: -1, Stderr: "Transport unavailable; see controlled audit"}
@@ -228,12 +253,15 @@ func (s *Service) Dispatch(ctx context.Context, token, asset string, required ..
 		result.State = "RECONCILING"
 	}
 	persistCtx := context.WithoutCancel(ctx)
+	if e := s.SaveStepResults(persistCtx, id, asset, result.Steps); e != nil {
+		return result, e
+	}
 	resultTx, persistErr := s.DB.Begin(persistCtx)
 	if persistErr != nil {
 		return result, persistErr
 	}
 	defer resultTx.Rollback(persistCtx)
-	_, persistErr = resultTx.Exec(persistCtx, `UPDATE flow_execution_target SET state=$3,exit_code=$4,stdout=$5,stderr=$6,ended_at=now() WHERE execution_id=$1 AND asset_id=$2`, id, asset, result.State, result.Exit, redactOutput(result.Stdout), redactOutput(result.Stderr))
+	_, persistErr = resultTx.Exec(persistCtx, `UPDATE flow_execution_target SET state=$3,exit_code=$4,stdout=$5,stderr=$6,ended_at=now() WHERE execution_id=$1 AND asset_id=$2 AND NOT(state IN('SUCCESS','FAILED') AND $3='RECONCILING')`, id, asset, result.State, result.Exit, redactOutput(result.Stdout), redactOutput(result.Stderr))
 	if persistErr != nil {
 		return result, persistErr
 	}
@@ -257,3 +285,14 @@ func redactOutput(v string) string {
 func Digest(b []byte) string { s := sha256.Sum256(b); return hex.EncodeToString(s[:]) }
 
 var _ io.Writer = (*bounded)(nil)
+
+var activeJobs sync.Map
+
+func CancelExecution(id string) {
+	activeJobs.Range(func(key, value any) bool {
+		if strings.HasPrefix(key.(string), id+":") {
+			value.(context.CancelFunc)()
+		}
+		return true
+	})
+}

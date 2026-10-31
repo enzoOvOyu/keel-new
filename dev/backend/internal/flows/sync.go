@@ -39,6 +39,9 @@ func (s *Service) Sync(ctx context.Context) error {
 	if e = s.Engine.JSON(ctx, "GET", "/executions/search?size=100&sort=state.startDate:desc", &page); e != nil {
 		return e
 	}
+	if e = s.SyncSchedules(ctx, page.Results); e != nil {
+		return e
+	}
 	for _, engine := range page.Results {
 		if state, ok := engine["state"].(map[string]any); ok {
 			if current, ok := state["current"].(string); ok {

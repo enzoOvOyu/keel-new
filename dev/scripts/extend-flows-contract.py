@@ -77,6 +77,26 @@ ss['FlowsExecutionPage']=O(dict(items=A('FlowsExecution'),page=R('FlowsQueryPage
 op('/flows/executions','get','listRealExecutions','FlowsExecutionPage')
 for name in ['cursor','q','state','source','flow_id','started_by','transport']:new['/flows/executions']['get']['parameters'].append({'name':name,'in':'query','schema':S})
 new['/flows/executions']['get']['parameters'].append({'name':'limit','in':'query','schema':{'type':'integer','minimum':1,'maximum':100,'default':50}})
+ss['FlowsJobStep']=O(dict(id=S,kind={'type':'string','enum':['command','bash','python']},command=S,depends_on=A(S),inputs={'type':'object','additionalProperties':S}))
+ss['FlowsRun']['properties'].update(dict(steps=A('FlowsJobStep'),approval_id=S,approval_action=S))
+ss['FlowsSchedule']=O(dict(cron=S,timezone=S,enabled=B,run=R('FlowsRun'),revision=I,last_error=N(S)))
+ss['FlowsFileRevision']=O(dict(id=S,path=S,revision=I,sha256=S,size=I,created_at=S))
+ss['FlowsFileUpload']=O(dict(path=S,data_base64={**S,'writeOnly':True},expected_revision=I))
+ss['FlowsStepResult']=O(dict(asset_id=S,step_id=S,state=S,exit_code=N(I),stdout=S,stderr=S))
+ss['FlowsApprovalRequest']=O(dict(run=R('FlowsRun'),reason=S))
+ss['FlowsApprovalResult']=O(dict(id=S,status=S))
+ss['FlowsEvent']=O(dict(id=I,type=S,data=J))
+op('/flows/{flowId}/schedule','get','getTargetSchedule','FlowsSchedule')
+op('/flows/{flowId}/schedule','put','saveTargetSchedule','FlowsSchedule','FlowsSchedule')
+op('/flows/{flowId}/namespace-artifacts','get','listNamespaceFileVersions','FlowsFileRevision',many=True)
+op('/flows/{flowId}/namespace-artifacts','post','uploadNamespaceBinary','FlowsFileRevision','FlowsFileUpload')
+op('/flows/{flowId}/namespace-artifacts/{revisionId}/distribute','post','distributeNamespaceRevision','FlowsExecution','FlowsRun')
+new['/flows/{flowId}/namespace-artifacts/{revisionId}']={'get':{'operationId':'downloadNamespaceRevision','tags':['FlowsReal'],'parameters':[{'in':'path','name':k,'required':True,'schema':S} for k in ['flowId','revisionId']]+[{'in':'query','name':'project_id','schema':S}],'responses':{'200':{'description':'Immutable authorized binary revision.','content':{'application/octet-stream':{'schema':{'type':'string','format':'binary'}}}}}}}
+op('/flows/approval-request','post','requestFlowsApproval','FlowsApprovalResult','FlowsApprovalRequest')
+op('/flows/executions/{executionId}/steps','get','getDeviceSteps','FlowsStepResult',many=True)
+events=new['/flows/executions/{executionId}/events']['get'];events['description']='Persisted Keel event journal; Last-Event-ID scoped to execution; replay ascending IDs. Permissions checked on every reconnect and stream lifetime.';events['parameters'] += [{'name':'project_id','in':'query','schema':S},{'name':'Last-Event-ID','in':'header','schema':S},{'name':'after','in':'query','schema':I},{'name':'history','in':'query','schema':B}]
+ss['FlowsEventPageEnvelope']=O(dict(data=A('FlowsEvent'),request_id=S));events['responses']['200']['content']['application/json']={'schema':R('FlowsEventPageEnvelope')}
+
 # Replace whole affected path blocks while keeping all unrelated source text untouched.
 for path,definition in new.items():
  fragment=yaml.safe_dump({path:definition},sort_keys=False,allow_unicode=True,width=120)

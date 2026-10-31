@@ -30,9 +30,9 @@ import (
 	"time"
 )
 
-const version = "0.1.0"
+const version = "0.2.0"
 
-var caps = []string{"exec.command", "script.bash", "script.python", "task.cancel", "task.stream", "inventory.collect", "file.upload", "file.download", "process.control"}
+var caps = []string{"job.pipeline", "exec.command", "script.bash", "script.python", "task.cancel", "task.stream", "inventory.collect", "file.upload", "file.download", "process.control"}
 var taskRegistry = struct {
 	sync.Mutex
 	active map[string]context.CancelFunc
@@ -283,7 +283,7 @@ func connect(ctx context.Context, address, dir string) error {
 }
 func execute(ctx context.Context, dir string, t flows.Task, callbacks ...func(string, string)) flows.Result {
 	out := flows.Result{ID: t.ID, State: "FAILED", Exit: -1}
-	if t.SHA256 != flows.Digest([]byte(t.Command)) {
+	if t.SHA256 != flows.TaskDigest(t) {
 		out.Stderr = "Script digest mismatch"
 		return out
 	}
@@ -298,6 +298,37 @@ func execute(ctx context.Context, dir string, t flows.Task, callbacks ...func(st
 	out.State = "RECONCILING"
 	out.Digest = t.SHA256
 	if e := os.WriteFile(journal, mustJSON(out), 0600); e != nil {
+		return out
+	}
+	if len(t.Steps) > 0 {
+		ctx, cancel := context.WithTimeout(ctx, time.Duration(t.Timeout)*time.Second)
+		defer cancel()
+		plan, err := flows.PlanSteps(t.Steps)
+		if err != nil {
+			out.State = "FAILED"
+			out.Stderr = err.Error()
+			return out
+		}
+		out.State = "SUCCESS"
+		out.Exit = 0
+		values := map[string]flows.StepResult{}
+		for _, step := range plan {
+			v := flows.StepResult{ID: step.ID, State: "BLOCKED", Exit: -1}
+			if out.State == "SUCCESS" {
+				emitAgent(flows.AgentMessage{Kind: "step", Step: &flows.AgentStep{TaskID: t.ID, Result: flows.StepResult{ID: step.ID, State: "RUNNING", Exit: -1}}})
+				child := flows.StepTask(t, step, values)
+				result := execute(ctx, dir, child, callbacks...)
+				v = flows.StepResult{ID: step.ID, State: result.State, Exit: result.Exit, Stdout: flows.BoundStepOutput(result.Stdout), Stderr: flows.BoundStepOutput(result.Stderr)}
+				out.State = result.State
+				out.Exit = result.Exit
+				out.Stdout += v.Stdout
+				out.Stderr += v.Stderr
+			}
+			out.Steps = append(out.Steps, v)
+			values[step.ID] = v
+			emitAgent(flows.AgentMessage{Kind: "step", Step: &flows.AgentStep{TaskID: t.ID, Result: v}})
+		}
+		os.WriteFile(journal, mustJSON(out), 0600)
 		return out
 	}
 	if t.Kind == "process.control" || t.Kind == "service.control" {
@@ -336,6 +367,9 @@ func execute(ctx context.Context, dir string, t flows.Task, callbacks ...func(st
 	command.Cancel = func() error { return syscall.Kill(-command.Process.Pid, syscall.SIGKILL) }
 	command.WaitDelay = 2 * time.Second
 	command.Env = []string{"PATH=/usr/local/bin:/usr/bin:/bin", "LANG=C.UTF-8"}
+	for key, value := range t.Env {
+		command.Env = append(command.Env, key+"="+value)
+	}
 	command.Dir = dir
 	command.Stdin = strings.NewReader(t.Command)
 	stdout, stderr := &limitWriter{}, &limitWriter{}

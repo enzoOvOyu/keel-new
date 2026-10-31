@@ -65,3 +65,17 @@ func TestTaskStreamsOutputBeforeExit(t *testing.T) {
 		t.Fatal(result)
 	}
 }
+
+func TestPipelineDependenciesAndOutput(t *testing.T) {
+	steps := []flows.JobStep{{ID: "first", Kind: "bash", Command: "printf predecessor", DependsOn: []string{}, Inputs: map[string]string{}}, {ID: "second", Kind: "bash", Command: "printf '%s-result' \"$PREVIOUS\"", DependsOn: []string{"first"}, Inputs: map[string]string{"PREVIOUS": "first"}}}
+	task := flows.Task{ID: "pipeline-local", Kind: "bash", Steps: steps, Timeout: 10}
+	task.SHA256 = flows.TaskDigest(task)
+	result := execute(context.Background(), t.TempDir(), task)
+	if result.State != "SUCCESS" || len(result.Steps) != 2 || result.Steps[1].Stdout != "predecessor-result" {
+		t.Fatalf("pipeline failed: %#v", result)
+	}
+	steps[0].DependsOn = []string{"second"}
+	if _, e := flows.PlanSteps(steps); e == nil {
+		t.Fatal("cycle accepted")
+	}
+}

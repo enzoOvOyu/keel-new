@@ -64,6 +64,9 @@ type Target struct {
 	SSH          string         `json:"ssh_profile_id"`
 }
 type RunRequest struct {
+	Steps           []JobStep         `json:"steps,omitempty"`
+	ApprovalID      string            `json:"approval_id,omitempty"`
+	ApprovalAction  string            `json:"approval_action,omitempty"`
 	Inputs          map[string]string `json:"inputs,omitempty"`
 	TargetRevisions map[string]int64  `json:"target_revisions,omitempty"`
 	Project         string            `json:"project_id"`
@@ -174,13 +177,16 @@ func Route(t Target, policy, capability string) Decision {
 	return d
 }
 func runValid(r RunRequest) error {
+	if _, e := PlanSteps(r.Steps); e != nil {
+		return e
+	}
 	if len(r.Targets) == 0 || len(r.Targets) > 200 {
 		return problem(422, "TARGET_COUNT_INVALID")
 	}
 	if strings.Contains(r.Command, "PRIVATE KEY-----") {
 		return problem(422, "COMMAND_MUST_NOT_CONTAIN_PRIVATE_KEY")
 	}
-	if r.Command == "" || len(r.Command) > 131072 {
+	if (r.Command == "" && len(r.Steps) == 0) || len(r.Command) > 2<<20 {
 		return problem(422, "COMMAND_INVALID")
 	}
 	if !contains([]string{"command", "bash", "python", "file.upload", "file.download", "inventory.collect"}, r.Kind) {

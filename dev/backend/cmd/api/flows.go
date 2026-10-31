@@ -34,7 +34,7 @@ func flowScope(r *http.Request, permission string) flows.Scope {
 	return scope
 }
 func readFlowInput(w http.ResponseWriter, r *http.Request, out any) bool {
-	d := json.NewDecoder(io.LimitReader(r.Body, 256<<10))
+	d := json.NewDecoder(io.LimitReader(r.Body, 2<<20))
 	d.DisallowUnknownFields()
 	if d.Decode(out) != nil {
 		fail(w, 400, "FLOWS_INPUT_INVALID")
@@ -104,7 +104,7 @@ func (s *Server) flowsRoutes(w http.ResponseWriter, r *http.Request) bool {
 	permission := "flows:read"
 	if r.Method != "GET" {
 		permission = "flows:edit"
-		if strings.HasSuffix(r.URL.Path, "/execute") || strings.Contains(r.URL.Path, "/executions/") || strings.HasSuffix(r.URL.Path, "/preflight") || strings.HasSuffix(r.URL.Path, "/quick-run") {
+		if strings.HasSuffix(r.URL.Path, "/execute") || strings.Contains(r.URL.Path, "/executions/") || strings.HasSuffix(r.URL.Path, "/preflight") || strings.HasSuffix(r.URL.Path, "/quick-run") || strings.HasSuffix(r.URL.Path, "/approval-request") || strings.HasSuffix(r.URL.Path, "/distribute") {
 			permission = "flows:execute"
 		}
 		if r.URL.Path == "/api/v1/flows" {
@@ -122,6 +122,9 @@ func (s *Server) flowsRoutes(w http.ResponseWriter, r *http.Request) bool {
 	ctx := r.Context()
 	path := strings.TrimPrefix(r.URL.Path, "/api/v1/flows")
 	parts := strings.Split(strings.Trim(path, "/"), "/")
+	if s.flowCompletion(w, r, scope, parts) {
+		return true
+	}
 	service := s.flows
 	var out any
 	var e error

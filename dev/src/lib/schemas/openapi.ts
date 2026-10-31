@@ -5913,6 +5913,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description Persisted Keel event journal; Last-Event-ID scoped to execution; replay ascending IDs. Permissions checked on every reconnect and stream lifetime. */
         get: operations["followRealExecution"];
         put?: never;
         post?: never;
@@ -6019,10 +6020,192 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/flows/{flowId}/schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getTargetSchedule"];
+        put: operations["saveTargetSchedule"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/{flowId}/namespace-artifacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listNamespaceFileVersions"];
+        put?: never;
+        post: operations["uploadNamespaceBinary"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/{flowId}/namespace-artifacts/{revisionId}/distribute": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["distributeNamespaceRevision"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/{flowId}/namespace-artifacts/{revisionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["downloadNamespaceRevision"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/approval-request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["requestFlowsApproval"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/executions/{executionId}/steps": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getDeviceSteps"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        FlowsEventPageEnvelope: {
+            data: components["schemas"]["FlowsEvent"][];
+            request_id: string;
+        };
+        getDeviceStepsEnvelope: {
+            data: components["schemas"]["FlowsStepResult"][];
+            request_id: string;
+        };
+        requestFlowsApprovalEnvelope: {
+            data: components["schemas"]["FlowsApprovalResult"];
+            request_id: string;
+        };
+        distributeNamespaceRevisionEnvelope: {
+            data: components["schemas"]["FlowsExecution"];
+            request_id: string;
+        };
+        uploadNamespaceBinaryEnvelope: {
+            data: components["schemas"]["FlowsFileRevision"];
+            request_id: string;
+        };
+        listNamespaceFileVersionsEnvelope: {
+            data: components["schemas"]["FlowsFileRevision"][];
+            request_id: string;
+        };
+        saveTargetScheduleEnvelope: {
+            data: components["schemas"]["FlowsSchedule"];
+            request_id: string;
+        };
+        getTargetScheduleEnvelope: {
+            data: components["schemas"]["FlowsSchedule"];
+            request_id: string;
+        };
+        FlowsEvent: {
+            id: number;
+            type: string;
+            data: {
+                [key: string]: unknown;
+            };
+        };
+        FlowsApprovalResult: {
+            id: string;
+            status: string;
+        };
+        FlowsApprovalRequest: {
+            run: components["schemas"]["FlowsRun"];
+            reason: string;
+        };
+        FlowsStepResult: {
+            asset_id: string;
+            step_id: string;
+            state: string;
+            exit_code: number | null;
+            stdout: string;
+            stderr: string;
+        };
+        FlowsFileUpload: {
+            path: string;
+            data_base64: string;
+            expected_revision: number;
+        };
+        FlowsFileRevision: {
+            id: string;
+            path: string;
+            revision: number;
+            sha256: string;
+            size: number;
+            created_at: string;
+        };
+        FlowsSchedule: {
+            cron: string;
+            timezone: string;
+            enabled: boolean;
+            run: components["schemas"]["FlowsRun"];
+            revision: number;
+            last_error: string | null;
+        };
+        FlowsJobStep: {
+            id: string;
+            /** @enum {string} */
+            kind: "command" | "bash" | "python";
+            command: string;
+            depends_on: string[];
+            inputs: {
+                [key: string]: string;
+            };
+        };
         FlowsExecutionPage: {
             items: components["schemas"]["FlowsExecution"][];
             page: components["schemas"]["FlowsQueryPage"];
@@ -6412,6 +6595,9 @@ export interface components {
             target_revisions?: {
                 [key: string]: number;
             };
+            steps?: components["schemas"]["FlowsJobStep"][];
+            approval_id?: string;
+            approval_action?: string;
         };
         FlowsTarget: {
             id: string;
@@ -32523,8 +32709,14 @@ export interface operations {
     };
     followRealExecution: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                project_id?: string;
+                after?: number;
+                history?: boolean;
+            };
+            header?: {
+                "Last-Event-ID"?: string;
+            };
             path: {
                 executionId: string;
             };
@@ -32539,6 +32731,7 @@ export interface operations {
                 };
                 content: {
                     "text/event-stream": string;
+                    "application/json": components["schemas"]["FlowsEventPageEnvelope"];
                 };
             };
         };
@@ -32820,6 +33013,361 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["registerFlowsAgentEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getTargetSchedule: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                flowId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getTargetScheduleEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    saveTargetSchedule: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                flowId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowsSchedule"];
+            };
+        };
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["saveTargetScheduleEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listNamespaceFileVersions: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                flowId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listNamespaceFileVersionsEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    uploadNamespaceBinary: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                flowId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowsFileUpload"];
+            };
+        };
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["uploadNamespaceBinaryEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    distributeNamespaceRevision: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                flowId: string;
+                revisionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowsRun"];
+            };
+        };
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["distributeNamespaceRevisionEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    downloadNamespaceRevision: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                flowId: string;
+                revisionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Immutable authorized binary revision. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/octet-stream": string;
+                };
+            };
+        };
+    };
+    requestFlowsApproval: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowsApprovalRequest"];
+            };
+        };
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["requestFlowsApprovalEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getDeviceSteps: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                executionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getDeviceStepsEnvelope"];
                 };
             };
             /** @description Permission or project scope denied */

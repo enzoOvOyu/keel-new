@@ -17,7 +17,7 @@ func (s *Service) Bootstrap(ctx context.Context, p Scope, in BootstrapRequest) (
 	if e := requireProject(p, in.Project); e != nil {
 		return nil, e
 	}
-	if in.Version != "0.1.0" {
+	if in.Version != "0.2.0" {
 		return nil, problem(422, "AGENT_VERSION_UNAVAILABLE")
 	}
 	url := os.Getenv("KEEL_AGENT_PACKAGE_URL")

@@ -207,6 +207,55 @@ func (s *Service) Preflight(ctx context.Context, p Scope, r RunRequest) ([]Decis
 	if e := ValidateTaskParameters(r.Kind, r.Command); e != nil {
 		return nil, e
 	}
+	if len(r.Steps) > 0 {
+		plan, _ := PlanSteps(r.Steps)
+		var merged []Decision
+		sshOnlyPossible := true
+		for _, step := range plan {
+			if !contains([]string{"command", "bash", "python"}, step.Kind) {
+				sshOnlyPossible = false
+			}
+		}
+		for _, step := range plan {
+			part := r
+			part.Steps = nil
+			part.Kind = step.Kind
+			part.Command = step.Command
+			decisions, e := s.Preflight(ctx, p, part)
+			if e != nil {
+				return nil, e
+			}
+			if merged == nil {
+				merged = decisions
+				continue
+			}
+			for i, d := range decisions {
+				if !d.Ready {
+					merged[i] = d
+				} else if merged[i].Ready && merged[i].Transport != d.Transport {
+					if r.Policy == "agent_preferred" && sshOnlyPossible && d.Target.SSH != "" {
+						merged[i].Transport = "SSH"
+					} else {
+						merged[i].Ready = false
+						merged[i].Transport = "BLOCKED"
+						merged[i].Reason = "PIPELINE_TRANSPORT_CAPABILITY_MISMATCH"
+					}
+				}
+			}
+		}
+		for i, d := range merged {
+			if d.Ready && d.Transport == "AGENT" && !contains(d.Target.Capabilities, "job.pipeline") {
+				if r.Policy == "agent_preferred" && sshOnlyPossible && d.Target.SSH != "" {
+					merged[i].Transport = "SSH"
+				} else {
+					merged[i].Ready = false
+					merged[i].Transport = "BLOCKED"
+					merged[i].Reason = "AGENT_PIPELINE_CAPABILITY_REQUIRED"
+				}
+			}
+		}
+		return merged, nil
+	}
 	targets, e := s.Targets(ctx, Scope{Projects: []string{r.Project}}, "")
 	if e != nil {
 		return nil, e
@@ -310,8 +359,8 @@ func (s *Service) Start(ctx context.Context, p Scope, r RunRequest, key string) 
 		}
 	}
 	// Arbitrary commands need explicit execution permission; known destructive operations remain in their approved domains.
-	if highRisk.MatchString(r.Command) {
-		return empty, problem(422, "HIGH_RISK_USE_APPROVED_DOMAIN_WORKFLOW")
+	if e := s.CheckJobApproval(ctx, p, r); e != nil {
+		return empty, e
 	}
 	ns := Namespace(r.Project)
 	fid := "quick-run"
@@ -359,6 +408,11 @@ func (s *Service) Start(ctx context.Context, p Scope, r RunRequest, key string) 
 	_, e = tx.Exec(ctx, `INSERT INTO flow_execution_binding(id,project_id,flow_id,namespace,engine_flow_id,flow_revision,source_module,requester_id,parent_id,idempotency_key,request_hash,request) VALUES($1,$2,NULLIF($3,'')::uuid,$4,$5,$6,$7,$8,NULLIF($9,'')::uuid,$10,$11,$12)`, id, r.Project, r.Flow, ns, fid, revision, r.Source, p.User, r.Parent, key, digest, raw(r))
 	if e != nil {
 		return empty, e
+	}
+	if r.ApprovalID != "" {
+		if _, e = tx.Exec(ctx, `UPDATE flow_execution_binding SET approval_id=$2 WHERE id=$1`, id, r.ApprovalID); e != nil {
+			return empty, problem(409, "APPROVAL_ALREADY_CLAIMED")
+		}
 	}
 	for _, d := range decisions {
 		_, e = tx.Exec(ctx, `INSERT INTO flow_execution_target(execution_id,asset_id,snapshot,selected_transport,command_hash,ssh_profile_id) VALUES($1,$2,$3,$4,$5,NULLIF($6,'')::uuid)`, id, d.Asset, raw(d.Target), d.Transport, hash(r.Command), d.Target.SSH)
@@ -545,6 +599,12 @@ func (s *Service) Action(ctx context.Context, p Scope, id, action string) (Execu
 	}
 	response.Body.Close()
 	if action == "kill" {
+		CancelExecution(ex.ID)
+		for _, target := range ex.Targets {
+			if target.Snapshot.Agent != "" {
+				s.Gateway.Cancel(target.Snapshot.Agent, ex.ID+":"+target.ID)
+			}
+		}
 		s.DB.Exec(ctx, `DELETE FROM flow_dispatch_ticket WHERE execution_id=$1`, ex.ID)
 	}
 	s.audit(ctx, p, ex.Project, "execution."+action, id, map[string]any{})

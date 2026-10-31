@@ -14949,6 +14949,22 @@ paths:
         required: true
         schema:
           type: string
+      - name: project_id
+        in: query
+        schema:
+          type: string
+      - name: Last-Event-ID
+        in: header
+        schema:
+          type: string
+      - name: after
+        in: query
+        schema:
+          type: integer
+      - name: history
+        in: query
+        schema:
+          type: boolean
       responses:
         '200':
           description: Authorized Kestra SSE proxy; reconnect refetches current state.
@@ -14956,6 +14972,11 @@ paths:
             text/event-stream:
               schema:
                 type: string
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowsEventPageEnvelope'
+      description: Persisted Keel event journal; Last-Event-ID scoped to execution; replay ascending IDs. Permissions checked
+        on every reconnect and stream lifetime.
   /flows/templates:
     get:
       operationId: getFlowsTemplate
@@ -15161,6 +15182,252 @@ paths:
               $ref: '#/components/schemas/FlowsEnrollmentInput'
       security: []
       description: TLS-only enrollment listener; one-use scoped token, no Session. Returns public certificate/CA only.
+  /flows/{flowId}/schedule:
+    get:
+      operationId: getTargetSchedule
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: flowId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getTargetScheduleEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+    put:
+      operationId: saveTargetSchedule
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: flowId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/saveTargetScheduleEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowsSchedule'
+  /flows/{flowId}/namespace-artifacts:
+    get:
+      operationId: listNamespaceFileVersions
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: flowId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listNamespaceFileVersionsEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+    post:
+      operationId: uploadNamespaceBinary
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: flowId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/uploadNamespaceBinaryEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowsFileUpload'
+  /flows/{flowId}/namespace-artifacts/{revisionId}/distribute:
+    post:
+      operationId: distributeNamespaceRevision
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: flowId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: revisionId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/distributeNamespaceRevisionEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowsRun'
+  /flows/{flowId}/namespace-artifacts/{revisionId}:
+    get:
+      operationId: downloadNamespaceRevision
+      tags:
+      - FlowsReal
+      parameters:
+      - in: path
+        name: flowId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: revisionId
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Immutable authorized binary revision.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  /flows/approval-request:
+    post:
+      operationId: requestFlowsApproval
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/requestFlowsApprovalEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowsApprovalRequest'
+  /flows/executions/{executionId}/steps:
+    get:
+      operationId: getDeviceSteps
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: executionId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getDeviceStepsEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
 components:
   securitySchemes:
     bearerAuth:
@@ -15242,6 +15509,251 @@ components:
           schema:
             $ref: "#/components/schemas/ErrorEnvelope"
   schemas:
+    FlowsEventPageEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowsEvent'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getDeviceStepsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowsStepResult'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    requestFlowsApprovalEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsApprovalResult'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    distributeNamespaceRevisionEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsExecution'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    uploadNamespaceBinaryEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsFileRevision'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    listNamespaceFileVersionsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowsFileRevision'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    saveTargetScheduleEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsSchedule'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getTargetScheduleEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsSchedule'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    FlowsEvent:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+        data:
+          type: object
+          additionalProperties: true
+      required:
+      - id
+      - type
+      - data
+    FlowsApprovalResult:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+      required:
+      - id
+      - status
+    FlowsApprovalRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        run:
+          $ref: '#/components/schemas/FlowsRun'
+        reason:
+          type: string
+      required:
+      - run
+      - reason
+    FlowsStepResult:
+      type: object
+      additionalProperties: false
+      properties:
+        asset_id:
+          type: string
+        step_id:
+          type: string
+        state:
+          type: string
+        exit_code:
+          type: integer
+          nullable: true
+        stdout:
+          type: string
+        stderr:
+          type: string
+      required:
+      - asset_id
+      - step_id
+      - state
+      - exit_code
+      - stdout
+      - stderr
+    FlowsFileUpload:
+      type: object
+      additionalProperties: false
+      properties:
+        path:
+          type: string
+        data_base64:
+          type: string
+          writeOnly: true
+        expected_revision:
+          type: integer
+      required:
+      - path
+      - data_base64
+      - expected_revision
+    FlowsFileRevision:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        path:
+          type: string
+        revision:
+          type: integer
+        sha256:
+          type: string
+        size:
+          type: integer
+        created_at:
+          type: string
+      required:
+      - id
+      - path
+      - revision
+      - sha256
+      - size
+      - created_at
+    FlowsSchedule:
+      type: object
+      additionalProperties: false
+      properties:
+        cron:
+          type: string
+        timezone:
+          type: string
+        enabled:
+          type: boolean
+        run:
+          $ref: '#/components/schemas/FlowsRun'
+        revision:
+          type: integer
+        last_error:
+          type: string
+          nullable: true
+      required:
+      - cron
+      - timezone
+      - enabled
+      - run
+      - revision
+      - last_error
+    FlowsJobStep:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        kind:
+          type: string
+          enum:
+          - command
+          - bash
+          - python
+        command:
+          type: string
+        depends_on:
+          type: array
+          items:
+            type: string
+        inputs:
+          type: object
+          additionalProperties:
+            type: string
+      required:
+      - id
+      - kind
+      - command
+      - depends_on
+      - inputs
     FlowsExecutionPage:
       type: object
       additionalProperties: false
@@ -16329,6 +16841,14 @@ components:
           type: object
           additionalProperties:
             type: integer
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowsJobStep'
+        approval_id:
+          type: string
+        approval_action:
+          type: string
       required:
       - project_id
       - target_ids

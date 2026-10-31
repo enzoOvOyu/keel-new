@@ -42,7 +42,7 @@ func TestBridgeDefinition(t *testing.T) {
 	if branch["type"] != "io.kestra.plugin.core.flow.If" {
 		t.Fatal("missing frozen transport branch")
 	}
-	if task["concurrencyLimit"] != 8 || task["type"] != "io.kestra.plugin.core.flow.Loop" {
+	if task["concurrencyLimit"] != 8 || task["type"] != "io.kestra.plugin.core.flow.Loop" || task["transmitFailed"] != false {
 		t.Fatal(task)
 	}
 	if _, e := FlowDocument(source); e != nil {
