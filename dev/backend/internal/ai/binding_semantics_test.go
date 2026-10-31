@@ -85,3 +85,27 @@ func TestIncompleteGlobalSummaryDoesNotExcludeRemainingSheets(t *testing.T) {
 		t.Fatal("omitted global summary entry aborted extraction or invented a disposition", err)
 	}
 }
+
+func TestTwoSidedGenericHeadersAreConnectionsNotInventory(t *testing.T) {
+	s := bom.Sheet{Name: "synthetic-dual"}
+	for row, values := range [][]string{{"设备名称", "端口号", "模块型号", "设备名称", "端口号", "模块型号"}, {"synthetic-a", "eth1", "synthetic-optic-a", "synthetic-b", "eth2", "synthetic-optic-b"}} {
+		for col, v := range values {
+			s.Cells = append(s.Cells, bom.Cell{Row: row + 1, Column: col + 1, Value: v})
+		}
+	}
+	p := SheetPlan{HeaderRows: []int{1}, Tables: []TablePlan{{Kind: "physical_connection", Type: "cable", Start: 2, End: 2, Fields: map[string]int{"endpoint_a_device": 1, "endpoint_a_port": 2, "endpoint_a_optic": 3, "endpoint_b_device": 4, "endpoint_b_port": 5, "endpoint_b_optic": 6}}}}
+	if err := CheckExtraction(s, p); err != nil {
+		t.Fatal("two-sided source mistaken for a single inventory", err)
+	}
+	p.Tables[0].Fields["endpoint_b_device"] = 1
+	if CheckExtraction(s, p) == nil {
+		t.Fatal("second device identity silently dropped")
+	}
+}
+func TestPointSummaryWithoutPortHeadersMayRemainReference(t *testing.T) {
+	s := bom.Sheet{Cells: []bom.Cell{{Row: 1, Column: 1, Value: "Aside dev"}, {Row: 1, Column: 2, Value: "Bside dev"}, {Row: 1, Column: 3, Value: "Cable Model"}, {Row: 2, Column: 1, Value: "synthetic-a"}, {Row: 2, Column: 2, Value: "synthetic-b"}, {Row: 2, Column: 3, Value: "synthetic-model"}}}
+	p := SheetPlan{HeaderRows: []int{1}, Purpose: "reference", Tables: []TablePlan{{Kind: "reference", Type: "other", Start: 2, End: 2, Fields: map[string]int{}}}}
+	if err := CheckExtraction(s, p); err != nil {
+		t.Fatal("summary forced to invent a physical cable", err)
+	}
+}

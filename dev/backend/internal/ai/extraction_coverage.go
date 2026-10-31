@@ -74,7 +74,9 @@ func inspectSourceCoverage(s bom.Sheet, p SheetPlan) error {
 	}
 	order := []int{}
 	for row, h := range headers {
-		if len(h) >= 2 && (len(h["hostname"]) > 0 && len(h["model"]) > 0 || len(h["endpoint_a_device"]) > 0 && len(h["endpoint_b_device"]) > 0) {
+		inventory := len(h["hostname"]) == 1 && len(h["model"]) > 0
+		explicitCable := len(h["endpoint_a_device"]) > 0 && len(h["endpoint_b_device"]) > 0 && (len(h["endpoint_a_port"])+len(h["endpoint_b_port"])+len(h["endpoint_a_uid"])+len(h["endpoint_b_uid"]) > 0)
+		if inventory || explicitCable || dualEndpointHeaders(h) {
 			order = append(order, row)
 		}
 	}
@@ -103,8 +105,29 @@ func inspectSourceCoverage(s bom.Sheet, p SheetPlan) error {
 			if !identity {
 				continue
 			}
+			if dualEndpointHeaders(h) {
+				for source, targets := range map[string][]string{"hostname": {"endpoint_a_device", "endpoint_b_device"}, "port_index": {"endpoint_a_port", "endpoint_b_port"}, "model": {"endpoint_a_optic", "endpoint_b_optic", "model"}} {
+					for _, col := range h[source] {
+						if bom.ExtractCellValue(rows[row][col], source) == "" {
+							continue
+						}
+						covered := false
+						for _, field := range targets {
+							if planMapsCell(p, rows[row], row, field, col) {
+								covered = true
+							}
+						}
+						if !covered {
+							return fmt.Errorf("SOURCE_FIELD_UNCOVERED: row=%d column=%d field=%s; preserve each explicit side of the connection", row, col, source)
+						}
+					}
+				}
+			}
 			// Deterministic diagnostics contain coordinates, never asset values.
 			for _, f := range []string{"hostname", "device_alias", "serial", "model", "management_ip", "mac", "rack", "site", "u_start", "u_height", "endpoint_a_device", "endpoint_a_port", "endpoint_b_device", "endpoint_b_port", "endpoint_a_optic", "endpoint_b_optic", "length", "speed", "media_type"} {
+				if dualEndpointHeaders(h) && (f == "hostname" || f == "model") {
+					continue
+				}
 				first, covered := 0, false
 				for _, col := range h[f] {
 					if bom.ExtractCellValue(rows[row][col], f) == "" {
@@ -228,4 +251,8 @@ func SourceAnchor(fields map[string]int) string {
 	}
 	sort.Strings(parts)
 	return strings.Join(parts, ",")
+}
+
+func dualEndpointHeaders(h map[string][]int) bool {
+	return len(h["hostname"]) == 2 && len(h["port_index"]) == 2
 }

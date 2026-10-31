@@ -9,14 +9,28 @@
     "Bound structural sampling allocations and cross-sheet reference indexing to requested evidence.",
     "Recover workbench read/retry state from authoritative persisted job state without nested large-JSON rewrites.",
     "Read BOM network_role consistently in topology matrix and visualization views, preserving explicit role precedence.",
-    "Redact source identities/account data before external model context."
+    "Redact source identities/account data before external model context.",
+    "Ignore whitespace-only formatted worksheet tails when checking column limits; real values/formulas beyond the limit remain rejected.",
+    "Allow existing audited parse-retry API for FAILED AI imports without enabling legacy mapping writes.",
+    "Omitted global-summary sheets stay unknown and are still independently analyzed; no invented purpose or silent exclusion.",
+    "Distinguish dual-sided device/port headers from inventory; verify both connection sides independently. Summaries without explicit ports are not forced into physical cables."
   ],
   "checks": {
     "Go_API_AI_BOM_CMDB": "PASS before final build",
     "PostgreSQL_BOM_network_role_matrix_scope_and_precedence": "PASS; isolated synthetic project inside rolled-back transaction",
-    "new_real_workbook": "NOT RUN at code commit"
+    "new_real_workbook": "IN PROGRESS: same independent batch after resolving parse and global-summary blockers",
+    "column_limit_blank_vs_real_value_and_formula": "PASS",
+    "omitted_global_summary_source": "PASS",
+    "dual_sided_connection_and_portless_summary": "PASS: go test ./internal/ai (cached successful run)"
   },
   "unchanged_gates": "No invented SN, units, geometry, port rates or model approvals. Missing actual business evidence remains a blocker.",
   "memory_limit": "Known allocation amplification reduced; repeated full-size runtime OOM recovery is not yet certified.",
-  "source_file": "TX B300 Layout-new.xlsx remains outside Git and is not modified."
+  "source_file": "TX B300 Layout-new.xlsx remains outside Git and is not modified.",
+  "runtime": {
+    "code_commit": "eea8aaf",
+    "binary": "/tmp/keel-api-bom-v6d-flows-1031",
+    "port": 8081,
+    "environment_preserved": true,
+    "frontend_changed": false
+  }
 }
