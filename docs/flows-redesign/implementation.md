@@ -143,3 +143,11 @@ Kestra2.0.7兼容修正包括Loop替代不存在的ForEach、`fromJson(item.valu
 - 修复接入时monacoSetup的ASI初始化错误；一次完整构建被137终止，裁减到本期YAML实际使用的generic Worker后构建通过。JSON/TypeScript语义Worker未开放，不暗示支持；源文件语法配色/编辑与Go侧校验继续独立。
 - 浏览器三项检查通过：原生Monaco挂载、实际键盘输入更新YAML、Visual/YAML切换保留内容，无pageerror。证据：[editor-validation.json](native-ui/editor-validation.json)、[截图](native-ui/editor.png)。结构面板动态渲染的间距样式随后定向修正，最终视觉需下一次页面检查；未声称全编辑器验收。
 - Monaco版本0.56与上游一致，附LICENSE/ThirdPartyNotices。新引入的DOMPurify依赖已锁定到修复补丁3.4.17；未进行无关全平台依赖升级。
+
+## 暂停接续 · 用户要求记录后暂停
+
+本次停止开发，当前完整范围约20%（功能估算）。最新接续入口移至HANDOFF顶部，列出全部未完成与环境边界。
+
+暂停前Outputs增量：复用上游SidebarList/explorerSearch和原生搜索/折叠/标签组件，接入当前Execution实际outputs；支持搜索、选择、值预览、复制和完整返回值JSON下载。不是完整Inputs/Variables表达式调试器，现有Artifact授权下载链接继续保留。
+
+`npm run build`通过；浏览器仅注入明确synthetic执行，挂载、搜索选择、下载三项通过，无页面错误，未写业务库/操作设备。证据：[outputs-validation.json](native-ui/outputs-validation.json)、[截图](native-ui/outputs.png)。不是实际引擎产物闭环。

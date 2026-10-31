@@ -1,18 +1,20 @@
 # Keel 当前开发交接
 
-## 当前任务接续入口：Kestra原生作业平台（优先读，开发中）
+## 当前任务接续入口：Kestra原生作业平台（已按用户要求暂停）
 
-- 分支 **`feat/jobs-kestra-ui`**；目录 **`/home/ubuntu/keel-kestra-ui-dev`**。最新原生接入提交`a9ae943`、来源格式修正`b12a816`；Quick Run/模板修复`564a1e5`。未合并main、未推送、未发布新分支。
-- 目标：直接复用Kestra开源Vue前端及LC-01…14生命周期功能；保留Keel React外壳、身份、ProjectContext、CMDB、审批和Agent/SSH执行边界。方案：[KESTRA-UI-REPLACEMENT](docs/flows-redesign/KESTRA-UI-REPLACEMENT.md)。用户已授权持续开发到完成，不逐阶段等待确认。
-- **实际完成**：原生design-system组件、Vue/React挂载和样式隔离；Flow/Execution两列表基础接线、搜索/状态URL恢复；原生RunTimeline接线；原生KsEditor/Monaco与多面板源码接线已写入，原生代码输入/YAML双向同步和切换保持已通过浏览器验证。不是完整No-code/详情已完成。
-- **已验证**：生产构建通过；浏览器三个检查（两列表挂载、筛选刷新恢复）通过，证据[validation.json](docs/flows-redesign/native-ui/validation.json)。使用浏览器拦截提供分支dist并读取现有API，未启动新服务、未写入资产/作业数据。Timeline目前编译通过，真实有历史执行的交互未验收。
-- **当前正在做**：原生多面板（YAML/结构）已接线，拖动/合并/最大化来自上游；下一步补真正的No-code节点编辑、文件/Docs及原生拓扑，不能把结构摘要冒充No-code。初始化ASI错误已修复，裁减无关语言Worker后构建通过，三个编辑器浏览器检查通过（挂载、输入同步、Visual/YAML切换保持）。
-- **下一步定位**：`dev/src/features/jobs-native`为新Vue模块，`dev/src/vendor/kestra`为固定commit49b62a2来源组件；React入口`features/flows/FlowsWorkspace.tsx`。上游源码审查目录`/tmp/keel-kestra-ui-source/ui`只作参考，交付代码不能依赖临时目录。
-- **未完成清单**：原生多面板编辑器/节点属性/Topology/Files/Docs；完整KSFilter、列管理、批量操作及服务器分页/最后执行摘要；原生执行Gantt/TaskRun/Attempt/日志/变量/指标/依赖；LC并发/排队/补跑/跨执行检索；QuickRun/Agents界面替换；Agent轮换/持久批量安装、设备事件触发、ZTP消费者及相关真实API。
-- **运行隔离**：原5180仍从`/home/ubuntu/keel-flows-dev/dev`运行；其他窗口正在更新8081；下方BOM v5段落仅是本分支历史，不能据此认定当前二进制版本。部署前必须核对最新运行进程及负责窗口交接，不得用本分支旧后端基线覆盖其BOM修复；迁移025尚未在当前环境执行。没有新端口/新增一级菜单。
-- **验证纪律**：只验证当前改动；无变化的检查不重跑，不导入资产或进行生产设备执行。每个有意义切片提交代码并更新此节，后续历史段落不作为当前完成状态。
+- **状态**：用户最新要求“记录handoff然后暂停”。已停止后续开发；当前整体完成度约20%（功能估算），不是完整交付。恢复时从本节继续，不重扫全部代码。
+- **分支/目录**：`feat/jobs-kestra-ui` / `/home/ubuntu/keel-kestra-ui-dev`。原生列表/时间线`a9ae943`；原生代码/多面板壳层`3df73d7`；QuickRun/模板修复`564a1e5`。本次暂停提交还包含下述Outputs增量。未合并main、未推送、未部署。
+- **唯一方案**：[KESTRA-UI-REPLACEMENT.md](docs/flows-redesign/KESTRA-UI-REPLACEMENT.md)，包括用户新增的LC-01…14生命周期范围。直接复用固定Kestra commit `49b62a2c820d37e98a1c7b63aa35fd83f960d4ec` 的Vue组件；Keel保留React外壳、项目/权限/CMDB/审批/Agent与SSH边界。
+- **实际完成**：原生design-system与React/Vue桥、样式隔离；两列表基础接线、搜索/状态URL恢复；RunTimeline接线；KsEditor/Monaco与原生多面板壳层（YAML+只读结构）；Outputs原生SidebarList搜索、选择、预览、复制/下载接线。结构摘要不是No-code，Outputs侧栏不是完整变量/表达式调试器。
+- **实际验证**：列表构建与三个浏览器检查通过；编辑器构建与三个浏览器检查通过（挂载、键盘输入同步、Visual/YAML切换保留）；Outputs构建与三个浏览器检查通过（挂载、搜索选择更新详情、JSON下载）。Outputs检查仅为浏览器注入的明确synthetic执行，未写业务库，不能当真实引擎产物验收。证据：[native-ui目录](docs/flows-redesign/native-ui/)。
+- **已修故障/限制**：编辑器ASI初始化错误已修；一次完整构建137退出，裁减为本期YAML所需generic Worker后通过。JSON/TypeScript语义Worker未启用。编辑器结构面板间距样式在截图后定向修正，完整最终视觉及拖动/合并/最大化/布局恢复仍待验证。旧React详情/Visual仍在过渡中。
+- **立即接续事项**：优先完善原生No-code节点/属性与Topology、Files/Docs，接入完整执行详情；同时补列表服务器分页/total/最后执行摘要，避免永远停留在本地分页。已检查上游FlowController/search、QueryFilterFormat源码位置，但尚未编写新目录查询接口。
+- **其余未完成**：完整KSFilter、列管理、批量动作；原生Gantt/TaskRun/Attempt/日志/完整变量/指标/依赖；LC并发/排队/补跑/跨执行检索/源码搜索；QuickRun/Agents替换；证书轮换/持久批量安装、设备事件触发、ZTP消费者及真实API契约与联调。不要把软件缺口归类为只等真机。
+- **代码入口**：`dev/src/features/jobs-native/`（新Vue模块）；`dev/src/vendor/kestra/`（来源与许可证）；`features/flows/FlowsWorkspace.tsx`（React消费者）；`features/flows/Builder.tsx`（YAML入口）。`dev/scripts/import-kestra-components.py`只从显式提供且commit匹配的上游checkout复制依赖。临时参考checkout `/tmp/keel-kestra-ui-source`不是交付运行依赖。
+- **验证脚本/日志**：本机`/tmp/keel-native-ui-check.mjs`、`/tmp/keel-native-editor-check.mjs`、`/tmp/keel-native-outputs-check.mjs`用浏览器拦截提供分支dist，不开新端口；脚本登录读取本机私有环境引用，不得输出/提交秘密。最新构建日志`/tmp/keel-native-outputs-build.log`。恢复时无代码变动不重复已过检查。
+- **环境保护**：5180仍由`/home/ubuntu/keel-flows-dev/dev`运行；本分支未切换服务。其他窗口持续更新8081，下面BOM v5段落只是本分支历史，不得当当前二进制。部署前核验负责窗口最新运行版本，不能用本分支旧后端基线覆盖BOM修复。迁移025未由本任务应用，恢复时先检查跨分支迁移编号是否占用。不要停止其他窗口服务、导入资产或恢复旧合成Agent。
 
-以下为既有发布和历史实施记录，若与本节冲突，以本节任务状态为准；运行环境的精确版本仍以对应最新发布证据为准。
+以下为历史实施与发布记录，不作为本任务的最新完成状态。
 
 ## 作业平台 UI 整改增量 · 2026-10-31
 
