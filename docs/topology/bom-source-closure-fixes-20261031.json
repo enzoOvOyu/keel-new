@@ -13,7 +13,9 @@
     "Ignore whitespace-only formatted worksheet tails when checking column limits; real values/formulas beyond the limit remain rejected.",
     "Allow existing audited parse-retry API for FAILED AI imports without enabling legacy mapping writes.",
     "Omitted global-summary sheets stay unknown and are still independently analyzed; no invented purpose or silent exclusion.",
-    "Distinguish dual-sided device/port headers from inventory; verify both connection sides independently. Summaries without explicit ports are not forced into physical cables."
+    "Distinguish dual-sided device/port headers from inventory; verify both connection sides independently. Summaries without explicit ports are not forced into physical cables.",
+    "Do not treat token embedded in a device hostname as a credential declaration; credential labels and values remain redacted. Upgrade cached IR from immutable source to excelize-ir/v4.",
+    "Retain missing module-model bindings only for unambiguous paired device/port/module headers, using the already-bound endpoint orientation."
   ],
   "checks": {
     "Go_API_AI_BOM_CMDB": "PASS before final build",
@@ -21,14 +23,16 @@
     "new_real_workbook": "IN PROGRESS: same independent batch after resolving parse and global-summary blockers",
     "column_limit_blank_vs_real_value_and_formula": "PASS",
     "omitted_global_summary_source": "PASS",
-    "dual_sided_connection_and_portless_summary": "PASS: go test ./internal/ai (cached successful run)"
+    "dual_sided_connection_and_portless_summary": "PASS: go test ./internal/ai (cached successful run)",
+    "token_named_inventory_and_real_credentials": "PASS: targeted BOM/AI/API packages; new workbook local parser retains 182 nonempty hostname-column cells, zero redacted; this is not an asset count.",
+    "paired_module_header_orientation": "PASS: AI package, reversed A/B fixture"
   },
   "unchanged_gates": "No invented SN, units, geometry, port rates or model approvals. Missing actual business evidence remains a blocker.",
   "memory_limit": "Known allocation amplification reduced; repeated full-size runtime OOM recovery is not yet certified.",
   "source_file": "TX B300 Layout-new.xlsx remains outside Git and is not modified.",
   "runtime": {
-    "code_commit": "eea8aaf",
-    "binary": "/tmp/keel-api-bom-v6d-flows-1031",
+    "code_commit": "d62dab1",
+    "binary": "/tmp/keel-api-bom-v6g-flows-1031",
     "port": 8081,
     "environment_preserved": true,
     "frontend_changed": false
