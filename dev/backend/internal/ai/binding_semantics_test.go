@@ -126,3 +126,23 @@ func TestRepeatedOpticHeadersFollowBoundEndpointSide(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestMixedInventoryAndConnectionUseOwnHeaders(t *testing.T) {
+	s := bom.Sheet{}
+	for row, vs := range [][]string{{"设备名称", "设备型号", "SN"}, {"synthetic-switch", "synthetic-model", "synthetic-sn"}, {"设备名称", "端口号", "线缆类型", "模块型号", "设备名称", "端口号", "线缆类型", "模块型号"}, {"synthetic-switch", "p1", "synthetic-cable", "synthetic-optic", "synthetic-peer", "p2", "synthetic-cable", "synthetic-optic"}} {
+		for col, v := range vs {
+			s.Cells = append(s.Cells, bom.Cell{Row: row + 1, Column: col + 1, Value: v})
+		}
+	}
+	p := SheetPlan{HeaderRows: []int{1, 3}, Tables: []TablePlan{
+		{Kind: "planned_device", Type: "switch", Start: 2, End: 2, Fields: map[string]int{"hostname": 1, "model": 2, "serial": 3}},
+		{Kind: "physical_connection", Type: "cable", Start: 4, End: 4, Fields: map[string]int{"endpoint_a_device": 1, "endpoint_a_port": 2, "endpoint_b_device": 5, "endpoint_b_port": 6, "media_type": 3}},
+	}}
+	normalizeExplicitBindings(s, &p)
+	if p.Tables[0].Fields["model"] != 2 || p.Tables[1].Fields["endpoint_a_port"] != 2 || p.Tables[1].Fields["endpoint_a_optic"] != 4 {
+		t.Fatal("another region overwrote bindings")
+	}
+	if err := CheckExtraction(s, p); err != nil {
+		t.Fatal(err)
+	}
+}

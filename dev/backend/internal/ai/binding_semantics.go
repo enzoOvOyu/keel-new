@@ -10,24 +10,40 @@ import (
 
 // Recover explicit table headers independently of the model's chosen header row.
 // Only repair an existing extractor: this never invents a table or source value.
-func sourceHeaders(s bom.Sheet, p SheetPlan) map[int]bom.Cell {
+func sourceHeaders(s bom.Sheet, p SheetPlan, tableStart ...int) map[int]bom.Cell {
+	limit := 50
+	if len(tableStart) > 0 {
+		limit = tableStart[0] - 1
+	}
+	declared := map[int]bool{}
+	for _, row := range p.HeaderRows {
+		declared[row] = true
+	}
 	scores := map[int]int{}
 	for _, c := range s.Cells {
-		if c.Row <= 50 && !c.Sensitive && bom.Field(c.Value) != "" {
+		if c.Row <= limit && !c.Sensitive && bom.Field(c.Value) != "" {
 			scores[c.Row]++
 		}
 	}
 	best := 0
 	for row, score := range scores {
+		if len(tableStart) > 0 {
+			if (score >= 3 || declared[row] && score > 0) && row > best {
+				best = row
+			}
+			continue
+		}
 		if score > scores[best] || score == scores[best] && row < best {
 			best = row
 		}
 	}
 	rows := map[int]bool{}
-	for _, row := range p.HeaderRows {
-		rows[row] = true
+	if len(tableStart) == 0 {
+		for _, row := range p.HeaderRows {
+			rows[row] = true
+		}
 	}
-	if scores[best] >= 3 {
+	if scores[best] >= 3 || len(tableStart) > 0 && declared[best] {
 		rows[best] = true
 	}
 	out := map[int]bom.Cell{}
@@ -89,32 +105,32 @@ func guardedField(field string) bool {
 }
 
 func normalizeExplicitBindings(s bom.Sheet, p *SheetPlan) {
-	heads := sourceHeaders(s, *p)
-	columns := map[string][]int{}
-	headerRows := map[int]bool{}
-	for col, c := range heads {
-		if f := bom.Field(c.Value); f != "" {
-			columns[f] = append(columns[f], col)
-			headerRows[c.Row] = true
-		}
-	}
-	for f := range columns {
-		sort.Ints(columns[f])
-	}
-	for row := range headerRows {
-		found := false
-		for _, h := range p.HeaderRows {
-			if row == h {
-				found = true
-			}
-		}
-		if !found {
-			p.HeaderRows = append(p.HeaderRows, row)
-		}
-	}
-	sort.Ints(p.HeaderRows)
 	for j := range p.Tables {
 		t := &p.Tables[j]
+		heads := sourceHeaders(s, *p, t.Start)
+		columns := map[string][]int{}
+		headerRows := map[int]bool{}
+		for col, c := range heads {
+			if f := bom.Field(c.Value); f != "" {
+				columns[f] = append(columns[f], col)
+				headerRows[c.Row] = true
+			}
+		}
+		for f := range columns {
+			sort.Ints(columns[f])
+		}
+		for row := range headerRows {
+			found := false
+			for _, h := range p.HeaderRows {
+				if row == h {
+					found = true
+				}
+			}
+			if !found {
+				p.HeaderRows = append(p.HeaderRows, row)
+			}
+		}
+		sort.Ints(p.HeaderRows)
 		if t.Kind == "reference" {
 			continue
 		}
@@ -161,8 +177,8 @@ func normalizeExplicitBindings(s bom.Sheet, p *SheetPlan) {
 }
 
 func inspectBindingSemantics(s bom.Sheet, p SheetPlan) error {
-	heads := sourceHeaders(s, p)
 	for _, t := range p.Tables {
+		heads := sourceHeaders(s, p, t.Start)
 		if t.Kind == "reference" {
 			continue
 		}
