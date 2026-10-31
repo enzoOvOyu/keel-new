@@ -71,7 +71,7 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 		raw = nil
 	}
 	// Upgrade cached IR from the immutable object once; never change the uploaded file.
-	if err == nil && len(wb.Sheets) > 0 && wb.Sheets[0].Parser != "excelize-ir/v3" {
+	if err == nil && len(wb.Sheets) > 0 && wb.Sheets[0].Parser != "excelize-ir/v4" {
 		var key string
 		if e := s.db.QueryRow(ctx, "SELECT object_key FROM bom_import_batch WHERE id=$1", id).Scan(&key); e != nil {
 			err = e

@@ -7,6 +7,7 @@ import (
 	"github.com/xuri/excelize/v2"
 	"io"
 	"path"
+	"regexp"
 	"strings"
 )
 
@@ -38,9 +39,16 @@ type Workbook struct {
 	AIConfigured bool    `json:"ai_configured"`
 }
 
+// Credential labels may contain token, but inventory names such as
+// synthetic-token-leaf are not secret-field declarations.
+var tokenLabel = regexp.MustCompile(`(?i)^(?:(?:api|access|auth|bearer|refresh)[ _-]*)?token(?:$|[\s:：=（(])|token\s*[:：=]|^(?:访问|认证|鉴权|访问令牌)?令牌`)
+
 func Sensitive(s string) bool {
-	s = strings.ToLower(s)
-	for _, x := range []string{"password", "passwd", "密码", "secret", "credential", "token", "private key", "api key", "username", "用户名", "账户", "账号"} {
+	s = strings.ToLower(strings.TrimSpace(s))
+	if tokenLabel.MatchString(s) {
+		return true
+	}
+	for _, x := range []string{"password", "passwd", "密码", "secret", "credential", "private key", "api key", "username", "用户名", "账户", "账号"} {
 		if strings.Contains(s, x) {
 			return true
 		}
@@ -73,7 +81,7 @@ func Parse(data []byte) (Workbook, error) {
 	for idx, name := range f.GetSheetList() {
 		visible, _ := f.GetSheetVisible(name)
 		dim, _ := f.GetSheetDimension(name)
-		s := Sheet{Name: name, Order: idx, Hidden: !visible, Dimension: dim, Purpose: "unclassified", Parser: "excelize-ir/v3", Cells: []Cell{}, Merges: []string{}}
+		s := Sheet{Name: name, Order: idx, Hidden: !visible, Dimension: dim, Purpose: "unclassified", Parser: "excelize-ir/v4", Cells: []Cell{}, Merges: []string{}}
 		merges, e := f.GetMergeCells(name)
 		if e != nil {
 			return result, e

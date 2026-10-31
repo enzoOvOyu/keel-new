@@ -160,3 +160,38 @@ func TestColumnLimitIgnoresWhitespaceTailButRejectsRealEvidence(t *testing.T) {
 		})
 	}
 }
+
+func TestTokenDeviceNameDoesNotRedactInventoryColumn(t *testing.T) {
+	f := excelize.NewFile()
+	defer f.Close()
+	for ref, value := range map[string]string{"A1": "设备名称", "A2": "synthetic-token-leaf-1", "A3": "synthetic-leaf-2", "B1": "设备型号", "B2": "synthetic-model", "C1": "API Token", "C2": "DO_NOT_EXPOSE_TOKEN"} {
+		if err := f.SetCellValue("Sheet1", ref, value); err != nil {
+			t.Fatal(err)
+		}
+	}
+	var b bytes.Buffer
+	if err := f.Write(&b); err != nil {
+		t.Fatal(err)
+	}
+	w, err := Parse(b.Bytes())
+	if err != nil {
+		t.Fatal(err)
+	}
+	kept := 0
+	for _, c := range w.Sheets[0].Cells {
+		if c.Column == 1 && !c.Sensitive && c.Value != "[REDACTED]" {
+			kept++
+		}
+		if c.Column == 3 && (!c.Sensitive || c.Value != "[REDACTED]") {
+			t.Fatal("credential column exposed")
+		}
+	}
+	if kept != 3 {
+		t.Fatal("device label erased inventory identity", kept)
+	}
+	for _, label := range []string{"token", "Access Token", "token: synthetic", "API_TOKEN", "token（凭据）", "令牌"} {
+		if !Sensitive(label) {
+			t.Fatalf("credential label not detected: %s", label)
+		}
+	}
+}
