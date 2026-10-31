@@ -4,7 +4,7 @@
 
 - 运维中心 `/topology`，内部为全局拓扑、网络架构、机柜组、物理布线、链路追踪和数据质量。
 - 原 Fabric Topology 的 Mock/逻辑视图保留，并增加真实 CMDB 数据中心拓扑跳转，避免把旧演示当作真实接口。
-- 保留 `/racks`、`/racks/:rackId`，默认接真实 CMDB 投影；旧 Mock 编辑器可用 `?legacy=1` 访问，未删除其代码和发布/版本能力。
+- `/racks`、`/racks/:rackId` 统一使用当前 CMDB 工作台，Sidebar 入口收于“数据中心拓扑 → 机柜管理”。旧 Mock 页及 `legacy=1` 分支已移除；历史资产、关系和版本数据保持。
 - 全局首层仅显示现有 data_center/region/pod 的 parent 层级，不叠加全部线缆；点击进入机柜组再下钻 rack，避免一屏混合层级和全部布线；机柜节点进入详情，设备以稳定 ID 定位详情及其机柜。URL 保存 focus/selected/cable/port/face/rack_tab，不以名称匹配。
 - 查询数据库不等于真机采集：当前主要是 CMDB 内的 synthetic 数据，界面显示标识。未知、陈旧和未采集不判 PASS。
 
@@ -59,3 +59,5 @@
 跨页项目上下文：机柜导航和拓扑机柜节点的 URL 带 project_id，恢复到同一个 ProjectContext 过滤；默认跨项目过滤仍可清除。
 
 实际视觉检查曾发现 G6 空 controlPoints 渲染中断及 Canvas 不解析 CSS 色值变量，已修复为显式空数组/可识别色值，并用无错误画布复查。全局页与布线页分开呈现，减少首屏连线拥挤。
+
+2026-10-31 导航与空间整改：旧 Rack 页退役，机柜管理嵌入 Sidebar 的数据中心拓扑分组；模块级顶部切换栏与长篇实现说明已移除，范围控制收进顶栏。机柜详情内部业务 Tab 保留。

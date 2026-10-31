@@ -73,7 +73,7 @@ export function TopologyCanvas({
         const g = new Graph({
           container: host.current!,
           autoResize: true,
-          height: 620,
+          height: host.current!.clientHeight || 620,
           animation: false,
           autoFit: "view",
           behaviors: ["drag-canvas", "zoom-canvas"],

@@ -4,7 +4,7 @@
 
 ## 2026-10-31 后续任务变更
 
-用户本轮转向数据中心拓扑与机柜一体化，当前优先级据此更新。新入口 `/topology`、`/racks`，实现/验证/缺口见 `docs/DATACENTER-VISUALIZATION.md`；代码在 `dev/src/features/infrastructure/`、`internal/cmdb/visualization.go`。BOM Agent 未完成状态保持，不因本次可视化开发声称已解决。
+用户本轮转向数据中心拓扑与机柜一体化，当前优先级据此更新。Sidebar 已将 `/racks` 收入数据中心拓扑，废弃 Rack 页面与 legacy 分支已移除；新入口 `/topology`、`/racks`，实现/验证/缺口见 `docs/DATACENTER-VISUALIZATION.md`；代码在 `dev/src/features/infrastructure/`、`internal/cmdb/visualization.go`。BOM Agent 未完成状态保持，不因本次可视化开发声称已解决。
 
 ## 1. 先看这里
 

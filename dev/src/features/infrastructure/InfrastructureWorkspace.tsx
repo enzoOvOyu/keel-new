@@ -346,24 +346,9 @@ export function InfrastructureWorkspace({
   return (
     <div className="workspace infrastructure">
       <div className="page-heading">
-        <div>
-          <small>运维中心 / 数据中心拓扑 {rack ? "/ " + rack.name : ""}</small>
-          <h1>{rack ? rack.name : rackOnly ? "机柜与机房" : "数据中心拓扑"}</h1>
-          <p>
-            CMDB 权威投影 · 位置与物理端点按稳定 ID 关联 ·
-            布局草稿与实际安装事实分离
-          </p>
-        </div>
-        <Button onClick={() => query.refetch()}>刷新 CMDB</Button>
+        <h1>{rack?rack.name:rackOnly?'机柜管理':({global:'全局拓扑',network:'网络架构',groups:'机柜组',cabling:'物理布线',trace:'链路追踪',quality:'数据质量'} as Record<string,string>)[view]||'数据中心拓扑'}</h1>
+        <div className="infra-heading-actions">{assets.some(a=>a.fields.is_demo)&&<Badge value="演示数据"/>}<Button onClick={()=>query.refetch()}>刷新</Button></div>
       </div>
-      {assets.some((a) => a.fields.is_demo) && (
-        <Badge value="SYNTHETIC · 数据库内合成演示资产" />
-      )}
-      {!query.isPending && data && !assets.length && (
-        <p>
-          当前筛选没有可显示的资产。请清除项目筛选或在 CMDB 检查授权与数据。
-        </p>
-      )}
       {query.isPending && <div role="status">正在加载获授权 CMDB 资产…</div>}
       {(query.error || error) && (
         <div className="error-panel" role="alert">
@@ -380,24 +365,7 @@ export function InfrastructureWorkspace({
       )}
       {!rackId && (
         <>
-          <nav className="module-tabs">
-            {[
-              ["global", "全局拓扑"],
-              ["network", "网络架构"],
-              ["groups", "机柜组"],
-              ["cabling", "物理布线"],
-              ["trace", "链路追踪"],
-              ["quality", "数据质量"],
-            ].map(([v, n]) => (
-              <button
-                key={v}
-                aria-current={view === v ? "page" : undefined}
-                onClick={() => change({ view: v })}
-              >
-                {n}
-              </button>
-            ))}
-          </nav>
+
           <div className="toolbar">
             <input
               aria-label="拓扑设备搜索"
@@ -451,8 +419,8 @@ export function InfrastructureWorkspace({
             </Button>
             {focus && <Badge value={"局部范围 " + focus} />}
             <span>
-              {data?.total_assets || 0} 个获授权基础对象 · 本页上限 {nodeLimit} 节点
-            </span><Button disabled={nodeLimit>=1000} onClick={()=>change({nodes:String(nodeLimit+200)})}>渐进展开 +200</Button>{graph.totalEdges>3000&&<span>当前边超过3000条，请缩小机柜/局部范围；画布仅展示前3000条。</span>}
+              {graph.nodes.length} 节点 · {data?.total_assets || 0} 资产
+            </span>{graph.nodes.length>=nodeLimit&&<Button disabled={nodeLimit>=1000} onClick={()=>change({nodes:String(nodeLimit+200)})}>展开更多</Button>}{graph.totalEdges>3000&&<span>当前边超过3000条，请缩小机柜/局部范围；画布仅展示前3000条。</span>}
           </div>
         </>
       )}
@@ -582,7 +550,7 @@ export function InfrastructureWorkspace({
             ))}
             {rackId && <Link to="/topology">返回全局拓扑</Link>}
           </aside>
-          <section className="panel infra-primary">
+          <section className="panel infra-primary">{!query.isPending&&data&&!assets.length&&<div className="infra-empty"><h3>当前项目暂无数据</h3><Button onClick={()=>ctx.setFilter(null)}>查看全部项目</Button></div>}
             {rackId ? (
               rack &&
               Number.isInteger(height) &&
@@ -1071,7 +1039,7 @@ export function InfrastructureWorkspace({
               </section>
             ))}
             {!chosen && !activeCable && (
-              <p>选择机柜、设备、端口或线缆查看真实关系与来源。</p>
+              <p>选择对象查看详情。</p>
             )}
           </aside>
         </div>
