@@ -20,11 +20,12 @@
 }
 .infra-workbench {
   display: grid;
-  grid-template-columns: 170px minmax(550px, 1fr) 290px;
+  grid-template-columns: minmax(0, 1fr) 290px;
   gap: 12px;
   align-items: start;
   margin-top: 12px;
 }
+.infra-workbench.with-rack-navigation{grid-template-columns:170px minmax(550px,1fr) 290px}
 .infra-tree {
   max-height: 760px;
   overflow: auto;
@@ -144,10 +145,10 @@
   box-shadow: inset 0 -2px var(--primary);
 }
 @media (max-width: 1400px) {
-  .infra-workbench {
+  .infra-workbench.with-rack-navigation {
     grid-template-columns: 140px minmax(500px, 1fr);
   }
-  .infra-inspector {
+  .infra-workbench.with-rack-navigation .infra-inspector {
     grid-column: 2;
   }
   .infra-rack-body {

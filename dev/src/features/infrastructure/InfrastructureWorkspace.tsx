@@ -55,9 +55,22 @@ export function InfrastructureWorkspace({
     [zoom, setZoom] = useState(1),
     [drawerDevices, setDrawerDevices] = useState<any[]>([]);
   const svg = useRef<SVGSVGElement>(null);
-  const scopeReady=useRef(false);
-  useEffect(()=>{if(url.has("project_id")){const p=url.get("project_id")||null;if(!p||ctx.projects.some(a=>a.id===p))ctx.setFilter(p)}},[url.get("project_id")]);
-  useEffect(()=>{if(!scopeReady.current){scopeReady.current=true;return}if(url.has("project_id")&&url.get("project_id")!==(ctx.filter||"")){const next=new URLSearchParams(url);next.set("project_id",ctx.filter||"");setUrl(next,{replace:true})}},[ctx.filter]);
+  const scopeSync=useRef<{initialized:boolean;url:string|null;pending:string|null|undefined}>({initialized:false,url:null,pending:undefined});
+  useEffect(()=>{
+    const requested=url.get('project_id'),sync=scopeSync.current;
+    if(!sync.initialized||sync.url!==requested){
+      sync.initialized=true;sync.url=requested;sync.pending=undefined;
+      if(url.has('project_id')&&(!requested||ctx.projects.some(p=>p.id===requested))&&ctx.filter!==(requested||null)){
+        sync.pending=requested||null;ctx.setFilter(sync.pending);
+      }
+      return;
+    }
+    // Wait for the URL's project to apply before reflecting user filter changes.
+    if(sync.pending!==undefined){if(ctx.filter!==sync.pending)return;sync.pending=undefined}
+    if(url.has('project_id')&&requested!==(ctx.filter||'')){
+      const next=new URLSearchParams(url);sync.url=ctx.filter||'';next.set('project_id',sync.url);setUrl(next,{replace:true});
+    }
+  },[ctx.filter,url.get('project_id')]);
   const query = useQuery({
     queryKey: [
       "infrastructure",
@@ -343,6 +356,16 @@ export function InfrastructureWorkspace({
       face: "back",
     });
   }
+  function rackLocation(id:string,port?:string){
+    const asset=byId.get(id);if(!asset)return null;
+    const owner=byId.get(asset.fields.owner_device_id)||asset;
+    const target=owner.type==='rack'?owner.id:owner.fields.rack_id;
+    if(!target)return null;
+    const params=new URLSearchParams({project_id:owner.project_id});
+    if(owner.type!=='rack'){params.set('selected',owner.id);params.set('rack_tab','mapping')}
+    if(port&&cables.some(c=>c.a===port&&c.device_a===owner.id||c.b===port&&c.device_b===owner.id)){params.set('port',port);params.set('face','back')}
+    return '/racks/'+encodeURIComponent(target)+'?'+params;
+  }
   return (
     <div className="workspace infrastructure">
       <div className="page-heading">
@@ -533,8 +556,8 @@ export function InfrastructureWorkspace({
         </>
       )}
       {data && (
-        <div className="infra-workbench">
-          <aside className="panel infra-tree">
+        <div className={"infra-workbench"+((rackOnly||rackId)?" with-rack-navigation":"")}>
+          {(rackOnly||!!rackId)&&(          <aside className="panel infra-tree">
             <h3>机房 / 机柜</h3>
             {racks.map((r) => (
               <button
@@ -549,7 +572,7 @@ export function InfrastructureWorkspace({
               </button>
             ))}
             {rackId && <Link to="/topology">返回全局拓扑</Link>}
-          </aside>
+          </aside>)}
           <section className="panel infra-primary">{!query.isPending&&data&&!assets.length&&<div className="infra-empty"><h3>当前项目暂无数据</h3><Button onClick={()=>ctx.setFilter(null)}>查看全部项目</Button></div>}
             {rackId ? (
               rack &&
@@ -956,18 +979,8 @@ export function InfrastructureWorkspace({
                     打开设备详情抽屉
                   </Button>
                 )}
-                {chosen.fields.rack_id && (
-                  <Link
-                    to={
-                      "/racks/" +
-                      encodeURIComponent(chosen.fields.rack_id) +
-                      "?selected=" +
-                      encodeURIComponent(chosen.id) +
-                      "&rack_tab=mapping"
-                    }
-                  >
-                    定位机柜 U 位 ↗
-                  </Link>
+                {rackLocation(chosen.id,chosen.type==='port'?chosen.id:portId)&&byId.get(chosen.fields.owner_device_id||chosen.id)?.fields.rack_id!==rackId&&(
+                  <Link to={rackLocation(chosen.id,chosen.type==='port'?chosen.id:portId)!}>定位所属机柜 ↗</Link>
                 )}
                 <Link
                   to={
@@ -1024,6 +1037,7 @@ export function InfrastructureWorkspace({
                   source: {c.source || "未记录"} · 运行状态
                   unknown，缺少双端观测不判 PASS
                 </small>
+                {[['A',c.device_a,c.a],['B',c.device_b,c.b]].map(([end,id,port])=>rackLocation(id,port)&&byId.get(id)?.fields.rack_id!==rackId?<Link key={end} to={rackLocation(id,port)!}>{end} 端所属机柜 ↗</Link>:null)}
                 <Button
                   onClick={() =>
                     nav(
