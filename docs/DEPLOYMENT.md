@@ -112,3 +112,16 @@
 执行018、019迁移；宿主Go使用backend/.secrets或KEEL_SECRET_DIR。Docker使用ai-secrets卷；重建镜像不应包含凭据。现有宿主进程8081与前端5174继续运行，本轮未执行生产部署。
 
 唯一详细说明与API对照见 [PROJECT-AI-CONFIGURATION.md](PROJECT-AI-CONFIGURATION.md)。
+
+
+## 2026-10-31 · 可视化功能分支部署到原开发环境
+
+用户已授权部署，不代表授权合并 main。运行代码为 `4541850`，来源分支 `feat/datacenter-visualization-approved`。
+
+- 前端仍为 `http://localhost:5180`，tmux `keel-dev-5180`，目录 `/home/ubuntu/keel-visualization-dev/dev`，命令 `KEEL_API_URL=http://127.0.0.1:8081 npm run dev -- --host 0.0.0.0 --port 5180 --strictPort`。
+- API 仍为 `127.0.0.1:8081`，tmux `keel-cmdb-api`，binary `/tmp/keel-api-4541850`。工作目录保持 `/home/ubuntu/keel/dev/backend`，读取原受控 `.env`，因此既有相对存储路径和凭据引用不变。
+- 没有新增端口、Git 合并、数据库迁移、资产导入或 Docker 依赖变更。5181 设计原型保留，5182/8082 不启动。
+- 启动检查发现的分组SQL超时已修复：分组统计约6568ms→447ms；这是单机观察，不是生产SLO。未提高5秒请求超时或修改数据库/JIT配置。
+- 四个查询接口200、五个工作区加载通过；记录为 `topology/deployment-validation.json`。未进行完整交互回归、真实导入或规模验收。
+
+回退：停止上述两个 tmux 服务，等待5180/8081释放后，将 API 恢复为 `/tmp/keel-cmdb-api`（同原后端目录/配置），前端恢复从 `/home/ubuntu/keel/dev` 执行原5180启动命令。原目录源代码仍为 `keel-new-main` / `978db7f`，不需要回退数据库。不要在端口尚未释放时直接起第二个监听实例。

@@ -1,0 +1,86 @@
+{
+  "deployed_at": "2026-10-31T05:47:00.783930+00:00",
+  "code_revision": "4541850",
+  "branch": "feat/datacenter-visualization-approved",
+  "frontend": {
+    "url": "http://localhost:5180",
+    "cwd": "/home/ubuntu/keel-visualization-dev/dev",
+    "session": "keel-dev-5180"
+  },
+  "backend": {
+    "address": "127.0.0.1:8081",
+    "binary": "/tmp/keel-api-4541850",
+    "config_and_storage_cwd": "/home/ubuntu/keel/dev/backend",
+    "session": "keel-cmdb-api"
+  },
+  "main_merged": false,
+  "database_migration": false,
+  "asset_import": false,
+  "api_startup_checks": {
+    "at": "2026-10-31T05:45:37.064Z",
+    "code_revision": "4541850",
+    "checks": [
+      {
+        "endpoint": "/cmdb/visualization/subgraph",
+        "status": 200,
+        "ms": 719
+      },
+      {
+        "endpoint": "/cmdb/visualization/matrix",
+        "status": 200,
+        "ms": 1195
+      },
+      {
+        "endpoint": "/cmdb/visualization/connections",
+        "status": 200,
+        "ms": 692
+      },
+      {
+        "endpoint": "/cmdb/visualization/trace",
+        "status": 200
+      }
+    ],
+    "asset_import_or_mutation": false
+  },
+  "browser_page_load_checks": {
+    "at": "2026-10-31T05:46:15.480Z",
+    "checks": [
+      {
+        "path": "/topology?view=global",
+        "status": "rendered"
+      },
+      {
+        "path": "/topology?view=network",
+        "status": "rendered"
+      },
+      {
+        "path": "/topology?view=cabling",
+        "status": "rendered"
+      },
+      {
+        "path": "/topology?view=trace",
+        "status": "rendered"
+      },
+      {
+        "path": "/racks?view=gallery",
+        "status": "rendered"
+      }
+    ],
+    "page_errors": [],
+    "failed_queries": [],
+    "scope": "deployed page load only; no full interaction regression or asset writes"
+  },
+  "performance_fix": {
+    "baseline_group_query_ms": 6568,
+    "fixed_group_query_ms": 447,
+    "timeout_changed": false,
+    "database_configuration_changed": false,
+    "scope": "single local read-only observations, not production SLO"
+  },
+  "limits": [
+    "No complete interaction regression",
+    "No real import acceptance",
+    "No production-scale benchmark",
+    "Historical first attempt timed out and was rolled back before fixed deployment"
+  ]
+}

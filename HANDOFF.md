@@ -4,6 +4,8 @@
 
 ## 2026-10-31 当前可视化开发交接
 
+**最新部署：用户已明确要求部署，当前 5180 前端来自本 feature worktree，8081 使用 `/tmp/keel-api-4541850`；API 工作目录和配置保留 `/home/ubuntu/keel/dev/backend`。未合并 main，未迁移或导入数据。四接口200、五页面加载检查通过，完整业务联调未运行。部署/回退见 `docs/DEPLOYMENT.md` 末节及 `docs/topology/deployment-validation.json`。下文未授权阶段约束保留历史范围，以最新用户指令为准。**
+
 代码已在 `feat/datacenter-visualization-approved`、`/home/ubuntu/keel-visualization-dev` 完成五工作区及4个专用查询接口接线。统一入口是 [实施报告](docs/topology/implementation-report.md)，接口以根 OpenAPI 为准，前端 DTO 使用生成类型别名。新增服务端范围分页/矩阵汇总/成员引用/物理Trace，页面不再默认下载 fullSnapshot5000；机柜处理未知数据、多Cable及位置变更项目/版本冻结。
 
 只做代码分支隔离。**不自行启动服务，不调整现有5180/8081，不迁移或导入数据库，不合并/发布 main。** 额外5182/8082已停止。原目录仍为 `keel-new-main` / `978db7f`。本轮生成类型、前端构建、Go编译和必要纯逻辑用例通过；新查询的数据库/HTTP/浏览器及真实导入/规模联调未运行，由用户安排。不得把旧 full 投影的截图或指标当新分页查询验收。
