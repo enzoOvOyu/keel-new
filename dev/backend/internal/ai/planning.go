@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"keel.local/dev/internal/bom"
+	"reflect"
 	"sort"
 	"strings"
 )
@@ -163,6 +164,17 @@ func decodeExtraction(content []byte, maxRow int) (SheetPlan, error) {
 				return plan, fmt.Errorf("field %q column %d is outside the allowed fields/columns", field, col)
 			}
 		}
+		// Row eligibility is deterministic. Optional detail columns must never
+		// filter out an otherwise identifiable incomplete source record.
+		if t.Kind == "reference" {
+			t.Required = nil
+		}
+		for _, key := range []string{"hostname", "endpoint_a_device", "endpoint_b_device", "parent_uid", "serial", "model", "name", "port_index"} {
+			if t.Fields[key] > 0 {
+				t.Required = []string{key}
+				break
+			}
+		}
 		for _, key := range t.Required {
 			if t.Fields[key] == 0 {
 				return plan, fmt.Errorf("row_keys field %q is missing from fields", key)
@@ -259,11 +271,15 @@ func CheckExtraction(s bom.Sheet, plan SheetPlan) error { return inspectExtracti
 // create values. Ambiguous aliases still remain candidates, never formal assets.
 func normalizeSourceBindings(s bom.Sheet, p *SheetPlan) {
 	heads := map[int]string{}
+	columns := map[string][]int{}
 	labels := []int{}
 	for _, row := range p.HeaderRows {
 		for _, c := range s.Cells {
 			if c.Row == row {
 				heads[c.Column] = bom.Field(c.Value)
+				if heads[c.Column] != "" {
+					columns[heads[c.Column]] = append(columns[heads[c.Column]], c.Column)
+				}
 				if heads[c.Column] == "hostname" {
 					labels = append(labels, c.Column)
 				}
@@ -272,6 +288,21 @@ func normalizeSourceBindings(s bom.Sheet, p *SheetPlan) {
 	}
 	for j := range p.Tables {
 		t := &p.Tables[j]
+		// Explicit, unambiguous source headers are deterministic evidence. Fill
+		// omitted bindings on an already identified object, never infer values,
+		// invent an extractor or overwrite a conflicting model binding.
+		fields := []string{}
+		if t.Kind == "planned_device" && (t.Fields["hostname"] > 0 || t.Fields["model"] > 0) {
+			fields = []string{"hostname", "serial", "model", "management_ip", "mac", "site", "rack", "u_start", "u_height"}
+		}
+		if t.Kind == "physical_connection" && (t.Fields["endpoint_a_device"] > 0 || t.Fields["endpoint_b_device"] > 0) {
+			fields = []string{"endpoint_a_device", "endpoint_a_port", "endpoint_b_device", "endpoint_b_port", "model", "endpoint_a_optic", "endpoint_b_optic", "length", "media_type", "speed"}
+		}
+		for _, field := range fields {
+			if t.Fields[field] == 0 && len(columns[field]) == 1 {
+				t.Fields[field] = columns[field][0]
+			}
+		}
 		if col := t.Fields["hostname"]; col > 0 && len(labels) == 1 && heads[col] != "hostname" {
 			if t.Fields["device_alias"] == 0 {
 				t.Fields["device_alias"] = col
@@ -295,7 +326,42 @@ func normalizeSourceBindings(s bom.Sheet, p *SheetPlan) {
 			delete(t.Fields, "rack_height")
 		}
 	}
+
+	// A model may split attributes of one source object into two recipes.
+	// Merge only compatible bindings; conflicting source interpretations still fail.
+	merged := []TablePlan{}
+	for _, table := range p.Tables {
+		joined := false
+		for j := range merged {
+			old := &merged[j]
+			if old.Kind != table.Kind || old.Type != table.Type || old.Start != table.Start || old.End != table.End || old.TypeColumn != table.TypeColumn || !reflect.DeepEqual(old.Types, table.Types) || SourceAnchor(old.Fields) != SourceAnchor(table.Fields) {
+				continue
+			}
+			conflict := false
+			for f, col := range table.Fields {
+				if old.Fields[f] > 0 && old.Fields[f] != col {
+					conflict = true
+				}
+			}
+			if conflict {
+				continue
+			}
+			for f, col := range table.Fields {
+				old.Fields[f] = col
+			}
+			if table.Confidence < old.Confidence {
+				old.Confidence = table.Confidence
+			}
+			joined = true
+			break
+		}
+		if !joined {
+			merged = append(merged, table)
+		}
+	}
+	p.Tables = merged
 }
+
 func disjointTypes(a, b TablePlan) bool {
 	if a.TypeColumn == 0 || a.TypeColumn != b.TypeColumn || len(a.Types) == 0 || len(b.Types) == 0 {
 		return false
@@ -311,6 +377,19 @@ func disjointTypes(a, b TablePlan) bool {
 // Re-use a persisted model answer after fixing the local interpreter. This does
 // not call the provider, and never reuses a transport failure as a valid plan.
 func RestoreExtraction(s bom.Sheet, raw []byte) (SheetPlan, error) {
+	p, e := RestoreExtractionBindings(s, raw)
+	if e != nil {
+		return p, e
+	}
+	return p, inspectExtraction(s, p)
+}
+
+// Legacy failed attempts could persist malformed answers. Only schema-valid,
+// locally interpretable bindings can constrain a later recognition attempt.
+func RestoreExtractionBindings(s bom.Sheet, raw []byte) (SheetPlan, error) {
+	if e := validateExtractionSchema(context.Background(), raw); e != nil {
+		return SheetPlan{}, e
+	}
 	max := 0
 	for _, c := range s.Cells {
 		if c.Row > max {
@@ -325,5 +404,5 @@ func RestoreExtraction(s bom.Sheet, raw []byte) (SheetPlan, error) {
 		return p, errors.New("NO_SAVED_EXTRACTION")
 	}
 	normalizeSourceBindings(s, &p)
-	return p, inspectExtraction(s, p)
+	return p, nil
 }

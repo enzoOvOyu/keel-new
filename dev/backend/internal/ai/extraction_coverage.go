@@ -28,6 +28,28 @@ func inspectSourceCoverage(s bom.Sheet, p SheetPlan) error {
 			seen[key] = true
 		}
 	}
+	// Every otherwise extractable typed row must match an extractor. A new
+	// distinct category cannot silently disappear because type_values omitted it.
+	for _, t := range p.Tables {
+		if t.TypeColumn == 0 || t.Kind == "reference" {
+			continue
+		}
+		for row := t.Start; row <= t.End; row++ {
+			if !tableRowPresent(t, rows[row]) {
+				continue
+			}
+			covered := false
+			for _, u := range p.Tables {
+				if u.Kind == t.Kind && row >= u.Start && row <= u.End && tableRowPresent(u, rows[row]) && tableTypeMatches(u, rows[row]) {
+					covered = true
+					break
+				}
+			}
+			if !covered {
+				return fmt.Errorf("SOURCE_TYPE_UNCOVERED: row=%d column=%d; inspect the actual value and include it in type_values", row, t.TypeColumn)
+			}
+		}
+	}
 	headers := map[int]map[string][]int{}
 	for _, c := range s.Cells {
 		if c.Sensitive {
@@ -74,40 +96,28 @@ func inspectSourceCoverage(s bom.Sheet, p SheetPlan) error {
 				continue
 			}
 			// Deterministic diagnostics contain coordinates, never asset values.
-			for _, f := range []string{"hostname", "device_alias", "serial", "model", "endpoint_a_device", "endpoint_a_port", "endpoint_b_device", "endpoint_b_port", "endpoint_a_optic", "endpoint_b_optic"} {
+			for _, f := range []string{"hostname", "device_alias", "serial", "model", "management_ip", "mac", "rack", "site", "u_start", "u_height", "endpoint_a_device", "endpoint_a_port", "endpoint_b_device", "endpoint_b_port", "endpoint_a_optic", "endpoint_b_optic", "length", "speed", "media_type"} {
+				first, covered := 0, false
 				for _, col := range h[f] {
 					if bom.ExtractCellValue(rows[row][col], f) == "" {
 						continue
 					}
-					if !planMapsCell(p, rows[row], row, f, col) {
-						return fmt.Errorf("SOURCE_FIELD_UNCOVERED: row=%d column=%d field=%s; inspect this region and preserve the explicit source field", row, col, f)
+					if first == 0 {
+						first = col
+					}
+					if planMapsCell(p, rows[row], row, f, col) {
+						covered = true
 					}
 				}
-			}
-		}
-	}
-	// Every otherwise extractable typed row must match an extractor. A new
-	// distinct category cannot silently disappear because type_values omitted it.
-	for _, t := range p.Tables {
-		if t.TypeColumn == 0 || t.Kind == "reference" {
-			continue
-		}
-		for row := t.Start; row <= t.End; row++ {
-			if !tableRowPresent(t, rows[row]) {
-				continue
-			}
-			covered := false
-			for _, u := range p.Tables {
-				if u.Kind == t.Kind && row >= u.Start && row <= u.End && tableRowPresent(u, rows[row]) && tableTypeMatches(u, rows[row]) {
-					covered = true
-					break
+				// Alternate labels may denote the same endpoint. One explicit
+				// binding identifies it; other source columns stay retained for review.
+				if first > 0 && !covered {
+					return fmt.Errorf("SOURCE_FIELD_UNCOVERED: row=%d column=%d field=%s; inspect this region and preserve the explicit source field", row, first, f)
 				}
 			}
-			if !covered {
-				return fmt.Errorf("SOURCE_TYPE_UNCOVERED: row=%d column=%d; inspect the actual value and include it in type_values", row, t.TypeColumn)
-			}
 		}
 	}
+
 	return nil
 }
 
