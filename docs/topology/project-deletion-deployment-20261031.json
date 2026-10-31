@@ -1,0 +1,21 @@
+{
+  "code_commit": "994bb1c",
+  "binary": "/tmp/keel-api-project-delete-1031",
+  "pid": 4021880,
+  "sha256": "8f1ad20225cf97b353670d24648e2c32e8d4b2af9138e2eb980eaa8d1f2aa37d",
+  "frontend_cwd": "/home/ubuntu/keel-project-delete-deploy/dev",
+  "frontend_port": 5180,
+  "api_health": 200,
+  "frontend_startup": 200,
+  "api_environment_preserved": true,
+  "migrations": [
+    25,
+    26
+  ],
+  "tests_run": false,
+  "real_project_deletion_run": false,
+  "schema_backup_only": true,
+  "full_backup": "Failed; incomplete artifact removed",
+  "frontend_full_typecheck": "Terminated with exit 137; not passed",
+  "frontend_bundle": "vite build --minify false with 768 MB heap passed"
+}
