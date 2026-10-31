@@ -1,0 +1,126 @@
+{
+  "status": "LOCAL_SOURCE_OBSERVATIONS_NOT_APPROVED_GROUND_TRUTH",
+  "cable_counts": {
+    "Cabling_EW_SP-LF": {
+      "candidate_endpoint_rows": 2592,
+      "unique_four_endpoint_tuples": 2592,
+      "duplicate_endpoint_tuple_rows": 0,
+      "nonempty_module_A": 2592,
+      "nonempty_module_Z": 2592,
+      "firstflag_A_sum": 1296.0,
+      "firstflag_Z_sum": 1296.0,
+      "calculated_length_rows": 2592,
+      "label_only_rows": 2
+    },
+    "Cabling_NS": {
+      "candidate_endpoint_rows": 484,
+      "unique_four_endpoint_tuples": 484,
+      "duplicate_endpoint_tuple_rows": 0,
+      "nonempty_module_A": 484,
+      "nonempty_module_Z": 484,
+      "firstflag_A_sum": 252.0,
+      "firstflag_Z_sum": 244.0,
+      "calculated_length_rows": 484,
+      "label_only_rows": 5
+    },
+    "Cabling_GB_OUT": {
+      "candidate_endpoint_rows": 3456,
+      "unique_four_endpoint_tuples": 3456,
+      "duplicate_endpoint_tuple_rows": 0,
+      "nonempty_module_A": 3456,
+      "nonempty_module_Z": 3456,
+      "firstflag_A_sum": 2160.0,
+      "firstflag_Z_sum": 1836.0,
+      "calculated_length_rows": 3456,
+      "label_only_rows": 18
+    },
+    "Cabling_OOB": {
+      "candidate_endpoint_rows": 216,
+      "unique_four_endpoint_tuples": 216,
+      "duplicate_endpoint_tuple_rows": 0,
+      "nonempty_module_A": 216,
+      "nonempty_module_Z": 216,
+      "firstflag_A_sum": 216.0,
+      "firstflag_Z_sum": 216.0,
+      "calculated_length_rows": 216,
+      "label_only_rows": 5
+    },
+    "Cabling_HDD_SSD_CPU": {
+      "candidate_endpoint_rows": 406,
+      "unique_four_endpoint_tuples": 406,
+      "duplicate_endpoint_tuple_rows": 0,
+      "nonempty_module_A": 406,
+      "nonempty_module_Z": 406,
+      "firstflag_A_sum": 406.0,
+      "firstflag_Z_sum": 204.0,
+      "calculated_length_rows": 406,
+      "label_only_rows": 4
+    }
+  },
+  "arithmetic": {
+    "power": {
+      "compared": 56,
+      "mismatch_rows": [],
+      "method": "Decimal arithmetic over source/cached inputs; NOT spreadsheet-engine recalculation or business rule approval"
+    },
+    "standard_length": {
+      "compared": 432,
+      "mismatch_rows": [],
+      "method": "Decimal arithmetic over source/cached inputs; NOT spreadsheet-engine recalculation or business rule approval"
+    }
+  },
+  "Network Information": {
+    "source_rows": 189,
+    "nonempty_fields": {
+      "label": 189,
+      "model": 189,
+      "serial": 0,
+      "rack": 189,
+      "u": 189
+    },
+    "unique_nonempty_labels": 189,
+    "count_limit": "nonempty source values only; no claim of valid physical identities or accepted placements"
+  },
+  "Server Information": {
+    "source_rows": 778,
+    "nonempty_fields": {
+      "label": 778,
+      "model": 778,
+      "serial": 0,
+      "rack": 778,
+      "u": 778
+    },
+    "unique_nonempty_labels": 778,
+    "count_limit": "nonempty source values only; no claim of valid physical identities or accepted placements"
+  },
+  "cabling": {
+    "Cabling_EW_SP-LF": {
+      "unique_combined_A_Z_module_keys": 2592,
+      "nonempty_keys": 5184,
+      "firstflags_include_zero": true
+    },
+    "Cabling_NS": {
+      "unique_combined_A_Z_module_keys": 496,
+      "nonempty_keys": 968,
+      "firstflags_include_zero": true
+    },
+    "Cabling_GB_OUT": {
+      "unique_combined_A_Z_module_keys": 3996,
+      "nonempty_keys": 6912,
+      "firstflags_include_zero": true
+    },
+    "Cabling_OOB": {
+      "unique_combined_A_Z_module_keys": 432,
+      "nonempty_keys": 432,
+      "firstflags_include_zero": true
+    },
+    "Cabling_HDD_SSD_CPU": {
+      "unique_combined_A_Z_module_keys": 610,
+      "nonempty_keys": 812,
+      "firstflags_include_zero": true
+    }
+  },
+  "global_module_key_count": 8126,
+  "global_key_limit": "source-generated Q/S keys, not accepted module identities or procurement quantities; placeholders/media compatibility/physical parent semantics still require review",
+  "tolerance_used_for_local_decimal_comparison": "1e-8 absolute; audit-only comparison, not a product default or approved engineering tolerance"
+}

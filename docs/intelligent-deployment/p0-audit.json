@@ -1,0 +1,854 @@
+{
+  "phase": "P0",
+  "status": "AUDIT_COMPLETE_AWAITING_ARCHITECTURE_REVIEW",
+  "scope": "仅本地只读资料分析与静态代码/文档审计；P1架构详细设计和业务实现未启动",
+  "baseline": {
+    "repository_commit": "2d66974",
+    "deployed_backend_commit": "994bb1c (deployment record)",
+    "source_sha256": "30481c4619366bcdc707c9b58f2118349eb599f4260d5f73010fe3b7a3782558",
+    "business_code_changed": false,
+    "api_database_mutations": false,
+    "external_ai_calls": 0,
+    "tests_or_builds_run": false
+  },
+  "01_workbook_semantic_understanding": {
+    "conclusion": "这是带设备组合、空间、功率、路线与采购计算的项目工程工作簿；Sheet是证据载体，不能直接成为产品菜单或表结构。",
+    "totals": {
+      "populated_cells": 162751,
+      "populated_rows": 9385,
+      "formula_cells": 94353,
+      "cached_formula_cells": 94353,
+      "empty_formula_results": 0,
+      "merged_ranges": 311,
+      "sheets": 15
+    },
+    "equipment_observations": {
+      "Network Information": {
+        "source_rows": 189,
+        "nonempty_fields": {
+          "label": 189,
+          "model": 189,
+          "serial": 0,
+          "rack": 189,
+          "u": 189
+        },
+        "unique_nonempty_labels": 189,
+        "count_limit": "nonempty source values only; no claim of valid physical identities or accepted placements"
+      },
+      "Server Information": {
+        "source_rows": 778,
+        "nonempty_fields": {
+          "label": 778,
+          "model": 778,
+          "serial": 0,
+          "rack": 778,
+          "u": 778
+        },
+        "unique_nonempty_labels": 778,
+        "count_limit": "nonempty source values only; no claim of valid physical identities or accepted placements"
+      }
+    },
+    "connectivity_observations": {
+      "Cabling_EW_SP-LF": {
+        "candidate_endpoint_rows": 2592,
+        "unique_four_endpoint_tuples": 2592,
+        "duplicate_endpoint_tuple_rows": 0,
+        "nonempty_module_A": 2592,
+        "nonempty_module_Z": 2592,
+        "firstflag_A_sum": 1296.0,
+        "firstflag_Z_sum": 1296.0,
+        "calculated_length_rows": 2592,
+        "label_only_rows": 2
+      },
+      "Cabling_NS": {
+        "candidate_endpoint_rows": 484,
+        "unique_four_endpoint_tuples": 484,
+        "duplicate_endpoint_tuple_rows": 0,
+        "nonempty_module_A": 484,
+        "nonempty_module_Z": 484,
+        "firstflag_A_sum": 252.0,
+        "firstflag_Z_sum": 244.0,
+        "calculated_length_rows": 484,
+        "label_only_rows": 5
+      },
+      "Cabling_GB_OUT": {
+        "candidate_endpoint_rows": 3456,
+        "unique_four_endpoint_tuples": 3456,
+        "duplicate_endpoint_tuple_rows": 0,
+        "nonempty_module_A": 3456,
+        "nonempty_module_Z": 3456,
+        "firstflag_A_sum": 2160.0,
+        "firstflag_Z_sum": 1836.0,
+        "calculated_length_rows": 3456,
+        "label_only_rows": 18
+      },
+      "Cabling_OOB": {
+        "candidate_endpoint_rows": 216,
+        "unique_four_endpoint_tuples": 216,
+        "duplicate_endpoint_tuple_rows": 0,
+        "nonempty_module_A": 216,
+        "nonempty_module_Z": 216,
+        "firstflag_A_sum": 216.0,
+        "firstflag_Z_sum": 216.0,
+        "calculated_length_rows": 216,
+        "label_only_rows": 5
+      },
+      "Cabling_HDD_SSD_CPU": {
+        "candidate_endpoint_rows": 406,
+        "unique_four_endpoint_tuples": 406,
+        "duplicate_endpoint_tuple_rows": 0,
+        "nonempty_module_A": 406,
+        "nonempty_module_Z": 406,
+        "firstflag_A_sum": 406.0,
+        "firstflag_Z_sum": 204.0,
+        "calculated_length_rows": 406,
+        "label_only_rows": 4
+      }
+    },
+    "module_applicability_proposal": [
+      {
+        "module": "Workbook Intelligence",
+        "sample_status": "DETECTED",
+        "inputs": "原始资料",
+        "outputs": "区域、事实、来源、ImportPlan提案",
+        "dependencies": "无工程域前置",
+        "evidence": "全工作簿结构与公式",
+        "gate": "来源覆盖、敏感处理和计划结构审核",
+        "publish": "Source/Intelligence revisions"
+      },
+      {
+        "module": "Equipment",
+        "sample_status": "DETECTED",
+        "inputs": "设备清单、配置组合、数量",
+        "outputs": "EquipmentPlan/DeviceAssembly",
+        "dependencies": "资料理解",
+        "evidence": "Network Information A1:Q190; Server Information A1:M779; 电力测算 A4:D14",
+        "gate": "身份粒度/组合数量/型号含义审核",
+        "publish": "工程设备计划；符合条件的planned资产"
+      },
+      {
+        "module": "Facility & Placement",
+        "sample_status": "DETECTED",
+        "inputs": "网格、设备位置、机柜尺寸/坐标",
+        "outputs": "FacilityModel/RackPlacement",
+        "dependencies": "规划身份用于落位关联；空间模型可先独立建立",
+        "evidence": "Layout; 落位图; 距离图; 距离计算公式 A1:D58",
+        "gate": "位置证据、单位、占位冲突",
+        "publish": "CMDB planned位置及现有机柜图消费"
+      },
+      {
+        "module": "Power & Cooling",
+        "sample_status": "NEEDS_INPUT",
+        "inputs": "单设备功率、各柜数量、容量、冷却类型",
+        "outputs": "PowerPlan/PowerCalculationResult",
+        "dependencies": "Equipment和Rack身份；容量表可独立提取",
+        "evidence": "电力测算 A4:D14/A16:B18/A20:N79/A81:B84",
+        "gate": "功率口径、容量来源与冷却参数；完整热工数据未确认",
+        "publish": "工程功率计划，实测层保持独立"
+      },
+      {
+        "module": "Connectivity & Cabling",
+        "sample_status": "DETECTED",
+        "inputs": "设备端口、点位、路径参数、线缆规格",
+        "outputs": "ConnectivityPlan/CablePlan/ModuleRequirement",
+        "dependencies": "端点身份；距离计算需Facility/批准规则",
+        "evidence": "五张Cabling区域、P2P-18、距离计算公式",
+        "gate": "端点/父口/路径/单位/规格兼容；部分输入仍需审核",
+        "publish": "planned连接及独立CablePlan"
+      },
+      {
+        "module": "Material & Workload",
+        "sample_status": "DETECTED",
+        "inputs": "设备数量、线缆和模块需求、订单/备件规则",
+        "outputs": "MaterialEstimate/WorkloadEstimate",
+        "dependencies": "按具体行引用设备或布线计算输出；不是整域全有才运行",
+        "evidence": "物料 A1:P39; 工作量 A1:H26/K1:M8",
+        "gate": "去重粒度、采购/备件口径、数量对账",
+        "publish": "工程估算，不写实物CMDB"
+      },
+      {
+        "module": "Network Design",
+        "sample_status": "NEEDS_INPUT",
+        "inputs": "角色/平面/端口、独立逻辑设计依据",
+        "outputs": "NetworkPlan候选",
+        "dependencies": "可独立解析网络来源；发布时引用批准的物理模型版本",
+        "evidence": "设备角色、链路类别、带宽；未找到可支撑完整IP/ASN/BGP策略的结构化资料",
+        "gate": "客户/网络工程师方案与审批",
+        "publish": "批准NetworkPlan Revision → Golden"
+      },
+      {
+        "module": "Validation & Release",
+        "sample_status": "DETECTED",
+        "inputs": "各域模型与输入版本",
+        "outputs": "问题、审核、发布记录",
+        "dependencies": "逐模块/逐发布目标",
+        "evidence": "平台能力需求，不是一个Sheet",
+        "gate": "模块独立门禁、权限、审批与幂等",
+        "publish": "各域独立目标"
+      }
+    ],
+    "state_note": "以上模块状态是P0分析提案，不是运行中ImportPlan；DETECTED不等于READY或APPROVED。没有依据时用NEEDS_INPUT，不能因缺资料直接判NOT_APPLICABLE。"
+  },
+  "02_regions_and_formula_dependencies": {
+    "profile": "p0-workbook-profile.json",
+    "regions": [
+      {
+        "source": "电力测算",
+        "regions": [
+          "A4:D14设备功率/数量",
+          "A16:B18容量参数",
+          "A20:N79机柜负载",
+          "A81:B84总计"
+        ],
+        "interpretation": "同Sheet多个语义区域"
+      },
+      {
+        "source": "距离计算公式",
+        "regions": [
+          "A1:D58点位坐标",
+          "F1:G7区域配对距离",
+          "I1:J5参数",
+          "L1:M13路线必经点",
+          "O1:P5特殊路线估算",
+          "R1:AE433逐路径计算"
+        ],
+        "interpretation": "横向并列表/规则/结果，不能用连续行块代替语义表区"
+      },
+      {
+        "source": "落位图",
+        "regions": [
+          "rows 1:53",
+          "rows 60:112",
+          "rows 119:171"
+        ],
+        "interpretation": "二维位置与合并单元格；必须人工核对U轴、设备占位和物理尺度"
+      },
+      {
+        "source": "工作量",
+        "regions": [
+          "A1:H26线缆规格长度数量",
+          "K1:M8设备/U/数量"
+        ],
+        "interpretation": "并列两个不同粒度汇总"
+      },
+      {
+        "source": "五个Cabling Sheet",
+        "regions": [
+          "A:P端接与规格/标签",
+          "Q:T模块去重辅助列"
+        ],
+        "interpretation": "物理连接候选与采购去重计算并存；非端点行保留作为标题/来源"
+      }
+    ],
+    "chains": [
+      "Equipment数量×PowerProfile→RackPowerPlan→Layout/落位图展示引用",
+      "设备位置/点位+项目路径参数→距离估算→标准线长→设备端口级连接展开",
+      "连接端口父级归并/首现标记→模块需求→采购差额",
+      "设备安装数+线缆规格/长度分布→WorkloadEstimate"
+    ],
+    "cell_trace_examples": [
+      "P2P-18!F2 → P2P-18!E2 → 距离计算公式!AE2 → AC2/AA2/AB2/U2/W2/J2/J5 → S2/T2及点位表 → P2P-18!C2/D2 (原始点位输入)",
+      "物料!J5 → Cabling_EW_SP-LF!B:B/G:G与R:R/T:T → Q/S物理模块去重键 → C/D/F/E设备和端口"
+    ],
+    "cycle_limit": "P2P-18与距离计算公式在Sheet级互相引用；上述样本单元格链回到原始输入，不构成该链的循环。未执行全工作簿单元格DAG/循环计算检查，不宣称全局无环。",
+    "formula_limit": "94,353个公式均有缓存，原文件forceFullCalc=1；零Excel错误单元格不能排除IFERROR掩盖的错误。函数统计和字面引用图不等于兼容性认证。",
+    "arithmetic_observations": {
+      "power": {
+        "compared": 56,
+        "mismatch_rows": [],
+        "method": "Decimal arithmetic over source/cached inputs; NOT spreadsheet-engine recalculation or business rule approval"
+      },
+      "standard_length": {
+        "compared": 432,
+        "mismatch_rows": [],
+        "method": "Decimal arithmetic over source/cached inputs; NOT spreadsheet-engine recalculation or business rule approval"
+      }
+    }
+  },
+  "03_current_capabilities": [
+    {
+      "capability": "上传/原文件/解析",
+      "status": "IMPLEMENTED_PARTIAL",
+      "evidence": [
+        "dev/backend/cmd/api/main.go:222",
+        "dev/backend/internal/bom/workbook.go:58"
+      ],
+      "reuse": "文件摘要、对象存储、ZIP约束、单元格/合并区/公式缓存读取",
+      "gap": "缺通用公式运行与兼容性记录；区域级敏感边界需重审，现按整列脱敏"
+    },
+    {
+      "capability": "Workbook IR与覆盖",
+      "status": "IMPLEMENTED_PARTIAL",
+      "evidence": [
+        "dev/backend/internal/bom/intelligence.go:55",
+        "dev/backend/internal/bom/intelligence.go:161"
+      ],
+      "reuse": "区域读取、来源坐标、保留覆盖审计",
+      "gap": "区域以空行及256行分块为主；不是语义区域；Complete反映保留/提取状态，不证明工程语义完整"
+    },
+    {
+      "capability": "AI Agent",
+      "status": "IMPLEMENTED_PARTIAL",
+      "evidence": [
+        "dev/backend/cmd/api/bom_recognition.go:36",
+        "dev/backend/internal/ai/planning_agent.go:15",
+        "dev/backend/internal/ai/planning_schema.go:67"
+      ],
+      "reuse": "Provider、结构化响应校验、工具轨迹、有限纠错、异步任务",
+      "gap": "仅围绕目标Sheet的4种动作和BOM字段枚举；8轮上限；明确表头路径可跳过模型；缺工程模型/规则/计算工具"
+    },
+    {
+      "capability": "公式及工程计算",
+      "status": "MISSING_FOR_NEW_REQUIREMENTS",
+      "evidence": [
+        "dev/backend/internal/ai/planning_agent.go:219",
+        "dev/backend/internal/bom/intelligence.go:118",
+        "dev/backend/internal/bom/engineering.go:23"
+      ],
+      "reuse": "原始公式证据、局部显式引用、单位解析及关系校验",
+      "gap": "工具输出清除公式正文；正则只解析跨表A1起点，未展开范围/列引用；未发现CalculationProvider/RuleRegistry/CalculationRun；环境无Calc"
+    },
+    {
+      "capability": "规划身份和部件关系",
+      "status": "IMPLEMENTED_PARTIAL",
+      "evidence": [
+        "dev/backend/internal/bom/workbench.go:143",
+        "dev/backend/internal/bom/recognition.go:46"
+      ],
+      "reuse": "planned_device、material_plan、父子/端口关联、稳定资产引用",
+      "gap": "都是Item/fields形态；缺EquipmentPlan/DeviceAssembly领域版本和类型化数量关系"
+    },
+    {
+      "capability": "规则/审核/重识别",
+      "status": "IMPLEMENTED_PARTIAL",
+      "evidence": [
+        "dev/backend/internal/bom/rules.go:8",
+        "dev/backend/cmd/api/bom_workbench.go:280"
+      ],
+      "reuse": "确定性问题、来源、人工修改原因、版本并发、已导入保护",
+      "gap": "规则静态Go列表；记录级confirm/ignore，不是独立模块/规则/发布目标审批"
+    },
+    {
+      "capability": "提交/CMDB投影",
+      "status": "IMPLEMENTED_REUSE_WITH_ADAPTER",
+      "evidence": [
+        "dev/backend/cmd/api/domain.go:430",
+        "dev/backend/internal/cmdb/domain.go:407",
+        "dev/backend/migrations/020_bom_workbench.sql:5"
+      ],
+      "reuse": "事务、idempotency、部分提交、Outbox、稳定ID、planned来源层",
+      "gap": "发布目标集中bom.committed；缺工程域发布记录。UpsertAsset现合并incoming属性，没有通用Observed优先选择策略，不能原样承诺规划绝不覆盖实际"
+    },
+    {
+      "capability": "机柜图/拓扑",
+      "status": "EXISTING_REAL_QUERY_PATH",
+      "evidence": [
+        "docs/api/visualization.md:13",
+        "dev/backend/internal/cmdb/visual_placement.go",
+        "dev/src/features/infrastructure/approved/pages/rack-detail.tsx"
+      ],
+      "reuse": "现有画布、位置质量、范围授权、subgraph/matrix/trace API",
+      "gap": "待P1定义RackPlacement到既有planned字段/关系的适配，P0无浏览器验收"
+    },
+    {
+      "capability": "前端工作台",
+      "status": "IMPLEMENTED_BOM_CENTRIC",
+      "evidence": [
+        "dev/src/features/RealBOMWorkspace.tsx:1"
+      ],
+      "reuse": "上传、证据、问题筛选、批量审核、进度/任务API客户端",
+      "gap": "四步及固定实体分组以入库为终点；缺计算过程、适用模块、独立发布、工程总览"
+    },
+    {
+      "capability": "Golden评估",
+      "status": "LIMITED_SYNTHETIC",
+      "evidence": [
+        "dev/backend/internal/ai/evaluation.go:22"
+      ],
+      "reuse": "结构化评测结果形态及已有合成用例",
+      "gap": "当前合成字段/Sheet评测不能证明新真实样本工程正确或跨客户泛化"
+    }
+  ],
+  "04_implementation_deviations": [
+    {
+      "id": "D01",
+      "topic": "目标偏差",
+      "finding": "将开局工程资料主要转成BOM记录，工程规则、计算结果和采购/工作量没有独立生命周期。",
+      "direction": "将旧BOM提交保留为物理发布适配器之一"
+    },
+    {
+      "id": "D02",
+      "topic": "智能体边界偏差",
+      "finding": "SheetPlan只描述列绑定和record_kind；PlanningContext只有摘要/来源/标识，没有模块适用性和版本化依赖计划。",
+      "direction": "以ImportPlan编排工程能力，解析工具供AI取证"
+    },
+    {
+      "id": "D03",
+      "topic": "公式语义丢失",
+      "finding": "94,353个公式只保留缓存用于抽取；Agent读工具不展示公式正文，不能解释距离选择、去重和采购计算。",
+      "direction": "公式分析/依赖/计算/规则建议独立能力"
+    },
+    {
+      "id": "D04",
+      "topic": "状态与门禁粒度",
+      "finding": "物理端口速率等约束直接施加到所有cable候选，不能表达资料足以完成连接意图但不足以发布确认链路。",
+      "direction": "领域/成熟度/发布目标各有门禁；缺信息只阻断依赖结果"
+    },
+    {
+      "id": "D05",
+      "topic": "数据模型粒度",
+      "finding": "Workbench/draft/workbook大JSON加Item.Fields承载多域，缺类型化工程实体和增量依赖。",
+      "direction": "核心对象结构化，扩展字段有schema/单位/版本"
+    },
+    {
+      "id": "D06",
+      "topic": "全域失败与性能",
+      "finding": "大工作簿状态反复序列化；已有OOM修复只减少单次写入峰值。",
+      "direction": "领域版本和按需证据读取；不要以加内存替代模型拆分"
+    },
+    {
+      "id": "D07",
+      "topic": "身份和统计混淆",
+      "finding": "967个有标签无SN的设备清单行以及7,154个连接明细行都是规划证据，不能当现场资产/实装链路数量。",
+      "direction": "规划实体、组合成员、实物身份分别建模"
+    },
+    {
+      "id": "D08",
+      "topic": "规划与观测覆盖风险",
+      "finding": "CMDB已有fact_layer但UpsertAsset仍按incoming合并当前payload，缺完整字段权威选择契约。",
+      "direction": "P1明确规划与Observed隔离及当前视图选择，不直接复用覆盖路径"
+    },
+    {
+      "id": "D09",
+      "topic": "覆盖率判据",
+      "finding": "源单元格保留完整不等于设备/公式/工程意义识别完整。",
+      "direction": "分别给出来源保留、关键事实召回、关系正确和计算验证覆盖"
+    },
+    {
+      "id": "D10",
+      "topic": "泛化与测试证据",
+      "finding": "旧文件修复和合成字段测试无法证明另一客户资料可用。",
+      "direction": "私有Golden+独立人工GT+结构变体；第二份结构不同真实资料单独验收"
+    }
+  ],
+  "05_reusable_code": [
+    {
+      "path": "dev/backend/internal/bom/workbook.go",
+      "retain": "只读Parser、单元格/合并区/公式原文、敏感处理基础",
+      "qualification": "需区域级脱敏和公式原始缓存/类型补充；不把现有Parser当完整Intelligence"
+    },
+    {
+      "path": "dev/backend/internal/bom/intelligence.go",
+      "retain": "Workbook IR读取、证据坐标、保留审计",
+      "qualification": "替换区域/公式依赖的简化逻辑；保留工具接口思路"
+    },
+    {
+      "path": "dev/backend/internal/ai/completion.go",
+      "retain": "真实Provider和结构化输出通道",
+      "qualification": "补充工程工具Schema；不把供应商调用当Agent全部能力"
+    },
+    {
+      "path": "dev/backend/internal/ai/planning_schema.go",
+      "retain": "本地Schema校验和错误反馈",
+      "qualification": "旧BOM字段枚举只属于BOM发布适配器"
+    },
+    {
+      "path": "dev/backend/cmd/api/jobs.go",
+      "retain": "持久化任务/失败状态/恢复基础",
+      "qualification": "模块实例需要独立执行状态与依赖版本"
+    },
+    {
+      "path": "dev/backend/cmd/api/domain.go",
+      "retain": "事务提交、稳定身份、幂等与Outbox",
+      "qualification": "仅复用可靠事务模式，扩展各域发布适配"
+    },
+    {
+      "path": "dev/backend/internal/cmdb/domain.go",
+      "retain": "Schema、来源、类型化关系、修订",
+      "qualification": "需明确planned/observed选择策略及工程计划边界"
+    },
+    {
+      "path": "dev/backend/internal/cmdb/changeset.go",
+      "retain": "审核发布及修订机制",
+      "qualification": "评估适配ReviewDecision，不能假定完全满足模块审核"
+    },
+    {
+      "path": "dev/backend/internal/cmdb/visual_placement.go",
+      "retain": "机柜几何和占位检查",
+      "qualification": "复用消费批准RackPlacement，不新写机柜画布"
+    },
+    {
+      "path": "dev/src/features/infrastructure/approved",
+      "retain": "现有机柜图/拓扑页面与Provider",
+      "qualification": "保持其职责和UI"
+    },
+    {
+      "path": "dev/src/features/RealBOMWorkspace.tsx",
+      "retain": "上传、证据、问题/批量操作组件",
+      "qualification": "重组统一工程工作台，非复制8个菜单"
+    }
+  ],
+  "06_modules_to_refactor": {
+    "source_intelligence": "从逐Sheet列映射控制流改成事实/区域/模块ImportPlan；增加公式可读工具和跨域问题分析。",
+    "engineering_model": "引入结构化工程对象和类型化扩展；旧Item是发布映射目标之一。",
+    "formula_rules": "新增可替换计算Provider、规则注册表、来源依赖图和CalculationRun，不用无限制脚本执行公式。",
+    "review_release": "从整批/选中行入库改为模块版本独立审核发布；保留现有幂等事务与Outbox。",
+    "workbench": "统一工作台：Understanding/Overview/模块/Evidence/Calculation/Issues/Review-Publish；复用已有组件。",
+    "first_vertical_slice": "P0/P1审核后先实现 EquipmentPlan+DeviceAssembly+FacilityModel+RackPlacement → 校验/人工审核 → planned发布 → 现有机柜图消费；后续按用户五批次推进。",
+    "not_started": [
+      "新业务代码",
+      "SQL迁移",
+      "新OpenAPI",
+      "UI重构",
+      "Formula provider安装或实现",
+      "新模型外部调用",
+      "正式入库"
+    ]
+  },
+  "07_target_engineering_model": {
+    "status": "P0架构方向提案，P1待审核后细化字段类型/索引/约束/状态迁移/API",
+    "layers": {
+      "Source & Intelligence": [
+        "WorkbookSource",
+        "WorkbookRegion",
+        "SemanticFact",
+        "EvidenceReference",
+        "Provenance",
+        "ImportPlan",
+        "EngineeringModule"
+      ],
+      "Engineering Model": [
+        "EquipmentPlan",
+        "DeviceAssembly",
+        "FacilityModel",
+        "RackPlacement",
+        "PowerPlan",
+        "ConnectivityPlan",
+        "CablePlan",
+        "MaterialEstimate",
+        "WorkloadEstimate",
+        "NetworkPlan"
+      ],
+      "Validation & Release": [
+        "CalculationRule",
+        "CalculationRun",
+        "ValidationIssue",
+        "ReviewDecision",
+        "ModelRevision",
+        "PublishRecord"
+      ]
+    },
+    "common_models": [
+      {
+        "name": "WorkbookSource",
+        "core_fields": "id/project_id/object_ref/sha256/original_filename/uploaded_by/uploaded_at/access_scope",
+        "relations": "1:N WorkbookRegion, ModelRevision source refs",
+        "constraints": "不可变原文件；重导新source版本；原始文件私有存储"
+      },
+      {
+        "name": "WorkbookRegion",
+        "core_fields": "id/source_id/sheet_id/range/region_kind/header_ranges/coordinate_system",
+        "relations": "N:M SemanticFact via EvidenceReference",
+        "constraints": "多表区/图形网格独立；Sheet名称只作来源元数据"
+      },
+      {
+        "name": "SemanticFact",
+        "core_fields": "id/subject_ref/predicate/value_type/typed_value/unit/fact_state/claim_status",
+        "relations": "N:M EvidenceReference; Provenance",
+        "constraints": "建议事实可冲突并存；unknown不等于0；值状态与审核状态分开"
+      },
+      {
+        "name": "EvidenceReference",
+        "core_fields": "id/source_id/sheet_id/cell_or_range/formula_ref/cache_ref/source_hash",
+        "relations": "引用不可变来源单元格/区域",
+        "constraints": "公式、缓存、重算值分开；敏感值只存受控引用"
+      },
+      {
+        "name": "Provenance",
+        "core_fields": "id/output_ref/method/input_refs/model_or_tool_version/run_ref/operator/time",
+        "relations": "多输入到一个输出的有向来源关系",
+        "constraints": "人工、原始、AI建议、公式缓存、确定性计算分别记录"
+      },
+      {
+        "name": "ImportPlan",
+        "core_fields": "id/source_revision/plan_revision/module_instances/dependency_edges/assumptions",
+        "relations": "1:N 模块运行实例",
+        "constraints": "AI提案经结构校验；依赖到输入输出版本；不按Sheet建模块"
+      },
+      {
+        "name": "EngineeringModule",
+        "core_fields": "id/version/input_schemas/output_schemas/dependencies/applicability/calculators/validators/review_gates/publish_targets",
+        "relations": "独立定义与导入内实例分离",
+        "constraints": "可信代码注册能力；AI只能选模块和提出参数，不能注册可执行任意代码"
+      },
+      {
+        "name": "CanonicalEntity",
+        "core_fields": "entity_id/project_id/entity_kind/schema_version/lifecycle_state/physical_asset_ref",
+        "relations": "规划实体到已有bom_item/CMDB稳定身份映射",
+        "constraints": "规划ID不伪造SN；核心类型独立表；不是第二套已发现资产身份库"
+      },
+      {
+        "name": "CalculationRule",
+        "core_fields": "id/domain/scope/version/input_types/output_types/units/expression/dependencies/validation_cases/approval_status",
+        "relations": "被CalculationRun按版本引用",
+        "constraints": "表达式为受限类型化表达式或受控引擎公式；项目规则不可自动全局化"
+      },
+      {
+        "name": "CalculationRun",
+        "core_fields": "id/rule_version/provider_version/source_hash/input_revision_refs/parameters/result_ref/errors/compatibility/start/end",
+        "relations": "N:M输入输出、EvidenceReference",
+        "constraints": "记录缓存与重算区别；输入或规则变更使依赖产物STALE"
+      },
+      {
+        "name": "ValidationIssue",
+        "core_fields": "id/domain/module_instance/entity_or_fact_ref/rule_version/severity/evidence/status/affected_publish_targets",
+        "relations": "连接领域对象、源位置和发布目标",
+        "constraints": "只阻断受影响域及依赖产物；关键未决项不得发布"
+      },
+      {
+        "name": "ReviewDecision",
+        "core_fields": "id/reviewer/decision/reason/target_revision/content_hash/previous_decision",
+        "relations": "精确绑定模块/规则/模型版本",
+        "constraints": "批准不可转用于变化后的内容；重导保留人工决定并形成冲突diff"
+      },
+      {
+        "name": "ModelRevision",
+        "core_fields": "id/project/domain/parent_revision/source_refs/input_revision_refs/content_hash/state",
+        "relations": "拥有类型化实体版本和关系版本",
+        "constraints": "不可变审核快照；增删改diff不是覆写已确认值"
+      },
+      {
+        "name": "PublishRecord",
+        "core_fields": "id/domain/model_revision/decision_ref/target/idempotency_key/status/outbox_ref/receipt/error",
+        "relations": "按域发布，复用Outbox",
+        "constraints": "同版本同目标幂等；记录目标应用状态；跨域不假装单个分布式原子提交"
+      }
+    ],
+    "domain_models": [
+      {
+        "name": "EquipmentPlan",
+        "core_fields": "plan_id/equipment_kind/model_ref/quantity/unit/planning_identity/status",
+        "relations": "EquipmentPlanLine, DeviceAssembly, CanonicalEntity",
+        "constraints": "数量计划与命名实例分开；无SN允许规划，不能标为discovered"
+      },
+      {
+        "name": "DeviceAssembly",
+        "core_fields": "assembly_id/parent_plan_ref/child_plan_ref/role/quantity/slot_or_position",
+        "relations": "树状部件组成、端口归属",
+        "constraints": "父子引用无环；机架级系统与托盘/节点/模块不按行数重复统计"
+      },
+      {
+        "name": "FacilityModel",
+        "core_fields": "facility_id/site/room/rack/geometry/coordinates/orientation/unit/reference_frame",
+        "relations": "FacilityNode/路径节点/机柜容量",
+        "constraints": "坐标系和单位明确；表格网格不直接当实际米坐标"
+      },
+      {
+        "name": "RackPlacement",
+        "core_fields": "placement_id/device_ref/rack_ref/u_start/u_height/face/mount/state",
+        "relations": "设备、FacilityModel、现有CMDB规划位置投影",
+        "constraints": "缺高度不补值；布局、设备表、功率表多个来源需冲突审核；复用机柜图"
+      },
+      {
+        "name": "PowerPlan",
+        "core_fields": "id/equipment_power_profile_ref/rack_ref/cooling_type/capacity/unit/load_basis",
+        "relations": "EquipmentPowerProfile,RackPowerPlan,RackCapacity,PowerCalculationResult",
+        "constraints": "规划MAX功率、实测功率、容量、余量分层；电力负载不等于完整冷却能力"
+      },
+      {
+        "name": "ConnectivityPlan",
+        "core_fields": "id/endpoints/physical_parent_ports/breakout_children/intermediate_nodes/state",
+        "relations": "DevicePort, Termination, PlannedConnection, PatchThrough",
+        "constraints": "设备级意图与端口级连接分开；端口身份在owner范围内唯一"
+      },
+      {
+        "name": "CablePlan",
+        "core_fields": "id/connection_ref/spec_ref/route_ref/estimated_length/calculated_length/selected_stock_length/confirmed_length/as_built_length/unit",
+        "relations": "CableSpec,CableRoute,CalculationRun,ModuleRequirement,Label",
+        "constraints": "Estimated/Calculated/Confirmed/As-built分开；模块按物理父口及安装位去重"
+      },
+      {
+        "name": "MaterialEstimate",
+        "core_fields": "id/revision/item_spec/required/ordered/spares/total/shortfall/unit/rule_ref",
+        "relations": "EquipmentPlan,CablePlan,ModuleRequirement",
+        "constraints": "采购聚合不可作为CMDB实物资产；采购差额和备件规则独立版本"
+      },
+      {
+        "name": "WorkloadEstimate",
+        "core_fields": "id/revision/activity_kind/quantity/unit/length_distribution/labor_rule_ref",
+        "relations": "EquipmentPlan,RackPlacement,CablePlan",
+        "constraints": "安装/布线数量与工时分开；没有生产率规则不猜工时"
+      },
+      {
+        "name": "NetworkPlan",
+        "core_fields": "id/fabric/plane/roles/interface_mapping/address_pools/ASN_allocations/protocol_policies/revision",
+        "relations": "类型化IPAllocation,ASNAllocation,BGP,BFD,RoCEQoS,AdaptiveRouting,EVPNVXLAN",
+        "constraints": "无来源不生成IP/ASN/邻居；批准发布后Golden方可消费"
+      }
+    ],
+    "storage_principle": "核心对象/数量/端点/位置/规则引用/版本/审核/发布使用明确类型和关系；JSON只容纳版本化类型扩展、工具响应或受控快照。原Workbook对象留源存储。",
+    "identity_principle": "统一规划entity_id映射现有bom_item/CMDB稳定ID；不创建平行的已发现Device/Switch事实源。物料估算没有物理资产身份。",
+    "fact_states": [
+      "Estimated",
+      "Calculated",
+      "Confirmed",
+      "As-built"
+    ],
+    "module_states": [
+      "NOT_APPLICABLE",
+      "DETECTED",
+      "NEEDS_INPUT",
+      "READY",
+      "PROCESSING",
+      "IN_REVIEW",
+      "APPROVED",
+      "PUBLISHED",
+      "BLOCKED",
+      "STALE"
+    ]
+  },
+  "08_business_dependencies": {
+    "registry_contract": [
+      "input/output schemas",
+      "dependencies by versioned input",
+      "applicability evidence and reason",
+      "calculation capabilities",
+      "validation capabilities",
+      "review gates",
+      "publish targets"
+    ],
+    "execution": "按具体输入/输出依赖调度，允许独立模块并行；缺失或失败只传播到依赖输出。模块顺序不由Sheet顺序或固定业务代码列表决定。",
+    "staleness": "输入事实、参数、规则或上游版本变化→依赖计算/校验/审批状态STALE；生成新revision+diff，人工已确认项保留并暴露冲突。",
+    "release_targets": {
+      "physical": "planned设备/组合/位置/端口/连接→既有CMDB与机柜图；不覆盖Observed",
+      "engineering": "CablePlan/PowerPlan/MaterialEstimate/WorkloadEstimate→工程域版本存储",
+      "network": "批准NetworkPlan Revision→Golden消费契约（待确认）"
+    },
+    "conflicts_with_old_documents": [
+      {
+        "source": "PRD FR-2.1、SYSTEM-DESIGN §3–6",
+        "old": "BOM中心、同批次物料统一提交",
+        "new": "工程模型为中心、按依赖分域发布",
+        "resolution": "本轮用户需求优先；旧BOM事务约束保留在单一物理发布批次内部，P1更新权威文档"
+      },
+      {
+        "source": "SYSTEM-DESIGN §4、RACK-DIAGRAM §2",
+        "old": "公式不执行、优先缓存；旧AI只列映射",
+        "new": "隔离确定性重算与AI多轮工程工具",
+        "resolution": "本轮要求覆盖旧阶段限制；P1明确隔离provider边界及兼容性记录"
+      },
+      {
+        "source": "AGENTS末节旧Agent范围",
+        "old": "交换机/端接优先的BOM识别",
+        "new": "通用智能开局工程模块",
+        "resolution": "本轮任务优先；P0不改业务实现"
+      }
+    ]
+  },
+  "09_risks_and_questions": {
+    "items": [
+      {
+        "id": "Q01",
+        "question": "样本中设备组合、托盘、机架系统与独立节点的边界如何人工确认？",
+        "evidence": "Server Information配置组合字段及778行，SN列全空",
+        "recommendation": "以EquipmentPlan与DeviceAssembly表达，不能将778直接叫778台已发现服务器",
+        "blocks": "P1设备身份及Golden关系标注"
+      },
+      {
+        "id": "Q02",
+        "question": "机柜布局、电力表和设备明细冲突时，以哪份来源/版本为准？",
+        "evidence": "电力56明细行、Layout54公式标签、落位图110公式格；计数口径不同不直接判丢失",
+        "recommendation": "按对象/字段多来源呈现冲突，确认权威来源后发布",
+        "blocks": "Placement确认"
+      },
+      {
+        "id": "Q03",
+        "question": "距离规则中的网格步长、上/下路线、余量、特殊路线、标准线长供应规格适用于哪些项目？",
+        "evidence": "距离计算公式 I2:J5、F2:G7、L2:M13、O2:P5；P2P-18 F2:F433",
+        "recommendation": "全部留在样本项目规则版本；5米步进只是观察结果，不作全局默认",
+        "blocks": "规则批准与工程线长发布"
+      },
+      {
+        "id": "Q04",
+        "question": "模块去重按父物理口、插槽、模块组件还是分支通道，铜缆/AOC等是否计模块？",
+        "evidence": "Cabling Q:T以及物料J:N",
+        "recommendation": "先人工标注典型breakout/特殊链路，分离端口父子结构与采购规则",
+        "blocks": "ModuleRequirement/MaterialEstimate正确性"
+      },
+      {
+        "id": "Q05",
+        "question": "功率与冷却的设计口径、余量/冗余和机柜容量由谁批准？",
+        "evidence": "电力测算使用MAX功率及风冷/液冷容量；未形成实测或完整热工证据",
+        "recommendation": "保留源规则，未知冷却指标NEEDS_INPUT，不能凭功率判冷却通过",
+        "blocks": "Power/Cooling发布"
+      },
+      {
+        "id": "Q06",
+        "question": "Golden人工核对负责人及可靠参考计算环境是什么？",
+        "evidence": "本地无LibreOffice/soffice，forceFullCalc=1",
+        "recommendation": "指定Excel或隔离Calc参考运行；缓存不作唯一真值；人工确认公式预期与单位",
+        "blocks": "P3公式兼容验收及P6Golden通过"
+      },
+      {
+        "id": "Q07",
+        "question": "分域审核的角色与职责分离如何沿用现有RBAC？",
+        "evidence": "旧流程记录级确认与model审批；新流程要求领域/规则/发布决策",
+        "recommendation": "在既有身份体系上定义域权限，冻结审批目标revision/hash",
+        "blocks": "P1审核契约"
+      },
+      {
+        "id": "Q08",
+        "question": "NetworkPlan与Golden的既有消费契约、版本绑定和逻辑网络来源在哪里？",
+        "evidence": "本样本角色/链路标签不等于完整网络配置依据",
+        "recommendation": "物理链先行；网络域NEEDS_INPUT；未明确Golden接口前不新增执行引擎",
+        "blocks": "第五批Network Design"
+      },
+      {
+        "id": "Q09",
+        "question": "第二份真实结构不同资料何时作为泛化验收输入？",
+        "evidence": "本轮只分析指定GB300文件；历史其他文件不自动成为本轮Ground Truth",
+        "recommendation": "结构变体与跨客户验收分开登记",
+        "blocks": "跨客户泛化通过声明"
+      }
+    ],
+    "golden_fixture": {
+      "source_sha256": "30481c4619366bcdc707c9b58f2118349eb599f4260d5f73010fe3b7a3782558",
+      "raw_source_in_git": false,
+      "status": "FIRST_GOLDEN_SOURCE_IDENTIFIED; GROUND_TRUTH_NOT_APPROVED",
+      "ground_truth_fields": [
+        "设备实例/组合父子/数量口径",
+        "设备-机柜-U位/高度/面",
+        "端接两端/父子口/中间节点",
+        "线缆规格/路径/估算与标准长度",
+        "模块物理去重及介质适用",
+        "功率/容量/余量与冷却缺口",
+        "物料已下单/备件/需求/采购差额",
+        "工作量与安装数量"
+      ],
+      "manual_evidence": "本轮人工阅读表头与代表公式，进行了56项负载与432项标准长度算术对照；没有完成逐实体/逐关系人工真值审核。",
+      "pending_reference": "可信Excel/隔离Calc重算，与人工确认规则/单位比对；不能以现有缓存或AI自评做唯一真值。",
+      "variant_matrix": [
+        "Sheet重命名",
+        "列重排",
+        "表头同义表达",
+        "插入无关Sheet",
+        "表格平移",
+        "单Sheet拆多区域",
+        "单位等价表达"
+      ],
+      "variant_execution": "NOT RUN (P0只审计)",
+      "cross_customer_generalization": "NOT VERIFIED；至少第二份真实结构不同资料独立人工标注验收"
+    },
+    "p0_acceptance": {
+      "read_required_docs_and_code": "DONE",
+      "read_actual_named_workbook": "DONE",
+      "nine_outputs": "DONE",
+      "business_implementation_changes": "NONE",
+      "source_hash_unchanged": "VERIFIED",
+      "full_formula_recalculation": "NOT RUN / engine unavailable",
+      "complete_ground_truth": "NOT APPROVED",
+      "architecture_review": "AWAITING USER",
+      "next_action": "STOP after P0 report; do not start P1/P2 implementation"
+    }
+  }
+}

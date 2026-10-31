@@ -1,0 +1,141 @@
+Keel Intelligent Deployment Engineering — P0 审阅报告
+状态：P0只读审计完成；等待用户审核架构方向。P1及业务实现未开始。
+代码基线：2d66974；审计工作树 /home/ubuntu/keel-engineering-p0。
+
+一、工作簿语义理解
+实际读取 /home/ubuntu/MM_Layout_GB300-18_HDD&SSD&CPU-112_V1.1.xlsx。
+SHA256：30481c4619366bcdc707c9b58f2118349eb599f4260d5f73010fe3b7a3782558。
+文件1,633,037字节，15个Sheet，162,751个有内容或公式的单元格，
+94,353个公式单元格，311个合并区域。原文件hash复核未变。
+
+这是一份项目工程工作簿，含设备组合、空间布局、功率容量、路径和采购计算。
+不能把15张Sheet变成15个菜单、数据库表或固定执行阶段。
+
+设备来源包含189条网络设备标签、778条服务器侧标签，共967条；两张清单SN均空。
+这是规划身份证据，不是967台现场实物。配置组合与部件父子关系仍须人工标注。
+五个布线明细中有7,154行四端点字段齐全的候选，不能直接视为已确认物理链路。
+单Sheet内四端点元组没有重复，不代表端口占用、父子口及跨Sheet关系全部正确。
+
+适用模块提案：设备、空间/落位、连接/布线、物料/工作量均有明确证据；
+电力有可计算依据，完整冷却方案仍需输入；网络角色与链路分类有依据，
+IP/ASN/BGP等完整NetworkPlan依据不足，应NEEDS_INPUT而非随意生成。
+这些是P0分析状态，不是已经执行或批准的ImportPlan。
+
+二、数据区域和公式依赖
+典型多区域：
+- 电力测算：A4:D14设备功率/数量，A16:B18容量参数，A20:N79每柜负载，A81:B84总计。
+- 距离计算公式：A:D点位坐标，F:G区域配对距离，I:J参数，L:M必经点，
+  O:P特殊路线，R:AE逐路径结果。同一Sheet横向多个独立区域。
+- 落位图：1:53、60:112、119:171三段网格，合并格参与表达空间和占位。
+- 工作量：A:H线缆规格/长度数量，与K:M设备/U数/安装量并列。
+- 布线明细：端接/型号/标签与Q:T模块Key及首现标记同时存在。
+
+关键计算链：
+设备数量×功率参数 → 每柜负载/剩余容量 → 布局显示。
+点位坐标+路径参数 → 路线选择/估算距离 → 标准长度 → 端口级连接展开。
+设备端口 → 父物理端口去重键 → 模块需求 → 采购差额。
+设备安装数+线缆规格/长度分布 → 施工数量；没有工时规则不推算工时。
+
+P2P-18与距离计算公式存在Sheet级双向引用。代表性单元格链：
+P2P-18!F2 → E2 → 距离计算公式!AE2 → 路径/坐标/参数 → P2P-18!C2/D2原始输入。
+不能把Sheet级双向边直接判为循环依赖；本轮未完整展开单元格DAG或证明全局无环。
+
+94,353个公式均有缓存且没有缓存错误单元格，但forceFullCalc=1。
+IFERROR可能隐藏无匹配/缺输入；缓存非空、没有#ERROR不等于计算正确。
+56项机柜负载和432项标准线长用独立Decimal算术对照缓存，均一致。
+对照只证明这些运算与已存输入/缓存一致，不证明来源、单位、业务口径或引擎兼容。
+本机未发现LibreOffice/soffice，没有进行Excel或Calc参考重算。
+
+三、现有系统能力
+可以保留：原始文件保存/摘要、Excelize只读Parser、合并单元格/公式/缓存证据、
+Workbook IR、真实AI Provider、结构化响应校验、任务持久化、人工修改原因、
+版本并发保护、稳定身份、部分提交、事务及Outbox、CMDB来源/关系/版本、现有机柜图。
+
+目前Agent多轮动作只有analyze_sheet、inspect_region、cross_sheet_resolve、submit_plan，
+围绕目标Sheet的BOM列映射运行，最多8轮。它不是所要求的通用工程编排Agent。
+明确表头还可直接走本地绑定；给AI的工具结果删除公式正文。
+当前工程校验侧重端口速率、介质、型号及引用，没有通用工程计算Provider/Run/Registry。
+目前Evaluation是小型合成字段和Sheet等用例，不能作为真实工程准确率。
+
+四、当前实现偏差
+1. 目标仍是候选行入库，缺少完整工程模型和分域产物。
+2. SheetPlan/PlanningContext不包含动态模块实例、输入依赖及分域发布计划。
+3. 公式以缓存值参与映射，计算规则、输入输出依赖与运行记录没有独立建模。
+4. 物理发布门禁直接影响规划候选，难以表达“意图可用，但确认链路缺速率证据”。
+5. 大Workbench JSON及Item.Fields混装多领域，带来大结果保存和增量更新问题。
+6. 记录级确认和部分提交不等于模块版本、规则版本独立审批发布。
+7. CMDB虽已有planned来源层，UpsertAsset仍按incoming属性合并当前payload；
+   规划与Observed的字段选择规则必须重新明确，不能假设已有fact_layer就完全隔离。
+8. Coverage Complete主要证明来源保留和Sheet处理状态，不能证明工程语义识别完整。
+
+五、可复用代码
+Parser/原始证据：dev/backend/internal/bom/workbook.go。
+IR/保留审计：dev/backend/internal/bom/intelligence.go。
+AI连接/结构校验：dev/backend/internal/ai/completion.go、planning_schema.go。
+任务：dev/backend/cmd/api/jobs.go。
+事务/幂等/Outbox：dev/backend/cmd/api/domain.go。
+CMDB类型、关系、来源：dev/backend/internal/cmdb/domain.go、changeset.go。
+位置质量：dev/backend/internal/cmdb/visual_placement.go。
+现有机柜/拓扑UI：dev/src/features/infrastructure/approved/。
+工作台组件：dev/src/features/RealBOMWorkspace.tsx。
+复用清单有边界，不表示全部可以不改直接用于新要求；逐项说明见p0-audit.json。
+
+六、需要重构的模块
+- Source/Intelligence：以区域、事实和证据为输入，输出ImportPlan及模型/规则建议。
+- Engineering：明确领域实体/关系/单位/版本，BOM Item仅为物理发布适配目标之一。
+- Formula/Rule：可替换计算Provider、公式依赖、规则版本和CalculationRun。
+- Validation/Release：模块独立门禁、人工决定、diff、STALE传播与分域发布。
+- 工作台：统一工程总览、模块状态、来源、计算过程、问题和审核发布。
+不新建八个菜单，不重新画机柜图，不扩展网络执行引擎。
+
+七、目标工程数据模型（P0方向提案，尚未冻结P1）
+Source & Intelligence：WorkbookSource、WorkbookRegion、SemanticFact、
+EvidenceReference、Provenance、ImportPlan、EngineeringModule。
+Engineering：EquipmentPlan、DeviceAssembly、FacilityModel、RackPlacement、
+PowerPlan、ConnectivityPlan、CablePlan、MaterialEstimate、WorkloadEstimate、NetworkPlan。
+Validation & Release：CalculationRule、CalculationRun、ValidationIssue、
+ReviewDecision、ModelRevision、PublishRecord。
+CanonicalEntity提供类型化工程身份，映射现有bom_item/CMDB稳定资产ID；
+不创建第二套已发现服务器/交换机身份库。
+
+核心字段、数量、位置、端点、引用、审核和发布应有明确类型与约束；
+JSON限于有版本Schema的扩展属性、工具结果或受控快照。
+规划ID不伪造SN；Estimated/Calculated/Confirmed/As-built与审核状态分开。
+所有14个通用模型、10个领域模型的职责、核心字段、关系、约束已列入p0-audit.json。
+
+八、业务依赖和发布
+模块注册表声明输入、输出、依赖、适用条件、计算、校验、门禁、发布目标。
+资料理解后由AI提出ImportPlan；可信执行器按输入/输出版本调度，允许独立模块并行。
+模块状态覆盖NOT_APPLICABLE、DETECTED、NEEDS_INPUT、READY、PROCESSING、
+IN_REVIEW、APPROVED、PUBLISHED、BLOCKED、STALE。
+缺资料不等于NOT_APPLICABLE；故障只阻断依赖它的结果。
+输入/参数/规则改变，使依赖计算、校验及审批STALE；生成新版本diff，不覆写人工确认。
+
+发布出口：
+- 设备/组合/位置/端口/连接的planned版本 → 现有CMDB与机柜图。
+- CablePlan/PowerPlan/MaterialEstimate/WorkloadEstimate → 工程域版本。
+- 审核后的NetworkPlan Revision → Golden（具体消费契约待确认）。
+保留事务Outbox；独立发布记录绑定模型版本/审核决定/目标与幂等键。
+
+建议首条纵向链：设备及组合 + 机房/机柜 + RackPlacement → 校验/审核 →
+planned发布 → 现有机柜图读取。后续按用户指定的连接、电力、采购、网络批次推进。
+P0/P1完成前不开始这条链的业务实现。
+
+九、风险与待确认
+- 样本中的机架系统、托盘/节点、模块和设备数量口径需人工Ground Truth。
+- 不同来源出现位置、数量冲突时，需要字段级权威来源与版本决定。
+- 路径参数、线长规格、去重、备件规则都必须有项目适用范围及批准版本。
+- 功率与冷却需确认MAX/规划/实测口径，不能只凭功率表声称冷却通过。
+- 需要确认规则/领域审核责任人、可靠的参考公式计算环境、Golden消费契约。
+- 第一份Golden已锁定原文件摘要；完整人工Ground Truth尚未批准。
+- 未运行结构变体或跨客户测试；第二份真实不同结构资料是跨客户验收必要条件。
+
+现有PRD/SYSTEM-DESIGN的BOM中心/统一提交和旧公式限制，与本轮要求有差异。
+本轮用户要求优先；P1审核后更新权威文档。差异已登记到docs/DECISIONS.md。
+
+P0验收结果：九项审计输出齐备，真实文件读取和摘要保持不变；业务代码/数据库/
+API/部署未修改，没有外部AI请求，没有运行冒烟、回归或全平台构建。
+工程计算引擎重算、完整Ground Truth、跨客户泛化仍未验证。
+到此暂停，等待用户审核架构方向。
+
+详细证据：p0-audit.json、p0-workbook-profile.json、p0-numeric-observations.json。

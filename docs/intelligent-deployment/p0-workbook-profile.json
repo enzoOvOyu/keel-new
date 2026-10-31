@@ -1,0 +1,2282 @@
+{
+  "source": {
+    "filename": "MM_Layout_GB300-18_HDD&SSD&CPU-112_V1.1.xlsx",
+    "path": "/home/ubuntu/MM_Layout_GB300-18_HDD&SSD&CPU-112_V1.1.xlsx",
+    "bytes": 1633037,
+    "sha256": "30481c4619366bcdc707c9b58f2118349eb599f4260d5f73010fe3b7a3782558",
+    "read_only": true
+  },
+  "method": "Local OOXML inspection; formula caches read, no formula execution, macro/external link execution or AI calls",
+  "calc_properties": {
+    "calcId": "191029",
+    "forceFullCalc": "1"
+  },
+  "defined_name_count": 0,
+  "external_link_parts": 0,
+  "media_parts": 0,
+  "sheets": [
+    {
+      "sheet": "Layout",
+      "dimension": "A1:P24",
+      "visibility": "visible",
+      "populated_cells": 192,
+      "populated_rows": 23,
+      "merges": [
+        "H1:H23",
+        "N1:N23"
+      ],
+      "hidden_rows": 0,
+      "hidden_column_spans": [],
+      "drawing_refs": 0,
+      "formula_cells": 54,
+      "cached_formula_cells": 54,
+      "empty_formula_results": 0,
+      "cached_errors": {},
+      "formula_kinds": {
+        "normal": 54
+      },
+      "functions": {
+        "CHAR": 54,
+        "TEXT": 54
+      },
+      "formula_column_counts": {
+        "C": 20,
+        "G": 18,
+        "I": 16
+      },
+      "safe_header_labels": [],
+      "formula_examples": [
+        {
+          "cell": "C2",
+          "formula_redacted": "电力测算!B23&CHAR(10)&TEXT(电力测算!L23,\"<text>\")&\"<text>\"",
+          "cache_type": "str",
+          "cached_numeric": null
+        }
+      ],
+      "formula_cross_sheet_dependencies": {
+        "电力测算": 108
+      },
+      "nonempty_row_bands": [
+        [
+          1,
+          22
+        ],
+        [
+          24,
+          24
+        ]
+      ]
+    },
+    {
+      "sheet": "电力测算",
+      "dimension": "A1:N84",
+      "visibility": "visible",
+      "populated_cells": 880,
+      "populated_rows": 80,
+      "merges": [
+        "A1:N1",
+        "A3:N3",
+        "A16:N16",
+        "A20:N20",
+        "A81:N81"
+      ],
+      "hidden_rows": 0,
+      "hidden_column_spans": [],
+      "drawing_refs": 0,
+      "formula_cells": 208,
+      "cached_formula_cells": 208,
+      "empty_formula_results": 0,
+      "cached_errors": {},
+      "formula_kinds": {
+        "normal": 25,
+        "shared": 183
+      },
+      "functions": {
+        "SUM": 20,
+        "SUMPRODUCT": 56,
+        "IF": 56
+      },
+      "formula_column_counts": {
+        "C": 8,
+        "D": 12,
+        "E": 2,
+        "F": 2,
+        "G": 2,
+        "H": 2,
+        "I": 2,
+        "J": 2,
+        "K": 2,
+        "L": 57,
+        "M": 57,
+        "N": 57,
+        "B": 3
+      },
+      "safe_header_labels": [
+        {
+          "cell": "A3",
+          "label": "一、设备清单与功率参数"
+        },
+        {
+          "cell": "B4",
+          "label": "单台MAX功率(kW)"
+        },
+        {
+          "cell": "C4",
+          "label": "数量"
+        },
+        {
+          "cell": "A14",
+          "label": "合计"
+        },
+        {
+          "cell": "A16",
+          "label": "二、机柜容量"
+        },
+        {
+          "cell": "A17",
+          "label": "风冷机柜容量(kW)"
+        },
+        {
+          "cell": "A18",
+          "label": "液冷机柜容量(kW)"
+        },
+        {
+          "cell": "A20",
+          "label": "三、机柜功率明细"
+        },
+        {
+          "cell": "C21",
+          "label": "单台功率(kW) →"
+        },
+        {
+          "cell": "A22",
+          "label": "机柜"
+        },
+        {
+          "cell": "C22",
+          "label": "类型"
+        },
+        {
+          "cell": "M22",
+          "label": "机柜容量(kW)"
+        },
+        {
+          "cell": "N22",
+          "label": "余量(kW)"
+        }
+      ],
+      "formula_examples": [
+        {
+          "cell": "C5",
+          "formula_redacted": "SUM(D$23:D$78)",
+          "cache_type": "n",
+          "cached_numeric": "18"
+        },
+        {
+          "cell": "D5",
+          "formula_redacted": "B5*C5",
+          "cache_type": "n",
+          "cached_numeric": "2430"
+        },
+        {
+          "cell": "D21",
+          "formula_redacted": "B5",
+          "cache_type": "n",
+          "cached_numeric": "135"
+        },
+        {
+          "cell": "L23",
+          "formula_redacted": "SUMPRODUCT($D23:$K23,D$21:K$21)",
+          "cache_type": "n",
+          "cached_numeric": "18.919999999999998"
+        },
+        {
+          "cell": "M23",
+          "formula_redacted": "IF($C23=\"<text>\",$B$18,$B$17)",
+          "cache_type": "n",
+          "cached_numeric": "20"
+        },
+        {
+          "cell": "N23",
+          "formula_redacted": "M23-L23",
+          "cache_type": "n",
+          "cached_numeric": "1.0800000000000018"
+        },
+        {
+          "cell": "B84",
+          "formula_redacted": "B82+B83",
+          "cache_type": "n",
+          "cached_numeric": "3040.2200000000003"
+        }
+      ],
+      "formula_cross_sheet_dependencies": {},
+      "nonempty_row_bands": [
+        [
+          1,
+          1
+        ],
+        [
+          3,
+          14
+        ],
+        [
+          16,
+          18
+        ],
+        [
+          20,
+          79
+        ],
+        [
+          81,
+          84
+        ]
+      ]
+    },
+    {
+      "sheet": "落位图",
+      "dimension": "A1:DV176",
+      "visibility": "visible",
+      "populated_cells": 8617,
+      "populated_rows": 159,
+      "merges": [
+        "AM153:AM154",
+        "C157:C158",
+        "I157:I158",
+        "U157:U158",
+        "AA157:AA158",
+        "AG157:AG158",
+        "AM157:AM158",
+        "C153:C154",
+        "I153:I154",
+        "U153:U154",
+        "AA153:AA154",
+        "AG153:AG154",
+        "AM145:AM146",
+        "C149:C150",
+        "I149:I150",
+        "U149:U150",
+        "AA149:AA150",
+        "AG149:AG150",
+        "AM149:AM150",
+        "C145:C146",
+        "I145:I146",
+        "U145:U146",
+        "AA145:AA146",
+        "AG145:AG146",
+        "AG137:AG138",
+        "AM137:AM138",
+        "C141:C142",
+        "I141:I142",
+        "O141:O142",
+        "U141:U142",
+        "AA141:AA142",
+        "AG141:AG142",
+        "AM141:AM142",
+        "C137:C138",
+        "I137:I138",
+        "O137:O138",
+        "U137:U138",
+        "AA137:AA138",
+        "C125:C126",
+        "I125:I126",
+        "O125:O126",
+        "U125:U126",
+        "AA125:AA126",
+        "AG129:AG130",
+        "AM129:AM130",
+        "C133:C134",
+        "I133:I134",
+        "O133:O134",
+        "U133:U134",
+        "AA133:AA134",
+        "AG133:AG134",
+        "AM133:AM134",
+        "C129:C130",
+        "I129:I130",
+        "O129:O130",
+        "U129:U130",
+        "AA129:AA130",
+        "AG125:AG126",
+        "AM125:AM126",
+        "CI109:CI110",
+        "CI111:CI112",
+        "DA94:DA95",
+        "CU101:CU102",
+        "CU103:CU104",
+        "CU105:CU106",
+        "CU107:CU108",
+        "CU109:CU110",
+        "CU111:CU112",
+        "DG94:DG95",
+        "BK98:BK99",
+        "BQ98:BQ99",
+        "BW98:BW99",
+        "CC98:CC99",
+        "DA98:DA99",
+        "DG98:DG99",
+        "BK94:BK95",
+        "BQ94:BQ95",
+        "BW94:BW95",
+        "CC94:CC95",
+        "CU95:CU96",
+        "CU97:CU98",
+        "CU99:CU100",
+        "DG86:DG87",
+        "BK90:BK91",
+        "BQ90:BQ91",
+        "BW90:BW91",
+        "CC90:CC91",
+        "CO90:CO91",
+        "DA90:DA91",
+        "DG90:DG91",
+        "BK86:BK87",
+        "BQ86:BQ87",
+        "BW86:BW87",
+        "CC86:CC87",
+        "CO86:CO87",
+        "DG78:DG79",
+        "BK82:BK83",
+        "BQ82:BQ83",
+        "BW82:BW83",
+        "CC82:CC83",
+        "CI82:CI83",
+        "CO82:CO83",
+        "DA82:DA83",
+        "DG82:DG83",
+        "BK78:BK79",
+        "BQ78:BQ79",
+        "BW78:BW79",
+        "CC78:CC79",
+        "CI78:CI79",
+        "DG70:DG71",
+        "BK74:BK75",
+        "BQ74:BQ75",
+        "BW74:BW75",
+        "CC74:CC75",
+        "CI74:CI75",
+        "CO74:CO75",
+        "DA74:DA75",
+        "DG74:DG75",
+        "BK70:BK71",
+        "BQ70:BQ71",
+        "BW70:BW71",
+        "CC70:CC71",
+        "CI70:CI71",
+        "DG66:DG67",
+        "BK66:BK67",
+        "BQ66:BQ67",
+        "BW66:BW67",
+        "CC66:CC67",
+        "CI66:CI67",
+        "CO66:CO67",
+        "DA66:DA67",
+        "BQ50:BQ53",
+        "C35:C36",
+        "I35:I36",
+        "DM39:DM40",
+        "DS39:DS40",
+        "BW42:BW45",
+        "CI42:CI43",
+        "CI44:CI45",
+        "DA42:DA43",
+        "DA44:DA45",
+        "CU40:CU41",
+        "CU42:CU43",
+        "C39:C40",
+        "I39:I40",
+        "BE38:BE41",
+        "BE42:BE45",
+        "CC34:CC37",
+        "CC38:CC41",
+        "CC42:CC45",
+        "C31:C32",
+        "I31:I32",
+        "DM31:DM32",
+        "DS31:DS32",
+        "C23:C24",
+        "I23:I24",
+        "DM23:DM24",
+        "DS23:DS24",
+        "DG24:DG25",
+        "BK22:BK25",
+        "BK26:BK29",
+        "BK30:BK33",
+        "BQ22:BQ25",
+        "C27:C28",
+        "I27:I28",
+        "DM27:DM28",
+        "DS27:DS28",
+        "DG28:DG29",
+        "BQ26:BQ29",
+        "CC22:CC25",
+        "CC26:CC29",
+        "CC30:CC33",
+        "C7:C8",
+        "I7:I8",
+        "C15:C16",
+        "I15:I16",
+        "C11:C12",
+        "I11:I12",
+        "C19:C20",
+        "I19:I20",
+        "DM19:DM20",
+        "DG20:DG21",
+        "BK18:BK21",
+        "BQ18:BQ21",
+        "BW18:BW21",
+        "CC14:CC17",
+        "CC18:CC21",
+        "CC6:CC9",
+        "CC10:CC13",
+        "BE46:BE49",
+        "BE50:BE53",
+        "BK14:BK17",
+        "DM15:DM16",
+        "DS15:DS16",
+        "DG16:DG17",
+        "BQ14:BQ17",
+        "BW14:BW17",
+        "DS19:DS20",
+        "BW46:BW49",
+        "BK50:BK53",
+        "BQ34:BQ37",
+        "BQ38:BQ41",
+        "BQ42:BQ45",
+        "BQ46:BQ49",
+        "BK34:BK37",
+        "BK38:BK41",
+        "BK42:BK45",
+        "BK46:BK49",
+        "DA34:DA35",
+        "DA36:DA37",
+        "DA38:DA39",
+        "DA40:DA41",
+        "BW50:BW53",
+        "O170:O171",
+        "DM7:DM8",
+        "DS7:DS8",
+        "DG8:DG9",
+        "DG32:DG33",
+        "DM35:DM36",
+        "DS35:DS36",
+        "BE14:BE17",
+        "DA7:DA8",
+        "CI7:CI8",
+        "CO7:CO8",
+        "BQ7:BQ8",
+        "BE7:BE8",
+        "DM11:DM12",
+        "DS11:DS12",
+        "DG12:DG13",
+        "O166:O167",
+        "O168:O169",
+        "BE18:BE21",
+        "BE22:BE25",
+        "BE26:BE29",
+        "BE30:BE33",
+        "BE34:BE37",
+        "BQ30:BQ33",
+        "CC46:CC49",
+        "CC50:CC53",
+        "BW22:BW25",
+        "BW26:BW29",
+        "BW30:BW33",
+        "BW34:BW37",
+        "BW38:BW41",
+        "CI46:CI47",
+        "CI48:CI49",
+        "CI50:CI51",
+        "CI32:CI33",
+        "CI34:CI35",
+        "CI36:CI37",
+        "CI38:CI39",
+        "CI40:CI41",
+        "CO46:CO47",
+        "CU91:CU92",
+        "CO52:CO53",
+        "CO32:CO33",
+        "CO34:CO35",
+        "CO36:CO37",
+        "CO38:CO39",
+        "CO40:CO41",
+        "CO42:CO43",
+        "CO44:CO45",
+        "DA32:DA33",
+        "CI107:CI108",
+        "CU34:CU35",
+        "CU36:CU37",
+        "CU38:CU39",
+        "CI52:CI53",
+        "DA46:DA47",
+        "DA48:DA49",
+        "DA50:DA51",
+        "DA52:DA53",
+        "CU93:CU94",
+        "CU66:CU67",
+        "CO48:CO49",
+        "CO50:CO51",
+        "CU44:CU45",
+        "CU46:CU47",
+        "CU48:CU49",
+        "CU50:CU51",
+        "CU52:CU53",
+        "CO70:CO71",
+        "DA70:DA71",
+        "CO78:CO79",
+        "DA78:DA79",
+        "DA86:DA87"
+      ],
+      "hidden_rows": 0,
+      "hidden_column_spans": [],
+      "drawing_refs": 0,
+      "formula_cells": 110,
+      "cached_formula_cells": 110,
+      "empty_formula_results": 0,
+      "cached_errors": {},
+      "formula_kinds": {
+        "normal": 110
+      },
+      "functions": {
+        "CHAR": 108,
+        "TEXT": 54
+      },
+      "formula_column_counts": {
+        "C": 3,
+        "I": 3,
+        "O": 3,
+        "U": 3,
+        "AA": 3,
+        "AG": 3,
+        "AM": 3,
+        "AS": 3,
+        "AY": 3,
+        "BE": 3,
+        "BK": 3,
+        "BQ": 3,
+        "BW": 3,
+        "CC": 3,
+        "CI": 3,
+        "CO": 3,
+        "CU": 1,
+        "DG": 2,
+        "DM": 1,
+        "DS": 1,
+        "A": 3,
+        "G": 3,
+        "M": 3,
+        "S": 3,
+        "Y": 3,
+        "AE": 3,
+        "AK": 3,
+        "AQ": 3,
+        "AW": 3,
+        "BC": 3,
+        "BI": 3,
+        "BO": 3,
+        "BU": 3,
+        "CA": 3,
+        "CG": 3,
+        "CM": 3,
+        "CS": 2,
+        "CY": 2,
+        "DE": 2,
+        "DK": 1,
+        "DQ": 1,
+        "DA": 1
+      },
+      "safe_header_labels": [
+        {
+          "cell": "A1",
+          "label": "Rack Power"
+        },
+        {
+          "cell": "G1",
+          "label": "Rack Power"
+        },
+        {
+          "cell": "M1",
+          "label": "Rack Power"
+        },
+        {
+          "cell": "S1",
+          "label": "Rack Power"
+        },
+        {
+          "cell": "Y1",
+          "label": "Rack Power"
+        },
+        {
+          "cell": "AE1",
+          "label": "Rack Power"
+        },
+        {
+          "cell": "AK1",
+          "label": "Rack Power"
+        },
+        {
+          "cell": "AQ1",
+          "label": "Rack Power"
+        },
+        {
+          "cell": "AW1",
+          "label": "Rack Power"
+        },
+        {
+          "cell": "BC1",
+          "label": "Rack Power"
+        },
+        {
+          "cell": "BI1",
+          "label": "Rack Power"
+        },
+        {
+          "cell": "BO1",
+          "label": "Rack Power"
+        },
+        {
+          "cell": "BU1",
+          "label": "Rack Power"
+        },
+        {
+          "cell": "CA1",
+          "label": "Rack Power"
+        },
+        {
+          "cell": "CG1",
+          "label": "Rack Power"
+        },
+        {
+          "cell": "CM1",
+          "label": "Rack Power"
+        },
+        {
+          "cell": "CS1",
+          "label": "Rack Power"
+        },
+        {
+          "cell": "CY1",
+          "label": "Rack Power"
+        },
+        {
+          "cell": "DE1",
+          "label": "Rack Power"
+        },
+        {
+          "cell": "DK1",
+          "label": "Rack Power"
+        },
+        {
+          "cell": "DQ1",
+          "label": "Rack Power"
+        }
+      ],
+      "formula_examples": [
+        {
+          "cell": "C1",
+          "formula_redacted": "电力测算!A23&CHAR(10)&电力测算!B23&CHAR(10)&TEXT(电力测算!L23,\"<text>\")&\"<text>\"",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "A4",
+          "formula_redacted": "电力测算!L23",
+          "cache_type": "n",
+          "cached_numeric": "18.919999999999998"
+        }
+      ],
+      "formula_cross_sheet_dependencies": {
+        "电力测算": 218
+      },
+      "nonempty_row_bands": [
+        [
+          1,
+          53
+        ],
+        [
+          60,
+          112
+        ],
+        [
+          119,
+          171
+        ]
+      ]
+    },
+    {
+      "sheet": "距离图",
+      "dimension": "A1:Y34",
+      "visibility": "visible",
+      "populated_cells": 154,
+      "populated_rows": 30,
+      "merges": [
+        "E34:F34",
+        "G34:H34",
+        "J34:K34",
+        "L34:M34",
+        "N34:O34",
+        "A2:A3",
+        "V2:V3",
+        "O6:O7",
+        "S6:S7",
+        "O29:O30",
+        "S29:S30",
+        "A30:A33",
+        "V30:V33",
+        "B1:C1",
+        "D1:E1",
+        "H1:M1",
+        "P1:R1",
+        "U1:Y1"
+      ],
+      "hidden_rows": 0,
+      "hidden_column_spans": [],
+      "drawing_refs": 0,
+      "formula_cells": 0,
+      "cached_formula_cells": 0,
+      "empty_formula_results": 0,
+      "cached_errors": {},
+      "formula_kinds": {},
+      "functions": {},
+      "formula_column_counts": {},
+      "safe_header_labels": [],
+      "formula_examples": [],
+      "formula_cross_sheet_dependencies": {},
+      "nonempty_row_bands": [
+        [
+          1,
+          2
+        ],
+        [
+          4,
+          30
+        ],
+        [
+          33,
+          33
+        ]
+      ]
+    },
+    {
+      "sheet": "距离计算公式",
+      "dimension": "A1:AE433",
+      "visibility": "visible",
+      "populated_cells": 6354,
+      "populated_rows": 433,
+      "merges": [],
+      "hidden_rows": 0,
+      "hidden_column_spans": [],
+      "drawing_refs": 0,
+      "formula_cells": 6048,
+      "cached_formula_cells": 6048,
+      "empty_formula_results": 0,
+      "cached_errors": {},
+      "formula_kinds": {
+        "shared": 5181,
+        "normal": 867
+      },
+      "functions": {
+        "ROW": 432,
+        "IFERROR": 3024,
+        "VLOOKUP": 3024,
+        "FALSE": 3024,
+        "IF": 6048,
+        "OR": 1296,
+        "LEFT": 3456,
+        "ABS": 2160
+      },
+      "formula_column_counts": {
+        "R": 432,
+        "S": 432,
+        "T": 432,
+        "U": 432,
+        "V": 432,
+        "W": 432,
+        "X": 432,
+        "Y": 432,
+        "Z": 432,
+        "AA": 432,
+        "AB": 432,
+        "AC": 432,
+        "AD": 432,
+        "AE": 432
+      },
+      "safe_header_labels": [],
+      "formula_examples": [
+        {
+          "cell": "R2",
+          "formula_redacted": "ROW()-1",
+          "cache_type": "n",
+          "cached_numeric": "1"
+        },
+        {
+          "cell": "S2",
+          "formula_redacted": "'P2P-18'!C2",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "U2",
+          "formula_redacted": "IFERROR(VLOOKUP(S2,$A$2:$D$58,3,FALSE()),\"<text>\")",
+          "cache_type": "n",
+          "cached_numeric": "8"
+        },
+        {
+          "cell": "Y2",
+          "formula_redacted": "IF(OR(S2=\"<text>\",T2=\"<text>\"),\"<text>\",LEFT(S2,1)&LEFT(T2,1))",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "Z2",
+          "formula_redacted": "IFERROR(VLOOKUP(Y2,$F$2:$G$7,2,FALSE()),0)",
+          "cache_type": "n",
+          "cached_numeric": "0"
+        },
+        {
+          "cell": "AA2",
+          "formula_redacted": "IF(OR(S2=T2,LEFT(S2,1)=LEFT(T2,1),Y2=\"<text>\"),0,ABS(U2-$J$3)+ABS(W2-$J$3)+Z2)",
+          "cache_type": "n",
+          "cached_numeric": "0"
+        },
+        {
+          "cell": "AC2",
+          "formula_redacted": "IF(S2=T2,\"<text>\",IF(Y2=\"<text>\",\"<text>\",IF(LEFT(S2,1)=LEFT(T2,1),\"<text>\",IF(AA2<=AB2,\"<text>\",\"<text>\"))))",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "AD2",
+          "formula_redacted": "IF(AC2=\"<text>\",\"<text>\",IF(AC2=\"<text>\",\"<text>\",IF(AC2=\"<text>\",\"<text>\",IFERROR(VLOOKUP(Y2&\"<text>\"&AC2,$L$2:$M$13,2,FALSE()),\"<text>\"))))",
+          "cache_type": "str",
+          "cached_numeric": null
+        }
+      ],
+      "formula_cross_sheet_dependencies": {
+        "P2P-18": 864
+      },
+      "nonempty_row_bands": [
+        [
+          1,
+          433
+        ]
+      ]
+    },
+    {
+      "sheet": "P2P-18",
+      "dimension": "A1:P433",
+      "visibility": "visible",
+      "populated_cells": 6062,
+      "populated_rows": 433,
+      "merges": [],
+      "hidden_rows": 0,
+      "hidden_column_spans": [],
+      "drawing_refs": 0,
+      "formula_cells": 1740,
+      "cached_formula_cells": 1740,
+      "empty_formula_results": 0,
+      "cached_errors": {},
+      "formula_kinds": {
+        "normal": 458,
+        "shared": 1282
+      },
+      "functions": {
+        "MAX": 432,
+        "CEILING": 432,
+        "IF": 2564,
+        "OR": 424,
+        "ISNUMBER": 2542,
+        "SEARCH": 2542,
+        "COUNTIFS": 6,
+        "SUMIFS": 8
+      },
+      "formula_column_counts": {
+        "E": 432,
+        "F": 432,
+        "I": 430,
+        "N": 432,
+        "K": 6,
+        "L": 4,
+        "M": 4
+      },
+      "safe_header_labels": [
+        {
+          "cell": "A1",
+          "label": "网络"
+        },
+        {
+          "cell": "F1",
+          "label": "标准线长"
+        },
+        {
+          "cell": "H1",
+          "label": "线缆型号"
+        },
+        {
+          "cell": "I1",
+          "label": "A端光模块"
+        },
+        {
+          "cell": "J1",
+          "label": "Z端光模块"
+        },
+        {
+          "cell": "K1",
+          "label": "线缆数量"
+        },
+        {
+          "cell": "N1",
+          "label": "机柜对"
+        }
+      ],
+      "formula_examples": [
+        {
+          "cell": "E2",
+          "formula_redacted": "距离计算公式!AE2",
+          "cache_type": "n",
+          "cached_numeric": "14.6"
+        },
+        {
+          "cell": "F2",
+          "formula_redacted": "MAX(CEILING(E2,5),5)",
+          "cache_type": "n",
+          "cached_numeric": "15"
+        },
+        {
+          "cell": "I2",
+          "formula_redacted": "IF(G2=\"<text>\",\"<text>\",IF(G2=\"<text>\",\"<text>\",IF(G2=\"<text>\",J2,IF(OR(ISNUMBER(SEARCH(\"<text>\",B2)),ISNUMBER(SEARCH(\"<text>\",B2))),\"<text>\",IF(ISNUMBER(SEARCH(\"<text>\",B2)),\"<text>\",IF(OR(ISNUMBER(SEARCH(\"<text>\",B2)),ISNUMBER(SEARCH(\"<text>\",B2)),ISNUMBER(SEARCH(\"<text>\",B2)),ISNUMBER(SEARCH(\"<text>\",B2))),\"<text>\",J2))))))",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "N2",
+          "formula_redacted": "C2&\"<text>\"&D2",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "I4",
+          "formula_redacted": "IF(G4=\"<text>\",\"<text>\",IF(G4=\"<text>\",\"<text>\",IF(G4=\"<text>\",J4,IF(ISNUMBER(SEARCH(\"<text>\",B4)),\"<text>\",IF(ISNUMBER(SEARCH(\"<text>\",B4)),\"<text>\",IF(OR(ISNUMBER(SEARCH(\"<text>\",B4)),ISNUMBER(SEARCH(\"<text>\",B4)),ISNUMBER(SEARCH(\"<text>\",B4)),ISNUMBER(SEARCH(\"<text>\",B4))),\"<text>\",J4))))))",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "I253",
+          "formula_redacted": "IF(G253=\"<text>\",\"<text>\",IF(G253=\"<text>\",\"<text>\",IF(G253=\"<text>\",J253,IF(ISNUMBER(SEARCH(\"<text>\",B253)),\"<text>\",J253))))",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "K428",
+          "formula_redacted": "COUNTIFS(Cabling_HDD_SSD_CPU!$C:$C,\"<text>\",Cabling_HDD_SSD_CPU!$D:$D,\"<text>\")",
+          "cache_type": "n",
+          "cached_numeric": "3"
+        },
+        {
+          "cell": "L428",
+          "formula_redacted": "SUMIFS(Cabling_HDD_SSD_CPU!$R:$R,Cabling_HDD_SSD_CPU!$C:$C,\"<text>\",Cabling_HDD_SSD_CPU!$D:$D,\"<text>\")",
+          "cache_type": "n",
+          "cached_numeric": "3"
+        }
+      ],
+      "formula_cross_sheet_dependencies": {
+        "距离计算公式": 432,
+        "Cabling_HDD_SSD_CPU": 36
+      },
+      "nonempty_row_bands": [
+        [
+          1,
+          433
+        ]
+      ]
+    },
+    {
+      "sheet": "物料",
+      "dimension": "A1:P39",
+      "visibility": "visible",
+      "populated_cells": 511,
+      "populated_rows": 39,
+      "merges": [],
+      "hidden_rows": 0,
+      "hidden_column_spans": [],
+      "drawing_refs": 0,
+      "formula_cells": 279,
+      "cached_formula_cells": 279,
+      "empty_formula_results": 0,
+      "cached_errors": {},
+      "formula_kinds": {
+        "normal": 202,
+        "shared": 77
+      },
+      "functions": {
+        "N": 12,
+        "MAX": 38,
+        "SUM": 7,
+        "COUNTIFS": 330,
+        "COUNTIF": 2
+      },
+      "formula_column_counts": {
+        "E": 38,
+        "H": 38,
+        "I": 38,
+        "J": 33,
+        "K": 33,
+        "L": 33,
+        "M": 33,
+        "N": 33
+      },
+      "safe_header_labels": [
+        {
+          "cell": "A1",
+          "label": "类型"
+        },
+        {
+          "cell": "B1",
+          "label": "物料编码/型号"
+        },
+        {
+          "cell": "C1",
+          "label": "长度(m)"
+        },
+        {
+          "cell": "F1",
+          "label": "备件规则"
+        },
+        {
+          "cell": "G1",
+          "label": "备件数"
+        },
+        {
+          "cell": "H1",
+          "label": "含备件需求"
+        },
+        {
+          "cell": "I1",
+          "label": "采购"
+        },
+        {
+          "cell": "P1",
+          "label": "0729计划提货数量"
+        },
+        {
+          "cell": "A38",
+          "label": "机柜配件"
+        },
+        {
+          "cell": "A39",
+          "label": "机柜配件"
+        },
+        {
+          "cell": "B39",
+          "label": "1U Cable Manager"
+        }
+      ],
+      "formula_examples": [
+        {
+          "cell": "E2",
+          "formula_redacted": "电力测算!C6",
+          "cache_type": "n",
+          "cached_numeric": "168"
+        },
+        {
+          "cell": "H2",
+          "formula_redacted": "E2+N(G2)",
+          "cache_type": "n",
+          "cached_numeric": "168"
+        },
+        {
+          "cell": "I2",
+          "formula_redacted": "MAX(0,H2-D2)",
+          "cache_type": "n",
+          "cached_numeric": "0"
+        },
+        {
+          "cell": "E5",
+          "formula_redacted": "SUM(J5:N5)",
+          "cache_type": "n",
+          "cached_numeric": "4770"
+        },
+        {
+          "cell": "J5",
+          "formula_redacted": "COUNTIFS('Cabling_EW_SP-LF'!B:B,$B5,'Cabling_EW_SP-LF'!R:R,1)+COUNTIFS('Cabling_EW_SP-LF'!G:G,$B5,'Cabling_EW_SP-LF'!T:T,1)",
+          "cache_type": "n",
+          "cached_numeric": "2592"
+        },
+        {
+          "cell": "K5",
+          "formula_redacted": "COUNTIFS(Cabling_NS!B:B,$B5,Cabling_NS!R:R,1)+COUNTIFS(Cabling_NS!G:G,$B5,Cabling_NS!T:T,1)",
+          "cache_type": "n",
+          "cached_numeric": "472"
+        },
+        {
+          "cell": "L5",
+          "formula_redacted": "COUNTIFS(Cabling_GB_OUT!B:B,$B5,Cabling_GB_OUT!R:R,1)+COUNTIFS(Cabling_GB_OUT!G:G,$B5,Cabling_GB_OUT!T:T,1)",
+          "cache_type": "n",
+          "cached_numeric": "1620"
+        },
+        {
+          "cell": "M5",
+          "formula_redacted": "COUNTIFS(Cabling_OOB!B:B,$B5,Cabling_OOB!R:R,1)+COUNTIFS(Cabling_OOB!G:G,$B5,Cabling_OOB!T:T,1)",
+          "cache_type": "n",
+          "cached_numeric": "0"
+        }
+      ],
+      "formula_cross_sheet_dependencies": {
+        "电力测算": 3,
+        "Cabling_EW_SP-LF": 132,
+        "Cabling_NS": 132,
+        "Cabling_GB_OUT": 132,
+        "Cabling_OOB": 132,
+        "Cabling_HDD_SSD_CPU": 132,
+        "落位图": 2
+      },
+      "nonempty_row_bands": [
+        [
+          1,
+          39
+        ]
+      ]
+    },
+    {
+      "sheet": "工作量",
+      "dimension": "A1:M26",
+      "visibility": "visible",
+      "populated_cells": 232,
+      "populated_rows": 26,
+      "merges": [],
+      "hidden_rows": 0,
+      "hidden_column_spans": [],
+      "drawing_refs": 0,
+      "formula_cells": 157,
+      "cached_formula_cells": 157,
+      "empty_formula_results": 0,
+      "cached_errors": {},
+      "formula_kinds": {
+        "normal": 157
+      },
+      "functions": {
+        "COUNTIFS": 250
+      },
+      "formula_column_counts": {
+        "C": 25,
+        "D": 25,
+        "E": 25,
+        "F": 25,
+        "G": 25,
+        "H": 25,
+        "M": 7
+      },
+      "safe_header_labels": [
+        {
+          "cell": "A1",
+          "label": "线缆型号"
+        },
+        {
+          "cell": "B1",
+          "label": "长度(m)"
+        },
+        {
+          "cell": "H1",
+          "label": "数量"
+        },
+        {
+          "cell": "M1",
+          "label": "数量"
+        }
+      ],
+      "formula_examples": [
+        {
+          "cell": "C2",
+          "formula_redacted": "COUNTIFS('Cabling_EW_SP-LF'!$H:$H,$A2,'Cabling_EW_SP-LF'!$I:$I,$B2)",
+          "cache_type": "n",
+          "cached_numeric": "0"
+        },
+        {
+          "cell": "D2",
+          "formula_redacted": "COUNTIFS(Cabling_NS!$H:$H,$A2,Cabling_NS!$I:$I,$B2)",
+          "cache_type": "n",
+          "cached_numeric": "8"
+        },
+        {
+          "cell": "E2",
+          "formula_redacted": "COUNTIFS(Cabling_GB_OUT!$H:$H,$A2,Cabling_GB_OUT!$I:$I,$B2)",
+          "cache_type": "n",
+          "cached_numeric": "0"
+        },
+        {
+          "cell": "F2",
+          "formula_redacted": "COUNTIFS(Cabling_OOB!$H:$H,$A2,Cabling_OOB!$I:$I,$B2)",
+          "cache_type": "n",
+          "cached_numeric": "8"
+        },
+        {
+          "cell": "G2",
+          "formula_redacted": "COUNTIFS(Cabling_HDD_SSD_CPU!$H:$H,$A2,Cabling_HDD_SSD_CPU!$I:$I,$B2)",
+          "cache_type": "n",
+          "cached_numeric": "86"
+        },
+        {
+          "cell": "H2",
+          "formula_redacted": "COUNTIFS('Cabling_EW_SP-LF'!$H:$H,$A2,'Cabling_EW_SP-LF'!$I:$I,$B2)+COUNTIFS(Cabling_NS!$H:$H,$A2,Cabling_NS!$I:$I,$B2)+COUNTIFS(Cabling_GB_OUT!$H:$H,$A2,Cabling_GB_OUT!$I:$I,$B2)+COUNTIFS(Cabling_OOB!$H:$H,$A2,Cabling_OOB!$I:$I,$B2)+COUNTIFS(Cabling_HDD_SSD_CPU!$H:$H,$A2,Cabling_HDD_SSD_CPU!$I:$I,$B2)",
+          "cache_type": "n",
+          "cached_numeric": "102"
+        },
+        {
+          "cell": "M2",
+          "formula_redacted": "电力测算!C6",
+          "cache_type": "n",
+          "cached_numeric": "168"
+        }
+      ],
+      "formula_cross_sheet_dependencies": {
+        "Cabling_EW_SP-LF": 100,
+        "Cabling_NS": 100,
+        "Cabling_GB_OUT": 100,
+        "Cabling_OOB": 100,
+        "Cabling_HDD_SSD_CPU": 100,
+        "电力测算": 7
+      },
+      "nonempty_row_bands": [
+        [
+          1,
+          26
+        ]
+      ]
+    },
+    {
+      "sheet": "Network Information",
+      "dimension": "A1:S190",
+      "visibility": "visible",
+      "populated_cells": 2852,
+      "populated_rows": 190,
+      "merges": [],
+      "hidden_rows": 0,
+      "hidden_column_spans": [],
+      "drawing_refs": 0,
+      "formula_cells": 187,
+      "cached_formula_cells": 187,
+      "empty_formula_results": 0,
+      "cached_errors": {},
+      "formula_kinds": {
+        "shared": 185,
+        "normal": 2
+      },
+      "functions": {},
+      "formula_column_counts": {
+        "D": 187
+      },
+      "safe_header_labels": [
+        {
+          "cell": "E1",
+          "label": "Device Type"
+        },
+        {
+          "cell": "G1",
+          "label": "Device Model"
+        },
+        {
+          "cell": "K1",
+          "label": "Rack No"
+        },
+        {
+          "cell": "L1",
+          "label": "Rack Unit"
+        },
+        {
+          "cell": "O1",
+          "label": "机柜"
+        }
+      ],
+      "formula_examples": [
+        {
+          "cell": "D2",
+          "formula_redacted": "I2&J2&K2&L2&M2&N2",
+          "cache_type": "str",
+          "cached_numeric": null
+        }
+      ],
+      "formula_cross_sheet_dependencies": {},
+      "nonempty_row_bands": [
+        [
+          1,
+          190
+        ]
+      ]
+    },
+    {
+      "sheet": "Server Information",
+      "dimension": "A1:M779",
+      "visibility": "visible",
+      "populated_cells": 7792,
+      "populated_rows": 779,
+      "merges": [],
+      "hidden_rows": 0,
+      "hidden_column_spans": [],
+      "drawing_refs": 0,
+      "formula_cells": 0,
+      "cached_formula_cells": 0,
+      "empty_formula_results": 0,
+      "cached_errors": {},
+      "formula_kinds": {},
+      "functions": {},
+      "formula_column_counts": {},
+      "safe_header_labels": [
+        {
+          "cell": "D1",
+          "label": "Model"
+        },
+        {
+          "cell": "H1",
+          "label": "Rack Number"
+        },
+        {
+          "cell": "I1",
+          "label": "Customer Rack Name"
+        },
+        {
+          "cell": "J1",
+          "label": "Rack Unit"
+        },
+        {
+          "cell": "K1",
+          "label": "Rack No"
+        }
+      ],
+      "formula_examples": [],
+      "formula_cross_sheet_dependencies": {},
+      "nonempty_row_bands": [
+        [
+          1,
+          779
+        ]
+      ]
+    },
+    {
+      "sheet": "Cabling_EW_SP-LF",
+      "dimension": "A1:T2595",
+      "visibility": "visible",
+      "populated_cells": 46685,
+      "populated_rows": 2595,
+      "merges": [],
+      "hidden_rows": 0,
+      "hidden_column_spans": [],
+      "drawing_refs": 0,
+      "formula_cells": 33704,
+      "cached_formula_cells": 33704,
+      "empty_formula_results": 0,
+      "cached_errors": {},
+      "formula_kinds": {
+        "shared": 12964,
+        "normal": 20740
+      },
+      "functions": {
+        "IFERROR": 5188,
+        "IF": 15564,
+        "ISNUMBER": 10376,
+        "SEARCH": 5188,
+        "LEFT": 10376,
+        "FIND": 5188,
+        "AND": 5188,
+        "LEN": 15564,
+        "VALUE": 5188,
+        "RIGHT": 5188,
+        "MID": 5188,
+        "COUNTIF": 5188
+      },
+      "formula_column_counts": {
+        "Q": 2594,
+        "R": 2594,
+        "S": 2594,
+        "T": 2594,
+        "B": 2592,
+        "C": 2592,
+        "F": 2592,
+        "G": 2592,
+        "H": 2592,
+        "I": 2592,
+        "J": 2592,
+        "O": 2592,
+        "P": 2592
+      },
+      "safe_header_labels": [
+        {
+          "cell": "B1",
+          "label": "本端模块型号"
+        },
+        {
+          "cell": "C1",
+          "label": "本端设备名称"
+        },
+        {
+          "cell": "D1",
+          "label": "本端端口名称"
+        },
+        {
+          "cell": "E1",
+          "label": "对端端口名称"
+        },
+        {
+          "cell": "F1",
+          "label": "对端设备名称"
+        },
+        {
+          "cell": "G1",
+          "label": "对端模块型号"
+        },
+        {
+          "cell": "H1",
+          "label": "线缆型号"
+        },
+        {
+          "cell": "I1",
+          "label": "线缆长度"
+        },
+        {
+          "cell": "J1",
+          "label": "Cable Type"
+        }
+      ],
+      "formula_examples": [
+        {
+          "cell": "Q2",
+          "formula_redacted": "C2&\"<text>\"&IFERROR(IF(ISNUMBER(SEARCH(\"<text>\",D2)),LEFT(D2,FIND(\"<text>\",D2)-1),IF(AND(LEN(D2)>1,ISNUMBER(VALUE(RIGHT(D2,1))),MID(D2,LEN(D2)-1,1)=\"<text>\"),LEFT(D2,LEN(D2)-2),D2)),D2)",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "R2",
+          "formula_redacted": "IF(COUNTIF($Q$2:Q2,Q2)=1,1,0)",
+          "cache_type": "n",
+          "cached_numeric": "1"
+        },
+        {
+          "cell": "B3",
+          "formula_redacted": "G3",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "C3",
+          "formula_redacted": "'Network Information'!D58",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "G3",
+          "formula_redacted": "'P2P-18'!J146",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "O3",
+          "formula_redacted": "C3&\"<text>\"&D3",
+          "cache_type": "str",
+          "cached_numeric": null
+        }
+      ],
+      "formula_cross_sheet_dependencies": {
+        "Network Information": 5184,
+        "P2P-18": 10368
+      },
+      "nonempty_row_bands": [
+        [
+          1,
+          2595
+        ]
+      ]
+    },
+    {
+      "sheet": "Cabling_NS",
+      "dimension": "A1:T490",
+      "visibility": "visible",
+      "populated_cells": 8767,
+      "populated_rows": 490,
+      "merges": [],
+      "hidden_rows": 0,
+      "hidden_column_spans": [],
+      "drawing_refs": 0,
+      "formula_cells": 6284,
+      "cached_formula_cells": 6284,
+      "empty_formula_results": 0,
+      "cached_errors": {},
+      "formula_kinds": {
+        "shared": 2384,
+        "normal": 3900
+      },
+      "functions": {
+        "IFERROR": 968,
+        "IF": 2904,
+        "ISNUMBER": 1936,
+        "SEARCH": 968,
+        "LEFT": 1936,
+        "FIND": 968,
+        "AND": 968,
+        "LEN": 2904,
+        "VALUE": 968,
+        "RIGHT": 968,
+        "MID": 968,
+        "COUNTIF": 968
+      },
+      "formula_column_counts": {
+        "B": 480,
+        "C": 484,
+        "F": 480,
+        "G": 484,
+        "H": 484,
+        "I": 484,
+        "J": 484,
+        "O": 484,
+        "P": 484,
+        "Q": 484,
+        "R": 484,
+        "S": 484,
+        "T": 484
+      },
+      "safe_header_labels": [
+        {
+          "cell": "A1",
+          "label": "序号"
+        },
+        {
+          "cell": "B1",
+          "label": "本端模块型号"
+        },
+        {
+          "cell": "C1",
+          "label": "本端设备名称"
+        },
+        {
+          "cell": "D1",
+          "label": "本端端口名称"
+        },
+        {
+          "cell": "E1",
+          "label": "对端端口名称"
+        },
+        {
+          "cell": "F1",
+          "label": "对端设备名称"
+        },
+        {
+          "cell": "G1",
+          "label": "对端模块型号"
+        },
+        {
+          "cell": "H1",
+          "label": "线缆型号"
+        },
+        {
+          "cell": "I1",
+          "label": "线缆长度"
+        },
+        {
+          "cell": "J1",
+          "label": "Cable Type"
+        }
+      ],
+      "formula_examples": [
+        {
+          "cell": "B3",
+          "formula_redacted": "G3",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "C3",
+          "formula_redacted": "'Network Information'!D97",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "G3",
+          "formula_redacted": "'P2P-18'!J214",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "O3",
+          "formula_redacted": "C3&\"<text>\"&D3",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "Q3",
+          "formula_redacted": "C3&\"<text>\"&IFERROR(IF(ISNUMBER(SEARCH(\"<text>\",D3)),LEFT(D3,FIND(\"<text>\",D3)-1),IF(AND(LEN(D3)>1,ISNUMBER(VALUE(RIGHT(D3,1))),MID(D3,LEN(D3)-1,1)=\"<text>\"),LEFT(D3,LEN(D3)-2),D3)),D3)",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "R3",
+          "formula_redacted": "IF(COUNTIF($Q$2:Q3,Q3)=1,1,0)",
+          "cache_type": "n",
+          "cached_numeric": "1"
+        }
+      ],
+      "formula_cross_sheet_dependencies": {
+        "Network Information": 964,
+        "P2P-18": 1952
+      },
+      "nonempty_row_bands": [
+        [
+          1,
+          490
+        ]
+      ]
+    },
+    {
+      "sheet": "Cabling_GB_OUT",
+      "dimension": "A1:T3475",
+      "visibility": "visible",
+      "populated_cells": 62354,
+      "populated_rows": 3475,
+      "merges": [],
+      "hidden_rows": 0,
+      "hidden_column_spans": [],
+      "drawing_refs": 0,
+      "formula_cells": 38504,
+      "cached_formula_cells": 38504,
+      "empty_formula_results": 0,
+      "cached_errors": {},
+      "formula_kinds": {
+        "shared": 14004,
+        "normal": 24500
+      },
+      "functions": {
+        "IFERROR": 6948,
+        "IF": 20844,
+        "ISNUMBER": 13896,
+        "SEARCH": 6948,
+        "LEFT": 13896,
+        "FIND": 6948,
+        "AND": 6948,
+        "LEN": 20844,
+        "VALUE": 6948,
+        "RIGHT": 6948,
+        "MID": 6948,
+        "COUNTIF": 6948
+      },
+      "formula_column_counts": {
+        "Q": 3474,
+        "R": 3474,
+        "S": 3474,
+        "T": 3474,
+        "B": 212,
+        "C": 3456,
+        "F": 3456,
+        "H": 3456,
+        "I": 3456,
+        "J": 3456,
+        "O": 3456,
+        "P": 3456,
+        "G": 204
+      },
+      "safe_header_labels": [
+        {
+          "cell": "A1",
+          "label": "序号"
+        },
+        {
+          "cell": "B1",
+          "label": "本端模块型号"
+        },
+        {
+          "cell": "C1",
+          "label": "本端设备名称"
+        },
+        {
+          "cell": "D1",
+          "label": "本端端口名称"
+        },
+        {
+          "cell": "E1",
+          "label": "对端端口名称"
+        },
+        {
+          "cell": "F1",
+          "label": "对端设备名称"
+        },
+        {
+          "cell": "G1",
+          "label": "对端模块型号"
+        },
+        {
+          "cell": "H1",
+          "label": "线缆型号"
+        },
+        {
+          "cell": "I1",
+          "label": "线缆长度"
+        },
+        {
+          "cell": "J1",
+          "label": "Cable Type"
+        }
+      ],
+      "formula_examples": [
+        {
+          "cell": "Q2",
+          "formula_redacted": "C2&\"<text>\"&IFERROR(IF(ISNUMBER(SEARCH(\"<text>\",D2)),LEFT(D2,FIND(\"<text>\",D2)-1),IF(AND(LEN(D2)>1,ISNUMBER(VALUE(RIGHT(D2,1))),MID(D2,LEN(D2)-1,1)=\"<text>\"),LEFT(D2,LEN(D2)-2),D2)),D2)",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "R2",
+          "formula_redacted": "IF(COUNTIF($Q$2:Q2,Q2)=1,1,0)",
+          "cache_type": "n",
+          "cached_numeric": "1"
+        },
+        {
+          "cell": "B3",
+          "formula_redacted": "G3",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "C3",
+          "formula_redacted": "'Server Information'!G133",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "F3",
+          "formula_redacted": "'Network Information'!D57",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "H3",
+          "formula_redacted": "'P2P-18'!H275",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "O3",
+          "formula_redacted": "C3&\"<text>\"&D3",
+          "cache_type": "str",
+          "cached_numeric": null
+        }
+      ],
+      "formula_cross_sheet_dependencies": {
+        "Server Information": 3456,
+        "Network Information": 3456,
+        "P2P-18": 10572
+      },
+      "nonempty_row_bands": [
+        [
+          1,
+          3475
+        ]
+      ]
+    },
+    {
+      "sheet": "Cabling_OOB",
+      "dimension": "A1:T222",
+      "visibility": "visible",
+      "populated_cells": 3943,
+      "populated_rows": 222,
+      "merges": [],
+      "hidden_rows": 0,
+      "hidden_column_spans": [],
+      "drawing_refs": 0,
+      "formula_cells": 2838,
+      "cached_formula_cells": 2838,
+      "empty_formula_results": 0,
+      "cached_errors": {},
+      "formula_kinds": {
+        "normal": 1793,
+        "shared": 1045
+      },
+      "functions": {
+        "IFERROR": 432,
+        "IF": 1296,
+        "ISNUMBER": 864,
+        "SEARCH": 432,
+        "LEFT": 864,
+        "FIND": 432,
+        "AND": 432,
+        "LEN": 1296,
+        "VALUE": 432,
+        "RIGHT": 432,
+        "MID": 432,
+        "COUNTIF": 432
+      },
+      "formula_column_counts": {
+        "B": 216,
+        "C": 216,
+        "F": 216,
+        "G": 216,
+        "H": 216,
+        "I": 216,
+        "J": 216,
+        "L": 30,
+        "O": 216,
+        "P": 216,
+        "Q": 216,
+        "R": 216,
+        "S": 216,
+        "T": 216
+      },
+      "safe_header_labels": [
+        {
+          "cell": "A1",
+          "label": "序号"
+        },
+        {
+          "cell": "B1",
+          "label": "本端模块型号"
+        },
+        {
+          "cell": "C1",
+          "label": "本端设备名称"
+        },
+        {
+          "cell": "D1",
+          "label": "本端端口名称"
+        },
+        {
+          "cell": "E1",
+          "label": "对端端口名称"
+        },
+        {
+          "cell": "F1",
+          "label": "对端设备名称"
+        },
+        {
+          "cell": "G1",
+          "label": "对端模块型号"
+        },
+        {
+          "cell": "H1",
+          "label": "线缆型号"
+        },
+        {
+          "cell": "I1",
+          "label": "线缆长度"
+        },
+        {
+          "cell": "J1",
+          "label": "Cable Type"
+        }
+      ],
+      "formula_examples": [
+        {
+          "cell": "B3",
+          "formula_redacted": "G3",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "C3",
+          "formula_redacted": "'Network Information'!D2",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "G3",
+          "formula_redacted": "'P2P-18'!J391",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "O3",
+          "formula_redacted": "C3&\"<text>\"&D3",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "Q3",
+          "formula_redacted": "C3&\"<text>\"&IFERROR(IF(ISNUMBER(SEARCH(\"<text>\",D3)),LEFT(D3,FIND(\"<text>\",D3)-1),IF(AND(LEN(D3)>1,ISNUMBER(VALUE(RIGHT(D3,1))),MID(D3,LEN(D3)-1,1)=\"<text>\"),LEFT(D3,LEN(D3)-2),D3)),D3)",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "R3",
+          "formula_redacted": "IF(COUNTIF($Q$2:Q3,Q3)=1,1,0)",
+          "cache_type": "n",
+          "cached_numeric": "1"
+        }
+      ],
+      "formula_cross_sheet_dependencies": {
+        "Network Information": 462,
+        "P2P-18": 864
+      },
+      "nonempty_row_bands": [
+        [
+          1,
+          222
+        ]
+      ]
+    },
+    {
+      "sheet": "Cabling_HDD_SSD_CPU",
+      "dimension": "A1:T417",
+      "visibility": "visible",
+      "populated_cells": 7356,
+      "populated_rows": 411,
+      "merges": [],
+      "hidden_rows": 0,
+      "hidden_column_spans": [],
+      "drawing_refs": 0,
+      "formula_cells": 4240,
+      "cached_formula_cells": 4240,
+      "empty_formula_results": 0,
+      "cached_errors": {},
+      "formula_kinds": {
+        "normal": 2640,
+        "shared": 1600
+      },
+      "functions": {
+        "IFERROR": 812,
+        "IF": 2436,
+        "ISNUMBER": 1624,
+        "SEARCH": 812,
+        "LEFT": 1624,
+        "FIND": 812,
+        "AND": 812,
+        "LEN": 2436,
+        "VALUE": 812,
+        "RIGHT": 812,
+        "MID": 812,
+        "COUNTIF": 812
+      },
+      "formula_column_counts": {
+        "C": 406,
+        "F": 400,
+        "H": 406,
+        "I": 406,
+        "O": 406,
+        "P": 406,
+        "Q": 406,
+        "R": 406,
+        "S": 406,
+        "T": 406,
+        "B": 62,
+        "G": 62,
+        "J": 62
+      },
+      "safe_header_labels": [
+        {
+          "cell": "A1",
+          "label": "序号"
+        },
+        {
+          "cell": "B1",
+          "label": "本端模块型号"
+        },
+        {
+          "cell": "C1",
+          "label": "本端设备名称"
+        },
+        {
+          "cell": "D1",
+          "label": "本端端口名称"
+        },
+        {
+          "cell": "E1",
+          "label": "对端端口名称"
+        },
+        {
+          "cell": "F1",
+          "label": "对端设备名称"
+        },
+        {
+          "cell": "G1",
+          "label": "对端模块型号"
+        },
+        {
+          "cell": "H1",
+          "label": "线缆型号"
+        },
+        {
+          "cell": "I1",
+          "label": "线缆长度"
+        },
+        {
+          "cell": "J1",
+          "label": "Cable Type"
+        }
+      ],
+      "formula_examples": [
+        {
+          "cell": "C3",
+          "formula_redacted": "'Server Information'!G2",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "F3",
+          "formula_redacted": "'Network Information'!D21",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "H3",
+          "formula_redacted": "'P2P-18'!H218",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "O3",
+          "formula_redacted": "C3&\"<text>\"&D3",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "Q3",
+          "formula_redacted": "C3&\"<text>\"&IFERROR(IF(ISNUMBER(SEARCH(\"<text>\",D3)),LEFT(D3,FIND(\"<text>\",D3)-1),IF(AND(LEN(D3)>1,ISNUMBER(VALUE(RIGHT(D3,1))),MID(D3,LEN(D3)-1,1)=\"<text>\"),LEFT(D3,LEN(D3)-2),D3)),D3)",
+          "cache_type": "str",
+          "cached_numeric": null
+        },
+        {
+          "cell": "R3",
+          "formula_redacted": "IF(COUNTIF($Q$2:Q3,Q3)=1,1,0)",
+          "cache_type": "n",
+          "cached_numeric": "1"
+        },
+        {
+          "cell": "C391",
+          "formula_redacted": "C388",
+          "cache_type": "str",
+          "cached_numeric": null
+        }
+      ],
+      "formula_cross_sheet_dependencies": {
+        "Server Information": 400,
+        "Network Information": 394,
+        "P2P-18": 998
+      },
+      "nonempty_row_bands": [
+        [
+          1,
+          411
+        ]
+      ]
+    }
+  ],
+  "function_counts": {
+    "CHAR": 162,
+    "TEXT": 108,
+    "SUM": 27,
+    "SUMPRODUCT": 56,
+    "IF": 51712,
+    "ROW": 432,
+    "IFERROR": 17372,
+    "VLOOKUP": 3024,
+    "FALSE": 3024,
+    "OR": 1720,
+    "LEFT": 32152,
+    "ABS": 2160,
+    "MAX": 470,
+    "CEILING": 432,
+    "ISNUMBER": 31238,
+    "SEARCH": 16890,
+    "COUNTIFS": 586,
+    "SUMIFS": 8,
+    "N": 12,
+    "COUNTIF": 14350,
+    "FIND": 14348,
+    "AND": 14348,
+    "LEN": 43044,
+    "VALUE": 14348,
+    "RIGHT": 14348,
+    "MID": 14348
+  },
+  "sheet_dependency_edges": [
+    {
+      "input_sheet": "电力测算",
+      "consumer_sheet": "Layout",
+      "reference_occurrences": 108,
+      "formula_cells_referencing": 54
+    },
+    {
+      "input_sheet": "电力测算",
+      "consumer_sheet": "落位图",
+      "reference_occurrences": 218,
+      "formula_cells_referencing": 110
+    },
+    {
+      "input_sheet": "P2P-18",
+      "consumer_sheet": "距离计算公式",
+      "reference_occurrences": 864,
+      "formula_cells_referencing": 864
+    },
+    {
+      "input_sheet": "距离计算公式",
+      "consumer_sheet": "P2P-18",
+      "reference_occurrences": 432,
+      "formula_cells_referencing": 432
+    },
+    {
+      "input_sheet": "Cabling_HDD_SSD_CPU",
+      "consumer_sheet": "P2P-18",
+      "reference_occurrences": 36,
+      "formula_cells_referencing": 14
+    },
+    {
+      "input_sheet": "电力测算",
+      "consumer_sheet": "物料",
+      "reference_occurrences": 3,
+      "formula_cells_referencing": 3
+    },
+    {
+      "input_sheet": "Cabling_EW_SP-LF",
+      "consumer_sheet": "物料",
+      "reference_occurrences": 132,
+      "formula_cells_referencing": 59
+    },
+    {
+      "input_sheet": "Cabling_NS",
+      "consumer_sheet": "物料",
+      "reference_occurrences": 132,
+      "formula_cells_referencing": 59
+    },
+    {
+      "input_sheet": "Cabling_GB_OUT",
+      "consumer_sheet": "物料",
+      "reference_occurrences": 132,
+      "formula_cells_referencing": 59
+    },
+    {
+      "input_sheet": "Cabling_OOB",
+      "consumer_sheet": "物料",
+      "reference_occurrences": 132,
+      "formula_cells_referencing": 59
+    },
+    {
+      "input_sheet": "Cabling_HDD_SSD_CPU",
+      "consumer_sheet": "物料",
+      "reference_occurrences": 132,
+      "formula_cells_referencing": 59
+    },
+    {
+      "input_sheet": "落位图",
+      "consumer_sheet": "物料",
+      "reference_occurrences": 2,
+      "formula_cells_referencing": 2
+    },
+    {
+      "input_sheet": "Cabling_EW_SP-LF",
+      "consumer_sheet": "工作量",
+      "reference_occurrences": 100,
+      "formula_cells_referencing": 50
+    },
+    {
+      "input_sheet": "Cabling_NS",
+      "consumer_sheet": "工作量",
+      "reference_occurrences": 100,
+      "formula_cells_referencing": 50
+    },
+    {
+      "input_sheet": "Cabling_GB_OUT",
+      "consumer_sheet": "工作量",
+      "reference_occurrences": 100,
+      "formula_cells_referencing": 50
+    },
+    {
+      "input_sheet": "Cabling_OOB",
+      "consumer_sheet": "工作量",
+      "reference_occurrences": 100,
+      "formula_cells_referencing": 50
+    },
+    {
+      "input_sheet": "Cabling_HDD_SSD_CPU",
+      "consumer_sheet": "工作量",
+      "reference_occurrences": 100,
+      "formula_cells_referencing": 50
+    },
+    {
+      "input_sheet": "电力测算",
+      "consumer_sheet": "工作量",
+      "reference_occurrences": 7,
+      "formula_cells_referencing": 7
+    },
+    {
+      "input_sheet": "Network Information",
+      "consumer_sheet": "Cabling_EW_SP-LF",
+      "reference_occurrences": 5184,
+      "formula_cells_referencing": 5184
+    },
+    {
+      "input_sheet": "P2P-18",
+      "consumer_sheet": "Cabling_EW_SP-LF",
+      "reference_occurrences": 10368,
+      "formula_cells_referencing": 10368
+    },
+    {
+      "input_sheet": "Network Information",
+      "consumer_sheet": "Cabling_NS",
+      "reference_occurrences": 964,
+      "formula_cells_referencing": 964
+    },
+    {
+      "input_sheet": "P2P-18",
+      "consumer_sheet": "Cabling_NS",
+      "reference_occurrences": 1952,
+      "formula_cells_referencing": 1952
+    },
+    {
+      "input_sheet": "Server Information",
+      "consumer_sheet": "Cabling_GB_OUT",
+      "reference_occurrences": 3456,
+      "formula_cells_referencing": 3456
+    },
+    {
+      "input_sheet": "Network Information",
+      "consumer_sheet": "Cabling_GB_OUT",
+      "reference_occurrences": 3456,
+      "formula_cells_referencing": 3456
+    },
+    {
+      "input_sheet": "P2P-18",
+      "consumer_sheet": "Cabling_GB_OUT",
+      "reference_occurrences": 10572,
+      "formula_cells_referencing": 10572
+    },
+    {
+      "input_sheet": "Network Information",
+      "consumer_sheet": "Cabling_OOB",
+      "reference_occurrences": 462,
+      "formula_cells_referencing": 462
+    },
+    {
+      "input_sheet": "P2P-18",
+      "consumer_sheet": "Cabling_OOB",
+      "reference_occurrences": 864,
+      "formula_cells_referencing": 864
+    },
+    {
+      "input_sheet": "Server Information",
+      "consumer_sheet": "Cabling_HDD_SSD_CPU",
+      "reference_occurrences": 400,
+      "formula_cells_referencing": 400
+    },
+    {
+      "input_sheet": "Network Information",
+      "consumer_sheet": "Cabling_HDD_SSD_CPU",
+      "reference_occurrences": 394,
+      "formula_cells_referencing": 394
+    },
+    {
+      "input_sheet": "P2P-18",
+      "consumer_sheet": "Cabling_HDD_SSD_CPU",
+      "reference_occurrences": 998,
+      "formula_cells_referencing": 998
+    }
+  ],
+  "totals": {
+    "populated_cells": 162751,
+    "populated_rows": 9385,
+    "formula_cells": 94353,
+    "cached_formula_cells": 94353,
+    "empty_formula_results": 0,
+    "merged_ranges": 311,
+    "sheets": 15
+  },
+  "limitations": [
+    "OOXML structural inspection, not a production parser execution or external model evaluation.",
+    "Cross-sheet edges count syntactic references including range references; not a complete expanded cell DAG or proof of acyclicity.",
+    "All cached results are present, but forceFullCalc=1; cache freshness and application compatibility remain unverified.",
+    "No formula engine installed locally; no LibreOffice/Excel reference recalculation performed.",
+    "No original workbook or source identities are included in Git."
+  ]
+}
