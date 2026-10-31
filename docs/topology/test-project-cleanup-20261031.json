@@ -1,0 +1,244 @@
+{
+  "scope": "User explicitly requested deletion of all test projects; preserve fixed demos, audit, approvals and shared catalog",
+  "targets": [
+    {
+      "id": "proj-0f250933-c326-40bc-a328-c4ef9257ae60",
+      "name": "独立测试-勿用于交付-BOM-CMDB-20261031-bomv1-78b799",
+      "code": "test-bom-1031-bomv1-78b799",
+      "status": "planned",
+      "template_id": ""
+    },
+    {
+      "id": "proj-1032abbd-38e7-4711-9467-7c0c2b551ac2",
+      "name": "BOM Four Step Synthetic",
+      "code": "bom-check-aa5eb027",
+      "status": "planned",
+      "template_id": ""
+    },
+    {
+      "id": "proj-27404266-3f03-4e48-bcd0-7768168ac468",
+      "name": "独立测试-勿用于交付-BOM-CMDB-20261031-netbom-e144da",
+      "code": "test-bom-1031-netbom-e144da",
+      "status": "planned",
+      "template_id": ""
+    },
+    {
+      "id": "proj-2b53b2bf-9c96-4290-a3b0-0df4f6748114",
+      "name": "独立测试-可清理-闭环根因-1031-netbom-08a35c",
+      "code": "test-closure-08a35c",
+      "status": "planned",
+      "template_id": ""
+    },
+    {
+      "id": "proj-613c9833-49a3-4173-b755-ae9164921c04",
+      "name": "开局 AI 真实文件验收",
+      "code": "ai-real-f99d5fdb",
+      "status": "planned",
+      "template_id": ""
+    },
+    {
+      "id": "proj-6275ce26-f6b6-4b10-b200-5d2dd2699cef",
+      "name": "独立测试-可清理-BOM拓扑-1031-bomv1-17d855",
+      "code": "test-bom-topo-17d855",
+      "status": "planned",
+      "template_id": ""
+    },
+    {
+      "id": "proj-63d0285c-c5ef-4d65-be24-e66c9e2fdc29",
+      "name": "test",
+      "code": "test",
+      "status": "planned",
+      "template_id": ""
+    },
+    {
+      "id": "proj-7c4b93e1-f8d1-4b54-81c3-1366cf69102f",
+      "name": "BOM Four Step Synthetic",
+      "code": "bom-check-9245023a",
+      "status": "planned",
+      "template_id": ""
+    },
+    {
+      "id": "proj-c6568a0b-4bd7-4df7-b02c-44f41ba7da03",
+      "name": "独立测试-可清理-BOM拓扑-1031-netbom-76c5ed",
+      "code": "test-bom-topo-76c5ed",
+      "status": "planned",
+      "template_id": ""
+    },
+    {
+      "id": "proj-d8a90883-3361-465f-8793-7b18346cf0b8",
+      "name": "独立测试-可清理-BOMv6新文件-1031-TX B300 Layout-new-213c56",
+      "code": "test-bom-v6-213c56",
+      "status": "planned",
+      "template_id": ""
+    },
+    {
+      "id": "proj-efe952e3-9797-4f84-bff4-8ae368c87ee4",
+      "name": "开局与CMDB联调验证项目",
+      "code": "BOM-CMDB-1793367852204",
+      "status": "planned",
+      "template_id": ""
+    },
+    {
+      "id": "proj-f389e107-13ff-42c0-8d2b-825ff91cb964",
+      "name": "独立测试-可清理-闭环根因-1031-bomv1-05944f",
+      "code": "test-closure-05944f",
+      "status": "planned",
+      "template_id": ""
+    },
+    {
+      "id": "proj-f4d933ec-eabb-4856-81da-61dfb63b33a4",
+      "name": "开局 AI 真实文件验收",
+      "code": "ai-real-52b424ab",
+      "status": "planned",
+      "template_id": ""
+    }
+  ],
+  "results": [
+    {
+      "project_id": "proj-0f250933-c326-40bc-a328-c4ef9257ae60",
+      "http": 202,
+      "result": {
+        "id": "proj-0f250933-c326-40bc-a328-c4ef9257ae60",
+        "status": "deleted",
+        "storage_event_id": "55187f98-29f8-4857-9392-ec56ab7b86c3",
+        "storage_status": "pending"
+      }
+    },
+    {
+      "project_id": "proj-1032abbd-38e7-4711-9467-7c0c2b551ac2",
+      "http": 202,
+      "result": {
+        "id": "proj-1032abbd-38e7-4711-9467-7c0c2b551ac2",
+        "status": "deleted",
+        "storage_event_id": "5c3fa65f-d724-4020-a933-4f1c350a2661",
+        "storage_status": "pending"
+      }
+    },
+    {
+      "project_id": "proj-27404266-3f03-4e48-bcd0-7768168ac468",
+      "http": 202,
+      "result": {
+        "id": "proj-27404266-3f03-4e48-bcd0-7768168ac468",
+        "status": "deleted",
+        "storage_event_id": "0623248c-cd70-4d96-bbfd-5908643a1947",
+        "storage_status": "pending"
+      }
+    },
+    {
+      "project_id": "proj-2b53b2bf-9c96-4290-a3b0-0df4f6748114",
+      "http": 202,
+      "result": {
+        "id": "proj-2b53b2bf-9c96-4290-a3b0-0df4f6748114",
+        "status": "deleted",
+        "storage_event_id": "13eda193-f6db-42fb-b12c-a3e1c639d4f4",
+        "storage_status": "pending"
+      }
+    },
+    {
+      "project_id": "proj-613c9833-49a3-4173-b755-ae9164921c04",
+      "http": 202,
+      "result": {
+        "id": "proj-613c9833-49a3-4173-b755-ae9164921c04",
+        "status": "deleted",
+        "storage_event_id": "cf2fd76f-6914-45eb-aff9-a8aab7252779",
+        "storage_status": "pending"
+      }
+    },
+    {
+      "project_id": "proj-6275ce26-f6b6-4b10-b200-5d2dd2699cef",
+      "http": 202,
+      "result": {
+        "id": "proj-6275ce26-f6b6-4b10-b200-5d2dd2699cef",
+        "status": "deleted",
+        "storage_event_id": "ff8868fe-e33a-487b-8871-2221e0b7b584",
+        "storage_status": "pending"
+      }
+    },
+    {
+      "project_id": "proj-63d0285c-c5ef-4d65-be24-e66c9e2fdc29",
+      "http": 202,
+      "result": {
+        "id": "proj-63d0285c-c5ef-4d65-be24-e66c9e2fdc29",
+        "status": "deleted",
+        "storage_event_id": "e9df20c6-7ea1-4df5-9dd9-7050d3284ad3",
+        "storage_status": "pending"
+      }
+    },
+    {
+      "project_id": "proj-7c4b93e1-f8d1-4b54-81c3-1366cf69102f",
+      "http": 202,
+      "result": {
+        "id": "proj-7c4b93e1-f8d1-4b54-81c3-1366cf69102f",
+        "status": "deleted",
+        "storage_event_id": "d4858bb2-6a39-4ccf-accb-f1c282fb3887",
+        "storage_status": "pending"
+      }
+    },
+    {
+      "project_id": "proj-c6568a0b-4bd7-4df7-b02c-44f41ba7da03",
+      "http": 202,
+      "result": {
+        "id": "proj-c6568a0b-4bd7-4df7-b02c-44f41ba7da03",
+        "status": "deleted",
+        "storage_event_id": "52640cb8-0fca-4517-ae9c-7cd8d5fb6c1e",
+        "storage_status": "pending"
+      }
+    },
+    {
+      "project_id": "proj-d8a90883-3361-465f-8793-7b18346cf0b8",
+      "http": 202,
+      "result": {
+        "id": "proj-d8a90883-3361-465f-8793-7b18346cf0b8",
+        "status": "deleted",
+        "storage_event_id": "22abbbcf-efc2-4af0-90e9-85f95c035970",
+        "storage_status": "pending"
+      }
+    },
+    {
+      "project_id": "proj-efe952e3-9797-4f84-bff4-8ae368c87ee4",
+      "http": 202,
+      "result": {
+        "id": "proj-efe952e3-9797-4f84-bff4-8ae368c87ee4",
+        "status": "deleted",
+        "storage_event_id": "7007f03e-daf6-4548-a171-c921c8434d89",
+        "storage_status": "pending"
+      }
+    },
+    {
+      "project_id": "proj-f389e107-13ff-42c0-8d2b-825ff91cb964",
+      "http": 202,
+      "result": {
+        "id": "proj-f389e107-13ff-42c0-8d2b-825ff91cb964",
+        "status": "deleted",
+        "storage_event_id": "dfac0ce1-5130-45b8-b097-d8f61de73602",
+        "storage_status": "pending"
+      }
+    },
+    {
+      "project_id": "proj-f4d933ec-eabb-4856-81da-61dfb63b33a4",
+      "http": 202,
+      "result": {
+        "id": "proj-f4d933ec-eabb-4856-81da-61dfb63b33a4",
+        "status": "deleted",
+        "storage_event_id": "317fd41b-ab8d-4fbf-9ea1-e9bd29147758",
+        "storage_status": "pending"
+      }
+    }
+  ],
+  "verification": {
+    "projects": 0,
+    "imports": 0,
+    "asset_scopes": 0,
+    "project_assets": 0,
+    "cleanup_completed": 13,
+    "deletion_audits": 13
+  },
+  "preserved": [
+    "audit and approval history",
+    "shared model catalog and shared assets",
+    "3 fixed demonstration projects",
+    "original XLSX files in workspace"
+  ],
+  "status": "COMPLETED",
+  "tests_run": false
+}
