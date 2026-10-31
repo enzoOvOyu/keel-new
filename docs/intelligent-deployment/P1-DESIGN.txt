@@ -1,0 +1,237 @@
+Keel Intelligent Deployment Engineering — P1 架构与数据模型
+版本：ide/v1，2026-10-31。依据：用户本轮批准继续P1及后续分批重构。
+状态：设计冻结；实现与验证分别登记到 implementation.json，不等同上线。
+前置：P0-REVIEW.txt、p0-audit.json。样本只提供证据，不定义产品模板。
+
+1. 三层与事实所有权
+Source & Intelligence：不可变原件、脱敏IR、区域/公式/证据、语义事实、ImportPlan。
+Engineering Model：结构化、带版本的工程意图；独立于源表和正式资产。
+Validation & Release：确定性计算、跨域校验、人工决定、版本及目标投影。
+
+原件仍存现有对象存储；复用bom.Parse及WorkbookIR，不复制文件存储或身份系统。
+Source适配器可引用既有bom_import_batch，但该批次状态不能驱动所有工程模块。
+规划模型是预发布工程事实，不是第二套真实设备。发布后通过CanonicalEntity映射
+现有bom_item/CMDB稳定ID。采购量不生成实物，规划身份不生成SN。
+原始证据、模型意图、observed观测各有所有权，后者不能由工程发布覆盖。
+
+Go保持模块化单体：internal/engineering提供模型、注册表、计划、校验与计算接口；
+internal/ai复用现有Provider和通信，将新多轮工具与旧SheetPlan协议分开；
+cmd/api负责RBAC、请求契约和持久任务；CMDB适配器复用既有事务和Outbox。
+不引入新的服务、数据库、UI组件库、通用工作流引擎或资产身份中心。
+
+2. 存储规则（下列为逻辑表设计，按纵向链分批migration）
+ID为UUID；project_id为既有project.id。所有项目实体使用project_id参与复合FK，
+禁止跨项目引用。版本实体以(entity_id,revision_id)唯一；数字数量用numeric，
+单位显式，缺失为NULL，零和unknown不同。enum约束与API一致。
+不可变行只追加，当前head指针CAS更新；所有写事务冻结expected_revision。
+时间为UTC。范围用(sheet_id,start_row,end_row,start_column,end_column)，非Sheet业务名。
+API中的聚合数组由关系表装配；不持久化整本工作台JSON作为工程模型。
+JSON只允许：版本化扩展schema、脱敏工具协议记录、原件解析IR缓存、受控审计摘要。
+
+通用模型/表及核心约束：
+WorkbookSource / eng_source：id,project_id,import_id,document_id,object_ref,sha256,
+ filename,media_type,byte_size,parser_version,created_by,created_at；源文件不可变。
+ 每次上传独立来源；同摘要可复用内容，不能抹掉不同项目/版本/上传者。
+WorkbookSheet / eng_sheet：id,source_id,ordinal,name,hidden,dimension；源内ordinal唯一。
+WorkbookRegion / eng_region：id,source_id,sheet_id,bounds,kind(table/grid/parameters/
+ narrative/unknown),semantic_label,status,coordinate_frame；区域可重叠，解释需证据。
+ eng_region_header(region_id,row,column,level,parent_header_id)支持多行表头；
+ eng_region_merge(region_id,bounds)保留合并位置，不把合并值伪装成多个原始值。
+SemanticFact / eng_fact：id,project_id,revision_id,region_id,subject_id,predicate,
+ typed_value_id,claim_status(proposed/accepted/rejected),maturity,provenance_id；
+ 未映射资料以unknown事实/区域保留，明确保留数量与待解释数量。
+EvidenceReference / eng_evidence：id,source_id,sheet_id,bounds,kind(input/formula/
+ cached_result/recalculated_result/manual/reference),source_sha256,calculation_run_id；
+ 公式正文与缓存/计算值使用不同证据，不用缓存假装重算。
+Provenance / eng_provenance：id,producer_type,producer_id,producer_version,run_id,
+ actor_id,created_at；eng_provenance_input连多个证据、事实或实体版本，保留因果链。
+ImportPlan / eng_import_plan：id,project_id,source_id,version,summary,created_by,
+ created_at,previous_plan_id；含ModuleInstance及输入版本依赖，不含可执行任意代码。
+EngineeringModule：可信代码注册的definition_id/version/domain及声明（见第4节）；
+ eng_module_instance(id,plan_id,definition_id,definition_version,state,head_revision_id,
+ applicability_reason)。计划可启用模块，AI不能注册工具/权限/发布目标。
+CanonicalEntity / eng_entity：id,project_id,domain,entity_kind,planning_key,
+ bom_item_uid nullable,cmdb_asset_id nullable；项目内planning_key唯一。
+ planning_key是模型稳定身份，不从Sheet名/行号绑定；证据坐标移动不创建新资产。
+ 有歧义的跨版本匹配形成候选并人工决定，不能按同名自动合并实物。
+CalculationRule / eng_rule_version：rule_id,version,domain,scope_type(project/customer/
+ domain),scope_id,status(draft/validated/approved/retired),expression_kind,
+ expression,provider_id,expression_hash,created_by,approved_decision_id。
+ eng_rule_io(rule_id,version,direction,name,type,unit,required)；
+ eng_rule_dependency(rule_id,version,dependency_rule_id,dependency_version)；
+ eng_rule_case(rule_id,version,id,expected_tolerance)及typed输入/预期输出值；
+ 验证通过不是批准；批准后不可原地修改。不同作用域不可静默fallback。
+CalculationRun / eng_calculation_run：id,project_id,module_instance_id,revision_id,
+ provider_id,provider_version,rule_id/version,source_sha256,input_digest,status,
+ started_at,finished_at,compatibility；eng_calculation_input/output/error逐项记录。
+ValidationIssue / eng_validation_issue：id,project_id,revision_id,module_instance_id,
+ code,severity(BLOCK/WARNING/INFO),message,entity_id,field,evidence_id,
+ publish_target_id,resolution(open/resolved/waived),rule_version；未知不等于通过。
+ReviewDecision / eng_review_decision：id,project_id,module_instance_id,revision_id,
+ digest,decision(approve/reject),actor,reason,created_at；签署绑定精确内容与依赖版本。
+ModelRevision / eng_revision：id,project_id,module_instance_id,sequence,parent_revision_id,
+ input_digest,content_digest,author_type,author_id,created_at；每域独立序列。
+ eng_revision_input绑定消费的source/module/rule版本；子域独立更新但依赖变化STALE。
+PublishRecord / eng_publish_record：id,project_id,module_instance_id,revision_id,
+ review_id,target,idempotency_key,digest,state(pending/published/failed),outbox_event_id,
+ receipt,error_code,created_at,published_at；同key异digest为409，不覆盖历史发布。
+
+有类型扩展：eng_attribute_definition(id,namespace,version,entity_kind,key,value_type,
+ unit,enum_values,required,approval_status)；eng_attribute_value(entity_id,revision_id,
+ definition_id,definition_version,text_value,number_value,bool_value,reference_id)。
+ CHECK恰好一个对应类型非空；核心字段不能以扩展覆写。属性批准版本固定，未知
+ 字段先留事实和证据，不能以任意JSON绕过核心类型/关系/审核。
+
+3. 工程域（规划版本与来源继承通用模型规则）
+EquipmentPlan：eng_equipment_plan(revision_id,entity_id,equipment_type,model_ref,
+ source_model_label,quantity,quantity_unit,identity_kind(group/planned_instance/
+ observed_reference),label,serial nullable,maturity)。quantity>0；组不能充当唯一
+ 端点或单个机柜占位；展开需显式身份依据/人工批准，不能从数量虚构SN。
+DeviceAssembly：eng_assembly(revision_id,parent_id,child_id,relation_type(contains/
+ installed_in/assembly_member),quantity,slot_label,evidence_id)。无自环/无环路，
+ 单实例物理部件不能同时归属两个父实体；逻辑组与物理父子关系分别标注。
+FacilityModel：eng_site(id,revision_id,label)、eng_room(id,revision_id,site_id,label)、
+ eng_rack(id,revision_id,room_id,label,capacity_u,width_mm,height_mm,depth_mm,
+ x_mm,y_mm,z_mm,orientation_deg,coordinate_frame_id)。尺寸/坐标未知为NULL；
+ 坐标有参考系及单位，无默认机柜高度、朝向或机房。
+RackPlacement：eng_placement(id,revision_id,equipment_id,rack_id,start_u,height_u,
+ mount_face(front/rear/both/unknown),depth_mm,maturity,evidence_id)。
+ 校验U正整数、越界、重叠、机柜引用、设备唯一性；深度/面未知不自动判无冲突。
+ 机柜capacity或设备高度缺失时只阻断placement目标，不阻断已明确设备发布。
+PowerPlan：eng_equipment_power(profile_id,equipment_id,basis(planned/nameplate/
+ measured),watts,cooling_type,source)；eng_rack_capacity(rack_id,power_w,cooling_w,
+ medium,rule_version)；eng_power_result(run_id,rack_id,load_w,remaining_w,basis)。
+ 实测功率、铭牌最大功率、设计负荷和容量分列；冷却资料缺失独立NEEDS_INPUT。
+ConnectivityPlan：eng_port(id,revision_id,equipment_id,name,parent_port_id,
+ breakout_index,role,rate_bps,medium)；eng_connection(id,revision_id,a_port_id,
+ z_port_id,connection_kind,maturity)；eng_connection_hop(connection_id,ordinal,
+ patch_panel_port_id)。父口/子口占用、唯一端接、转接节点按型号能力验证。
+CablePlan：eng_cable_spec(id,revision_id,medium,connector_a,connector_z,rate_bps,
+ category)；eng_cable_route(id,revision_id,connection_id,rule_id,rule_version)；
+ eng_route_segment(route_id,ordinal,from_node,to_node,distance_m,run_id)；
+ eng_cable_length(connection_id,revision_id,estimated_m,calculated_m,selected_stock_m,
+ confirmed_m,as_built_m)；eng_optic_requirement(physical_port_id,spec_id,quantity)。
+ Estimated/Calculated/Confirmed/As-built均保留不同值与证据，不能相互改名。
+ 规格阶梯/路线/余量/模块去重来自已审规则，不能固定5m、机柜数量或端口截断方式。
+MaterialEstimate：eng_material_line(id,revision_id,spec_ref,required_qty,purchased_qty,
+ spare_qty,purchase_gap_qty,unit,rule_version,run_id)。需求与已购/缺口独立；采购行
+ 不调用CMDB实物资产创建器。负缺口按批准规则展示富余，不擅自归零。
+WorkloadEstimate：eng_workload_line(id,revision_id,work_type,spec_ref,quantity,unit,
+ standard_length_m,labor_hours nullable,rule_version,run_id)。无工时规则不算工时。
+NetworkPlan：eng_network_plan(id,revision_id,physical_revision_id,source_id)；
+ eng_fabric/plane/device_role/interface_mapping；eng_ip_allocation(address,prefix,
+ interface_id,pool_id)、eng_asn_allocation(entity_id,asn)、eng_bgp_session(a,b,afi,
+ safi,policy_id)、eng_bfd、eng_roce_qos、eng_adaptive_routing、eng_evpn_vxlan。
+ 每项必须有规划依据，不从物理线缆推断协议。NetworkPlan独立审批；Golden只
+ 消费获批发布版本，不消费Agent候选。Golden外部消费契约未明确，保持未启用。
+
+4. 动态注册与调度
+每个EngineeringModule定义：id,version,domain,title,inputs[{name,entity_type,
+ required,min_maturity}],outputs[{name,entity_type}],dependencies[{module_id,
+ output,required,stage(process/review/publish)}],applicability,calculations,
+ validations,review_gates,publish_targets,implementation_status。
+模块能力名稳定，实际依赖由材料与输出决定，不把八个模块写成固定串行流程。
+内置：workbook_intelligence、equipment、facility_placement、power_cooling、
+ connectivity_cabling、material_workload、network_design、validation_release。
+内部可有独立产物与门禁；Equipment先发布后Placement补足仍合法。
+
+状态和事件：
+ DETECTED→NEEDS_INPUT(缺必需输入)/READY(输入可用)/NOT_APPLICABLE(有依据)/BLOCKED(冲突)。
+ NEEDS_INPUT→READY(补齐)/BLOCKED(证据冲突)/NOT_APPLICABLE(人工确定不适用)。
+ READY→PROCESSING(持久任务领取)；PROCESSING→IN_REVIEW/NEEDS_INPUT/BLOCKED。
+ IN_REVIEW→APPROVED(精确revision人工批准)/BLOCKED(驳回)/READY(新revision)。
+ APPROVED→PUBLISHED(所有该次请求目标有成功receipt)/STALE(输入变化)。
+ PUBLISHED→STALE(新资料或规则影响已消费版本，历史发布仍有效且可追溯)。
+ BLOCKED→READY/NEEDS_INPUT(问题修正)/NOT_APPLICABLE(人工决定)；
+ STALE→READY/NEEDS_INPUT/BLOCKED(重算新revision)；NOT_APPLICABLE→DETECTED(新增依据)。
+
+NOT_APPLICABLE必须有适用性证据/决定，不能替代未实现或缺少输入；尚未实现的
+ 能力可以DETECTED或NEEDS_INPUT并列implementation_status=planned。
+READY由可信执行器确定，不采纳AI写入的state/approval/publish字段。
+依赖引用计划内实际实例与明确产物版本；外部已发布物理模型也可作输入。
+拓扑排序检查真正的模块环；Sheet互相引用不等于模块循环。
+局部缺失传播到required依赖，optional不阻断；相互独立模块可并行。
+修改一个输出只使消费该版本的产物及其审核STALE，不全局作废无关模块。
+
+5. AI工具与结构化输出
+AI多轮读经脱敏的Workbook IR，源内容作为不可信资料；无数据库/审批/发布工具。
+inspect_workbook：来源摘要、Sheet列表/大小、合并/公式计数、已解释与未解释区域。
+inspect_sheet：Sheet描述/分页结构，不根据名称预设业务意义。
+inspect_region/read_range：坐标分页+next_cursor，区分merged anchor与继承展示值。
+inspect_formula：原始公式、缓存值、错误、依赖与敏感性分别返回。
+trace_formula_dependencies：带边类型的单元格/范围图及unsupported/missing/cycle。
+classify_information：有证据的业务语义/适用性建议，保留unknown。
+map_semantic_fields：region、header_cells、多行层级、字段/单位/输入或结果绑定。
+resolve_cross_sheet_references：公式引用或明确键匹配；多匹配输出冲突，不取第一条。
+propose_engineering_model：类型化域建议与关系证据，服务端检查字段与引用。
+propose_calculation_rule：规则范围、typed I/O、单位、表达式、依赖、验证案例建议。
+run_calculation：受控Provider/已验证规则；只生成CalculationRun，不批准规则。
+validate_model：确定性规则输出ValidationIssue；Agent不能将其覆写成PASS。
+analyze_validation_issues：解释/修复建议；修改必须形成新建议版本。
+
+每个action有闭合JSON Schema（additionalProperties=false），数量/枚举/引用
+ 独立校验；Provider结构化输出不支持时本地Schema验证仍必须执行。
+分类/模型生成与确定性区域遍历分工：模型决定语义绑定，工具遍历全部有效行；
+不能只提取模型看到的抽样，也不能由表头捷径完全跳过AI理解。
+模型预算/超时显式记录partial或failed；成功子模块保留，不强迫整本重新分析。
+工具历史/步骤持续保存到任务，暂停/进程恢复不抹掉已审内容。
+重新识别产生建议diff：同字段人工确认值保持原revision，AI不同值为冲突待审核。
+
+6. 公式Provider与规则注册
+SpreadsheetCalculationProvider接口：Capabilities、Calculate(ctx, immutableSource,
+ requestedCells, parameters, limits)→CalculationRun；provider必须报告版本/兼容性。
+输入原件只读；输出重算副本/结果单独存储并摘要；不把副本覆盖原件。
+缓存Provider只展示cached_result，不能返回计算成功。第一阶段引擎可用隔离Calc：
+禁宏/外链更新，网络禁用，临时目录，CPU/内存/时限，固定受控可执行文件；
+未安装/不支持必须返回unsupported，不回退为“缓存即成功”。
+公式引用图支持绝对/相对、引号Sheet、范围、跨Sheet、命名区域；不支持的动态
+引用/外部引用单独登记，不能用正则漏掉后宣称完整依赖闭环。
+工程计算只运行批准的单位和有限表达式AST/可信计算器，不eval Python/JS。
+规则执行绑定版本和作用域，结果验证与参考引擎/人工GT比较；容差由规则声明。
+
+7. 审核、版本差异与分域发布
+新增工程权限映射先复用既有bom:read/import/edit/review/execute；规则批准使用
+ bom:approve。普通工程审核沿用已授权角色，不赋予AI/系统任务人类签署权限。
+Network签署和高风险规则沿用现有NE/DE等门禁，未明确NH不授予admin替签资格。
+所有修改/批准/发布必须带expected_revision；发布事务重新检查最新head、依赖
+摘要、未解决BLOCK和所需ReviewDecision，不能只相信客户端按钮或旧校验结果。
+模块复审不要求重新审批无关域；同次物理发布的设备/关系原子提交。
+
+发布目标：CMDB_PLANNED(equipment/assembly/facility/placement/port/connection)、
+ ENGINEERING_REVISION(power/cable/material/workload)、NETWORK_REVISION；
+ Golden消费者是独立适配器，不能从CMDB读取候选来绕过NetworkPlan审核。
+CMDB_PLANNED使用既有稳定身份及明确planned来源；已存在实体只新增规划事实/
+关系版本，不更新Observed字段；冲突在现有机柜图按来源分层展示。
+禁止直接使用旧ProjectBOM的incoming覆盖策略投影已有observed资产。
+原子写入PublishRecord、必要bom_item/project_asset身份关联和outbox_event；
+幂等消费者执行投影并回写receipt。发布请求202=pending，不标PUBLISHED；
+投影失败保留failed/可重试，只有成功receipt才能返回实际已发布。
+
+删除项目：工程专属来源/模型/任务/计划随项目清理，审计与审核记录按既有策略
+留存；共享型号、规则定义不级联删除。源对象清理沿用对象Outbox，不另造删除队列。
+老导入保留只读/原流程兼容；新工程任务不把旧Workbench JSON自动视为获批模型。
+
+8. 工作台与API边界
+沿用BOM入口与ProjectContext，统一工作台不增八个菜单。来源/理解、工程总览、
+适用模块、证据、计算、问题、审核发布按选中任务和模块展开。
+前端仅依赖src/lib/api的OpenAPI生成类型；复用抽屉、表格、反馈、现有机柜图链接。
+按钮对应明确动作：查看证据、编辑参数、新版本重算、批量审核、驳回、重新分析、
+对比revision；未实现能力明确状态，不假按钮、不伪造成功。
+接口以/api/v1/projects/{projectId}/engineering/...作用域；GET无副作用；
+POST写入经Session/CSRF/RBAC，异步返回job；409版本冲突、422业务门禁、403权限。
+设计操作在OpenAPI冻结后才接Handler/Adapter，登记真实台账。源大数据按区域分页；
+总览不返回整本Workbook/所有公式/所有设备大JSON。
+
+9. 分批实施与验收
+P1：本文件全部通用/域模型、关系、状态、发布职责与阶段边界定稿；设计不等于实现。
+S1：通用内核+设备/组合、机房/落位纵向链。理解→类型化草案→确定性校验→独立
+审核→Outbox planned投影→原机柜图读取。未知Height/Capacity不默认42U或1U。
+S2：连接/线缆，父子口/配线节点、规则引擎、标准长度、模块物理去重。
+S3：电力/冷却；S4：采购/工作量；S5：NetworkPlan；均消费已版本化输入。
+公式基础与工具逐批覆盖；没实现的工具/计算能力明确unsupported，不把契约当功能。
+
+每阶段定向检查，按用户安排开展真实业务验收，不恢复旧全平台冒烟/重复回归。
+第一Golden摘要沿用P0；Ground Truth需要人类核对并签署，不能AI给自己打分。
+验收覆盖设备父子/机柜/U/端接/规格/距离/标准线长/模块去重/电力/采购/工作量。
+变体改名/列序/表头/无关Sheet/区域偏移/拆分/单位只能证明结构鲁棒性。
+第二份真实不同结构资料尚缺，跨客户泛化保持NOT RUN；源文件/真实行不入Git。

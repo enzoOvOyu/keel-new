@@ -1,8 +1,8 @@
 # Keel 当前开发交接
 
-## 当前任务：通用智能开局工程 P0 审计（等待用户审核）
+## 当前任务：通用智能开局工程重构（P1）
 
-独立工作树 `/home/ubuntu/keel-engineering-p0`，分支 `audit/intelligent-deployment-p0`，代码基线2d66974。已本地读取指定MM_Layout_GB300样本（在 `/home/ubuntu/`），完成九项代码/资料审计；报告入口 `docs/intelligent-deployment/P0-REVIEW.txt`，完整报告及结构证据同目录JSON。15 Sheet、94,353公式；源文件摘要未变，不入Git。P0只新增报告和决策记录，业务代码、数据库、API、部署均未改动。未运行外部AI、冒烟/回归或构建。P1架构详细设计及任何实现必须等待用户审核本次方向；不得恢复旧Agent补丁任务。
+用户已批准在 `audit/intelligent-deployment-p0` 继续P1及按批次重构，工作树 `/home/ubuntu/keel-engineering-p0`。P0已提交314126d并推送同名远程分支。P1三层、14个通用模型、10个领域模型、模块状态/依赖、公式Provider、独立审核与planned发布边界已冻结，入口 `docs/intelligent-deployment/P1-DESIGN.txt`。按首批设备/组合→机房/落位纵向链实施；不得恢复旧Agent补丁、复制机柜图或同时实现全部工程域。当前只完成设计，业务实现/迁移/部署未改变；没有进行外部AI或冒烟/回归。后续实施状态单独登记。
 
 
 ## 用户决定：停止旧Agent补丁并重新开发开局配置

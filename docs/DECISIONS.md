@@ -112,3 +112,8 @@ PRD §2 已定义 NH 业务职责，但本次要求的六个稳定默认身份�
 P1待审核细化：规划工程身份到既有bom_item/CMDB身份的映射，planned/Observed字段选择，模块/规则审核角色，Golden消费契约，以及样本各来源/规则的适用权威。最小方案是保留现有来源、身份、事务Outbox和机柜图，新增结构化工程域及适配器；不复制资产中心或机柜画布。
 
 报告：[P0审阅](intelligent-deployment/P0-REVIEW.txt)、[九项报告](intelligent-deployment/p0-audit.json)。本节仅登记冲突及提案，不代表P1架构已批准。
+
+
+## IDE-P1-20261031 · 已批准继续重构
+
+用户明确在当前分支继续P1及分批实施，P0等待审核已结束。详细模型、版本/事实所有权、模块状态与发布边界见 [P1设计](intelligent-deployment/P1-DESIGN.txt)。新工程域优先于历史BOM中心约束；保留既有BOM身份、物理发布原子性、Outbox与CMDB画布。首批仅设备/组合和机房/落位，后续批次不以空壳声明已完成。审批复用已有RBAC；Golden外部消费、NH签署与样本人工Ground Truth尚未明确，不阻断物理模型设计。
