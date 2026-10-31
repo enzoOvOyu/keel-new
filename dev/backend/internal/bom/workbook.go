@@ -98,6 +98,16 @@ func Parse(data []byte) (Workbook, error) {
 				rows.Close()
 				return result, e
 			}
+			// Spreadsheet editors may write whitespace/style residue to XFD. Bound
+			// meaningful data, not the formatted row width; formulas remain evidence.
+			for len(cols) > 512 && strings.TrimSpace(cols[len(cols)-1]) == "" {
+				ref, _ := excelize.CoordinatesToCellName(len(cols), r)
+				formula, _ := f.GetCellFormula(name, ref)
+				if formula != "" {
+					break
+				}
+				cols = cols[:len(cols)-1]
+			}
 			if len(cols) > 512 {
 				rows.Close()
 				return result, fmt.Errorf("COLUMN_LIMIT")
@@ -105,7 +115,7 @@ func Parse(data []byte) (Workbook, error) {
 			for c, v := range cols {
 				ref, _ := excelize.CoordinatesToCellName(c+1, r)
 				formula, _ := f.GetCellFormula(name, ref)
-				if v == "" && formula == "" {
+				if strings.TrimSpace(v) == "" && formula == "" {
 					continue
 				}
 				if Sensitive(v) {

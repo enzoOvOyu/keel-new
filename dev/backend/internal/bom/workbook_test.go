@@ -128,3 +128,35 @@ func TestApprovedTemplateTracksReorderedHeaders(t *testing.T) {
 		t.Fatal("template was tied to original column position")
 	}
 }
+
+func TestColumnLimitIgnoresWhitespaceTailButRejectsRealEvidence(t *testing.T) {
+	for _, kind := range []string{"whitespace", "value", "formula"} {
+		t.Run(kind, func(t *testing.T) {
+			f := excelize.NewFile()
+			defer f.Close()
+			f.SetCellValue("Sheet1", "A1", "Hostname")
+			f.SetCellValue("Sheet1", "A2", "synthetic-device")
+			f.SetCellValue("Sheet1", "XFC2", " \t ")
+			if kind == "value" {
+				f.SetCellValue("Sheet1", "XFC2", "synthetic-important-value")
+			}
+			if kind == "formula" {
+				f.SetCellFormula("Sheet1", "XFC2", "SUM(1,2)")
+			}
+			var data bytes.Buffer
+			if err := f.Write(&data); err != nil {
+				t.Fatal(err)
+			}
+			w, err := Parse(data.Bytes())
+			if kind != "whitespace" {
+				if err == nil || err.Error() != "COLUMN_LIMIT" {
+					t.Fatal("meaningful over-limit evidence silently discarded", err)
+				}
+				return
+			}
+			if err != nil || len(w.Sheets) != 1 || len(w.Sheets[0].Cells) != 2 {
+				t.Fatal("whitespace tail rejected or actual cells lost", err)
+			}
+		})
+	}
+}
