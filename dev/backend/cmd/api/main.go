@@ -158,7 +158,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			var mode string
 			s.db.QueryRow(ctx, "SELECT import_mode FROM bom_import_batch WHERE id=$1", id).Scan(&mode)
-			if mode != "legacy" {
+			parseRetry := r.Method == "POST" && len(p) == 5 && p[4] == "retry" && status == "FAILED"
+			if mode != "legacy" && !parseRetry {
 				fail(w, 422, "USE_WORKBENCH_ACTION")
 				return
 			}
