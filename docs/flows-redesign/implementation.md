@@ -135,3 +135,11 @@ Kestra2.0.7兼容修正包括Loop替代不存在的ForEach、`fromJson(item.valu
 - 接入上游RunTimeline.vue（保留许可证，标注Keel导入/日期/类型及popover隔离改动），从真实Execution.state.histories展示状态历史；不填造历史。此组件当前仅完成接线和编译检查，未在真实有历史的执行记录上完成交互验收。
 - Native列表搜索/状态保留在URL；当前仍是过渡目录与已加载执行数据筛选，服务端完整分页/total/聚合尚待实现。
 - 最新分支构建（TypeScript+Vite）通过；[三项浏览器证据](native-ui/validation.json)与[当前原生目录截图](native-ui/catalog.png)已保存。搜索URL/刷新恢复检查通过，无页面或console error；不是编辑器、真实设备或完整生命周期验收。
+
+## 原生编辑器接入增量（开发中）
+
+- 接入上游KsEditor/Monaco和MultiPanelGenericEditorView/MultiPanelTabs，当前YAML与只读结构面板；不是No-code已完成。多面板作用域按项目/Flow隔离，仅持久化布局UID，不保存执行目标或秘密。
+- Vue编辑器通过既有React回调更新同一YAML；只读与保存草稿快捷键受权限/忙状态约束。原生面板组件去除上游外部统计调用，并连接实际快捷键说明面板；弹层保持在模块内。
+- 修复接入时monacoSetup的ASI初始化错误；一次完整构建被137终止，裁减到本期YAML实际使用的generic Worker后构建通过。JSON/TypeScript语义Worker未开放，不暗示支持；源文件语法配色/编辑与Go侧校验继续独立。
+- 浏览器三项检查通过：原生Monaco挂载、实际键盘输入更新YAML、Visual/YAML切换保留内容，无pageerror。证据：[editor-validation.json](native-ui/editor-validation.json)、[截图](native-ui/editor.png)。结构面板动态渲染的间距样式随后定向修正，最终视觉需下一次页面检查；未声称全编辑器验收。
+- Monaco版本0.56与上游一致，附LICENSE/ThirdPartyNotices。新引入的DOMPurify依赖已锁定到修复补丁3.4.17；未进行无关全平台依赖升级。
