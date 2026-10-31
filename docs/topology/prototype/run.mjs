@@ -1,0 +1,10 @@
+import {existsSync,symlinkSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
+import {spawnSync} from 'node:child_process';
+const root=fileURLToPath(new URL('.',import.meta.url));
+const deps=fileURLToPath(new URL('../../../dev/node_modules',import.meta.url));
+if(!existsSync(deps))throw Error('请先在 dev/ 执行 npm ci');
+if(!existsSync(root+'node_modules'))symlinkSync(deps,root+'node_modules','dir');
+const mode=process.argv[2];
+const args=mode==='check'?[deps+'/typescript/bin/tsc','--noEmit']:[deps+'/vite/bin/vite.js',...(mode==='build'?['build']:[]),'--config','vite.config.ts'];
+process.exit(spawnSync(process.execPath,args,{cwd:root,stdio:'inherit'}).status??1);

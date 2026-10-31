@@ -1,0 +1,1 @@
+{"name":"keel-topology-design-prototype","private":true,"type":"module","scripts":{"dev":"node run.mjs","build":"node run.mjs build","check":"node run.mjs check"}}
