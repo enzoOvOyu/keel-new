@@ -1,5 +1,5 @@
 {
-  "status": "AWAITING_EXPLICIT_MODEL_APPROVAL_AUTHORIZATION",
+  "status": "USER_AUTHORIZED_AND_EXECUTED",
   "project_id": "proj-d8a90883-3361-465f-8793-7b18346cf0b8",
   "evidence": {
     "workbook": "TX B300 Layout-new.xlsx",
@@ -20,5 +20,10 @@
     }
   },
   "side_effect": "Creates a GLOBAL catalog revision; current API has no project-only model catalog or deletion endpoint. Deleting the project alone does not remove the catalog revision.",
-  "acceptance_limit": "Enables an asset-ingestion test only; physical cable speed evidence and topology edges remain independently gated."
+  "acceptance_limit": "Enables an asset-ingestion test only; physical cable speed evidence and topology edges remain independently gated.",
+  "result": {
+    "http": 201,
+    "model_revision_id": "2417e33c-afb1-4414-9e53-2022af410b72",
+    "formally_imported_switches": 30
+  }
 }

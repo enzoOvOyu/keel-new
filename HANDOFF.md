@@ -2,11 +2,13 @@
 
 ## 当前运行环境 · BOM 新文件根因修复（2026-10-31）
 
-此节覆盖下方旧运行版本。后端 `00b3fd5`，分支 `fix/bom-source-closure`，工作树 `/home/ubuntu/keel-bom-closure-dev`；8081 运行 `/tmp/keel-api-bom-v6n-flows-1031`，启动器 `/tmp/keel-bom-v6n-run-api.py`。前端5180、Flows运行环境及原配置未替换。部署证据 `/tmp/keel-bom-v6n-20261031/deployment.json`，秘密环境文件不得打印或入Git。
+此节覆盖下方旧运行版本。后端 `7a49bca`，分支 `fix/bom-source-closure`，工作树 `/home/ubuntu/keel-bom-closure-dev`；8081 运行 `/tmp/keel-api-bom-v6p-flows-1031`，启动器 `/tmp/keel-bom-v6p-run-api.py`。前端5180、Flows及原配置未替换。部署证据 `/tmp/keel-bom-v6p-20261031/deployment.json`，秘密环境文件不得打印或入Git。
 
-新文件33/33提取和来源覆盖已通过，216行显式类型全部核对；revision 22实际确认/提交均422，BOM→CMDB→拓扑闭环失败，仍在处理。最终保存曾触发 PostgreSQL OOM，现同事务分步写入，定向原子性检查和一次全尺寸保存通过。全局型号登记方案在 `docs/topology/bom-test-model-approval-proposal-20261031.json`，尚未执行。独立可清理项目 `proj-d8a90883-3361-465f-8793-7b18346cf0b8`，导入 `fd0f48a6-32e0-440f-a958-9c9c1d545527`；私有证据 `/tmp/keel-tx-layout-v6-20261031`。原文件未改动。当前修复包含双侧表头误判、全局摘要漏表、空白列尾、失败解析重试、字段语义、角色投影、token设备名被误脱敏、端点模块型号遗漏；详见 `docs/topology/bom-source-closure-fixes-20261031.json`。型号审批、真实端口/速率/位置等证据不能伪造。
+新文件33/33提取完成，216/216显式类型核对通过；整批确认/提交曾422，完整闭环仍未通过。用户已批准并执行一个空能力的测试型号登记。实际分批入库：30台交换机、14个机柜、8个端口，共52个唯一资产；两次Outbox均已发布，8/8端口归属正确。项目资产58条是版本历史，不是58个唯一资产。此前口头40交换机/4机柜统计不准确，以此次实际API/数据库结果为准。
 
+本次补修CMDB尺寸类型/空值导致投影失败、分批提交候选ID未映射正式资产ID导致依赖失败；部署后同批重试通过。层级/Fabric返回52资产，物理线缆仍0，四类连接矩阵均空，Trace为no_record。线缆速率证据、端点/占用冲突及其他候选审核尚未闭环，不能把HTTP200或资产入库当作完整拓扑通过。不猜测源文件缺失事实，不继续重复全量识别。
 
+独立项目 `proj-d8a90883-3361-465f-8793-7b18346cf0b8`，导入 `fd0f48a6-32e0-440f-a958-9c9c1d545527`。全局测试型号revision `2417e33c-afb1-4414-9e53-2022af410b72`需单独记录清理，删除项目不会删除它。原文件未修改。实测/清理记录见 `docs/topology/bom-real-subset-acceptance-20261031.json`，修复清单见 `docs/topology/bom-source-closure-fixes-20261031.json`。私有原始证据 `/tmp/keel-tx-layout-v6-20261031` 不入Git。
 
 ## 当前运行环境 · BOM v5 与 Flows 合并发布（2026-10-31）
 

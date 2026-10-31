@@ -18,7 +18,9 @@
     "Retain missing module-model bindings only for unambiguous paired device/port/module headers, using the already-bound endpoint orientation.",
     "Scope normalization, validation and model-schema column constraints to independent header regions; bind explicit stacked tables locally.",
     "Preserve literal source device type, retain category provenance, and avoid overriding it with model guesses.",
-    "Persist final workbench and draft in separate statements of one transaction to reduce PostgreSQL JSON parsing peak memory."
+    "Persist final workbench and draft in separate statements of one transaction to reduce PostgreSQL JSON parsing peak memory.",
+    "Normalize source rack units losslessly for numeric CMDB fields and omit empty optional dimensions; preserve original source evidence.",
+    "Resolve imported candidate references to canonical asset IDs before loading dependencies for later subset submissions."
   ],
   "checks": {
     "Go_API_AI_BOM_CMDB": "PASS before final build",
@@ -32,17 +34,20 @@
     "explicit_source_category": "216/216 match; 151 earlier mismatches corrected.",
     "snapshot_atomicity": "PASS on real PostgreSQL temporary shadow table: success, stale revision rejection, second-write rollback.",
     "full_size_snapshot_after_fix": "PASS once: 41,690 candidates saved after PostgreSQL OOM recovery. Not a concurrency/load certification.",
-    "actual_ingestion": "Confirm 422 SELECTED_RECORDS_REQUIRE_CORRECTION; submit 422 SELECTED_RECORDS_NOT_CONFIRMED_OR_VALID."
+    "actual_ingestion": "Whole recognized selection at revision 22 rejected (422); subsequently authorized model subset: 30 switches + 14 racks committed, then 8 ports committed after dependency fix; both Outbox events published.",
+    "cmdb_projection_dimensions": "PASS: targeted Go tests and actual source projection in rolled-back PostgreSQL transaction; formerly failing Outbox published after deployment.",
+    "later_subset_dependencies": "PASS: targeted API tests and retry of the same 8 confirmed ports, HTTP 201; 8/8 parent relationships verified.",
+    "visualization": "Hierarchy/Fabric return 52 unique assets; 14 rack groups. Physical edges and all four matrices remain empty; trace returns no_record, not full acceptance."
   },
-  "unchanged_gates": "No invented SN, units, geometry, port rates or model approvals. Missing actual business evidence remains a blocker.",
+  "unchanged_gates": "No invented SN, geometry or port rates. One explicitly user-authorized global test model revision was created with empty capabilities; no other model approvals.",
   "memory_limit": "Known allocation amplification reduced; repeated full-size runtime OOM recovery is not yet certified.",
   "source_file": "TX B300 Layout-new.xlsx remains outside Git and is not modified.",
   "runtime": {
-    "code_commit": "00b3fd5",
-    "binary": "/tmp/keel-api-bom-v6n-flows-1031",
+    "code_commit": "7a49bca",
+    "binary": "/tmp/keel-api-bom-v6p-flows-1031",
     "port": 8081,
     "environment_preserved": true,
     "frontend_changed": false
   },
-  "remaining": "No positive CMDB/topology ingestion acceptance. 226 model approval blockers; 14,963 cable speed evidence blockers; endpoint/duplicate/source-evidence issues remain. Global model approval proposal prepared, not executed."
+  "remaining": "Full workbook and physical topology acceptance NOT PASSED. Before authorized subset, revision 22 had 14963 cable-speed evidence blockers plus endpoint/occupancy, identity, model and source classification blockers. Counts are pre-subset, not current totals. Explicit interface media/connectors do not establish operating speed. No additional model/capability approval or inferred physical links."
 }

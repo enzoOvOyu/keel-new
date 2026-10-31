@@ -1,0 +1,138 @@
+{
+  "asset_types": {
+    "port": 8,
+    "switch": 30,
+    "rack": 14
+  },
+  "unique_assets": 52,
+  "port_parent_assertions_passed": 8,
+  "port_parent_assertions_total": 8,
+  "unique_port_parents": 4,
+  "checks": [
+    {
+      "view": "hierarchy",
+      "http": 200,
+      "assets": 52,
+      "cables": 0,
+      "groups": 14,
+      "coverage": {
+        "returned_assets": 52,
+        "total_assets": 52,
+        "limit": 5000,
+        "complete": true
+      },
+      "error": null
+    },
+    {
+      "view": "fabric",
+      "http": 200,
+      "assets": 52,
+      "cables": 0,
+      "groups": 14,
+      "coverage": {
+        "returned_assets": 52,
+        "total_assets": 52,
+        "limit": 5000,
+        "complete": true
+      },
+      "error": null
+    },
+    {
+      "view": "physical",
+      "http": 200,
+      "assets": 0,
+      "cables": 0,
+      "groups": 14,
+      "coverage": {
+        "returned_assets": 0,
+        "total_assets": 0,
+        "limit": 5000,
+        "complete": true
+      },
+      "error": null
+    },
+    {
+      "endpoint": "connections",
+      "http": 200,
+      "assets": 4,
+      "cables": 0,
+      "selected_port_retained": true
+    },
+    {
+      "endpoint": "trace",
+      "http": 200,
+      "integrity": "no_record",
+      "segments": 0,
+      "error": null
+    }
+  ],
+  "outboxes": [
+    {
+      "id": "6198b108-729c-4016-b364-3879a8c03c6c",
+      "published": true,
+      "retry_count": 13,
+      "error": null
+    },
+    {
+      "id": "98b165b0-8db1-4e79-8260-aba6c73bab24",
+      "published": true,
+      "retry_count": 0,
+      "error": null
+    }
+  ],
+  "status": "PARTIAL_PASS_FULL_TOPOLOGY_BLOCKED",
+  "project_id": "proj-d8a90883-3361-465f-8793-7b18346cf0b8",
+  "import_id": "fd0f48a6-32e0-440f-a958-9c9c1d545527",
+  "runtime_commit": "7a49bca",
+  "source_unchanged": true,
+  "scope": "Real API/database assertions; no browser rendering or live device validation",
+  "matrix_checks": [
+    {
+      "axis": "server_switch",
+      "http": 200,
+      "cells": 0,
+      "included": 0,
+      "excluded": 0
+    },
+    {
+      "axis": "leaf_spine",
+      "http": 200,
+      "cells": 0,
+      "included": 0,
+      "excluded": 0
+    },
+    {
+      "axis": "rack_leaf",
+      "http": 200,
+      "cells": 0,
+      "included": 0,
+      "excluded": 0
+    },
+    {
+      "axis": "port_pair",
+      "http": 200,
+      "cells": 0,
+      "included": 0,
+      "excluded": 0
+    }
+  ],
+  "cleanup": {
+    "project_name": "独立测试-可清理-BOMv6新文件-1031-TX B300 Layout-new-213c56",
+    "global_model_revision_id": "2417e33c-afb1-4414-9e53-2022af410b72",
+    "note": "Global catalog revision is not removed by deleting the project; no cleanup performed.",
+    "submissions": [
+      "e713ebb9-61fc-4436-81a9-73e06d324d26",
+      "9a2f5d65-4fcf-4c2a-beee-516aa9222b1f"
+    ]
+  },
+  "identity_check": {
+    "project_asset_history_rows": 58,
+    "unique_asset_ids": 52,
+    "note": "History rows are revision records, not duplicate canonical assets."
+  },
+  "limits": [
+    "33/33 sheets extracted and 216/216 explicit source types matched; this is not proof that all unknown source rows are correctly classified.",
+    "Physical cables remain blocked; empty matrices do not establish diagram acceptance.",
+    "Earlier commentary reporting 40 switches and 4 racks was incorrect; authoritative persisted counts are 30 switches and 14 racks."
+  ]
+}
