@@ -66,6 +66,48 @@ func TestPlanRevisionPreservesNonstandardSourceBinding(t *testing.T) {
 	}
 }
 
+func TestAlternateEndpointLabelsAndIncompleteRows(t *testing.T) {
+	s, p := syntheticCablePlan()
+	s.Cells = append(s.Cells, bom.Cell{Sheet: s.Name, Row: 1, Column: 7, Ref: "G1", Value: "A Side Lable Name"}, bom.Cell{Sheet: s.Name, Row: 2, Column: 7, Ref: "G2", Value: "synthetic-alias"})
+	if e := CheckExtraction(s, p); e != nil {
+		t.Fatal("alternate label incorrectly requires a second cable", e)
+	}
+	p.Tables[0].Required = []string{"hostname", "model", "network_role"}
+	raw, _ := json.Marshal(p)
+	decoded, e := decodeExtraction(raw, 3)
+	if e != nil || len(decoded.Tables[0].Required) != 1 || decoded.Tables[0].Required[0] != "endpoint_a_device" {
+		t.Fatal("optional or unmapped row keys were not replaced by explicit source identity", e)
+	}
+}
+
+func TestFailedLegacyPlanCannotBecomeBaseline(t *testing.T) {
+	s, p := syntheticCablePlan()
+	p.Tables[0].Fields["unsupported_legacy_field"] = 5
+	raw, _ := json.Marshal(p)
+	if _, e := RestoreExtractionBindings(s, raw); e == nil {
+		t.Fatal("failed legacy recipe promoted to a valid baseline")
+	}
+}
+
+func TestExplicitHeadersRepairOmissionsWithoutInventingValues(t *testing.T) {
+	s, p := syntheticCablePlan()
+	delete(p.Tables[0].Fields, "model")
+	normalizeSourceBindings(s, &p)
+	if p.Tables[0].Fields["model"] != 5 || p.Tables[0].Fields["speed"] != 0 {
+		t.Fatal("explicit model omitted or absent speed invented")
+	}
+	duplicate := p.Tables[0]
+	duplicate.Key = "another-model-name"
+	p.Tables = append(p.Tables, duplicate)
+	normalizeSourceBindings(s, &p)
+	if len(p.Tables) != 1 {
+		t.Fatal("compatible recipes for the same source object duplicated")
+	}
+	if e := CheckExtraction(s, p); e != nil {
+		t.Fatal(e)
+	}
+}
+
 func TestAgentInspectsRejectedRegionAndRepairsPlan(t *testing.T) {
 	s, valid := syntheticCablePlan()
 	_, invalid := syntheticCablePlan()
@@ -84,13 +126,30 @@ func TestAgentInspectsRejectedRegionAndRepairsPlan(t *testing.T) {
 		case 1:
 			reply = map[string]any{"action": "submit_plan", "plan": invalid}
 		case 2:
-			if !strings.Contains(body.Messages[1].Content, "SOURCE_FIELD_UNCOVERED") || !strings.Contains(body.Messages[1].Content, "row=3") {
+			if !strings.Contains(body.Messages[1].Content, "SOURCE_TYPE_UNCOVERED") || !strings.Contains(body.Messages[1].Content, "row=3") {
 				t.Error("independent validator did not feed exact missing evidence back")
 			}
 			reply = map[string]any{"action": "inspect_region", "sheet_name": s.Name, "start_row": 3, "end_row": 3, "first_column": 1, "last_column": 6}
 		case 3:
-			if !strings.Contains(body.Messages[1].Content, "read") && !strings.Contains(body.Messages[1].Content, "400G") {
-				t.Error("IR result absent")
+			var input struct {
+				History []struct {
+					Action string
+					Result []bom.Cell
+				} `json:"tool_history"`
+			}
+			if json.Unmarshal([]byte(body.Messages[1].Content), &input) != nil || len(input.History) < 2 {
+				t.Error("IR history absent")
+			} else {
+				last := input.History[len(input.History)-1]
+				found := false
+				for _, cell := range last.Result {
+					if cell.Row == 3 && cell.Column == 6 && cell.Value == "400G" {
+						found = true
+					}
+				}
+				if last.Action != "inspect_region" || !found {
+					t.Error("requested IR result absent")
+				}
 			}
 			reply = map[string]any{"action": "submit_plan", "plan": valid}
 		default:
@@ -118,7 +177,7 @@ func TestAgentInspectsRejectedRegionAndRepairsPlan(t *testing.T) {
 
 func TestAgentStopsWithoutReturningRejectedPlan(t *testing.T) {
 	s, invalid := syntheticCablePlan()
-	delete(invalid.Tables[0].Fields, "model")
+	invalid.Tables[0].End = 2
 	calls := 0
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		calls++

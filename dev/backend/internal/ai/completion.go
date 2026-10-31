@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func (p *Provider) completeJSON(ctx context.Context, prompt string, input any) ([]byte, error) {
+func (p *Provider) completeJSON(ctx context.Context, prompt string, input any, format ...map[string]any) ([]byte, error) {
 	p.Calls++
 	encoded, _ := json.Marshal(input)
 	payload := map[string]any{"model": p.Model, "messages": []map[string]string{{"role": "system", "content": prompt}, {"role": "user", "content": string(encoded)}}, "stream": false}
@@ -25,6 +25,9 @@ func (p *Provider) completeJSON(ctx context.Context, prompt string, input any) (
 	}
 	if p.JSONMode {
 		payload["response_format"] = map[string]string{"type": "json_object"}
+	}
+	if len(format) > 0 {
+		payload["response_format"] = format[0]
 	}
 	b, _ := json.Marshal(payload)
 	req, e := http.NewRequestWithContext(ctx, "POST", p.Endpoint, bytes.NewReader(b))

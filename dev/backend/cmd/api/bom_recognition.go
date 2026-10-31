@@ -38,6 +38,15 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 		return
 	}
 	provider, providerID, err := s.workbenchProvider(ctx, id)
+	if err != nil {
+		// A missing provider is an execution failure, not a new empty workbook.
+		// Retain all previous plans, candidates and human review decisions.
+		b.State, b.Phase, b.Error = "pending_review", "review", err.Error()
+		data, _ := json.Marshal(b)
+		s.db.Exec(ctx, "UPDATE bom_import_batch SET workbench=$2,revision=revision+1,reviewed_revision=NULL,updated_at=now() WHERE id=$1 AND revision=$3", id, data, rev)
+		s.db.Exec(ctx, "UPDATE bom_job SET status='failed',error_code=$2,updated_at=now() WHERE id=$1", job, err.Error())
+		return
+	}
 	started := time.Now()
 	var selectedIDs []string
 	json.Unmarshal(params, &selectedIDs)
@@ -104,8 +113,7 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 		}
 		// Resume persisted successful extraction after a worker restart.
 		if resume && len(selected) == 0 && wanted[sheet.Name] && info.State == "recognized" {
-			var plan ai.SheetPlan
-			if json.Unmarshal(info.Plan, &plan) == nil && ai.CheckExtraction(sheet, plan) == nil {
+			if _, restoreErr := ai.RestoreExtraction(sheet, info.Plan); restoreErr == nil {
 				delete(wanted, sheet.Name)
 			} else {
 				wanted[sheet.Name] = true
@@ -187,8 +195,7 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 					adapter.TotalInputTokens = 0
 					adapter.TotalOutputTokens = 0
 					var prior *ai.SheetPlan
-					var saved ai.SheetPlan
-					if json.Unmarshal(previous[sheet.Name].Plan, &saved) == nil && len(saved.Tables) > 0 {
+					if saved, restoreErr := ai.RestoreExtractionBindings(sheet, previous[sheet.Name].Plan); restoreErr == nil && len(saved.Tables) > 0 {
 						prior = &saved
 					}
 					plan, e := adapter.PlanSheetWithWorkbook(workCtx, safeIR, sheet.Name, planning, prior)
@@ -263,6 +270,9 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 					} else {
 						info.Purpose = r.plan.Purpose
 						info.Note = r.plan.Note
+						if len(selected) > 0 && previous[r.sheet.Name].State != "recognized" {
+							info.State = "pending"
+						}
 						validSheets[r.sheet.Name] = true
 						b.Trace("analyze_sheet", r.sheet.Name, "", "succeeded", r.plan.Note)
 						for _, region := range regions {
