@@ -35,8 +35,16 @@ export type CmdbRevision=components['schemas']['CmdbRevision'];
 export type ChangeSet=components['schemas']['CmdbChangeSet'];
 export async function cmdbDrawerTab(project:string,id:string,tab:string,signal?:AbortSignal){const r=await cmdbFetch<any>(assetPath(id,project,'drawer/'+tab),'GET',undefined,signal);if(r.device)devices.set(r.device.id,r.device);for(const[key,rows]of Object.entries(r.resources||{}))resources.set(project+':'+id+':'+key,rows as Row[]);return r}
 
-let inventoryIdentity='';let inventoryPending:Promise<void>|null=null;
-export function refreshCanonicalInventory(force=false):Promise<void>{const session=identitySnapshot();if(!session||!realCmdbEnabled||!session.authorized_projects.length)return Promise.resolve();const key=session.user.id+':'+session.permission_revision+':'+JSON.stringify(session.grants);if(!force&&key===inventoryIdentity)return inventoryPending||Promise.resolve();inventoryIdentity=key;inventoryPending=cmdbFetch<{data:Record<string,Row[]>}>('inventory').then(result=>{if(identitySnapshot()?.user.id===session.user.id)installCanonicalInventory(result.data)}).catch(error=>{inventoryIdentity='';throw error}).finally(()=>{inventoryPending=null});return inventoryPending}
+let inventoryIdentity='';let inventoryPending:Promise<void>|null=null;let inventoryGeneration=0;
+function inventoryKey(session:NonNullable<ReturnType<typeof identitySnapshot>>){return session.user.id+':'+session.permission_revision+':'+JSON.stringify([session.grants,session.authorized_projects.map(p=>p.id)])}
+export function refreshCanonicalInventory(force=false):Promise<void>{
+ const session=identitySnapshot();
+ if(!session||!realCmdbEnabled||!session.authorized_projects.length){inventoryGeneration++;inventoryIdentity='';inventoryPending=null;if(realCmdbEnabled)installCanonicalInventory(Object.fromEntries(['servers','switches','gpus','nics','ports','switch_ports','optics','cables','racks','rack_placements'].map(k=>[k,[]])));return Promise.resolve()}
+ const key=inventoryKey(session);if(!force&&key===inventoryIdentity)return inventoryPending||Promise.resolve();
+ const generation=++inventoryGeneration;inventoryIdentity=key;
+ const pending=cmdbFetch<{data:Record<string,Row[]>}>('inventory').then(result=>{const current=identitySnapshot();if(generation===inventoryGeneration&&current&&inventoryKey(current)===key)installCanonicalInventory(result.data)}).catch(error=>{if(generation===inventoryGeneration)inventoryIdentity='';throw error}).finally(()=>{if(generation===inventoryGeneration)inventoryPending=null});
+ inventoryPending=pending;return pending
+}
 window.addEventListener('keel-inventory-published',()=>{void refreshCanonicalInventory(true).catch(()=>{})});
 
 export function cmdbAttributes(schema:CmdbSchema|undefined,kind:string){const fields=new Map<string,NonNullable<CmdbSchema['types'][number]>['attributes'][number]>();const seen=new Set<string>();function load(name:string){if(seen.has(name))return;seen.add(name);const t=schema?.types.find(t=>t.name===name);if(!t)return;if(t.extends)load(t.extends);for(const a of t.attributes)fields.set(a.name,a)}load(kind);return [...fields.values()]}
