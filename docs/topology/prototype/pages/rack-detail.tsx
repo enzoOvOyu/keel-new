@@ -4,6 +4,7 @@ import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/s
 import {Button,SearchBox} from '../shared';
 import {type Go} from '../model';
 import {rackApi,type Overlay,overlayLabels,shortPod} from '../rack/model';
+import {RoomGallery} from '../rack/RoomGallery';
 import {Elevation} from '../rack/Elevation';
 import {SpatialWorkspace} from '../rack/SpatialWorkspace';
 import '../rack/rack.css';
@@ -24,7 +25,7 @@ export default function RackPage({params,set,go}:Props){
   const snapshot=rackApi.snapshot(rackID);
   const pod=params.get('pod')||'',q=params.get('q')||'';
   const pods=[...new Set(rackApi.list().map(r=>r.fields.pod_id as string))];
-  function openRack(id:string,asset=''){set({view:'spatial',rack:id,asset,port:'',cable:'',tab:'asset'})}
+  function openRack(id:string,asset=''){set({view:'spatial',rack:id,asset,port:'',cable:'',tab:'asset',...(view==='gallery'&&overlay==='capacity'?{camera:'dual'}:{})})}
   return <div className="rack-viz">
     <div className="rv-commandbar"><h1 className="sr-page-title">Spatial Rack<span>机柜工程视图</span></h1>
       <div className="rv-segment" role="tablist" aria-label="机柜视图">{views.map(([key,label,Icon])=><button key={key} role="tab" aria-selected={view===key} onClick={()=>set({view:key,...(key==='spatial'?{rack:rackID}:{})})}><Icon size={14}/>{label}</button>)}</div>
@@ -34,7 +35,7 @@ export default function RackPage({params,set,go}:Props){
     </div>
     {view==='gallery'?<>
       <div className="rv-filterbar"><SearchBox value={q} onChange={q=>set({q})} placeholder="搜索机柜、设备、型号、SN"/><select aria-label="Pod 筛选" value={pod} onChange={e=>set({pod:e.target.value})}><option value="">所有 Pod</option>{pods.map(p=><option key={p} value={p}>{shortPod(p)}</option>)}</select><span className="spacer"/><OverlayControl value={overlay} onChange={overlay=>set({overlay})}/></div>
-      <Gallery q={q} pod={pod} overlay={overlay} current={rackID} onOpen={openRack}/>
+      {overlay==='capacity'?<RoomGallery q={q} pod={pod} current={rackID} params={params} set={set} onOpen={openRack}/>:<Gallery q={q} pod={pod} overlay={overlay} current={rackID} onOpen={openRack}/>}
     </>:!snapshot?<div className="rv-empty"><Database/><h2>找不到此机柜</h2><p>保留 URL 中的对象 ID，不替换成其他资产。</p><Button onClick={()=>set({view:'gallery',rack:'',asset:'',port:'',cable:''})}>返回机柜阵列</Button></div>:<><div className="sr-contextbar"><select aria-label="选择机柜" value={rackID} onChange={e=>openRack(e.target.value)}>{rackApi.list().map(r=><option key={r.id} value={r.id}>{r.name} · {shortPod(r.fields.pod_id)}</option>)}</select><span>{snapshot.height}U</span><span>{snapshot.items.length} 设备</span><span>{snapshot.layout?.occupied}U 登记占位</span><span className="spacer"/>{viewNotice&&<small role="status">{viewNotice}</small>}<OverlayControl value={overlay} onChange={overlay=>set({overlay})}/><Button aria-label="保存机柜视图" title="保存当前机柜、对象与视角" onClick={()=>{localStorage.setItem('keel.topology.prototype.rack-view',window.location.search);setViewNotice('视图已保存')}}><Bookmark size={14}/></Button><Button aria-label="恢复机柜视图" title="恢复已保存的机柜视图" onClick={()=>{const saved=localStorage.getItem('keel.topology.prototype.rack-view');if(saved!==null){const restored:Record<string,string>=Object.fromEntries([...params.keys()].map(k=>[k,'']));new URLSearchParams(saved).forEach((v,k)=>restored[k]=v);set(restored);setViewNotice('视图已恢复')}else setViewNotice('暂无保存视图')}}><RotateCcw size={14}/></Button></div><SpatialWorkspace key={rackID} {...{params,set,go,snapshot,overlay,selectedId}} onOpen={openRack}/></>}
     <Capabilities open={capabilities} close={()=>showCapabilities(false)}/>
   </div>

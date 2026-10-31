@@ -132,6 +132,22 @@ Spatial Rack
 - 不绘制假行列坐标；响应式阵列只是视图排版。
 - 零匹配显示空状态，保留筛选。返回阵列保持查询上下文。
 
+### 4.1a 机柜阵列 · 空间：机房 3D 总览
+
+入口：`/rack-detail?view=gallery&overlay=capacity`。本轮用户明确要求用整体机房俯视模型替换原“空间”模式的平面机柜卡片；资产、计算资源阵列及单柜双面工作台保留。
+
+参考 [Sunbird Data Center CMDB](https://www.sunbirddcim.com/data-center-cmdb) 中 **What You Can’t Get From Your Traditional IT CMDB** 的实际配图：中央整体机房、容量图层、选择关联右侧立面。借鉴信息组织与交互，不复制其截图、材质、设备图片或代码。
+
+- **主体**：独立 Three.js 0.187.0 / WebGL2 场景，正交相机提供 3D 俯视、垂直俯视；OrbitControls 旋转/平移/缩放，聚焦机柜和适配全局。按相机/选择/筛选/尺寸变化重绘，不持续空转。
+- **数据**：16 个机柜、64 台服务器、512 GPU、24 台交换机来自同一 `rackApi`。设备条带高度与位置复用既有 U/高度模型；容量按相同区间并集计算。未新增资产、机柜或业务 ID。
+- **排布边界**：现有数据只有 Pod 和机柜归属，无测绘 XY、机柜宽深、建筑轮廓。按稳定 ID 和 Pod 生成确定性的**示意排布**，过滤不改变剩余机柜坐标。地板网格、间距、机柜横向/深向代理外形仅为展示单位；不代表实际机房布局、通道宽度、冷热通道、实装或净空。不添加空调、PDU、消防、门窗等无来源对象。
+- **图层**：屋顶色带和容量条仅表达已登记 U 占用率（0–100%），不表示温度、健康或功耗。右栏明确实时观测未知。
+- **联动**：点击三维实体或机柜标签 → 高亮、右侧 U 容量/资源数量/立面/设备清单。双击机柜或点击详情动作 → 同一 rack ID 的双面工作台；点击右侧设备 → 同一资产；返回阵列保留空间模式和筛选。现有设备面板仍为登记索引，不冒充真实照片。
+- **状态**：空筛选在场景与详情区明确展示；不支持 WebGL2 时提示并允许通过上方“资产”返回已有阵列。选择、筛选和视角写入 URL，刷新可恢复；自由旋转/缩放作为临时视图状态。
+- **依赖隔离**：Three.js 和类型定义只安装在 `prototype/rack/room/`，不修改 dev/package.json 或生产页面；房间模块按需加载。单柜继续使用 React + SVG，未替换已完成几何与端接组件。
+
+未来只有经确认的 room 边界、坐标系统/单位、机柜 XY/朝向/外形与来源版本齐备后，才可通过 Adapter 启用“测绘布局”。当前不得将示意排布直接升级为实际坐标或施工依据。
+
 ### 4.2 Spatial Workspace 与 Precision Dual Elevation
 
 ```text
@@ -284,6 +300,7 @@ type DeviceGeometry = {
 |---|---|
 | Spatial Workspace 默认工程视图 | http://localhost:5181/rack-detail |
 | Rack Gallery 整体范围 | http://localhost:5181/rack-detail?view=gallery |
+| 机房 3D 空间总览 | http://localhost:5181/rack-detail?view=gallery&overlay=capacity |
 | Precision Dual Elevation | http://localhost:5181/rack-detail?view=spatial&rack=rack-0001&camera=dual |
 | 选择性分解 | http://localhost:5181/rack-detail?view=spatial&rack=rack-0001&asset=srv-0001&explode=1 |
 | 安装剖面 | http://localhost:5181/rack-detail?rack=rack-0001&asset=srv-0001&camera=section&tab=installation |
@@ -291,15 +308,16 @@ type DeviceGeometry = {
 | Mapping / 端接 | http://localhost:5181/rack-detail?rack=rack-0001&asset=srv-0001&camera=rear&tab=mapping |
 | Dual-State Comparison | 暂不开放入口；数据资格与分级设计见 §4.4 |
 
-实现：[页面](topology/prototype/pages/rack-detail.tsx)、[空间工作台](topology/prototype/rack/SpatialWorkspace.tsx)、[空间投影](topology/prototype/rack/SpatialScene.tsx)、[共享几何](topology/prototype/rack/geometry.ts)、[双面/Gallery](topology/prototype/rack/Elevation.tsx)、[Mapping/来源](topology/prototype/rack/Details.tsx)、[数据适配](topology/prototype/rack/model.ts)。React + SVG，没有增加图形依赖。
+实现：[页面](topology/prototype/pages/rack-detail.tsx)、[空间工作台](topology/prototype/rack/SpatialWorkspace.tsx)、[空间投影](topology/prototype/rack/SpatialScene.tsx)、[共享几何](topology/prototype/rack/geometry.ts)、[双面/Gallery](topology/prototype/rack/Elevation.tsx)、[Mapping/来源](topology/prototype/rack/Details.tsx)、[数据适配](topology/prototype/rack/model.ts)。单柜使用 React + SVG；机房空间模式按需加载隔离 Three.js，详见 §4.1a。
 
 ```bash
+npm ci --prefix docs/topology/prototype/rack/room # 首次安装隔离 3D 依赖
 node docs/topology/prototype/run.mjs        # 独立 5181
 node docs/topology/prototype/run.mjs check
 node docs/topology/prototype/run.mjs build
 ```
 
-URL 保留 `view/rack/asset/port/cable/tab/face/overlay/q/pod/camera/explode/isolate/cutaway`；旧 `view=dual` 链接继续打开双面，不失效。缩放/平移为当前相机局部状态，切换相机适配；未冒充 CMDB 位置。草稿继续隔离于 `keel.topology.prototype.rack-v2.*`，没有真实 CMDB 请求或写入。
+URL 保留 `view/rack/asset/port/cable/tab/face/overlay/q/pod/camera/roomCamera/explode/isolate/cutaway`；旧 `view=dual` 链接继续打开双面，不失效。缩放/平移为当前相机局部状态，切换相机适配；未冒充 CMDB 位置。草稿继续隔离于 `keel.topology.prototype.rack-v2.*`，没有真实 CMDB 请求或写入。
 
 ## 9. 实施顺序与验收标准
 
@@ -342,3 +360,9 @@ V1 历史检查保留在 [旧验证报告](rack-visualization/validation.md)。�
 本轮研究直接核对 [Rackula 碰撞计算](https://github.com/RackulaLives/Rackula/blob/main/src/lib/utils/collision.ts)、[Rackula 架构](https://github.com/RackulaLives/Rackula/blob/main/docs/reference/ARCHITECTURE.md)、[NetBox Device](https://netbox.readthedocs.io/en/stable/models/dcim/device/)、[Visual Explorer](https://netboxlabs.com/docs/visual-explorer/)、[Sunbird 可视化](https://www.sunbirddcim.com/product/data-center-visualization) 与 [Interactive Dynamics](https://idl.cs.washington.edu/files/2012-InteractiveDynamics-CACM.pdf)。它们分别约束几何、数据来源、空间表达与视图协同；不会因参考产品有照片或实时传感器就假定 Keel 也有。
 
 必要验证及截图见 [本轮自审记录](rack-visualization/review-v3.md)。精确面板素材、真实遥测、合格规划/实装配对、完整毫米级空间验收仍未具备；没有声称完成生产数字孪生。
+
+## 13. 机房空间模式增补（2026-10-31）
+
+- **D-RACK-06**：用户本轮授权机房级真实 3D 渲染，以隔离 Three.js 场景实现；D-RACK-03 的 SVG 选择继续适用于单柜工程工作台。两种尺度使用不同渲染器、共享资产数据，不重复建设 CMDB。
+- **D-RACK-07**：允许明确标注的示意空间排布用于原型交互；它不是经过确认的机房平面图，也不是规划快照。真实坐标缺口保持不变。
+- 必要检查、截图和限制见 [机房空间验证记录](rack-visualization/room-validation.md)。只验证当前 16 柜切片，不声称千卡级生产性能或完整机房数字孪生。

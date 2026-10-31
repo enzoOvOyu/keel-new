@@ -199,3 +199,5 @@ React Flow承载拓扑的缩放、平移、节点拖动、Minimap与自动布局
 Gallery 借鉴 NetBox 的系统登记数据可视化；Dual 借鉴 Rackula 的精确 U 坐标和撤销语义；Spatial 借鉴 Sunbird 的柜侧透视、安装对齐与容量/连接联动。多视图协调、语义缩放及选择性分解采用研究支持的交互，React + SVG 实现，各视角互补，不把缺失深度画成实物。实际研究范围、引用、许可边界和可运行入口统一见 [rack-visualization.md](rack-visualization.md)。不复制素材，不用旧 fixture 的 front 默认值补 CMDB 缺测。前文“机柜维持现状”仅指此前四页 V3 工作阶段。
 
 本轮机柜原型自审落实为业务视角：Front 查设备/型号/安装，Rear 查登记端口/Cable/对端；端口索引不得伪装成实物面板坐标。跨柜连接可按稳定 ID 定位，缺失端点显式终止。Dual-State Comparison 按确认规划与实际数据能力分级，缺合格快照隐藏入口。详细交互与验证见 [机柜设计 §12](rack-visualization.md#12-参考资料自审与本轮修正2026-10-31)。
+
+机柜阵列“空间”模式新增机房级 3D 俯视，参考 Sunbird Data Center CMDB 的整体机房/容量/选中柜立面联动；资产阵列和单柜 SVG 不替换。示意排布、正式坐标边界、Three.js 隔离依赖与操作规范统一见 [rack-visualization.md §4.1a](rack-visualization.md#41a-机柜阵列--空间机房-3d-总览)。

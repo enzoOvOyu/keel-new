@@ -1,0 +1,28 @@
+{
+  "at": "2026-10-31T04:36:52.652Z",
+  "scope": "isolated 16-rack room prototype",
+  "results": [
+    {
+      "name": "阵列空间按钮进入 WebGL2 三维场景；16柜/430U/512GPU来自原投影",
+      "status": "PASS"
+    },
+    {
+      "name": "实际点击三维机柜实体，经 Raycaster 选中同一 rack ID",
+      "status": "PASS"
+    },
+    {
+      "name": "机柜标签联动容量和立面；垂直俯视、聚焦、缩放、复位及URL恢复",
+      "status": "PASS"
+    },
+    {
+      "name": "Pod/设备搜索过滤；从机房下钻同机柜、同设备的原双面工作台",
+      "status": "PASS"
+    },
+    {
+      "name": "下钻后返回保持范围；空搜索显式提示；1440适配；资产阵列保留且离开后清理3D场景",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "business_api_requests": []
+}
