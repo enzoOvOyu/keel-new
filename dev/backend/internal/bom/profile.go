@@ -43,6 +43,16 @@ var canonicalFields = func() map[string]string {
 	return out
 }()
 
+// ImportFields is the authoritative vocabulary shared by AI planning and local validation.
+func ImportFields() []string {
+	out := []string{}
+	for _, f := range canonicalFields {
+		out = append(out, f)
+	}
+	sort.Strings(out)
+	return out
+}
+
 func Field(s string) string {
 	key := canonical(s)
 	if f := canonicalFields[key]; f != "" {
@@ -51,7 +61,7 @@ func Field(s string) string {
 	if f := aliases[key]; f != "" {
 		return f
 	}
-	extra := map[string]string{"物料名称": "name", "名称": "name", "描述": "description", "规格": "specification", "数量": "quantity", "单位": "unit", "品牌": "brand", "manufacturer": "brand", "qty": "quantity", "数量(台)": "quantity", "productname": "name", "物料描述": "description", "asidelablename": "endpoint_a_device", "zsidelablename": "endpoint_b_device", "本端设备名称": "endpoint_a_device", "对端设备名称": "endpoint_b_device", "本端端口名称": "endpoint_a_port", "对端端口名称": "endpoint_b_port", "a端口": "endpoint_a_port", "z端口": "endpoint_b_port", "cabletype": "media_type", "rackunit": "u_start", "uposition": "u_start", "uposiotion": "u_start", "racknumber": "rack", "rackno": "rack", "dcname": "site", "speed": "speed", "带宽": "speed", "u位": "u_start", "u数": "u_height", "parent": "parent_uid", "itemuid": "item_uid", "endpointauid": "endpoint_a_uid", "endpointbuid": "endpoint_b_uid", "modelversionref": "model_version_ref"}
+	extra := map[string]string{"线缆型号": "model", "cablemodel": "model", "本端模块型号": "endpoint_a_optic", "对端模块型号": "endpoint_b_optic", "线缆长度": "length", "物料名称": "name", "名称": "name", "描述": "description", "规格": "specification", "数量": "quantity", "单位": "unit", "品牌": "brand", "manufacturer": "brand", "qty": "quantity", "数量(台)": "quantity", "productname": "name", "物料描述": "description", "asidelablename": "endpoint_a_device", "zsidelablename": "endpoint_b_device", "本端设备名称": "endpoint_a_device", "对端设备名称": "endpoint_b_device", "本端端口名称": "endpoint_a_port", "对端端口名称": "endpoint_b_port", "a端口": "endpoint_a_port", "z端口": "endpoint_b_port", "cabletype": "media_type", "rackunit": "u_start", "uposition": "u_start", "uposiotion": "u_start", "racknumber": "rack", "rackno": "rack", "dcname": "site", "speed": "speed", "带宽": "speed", "u位": "u_start", "u数": "u_height", "parent": "parent_uid", "itemuid": "item_uid", "endpointauid": "endpoint_a_uid", "endpointbuid": "endpoint_b_uid", "modelversionref": "model_version_ref"}
 	return extra[key]
 }
 func Profiles(w Workbook) []Profile {

@@ -2,6 +2,7 @@ package bom
 
 import (
 	"encoding/json"
+	"fmt"
 	"sort"
 	"strconv"
 	"strings"
@@ -63,18 +64,24 @@ func LinkRecognizedRecords(b *Workbench) {
 	// Compare both source labels and resolved references in the same identity space.
 	aliases := map[string]map[string]bool{}
 	ids := map[string]bool{}
-	for _, r := range b.Records {
-		ids[r.ID] = true
-		for _, name := range []string{r.Item.Hostname, r.Item.Serial, r.Item.Fields["device_alias"]} {
-			if name == "" {
-				continue
+	rebuildAliases := func() {
+		aliases = map[string]map[string]bool{}
+		ids = map[string]bool{}
+		for _, r := range b.Records {
+			ids[r.ID] = true
+			for _, name := range []string{r.Item.Hostname, r.Item.Serial, r.Item.Fields["device_alias"]} {
+				if name == "" {
+					continue
+				}
+				if aliases[name] == nil {
+					aliases[name] = map[string]bool{}
+				}
+				aliases[name][r.ID] = true
 			}
-			if aliases[name] == nil {
-				aliases[name] = map[string]bool{}
-			}
-			aliases[name][r.ID] = true
 		}
 	}
+	rebuildAliases()
+
 	ownerID := func(name string) string {
 		if ids[name] {
 			return name
@@ -115,7 +122,17 @@ func LinkRecognizedRecords(b *Workbench) {
 						}
 					}
 					if old.ID != r.ID {
-						old.Raw = append(old.Raw, r.Raw...)
+						seen := map[string]bool{}
+						for _, c := range old.Raw {
+							seen[fmt.Sprint(c.Sheet, ":", c.Row, ":", c.Column)] = true
+						}
+						for _, c := range r.Raw {
+							key := fmt.Sprint(c.Sheet, ":", c.Row, ":", c.Column)
+							if !seen[key] {
+								old.Raw = append(old.Raw, c)
+								seen[key] = true
+							}
+						}
 					}
 					continue
 				}
@@ -128,6 +145,7 @@ func LinkRecognizedRecords(b *Workbench) {
 		merged = append(merged, r)
 	}
 	b.Records = merged
+	rebuildAliases()
 	// Explicit module models at cable ends describe modules on those owner ports, not extra unknown rows.
 	moduleKeys := map[string]bool{}
 	for _, r := range b.Records {

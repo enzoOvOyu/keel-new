@@ -39,6 +39,8 @@ func TestRecognizedGraphReplayPreservesModuleIdentity(t *testing.T) {
 		}
 	}
 	for pass := 0; pass < 3; pass++ {
+		// A second inventory row names the same source device on every replay.
+		b.Records = append(b.Records, ImportRecord{ID: "second-source-row", Raw: []Cell{{Sheet: "inventory", Row: 3, Column: 1, Ref: "A3", Value: "host-a"}}, Item: Item{UID: "second-source-row", Category: "server", Hostname: "host-a", Fields: map[string]string{}}})
 		LinkRecognizedRecords(&b)
 		if len(b.Records) != n {
 			t.Fatalf("pass %d changed graph size: %d != %d", pass, len(b.Records), n)
@@ -49,6 +51,9 @@ func TestRecognizedGraphReplayPreservesModuleIdentity(t *testing.T) {
 				t.Fatal("duplicate candidate ID")
 			}
 			seen[r.ID] = true
+			if r.ID == "device-a" && len(r.Raw) != 1 {
+				t.Fatal("replay duplicated immutable source evidence")
+			}
 		}
 		if !seen[module] {
 			t.Fatal("module identity changed after parent resolution")

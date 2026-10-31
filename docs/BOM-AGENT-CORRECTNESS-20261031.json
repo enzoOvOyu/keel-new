@@ -1,0 +1,93 @@
+{
+  "date": "2026-10-31",
+  "scope": "BOM AI recognition repeatability, source-field completeness and BOM/CMDB identity integrity",
+  "status": "DEVELOPMENT_FROZEN_AWAITING_USER_TEST",
+  "user_direction": "Stop repeated real-provider runs. User will schedule acceptance testing.",
+  "implemented": [
+    "Bounded single-agent loop supports read-only analyze_sheet, inspect_region, cross_sheet_resolve and independently validated submit_plan.",
+    "Supply field/type schema during generation; recover malformed JSON within the same bounded loop; retain local validation if the provider rejects schema format.",
+    "Validate source identity, model, endpoint and type coverage against immutable source rows. Feed cited source coordinates back into correction.",
+    "Reuse only structurally valid historical bindings; retain omitted validated bindings on the same source object, reject conflicting or regressive recipes.",
+    "Candidate IDs use source identity columns, not generated table names. Merge compatible recipes and deduplicate generated optic modules using canonical owner identity.",
+    "Preserve reviewed/imported/manual records; keep selected reanalysis scoped, avoid whole-workbook reconstruction on resume, preserve prior results on provider failure.",
+    "Preserve known categories on conflicting classification and require review; group model classification with source context.",
+    "Retain raw-source coordinates without repeatedly appending duplicate evidence during graph replay."
+  ],
+  "checks": {
+    "targeted_go_packages": {
+      "packages": [
+        "./cmd/api",
+        "./internal/ai",
+        "./internal/bom"
+      ],
+      "result": "PASS",
+      "note": "Completed before user requested testing stop; uses configured local Pydantic validator. Not business acceptance."
+    },
+    "cmdb_existing_committed_projection_replay": {
+      "test": "TestCommittedBOMProjectionReplay",
+      "result": "PASS",
+      "note": "Existing committed BOM, rolled-back PostgreSQL transaction; stable asset identities, two cable endpoints, one ingest event after replay."
+    },
+    "real_provider_source_checks": {
+      "files": [
+        "bomv1.xlsx",
+        "netbom.xlsx"
+      ],
+      "sheets": [
+        "Network Information",
+        "Server Information",
+        "Cabling_OOB",
+        "Cabling_NS"
+      ],
+      "result": "PARTIAL / FAILURES OBSERVED",
+      "note": "Some runs restored the 189 source switches per file and the previously omitted cable rows/fields. Repeated runs still included rejected model answers with wrong/missing column bindings or missing prior aliases. Do not claim all rounds passed or 100% accuracy. Successful extraction snapshots had no duplicate candidate IDs. Final follow-up changes have not undergone full real-provider acceptance."
+    },
+    "original_workbooks_formal_submission": {
+      "result": "NOT VERIFIED",
+      "note": "No new formal BOM/CMDB submission by this fix. Model approvals, source gaps and dependency-complete eligible selections remain acceptance prerequisites."
+    },
+    "ui_and_full_platform_regression": {
+      "result": "NOT RUN",
+      "note": "No frontend changes; no resumed full-platform smoke tests."
+    }
+  },
+  "findings": [
+    {
+      "id": "BOM-AI-001",
+      "implementation": "Schema constraints, bounded correction, legacy failed-plan rejection",
+      "acceptance": "PENDING_USER_TEST"
+    },
+    {
+      "id": "BOM-AI-002",
+      "implementation": "Source-based candidate IDs and canonical module/owner deduplication",
+      "acceptance": "TARGETED_CHECKS_PASS; FULL_ACCEPTANCE_PENDING"
+    },
+    {
+      "id": "BOM-AI-003",
+      "implementation": "Scoped replay, human-review preservation and classification conflict handling",
+      "acceptance": "TARGETED_CHECKS_PASS; FULL_ACCEPTANCE_PENDING"
+    },
+    {
+      "id": "BOM-AI-004",
+      "implementation": "Source-field/type coverage checks and non-regression of validated bindings",
+      "acceptance": "PENDING_USER_TEST; MODEL_INSTABILITY_OBSERVED"
+    },
+    {
+      "id": "BOM-CMDB-001",
+      "implementation": "Existing projection replay verified; do not weaken dependency, approval or evidence gates",
+      "acceptance": "ORIGINAL_FILE_COMMIT_AND_REPLAY_NOT_VERIFIED"
+    },
+    {
+      "id": "SOURCE-DATA-001",
+      "implementation": "Four previously identified Cabling_NS missing endpoint-inventory references remain source gaps; no invented devices",
+      "acceptance": "REQUIRES_SOURCE_CLARIFICATION"
+    }
+  ],
+  "local_evidence": {
+    "original_report": "/tmp/keel-bom-cmdb-test-20261031/REPORT.json",
+    "fix_attempts": "/tmp/keel-bom-agent-validation-20261031",
+    "note": "Private local evidence, not copied into Git. Contains intermediate failures and cached results; not an all-pass final report."
+  },
+  "runtime": "No service restart or formal asset migration performed by this fix. Current running service may still use the old binary.",
+  "next": "User schedules acceptance on a build of these commits; do not automatically restart paid-provider or import tests."
+}
