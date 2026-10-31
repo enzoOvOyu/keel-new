@@ -13,6 +13,7 @@ import (
 func inspectSourceCoverage(s bom.Sheet, p SheetPlan) error {
 	rows := bom.MergedSourceCells(s)
 	seen := map[string]bool{}
+	connections := map[string]bool{}
 	for _, t := range p.Tables {
 		if t.Kind == "reference" {
 			continue
@@ -26,6 +27,13 @@ func inspectSourceCoverage(s bom.Sheet, p SheetPlan) error {
 				return fmt.Errorf("DUPLICATE_SOURCE_OBJECT: row=%d; overlapping extractors produce the same source identity", row)
 			}
 			seen[key] = true
+			if t.Kind == "physical_connection" && t.Fields["endpoint_a_port"] > 0 && t.Fields["endpoint_b_port"] > 0 {
+				key := fmt.Sprint(row, ":", t.Fields["endpoint_a_port"], ":", t.Fields["endpoint_b_port"])
+				if connections[key] {
+					return fmt.Errorf("DUPLICATE_SOURCE_CONNECTION: row=%d column=%d; alternate device labels for the same source ports must not create another cable", row, t.Fields["endpoint_a_port"])
+				}
+				connections[key] = true
+			}
 		}
 	}
 	// Every otherwise extractable typed row must match an extractor. A new
@@ -122,6 +130,16 @@ func inspectSourceCoverage(s bom.Sheet, p SheetPlan) error {
 }
 
 func tableRowPresent(t TablePlan, cells map[int]bom.Cell) bool {
+	// A missing A end does not erase a row with an explicit B end. Such a
+	// cable remains visible and blocked until its missing endpoint is supplied.
+	if t.Kind == "physical_connection" {
+		for _, f := range []string{"endpoint_a_device", "endpoint_b_device", "endpoint_a_uid", "endpoint_b_uid"} {
+			if bom.ExtractCellValue(cells[t.Fields[f]], f) != "" {
+				return true
+			}
+		}
+		return false
+	}
 	for _, f := range t.Required {
 		if bom.ExtractCellValue(cells[t.Fields[f]], f) == "" {
 			return false
@@ -134,6 +152,9 @@ func tableRowPresent(t TablePlan, cells map[int]bom.Cell) bool {
 	}
 	return false
 }
+
+// The local extractor and independent checker must use the same row predicate.
+func TableRowPresent(t TablePlan, cells map[int]bom.Cell) bool { return tableRowPresent(t, cells) }
 
 func tableTypeMatches(t TablePlan, cells map[int]bom.Cell) bool {
 	if t.TypeColumn == 0 {

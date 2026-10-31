@@ -116,3 +116,66 @@ func TestCableEndpointRemovalCannotBypassIntegrityFromPort(t *testing.T) {
 		t.Fatalf("single cable-end removal must be blocked, got %v", e)
 	}
 }
+
+// Synthetic, isolated project; every write is rolled back. Exercise the actual
+// topology SQL used by physical graphs, connection lists, matrices and traces.
+func TestPhysicalComponentOwnerQuery(t *testing.T) {
+	if os.Getenv("KEEL_CMDB_INTEGRATION") != "1" {
+		t.Skip("explicit local PostgreSQL integration run required")
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	db, e := pgxpool.New(ctx, os.Getenv("DATABASE_URL"))
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer db.Close()
+	tx, e := db.Begin(ctx)
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer tx.Rollback(ctx)
+	project := "test-bom-root-" + uuid.NewString()
+	if _, e = tx.Exec(ctx, "INSERT INTO project(id,name,code) VALUES($1,'独立测试-事务回滚-BOM拓扑',$1)", project); e != nil {
+		t.Fatal(e)
+	}
+	for id, kind := range map[string]string{"port": "port", "gpu": "gpu", "server-a": "server", "server-b": "server"} {
+		if _, e = tx.Exec(ctx, "INSERT INTO cmdb_entity(item_uid,asset_type,name,payload,source_ref) VALUES($1,$2,$2,'{}','synthetic-root-regression')", project+id, kind); e != nil {
+			t.Fatal(e)
+		}
+		if _, e = tx.Exec(ctx, "INSERT INTO cmdb_asset_scope(project_id,asset_id,source_ref) VALUES($1,$2,'synthetic-root-regression')", project, project+id); e != nil {
+			t.Fatal(e)
+		}
+	}
+	link := func(a, b string) {
+		t.Helper()
+		if _, e := tx.Exec(ctx, "INSERT INTO cmdb_relationship(from_uid,to_uid,kind,definition_id,project_id,source_ref) VALUES($1,$2,'contains','contains',$3,'synthetic-root-regression')", project+a, project+b, project); e != nil {
+			t.Fatal(e)
+		}
+	}
+	owner := func(scope Scope) string {
+		t.Helper()
+		var value string
+		args := append(scope.Args(), "", project+"port")
+		if e := tx.QueryRow(ctx, visualCTE()+"SELECT COALESCE((SELECT id FROM owner WHERE port_id=$4),'')", args...).Scan(&value); e != nil {
+			t.Fatal(e)
+		}
+		return value
+	}
+	scope := Scope{Projects: []string{project}}
+	link("gpu", "port")
+	if owner(scope) != project+"gpu" {
+		t.Fatal("component-owned port missing from topology query")
+	}
+	if owner(Scope{Projects: []string{"unrelated-project"}}) != "" {
+		t.Fatal("component owner crossed project scope")
+	}
+	link("server-a", "gpu")
+	if owner(scope) != project+"server-a" {
+		t.Fatal("enclosing device precedence changed")
+	}
+	link("server-b", "gpu")
+	if owner(scope) != "" {
+		t.Fatal("ambiguous ownership was hidden by component fallback")
+	}
+}

@@ -147,6 +147,7 @@ func (p *Provider) PlanSheetWithWorkbook(ctx context.Context, ir *bom.WorkbookIR
 		toolSheet, exists := ir.AnalyzeSheet(request.Sheet)
 		var output any
 		var toolErr error
+		var remaining map[string]int
 		region := ""
 		if !exists {
 			toolErr = errors.New("UNKNOWN_SOURCE_SHEET")
@@ -155,9 +156,25 @@ func (p *Provider) PlanSheetWithWorkbook(ctx context.Context, ir *bom.WorkbookIR
 			case "analyze_sheet":
 				output = describeSheet(toolSheet, true)
 			case "inspect_region":
-				if request.Start < 1 || request.End < request.Start || request.End-request.Start >= 16 || request.First < 1 || request.Last < request.First || request.Last-request.First >= 64 || request.Last > 512 {
-					toolErr = errors.New("REGION_OUT_OF_BOUNDS: use at most 16 rows and 64 columns")
+				if request.Start < 1 || request.End < request.Start || request.First < 1 || request.Last < request.First || request.First > 512 {
+					toolErr = errors.New("REGION_OUT_OF_BOUNDS: positive ordered rows/columns required; first_column <= 512")
 					break
+				}
+				// Serve a bounded page of an oversized read, with explicit
+				// continuation. Do not burn the agent's budget rejecting a
+				// request to inspect the complete inventory.
+				end, last := request.End, request.Last
+				if request.End-request.Start >= 16 {
+					request.End = request.Start + 15
+				}
+				if request.Last-request.First >= 64 {
+					request.Last = request.First + 63
+				}
+				if request.Last > 512 {
+					request.Last = 512
+				}
+				if request.End != end || request.Last != last {
+					remaining = map[string]int{"requested_end_row": end, "requested_last_column": last, "returned_end_row": request.End, "returned_last_column": request.Last}
 				}
 				region = fmt.Sprintf("R%dC%d:R%dC%d", request.Start, request.First, request.End, request.Last)
 				cells := ir.InspectRegion(bom.Region{Sheet: request.Sheet, Start: request.Start, End: request.End, FirstColumn: request.First, LastColumn: request.Last})
@@ -179,7 +196,7 @@ func (p *Provider) PlanSheetWithWorkbook(ctx context.Context, ir *bom.WorkbookIR
 			continue
 		}
 		trace(request.Action, request.Sheet, region, "succeeded", "read sanitized immutable Workbook IR")
-		history = append(history, map[string]any{"action": request.Action, "sheet_name": request.Sheet, "region": region, "result": output})
+		history = append(history, map[string]any{"action": request.Action, "sheet_name": request.Sheet, "region": region, "result": output, "truncated": remaining != nil, "continuation": remaining})
 	}
 	if err == nil {
 		err = errors.New("AGENT_TURN_LIMIT")

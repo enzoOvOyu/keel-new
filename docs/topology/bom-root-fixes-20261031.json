@@ -1,0 +1,127 @@
+{
+  "status": "IMPLEMENTED_TARGETED_CHECKS_PASS",
+  "recorded_at": "2026-10-31T09:14:55.767098+00:00",
+  "branch": "fix/bom-acceptance-root-causes",
+  "base_commit": "148b88d",
+  "agent_version": "workbook-agent/v5",
+  "deployment": "NOT_DEPLOYED; existing service and test batches unchanged",
+  "findings": [
+    {
+      "id": "BT-001",
+      "software_status": "FIXED",
+      "resolution": "表头修正后重算行资格；身份脱敏保留空值；超大 IR 请求返回受限页及续读坐标；旧保存方案的空集合恢复不再永久失败。"
+    },
+    {
+      "id": "BT-002",
+      "software_status": "FIXED",
+      "resolution": "原始行占位键不复用光模块键；恢复同 ID 同事实重复候选，冲突保留歧义；先合并设备再合并部件并更新引用；首次关联即补齐来源明确的光模块型号及归属。"
+    },
+    {
+      "id": "BT-003",
+      "software_status": "FIXED",
+      "resolution": "纠正设备标签/端口 UID、模块型号/波长、序号/父实体等错误绑定；合并兼容提取片段；拒绝同源端口重复线缆；保护已确认/人工/已入库记录。"
+    },
+    {
+      "id": "BT-004",
+      "software_status": "FIXED",
+      "resolution": "空 record_ids 保持整批语义；全批继续可本地重放有效保存方案并恢复 pending；局部任务冻结来源坐标，不将未全面应用的新方案标成整表完成。"
+    },
+    {
+      "id": "BT-005",
+      "software_status": "SOFTWARE_DEPENDENCIES_FIXED_EXTERNAL_EVIDENCE_PENDING",
+      "resolution": "去除线缆伪父引用；GPU/NIC/BMC/PSU 等具名物理部件可拥有明确端口，保持资产类型；拓扑优先真实上级设备，否则保留明确部件归属，歧义/授权继续校验。4 条来源依赖缺失及型号审批、单位、尺寸等门禁仍保留。"
+    },
+    {
+      "id": "BT-006",
+      "software_status": "INVALID_PHYSICAL_RECIPE_REJECTED",
+      "resolution": "P2P-18 保存方案缺少明确物理端口，不再允许当作 432 条实物线缆；原始数量/估算证据保留，正确参考/物料方案和人工处置仍待后续验收。"
+    }
+  ],
+  "offline_replay": {
+    "method": "Original local XLSX plus already saved proposals, replayed through the corrected interpreter. No provider or database calls. This is deterministic recovery, not fresh model accuracy.",
+    "files": [
+      {
+        "file": "bomv1.xlsx",
+        "switch_inventory": 189,
+        "physical_cable_candidates": 7154,
+        "resolved_cable_port_pairs": 7150,
+        "unresolved_cable_port_pairs": 4,
+        "phantom_cable_parents": 0,
+        "ns_row3_cables": 1,
+        "source_cells": 162715,
+        "retained_cells": 162715,
+        "accepted_saved_sheet_plans": 14,
+        "rejected_saved_sheet_plans": [
+          "P2P-18"
+        ],
+        "unique_candidate_ids": true,
+        "linker_replay_identity_set_stable": true,
+        "records": 37136
+      },
+      {
+        "file": "netbom.xlsx",
+        "switch_inventory": 189,
+        "physical_cable_candidates": 7154,
+        "resolved_cable_port_pairs": 7150,
+        "unresolved_cable_port_pairs": 4,
+        "phantom_cable_parents": 0,
+        "ns_row3_cables": 1,
+        "source_cells": 162715,
+        "retained_cells": 162715,
+        "accepted_saved_sheet_plans": 14,
+        "rejected_saved_sheet_plans": [
+          "P2P-18"
+        ],
+        "unique_candidate_ids": true,
+        "linker_replay_identity_set_stable": true,
+        "records": 37170
+      }
+    ]
+  },
+  "checks": [
+    {
+      "command": "KEEL_BOM_PYTHON=<local validator> go test ./cmd/api ./internal/ai ./internal/bom ./internal/cmdb",
+      "result": "PASS",
+      "notes": "Opt-in real-provider/database tests skipped here; actual opt-in executions listed below."
+    },
+    {
+      "command": "KEEL_BOM_SOURCE_DIR=<private path> KEEL_BOM_SAVED_EVIDENCE=<private path> KEEL_BOM_PYTHON=<local validator> go test ./cmd/api -run TestLocalSavedWorkbookRepair -v -count=1",
+      "result": "PASS",
+      "provider_calls": 0,
+      "database_writes": 0
+    },
+    {
+      "command": "KEEL_CMDB_INTEGRATION=1 go test ./internal/cmdb -run 'TestCommittedBOMProjectionReplay|TestVisualizationFullProjectionBoundaries|TestPhysicalComponentOwnerQuery' -v -count=1",
+      "result": "PASS",
+      "notes": "Existing synthetic projection control and an isolated synthetic project in a rolled-back transaction; no persisted test assets."
+    },
+    {
+      "command": "node dev/scripts/check-real-api-docs.mjs",
+      "result": "PASS: 5 registered operations; no service calls"
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS"
+    },
+    {
+      "command": "go build -o /tmp/keel-api-agent-root-fix-1031 ./cmd/api",
+      "result": "PASS"
+    }
+  ],
+  "private_evidence": [
+    "/tmp/keel-bom-root-evidence/offline-replay.log",
+    "/tmp/keel-bom-root-evidence/cmdb-integration.log"
+  ],
+  "limitations": [
+    "No new external AI calls or fresh model accuracy benchmark.",
+    "No formal submission of the two original workbooks; actual-file published topology and browser rendering acceptance NOT RUN.",
+    "Existing independent test projects remain unchanged for user cleanup.",
+    "No XLSX, raw rows, identities or credentials committed.",
+    "No API payload/schema changes or database migrations; asset categories and approval gates preserved."
+  ],
+  "prepared_binary": {
+    "path": "/tmp/keel-api-agent-root-fix-1031",
+    "sha256": "9741d4507f58f00379cfea472ad97b07a95ec34f87de42253e8cb5d6bd819dc8",
+    "running": false
+  }
+}

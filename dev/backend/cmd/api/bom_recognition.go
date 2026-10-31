@@ -54,6 +54,12 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 	for _, v := range selectedIDs {
 		selected[v] = true
 	}
+	affected := map[string]bool{}
+	for _, r := range b.Records {
+		if selected[r.ID] {
+			affected[fmt.Sprint(r.Sheet, ":", r.Row)] = true
+		}
+	}
 	var raw []byte
 	var wb bom.Workbook
 	if err == nil {
@@ -94,6 +100,7 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 	b.Provider = providerID
 	b.Error = ""
 	previous := map[string]bom.RecognitionSheet{}
+	validSheets := map[string]bool{}
 	for _, info := range b.Sheets {
 		previous[info.Name] = info
 	}
@@ -112,11 +119,10 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 			info = bom.RecognitionSheet{Name: sheet.Name, State: "pending"}
 		}
 		// Resume persisted successful extraction after a worker restart.
-		if resume && len(selected) == 0 && wanted[sheet.Name] && info.State == "recognized" {
-			if _, restoreErr := ai.RestoreExtraction(sheet, info.Plan); restoreErr == nil {
+		if resume && len(selected) == 0 && wanted[sheet.Name] {
+			if restoreWholeSheet(&b, sheet, &info) {
+				validSheets[sheet.Name] = true
 				delete(wanted, sheet.Name)
-			} else {
-				wanted[sheet.Name] = true
 			}
 		}
 		if wanted[sheet.Name] {
@@ -149,7 +155,6 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 		safeWorkbook.Sheets = append(safeWorkbook.Sheets, safeSheet(sh))
 	}
 	safeIR := bom.NewWorkbookIR(safeWorkbook)
-	validSheets := map[string]bool{}
 	var planning ai.PlanningContext
 	json.Unmarshal(b.Analysis, &planning)
 	if err == nil && planning.Summary == "" {
@@ -195,7 +200,7 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 					adapter.TotalInputTokens = 0
 					adapter.TotalOutputTokens = 0
 					var prior *ai.SheetPlan
-					if saved, restoreErr := ai.RestoreExtractionBindings(sheet, previous[sheet.Name].Plan); restoreErr == nil && len(saved.Tables) > 0 {
+					if saved, restoreErr := ai.RestoreExtraction(sheet, previous[sheet.Name].Plan); restoreErr == nil && len(saved.Tables) > 0 {
 						prior = &saved
 					}
 					plan, e := adapter.PlanSheetWithWorkbook(workCtx, safeIR, sheet.Name, planning, prior)
@@ -270,8 +275,13 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 					} else {
 						info.Purpose = r.plan.Purpose
 						info.Note = r.plan.Note
-						if len(selected) > 0 && previous[r.sheet.Name].State != "recognized" {
+						if len(selected) > 0 {
+							// A partial pass does not prove the persisted whole-sheet
+							// plan was applied, even if the old sheet was recognized.
 							info.State = "pending"
+							if old, e := ai.RestoreExtraction(r.sheet, previous[r.sheet.Name].Plan); e == nil && previous[r.sheet.Name].State == "recognized" && ai.SameExtraction(old, r.plan) {
+								info.State = "recognized"
+							}
 						}
 						validSheets[r.sheet.Name] = true
 						b.Trace("analyze_sheet", r.sheet.Name, "", "succeeded", r.plan.Note)
@@ -308,12 +318,6 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 	if err == nil {
 		b.Phase = "classifying"
 		save(false)
-		affected := map[string]bool{}
-		for _, r := range b.Records {
-			if selected[r.ID] {
-				affected[fmt.Sprint(r.Sheet, ":", r.Row)] = true
-			}
-		}
 		groups := map[int][]int{}
 		groupIDs := map[string]int{}
 		descriptions := []ai.Description{}
@@ -433,7 +437,7 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 		state = "failed"
 		code = "PARTIAL_SHEET_RECOGNITION"
 	}
-	diag := map[string]any{"schema_version": "workbook-agent/v4", "prompt_version": "workbook-agent/v4", "provider_id": providerID, "completed_sheets": completed, "failed_sheets": failed, "total_sheets": len(b.Sheets), "records": len(b.Records), "model_calls": calls, "input_tokens": inputTokens, "output_tokens": outputTokens, "duration_ms": time.Since(started).Milliseconds(), "error_code": code, "raw_response_stored": false}
+	diag := map[string]any{"schema_version": "workbook-agent/v5", "prompt_version": "workbook-agent/v5", "provider_id": providerID, "completed_sheets": completed, "failed_sheets": failed, "total_sheets": len(b.Sheets), "records": len(b.Records), "model_calls": calls, "input_tokens": inputTokens, "output_tokens": outputTokens, "duration_ms": time.Since(started).Milliseconds(), "error_code": code, "raw_response_stored": false}
 	if provider != nil {
 		diag["model"] = provider.Model
 		diag["provider_revision"] = provider.ConfigRevision
@@ -441,6 +445,20 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 	diagnostic, _ := json.Marshal(diag)
 	s.db.Exec(ctx, "UPDATE bom_job SET status=$2,error_code=$3,result=$4,updated_at=now() WHERE id=$1", job, state, code, diagnostic)
 	s.db.Exec(ctx, "INSERT INTO ai_task(id,import_id,mode,task,status,diagnostic) VALUES($1,$2,'provider','records',$3,$4)", uuid.NewString(), id, state, diagnostic)
+}
+
+// A validated saved recipe may have been applied only to selected rows (or
+// incorrectly marked pending by an older worker). Full resume applies it to
+// every source row locally before marking the sheet complete.
+func restoreWholeSheet(b *bom.Workbench, sheet bom.Sheet, info *bom.RecognitionSheet) bool {
+	plan, err := ai.RestoreExtraction(sheet, info.Plan)
+	if err != nil {
+		return false
+	}
+	b.Records = extractWithTools(b, sheet, plan, nil)
+	info.State, info.Error = "recognized", ""
+	info.Plan, _ = json.Marshal(plan)
+	return true
 }
 
 func safeSheet(sheet bom.Sheet) bom.Sheet {
@@ -458,7 +476,7 @@ func safeSheet(sheet bom.Sheet) bom.Sheet {
 		c := &safe.Cells[k]
 		if c.Sensitive {
 			c.Value = ""
-		} else if identityCols[c.Column] && bom.Field(c.Value) == "" {
+		} else if identityCols[c.Column] && bom.Field(c.Value) == "" && bom.ExtractCellValue(*c, "serial") != "" {
 			c.Value = "[IDENTITY]"
 		}
 	}
@@ -485,6 +503,10 @@ func applySheetPlan(records []bom.ImportRecord, sheet bom.Sheet, plan ai.SheetPl
 		}
 	}
 	selectedRows := map[int]bool{}
+	sourceRows := map[int]bom.ImportRecord{}
+	for _, r := range bom.PlanningSourceRows(bom.Workbook{Sheets: []bom.Sheet{sheet}}).Records {
+		sourceRows[r.Row] = r
+	}
 	protected := map[string]bool{}
 	priorIDs := map[string]string{}
 	for _, old := range records {
@@ -533,6 +555,10 @@ func applySheetPlan(records []bom.ImportRecord, sheet bom.Sheet, plan ai.SheetPl
 			continue
 		}
 		seenRows[record.Row] = true
+		// A surviving derived optic/port or an old extracted entity cannot be
+		// reused as the raw-row placeholder. Its ID may be regenerated later.
+		rawRow := sourceRows[record.Row]
+		record.Raw, record.Original = rawRow.Raw, rawRow.Original
 		record.HeaderContext = headers
 		record.Method = "provider"
 		record.Recognition = "unrecognized"
@@ -574,13 +600,7 @@ func applySheetPlan(records []bom.ImportRecord, sheet bom.Sheet, plan ai.SheetPl
 						sources[f] = c
 					}
 				}
-				valid := true
-				for _, key := range t.Required {
-					if fields[key] == "" {
-						valid = false
-					}
-				}
-				if !valid || len(fields) == 0 {
+				if !ai.TableRowPresent(t, cells[record.Row]) || len(fields) == 0 {
 					continue
 				}
 				kind := t.Type
@@ -634,6 +654,7 @@ func applySheetPlan(records []bom.ImportRecord, sheet bom.Sheet, plan ai.SheetPl
 			}
 		}
 		if len(matches) == 0 {
+			record.ID = rawRow.ID
 			record.Item = bom.Item{UID: record.ID, Sheet: record.Sheet, Status: "planned", Category: "other", Fields: map[string]string{"category": "other"}, Sources: map[string]bom.Cell{}}
 			record.Confidence = nil
 			record.Ambiguity = false

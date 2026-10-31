@@ -3,6 +3,7 @@ package bom
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"sort"
 	"strconv"
 	"strings"
@@ -61,6 +62,24 @@ func LinkRecognizedRecords(b *Workbench) {
 			}
 		}
 	}()
+	// Recover identical persisted duplicates before using candidate IDs as map
+	// keys. Never resolve a conflicting duplicate by last-writer-wins.
+	unique := []ImportRecord{}
+	positions := map[string]int{}
+	for _, r := range b.Records {
+		if n, exists := positions[r.ID]; exists {
+			old := &unique[n]
+			if reflect.DeepEqual(old.Item, r.Item) && !r.Imported && !r.Confirmed && !r.Ignored && r.Method != "manual" {
+				mergeSourceEvidence(old, r)
+				continue
+			}
+			old.Ambiguity, r.Ambiguity = true, true
+		} else {
+			positions[r.ID] = len(unique)
+		}
+		unique = append(unique, r)
+	}
+	b.Records = unique
 	// Compare both source labels and resolved references in the same identity space.
 	aliases := map[string]map[string]bool{}
 	ids := map[string]bool{}
@@ -94,63 +113,89 @@ func LinkRecognizedRecords(b *Workbench) {
 		return name
 	}
 
-	merged := []ImportRecord{}
-	indices := map[string]int{}
-	for _, r := range b.Records {
-		key := ""
-		if !r.Imported && !r.Ignored && !r.Confirmed && r.Method != "manual" && r.Item.Hostname != "" && (r.Item.Category == "server" || r.Item.Category == "switch" || r.Item.Category == "router") {
-			key = r.Item.Category + ":" + r.Item.Hostname
-		}
-		if !r.Imported && !r.Ignored && !r.Confirmed && r.Method != "manual" && (r.Item.Category == "optic_module" || r.Item.Category == "electrical_module") && r.Item.Fields["record_kind"] != "material_summary" && r.Item.Parent != "" && r.Item.Port != "" {
-			key = r.Item.Category + ":" + ownerID(r.Item.Parent) + ":" + r.Item.Port
-		}
-		if key != "" {
-			if n, ok := indices[key]; ok {
-				old := &merged[n]
-				conflict := false
-				for _, field := range []string{"serial", "model", "rack", "site"} {
-					a, c := old.Item.Fields[field], r.Item.Fields[field]
-					if a != "" && c != "" && a != c {
-						conflict = true
-					}
-				}
-				if !conflict {
-					for f, v := range r.Item.Fields {
-						if old.Item.Fields[f] == "" {
-							old.Item.Fields[f] = v
-							old.Item.Sources[f] = r.Item.Sources[f]
+	redirects := map[string]string{}
+	// Resolve inventory identities first. Component keys must see the final
+	// owner identity rather than an inventory row removed in this same pass.
+	for _, phase := range []string{"devices", "components"} {
+		merged := []ImportRecord{}
+		indices := map[string]int{}
+		for _, r := range b.Records {
+			key := ""
+			if phase == "devices" && !r.Imported && !r.Ignored && !r.Confirmed && r.Method != "manual" && r.Item.Hostname != "" && (r.Item.Category == "server" || r.Item.Category == "switch" || r.Item.Category == "router") {
+				key = r.Item.Category + ":" + r.Item.Hostname
+			}
+			if phase == "components" && !r.Imported && !r.Ignored && !r.Confirmed && r.Method != "manual" && (r.Item.Category == "optic_module" || r.Item.Category == "electrical_module") && r.Item.Fields["record_kind"] != "material_summary" && r.Item.Parent != "" && r.Item.Port != "" {
+				key = r.Item.Category + ":" + ownerID(r.Item.Parent) + ":" + r.Item.Port
+			}
+			if key != "" {
+				if n, ok := indices[key]; ok {
+					old := &merged[n]
+					conflict := false
+					for _, field := range []string{"serial", "model", "rack", "site"} {
+						a, c := old.Item.Fields[field], r.Item.Fields[field]
+						if a != "" && c != "" && a != c {
+							conflict = true
 						}
 					}
-					if old.ID != r.ID {
-						seen := map[string]bool{}
-						for _, c := range old.Raw {
-							seen[fmt.Sprint(c.Sheet, ":", c.Row, ":", c.Column)] = true
+					if !conflict {
+						if old.Item.Fields == nil {
+							old.Item.Fields = map[string]string{}
 						}
-						for _, c := range r.Raw {
-							key := fmt.Sprint(c.Sheet, ":", c.Row, ":", c.Column)
-							if !seen[key] {
-								old.Raw = append(old.Raw, c)
-								seen[key] = true
+						if old.Item.Sources == nil {
+							old.Item.Sources = map[string]Cell{}
+						}
+						for f, v := range r.Item.Fields {
+							if old.Item.Fields[f] == "" {
+								old.Item.Fields[f] = v
+								old.Item.Sources[f] = r.Item.Sources[f]
 							}
 						}
+						if old.Item.Model == "" {
+							old.Item.Model = r.Item.Model
+						}
+						if old.Item.Serial == "" {
+							old.Item.Serial = r.Item.Serial
+						}
+						mergeSourceEvidence(old, r)
+						redirects[r.ID] = old.ID
+						continue
 					}
-					continue
+					old.Ambiguity = true
+					r.Ambiguity = true
+				} else {
+					indices[key] = len(merged)
 				}
-				old.Ambiguity = true
-				r.Ambiguity = true
-			} else {
-				indices[key] = len(merged)
+			}
+			merged = append(merged, r)
+		}
+		b.Records = merged
+		for j := range b.Records {
+			r := &b.Records[j]
+			if r.Imported || r.Confirmed || r.Ignored || r.Method == "manual" {
+				continue
+			}
+			for _, ref := range []struct {
+				value *string
+				field string
+			}{{&r.Item.Parent, "parent_uid"}, {&r.Item.A, "endpoint_a_uid"}, {&r.Item.B, "endpoint_b_uid"}} {
+				if to := redirects[*ref.value]; to != "" && to != *ref.value {
+					*ref.value = to
+					r.Item.Fields[ref.field] = to
+				}
+			}
+			if to := redirects[r.Item.Fields["port_uid"]]; to != "" {
+				r.Item.Fields["port_uid"] = to
 			}
 		}
-		merged = append(merged, r)
+		rebuildAliases()
 	}
-	b.Records = merged
-	rebuildAliases()
 	// Explicit module models at cable ends describe modules on those owner ports, not extra unknown rows.
 	moduleKeys := map[string]bool{}
-	for _, r := range b.Records {
+	modulesByPort := map[string][]int{}
+	for j, r := range b.Records {
 		if r.Item.Category == "optic_module" || r.Item.Category == "electrical_module" {
 			moduleKeys[ownerID(r.Item.Parent)+":"+r.Item.Port+":"+r.Item.Model] = true
+			modulesByPort[ownerID(r.Item.Parent)+":"+r.Item.Port] = append(modulesByPort[ownerID(r.Item.Parent)+":"+r.Item.Port], j)
 		}
 	}
 	add := []ImportRecord{}
@@ -171,7 +216,35 @@ func LinkRecognizedRecords(b *Workbench) {
 				continue
 			}
 			moduleKeys[key] = true
+			if existing := modulesByPort[ownerID(owner)+":"+port]; len(existing) == 1 {
+				old := &b.Records[existing[0]]
+				if old.Item.Model == "" && !old.Imported && !old.Confirmed && !old.Ignored && old.Method != "manual" {
+					// The AI may extract an explicit port module without its
+					// model. Enrich that same source-backed object immediately;
+					// don't create another module for the next pass to merge.
+					old.Item.Model = model
+					if old.Item.Fields == nil {
+						old.Item.Fields = map[string]string{}
+					}
+					if old.Item.Sources == nil {
+						old.Item.Sources = map[string]Cell{}
+					}
+					old.Item.Fields["model"], old.Item.Sources["model"] = model, r.Item.Sources[f]
+					mergeSourceEvidence(old, r)
+					continue
+				}
+			}
 			id := StableID("module-candidate:" + key)
+			if ids[id] {
+				// An older conflicting candidate already owns this ID. Keep
+				// the evidence blocked rather than append a duplicate identity.
+				for j := range b.Records {
+					if b.Records[j].ID == id {
+						b.Records[j].Ambiguity = true
+					}
+				}
+				continue
+			}
 			fields := map[string]string{"category": "optic_module", "record_kind": "component", "name": model, "model": model, "parent_uid": owner, "port_index": port}
 			sources := map[string]Cell{"name": r.Item.Sources[f], "model": r.Item.Sources[f], "parent_uid": r.Item.Sources["endpoint_"+side+"_device"], "port_index": r.Item.Sources["endpoint_"+side+"_port"]}
 			add = append(add, ImportRecord{ID: id, Sheet: r.Sheet, Row: r.Row, Raw: r.Raw, Original: owner + " / " + port + " / " + model, Item: Item{UID: id, Sheet: r.Sheet, Category: "optic_module", Model: model, Parent: owner, Port: port, Fields: fields, Sources: sources}, Recognition: "recognized", Method: "source_relation", Confidence: r.Confidence, Reason: "来自布线明细的端口光模块型号；规划关系，尚未声明实物 SN", Issues: []Issue{}})
@@ -214,16 +287,18 @@ func LinkRecognizedRecords(b *Workbench) {
 	}
 	items = ResolveWorkbench(items)
 	byID := map[string]Item{}
+	idCounts := map[string]int{}
 	ports := map[string][]string{}
 	for _, i := range items {
 		byID[i.UID] = i
+		idCounts[i.UID]++
 		if i.Category == "port" {
 			ports[i.Parent+":"+i.Port] = append(ports[i.Parent+":"+i.Port], i.UID)
 		}
 	}
 	for j := range b.Records {
 		r := &b.Records[j]
-		if i, ok := byID[r.ID]; ok {
+		if i, ok := byID[r.ID]; ok && idCounts[r.ID] == 1 {
 			r.Item = i
 		}
 		if r.Item.Category == "optic_module" || r.Item.Category == "electrical_module" {
@@ -231,6 +306,20 @@ func LinkRecognizedRecords(b *Workbench) {
 			if len(p) == 1 {
 				r.Item.Fields["port_uid"] = p[0]
 			}
+		}
+	}
+}
+
+func mergeSourceEvidence(dst *ImportRecord, src ImportRecord) {
+	seen := map[string]bool{}
+	for _, c := range dst.Raw {
+		seen[fmt.Sprint(c.Sheet, ":", c.Row, ":", c.Column)] = true
+	}
+	for _, c := range src.Raw {
+		key := fmt.Sprint(c.Sheet, ":", c.Row, ":", c.Column)
+		if !seen[key] {
+			dst.Raw = append(dst.Raw, c)
+			seen[key] = true
 		}
 	}
 }

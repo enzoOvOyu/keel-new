@@ -446,7 +446,11 @@ func ExpandPorts(items []Item) []Item {
 	names := map[string][]Item{}
 	ports := map[string]bool{}
 	for _, i := range items {
-		if i.Category == "server" || i.Category == "switch" {
+		// A named physical component can own an explicitly listed port too.
+		// Keep its category; do not promote GPU trays/PSUs/NICs to servers to
+		// make endpoint resolution work. Unknown/material rows remain excluded.
+		switch i.Category {
+		case "server", "switch", "router", "gpu", "nic", "bmc", "psu", "pdu", "patch_panel", "connector", "electrical_module", "optic_module":
 			names[i.Hostname] = append(names[i.Hostname], i)
 			if alias := i.Fields["device_alias"]; alias != "" && alias != i.Hostname {
 				names[alias] = append(names[alias], i)
