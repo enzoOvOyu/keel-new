@@ -1,14 +1,35 @@
-# Keel Rack Visualization · 机柜可视化设计
+# Keel Spatial Rack Digital Twin · 工程空间视图设计
 
 更新：2026-10-31。状态：**产品设计与独立可运行原型，待用户评审；不是生产功能交付**。
 
 本文件是本轮机柜可视化的设计入口，接替 `topology.md` 中“机柜冻结”的阶段性决定。四个拓扑原型保持原设计；正式 `/racks`、CMDB、数据库及业务 API 均未修改。现有业务规则继续以 PRD、RACK-DIAGRAM、DATA-DICTIONARY 和 OpenAPI 为准。
 
+## 本轮 V2 纠偏：空间工作台
+
+用户要求升级为 Spatial Rack Digital Twin。本轮继续限于设计和 5181 独立原型；CMDB 的设备身份、安装事实、规划与观测所有权不变。空间孪生是数据与关系模型，不等于开启 3D 动画。当前几何和实时观测不足，产品呈现“部分空间模型”，不宣称已建立实时、毫米级数字孪生。
+
+```text
+现有导航 / 顶栏
+[机柜阵列] RACK-01 / Pod 1       [资产 | 空间 | 计算] [比较] [数据依据]
+┌ 柜内对象树 ┬ 空间主视图（可选择 / 聚焦 / 分解） ┬ 设备与工程信息工作区 ┐
+│ 按U顺序    │ 平行斜投影 / 双面 / 剖面                │ 资产、Mapping、安装  │
+│ 设备 / ID  │ 机柜参考坐标与真实U安装关系       │ 端口索引、端接证据   │
+│ 相邻机柜   │ 几何已知→实体；未知→开放边界     │ 设备尺寸、约束与来源 │
+│ 搜索       │ 选择设备后显示尺寸与关联引导线   │ 运行观测与能力缺口   │
+└────────────┴ 同坐标的U占用导航 / 选中区间 ────┴────────────────────┘
+```
+
+- 信息按总览→设备→端口三个尺度展开，不把全部文本缩小塞进 Gallery。
+- 视图状态、事实位置、观测状态分离。选择/相机/分解属于展示；拖动安装草稿仍需明确确认且不写 CMDB。
+- 已知 U 高决定竖向几何；未知宽深用未标定参考轴。不得使用固定透视厚度冒充设备深度；不会生成无来源的风扇、盘位、PDU、功率或热力。
+- 右侧留出足够宽度，以工程清单与结构图承载信息。源数据限制放进针对性字段/来源面板，不占据数行顶部说明。
+- 审计作为数据依据保留。Gallery、空间工作台与双面精确投影各有职责，相互补充；V2 改变默认阅读顺序，不删除原有 Mapping、双面选择、草稿和追踪能力。
+
 ## 1. 定位与交付边界
 
-用一套确定性几何模型，将 CMDB **已经登记且有来源**的机柜和设备关系自动投影为 Rack Gallery 与前后双面立面。两种尺度共享身份、U 区间、选择上下文与证据，不维护第二套资产库。
+用一套确定性安装模型，将 CMDB **已经登记且有来源**的身份、U 区间、几何与关系投影为 Gallery、空间工作台、前后双面和安装剖面。整体范围、安装关系与端口细节是三个互补尺度，共享选择上下文与证据，不维护第二套资产库。
 
-第一期核心：Gallery、Dual Elevation、Asset / Capacity / Compute、设备 Mapping 与来源追溯。规划与实装比较保留明确入口，但当前数据不足时只展示缺口；Power / Health / Thermal 不因字段名称存在就自动启用。
+第一期核心：Gallery 与 Pod 范围导航、空间平行投影、Dual Elevation、安装剖面、Asset / Capacity / Compute、设备 Mapping 与来源追溯。规划与实装比较保留明确入口，但当前数据不足时只展示缺口；Power / Health / Thermal 不因字段名称存在就自动启用。
 
 本轮不做真实位置修改、实际设备访问、实时遥测接入、生产审批、新增 CMDB 实体或 3D 引擎。原型的展示草稿仅保存浏览器布局，不是安装事实、批准规划或 As-built。
 
@@ -73,14 +94,30 @@
 
 实际阅读的是用户提供的[预览](https://gso-sims-preview-doc-aws.s3-eu-west-1.amazonaws.com/iso-tr-24464-2025-en.html)，包含范围、术语及目录，**不是全文**。借鉴其对可视化保真度的关注，Keel 区分：空间分辨率（U 坐标）、几何细节（面板素材）、时间有效性（observed_at/freshness）与事实可信度。此为设计取舍，不宣称符合 ISO 认证或完整实施该报告。
 
+### Sunbird：空间上下文与连接细节互补
+
+实际阅读 [Data Center CMDB](https://www.sunbirddcim.com/data-center-cmdb)、[Data Center Visualization](https://www.sunbirddcim.com/product/data-center-visualization)，并用浏览器查看后者的 X-ray 柜体/侧面展示。其价值是把机柜内部安装、设备深度/对齐、连接和容量联系起来，而不是单纯增加透视。Keel 采用可隐藏的柜侧参考面、设备选择、安装剖面、关联线缆与容量面板。没有测量深度时，只呈现开放参考边界；没有机房坐标时，不生成 Sunbird 示例中的三维楼面。没有复制页面、模型或素材。
+
+### 可视化理论到实际交互
+
+| 原始研究 / 方法 | Keel 采用的设计 | 本原型可操作内容 / 边界 |
+|---|---|---|
+| [Heer & Shneiderman, Interactive Dynamics for Visual Analysis, 2012](https://idl.cs.washington.edu/files/2012-InteractiveDynamics-CACM.pdf) | 概览、语义缩放、选择过滤、关联多视图 | Gallery 删除微小文字；单柜保留范围缩略图；设备树、U 导航、画布和详情同步选择。不是全图仅放大 |
+| [A Coordination Model for Exploratory Multi-View Visualization, 2003](https://www.cs.kent.ac.uk/pubs/2003/1654/) | 共享对象而非共享像素 | asset/port/cable ID 驱动相机、双面和详情；切换视角保留当前对象和端接，不通过名称猜关联 |
+| [Li et al., Interactive 3D Exploded View Diagrams, SIGGRAPH 2008](https://grail.cs.washington.edu/projects/exview3D/) | 选择性分解，保留装配位置上下文 | 仅分离选中设备的展示平面，原 U 位留轮廓与引导线。没有零件几何/阻挡关系，不实现论文的自动拆卸规划，也不把分解方向当维护抽出方向 |
+| 工程制图：正投影、平行斜投影、局部剖面、尺寸界线 | 不同问题采用不同投影 | 空间看前后安装关系，Dual 看两面，正视核对 U，剖面看已知/未知深度；宽深未标定时不宣称毫米等比或碰撞可行 |
+| Focus + Context / 按需细节 | 局部高亮但保留范围 | 聚焦弱化不相关设备，选线缆保留两端；右侧端口索引展开为线缆证据与追踪，不把全柜端口塞在画布上 |
+
+上述为基于研究的产品取舍，不是对论文算法或性能的实现宣称。双面立面仍有精确核对价值，空间视图不能取代它；也不能拿未来运行遥测功能充当本期设计效果。
+
 ## 4. 信息架构与交互
 
 ### 4.1 Rack Gallery
 
 ```text
 现有 Sidebar / 顶栏（保持）
-机柜可视化                   保存 / 恢复视图
-[机柜阵列 | 双面立面 | 规划/实装]        数据能力
+Spatial Rack
+[空间工作台 | 机柜阵列 | 规划/实装]      数据能力
 [设备/型号/SN 搜索] [Pod]        叠加层：资产 / 空间 / 计算
 范围摘要：机柜、登记 U、服务器、登记 GPU、交换机
 ┌ Pod 1：4 个缩略立面 ┐ ┌ Pod 2：4 个缩略立面 ┐
@@ -89,38 +126,42 @@
 紧凑图例：设备类别、未知面；不是实际机房坐标
 ```
 
-- Gallery 使用同一 `layoutRack` 和 `Elevation`。缩略尺度降低标签密度，设备占位不变；不按设备数平均排布。
+- Gallery 使用同一 `layoutRack` 与 `Elevation`，空间主图同样消费此布局输出。缩略尺度降低标签密度，设备占位不变；不按设备数平均排布。
 - 每柜显示名称、U 高、占用并集、未占用 U、服务器/GPU/交换机登记数量与“实装/健康未核验”。缺记录显示未知。
 - 搜索设备、型号、SN、资产 ID 或机柜；命中设备后打开其所在柜并选择该设备。Pod 筛选写 URL。
 - 不绘制假行列坐标；响应式阵列只是视图排版。
 - 零匹配显示空状态，保留筛选。返回阵列保持查询上下文。
 
-### 4.2 Precision Dual Elevation
+### 4.2 Spatial Workspace 与 Precision Dual Elevation
 
 ```text
-[返回] [柜号] [上柜/下柜]          [叠加层] [展示草稿] [SVG]
-柜号 / Pod / 总U / 登记占位 / 未占用 / 设备 / GPU
-┌ Front ─────── Rear ───────┐ ┌ 选中设备 / 稳定ID ┐
-│ 同一 U 刻度，双面同步选择 │ │ 设备 | 资产       │
-│ 未知面使用虚线登记参考   │ │ Mapping | 来源    │
-│ 缩放 / 0U未定位托盘      │ │ 按当前资产加载    │
-└ 同一位置，不复制资产     ┘ └ 来源与跳转        ┘
+Spatial Rack [空间工作台 | 机柜阵列 | 规划/实装]             [数据能力]
+[当前机柜 / Pod]  U高 / 设备 / 登记占位               [资产 | 空间 | 计算]
+┌ 柜内对象 / 范围 ┬ [空间 | 双面 | 正视 | 背视 | 剖面] ┬ 选中设备 / 型号 / ID ┐
+│ 搜索与U序清单  │ 柜体透视 / 聚焦 / 选择性分解       │ 资产、面板与端接、安装│
+│                │ 设备安装坐标 / 参考面 / 开放边界   │ 容量、观测、来源      │
+│ Pod机柜缩略索引│ 双面模式：同步 Front / Rear        │ 信息与证据按需展示   │
+│ 上一柜/下一柜  │ U占用导航 / 缩放 / 草稿 / SVG      │ 关联拓扑与追踪入口   │
+└────────────────┴───────────────────────────────────┴─────────────────────┘
 ```
 
-- 1440px+：画布为主、右栏 340px，1600px 以上留足双柜阅读宽度；窄屏上下堆叠。不要同时塞入一组完整机柜阵列。
-- 一处选择同时高亮两面；右侧设备清单同样定位。使用精确 ID，不通过设备名模糊匹配。
-- 当前安装面缺失时，两面显示**登记占位参考**并统一虚线提示。不是已知 Front+Rear，也不重复统计 U、设备或 GPU。
-- Front / Rear 使用相同身份与 U 区间。精确面板未绑定时，仅绘资产轮廓、类别、型号与已有数量；没有虚构盘位、电源、风扇或端口数。
-- 后面板中的点阵框表示“几何未绑定”，不作为实际接口。端口仅在右栏 Mapping 以登记名称清单呈现。
-- U 方向按实际 U 数据成比例。**横向为固定阅读宽度，当前未投影可靠 mm 宽度，因此不是物理尺寸施工图**。后续有型号宽度与轨距证据才启用毫米等比。
-- 双面缩放统一，超过容器可滚动；SVG 导出保留两面、数据性质、图例语义与选择样式。
+- **整体**：Gallery 对比全部机柜。进入单柜后保留 Pod 分组的范围索引，不让用户丢失当前柜在授权资产范围中的位置；索引只是排版，不是机房坐标。
+- **空间**：固定平行斜投影，参考 Front/Rear 面与 U 轴。柜侧板可隐藏；相机不影响真实位置。当前缺少宽深，参考后平面用细线表示，未知设备深度只画开放引导线，不画虚构实体机箱。
+- **双面**：同屏 Front/Rear，共享 U、选择和缩放。Front 显示资产类别/型号/数量；Rear 显示登记端口数量与端接入口。安装面缺失时均为明确标记的占位投影，不声称这是实际正反面板。
+- **正视 / 背视**：单面放大用于 U 区间核对；背视联动右侧端口索引与线缆。未有面板坐标，不在机箱上假造网口位置。
+- **剖面**：按 U 展示设备高度与深度范围。缺少深度用未定界区间；选中设备集中显示、其他设备弱化。只有设备/机柜深度同时已知时才计算相对长度；仍需安装面/对齐才能作真实净空结论。
+- **聚焦**：弱化不相关对象，保留当前设备及选定 Cable 两端。**分解**只分离选中设备展示平面，保留原位置和引导线；不是实际位置变化、拆卸指令或维护空间验收。
+- 画布点击、柜内树、U 导航和右栏端口索引共用稳定 ID。切换相机保留资产、端口、线缆、详情 Tab；切换机柜清理不属于新柜的选中端点。
+- 当前 1440px 桌面采用约 168px 对象栏 / 剩余空间画布 / 385px 工程栏；1600px 以上右栏 430px。窄屏先收起对象栏，再上下排列，不能通过缩小全部文字维持三栏。
+- 草稿沿用半 U 吸附、冲突/越界检查、撤销/重做与明确确认。保存只写隔离浏览器存储。0U、缺位置或缺高度进入未定位托盘，不从画布丢弃。
+- SVG 导出当前空间或双面视图，带 SYNTHETIC、规划/草稿和非实装测量说明；不对其他未实现格式提供假按钮。
 
 ### 4.3 设备详情与 Mapping
 
-- 设备：柜内搜索，按 U 排序，型号、U 高、资产 ID；点击联动立面。
-- 资产：已有型号、SN、登记 U、GPU/NIC/端口数量；安装面/深度/当前健康缺失明确标示。型号轮廓不是产品照片。
-- Mapping：**当前设备 → 登记端口 → Cable → 对端设备/端口**。端口分页/搜索，选端口缩小关联范围；选线缆显示介质、长度、双端、来源与异常状态，可进入既有布线矩阵和链路追踪原型。
-- 来源：规划登记、几何字段、缺失实装与实时证据分层展示；保留 synthetic 来源和参考时间，不用参考时间冒充采集时间。
+- 柜内对象：搜索，按 U 排序，型号、U 高、资产 ID；点击同步所有投影与右侧详情。
+- 资产：已有型号、SN、登记 U、GPU/NIC/端口数量与组成摘要；安装：几何、来源与净空约束；容量：U 并集、连续空闲区间、计算资源与核算边界。设备符号不是产品照片。
+- 面板与端接（保留 Mapping）：**当前设备 → 登记端口 → Cable → 对端设备/端口**。端口分页/搜索，选端口缩小关联范围；选线缆显示介质、长度、双端、来源与异常状态，可进入既有布线矩阵和链路追踪原型。选中线缆时画布仅画当前双端的关联引导线；端点落在设备范围，明确不是实体走线或实际端口坐标。
+- 观测：显示当前能力、时间与历史登记证据；没有有效采集不展示热力图。来源：规划登记、几何字段、缺失实装与实时证据分层展示；保留 synthetic 来源和参考时间，不用参考时间冒充采集时间。
 - 不另建设备抽屉。后续生产实现仍调用已有 ServerDetailDrawer 五 Tab / NetworkDeviceDrawer 八 Tab；本原型使用隔离证据面板，避免加载真实 Provider。
 
 ### 4.4 Planned vs As-built
@@ -135,7 +176,7 @@
 
 | 层 | 启用条件 | 当前行为 | 不能推导 |
 |---|---|---|---|
-| Asset | 存在授权设备身份与类别 | 服务器淡蓝、交换机淡青；选中紫色 | 设备健康 |
+| Asset | 存在授权设备身份与类别 | 服务器蓝灰、交换机暗青；选中紫色，颜色只表示类型/选择 | 设备健康 |
 | Capacity | 有柜高与有效占位 | 并集 U、斜线未占用区间 | 可安装深度、功率或承重 |
 | Compute | 有 GPU 数量或一致的组成关联 | 登记 GPU 数；未知保留未知 | GPU 可用率、算力、温度、功耗 |
 | Power | 可靠测点、单位、时间、保鲜、作用范围 | 当前不出现在覆盖菜单 | 用 BOM 预算冒充运行功耗 |
@@ -179,7 +220,7 @@ type DeviceGeometry = {
 
 ### 5.2 设备素材与视觉细节
 
-三层细节：Gallery 占位 → Dual 标准资产轮廓 → 经确认型号面板。选择哪个层由素材与几何能力决定，不由缩放触发虚构硬件。
+三层细节：Gallery 占位 → 空间/Dual 标准资产轮廓与端口索引 → 经确认型号面板。选择哪个层由素材与几何能力决定，不由缩放触发虚构硬件。
 
 未来素材注册建议记录 model_revision、manufacturer、part_number、front/rear、SVG viewBox、anchor-to-port-template、license、source URL、revision/hash。素材不保存实例 SN、MAC、健康或实际端接；实例数据从 CMDB 叠加。端口模板与实例端口必须能明确映射，否则仅展示静态面板并关闭热点。
 
@@ -187,12 +228,12 @@ type DeviceGeometry = {
 
 ## 6. 视觉与状态规范
 
-继承 DESIGN-SYSTEM 字体、紫色主操作、背景/边框/间距令牌，新增样式只作用于 `.rack-viz` 与 `rv-*`。不改全局 CSS 或其他四个拓扑原型。
+继承 DESIGN-SYSTEM 字体、紫色主操作、背景/边框/间距令牌，新增样式只作用于 `.rack-viz`、`rv-*`、`sr-*` 和机柜路由布局。正式 DESIGN-SYSTEM 令牌、全局 CSS 与其他四个拓扑页面不变。
 
-- 页面标题 20px；柜/设备标题 15–17px；正文 12px；证据/来源 10–11px；ID 和 U 使用等宽。缩略 SVG 不承担完整文本阅读。
-- 控件高 28–34px；画布/证据栏间距 16px；无多层卡片阴影。Gallery 采用两组 Pod 并排，每组四柜，窄屏顺序折叠。
+- 页面标题 18px；工程栏设备标题 21px；正文 11–12px；证据/来源 10–11px；ID 和 U 使用等宽。缩略 SVG 不承担完整文本阅读。
+- 控件高 28–34px；工作区分栏以细边界相隔；无多层卡片阴影。Gallery 采用两组 Pod 并排，每组四柜，窄屏顺序折叠。
 - U 标尺每 U 可读，选择有描边和文本反馈；颜色是类别/选择，不伪装健康。
-- 已知占位实边、未知面虚线；未占用细斜线；冲突红色并有文字。维护态若有授权有效状态则遵循现有蓝色暂停规范，与健康分开。
+- 已知 U 占位实边；安装面缺失明确注明，未知深度用开放虚线；未占用细斜线；冲突红色并有文字。维护态若有授权有效状态则遵循现有蓝色暂停规范，与健康分开。
 - SVG 可键盘选择；编辑时上下键每次 0.5U；Dialog 沿用 shadcn 焦点管理。缩放不改变业务位置。
 - Loading/Error/Permission 在生产 Adapter 接入时用既有状态组件；本原型固定本地快照，不用定时器伪造加载过程。未知对象 ID 显示找不到，不静默替换资产。
 
@@ -216,14 +257,16 @@ type DeviceGeometry = {
 
 | 能力 | 入口 |
 |---|---|
-| Rack Gallery | http://localhost:5181/rack-detail |
-| Dual Elevation | http://localhost:5181/rack-detail?view=dual&rack=rack-0001 |
-| Compute | http://localhost:5181/rack-detail?view=dual&rack=rack-0001&overlay=compute&asset=srv-0001 |
-| Capacity | http://localhost:5181/rack-detail?view=dual&rack=rack-0001&overlay=capacity |
-| Mapping | http://localhost:5181/rack-detail?view=dual&rack=rack-0001&asset=srv-0001&tab=mapping |
+| Spatial Workspace 默认工程视图 | http://localhost:5181/rack-detail |
+| Rack Gallery 整体范围 | http://localhost:5181/rack-detail?view=gallery |
+| Precision Dual Elevation | http://localhost:5181/rack-detail?view=spatial&rack=rack-0001&camera=dual |
+| 选择性分解 | http://localhost:5181/rack-detail?view=spatial&rack=rack-0001&asset=srv-0001&explode=1 |
+| 安装剖面 | http://localhost:5181/rack-detail?rack=rack-0001&asset=srv-0001&camera=section&tab=installation |
+| Capacity | http://localhost:5181/rack-detail?rack=rack-0001&overlay=capacity&tab=capacity |
+| Mapping / 端接 | http://localhost:5181/rack-detail?rack=rack-0001&asset=srv-0001&camera=rear&tab=mapping |
 | Planned / As-built 数据前提 | http://localhost:5181/rack-detail?view=compare&rack=rack-0001 |
 
-实现位置：[prototype/pages/rack-detail.tsx](topology/prototype/pages/rack-detail.tsx)、[共享几何](topology/prototype/rack/geometry.ts)、[数据适配](topology/prototype/rack/model.ts)、[SVG](topology/prototype/rack/Elevation.tsx)、[局部样式](topology/prototype/rack/rack.css)。
+实现：[页面](topology/prototype/pages/rack-detail.tsx)、[空间工作台](topology/prototype/rack/SpatialWorkspace.tsx)、[空间投影](topology/prototype/rack/SpatialScene.tsx)、[共享几何](topology/prototype/rack/geometry.ts)、[双面/Gallery](topology/prototype/rack/Elevation.tsx)、[Mapping/来源](topology/prototype/rack/Details.tsx)、[数据适配](topology/prototype/rack/model.ts)。React + SVG，没有增加图形依赖。
 
 ```bash
 node docs/topology/prototype/run.mjs        # 独立 5181
@@ -231,22 +274,29 @@ node docs/topology/prototype/run.mjs check
 node docs/topology/prototype/run.mjs build
 ```
 
-URL 恢复 `view/rack/asset/port/cable/tab/overlay/q/pod`；从旧拓扑携带 rack/asset 进入时自动开 Dual。顶栏保存视图复用已有原型行为；草稿隔离于 `keel.topology.prototype.rack-v2.*`。没有真实 CMDB 网络请求或写入。
+URL 保留 `view/rack/asset/port/cable/tab/overlay/q/pod/camera/explode/isolate/cutaway`；旧 `view=dual` 链接继续打开双面，不失效。缩放/平移为当前相机局部状态，切换相机适配；未冒充 CMDB 位置。草稿继续隔离于 `keel.topology.prototype.rack-v2.*`，没有真实 CMDB 请求或写入。
 
 ## 9. 实施顺序与验收标准
 
-1. 本期：审核当前文档、独立 Gallery/Dual/Overlay/Mapping 原型；核对实际数据边界。
+1. 本期：审核当前文档、独立 Gallery/Spatial/Dual/Overlay/Mapping 原型；核对实际数据边界。
 2. 用户确认后：最小扩展现有投影的来源/安装几何字段；通过 Adapter 接现有页面，保持原详情抽屉与权限。
 3. 资产资料补齐后：型号素材、准确 front/rear 面板、0U 侧挂与实装确认；缺一项则只开放对应受支持细节。
 4. 有一对合格快照后：Planned vs As-built 正式 Diff；遥测单独满足证据条件后启用相应 Overlay。
 
-验收：Gallery 与 Dual 的同一资产 U/高完全相同；并集计数不重复；筛选、选择、前后同步、URL 恢复、Mapping 到端接/追踪有效；半 U/0U/越界/安装面冲突准确；未知面/深度/实时监控不伪装已知；草稿保存不改事实；差异前置缺失时不能生成结果；所有原型证据标记 synthetic。
+验收：Gallery、空间、剖面与 Dual 的同一资产 U/高完全相同；并集计数不重复；筛选、选择、前后同步、URL 恢复、Mapping 到端接/追踪有效；半 U/0U/越界/安装面冲突准确；未知面/深度/实时监控不伪装已知；草稿保存不改事实；差异前置缺失时不能生成结果；所有原型证据标记 synthetic。
 
-实际检查结果与截图见 [验证报告](rack-visualization/validation.md)。只证明独立原型与几何行为，不证明生产页面、实际设备、三维碰撞、完整工程验收或千卡性能。
+V1 历史检查保留在 [旧验证报告](rack-visualization/validation.md)。当前 V2 检查与截图见 [空间工作台验证记录](rack-visualization/validation-v2.md)。只证明独立原型与几何行为，不证明生产页面、实际设备、三维碰撞、完整工程验收或千卡性能。
 
 ## 10. 当前缺口与设计决策
 
-- **已决定**：安装面未知时双面虚线参考；Power/Health/Thermal 不启用；空间“未占用”不等于“可安装”；Mapping 保留；不复制旧 fixture 的默认面作为正式事实。
+- **已决定**：安装面未知时双面占位参考、明确标注；深度未知保留开放边界；空间和双面互补而非互相替换；Power/Health/Thermal 不启用；空间“未占用”不等于“可安装”；Mapping 保留；不复制旧 fixture 的默认面作为正式事实。
 - **待资料**：安装面/深度/full-depth、精确型号面板与端口锚点、PDU/供电关系、宽度/轨距、批准规划快照、现场实装记录、有效监控链。
 - **需后续业务确认**：现场位置确认的责任主体/审批权限、何种证据可签署 As-built、旧规划版本选择方式。由现有 CMDB/交付审批体系补齐，不在原型中自造批准规则。
 - **本阶段未实现**：生产 API 扩展、真实遥测、精确设备素材、可执行的规划/实装比较。未把这些能力标成已完成。
+
+## 11. V2 设计决策记录
+
+- **D-RACK-02**：综合 NetBox 的资产事实、Rackula 的坐标/编辑、Sunbird 的空间/连接/容量；不是选一家替换另一家。保持整体范围、精确双面、空间关系、端口细节四个层级。
+- **D-RACK-03**：当前不使用 WebGL 增加无数据体积。React + SVG 的平行斜投影足以验证安装/选择/剖面交互；未来毫米几何齐备、明确需要自由相机时再评估渲染适配器。
+- **D-RACK-04**：事实/设计/观测/验收/展示五层互不转正。所有基于未标定宽深的引导面为展示坐标，导出亦明确注明；不从视觉模型反写资产。
+- **D-RACK-05**：当前 default 为单柜工程工作台，但 Gallery 与双面完整保留。用户要求“兼顾整体和细节”，因此单柜左侧保留所有机柜的分组范围索引；不是另一张伪楼面图。

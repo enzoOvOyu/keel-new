@@ -196,4 +196,4 @@ React Flow承载拓扑的缩放、平移、节点拖动、Minimap与自动布局
 
 ## 2026-10-31 · 机柜设计后续授权
 
-Gallery 借鉴 NetBox 的系统登记数据可视化；Dual 借鉴 Rackula 的精确 U 坐标和撤销语义，使用 React + SVG。实际研究范围、引用、许可边界和可运行入口统一见 [rack-visualization.md](rack-visualization.md)。不复制素材，不用旧 fixture 的 front 默认值补 CMDB 缺测。前文“机柜维持现状”仅指此前四页 V3 工作阶段。
+Gallery 借鉴 NetBox 的系统登记数据可视化；Dual 借鉴 Rackula 的精确 U 坐标和撤销语义；Spatial 借鉴 Sunbird 的柜侧透视、安装对齐与容量/连接联动。多视图协调、语义缩放及选择性分解采用研究支持的交互，React + SVG 实现，各视角互补，不把缺失深度画成实物。实际研究范围、引用、许可边界和可运行入口统一见 [rack-visualization.md](rack-visualization.md)。不复制素材，不用旧 fixture 的 front 默认值补 CMDB 缺测。前文“机柜维持现状”仅指此前四页 V3 工作阶段。

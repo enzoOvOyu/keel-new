@@ -1,3 +1,4 @@
+// Historical V1 UI verifier (83abdf3). Current UI: verify-spatial.mjs. Geometry cases retained as evidence.
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';

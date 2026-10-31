@@ -1,0 +1,45 @@
+{
+  "at": "2026-10-31T04:00:31.691Z",
+  "scope": "isolated spatial rack prototype",
+  "results": [
+    {
+      "name": "1440px 范围索引16柜、同柜7设备、未知深度保留、无横向溢出",
+      "status": "PASS"
+    },
+    {
+      "name": "选择性分解不改U、聚焦、隐藏柜侧、平移、缩放与适配",
+      "status": "PASS"
+    },
+    {
+      "name": "双面同身份/U、选择同步、可读深色面板、双面SVG导出",
+      "status": "PASS"
+    },
+    {
+      "name": "剖面显示未知几何，容量复用29U并集/13U未占用",
+      "status": "PASS"
+    },
+    {
+      "name": "端口→线缆→双端高亮、刷新恢复、已有链路追踪稳定ID跳转",
+      "status": "PASS"
+    },
+    {
+      "name": "范围切柜、Gallery搜索设备下钻、整体/细节联动、保存恢复视图",
+      "status": "PASS"
+    },
+    {
+      "name": "0.5U草稿、冲突阻断、撤销、确认保存、退出恢复CMDB登记位置",
+      "status": "PASS"
+    },
+    {
+      "name": "无遥测不伪造健康；缺快照不生成Diff；无页面异常及业务API请求",
+      "status": "PASS"
+    },
+    {
+      "name": "截图修正：分解对象绘制在最上层；双面聚焦开关实际弱化/恢复其余设备",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "business_api_requests": [],
+  "visual_followup_at": "2026-10-31T04:02:07.575Z"
+}

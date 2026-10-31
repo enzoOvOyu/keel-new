@@ -253,4 +253,4 @@ CMDB左树+主工作区，五视图共享asset/filter URL。目录按类型字�
 
 ## 2026-10-31 · 机柜可视化设计原型
 
-后续独立机柜设计以 [rack-visualization.md §4–6](rack-visualization.md#4-信息架构与交互) 为准：Gallery 与 Dual 共用几何；未知安装面虚线占位；Asset/Capacity/Compute 依数据启用；规划/实装缺快照不生成 Diff。新增样式限定于 rack-viz/rv-*，继承全局 token，未更改正式页面或其他四个拓扑原型。
+后续独立机柜设计以 [rack-visualization.md §4–6](rack-visualization.md#4-信息架构与交互) 为准：Gallery、Spatial、Dual 与剖面共用几何；安装面未知标注、深度未定界；整体范围与端口细节联动；Asset/Capacity/Compute 依数据启用；规划/实装缺快照不生成 Diff。新增样式限定于机柜原型路由及 rack-viz/rv-*/sr-*，继承全局 token，未更改正式页面或其他四个拓扑原型。
