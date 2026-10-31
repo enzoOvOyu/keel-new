@@ -175,3 +175,7 @@ Fabric无损选择设备/反例→端口→rule@version→五层证据→读取�
 ## 2026-10-31 · 可视化核线工作流 V3
 
 全局 Pod / 局部矩阵 → Fabric 角色束 → 原始成员或 Bipartite → Connection Matrix 单元格 → BioFabric端口列/端口面板 → Cable双端证据 → Metro物理段 → 关联支路树与证据表。URL携带稳定scope、asset、port、cable、row/col；图形只切换表达，不创建资产或路径。缺端记录单独可查，逻辑证据不足停止追踪。详细四页流程、状态和回跳规则以 [topology.md §4](topology.md#4-四个模块的页面设计v3-权威方向) 为唯一说明。本轮只改隔离原型，机柜流程不变。
+
+## 2026-10-31 · Gallery → Dual → Mapping
+
+机柜阵列搜索/Pod筛选 → 同一 ID 的前后双面 → 选择设备 → Mapping 登记端口 → Cable 双端 → 既有布线矩阵/链路追踪。选择、叠加层和筛选写 URL；实装对比缺快照时只提供来源与缺口入口。展示草稿保存不触发 CMDB 变更。详见 [rack-visualization.md](rack-visualization.md)，本次只替换独立 5181 原型。

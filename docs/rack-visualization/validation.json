@@ -1,0 +1,48 @@
+{
+  "at": "2026-10-31T03:28:48.155Z",
+  "scope": "isolated rack prototype only",
+  "viewport": [
+    1600,
+    1040
+  ],
+  "results": [
+    {
+      "name": "几何：42/45/48U、0.5U、0U、越界、同面/全深度冲突、未知面与双侧共用并集",
+      "status": "PASS"
+    },
+    {
+      "name": "Gallery 16 柜、范围数量、Pod 筛选、设备搜索定位与双面同步选择",
+      "status": "PASS"
+    },
+    {
+      "name": "双面同身份/U、29U 并集、13U 未占用、Compute/Capacity、URL 恢复",
+      "status": "PASS"
+    },
+    {
+      "name": "Mapping：设备 → 登记端口 → 线缆 → 链路追踪（稳定 ID）",
+      "status": "PASS"
+    },
+    {
+      "name": "规划/实装缺口禁用比较、能力审计数据可查看、无虚构实时覆盖层",
+      "status": "PASS"
+    },
+    {
+      "name": "草稿 0.5U 键盘移动、冲突阻断保存、撤销、显式保存、退出恢复事实",
+      "status": "PASS"
+    },
+    {
+      "name": "双面 SVG 导出包含数据性质与两面",
+      "status": "PASS"
+    },
+    {
+      "name": "1440px 无横向溢出；浏览器无异常；0 条业务 API 请求",
+      "status": "PASS"
+    },
+    {
+      "name": "截图修正：速率保留原始单位、放大立面实际增加绘制尺寸",
+      "status": "PASS"
+    }
+  ],
+  "page_errors": [],
+  "business_api_requests": []
+}

@@ -193,3 +193,7 @@ React Flow承载拓扑的缩放、平移、节点拖动、Minimap与自动布局
 ## 2026-10-31 · 四页图表研究与原型 V3
 
 全局拓扑借鉴 Cluster Map / Hybrid Graph；网络架构借鉴角色骨架与语义束线；物理布线默认 Connection Matrix，Bipartite/BioFabric服务精确端点检查；追踪使用 Metro Route + Tree/Table。六篇研究的链接、实际阅读范围、采用理由及限制统一见 [topology.md §14](topology.md#14-研究依据方法取舍与视觉质量评价)，不把论文实验或算法名称冒充 Keel 能力。原型入口见该文 §7；机柜维持现状。此增补仅约束运维拓扑设计，不改变既有 Fabric 业务模块。
+
+## 2026-10-31 · 机柜设计后续授权
+
+Gallery 借鉴 NetBox 的系统登记数据可视化；Dual 借鉴 Rackula 的精确 U 坐标和撤销语义，使用 React + SVG。实际研究范围、引用、许可边界和可运行入口统一见 [rack-visualization.md](rack-visualization.md)。不复制素材，不用旧 fixture 的 front 默认值补 CMDB 缺测。前文“机柜维持现状”仅指此前四页 V3 工作阶段。

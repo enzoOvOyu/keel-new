@@ -250,3 +250,7 @@ CMDB左树+主工作区，五视图共享asset/filter URL。目录按类型字�
 ## 2026-10-31 · 数据中心可视化 V3（设计评审）
 
 四页采用“Cluster/Hybrid、Fabric Flow、Connection Matrix、Metro + Tree/Table”的差异化工作区。默认正文占满宽度，选择对象才显示证据栏；继承现有字体、颜色与间距，不增加一排重复 KPI 卡片。束的交叉不等于连接、矩阵空格不等于正常、证据状态不并入位置/数量。完整视觉编码、密度与选择规则以 [topology.md §4、§6、§14](topology.md#4-四个模块的页面设计v3-权威方向) 为准，**不改变全局设计令牌或正式页面**。机柜不在本轮设计范围。
+
+## 2026-10-31 · 机柜可视化设计原型
+
+后续独立机柜设计以 [rack-visualization.md §4–6](rack-visualization.md#4-信息架构与交互) 为准：Gallery 与 Dual 共用几何；未知安装面虚线占位；Asset/Capacity/Compute 依数据启用；规划/实装缺快照不生成 Diff。新增样式限定于 rack-viz/rv-*，继承全局 token，未更改正式页面或其他四个拓扑原型。

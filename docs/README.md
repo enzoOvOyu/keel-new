@@ -92,3 +92,7 @@ IA v2.3 设计及实施计划入口：[IA-V2.3.md](IA-V2.3.md)。该段为v2.3�
 - [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)：真实CMDB模型、接口对照、Adapter保护与迁移边界。
 
 - [PROJECT-AI-CONFIGURATION.md](PROJECT-AI-CONFIGURATION.md)：真实项目创建、系统管理AI配置和BOM接入。
+
+## 机柜可视化设计评审入口
+
+[rack-visualization.md](rack-visualization.md) 汇总本地 CMDB 能力审计、Rack Gallery、前后双面精确立面、数据驱动叠加与实装比较前提。隔离原型位于 5181/rack-detail；不代表正式机柜页面已经改造。

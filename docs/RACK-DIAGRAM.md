@@ -106,3 +106,7 @@
 ## 2026-10-31 数据中心可视化增补
 
 新增运维 `/topology` 与真实 CMDB 机柜工作台；投影接口、布局/事实边界、asset.relocate 审核发布、验证记录和未完成项统一见 [DATACENTER-VISUALIZATION.md](DATACENTER-VISUALIZATION.md)，HTTP schema 见 openapi.yaml。沿用原资产身份和权限，不把计划连接或 synthetic 数据视为真机验证。
+
+## 2026-10-31 · Rack Visualization 独立设计
+
+新一轮 Gallery / Dual Elevation 的能力矩阵、U 几何、未知安装面、草稿隔离与规划/实装前置要求统一见 [rack-visualization.md](rack-visualization.md)。该设计替代旧原型的单柜布局，不改变现有生产页面、资产身份、审批或发布规则。当前位置多为 synthetic planned，不能冒充实装；未占用 U 不等于可安装容量。

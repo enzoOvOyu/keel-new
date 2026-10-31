@@ -2,7 +2,7 @@
 
 更新：2026-10-31。状态：**第一阶段设计评审；文档与可运行原型，未批准进入生产实施**。
 
-本文件是唯一主设计。V3 依据用户最新纠偏，**只重做全局拓扑、网络架构、物理布线和链路追踪的展示方案与隔离原型**；机柜现状冻结，不设计、不修改。保留既有 CMDB 身份、事实/观测分层及接口边界。研究方法与访问限制见 §14；本文明确区分论文结论、Keel 设计推断和已运行原型，不把科研算法名称当成实现证明。本阶段不修改正式页面、数据库、业务 API 或根设计令牌。
+本文件是四个拓扑模块的主设计。机柜后续独立设计见 [rack-visualization.md](rack-visualization.md)，其 Gallery/Dual 原型已替换 5181/rack-detail，正式机柜页面保持不变。V3 依据用户最新纠偏，**只重做全局拓扑、网络架构、物理布线和链路追踪的展示方案与隔离原型**；当时机柜现状冻结。后续用户已单独授权机柜设计，边界见上方链接。保留既有 CMDB 身份、事实/观测分层及接口边界。研究方法与访问限制见 §14；本文明确区分论文结论、Keel 设计推断和已运行原型，不把科研算法名称当成实现证明。本阶段不修改正式页面、数据库、业务 API 或根设计令牌。
 ## 1. 产品定位与范围
 
 面向网络工程师、交付工程师和运维人员，回答“在哪、怎样组织、如何端接、凭什么确认”。CMDB 提供资产与持久关系事实；BOM 提供规划来源；配置、观测和验收证据保持领域所有权。可视化是授权查询投影，不是第二资产库。
@@ -13,7 +13,7 @@
 | 网络架构 | 实际有哪些 Fabric 和角色互联？ | Fabric Flow / 语义束线、Bipartite | 根据设备名猜 VLAN 或 IB |
 | 物理布线 | 两端如何端接？ | Connection Matrix 优先，BioFabric / Panel / Inventory | LLDP/FDB 当线缆 |
 | 链路追踪 | 从这个端口能证实到哪里？ | Metro Route + Tree/Table | 设备 BFS 伪装转发路径 |
-| 现有机柜详情 | **冻结，不属于本轮整改** | 原入口与现有能力保持 | 不新增设计或实现 |
+| 机柜可视化 | 后续独立设计 [rack-visualization.md](rack-visualization.md) | Gallery / Dual，与拓扑按稳定 ID 联动 | 不修改正式机柜与 CMDB |
 
 六阶段交付、项目授权、既有五/八 Tab 设备抽屉不改变。maintained 遵守当前 IPMI-only 限制；这些观察页面不提供设备执行或审批绕过。
 
@@ -144,9 +144,9 @@
 
 **Logical Trace**：具备同一窗口/VRF/地址族/方向的 FIB/转发表证据后，才可用 Metro 多线路表达实际转发/冗余；缺证据时禁用查询并显示缺口。BGP、LLDP、FDB、ARP、DDM 都不能独自充当永久线缆或真实转发路径。本轮不伪造完整多跳或故障影响数量。
 
-## 5. 机柜既有基线（冻结；不属于 V3 工作范围）
+## 5. 机柜既有基线与后续设计入口
 
-以下为 V2 留存内容，仅避免丢失既有业务约束。本轮不执行增强，不改变其代码、布局、交互或验收状态；四页只保留对现有机柜对象的精确链接。
+以下为 V2 正式系统基线，保留既有业务约束。后续用户授权的机柜产品设计、实际 CMDB 能力审计与 Gallery / Dual 原型以 [rack-visualization.md](rack-visualization.md) 为唯一入口；下方旧线框不是新原型的布局要求。正式代码与四页拓扑不变，稳定 ID 跳转继续兼容。
 
 复用 `/racks/:rackId` 与现有 SVG/领域校验，不新建机柜系统。头部一行显示位置面包屑、总/占用/空闲 U、设备数；操作为前后视图、编辑草稿、导出、定位相关拓扑（带当前柜 ID）。
 
@@ -185,7 +185,7 @@
 
 ## 7. 高保真原型入口与运行
 
-独立目录：[topology/prototype/](topology/prototype/)。四页采用 React + SVG / HTML 矩阵，复用 dev 的 shadcn 依赖，不再让四页共用 `TopologyCanvas`。旧 graph.tsx 保留未引用，不作为新视图。机柜原型仍保持既有 RackElevation 实现。本轮没有新增图形引擎或依赖。独立 CSS 以 `.viz-v3`/`v-*` 隔离，数据集中读取 synthetic fixture，不引入真实 IdentityProvider/cmdbFetch，也没有 `/api` 代理。
+独立目录：[topology/prototype/](topology/prototype/)。四页采用 React + SVG / HTML 矩阵，复用 dev 的 shadcn 依赖，不再让四页共用 `TopologyCanvas`。旧 graph.tsx 保留未引用，不作为新视图。机柜原型后续改用独立的共享几何与双面 SVG，详见 rack-visualization.md；未改正式 RackElevation。本轮没有新增图形引擎或依赖。独立 CSS 以 `.viz-v3`/`v-*` 隔离，数据集中读取 synthetic fixture，不引入真实 IdentityProvider/cmdbFetch，也没有 `/api` 代理。
 ```bash
 cd docs/topology/prototype
 npm run dev     # 5181，复用 dev/node_modules；无需安装另一套依赖
@@ -199,7 +199,7 @@ npm run build   # 独立 dist，不影响 dev/dist
 | network-architecture | http://localhost:5181/network-architecture | Fabric Flow、束展开、Bipartite、交换机证据 |
 | physical-cabling | http://localhost:5181/physical-cabling | 默认Connection Matrix、BioFabric、Panel/Inventory、缺端托盘 |
 | link-tracing | http://localhost:5181/link-tracing | Metro Route、关联树、证据表、断点与逻辑能力边界 |
-| rack-detail（冻结） | http://localhost:5181/rack-detail | 旧原型原样保留，不属于本轮设计/验证 |
+| rack-detail（独立后续设计） | http://localhost:5181/rack-detail | Gallery / Dual / 能力驱动叠加 / Mapping；检查见 rack-visualization.md |
 
 原型 URL 支持 rack/asset/cable/port、mode、scope/pod、row/col、bundle、order、state、q；这些是原型内 view-state，正式实施由 Adapter 映射到 §3 既有参数。按钮和筛选本地生效，标记 **SYNTHETIC · 设计原型**；保存仅 `keel.topology.prototype.*` 本地存储；没有 CMDB 写入操作。
 
@@ -278,7 +278,7 @@ Scope 必须基于会话获授权项目求交集；不可把客户端省略 proj
 
 ## 12. 实施顺序与设计决策
 
-1. **当前阶段 V3**：研究六篇资料，整改四页原型与本文；只验证相关交互、截图、类型/构建。机柜不动。完成即停，等待用户评审。
+1. **当前阶段 V3**：研究六篇资料，整改四页原型与本文；只验证相关交互、截图、类型/构建。四个拓扑页面完成即停，等待用户评审；后续授权的机柜设计独立记录。
 2. **确认后才实施**：补专用查询契约及Scope/Snapshot；拆四个领域ViewModel，保留生产路由与设备抽屉。
 3. 经批准后依次实现全局 Hybrid → 网络语义束线 → 布线 Matrix/BioFabric → Metro/Tree/Table；本轮不安排机柜设计。沿用 CMDB/ChangeSet。
 4. 真实数据质量核查后再做规模基准，不用Demo流畅替代千卡证据。

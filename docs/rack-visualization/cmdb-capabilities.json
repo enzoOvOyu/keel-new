@@ -1,0 +1,350 @@
+{
+  "field_coverage": [
+    {
+      "asset_type": "rack",
+      "key": "depth_mm",
+      "total": 16,
+      "present": 0
+    },
+    {
+      "asset_type": "rack",
+      "key": "pod_id",
+      "total": 16,
+      "present": 16
+    },
+    {
+      "asset_type": "rack",
+      "key": "position",
+      "total": 16,
+      "present": 16
+    },
+    {
+      "asset_type": "rack",
+      "key": "power_capacity_kw",
+      "total": 16,
+      "present": 16
+    },
+    {
+      "asset_type": "rack",
+      "key": "power_used_kw",
+      "total": 16,
+      "present": 16
+    },
+    {
+      "asset_type": "rack",
+      "key": "u_height",
+      "total": 16,
+      "present": 16
+    },
+    {
+      "asset_type": "server",
+      "key": "cpu",
+      "total": 66,
+      "present": 0
+    },
+    {
+      "asset_type": "server",
+      "key": "depth_mm",
+      "total": 66,
+      "present": 0
+    },
+    {
+      "asset_type": "server",
+      "key": "face",
+      "total": 66,
+      "present": 0
+    },
+    {
+      "asset_type": "server",
+      "key": "gpu_count",
+      "total": 66,
+      "present": 64
+    },
+    {
+      "asset_type": "server",
+      "key": "gpu_model",
+      "total": 66,
+      "present": 0
+    },
+    {
+      "asset_type": "server",
+      "key": "is_full_depth",
+      "total": 66,
+      "present": 0
+    },
+    {
+      "asset_type": "server",
+      "key": "memory_gb",
+      "total": 66,
+      "present": 0
+    },
+    {
+      "asset_type": "server",
+      "key": "model",
+      "total": 66,
+      "present": 66
+    },
+    {
+      "asset_type": "server",
+      "key": "mounting_face",
+      "total": 66,
+      "present": 0
+    },
+    {
+      "asset_type": "server",
+      "key": "observed_at",
+      "total": 66,
+      "present": 0
+    },
+    {
+      "asset_type": "server",
+      "key": "panel_back",
+      "total": 66,
+      "present": 0
+    },
+    {
+      "asset_type": "server",
+      "key": "panel_front",
+      "total": 66,
+      "present": 0
+    },
+    {
+      "asset_type": "server",
+      "key": "rack_id",
+      "total": 66,
+      "present": 64
+    },
+    {
+      "asset_type": "server",
+      "key": "rack_u",
+      "total": 66,
+      "present": 64
+    },
+    {
+      "asset_type": "server",
+      "key": "u_height",
+      "total": 66,
+      "present": 64
+    },
+    {
+      "asset_type": "server",
+      "key": "u_start",
+      "total": 66,
+      "present": 0
+    },
+    {
+      "asset_type": "switch",
+      "key": "depth_mm",
+      "total": 26,
+      "present": 0
+    },
+    {
+      "asset_type": "switch",
+      "key": "face",
+      "total": 26,
+      "present": 0
+    },
+    {
+      "asset_type": "switch",
+      "key": "is_full_depth",
+      "total": 26,
+      "present": 0
+    },
+    {
+      "asset_type": "switch",
+      "key": "model",
+      "total": 26,
+      "present": 26
+    },
+    {
+      "asset_type": "switch",
+      "key": "mounting_face",
+      "total": 26,
+      "present": 0
+    },
+    {
+      "asset_type": "switch",
+      "key": "panel_back",
+      "total": 26,
+      "present": 0
+    },
+    {
+      "asset_type": "switch",
+      "key": "panel_front",
+      "total": 26,
+      "present": 0
+    },
+    {
+      "asset_type": "switch",
+      "key": "rack_id",
+      "total": 26,
+      "present": 24
+    },
+    {
+      "asset_type": "switch",
+      "key": "rack_u",
+      "total": 26,
+      "present": 24
+    },
+    {
+      "asset_type": "switch",
+      "key": "u_height",
+      "total": 26,
+      "present": 24
+    }
+  ],
+  "counts": {
+    "cable": 706,
+    "pod": 4,
+    "material_plan": 4,
+    "config_baseline": 88,
+    "firmware_inventory": 256,
+    "fabric": 1,
+    "nic": 640,
+    "environment_sensor": 4,
+    "port": 1668,
+    "issue": 54,
+    "rack": 16,
+    "test_report": 131,
+    "network_baseline": 1,
+    "optic": 1024,
+    "execution_reference": 45,
+    "region": 4,
+    "data_center": 1,
+    "gpu": 512,
+    "bom_batch": 2,
+    "mapping_revision": 1,
+    "config_revision": 178,
+    "switch": 26,
+    "project": 5,
+    "server": 66,
+    "network_segment": 40
+  },
+  "location_relations": [
+    {
+      "fact_layer": "planned",
+      "source_type": "bom",
+      "count": 88
+    }
+  ],
+  "position_sources": [
+    {
+      "field_name": "rack_id",
+      "fact_layer": "planned",
+      "approval_status": "synthetic_confirmed",
+      "support": "supported",
+      "freshness": "fresh",
+      "count": 84
+    },
+    {
+      "field_name": "rack_id",
+      "fact_layer": "planned",
+      "approval_status": "synthetic_confirmed",
+      "support": "supported",
+      "freshness": "stale",
+      "count": 5
+    },
+    {
+      "field_name": "rack_u",
+      "fact_layer": "planned",
+      "approval_status": "synthetic_confirmed",
+      "support": "supported",
+      "freshness": "fresh",
+      "count": 83
+    },
+    {
+      "field_name": "rack_u",
+      "fact_layer": "planned",
+      "approval_status": "synthetic_confirmed",
+      "support": "supported",
+      "freshness": "stale",
+      "count": 5
+    },
+    {
+      "field_name": "u_height",
+      "fact_layer": "planned",
+      "approval_status": "synthetic_confirmed",
+      "support": "supported",
+      "freshness": "fresh",
+      "count": 83
+    },
+    {
+      "field_name": "u_height",
+      "fact_layer": "planned",
+      "approval_status": "synthetic_confirmed",
+      "support": "supported",
+      "freshness": "stale",
+      "count": 5
+    },
+    {
+      "field_name": "u_height",
+      "fact_layer": "planned",
+      "approval_status": "synthetic_confirmed",
+      "support": "supported",
+      "freshness": "unknown",
+      "count": 16
+    }
+  ],
+  "samples": [
+    {
+      "item_uid": "sw-leaf-0001",
+      "asset_type": "switch",
+      "model": "SN5610 (demo)",
+      "rack_id": "rack-0001",
+      "rack_u": "2",
+      "u_height": "2",
+      "gpu_count": null,
+      "face": null
+    },
+    {
+      "item_uid": "rack-0001",
+      "asset_type": "rack",
+      "model": null,
+      "rack_id": null,
+      "rack_u": null,
+      "u_height": "42",
+      "gpu_count": null,
+      "face": null
+    },
+    {
+      "item_uid": "srv-0001",
+      "asset_type": "server",
+      "model": "HGX B300 (demo)",
+      "rack_id": "rack-0001",
+      "rack_u": "33",
+      "u_height": "6",
+      "gpu_count": "8",
+      "face": null
+    }
+  ],
+  "active_schema": "keel-cmdb-v3",
+  "model_revision_count": 4,
+  "rack_placement_count": 0,
+  "bom_revision_count": 23,
+  "audited_at": "2026-10-31T03:11:36.377081+00:00",
+  "source": "Local PostgreSQL read-only aggregate, includes synthetic and test records; not a device inspection",
+  "additional_observations": {
+    "model_revisions": 4,
+    "model_revisions_with_geometry": 0,
+    "server_gpu_contains_relations": 512,
+    "pdu_entities": 0,
+    "confirmed_as_built_locations": 0,
+    "rack_position_sample": "01 (text ordinal, not surveyed XY)",
+    "rack_power_sample": {
+      "id": "rack-0001",
+      "power_capacity_kw": 60,
+      "power_used_kw": 51.38,
+      "fact_layer": "planned",
+      "source_type": "bom",
+      "freshness": "unknown"
+    },
+    "legacy_fixture": {
+      "rack_placements": 88,
+      "rack_diagram_revisions": 4,
+      "device_models": 2,
+      "rack_environment_sensors": 16,
+      "rack_power_circuits": 32,
+      "note": "Synthetic fixture collections are not confirmed live CMDB installation or telemetry snapshots."
+    }
+  }
+}

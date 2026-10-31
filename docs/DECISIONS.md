@@ -69,3 +69,7 @@
 ## IDENTITY-NH-2026-10-30 · 待确认：Critical 网络签署资格
 
 PRD §2 已定义 NH 业务职责，但本次要求的六个稳定默认身份角色中没有 NH，也没有规定哪种角色/资源授权可获得 NH 签署资格。保留 NE+DE+NH 三签；实现 blocked_policy，禁止 admin 替代。待产品选择：增加独立签署资格（不改变六个默认角色），或明确新增 NH 角色及分配范围。仅阻断 Critical 网络审批，不影响普通 NE+DE 双签、本地登录和 BOM。
+
+## RACK-VIS-2026-10-31 · 安装面、几何与实装来源
+
+实查 CMDB 88 条 active located_in 为 planned/bom，安装面与深度未记录；旧 synthetic fixture 有 front 默认值和布局版本。决定不跨来源补写、不把登记规划冒充实装。独立原型双面显示明确标注的虚线占位，Comparison 等待批准规划与实装快照；不阻塞 Gallery、U 立面与 Mapping。现场安装确认责任人/权限、可接受实装证据、规划比较版本的选择需后续业务确认；沿用既有 ChangeSet 审批，不自行授予新签署权。完整数据审计与设计见 [rack-visualization.md](rack-visualization.md)。
