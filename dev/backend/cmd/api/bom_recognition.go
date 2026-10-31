@@ -86,40 +86,16 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 	b.Error = ""
 	previous := map[string]bom.RecognitionSheet{}
 	for _, info := range b.Sheets {
-		if source, ok := ir.AnalyzeSheet(info.Name); ok && len(info.Plan) > 0 {
-			if plan, e := ai.RestoreExtraction(source, info.Plan); e == nil {
-				info.Plan, _ = json.Marshal(plan)
-				info.State = "recognized"
-				info.Error = ""
-			}
-		}
 		previous[info.Name] = info
 	}
 	wanted := map[string]bool{}
 	for _, r := range b.Records {
-		if !r.Imported && !r.Ignored && (len(selected) == 0 || selected[r.ID]) {
+		if !r.Imported && !r.Ignored && !r.Confirmed && r.Method != "manual" && (len(selected) == 0 || selected[r.ID]) {
 			wanted[r.Sheet] = true
 		}
 	}
-	// Replay already obtained AI plans against immutable cells after a worker restart.
-	// No external request or stale generated candidate is needed for this step.
-	canReplay := resume
-	for _, r := range b.Records {
-		if r.Imported || r.Method == "manual" || r.Confirmed || r.Ignored {
-			canReplay = false
-		}
-	}
-	if canReplay {
-		b.Records = bom.PlanningSourceRows(wb).Records
-		selected = map[string]bool{}
-		for _, sh := range wb.Sheets {
-			info := previous[sh.Name]
-			var plan ai.SheetPlan
-			if info.State == "recognized" && json.Unmarshal(info.Plan, &plan) == nil && ai.CheckExtraction(sh, plan) == nil {
-				b.Records = applySheetPlan(b.Records, sh, plan, nil)
-			}
-		}
-	}
+	// Resume from persisted candidates. A failed attempt must never replace a
+	// successful plan or reconstruct unrelated reviewed source rows.
 	b.Sheets = nil
 	for _, sheet := range wb.Sheets {
 		info, exists := previous[sheet.Name]
@@ -127,7 +103,7 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 			info = bom.RecognitionSheet{Name: sheet.Name, State: "pending"}
 		}
 		// Resume persisted successful extraction after a worker restart.
-		if resume && info.State == "recognized" {
+		if resume && len(selected) == 0 && wanted[sheet.Name] && info.State == "recognized" {
 			var plan ai.SheetPlan
 			if json.Unmarshal(info.Plan, &plan) == nil && ai.CheckExtraction(sheet, plan) == nil {
 				delete(wanted, sheet.Name)
@@ -160,6 +136,12 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 		return e == nil && tag.RowsAffected() == 1
 	}
 	save(false)
+	safeWorkbook := bom.Workbook{}
+	for _, sh := range wb.Sheets {
+		safeWorkbook.Sheets = append(safeWorkbook.Sheets, safeSheet(sh))
+	}
+	safeIR := bom.NewWorkbookIR(safeWorkbook)
+	validSheets := map[string]bool{}
 	var planning ai.PlanningContext
 	json.Unmarshal(b.Analysis, &planning)
 	if err == nil && planning.Summary == "" {
@@ -168,11 +150,7 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 		s.db.QueryRow(ctx, "SELECT name,code FROM project WHERE id=$1", s.project).Scan(&name, &code)
 		project["name"] = name
 		project["code"] = code
-		safe := bom.Workbook{}
-		for _, sh := range wb.Sheets {
-			safe.Sheets = append(safe.Sheets, safeSheet(sh))
-		}
-		planning, err = provider.UnderstandPlanning(ctx, project, safe)
+		planning, err = provider.UnderstandPlanning(ctx, project, safeWorkbook)
 		if err == nil {
 			b.Analysis, _ = json.Marshal(planning)
 			b.Phase = "extracting"
@@ -208,12 +186,18 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 					adapter.Calls = 0
 					adapter.TotalInputTokens = 0
 					adapter.TotalOutputTokens = 0
-					source, _ := ir.AnalyzeSheet(sheet.Name)
-					safe := safeSheet(source)
-					plan, e := adapter.PlanSheet(workCtx, safe, planning)
+					var prior *ai.SheetPlan
+					var saved ai.SheetPlan
+					if json.Unmarshal(previous[sheet.Name].Plan, &saved) == nil && len(saved.Tables) > 0 {
+						prior = &saved
+					}
+					plan, e := adapter.PlanSheetWithWorkbook(workCtx, safeIR, sheet.Name, planning, prior)
 					// A transient timeout on one Sheet must not discard results from all other Sheets.
 					if e != nil && (e.Error() == "PROVIDER_TIMEOUT_OR_UNAVAILABLE" || e.Error() == "PROVIDER_RESPONSE_FAILED") {
-						plan, e = adapter.PlanSheet(workCtx, safe, planning)
+						plan, e = adapter.PlanSheetWithWorkbook(workCtx, safeIR, sheet.Name, planning, prior)
+					}
+					if e == nil {
+						e = ai.CheckPlanRevision(sheet, plan, prior)
 					}
 					r := result{sheet: sheet, plan: plan, err: e}
 					r.input = adapter.TotalInputTokens
@@ -264,6 +248,7 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 			case <-ctx.Done():
 				return
 			}
+			b.Steps = append(b.Steps, r.plan.Steps...)
 			calls += r.calls
 			inputTokens += r.input
 			outputTokens += r.output
@@ -271,14 +256,14 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 				if b.Sheets[k].Name == r.sheet.Name {
 					info := &b.Sheets[k]
 					info.State = "recognized"
-					info.Purpose = r.plan.Purpose
-					info.Note = r.plan.Note
 					if r.err != nil {
 						info.State = "failed"
 						info.Error = r.err.Error()
-						info.Plan, _ = json.Marshal(r.plan)
 						failed++
 					} else {
+						info.Purpose = r.plan.Purpose
+						info.Note = r.plan.Note
+						validSheets[r.sheet.Name] = true
 						b.Trace("analyze_sheet", r.sheet.Name, "", "succeeded", r.plan.Note)
 						for _, region := range regions {
 							if region.Sheet == r.sheet.Name {
@@ -319,17 +304,22 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 				affected[fmt.Sprint(r.Sheet, ":", r.Row)] = true
 			}
 		}
-		groups := map[string][]int{}
+		groups := map[int][]int{}
+		groupIDs := map[string]int{}
 		descriptions := []ai.Description{}
 		for j, r := range b.Records {
-			if (len(selected) > 0 && !affected[fmt.Sprint(r.Sheet, ":", r.Row)]) || r.Imported || r.Ignored || r.Confirmed || r.Method == "manual" || r.Item.Model == "" || (r.Item.Category != "other" && r.Item.Category != "material" && r.Item.Category != "server" && r.Item.Category != "switch" && r.Item.Category != "router") {
+			if !validSheets[r.Sheet] || (len(selected) > 0 && !affected[fmt.Sprint(r.Sheet, ":", r.Row)]) || r.Imported || r.Ignored || r.Confirmed || r.Method == "manual" || r.Item.Model == "" || (r.Item.Category != "other" && r.Item.Category != "material" && r.Item.Category != "server" && r.Item.Category != "switch" && r.Item.Category != "router") {
 				continue
 			}
-			key := strings.TrimSpace(r.Item.Model)
-			if _, ok := groups[key]; !ok {
-				descriptions = append(descriptions, ai.Description{ID: len(descriptions), Model: r.Item.Model, Name: r.Item.Model, Description: r.Item.Fields["description"] + " " + r.Item.Fields["specification"]})
+			description := r.Item.Fields["description"] + " " + r.Item.Fields["specification"] + " source_type=" + r.Item.Category + " record_kind=" + r.Item.Fields["record_kind"]
+			key := strings.TrimSpace(r.Item.Model) + "|" + description
+			gid, exists := groupIDs[key]
+			if !exists {
+				gid = len(descriptions)
+				groupIDs[key] = gid
+				descriptions = append(descriptions, ai.Description{ID: gid, Model: r.Item.Model, Name: r.Item.Model, Description: description})
 			}
-			groups[key] = append(groups[key], j)
+			groups[gid] = append(groups[gid], j)
 		}
 
 		if b.Classifications == nil {
@@ -339,13 +329,15 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 			return fmt.Sprint(providerID, "@", provider.ConfigRevision, "|", d.Model, "|", d.Description)
 		}
 		apply := func(c ai.Classification, d ai.Description) {
-			for _, j := range groups[strings.TrimSpace(d.Model)] {
+			for _, j := range groups[d.ID] {
 				r := &b.Records[j]
+				if r.Item.Category != "other" && r.Item.Category != "material" && r.Item.Category != c.Type {
+					r.Ambiguity = true
+					r.Reason = "分类建议与已有来源类型冲突，保留原类型并要求人工核查：" + c.Type
+					continue
+				}
 				r.Item.Category = c.Type
 				r.Item.Fields["category"] = c.Type
-				if c.Type != "server" && c.Type != "switch" && c.Type != "router" && r.Item.Fields["record_kind"] == "planned_device" {
-					r.Item.Fields["record_kind"] = "component"
-				}
 				r.Confidence = &c.Confidence
 				r.Reason = c.Reason
 				r.Recognition = "recognized"
@@ -431,7 +423,7 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 		state = "failed"
 		code = "PARTIAL_SHEET_RECOGNITION"
 	}
-	diag := map[string]any{"schema_version": "workbook-agent/v3", "prompt_version": "workbook-agent/v3", "provider_id": providerID, "completed_sheets": completed, "failed_sheets": failed, "total_sheets": len(b.Sheets), "records": len(b.Records), "model_calls": calls, "input_tokens": inputTokens, "output_tokens": outputTokens, "duration_ms": time.Since(started).Milliseconds(), "error_code": code, "raw_response_stored": false}
+	diag := map[string]any{"schema_version": "workbook-agent/v4", "prompt_version": "workbook-agent/v4", "provider_id": providerID, "completed_sheets": completed, "failed_sheets": failed, "total_sheets": len(b.Sheets), "records": len(b.Records), "model_calls": calls, "input_tokens": inputTokens, "output_tokens": outputTokens, "duration_ms": time.Since(started).Milliseconds(), "error_code": code, "raw_response_stored": false}
 	if provider != nil {
 		diag["model"] = provider.Model
 		diag["provider_revision"] = provider.ConfigRevision
@@ -482,10 +474,48 @@ func applySheetPlan(records []bom.ImportRecord, sheet bom.Sheet, plan ai.SheetPl
 			headers = append(headers, c)
 		}
 	}
+	selectedRows := map[int]bool{}
+	protected := map[string]bool{}
+	priorIDs := map[string]string{}
+	for _, old := range records {
+		if old.Sheet != sheet.Name {
+			continue
+		}
+		if selected[old.ID] {
+			selectedRows[old.Row] = true
+		}
+		if old.Method == "source_relation" {
+			continue
+		}
+		cols := map[string]int{}
+		for field, cell := range old.Item.Sources {
+			cols[field] = cell.Column
+		}
+		if anchor := extractionAnchor(cols); anchor != "" {
+			key := fmt.Sprint(old.Row) + ":" + anchor
+			priorIDs[key] = old.ID
+			if old.Imported || old.Ignored || old.Confirmed || old.Method == "manual" {
+				protected[key] = true
+			}
+		}
+	}
+	if len(selected) == 0 {
+		present := map[int]bool{}
+		for _, old := range records {
+			if old.Sheet == sheet.Name {
+				present[old.Row] = true
+			}
+		}
+		for _, source := range bom.PlanningSourceRows(bom.Workbook{Sheets: []bom.Sheet{sheet}}).Records {
+			if !present[source.Row] {
+				records = append(records, source)
+			}
+		}
+	}
 	out := []bom.ImportRecord{}
 	seenRows := map[int]bool{}
 	for _, record := range records {
-		if record.Sheet != sheet.Name || record.Imported || record.Ignored || (len(selected) > 0 && !selected[record.ID]) {
+		if record.Sheet != sheet.Name || record.Imported || record.Ignored || record.Confirmed || record.Method == "manual" || record.Method == "source_relation" || (len(selected) > 0 && !selectedRows[record.Row]) {
 			out = append(out, record)
 			continue
 		}
@@ -554,8 +584,13 @@ func applySheetPlan(records []bom.ImportRecord, sheet bom.Sheet, plan ai.SheetPl
 					}
 				}
 				r := record
-				if len(plan.Tables) > 1 {
-					r.ID = bom.StableID("candidate:" + record.Sheet + ":" + fmt.Sprint(record.Row) + ":object:" + t.Key)
+				anchor := extractionAnchor(t.Fields)
+				r.ID = bom.StableID("candidate:" + record.Sheet + ":" + fmt.Sprint(record.Row) + ":source:" + anchor)
+				if protected[fmt.Sprint(record.Row)+":"+anchor] {
+					continue
+				}
+				if old := priorIDs[fmt.Sprint(record.Row)+":"+anchor]; old != "" {
+					r.ID = old
 				}
 				r.Item = bom.Item{UID: r.ID, Sheet: r.Sheet, Status: "planned", Category: kind, Fields: fields, Sources: sources, Serial: fields["serial"], Hostname: fields["hostname"], Model: fields["model"], Parent: fields["parent_uid"], Port: fields["port_index"]}
 				r.Item.Fields["category"] = kind
@@ -566,6 +601,12 @@ func applySheetPlan(records []bom.ImportRecord, sheet bom.Sheet, plan ai.SheetPl
 				}
 				r.Confidence = &t.Confidence
 				r.Ambiguity = false
+				if record.Item.Category != "" && record.Item.Category != "other" && record.Item.Category != "material" && record.Item.Category != kind && extractionAnchorFromItem(record.Item) == anchor {
+					r.Ambiguity = true
+					r.Reason = "重分析分类与已有候选冲突，保留原类型并要求人工核查：" + kind
+					r.Item.Category = record.Item.Category
+					r.Item.Fields["category"] = record.Item.Category
+				}
 				r.Recognition = "recognized"
 				if kind == "other" {
 					r.Recognition = "unrecognized"
@@ -616,4 +657,15 @@ func extractWithTools(b *bom.Workbench, sheet bom.Sheet, plan ai.SheetPlan, sele
 		b.Trace(tool, sheet.Name, "", "succeeded", "copied bound original cell values; no generated equipment identities")
 	}
 	return result
+}
+
+// Candidate identity is derived from source identity columns, never an AI-generated table name or classification.
+func extractionAnchor(fields map[string]int) string { return ai.SourceAnchor(fields) }
+
+func extractionAnchorFromItem(item bom.Item) string {
+	cols := map[string]int{}
+	for field, cell := range item.Sources {
+		cols[field] = cell.Column
+	}
+	return extractionAnchor(cols)
 }

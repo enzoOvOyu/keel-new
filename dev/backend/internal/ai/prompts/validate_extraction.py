@@ -5,7 +5,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 class Extractor(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', strict=True)
     key: str = ''
     entity_type: str
     record_kind: Literal['planned_device','material_summary','component','physical_connection','physical_port','logical_connection','reference']
@@ -18,7 +18,7 @@ class Extractor(BaseModel):
     confidence: float = Field(ge=0, le=1)
 
 class ExtractionPlan(BaseModel):
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra='forbid', strict=True)
     purpose: str
     header_rows: list[int]
     tables: list[Extractor]

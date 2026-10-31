@@ -12,10 +12,11 @@ import (
 
 // A plan contains column references, never executable code or invented asset values.
 type SheetPlan struct {
-	Purpose    string      `json:"purpose"`
-	HeaderRows []int       `json:"header_rows"`
-	Tables     []TablePlan `json:"tables"`
-	Note       string      `json:"note"`
+	Purpose    string          `json:"purpose"`
+	HeaderRows []int           `json:"header_rows"`
+	Tables     []TablePlan     `json:"tables"`
+	Note       string          `json:"note"`
+	Steps      []bom.AgentStep `json:"-"`
 }
 type TablePlan struct {
 	Key        string            `json:"key"`
@@ -129,59 +130,7 @@ func (p *Provider) UnderstandPlanning(ctx context.Context, project map[string]st
 	return result, nil
 }
 func (p *Provider) PlanSheet(ctx context.Context, s bom.Sheet, planning PlanningContext) (SheetPlan, error) {
-	input := describeSheet(s, false)
-	ir := bom.NewWorkbookIR(bom.Workbook{Sheets: []bom.Sheet{s}})
-	regions := []any{}
-	for _, region := range ir.InspectWorkbook() {
-		cells := ir.InspectRegion(region)
-		samples := []bom.Cell{}
-		for _, c := range cells {
-			if c.Row <= region.Start+2 || c.Row == (region.Start+region.End)/2 || c.Row == region.End {
-				c.FormulaBacked = c.FormulaBacked || c.Formula != ""
-				c.Formula = ""
-				samples = append(samples, c)
-			}
-		}
-		regions = append(regions, map[string]any{"region": region, "sample_cells": samples})
-	}
-	input["regions"] = regions
-	input["planning_context"] = planning
-	input["allowed_types"] = bom.ImportTypes
-	prompt, _ := prompts.ReadFile("prompts/extraction-v1.txt")
-	content, e := p.completeJSON(ctx, string(prompt), input)
-	if e != nil {
-		return SheetPlan{}, e
-	}
-	schemaErr := validateExtractionSchema(ctx, content)
-	plan, e := decodeExtraction(content, input["last_row"].(int))
-	if schemaErr != nil {
-		e = schemaErr
-	}
-	if e == nil {
-		normalizeSourceBindings(s, &plan)
-	}
-	if e == nil {
-		e = inspectExtraction(s, plan)
-	}
-	if e != nil {
-		input["invalid_response"] = json.RawMessage(content)
-		input["correction_required"] = e.Error()
-		content, e = p.completeJSON(ctx, string(prompt)+"\nYour previous response failed the supplied contract check. Correct only the indicated structural error, using allowed entity types and source column numbers. Return the full corrected JSON.", input)
-		if e != nil {
-			return plan, e
-		}
-		if err := validateExtractionSchema(ctx, content); err != nil {
-			return plan, err
-		}
-		fixed, err := decodeExtraction(content, input["last_row"].(int))
-		if err == nil {
-			normalizeSourceBindings(s, &fixed)
-			err = inspectExtraction(s, fixed)
-		}
-		return fixed, err
-	}
-
-	return plan, nil
+	return p.PlanSheetWithWorkbook(ctx, bom.NewWorkbookIR(bom.Workbook{Sheets: []bom.Sheet{s}}), s.Name, planning, nil)
 }
 
 func decodeExtraction(content []byte, maxRow int) (SheetPlan, error) {
@@ -203,11 +152,13 @@ func decodeExtraction(content []byte, maxRow int) (SheetPlan, error) {
 		if t.Confidence < 0 || t.Confidence > 1 {
 			return plan, errors.New("confidence must be between 0 and 1")
 		}
+		if t.TypeColumn < 0 || t.TypeColumn > 512 {
+			return plan, errors.New("type_column must be 0 or an actual source column")
+		}
+		if t.Kind != "reference" && len(t.Fields) == 0 {
+			return plan, errors.New("non-reference extractor requires source fields")
+		}
 		for field, col := range t.Fields {
-			if col == 0 {
-				delete(t.Fields, field)
-				continue
-			}
 			if bom.Field(field) != field || col < 1 || col > 512 {
 				return plan, fmt.Errorf("field %q column %d is outside the allowed fields/columns", field, col)
 			}
@@ -299,7 +250,7 @@ func inspectExtraction(s bom.Sheet, plan SheetPlan) error {
 			}
 		}
 	}
-	return nil
+	return inspectSourceCoverage(s, plan)
 }
 
 func CheckExtraction(s bom.Sheet, plan SheetPlan) error { return inspectExtraction(s, plan) }
@@ -321,10 +272,6 @@ func normalizeSourceBindings(s bom.Sheet, p *SheetPlan) {
 	}
 	for j := range p.Tables {
 		t := &p.Tables[j]
-		if t.TypeColumn > 0 && len(t.Types) == 0 {
-			t.TypeColumn = 0
-			t.Type = "other"
-		}
 		if col := t.Fields["hostname"]; col > 0 && len(labels) == 1 && heads[col] != "hostname" {
 			if t.Fields["device_alias"] == 0 {
 				t.Fields["device_alias"] = col

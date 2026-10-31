@@ -1,0 +1,200 @@
+package ai
+
+import (
+	"fmt"
+	"sort"
+	"strings"
+
+	"keel.local/dev/internal/bom"
+)
+
+// Validate semantic extraction separately from raw-cell retention. These checks
+// only use explicit source headers and values; they never invent missing assets.
+func inspectSourceCoverage(s bom.Sheet, p SheetPlan) error {
+	rows := bom.MergedSourceCells(s)
+	seen := map[string]bool{}
+	for _, t := range p.Tables {
+		if t.Kind == "reference" {
+			continue
+		}
+		for row := t.Start; row <= t.End; row++ {
+			if !tableRowPresent(t, rows[row]) || !tableTypeMatches(t, rows[row]) {
+				continue
+			}
+			key := fmt.Sprint(row, ":", SourceAnchor(t.Fields))
+			if seen[key] {
+				return fmt.Errorf("DUPLICATE_SOURCE_OBJECT: row=%d; overlapping extractors produce the same source identity", row)
+			}
+			seen[key] = true
+		}
+	}
+	headers := map[int]map[string][]int{}
+	for _, c := range s.Cells {
+		if c.Sensitive {
+			continue
+		}
+		f := bom.Field(c.Value)
+		if f == "" {
+			continue
+		}
+		if headers[c.Row] == nil {
+			headers[c.Row] = map[string][]int{}
+		}
+		headers[c.Row][f] = append(headers[c.Row][f], c.Column)
+	}
+	order := []int{}
+	for row, h := range headers {
+		if len(h) >= 2 && (len(h["hostname"]) > 0 && len(h["model"]) > 0 || len(h["endpoint_a_device"]) > 0 && len(h["endpoint_b_device"]) > 0) {
+			order = append(order, row)
+		}
+	}
+	sort.Ints(order)
+	max := 0
+	for row := range rows {
+		if row > max {
+			max = row
+		}
+	}
+	for j, header := range order {
+		end := max
+		if j+1 < len(order) {
+			end = order[j+1] - 1
+		}
+		h := headers[header]
+		for row := header + 1; row <= end; row++ {
+			identity := false
+			for _, f := range []string{"hostname", "endpoint_a_device", "endpoint_b_device"} {
+				for _, col := range h[f] {
+					if bom.ExtractCellValue(rows[row][col], f) != "" {
+						identity = true
+					}
+				}
+			}
+			if !identity {
+				continue
+			}
+			// Deterministic diagnostics contain coordinates, never asset values.
+			for _, f := range []string{"hostname", "device_alias", "serial", "model", "endpoint_a_device", "endpoint_a_port", "endpoint_b_device", "endpoint_b_port", "endpoint_a_optic", "endpoint_b_optic"} {
+				for _, col := range h[f] {
+					if bom.ExtractCellValue(rows[row][col], f) == "" {
+						continue
+					}
+					if !planMapsCell(p, rows[row], row, f, col) {
+						return fmt.Errorf("SOURCE_FIELD_UNCOVERED: row=%d column=%d field=%s; inspect this region and preserve the explicit source field", row, col, f)
+					}
+				}
+			}
+		}
+	}
+	// Every otherwise extractable typed row must match an extractor. A new
+	// distinct category cannot silently disappear because type_values omitted it.
+	for _, t := range p.Tables {
+		if t.TypeColumn == 0 || t.Kind == "reference" {
+			continue
+		}
+		for row := t.Start; row <= t.End; row++ {
+			if !tableRowPresent(t, rows[row]) {
+				continue
+			}
+			covered := false
+			for _, u := range p.Tables {
+				if u.Kind == t.Kind && row >= u.Start && row <= u.End && tableRowPresent(u, rows[row]) && tableTypeMatches(u, rows[row]) {
+					covered = true
+					break
+				}
+			}
+			if !covered {
+				return fmt.Errorf("SOURCE_TYPE_UNCOVERED: row=%d column=%d; inspect the actual value and include it in type_values", row, t.TypeColumn)
+			}
+		}
+	}
+	return nil
+}
+
+func tableRowPresent(t TablePlan, cells map[int]bom.Cell) bool {
+	for _, f := range t.Required {
+		if bom.ExtractCellValue(cells[t.Fields[f]], f) == "" {
+			return false
+		}
+	}
+	for f, col := range t.Fields {
+		if bom.ExtractCellValue(cells[col], f) != "" {
+			return true
+		}
+	}
+	return false
+}
+
+func tableTypeMatches(t TablePlan, cells map[int]bom.Cell) bool {
+	if t.TypeColumn == 0 {
+		return true
+	}
+	_, ok := t.Types[strings.TrimSpace(cells[t.TypeColumn].Value)]
+	return ok
+}
+
+func planMapsCell(p SheetPlan, cells map[int]bom.Cell, row int, field string, col int) bool {
+	for _, t := range p.Tables {
+		if t.Kind != "reference" && row >= t.Start && row <= t.End && t.Fields[field] == col && tableRowPresent(t, cells) && tableTypeMatches(t, cells) {
+			return true
+		}
+	}
+	return false
+}
+
+// Previously extracted, source-backed fields may not disappear on retry. A
+// correction that removes an established binding needs explicit human review.
+func CheckPlanRevision(s bom.Sheet, next SheetPlan, previous *SheetPlan) error {
+	if e := inspectExtraction(s, next); e != nil {
+		return e
+	}
+	if previous == nil {
+		return nil
+	}
+	rows := bom.MergedSourceCells(s)
+	for _, t := range previous.Tables {
+		if t.Kind == "reference" {
+			continue
+		}
+		fields := []string{}
+		for f := range t.Fields {
+			fields = append(fields, f)
+		}
+		sort.Strings(fields)
+		for row := t.Start; row <= t.End; row++ {
+			if !tableRowPresent(t, rows[row]) || !tableTypeMatches(t, rows[row]) {
+				continue
+			}
+			for _, f := range fields {
+				col := t.Fields[f]
+				if bom.ExtractCellValue(rows[row][col], f) != "" && !planMapsCell(next, rows[row], row, f, col) {
+					return fmt.Errorf("EXTRACTION_REGRESSION: row=%d column=%d field=%s; preserve the previous source binding or leave this attempt failed for manual review", row, col, f)
+				}
+			}
+		}
+	}
+	return nil
+}
+
+// Source coordinates, not AI-generated table names or categories, identify a candidate.
+func SourceAnchor(fields map[string]int) string {
+	for _, group := range [][]string{{"endpoint_a_device", "endpoint_a_port", "endpoint_b_device", "endpoint_b_port"}, {"parent_uid", "port_index"}, {"hostname"}, {"serial"}, {"model"}, {"name"}} {
+		parts := []string{}
+		for _, field := range group {
+			if fields[field] <= 0 {
+				parts = nil
+				break
+			}
+			parts = append(parts, fmt.Sprint(field, "=", fields[field]))
+		}
+		if len(parts) > 0 {
+			return strings.Join(parts, ",")
+		}
+	}
+	parts := []string{}
+	for field, col := range fields {
+		parts = append(parts, fmt.Sprint(field, "=", col))
+	}
+	sort.Strings(parts)
+	return strings.Join(parts, ",")
+}
