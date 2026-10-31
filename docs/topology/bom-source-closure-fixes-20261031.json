@@ -15,26 +15,34 @@
     "Omitted global-summary sheets stay unknown and are still independently analyzed; no invented purpose or silent exclusion.",
     "Distinguish dual-sided device/port headers from inventory; verify both connection sides independently. Summaries without explicit ports are not forced into physical cables.",
     "Do not treat token embedded in a device hostname as a credential declaration; credential labels and values remain redacted. Upgrade cached IR from immutable source to excelize-ir/v4.",
-    "Retain missing module-model bindings only for unambiguous paired device/port/module headers, using the already-bound endpoint orientation."
+    "Retain missing module-model bindings only for unambiguous paired device/port/module headers, using the already-bound endpoint orientation.",
+    "Scope normalization, validation and model-schema column constraints to independent header regions; bind explicit stacked tables locally.",
+    "Preserve literal source device type, retain category provenance, and avoid overriding it with model guesses.",
+    "Persist final workbench and draft in separate statements of one transaction to reduce PostgreSQL JSON parsing peak memory."
   ],
   "checks": {
     "Go_API_AI_BOM_CMDB": "PASS before final build",
     "PostgreSQL_BOM_network_role_matrix_scope_and_precedence": "PASS; isolated synthetic project inside rolled-back transaction",
-    "new_real_workbook": "IN PROGRESS: same independent batch after resolving parse and global-summary blockers",
+    "new_real_workbook": "33/33 extraction completed, coverage complete; full ingestion FAILED with 422 at revision 22.",
     "column_limit_blank_vs_real_value_and_formula": "PASS",
     "omitted_global_summary_source": "PASS",
     "dual_sided_connection_and_portless_summary": "PASS: go test ./internal/ai (cached successful run)",
     "token_named_inventory_and_real_credentials": "PASS: targeted BOM/AI/API packages; new workbook local parser retains 182 nonempty hostname-column cells, zero redacted; this is not an asset count.",
-    "paired_module_header_orientation": "PASS: AI package, reversed A/B fixture"
+    "paired_module_header_orientation": "PASS: AI package, reversed A/B fixture",
+    "explicit_source_category": "216/216 match; 151 earlier mismatches corrected.",
+    "snapshot_atomicity": "PASS on real PostgreSQL temporary shadow table: success, stale revision rejection, second-write rollback.",
+    "full_size_snapshot_after_fix": "PASS once: 41,690 candidates saved after PostgreSQL OOM recovery. Not a concurrency/load certification.",
+    "actual_ingestion": "Confirm 422 SELECTED_RECORDS_REQUIRE_CORRECTION; submit 422 SELECTED_RECORDS_NOT_CONFIRMED_OR_VALID."
   },
   "unchanged_gates": "No invented SN, units, geometry, port rates or model approvals. Missing actual business evidence remains a blocker.",
   "memory_limit": "Known allocation amplification reduced; repeated full-size runtime OOM recovery is not yet certified.",
   "source_file": "TX B300 Layout-new.xlsx remains outside Git and is not modified.",
   "runtime": {
-    "code_commit": "d62dab1",
-    "binary": "/tmp/keel-api-bom-v6g-flows-1031",
+    "code_commit": "00b3fd5",
+    "binary": "/tmp/keel-api-bom-v6n-flows-1031",
     "port": 8081,
     "environment_preserved": true,
     "frontend_changed": false
-  }
+  },
+  "remaining": "No positive CMDB/topology ingestion acceptance. 226 model approval blockers; 14,963 cable speed evidence blockers; endpoint/duplicate/source-evidence issues remain. Global model approval proposal prepared, not executed."
 }

@@ -1,0 +1,24 @@
+{
+  "status": "AWAITING_EXPLICIT_MODEL_APPROVAL_AUTHORIZATION",
+  "project_id": "proj-d8a90883-3361-465f-8793-7b18346cf0b8",
+  "evidence": {
+    "workbook": "TX B300 Layout-new.xlsx",
+    "sheet": "Device Information",
+    "first_source_row": 50,
+    "matching_candidates": 30,
+    "source_type": "Switch",
+    "verified": "Literal source type and model; no hardware capability inferred"
+  },
+  "request": {
+    "method": "POST",
+    "path": "/api/v1/bom-models",
+    "body": {
+      "model": "S9825-64D",
+      "category": "switch",
+      "capabilities": {},
+      "reason": "Isolated BOM test proj-d8a90883-3361-465f-8793-7b18346cf0b8: source model/type verified; no speed, geometry or hardware capability asserted. Record created model revision ID for cleanup."
+    }
+  },
+  "side_effect": "Creates a GLOBAL catalog revision; current API has no project-only model catalog or deletion endpoint. Deleting the project alone does not remove the catalog revision.",
+  "acceptance_limit": "Enables an asset-ingestion test only; physical cable speed evidence and topology edges remain independently gated."
+}

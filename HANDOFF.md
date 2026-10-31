@@ -2,9 +2,9 @@
 
 ## 当前运行环境 · BOM 新文件根因修复（2026-10-31）
 
-此节覆盖下方旧运行版本。后端 `d62dab1`，分支 `fix/bom-source-closure`，工作树 `/home/ubuntu/keel-bom-closure-dev`；8081 运行 `/tmp/keel-api-bom-v6g-flows-1031`，启动器 `/tmp/keel-bom-v6g-run-api.py`。前端5180、Flows运行环境及原配置未替换。部署证据 `/tmp/keel-bom-v6g-20261031/deployment.json`，秘密环境文件不得打印或入Git。
+此节覆盖下方旧运行版本。后端 `00b3fd5`，分支 `fix/bom-source-closure`，工作树 `/home/ubuntu/keel-bom-closure-dev`；8081 运行 `/tmp/keel-api-bom-v6n-flows-1031`，启动器 `/tmp/keel-bom-v6n-run-api.py`。前端5180、Flows运行环境及原配置未替换。部署证据 `/tmp/keel-bom-v6n-20261031/deployment.json`，秘密环境文件不得打印或入Git。
 
-新文件测试仍进行中，不能宣称 BOM→CMDB→拓扑闭环通过。独立可清理项目 `proj-d8a90883-3361-465f-8793-7b18346cf0b8`，导入 `fd0f48a6-32e0-440f-a958-9c9c1d545527`；私有证据 `/tmp/keel-tx-layout-v6-20261031`。原文件未改动。当前修复包含双侧表头误判、全局摘要漏表、空白列尾、失败解析重试、字段语义、角色投影、token设备名被误脱敏、端点模块型号遗漏；详见 `docs/topology/bom-source-closure-fixes-20261031.json`。型号审批、真实端口/速率/位置等证据不能伪造。
+新文件33/33提取和来源覆盖已通过，216行显式类型全部核对；revision 22实际确认/提交均422，BOM→CMDB→拓扑闭环失败，仍在处理。最终保存曾触发 PostgreSQL OOM，现同事务分步写入，定向原子性检查和一次全尺寸保存通过。全局型号登记方案在 `docs/topology/bom-test-model-approval-proposal-20261031.json`，尚未执行。独立可清理项目 `proj-d8a90883-3361-465f-8793-7b18346cf0b8`，导入 `fd0f48a6-32e0-440f-a958-9c9c1d545527`；私有证据 `/tmp/keel-tx-layout-v6-20261031`。原文件未改动。当前修复包含双侧表头误判、全局摘要漏表、空白列尾、失败解析重试、字段语义、角色投影、token设备名被误脱敏、端点模块型号遗漏；详见 `docs/topology/bom-source-closure-fixes-20261031.json`。型号审批、真实端口/速率/位置等证据不能伪造。
 
 
 
