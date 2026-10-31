@@ -1,5 +1,10 @@
 # Keel 当前开发交接
 
+## 当前前端热修复：删除项目不重载页面
+
+前端代码 `0deb3a6`，当前5180源目录未变，通过Vite热更新生效；后端继续994bb1c。删除后在页内更新授权快照、项目列表与项目缓存，后台刷新Session，不再清空整个QueryClient或强制刷新页面。修正启动占位/真实删除Modal说明，拒绝旧授权资产请求回写，空授权清空资产。未运行冒烟、回归或实际删除，详情见项目删除记录。
+
+
 ## 当前部署：项目删除（2026-10-31，覆盖下方历史环境）
 
 用户已授权部署，运行代码 `994bb1c`，集成项目删除及 Flows `95df50f`，保留此前BOM/拓扑修复。8081运行 `/tmp/keel-api-project-delete-1031`，5180前端源目录改为 `/home/ubuntu/keel-project-delete-deploy/dev`；API原配置逐字节保留。启动器及私有部署记录 `/tmp/keel-project-delete-deployment-1031`，不得打印环境文件。迁移025 Flows游标、026项目删除已应用。项目列表提供删除确认；没有实际删除任何项目，没有运行冒烟/回归。Go构建及受限内存前端打包通过，合并后的完整TypeScript构建被终止，不能声称类型检查通过。全库备份失败，完成结构备份；部署详情见 `docs/topology/project-deletion-deployment-20261031.json`。
