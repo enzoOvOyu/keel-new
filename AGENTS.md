@@ -271,3 +271,4 @@
 - 用户要求先分析需求并提交可替换方案。方案入口 `docs/flows-redesign/KESTRA-UI-REPLACEMENT.md`；本阶段不修改正式UI或部署。
 - 后续在 `feat/jobs-kestra-ui`、`/home/ubuntu/keel-kestra-ui-dev` 实施；允许本模块直接复用Apache-2.0的Kestra Vue组件，覆盖旧“不得复制Kestra UI”约束。保留署名和许可；其他业务不迁移框架。
 - 不用自制React近似页面冒充原生复用；Keel项目/身份/审批/CMDB/通道仍经统一后端授权，不能直接开放整个引擎后台。
+- 用户随后明确“开始开发”：方案阶段的暂停开发约束现已解除；在上述新分支持续实施原生组件替换与LC生命周期范围，不自行部署到当前测试环境。

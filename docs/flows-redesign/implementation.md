@@ -122,3 +122,16 @@ Kestra2.0.7兼容修正包括Loop替代不存在的ForEach、`fromJson(item.valu
 ## 用户授权发布 · 9f16065
 
 已部署到现有5180/8081；兼容纳入原BOM修复4403c63/9f16065，不修改其实现语义。原数据库应用021…024前保留完整私有dump，未导入隔离合成行。原admin登录/5项只读API/3页面渲染共9项通过，容器回调可达且无票据403。证据[deployment-validation.json](deployment-validation.json)。临时5190/8096与合成Agent关闭；当前运行/回退以HANDOFF顶部发布节为准，不再使用先前隔离环境描述作为当前状态。
+
+## 原生Kestra UI接入 · feat/jobs-kestra-ui · 开发中
+
+- 用户已授权实施，替换方案及LC-01…14为当前范围。新目录`/home/ubuntu/keel-kestra-ui-dev`，原5180/8081没有切换。
+- 已固定上游commit49b62a2，纳入原生KsDataTable/KsTableColumn/KsButton/KsInput/KsExecutionStatus及19个直接依赖文件；许可和来源见`dev/src/vendor/kestra/`。不是完整原生应用已迁移。
+- Vue3挂载到React模块内，原生SFC由Vite Vue插件编译；样式通过PostCSS限定在`.keel-kestra`，主题令牌也作用于模块范围。上游完整UI要求Node24，本次实际证明的是所引入组件子集可在现有Node22/Vite6编译，不代表完整编辑器依赖已验证。
+- 作业列表与Execution列表接入原有Provider，原生分页/搜索/状态/行跳转，运行和QuickRun仍接既有流程。当前是已加载数据的本地分页，不冒充已完成服务端total/统计；执行历史仍通过原游标加载更多。
+- `npm run build`通过；浏览器借助请求拦截加载新分支dist并读取现有API，两原生列表挂载无pageerror/console error。没有新服务/端口，没有改测试数据。检查发现空态翻译键显示已补中文消息，字体按上游16px根字号换算为模块内12/14px，避免Keel根字号压缩原生组件。
+- 尚待：原生多面板编辑器/执行详情及生命周期页、完整KSFilter、URL筛选/列管理/批量动作、服务端目录分页与最近执行摘要。当前不能称为完整前端替换。
+- 保留并迁入此前未发布修复：QuickRun保存真实Revision、历史Execution精确Revision恢复、完整原生模板转换、Files载入任务脚本；Go定向测试及编辑器回归通过，尚未覆盖当前BOM集成二进制。
+- 接入上游RunTimeline.vue（保留许可证，标注Keel导入/日期/类型及popover隔离改动），从真实Execution.state.histories展示状态历史；不填造历史。此组件当前仅完成接线和编译检查，未在真实有历史的执行记录上完成交互验收。
+- Native列表搜索/状态保留在URL；当前仍是过渡目录与已加载执行数据筛选，服务端完整分页/total/聚合尚待实现。
+- 最新分支构建（TypeScript+Vite）通过；[三项浏览器证据](native-ui/validation.json)与[当前原生目录截图](native-ui/catalog.png)已保存。搜索URL/刷新恢复检查通过，无页面或console error；不是编辑器、真实设备或完整生命周期验收。

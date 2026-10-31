@@ -117,3 +117,7 @@
 - 用户要求先提交替换方案，见[Kestra UI替换](docs/flows-redesign/KESTRA-UI-REPLACEMENT.md)。原生Vue组件复用为推荐路线，当前仅源码审查及设计，尚未实施界面替换。
 - 分支携带Quick Run版本冻结、完整原生模板转换、Files脚本载入等未部署修复；之前的构建/定向测试通过不代表原生Vue模块已验收。
 - 用户进一步要求纳入Kestra中有用的遗漏信息页；替换方案已增加LC-01…14：执行时间线/Attempt、恢复重跑、变量文件、指标、依赖、Flow日志/趋势/并发、调度补跑、异常等待视图、全局日志、源码Docs及历史导航。源码中的Enterprise锁定demo页已区分，不计为可直接复用的真实能力；均为方案增补，尚未实现。
+
+## 原生UI实施起点（开发中）
+- 用户已从方案阶段转为授权实施。新分支原生组件/两列表代码在`dev/src/features/jobs-native`，来源组件在`dev/src/vendor/kestra`，React消费者仍是`features/flows/FlowsWorkspace.tsx`。只在新工作区改动，原运行环境未切换。
+- 构建和浏览器两列表挂载已通过；检查用浏览器拦截提供新dist，不启动新端口或写入资产/作业数据。尚未接原生编辑器和LC生命周期页面。具体当前限制见flows-redesign实施记录末节，不用旧“全部完成”描述。
