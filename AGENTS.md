@@ -266,3 +266,8 @@
 
 ## 2026-10-31 作业平台命名更正
 用户最新明确界面名称为「作业平台」，覆盖压缩包中固定 Flows 名称的旧约束。保留 /flows 路由、API、权限标识及领域 Flow/Execution 名称，不另建入口。
+
+## 最新方向：作业平台复用Kestra原生前端
+- 用户要求先分析需求并提交可替换方案。方案入口 `docs/flows-redesign/KESTRA-UI-REPLACEMENT.md`；本阶段不修改正式UI或部署。
+- 后续在 `feat/jobs-kestra-ui`、`/home/ubuntu/keel-kestra-ui-dev` 实施；允许本模块直接复用Apache-2.0的Kestra Vue组件，覆盖旧“不得复制Kestra UI”约束。保留署名和许可；其他业务不迁移框架。
+- 不用自制React近似页面冒充原生复用；Keel项目/身份/审批/CMDB/通道仍经统一后端授权，不能直接开放整个引擎后台。

@@ -111,3 +111,8 @@
 ## 当前 Flows 重构分支（2026-10-31）
 
 最新任务包见 `docs/flows-redesign/`，实施索引 `docs/flows-redesign/implementation.md`。本任务已隔离到 `/home/ubuntu/keel-flows-dev` / `feat/flows-redesign`，基线 d8a91b4；不要在运行5180的可视化 worktree 继续写本任务。包内指定真实 Kestra/Go/Agent/SSH 落地，覆盖旧 Mock-only 的 Flows 阶段限制；其他业务不扩展。新底座 `keel-flows-*` 独立容器，Kestra 仅127.0.0.1:8095，未替换现有5180/8081，未修改原数据库。
+
+## 作业平台最新设计方向：Kestra原生UI替换方案
+- 新分支 `feat/jobs-kestra-ui`、独立目录 `/home/ubuntu/keel-kestra-ui-dev`；现有5180/8081未切换到新工作区。
+- 用户要求先提交替换方案，见[Kestra UI替换](docs/flows-redesign/KESTRA-UI-REPLACEMENT.md)。原生Vue组件复用为推荐路线，当前仅源码审查及设计，尚未实施界面替换。
+- 分支携带Quick Run版本冻结、完整原生模板转换、Files脚本载入等未部署修复；之前的构建/定向测试通过不代表原生Vue模块已验收。
