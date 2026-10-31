@@ -72,3 +72,16 @@ func TestClassificationMapsLocalBatchIDsBackToSourceGroups(t *testing.T) {
 		t.Fatal("classification lost source group identity", err)
 	}
 }
+
+func TestIncompleteGlobalSummaryDoesNotExcludeRemainingSheets(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		raw := `{"summary":"synthetic context","sources":[{"sheet":"first","role":"inventory","description":"synthetic"}],"identifiers":[],"questions":[]}`
+		json.NewEncoder(w).Encode(map[string]any{"choices": []any{map[string]any{"message": map[string]string{"content": raw}}}})
+	}))
+	defer server.Close()
+	p := Provider{Endpoint: server.URL, Timeout: time.Second}
+	result, err := p.UnderstandPlanning(context.Background(), nil, bom.Workbook{Sheets: []bom.Sheet{{Name: "first"}, {Name: "second"}}})
+	if err != nil || len(result.Sources) != 2 || result.Sources[1].Sheet != "second" || result.Sources[1].Role != "unknown" || len(result.Questions) != 1 {
+		t.Fatal("omitted global summary entry aborted extraction or invented a disposition", err)
+	}
+}

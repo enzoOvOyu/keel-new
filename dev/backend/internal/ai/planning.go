@@ -152,8 +152,14 @@ func (p *Provider) UnderstandPlanning(ctx context.Context, project map[string]st
 		}
 		seen[s.Sheet] = true
 	}
-	if len(seen) != len(names) {
-		return result, errors.New("AI_PLANNING_SOURCE_COVERAGE")
+	// The global summary is context, not an extraction gate. Every actual
+	// sheet is still independently inspected and audited by the orchestrator.
+	// Missing summary entries are unknown, never implicitly excluded or approved.
+	for _, sheet := range wb.Sheets {
+		if !seen[sheet.Name] {
+			result.Sources = append(result.Sources, PlanningSource{Sheet: sheet.Name, Role: "unknown", Description: "全局摘要未覆盖；必须独立分析，尚未确认用途或版本范围"})
+			result.Questions = append(result.Questions, "需要逐表确认用途和项目范围："+sheet.Name)
+		}
 	}
 	return result, nil
 }
