@@ -37,7 +37,7 @@ func TestProjectDeleteRollback(t *testing.T) {
 		t.Fatal(e)
 	}
 	defer tx.Rollback(ctx)
-	migration, e := os.ReadFile("../../migrations/025_project_delete.sql")
+	migration, e := os.ReadFile("../../migrations/026_project_delete.sql")
 	if e != nil {
 		t.Fatal(e)
 	}
