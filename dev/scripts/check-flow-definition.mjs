@@ -1,0 +1,20 @@
+// Focused editor regression checks; no API, database or device calls.
+import fs from 'node:fs';
+import ts from 'typescript';
+import assert from 'node:assert/strict';
+const source=fs.readFileSync(new URL('../src/features/flows/definition.ts',import.meta.url),'utf8');
+const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;
+const m=await import('data:text/javascript;base64,'+Buffer.from(compiled).toString('base64'));
+const task=(id,type='log.Log',extra={})=>({id,type:'io.kestra.plugin.core.'+type,...extra});
+const doc={tasks:[task('branch','flow.If',{then:[task('parallel','flow.Parallel',{tasks:[task('a'),task('b')]})],else:[task('c')]}),task('end')],errors:[task('error')],finally:[task('final')]};
+const graph=m.definitionGraph(doc);assert.equal(new Set(graph.nodes.map(n=>n.x+':'+n.y)).size,graph.nodes.length);
+assert(graph.edges.some(e=>e.source==='branch'&&e.target==='c'));assert(!graph.edges.some(e=>e.source==='a'&&e.target==='b'));
+m.removeTask(doc,'b');m.removeTask(doc,'error');assert(!m.taskList(doc).some(t=>t.id==='b'||t.id==='error'));
+assert.throws(()=>m.sequenceAfter(doc,'c','a'));m.sequenceAfter(doc,'end','branch');assert.equal(doc.tasks[0].id,'end');
+const steps=[{id:'a',depends_on:[]},{id:'b',depends_on:[]},{id:'c',depends_on:['b']}];
+m.connectSteps(steps,'step:a','step:b');assert.deepEqual(steps[1].depends_on,['a']);assert.throws(()=>m.connectSteps(steps,'step:c','step:a'));assert.deepEqual(steps[0].depends_on,[]);
+assert.equal(m.durationSeconds('PT1H2M3S'),3723);assert.equal(m.durationSeconds('PT5M'),300);
+const config={tasks:[task('targets','flow.Loop',{concurrencyLimit:3,tasks:[task('agent_task','http.Request',{timeout:'PT130S'})]})],inputs:[{id:'kind',defaults:'python'},{id:'command',defaults:'print(1)'},{id:'steps',defaults:[]}]};
+assert.equal(m.runDefaults(config).timeout,120);assert.equal(m.runDefaults(config).concurrency,3);assert.equal(m.runDefaults(config).kind,'python');
+assert.throws(()=>m.checkStructure({tasks:'invalid'}));m.checkStructure({tasks:[task('sub','flow.Subflow',{inputs:{key:'value'}})]});
+console.log('PASS: nested branches/layout/delete, same-branch reorder, device DAG/cycle rejection, duration and run defaults, editable YAML structure');

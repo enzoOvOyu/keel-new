@@ -1,138 +1,66 @@
 import { useMemo, useState } from 'react';
-import { ReactFlow, Background, Controls, MarkerType, Panel as CanvasPanel, type Node, type Edge } from '@xyflow/react';
+import { ReactFlow, Background, Controls, MarkerType, Handle, Position, type Node, type Edge } from '@xyflow/react';
+import { Box, GitBranch, Terminal, Repeat2, Layers, ArrowDown, ArrowUp, Trash2, Plus, ListTree, FileCode2, FolderOpen, Check, Save, Upload } from 'lucide-react';
 import '@xyflow/react/dist/style.css';
 import YAML from 'yaml';
-import { Button, Notice, Tabs } from './ui';
-const library = [['KEEL · ADAPTER', 'CMDB Target Resolver', 'keel.cmdb.resolve'], ['KEEL · ADAPTER', 'Transport Selector', 'keel.transport.select'], ['KEEL · ADAPTER', 'Agent Task', 'keel.agent.task'], ['KEEL · ADAPTER', 'SSH Command', 'keel.ssh.command'], ['KEEL · ADAPTER', 'File Transfer', 'keel.file.transfer'], ['CONTROL FLOW', 'Loop', 'io.kestra.plugin.core.flow.Loop'], ['CONTROL FLOW', 'Parallel', 'io.kestra.plugin.core.flow.Parallel'], ['CONTROL FLOW', 'Condition', 'io.kestra.plugin.core.flow.If'], ['CONTROL FLOW', 'Subflow', 'io.kestra.plugin.core.flow.Subflow'], ['KEEL · ADAPTER', 'Bash Script', 'keel.script.bash'], ['KEEL · ADAPTER', 'Python Script', 'keel.script.python'], ['KESTRA TASKS', 'Log / Output', 'io.kestra.plugin.core.log.Log']] as const;
-export function FlowGraph({ document, onSelect, readonly = true }: {
-    document: any;
-    onSelect?: (id: string) => void;
-    readonly?: boolean;
-}) {
-    const [offsets, setOffsets] = useState<Record<string, {
-        x: number;
-        y: number;
-    }>>({});
-    const [nodes, edges] = useMemo(() => {
-        const nodes: Node[] = [], edges: Edge[] = [];
-        function sequence(tasks: any[], incoming: string[], column: number): string[] {
-            let previous = incoming;
-            for (const task of tasks || []) {
-                previous = place(task, previous, column);
-            }
-            return previous;
-        }
-        function place(t: any, incoming: string[], column: number): string[] {
-            if (!t?.id)
-                return incoming;
-            const id = String(t.id);
-            nodes.push({ id, position: offsets[id] || { x: column * 260, y: nodes.length * 110 }, data: { label: <><strong>{id}</strong><small>{String(t.type || '').split('.').slice(-2).join('.')}</small></> }, style: { width: 220, borderRadius: 6, border: '1px solid var(--border,#d7dce5)', background: 'var(--card,#fff)', fontSize: 12 }, draggable: !readonly });
-            for (const from of incoming)
-                edges.push({ id: from + '-' + id, source: from, target: id, markerEnd: { type: MarkerType.ArrowClosed }, type: 'smoothstep' });
-            if (String(t.type).endsWith('.Parallel'))
-                return (t.tasks || []).flatMap((child: any, i: number) => place(child, [id], column + i));
-            if (String(t.type).endsWith('.If'))
-                return [...sequence(t.then || [], [id], column + 1), ...sequence(t.else || [], [id], column - 1)];
-            return Array.isArray(t.tasks) && t.tasks.length ? sequence(t.tasks, [id], column + 1) : [id];
-        }
-        sequence(document?.tasks || [], [], 0);
-        for (const task of document?.finally || []) {
-            const before = nodes.length;
-            place(task, [], 0);
-            if (nodes[before])
-                nodes[before].data.label = <><strong>{task.id}</strong><small>Finally · 任何终态</small></>;
-        }
-        return [nodes, edges] as const;
-    }, [document, offsets, readonly]);
-    return <ReactFlow nodes={nodes} edges={edges} fitView fitViewOptions={{ maxZoom: 1, padding: .3 }} onPaneClick={() => onSelect?.('')} onNodeClick={(_, node) => onSelect?.(node.id)} onNodeDragStop={(_, node) => setOffsets(v => ({ ...v, [node.id]: node.position }))} nodesConnectable={false} nodesDraggable={!readonly} minZoom={.25} maxZoom={2}><Background /><Controls /></ReactFlow>;
+import { Button, Notice, Tabs, State } from './ui';
+import { branches, checkStructure, taskList, locate, removeTask, moveTask, sequenceAfter, connectSteps, definitionGraph, isControlled, inputDefault, setDefault, type Definition, type Task } from './definition';
+const core = 'io.kestra.plugin.core.';
+const library = [
+  ['CONTROL FLOW', 'Loop', core+'flow.Loop', Repeat2], ['CONTROL FLOW', 'Parallel', core+'flow.Parallel', Layers],
+  ['CONTROL FLOW', 'Condition', core+'flow.If', GitBranch], ['CONTROL FLOW', 'Subflow', core+'flow.Subflow', Box],
+  ['KESTRA TASKS', 'Log', core+'log.Log', Terminal], ['KESTRA TASKS', 'Output', core+'output.OutputValues', Box],
+] as const;
+function TaskNode({data}: any) {
+  const Icon = data.type?.endsWith('.If') ? GitBranch : data.type?.endsWith('.Loop') ? Repeat2 : data.type?.endsWith('.Parallel') ? Layers : Terminal;
+  return <><Handle type="target" position={Position.Top}/><div className="fl-node-title"><Icon size={16}/><strong>{data.label}</strong>{data.state&&<State value={data.state}/>}</div><small>{data.subtitle}</small>{data.lane&&<span className="fl-node-lane">{data.lane}</span>}<Handle type="source" position={Position.Bottom}/></>;
 }
-export function Builder({ source, onChange, onValidate, onSave, onFiles, onTemplate, canEdit, busy, filesEnabled = true }: {
-    source: string;
-    onChange: (s: string) => void;
-    onValidate: () => void;
-    onSave: (draft?: boolean) => void;
-    onFiles: () => void;
-    onTemplate: (kind?: string, policy?: string) => void;
-    canEdit: boolean;
-    busy: boolean;
-    filesEnabled?: boolean;
+const nodeTypes = { task: TaskNode };
+export function FlowGraph({ document, onSelect, readonly = true, onConnect, selected, states = {} }: {
+  document: Definition; onSelect?: (id: string) => void; readonly?: boolean;
+  onConnect?: (from:string,to:string)=>void; selected?:string; states?:Record<string,string>;
 }) {
-    const [view, setView] = useState('Visual'), [selected, setSelected] = useState(''), [search, setSearch] = useState(''), [editError, setEditError] = useState('');
-    let doc: any = null, parseError = '';
-    try {
-        doc = YAML.parse(source);
-        if (!doc || typeof doc !== 'object')
-            parseError = '需要有效的 Kestra YAML';
-    }
-    catch (e) {
-        parseError = String(e);
-    }
-    const find = (tasks: any[]): any => {
-        for (const t of tasks || []) {
-            if (t.id === selected)
-                return t;
-            const nested = find([...(t.tasks || []), ...(t.then || []), ...(t.else || [])]);
-            if (nested)
-                return nested;
-        }
-        return null;
-    };
-    const task = doc ? find([...(doc.tasks || []), ...(doc.finally || []), ...(doc.errors || [])]) : null;
-    function changeTask(patch: any) {
-        if (!canEdit || !task)
-            return;
-        Object.assign(task, patch);
-        onChange(YAML.stringify(doc));
-    }
-    function add(type: string) {
-        if (!canEdit || !doc)
-            return;
-        if (type.startsWith('keel.')) {
-            const kind = type === 'keel.script.python' ? 'python' : type === 'keel.ssh.command' ? 'command' : type === 'keel.file.transfer' ? 'file.upload' : 'bash';
-            const policy = type === 'keel.agent.task' || type === 'keel.file.transfer' ? 'agent_only' : type === 'keel.ssh.command' ? 'ssh_only' : 'agent_preferred';
-            onTemplate(kind, policy);
-            return;
-        }
-        const id = 'task_' + crypto.randomUUID().slice(0, 6);
-        const t: any = { id, type };
-        if (type.endsWith('.Log'))
-            t.message = '';
-        if (type.endsWith('.Loop'))
-            Object.assign(t, { values: '{{ inputs.targets }}', concurrencyLimit: 8, tasks: [] });
-        if (type.endsWith('.Parallel'))
-            t.tasks = [];
-        if (type.endsWith('.If'))
-            Object.assign(t, { condition: '', then: [], else: [] });
-        if (type.endsWith('.Subflow'))
-            Object.assign(t, { namespace: doc.namespace, flowId: '' });
-        if (type.endsWith('.Commands'))
-            t.commands = [''];
-        if (type.endsWith('.Script'))
-            t.script = '';
-        if (task && Array.isArray(task.tasks))
-            task.tasks.push(t);
-        else
-            doc.tasks = [...(doc.tasks || []), t];
-        onChange(YAML.stringify(doc));
-        setSelected(id);
-        setEditError('');
-    }
-    return <div className="fl-builder"><div className="fl-builder-toolbar"><Tabs items={['Visual', 'YAML', 'Topology']} current={view} onChange={setView}/><span className="spacer"/><Button size="sm" variant="outline" onClick={() => onTemplate()}>Start from Template</Button><Button size="sm" variant="outline" disabled={!filesEnabled} title={!filesEnabled ? '保存 Flow 后管理 Namespace Files' : undefined} onClick={onFiles}>Files</Button><Button size="sm" variant="outline" disabled={busy} onClick={onValidate}>Validate</Button><Button size="sm" variant="outline" disabled={!canEdit || busy || !!parseError} onClick={() => onSave(true)}>Save Draft</Button><Button size="sm" disabled={!canEdit || busy || !!parseError} onClick={() => onSave(false)}>Publish</Button></div><Notice error={parseError || editError}/>{view === 'YAML' ? <textarea aria-label="Kestra Flow YAML" className="fl-yaml" readOnly={!canEdit} value={source} onChange={e => onChange(e.target.value)}/> : <div className="fl-builder-columns"><aside className="fl-node-library"><h3>NODE LIBRARY</h3><button onClick={() => setSelected('')}>Flow Settings / Inputs</button><input placeholder="Search nodes…" value={search} onChange={e => setSearch(e.target.value)}/>{library.filter(t => t.join(' ').toLowerCase().includes(search.toLowerCase())).map(([group, label, type], i, a) => <div key={type}>{i === 0 || group !== a[i - 1][0] ? <h4>{group}</h4> : null}<button disabled={!canEdit || view === 'Topology'} title={type} onClick={() => add(type)}>{label}<small>{type.startsWith('keel.') ? 'Keel 接入点 · 非原生插件' : type.split('.').slice(-1)}</small></button></div>)}<h4>ERROR HANDLING</h4><button disabled={!canEdit} onClick={() => { doc.finally = [...(doc.finally || []), { id: 'finalize_' + crypto.randomUUID().slice(0, 6), type: 'io.kestra.plugin.core.log.Log', message: 'Execution finished' }]; onChange(YAML.stringify(doc)); }}>Finally</button></aside><div className="fl-dag"><FlowGraph document={doc} readonly={view === 'Topology' || !canEdit} onSelect={setSelected}/></div><aside className="fl-node-inspector"><h3>NODE INSPECTOR</h3>{task ? <><label>Task ID<input disabled={!canEdit} value={task.id} onChange={e => { const id = e.target.value; changeTask({ id }); setSelected(id); }}/></label><label>Type<code>{task.type}</code></label>{['message', 'script', 'values', 'condition', 'namespace', 'flowId', 'body'].filter(k => k in task).map(k => <label key={k}>{k}<textarea disabled={!canEdit} value={String(task[k])} onChange={e => changeTask({ [k]: e.target.value })}/></label>)}{'commands' in task && <label>Commands<textarea disabled={!canEdit} value={task.commands.join('\n')} onChange={e => changeTask({ commands: e.target.value.split('\n') })}/></label>}{'concurrencyLimit' in task && <label>Target concurrency<input disabled={!canEdit} type="number" min={1} max={64} value={task.concurrencyLimit} onChange={e => changeTask({ concurrencyLimit: Number(e.target.value) })}/></label>}<label>最大重试次数<input disabled={!canEdit || task.type === 'io.kestra.plugin.core.http.Request'} type="number" min={0} max={10} value={Math.max(0, (task.retry?.maxAttempts || 1) - 1)} onChange={e => {
-                    const retries = Number(e.target.value);
-                    if (retries === 0) {
-                        delete task.retry;
-                        onChange(YAML.stringify(doc));
-                    }
-                    else
-                        changeTask({ retry: { type: 'constant', maxAttempts: retries + 1, interval: 'PT1S' } });
-                }}/></label><small>目标端副作用不自动重放；使用失败目标定向重试。</small><label>Timeout<input disabled={!canEdit} placeholder="PT10M" value={task.timeout || ''} onChange={e => changeTask({ timeout: e.target.value })}/></label><p>Flow 并发与单次目标并发分开配置。插件和字段支持由 Kestra 校验。</p><Button variant="outline" disabled={!canEdit} onClick={() => { const remove = (tasks: any[]): any[] => tasks.filter(t => t.id !== selected).map(t => ({ ...t, ...(t.tasks ? { tasks: remove(t.tasks) } : {}) })); doc.tasks = remove(doc.tasks || []); onChange(YAML.stringify(doc)); setSelected(''); }}>删除节点</Button></> : <FlowInputs document={doc} onChange={onChange} canEdit={canEdit}/>}</aside></div>}</div>;
+  const [offsets,setOffsets]=useState<Record<string,{x:number;y:number}>>({});
+  const graph=useMemo(()=>definitionGraph(document || {}),[document]);
+  const nodes:Node[]=graph.nodes.map(n=>({id:n.id,type:'task',position:offsets[n.id]||{x:n.x,y:n.y},selected:selected===n.id,
+    data:{label:n.id,type:n.task.type,subtitle:n.task.type?.split('.').at(-1),lane:n.lane,state:states[n.id]},draggable:!readonly}));
+  const edges:Edge[]=graph.edges.map((e,i)=>({id:`${e.source}-${e.target}-${i}`,source:e.source,target:e.target,label:e.label,type:'smoothstep',markerEnd:{type:MarkerType.ArrowClosed}}));
+  return <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes} fitView fitViewOptions={{maxZoom:1,padding:.25}}
+    onNodeClick={(_,n)=>onSelect?.(n.id)} onPaneClick={()=>onSelect?.('')} onNodeDragStop={(_,n)=>setOffsets(v=>({...v,[n.id]:n.position}))}
+    onConnect={e=>e.source&&e.target&&onConnect?.(e.source,e.target)} nodesConnectable={!readonly&&!!onConnect} nodesDraggable={!readonly} minZoom={.2} maxZoom={1.5}>
+    <Background gap={20} size={1}/><Controls showInteractive={false}/>
+  </ReactFlow>;
 }
-function FlowInputs({ document: d, onChange, canEdit }: {
-    document: any;
-    onChange: (s: string) => void;
-    canEdit: boolean;
+export function Builder({source,onChange,onValidate,onSave,onFiles,onTemplate,canEdit,busy,filesEnabled=true}: {
+ source:string;onChange:(s:string)=>void;onValidate:()=>void;onSave:(draft?:boolean)=>void;onFiles:()=>void;onTemplate:(kind?:string,policy?:string)=>void;canEdit:boolean;busy:boolean;filesEnabled?:boolean;
 }) {
-    if (!d)
-        return <p>先修正 YAML。</p>;
-    return <><label>Flow concurrency<input disabled={!canEdit} type="number" min={1} max={64} value={d.concurrency?.limit || 1} onChange={e => { d.concurrency = { limit: Number(e.target.value), behavior: 'QUEUE' }; onChange(YAML.stringify(d)); }}/></label><p>同一 Flow 的 Execution 并发；与 Loop 内的目标并发分别配置。</p><h4>Inputs</h4>{(d.inputs || []).map((input: any, i: number) => <div className="fl-validation" key={i}><label>Name<input disabled={!canEdit || input.id === 'ticket' || input.id === 'targets'} value={input.id} onChange={e => { input.id = e.target.value; onChange(YAML.stringify(d)); }}/></label><label>Type<select disabled={!canEdit || input.id === 'ticket' || input.id === 'targets'} value={input.type} onChange={e => { input.type = e.target.value; onChange(YAML.stringify(d)); }}>{['STRING', 'INT', 'BOOLEAN', 'JSON', 'SECRET'].map(t => <option key={t}>{t}</option>)}</select></label>{input.id !== 'ticket' && input.id !== 'targets' && input.type !== 'SECRET' && <label>Default<textarea disabled={!canEdit} value={typeof input.defaults === 'string' ? input.defaults : input.defaults === undefined ? '' : JSON.stringify(input.defaults)} onChange={e => { input.defaults = e.target.value; onChange(YAML.stringify(d)); }}/></label>}<small>{input.id === 'ticket' ? '受控 Job Service 注入，不填写明文。' : input.id === 'targets' ? '由 CMDB 目标预检冻结。' : '原生 Kestra 输入参数'}</small></div>)}<Button size="sm" variant="outline" disabled={!canEdit} onClick={() => { d.inputs = [...(d.inputs || []), { id: 'input_' + crypto.randomUUID().slice(0, 5), type: 'STRING' }]; onChange(YAML.stringify(d)); }}>Add Input</Button></>;
+ const [view,setView]=useState('Visual'),[selected,setSelected]=useState(''),[search,setSearch]=useState(''),[error,setError]=useState(''),[branch,setBranch]=useState('tasks'),[layout,setLayout]=useState(0),[outline,setOutline]=useState(false),[graphScope,setGraphScope]=useState('devices');
+ let doc:Definition={};let parseError='';try{doc=YAML.parse(source);checkStructure(doc)}catch(e){parseError=String(e);doc={}}
+ const controlled=isControlled(doc), all=taskList(doc), task=all.find(t=>t.id===selected), steps=inputDefault(doc,'steps',[]) as any[];
+ const step=steps.find(s=>'step:'+s.id===selected),readOnly=!canEdit||view==='Topology'||!!parseError;
+ const update=(fn:()=>void)=>{if(readOnly)return;try{fn();onChange(YAML.stringify(doc));setError('')}catch(e){setError(String(e))}};
+ const changeTask=(patch:Record<string,unknown>)=>update(()=>Object.assign(task!,patch));
+ const changeStep=(patch:Record<string,unknown>)=>update(()=>{Object.assign(step,patch);setDefault(doc,'steps',steps,'JSON')});
+ function add(type:string){setGraphScope('orchestration');update(()=>{const id='task_'+crypto.randomUUID().slice(0,6);const t:Task={id,type};
+  if(type.endsWith('.Log'))t.message='';if(type.endsWith('.OutputValues'))t.values={};
+  if(type.endsWith('.Loop'))Object.assign(t,{values:'{{ inputs.items }}',concurrencyLimit:8,tasks:[]});
+  if(type.endsWith('.Parallel'))t.tasks=[];if(type.endsWith('.If'))Object.assign(t,{condition:'',then:[],else:[]});
+  if(type.endsWith('.Subflow'))Object.assign(t,{namespace:doc.namespace,flowId:''});
+  const parent=task&&['tasks','then','else'].some(k=>Array.isArray(task[k]))?task:doc;
+  const key=parent===doc?(['errors','finally'].includes(branch)?branch:'tasks'):parent.type.endsWith('.If')?(branch==='else'?'else':'then'):'tasks';
+  parent[key]||=[];parent[key].push(t);setSelected(id);
+ })}
+ function addStep(kind:string){setGraphScope('devices');update(()=>{const id='step_'+crypto.randomUUID().slice(0,6);steps.push({id,kind,command:'',depends_on:steps.length?[steps.at(-1).id]:[],inputs:{}});setDefault(doc,'steps',steps,'JSON');setSelected('step:'+id)})}
+ const structured=controlled&&graphScope==='devices';
+ const stepDoc:Definition={tasks:steps.map(s=>({id:'step:'+s.id,type:'keel.'+s.kind,depends_on:(s.depends_on||[]).map((id:string)=>'step:'+id)}))};
+ return <div className="fl-builder"><div className="fl-builder-toolbar"><Tabs items={['Visual','YAML','Topology']} current={view} onChange={setView}/><span className="spacer"/><Button size="sm" variant="ghost" onClick={()=>onTemplate()}><Box size={14}/>Templates</Button><Button size="sm" variant="ghost" disabled={!filesEnabled} onClick={onFiles}><FolderOpen size={14}/>Files</Button><Button size="sm" variant="outline" disabled={busy||!!parseError} onClick={onValidate}><Check size={14}/>Validate</Button><Button size="sm" variant="outline" disabled={!canEdit||busy||!!parseError} onClick={()=>onSave(true)}><Save size={14}/>Save draft</Button><Button size="sm" disabled={!canEdit||busy||!!parseError} onClick={()=>onSave(false)}><Upload size={14}/>Publish</Button></div>
+ <Notice error={parseError||error}/>{view==='YAML'?<div className="fl-source-editor"><div className="fl-editor-caption"><FileCode2 size={14}/>Kestra Flow · YAML<span className="spacer"/>{source.split('\n').length} lines</div><textarea spellCheck={false} aria-label="Kestra Flow YAML" className="fl-yaml" readOnly={!canEdit} value={source} onChange={e=>onChange(e.target.value)}/></div>:
+ <div className="fl-builder-columns"><aside className="fl-node-library"><div className="fl-section-title"><h3>{outline?'FLOW OUTLINE':'NODE LIBRARY'}</h3><Button size="sm" variant="ghost" aria-label="切换节点目录与结构" onClick={()=>setOutline(!outline)}><ListTree size={15}/></Button></div><input placeholder="Search nodes…" value={search} onChange={e=>setSearch(e.target.value)}/><button className={!selected?'active':''} onClick={()=>setSelected('')}><Box size={14}/>Flow settings</button>
+ {outline?<>{all.filter(t=>t.id.includes(search)).map(t=><button key={t.id} className={selected===t.id?'active':''} onClick={()=>{setGraphScope('orchestration');setSelected(t.id)}}><GitBranch size={14}/>{t.id}</button>)}</>:<><h4>DEVICE TASKS</h4>{[['bash','Bash script'],['python','Python script'],['command','SSH / Agent command']].map(([kind,label])=><button key={kind} disabled={readOnly||!controlled} title={!controlled?'先选择 CMDB Batch Execution 模板，再添加设备任务':undefined} onClick={()=>addStep(kind)}><Terminal size={14}/>{label}</button>)}{!controlled&&<button className="fl-library-link" disabled={readOnly} onClick={()=>onTemplate()}>选择设备作业模板 →</button>}{library.filter(v=>v[1].toLowerCase().includes(search.toLowerCase())).map(([group,label,type,Icon],i,a)=><div key={type}>{i===0||group!==a[i-1][0]?<h4>{group}</h4>:null}<button disabled={readOnly} onClick={()=>add(type)}><Icon size={14}/>{label}</button></div>)}<h4>ERROR HANDLING</h4>{['errors','finally'].map(b=><button key={b} disabled={readOnly} onClick={()=>{setSelected('');setBranch(b)}}><GitBranch size={14}/>{b==='errors'?'On error':'Finally'}{branch===b?' · selected':''}</button>)}</>}
+ </aside><div className="fl-dag-workspace"><div className="fl-canvas-toolbar"><span>{structured?'设备任务 · 按依赖顺序执行':`${all.length} tasks · ${doc.namespace||'namespace'}`}</span><span className="spacer"/>{controlled&&<select aria-label="画布范围" value={graphScope} onChange={e=>{setGraphScope(e.target.value);setSelected('')}}><option value="devices">设备任务</option><option value="orchestration">完整编排</option></select>}{structured&&<Button size="sm" variant="ghost" onClick={()=>setView('YAML')}>查看完整编排</Button>}<Button size="sm" variant="ghost" onClick={()=>setLayout(v=>v+1)}>自动布局</Button></div><div className="fl-dag">{structured&&!steps.length&&<div className="fl-canvas-empty"><Terminal size={24}/><strong>添加第一个设备任务</strong><span>从左侧选择 Bash、Python 或 Command，配置脚本和依赖。</span></div>}<FlowGraph key={layout} document={structured?stepDoc:doc} selected={selected} readonly={readOnly} onSelect={setSelected} onConnect={(from,to)=>update(()=>{if(structured){connectSteps(steps,from,to);setDefault(doc,'steps',steps,'JSON')}else sequenceAfter(doc,from,to)})}/></div><div className="fl-canvas-footer">{structured?'任务参数与输出依赖保存在同一 Flow 的 inputs.steps 中。':`插入位置：${task?.id||'Flow'} / ${branch} · 连线调整同一分支的顺序`}</div></div>
+ <aside className="fl-node-inspector"><div className="fl-section-title"><h3>{task||step?'NODE INSPECTOR':'FLOW SETTINGS'}</h3>{(task||step)&&<span className="fl-node-kind">{step?.kind||task?.type.split('.').at(-1)}</span>}</div>
+ {step?<><label>Task ID<input value={step.id} readOnly/></label><label>Script<textarea aria-label="Device task script" className="fl-inspector-script" disabled={readOnly} value={step.command} onChange={e=>changeStep({command:e.target.value})}/></label><label>Depends on<select multiple disabled={readOnly} value={step.depends_on} onChange={e=>changeStep({depends_on:Array.from(e.target.selectedOptions,v=>v.value)})}>{steps.filter(s=>s!==step).map(s=><option key={s.id}>{s.id}</option>)}</select></label><label>Output bindings (ENV=step_id)<input disabled={readOnly} value={Object.entries(step.inputs||{}).map(([k,v])=>`${k}=${v}`).join(',')} onChange={e=>changeStep({inputs:Object.fromEntries(e.target.value.split(',').filter(v=>v.includes('=')).map(v=>v.split('=',2).map(x=>x.trim())))})}/></label><Button variant="outline" disabled={readOnly||steps.some(s=>s.depends_on.includes(step.id)||Object.values(s.inputs||{}).includes(step.id))} onClick={()=>update(()=>{setDefault(doc,'steps',steps.filter(s=>s!==step),'JSON');setSelected('')})}><Trash2 size={14}/>删除任务</Button></>:
+ task?<><label>Task ID<input value={task.id} readOnly title="稳定任务标识；调整属性不改变身份"/></label>{task.type.endsWith('.If')&&<label>插入分支<select value={branch==='else'?'else':'then'} onChange={e=>setBranch(e.target.value)}><option value="then">True / then</option><option value="else">False / else</option></select></label>}{['message','script','condition','namespace','flowId','body'].filter(k=>k in task).map(k=><label key={k}>{k}<textarea disabled={readOnly} value={String(task[k])} onChange={e=>changeTask({[k]:e.target.value})}/></label>)}{'values' in task&&<label>Values<textarea disabled={readOnly} defaultValue={typeof task.values==='string'?task.values:JSON.stringify(task.values,null,2)} key={task.id} onBlur={e=>{try{changeTask({values:task.type.endsWith('.OutputValues')?JSON.parse(e.target.value):e.target.value})}catch{setError('Output values 必须是 JSON 对象')}}}/></label>}{'concurrencyLimit'in task&&<label>Target concurrency<input type="number" min={1} max={64} disabled={readOnly} value={task.concurrencyLimit} onChange={e=>changeTask({concurrencyLimit:Number(e.target.value)})}/></label>}<label>Timeout<input disabled={readOnly} placeholder="PT10M" value={task.timeout||''} onChange={e=>changeTask({timeout:e.target.value})}/></label><label>Maximum retries<input type="number" min={0} max={10} disabled={readOnly||task.type===core+'http.Request'} value={Math.max(0,(task.retry?.maxAttempts||1)-1)} onChange={e=>update(()=>{const n=Number(e.target.value);if(n)task.retry={type:'constant',maxAttempts:n+1,interval:'PT1S'};else delete task.retry})}/></label><div className="fl-inspector-actions"><Button variant="outline" size="sm" disabled={readOnly} aria-label="上移节点" onClick={()=>update(()=>moveTask(doc,selected,-1))}><ArrowUp size={14}/></Button><Button variant="outline" size="sm" disabled={readOnly} aria-label="下移节点" onClick={()=>update(()=>moveTask(doc,selected,1))}><ArrowDown size={14}/></Button><Button variant="outline" size="sm" disabled={readOnly} onClick={()=>update(()=>{removeTask(doc,selected);setSelected('')})}><Trash2 size={14}/>删除</Button></div></>:
+ <><label>Flow ID<input value={doc.id||''} disabled={readOnly} onChange={e=>update(()=>{doc.id=e.target.value})}/></label><label>Execution concurrency<input type="number" min={1} max={64} disabled={readOnly} value={doc.concurrency?.limit||1} onChange={e=>update(()=>{doc.concurrency={limit:Number(e.target.value),behavior:'QUEUE'}})}/></label>{controlled&&<label>Execution transport<select disabled={readOnly} value={inputDefault(doc,'transport_policy','agent_preferred')} onChange={e=>update(()=>setDefault(doc,'transport_policy',e.target.value))}><option value="agent_preferred">Agent Preferred</option><option value="agent_only">Agent Only</option><option value="ssh_only">SSH Only</option></select></label>}<label>插入区域<select value={branch} onChange={e=>setBranch(e.target.value)}><option value="tasks">Tasks</option><option value="errors">On error</option><option value="finally">Finally</option></select></label><h4>Inputs</h4>{(doc.inputs||[]).filter(i=>!['ticket','targets','steps'].includes(i.id)).map((i,index)=><label key={index}>{i.id}<input disabled={readOnly||i.type==='SECRET'} value={typeof i.defaults==='string'?i.defaults:i.defaults===undefined?'':JSON.stringify(i.defaults)} placeholder={i.type==='SECRET'?'受控秘密引用':i.type} onChange={e=>update(()=>{i.defaults=e.target.value})}/></label>)}<Button size="sm" variant="outline" disabled={readOnly} onClick={()=>update(()=>{doc.inputs||=[];doc.inputs.push({id:'input_'+crypto.randomUUID().slice(0,6),type:'STRING'})})}><Plus size={14}/>Add input</Button></>}
+ </aside></div>}</div>;
 }

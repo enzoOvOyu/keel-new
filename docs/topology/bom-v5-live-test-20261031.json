@@ -1,0 +1,18 @@
+{
+  "status": "FAIL_TEST_ABORTED_API_OOM",
+  "recorded_at": "2026-10-31T09:45:10.853809+00:00",
+  "runtime": "fdffbcb",
+  "scope": "Existing isolated real-workbook batches; one full resume each completed, subsequent same-source repeats aborted. Five rounds NOT completed. No business code edits.",
+  "user_instruction_correction": "用户始终要求修改Agent，没有修改表格。此前将用户“改了很多次”误解为改表是不正确的。",
+  "findings": [
+    "Full pass: 189 source switch candidates in bomv1, duplicate IDs zero in both workbooks.",
+    "Both full snapshots mark all 15 sheets recognized, but overall errors report 2/4 sheet failures. Code counts classification batch errors in the same failed counter; underlying classification failure details were not persisted.",
+    "Both retain 7586 cable candidates including legacy P2P entries, rather than only the 7154 cabling source rows.",
+    "No successful real-source formal submission or populated imported-project chart verification. Existing synthetic topology controls passed, including 705 cables, matrix memberships and physical trace.",
+    "2026-10-31 09:42:48 UTC: kernel OOM killed backend PID3708647 at 3645360 KiB anonymous RSS during same-source recognition/linking.",
+    "Test cleanup attempted nested JSONB state rewrite; PostgreSQL PID3727389 was OOM-killed at 09:44:02, and that transaction failed. Replaced with small job-status/revision updates; both jobs cancelled as failed, no pending/running jobs remain."
+  ],
+  "recovery": "Same deployed API restarted with original environment. Remaining own test jobs marked failed TEST_ABORTED_AFTER_API_OOM; batch revisions advanced to invalidate stale workers. Large draft payload retained; its UI state may remain recognizing until corrected.",
+  "next_required": "Agent memory usage and large-workbench persistence/recovery, correct classification failure diagnostics, and invalid legacy candidate lifecycle require repair before another full retest.",
+  "ui_rendering": "NOT RUN; API-only per user direction."
+}

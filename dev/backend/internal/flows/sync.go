@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/uuid"
+	"log"
+	"net/url"
 	"time"
 )
 
@@ -33,10 +35,20 @@ func (s *Service) Sync(ctx context.Context) error {
 			return nil
 		}
 	}
+	var windowStart, windowEnd time.Time
+	var pageNumber int
+	_, e = s.DB.Exec(ctx, `INSERT INTO flow_sync_cursor(name,window_start,window_end) SELECT 'executions',COALESCE(min(created_at),now()),now() FROM flow_binding ON CONFLICT DO NOTHING`)
+	if e != nil {
+		return e
+	}
+	if e = s.DB.QueryRow(ctx, `SELECT window_start,window_end,page FROM flow_sync_cursor WHERE name='executions'`).Scan(&windowStart, &windowEnd, &pageNumber); e != nil {
+		return e
+	}
+	query := url.Values{"size": {"100"}, "page": {fmt.Sprint(pageNumber)}, "sort": {"state.startDate:asc"}, "filters[startDate][GREATER_THAN_OR_EQUAL_TO]": {windowStart.Format(time.RFC3339Nano)}, "filters[startDate][LESS_THAN_OR_EQUAL_TO]": {windowEnd.Format(time.RFC3339Nano)}}
 	var page struct {
 		Results []map[string]any `json:"results"`
 	}
-	if e = s.Engine.JSON(ctx, "GET", "/executions/search?size=100&sort=state.startDate:desc", &page); e != nil {
+	if e = s.Engine.JSON(ctx, "GET", "/executions/search?"+query.Encode(), &page); e != nil {
 		return e
 	}
 	if e = s.SyncSchedules(ctx, page.Results); e != nil {
@@ -45,7 +57,9 @@ func (s *Service) Sync(ctx context.Context) error {
 	for _, engine := range page.Results {
 		if state, ok := engine["state"].(map[string]any); ok {
 			if current, ok := state["current"].(string); ok {
-				s.DB.Exec(ctx, `UPDATE flow_execution_binding SET engine_state=$2,state_observed_at=now() WHERE kestra_id=$1`, fmt.Sprint(engine["id"]), current)
+				if _, err := s.DB.Exec(ctx, `UPDATE flow_execution_binding SET engine_state=$2,state_observed_at=now() WHERE kestra_id=$1`, fmt.Sprint(engine["id"]), current); err != nil {
+					return err
+				}
 			}
 		}
 		b, ok := bindings[fmt.Sprint(engine["namespace"])+":"+fmt.Sprint(engine["flowId"])]
@@ -105,6 +119,47 @@ func (s *Service) Sync(ctx context.Context) error {
 			return e
 		}
 	}
+	if len(page.Results) == 100 {
+		_, e = s.DB.Exec(ctx, `UPDATE flow_sync_cursor SET page=page+1 WHERE name='executions'`)
+	} else {
+		_, e = s.DB.Exec(ctx, `UPDATE flow_sync_cursor SET window_start=window_end,window_end=now(),page=1 WHERE name='executions'`)
+	}
+	if e != nil {
+		return e
+	}
+	// Refresh active older executions separately from creation-time discovery.
+	active, err := s.DB.Query(ctx, `SELECT kestra_id FROM flow_execution_binding WHERE kestra_id IS NOT NULL AND (engine_state IS NULL OR engine_state NOT IN('SUCCESS','FAILED','KILLED','CANCELLED','WARNING')) ORDER BY state_observed_at ASC NULLS FIRST LIMIT 100`)
+	if err != nil {
+		return err
+	}
+	ids := []string{}
+	for active.Next() {
+		var id string
+		if err = active.Scan(&id); err != nil {
+			active.Close()
+			return err
+		}
+		ids = append(ids, id)
+	}
+	err = active.Err()
+	active.Close()
+	if err != nil {
+		return err
+	}
+	for _, id := range ids {
+		var state struct {
+			State struct {
+				Current string `json:"current"`
+			} `json:"state"`
+		}
+		if err = s.Engine.JSON(ctx, "GET", "/executions/"+url.PathEscape(id), &state); err != nil {
+			return err
+		}
+		if _, err = s.DB.Exec(ctx, `UPDATE flow_execution_binding SET engine_state=$2,state_observed_at=now() WHERE kestra_id=$1`, id, state.State.Current); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 func (s *Service) SyncLoop(ctx context.Context) {
@@ -116,7 +171,9 @@ func (s *Service) SyncLoop(ctx context.Context) {
 			return
 		case <-tick.C:
 			task, cancel := context.WithTimeout(ctx, 15*time.Second)
-			s.Sync(task)
+			if err := s.Sync(task); err != nil {
+				log.Printf("flows sync failed: %v", err)
+			}
 			cancel()
 		}
 	}

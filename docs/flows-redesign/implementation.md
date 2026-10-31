@@ -1,4 +1,36 @@
-# Flows 重构实施记录
+# 作业平台重构实施记录（技术域 Flows）
+
+## 最新整改状态 · 2026-10-31（覆盖下方“仅待真机验收”的旧结论）
+
+本轮复用 Kestra、Job Service、审批、CMDB、Agent/SSH 和幂等底座，调整现有 `/flows` 页面，不增加入口或启动额外服务。用户最新命名：**作业平台**，不改变 `/flows` 与 Flow/Execution 领域标识。
+
+| 本轮修改 | 实际结果 |
+|---|---|
+| 页面视觉 | 统一现有设计令牌、紧凑标题与工具栏、三栏Builder、专属节点、结构化日志/输出/审计、Agent详情；去掉旧宽松拼装布局 |
+| Builder | Visual/YAML/Topology同源；原生Loop/Parallel/If/Subflow/Log/Output添加、嵌套删除与分支顺序调整；设备步骤真正添加到inputs.steps；依赖连线及循环拒绝；脚本/输出绑定编辑；自动布局避开嵌套分支重叠 |
+| 执行监控 | 执行原Revision拓扑叠加TaskRun状态、Gantt/迭代筛选；日志按设备/stdout/stderr/任务/级别/文本筛选、跟随及下载；Outputs/Audit结构化呈现 |
+| 目录与调度 | URL筛选、状态/namespace/触发类型、近期执行链接、来源/通道/发起人/时间过滤；修复ISO超时解析及调度覆盖类型/超时/并发；重载不覆盖在编辑的Flow与Schedule |
+| Agents | 状态/版本/能力筛选，多选心跳/证书/能力检查；批量按设备SSH安装及逐台结果；真实版本0.2.0；独立身份/任务/连接/证书/审计面板。没有配置安装包/TLS就明确阻断 |
+| 后端增量 | 显式列表分页、解除内部目标500条截断；Execution时间过滤；固定时间窗分页同步；Quick Run也可读取冻结执行定义。新增迁移025尚未应用 |
+
+### 验证与运行边界
+
+- `npm run build`（TypeScript + Vite）通过；已有共享seed体积、大chunk和Zod注释警告未改动。
+- `go test ./internal/flows ./cmd/api`通过；未启用真实设备/数据库集成环境的用例不算运行验收。
+- `node dev/scripts/check-flow-definition.mjs`通过：嵌套分支布局与删除、同分支排序、设备依赖和循环拒绝、ISO时长及运行默认值、YAML结构。
+- 现有5180浏览器实际通过：作业平台导航、Agents页面、新Flow草稿、添加设备任务、脚本编辑与canonical YAML联动；无pageerror。仅读取API和编辑未保存草稿，没有执行设备命令/创建测试资产/保存业务数据。截图见 `screenshots/correction-builder.png`。
+- 本轮后端增量未覆盖8081的BOM v5集成版，迁移025未执行，新执行定义接口与时间筛选未进行运行联调。部署需先在当前BOM集成基线上纳入本增量。
+
+### 仍未实现，不能归类为“只缺真实设备”
+
+- Agent自动证书续签/轮换流程仍缺失；当前只具有注册发证、证书展示与撤销。
+- 受控设备Flow目前支持手动与Cron；Webhook/事件触发的作用域Job Adapter尚未完成。原生无设备Flow可用Kestra触发器，但不等于设备事件调度已实现。
+- ZTP真实业务后端尚无调用Job Service的消费者；source_module字段不能冒充已接通。
+- Builder为已实现插件子集，不宣称任意Kestra插件的动态表单均可编辑；设备多步骤仍按依赖串行执行，不等于设备内任意并行DAG。
+- 批量SSH安装UI逐台提交；服务端持久化批量安装任务/断点恢复未实现。真实发行版安装和长期生产规模未验收。
+- 本轮没有用合成完整页面冒充真实API端到端；实际原型逐页视觉/交互验收仍以用户审核为准。
+
+以上问题明确保留，修正旧记录“全部开发完成，仅待生产设备”的不准确结论。
 
 基准：包内 build-spec 与 draw.io 八页，保留全局 UI、身份、CMDB、SSH 信任入口。独立工作区 `/home/ubuntu/keel-flows-dev`，分支 `feat/flows-redesign`，基于 `d8a91b4`；不替换正在运行的 5180/8081。当前原环境后端来自另一集成分支，重新部署时必须保留其 BOM Agent 修复。
 

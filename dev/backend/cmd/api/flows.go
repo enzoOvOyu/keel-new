@@ -10,6 +10,7 @@ import (
 	"keel.local/dev/internal/flows"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 )
@@ -131,7 +132,7 @@ func (s *Server) flowsRoutes(w http.ResponseWriter, r *http.Request) bool {
 	code := 200
 	switch {
 	case path == "/capabilities" && r.Method == "GET":
-		out = map[string]any{"namespace": flows.Namespace(r.URL.Query().Get("project_id")), "engine": "Kestra", "version": "2.0.7", "configured": service.Engine.Base != "", "agent_gateway": service.Gateway != nil, "scheduling": "Kestra triggers", "native_plugins": "validated by configured Kestra"}
+		out = map[string]any{"namespace": flows.Namespace(r.URL.Query().Get("project_id")), "engine": "Kestra", "version": "2.0.7", "configured": service.Engine.Base != "", "agent_versions": []string{"0.2.0"}, "execution_definition": true, "bootstrap_ready": flows.BootstrapConfigured(), "agent_public_gateway": os.Getenv("KEEL_AGENT_PUBLIC_GATEWAY"), "enrollment_url": os.Getenv("KEEL_PUBLIC_HTTPS_URL"), "agent_gateway": service.Gateway != nil, "scheduling": "Kestra triggers", "native_plugins": "validated by configured Kestra"}
 	case path == "/templates" && r.Method == "GET":
 		project := r.URL.Query().Get("project_id")
 		found := false
@@ -146,7 +147,7 @@ func (s *Server) flowsRoutes(w http.ResponseWriter, r *http.Request) bool {
 		}
 		out, e = service.Template(project)
 	case path == "/targets" && r.Method == "GET":
-		out, e = service.Targets(ctx, scope, r.URL.Query().Get("q"))
+		out, e = service.Targets(ctx, scope, r.URL.Query().Get("q"), r.URL.Query())
 	case path == "/preflight" && r.Method == "POST":
 		var input flows.RunRequest
 		if !readFlowInput(w, r, &input) {
@@ -163,7 +164,7 @@ func (s *Server) flowsRoutes(w http.ResponseWriter, r *http.Request) bool {
 		out, e = service.Start(ctx, scope, input, r.Header.Get("Idempotency-Key"))
 		code = 201
 	case path == "" && r.Method == "GET":
-		out, e = service.Flows(ctx, scope)
+		out, e = service.Flows(ctx, scope, r.URL.Query())
 	case path == "" && r.Method == "POST":
 		var input flows.SaveFlow
 		if !readFlowInput(w, r, &input) {
@@ -172,7 +173,7 @@ func (s *Server) flowsRoutes(w http.ResponseWriter, r *http.Request) bool {
 		out, e = service.Save(ctx, scope, "", input)
 		code = 201
 	case path == "/agents" && r.Method == "GET":
-		out, e = service.Agents(ctx, scope)
+		out, e = service.Agents(ctx, scope, r.URL.Query())
 	case path == "/agents/enrollment-tokens" && r.Method == "POST":
 		var input struct {
 			Project string `json:"project_id"`
@@ -271,7 +272,9 @@ func (s *Server) flowsRoutes(w http.ResponseWriter, r *http.Request) bool {
 			io.Copy(w, response.Body)
 			return true
 		}
-		if action == "targets" {
+		if action == "definition" && r.Method == "GET" {
+			out, e = service.ExecutionDefinition(ctx, scope, ex.ID)
+		} else if action == "targets" {
 			out = ex.Targets
 		} else if action == "outputs" {
 			out = ex.Engine["outputs"]
