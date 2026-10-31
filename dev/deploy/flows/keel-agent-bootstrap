@@ -1,0 +1,38 @@
+#!/bin/sh
+# Install root-owned once; sudoers grants only this fixed helper to the bootstrap identity.
+# Never grant unrestricted sudo, and serve only the audited/versioned Keel package.
+set -eu
+[ "$#" -eq 4 ] || exit 2
+agent_bin=$1
+token_file=$2
+api_url=$3
+gateway_addr=$4
+case "$api_url" in https://*) ;; *) exit 2 ;; esac
+[ -f "$agent_bin" ] && [ -f "$token_file" ] || exit 2
+id keel-agent >/dev/null 2>&1 || useradd --system --home-dir /var/lib/keel-agent --shell /usr/sbin/nologin keel-agent
+install -m 0755 "$agent_bin" /usr/local/bin/keel-agent
+install -d -m 0700 -o keel-agent -g keel-agent /var/lib/keel-agent /run/keel-agent
+install -m 0600 -o keel-agent -g keel-agent "$token_file" /run/keel-agent/enrollment-token
+# Values are passed as arguments, never interpreted as shell/systemd directives.
+case "$api_url$gateway_addr" in *[!a-zA-Z0-9.:/_-]*) exit 2 ;; esac
+cat > /etc/systemd/system/keel-agent.service <<UNIT
+[Unit]
+Description=Keel target execution agent
+After=network-online.target
+Wants=network-online.target
+[Service]
+User=keel-agent
+Group=keel-agent
+ExecStart=/usr/local/bin/keel-agent --gateway $gateway_addr --enroll-url $api_url --token-file /run/keel-agent/enrollment-token --state-dir /var/lib/keel-agent
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/keel-agent /run/keel-agent
+[Install]
+WantedBy=multi-user.target
+UNIT
+systemctl daemon-reload
+systemctl enable --now keel-agent.service

@@ -1,0 +1,54 @@
+name: keel-flows
+services:
+  postgres:
+    image: postgres:17.6
+    environment:
+      POSTGRES_DB: kestra
+      POSTGRES_USER: kestra
+      POSTGRES_PASSWORD: ${KESTRA_DB_PASSWORD:?set KESTRA_DB_PASSWORD}
+    volumes: [kestra-db:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U kestra -d kestra]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  storage-init:
+    image: kestra/kestra:v2.0.7
+    user: root
+    entrypoint: ["chown", "1000:1000", "/app/storage"]
+    volumes: [kestra-storage:/app/storage]
+  kestra:
+    image: kestra/kestra:v2.0.7
+    command: server standalone
+    ports: ["127.0.0.1:8095:8080"]
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      storage-init: {condition: service_completed_successfully}
+    environment:
+      JAVA_OPTS: -Xms256m -Xmx1024m
+      KESTRA_CONFIGURATION: |
+        datasources:
+          postgres:
+            url: jdbc:postgresql://postgres:5432/kestra
+            driverClassName: org.postgresql.Driver
+            username: kestra
+            password: ${KESTRA_DB_PASSWORD}
+        kestra:
+          server:
+            basic-auth:
+              enabled: true
+              username: ${KESTRA_USERNAME}
+              password: ${KESTRA_PASSWORD}
+          repository:
+            type: postgres
+          queue:
+            type: postgres
+          storage:
+            type: local
+            local:
+              basePath: /app/storage
+    volumes: [kestra-storage:/app/storage]
+volumes:
+  kestra-db:
+  kestra-storage:

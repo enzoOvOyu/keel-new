@@ -240,3 +240,11 @@
 - 用户现已明确要求将功能分支部署到现有环境，允许更新原 5180 前端与 8081 API；此前“不得替换服务”针对未授权阶段。
 - 不合并或推送 main，不新增运行端口，不执行数据库迁移、资产导入或数据重建；沿用原配置和存储路径。
 - 部署前保留可回退版本；只进行必要启动、只读 API 和页面加载检查，不扩展为全平台回归。
+
+## 当前授权：Flows 包内全栈重构（2026-10-31）
+
+- 唯一任务基准：`docs/flows-redesign/keel-flows-module-build-spec.md` 与同目录 draw.io 八页原型；只改 Flows，不扩展其他业务。
+- 分支 `feat/flows-redesign`，独立目录 `/home/ubuntu/keel-flows-dev`；不得覆盖原5180/8081或其他窗口正在测试的环境。
+- 本模块现已授权真实 Kestra、Go Job Service、Agent/mTLS与SSH双通道实施；保留统一 CMDB/RBAC/Secret引用及维护态IPMI-only。其他模块不随之真实化。
+- 导航严格 Flows（父入口）、Executions、Agents；模板、文件和调度归上下文。保留其他模块使用的共享实现，不批量删除 Mock/API。
+- 进度、契约与未验证事项写入实施记录；不得将引擎HTTP200或编译通过当作真实设备批量验收。

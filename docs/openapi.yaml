@@ -9184,87 +9184,83 @@ paths:
           description: Project or resource permission denied
   /flows:
     get:
-      operationId: fullflowsflows
+      operationId: listRealFlows
       tags:
-        - FullDemo
-      summary: Typed mock view of flows
+      - FlowsReal
       parameters:
-        - name: project_id
-          in: query
-          schema:
-            type: string
-        - name: cursor
-          in: query
-          schema:
-            type: string
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 200
-            default: 50
-        - name: q
-          in: query
-          schema:
-            type: string
-        - name: sort
-          in: query
-          schema:
-            type: string
+      - in: query
+        name: project_id
+        schema:
+          type: string
       responses:
-        "200":
-          description: Authorized source records, paginated; missing data is not healthy.
+        '200':
+          description: Real engine/domain result.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/FullFlowsListEnvelope"
-        "403":
-          description: Project or resource permission denied
+                $ref: '#/components/schemas/listRealFlowsEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+    post:
+      operationId: createRealFlow
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createRealFlowEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowsSave'
   /flows/{flowId}/revisions:
     get:
-      operationId: fullflowrevisionsflowsflowIdrevisions
+      operationId: getFlowRevisions
       tags:
-        - FullDemo
-      summary: Typed mock view of flow_revisions
+      - FlowsReal
       parameters:
-        - name: flowId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: project_id
-          in: query
-          schema:
-            type: string
-        - name: cursor
-          in: query
-          schema:
-            type: string
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 200
-            default: 50
-        - name: q
-          in: query
-          schema:
-            type: string
-        - name: sort
-          in: query
-          schema:
-            type: string
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: flowId
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
-          description: Authorized source records, paginated; missing data is not healthy.
+        '200':
+          description: Real engine/domain result.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/FullFlowRevisionsListEnvelope"
-        "403":
-          description: Project or resource permission denied
+                $ref: '#/components/schemas/getFlowRevisionsEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
   /flow-blueprints:
     get:
       operationId: fullflowblueprintsflowblueprints
@@ -14047,6 +14043,906 @@ paths:
             mixed types or missing correction reason
       parameters:
       - $ref: '#/components/parameters/IdempotencyKey'
+  /flows/capabilities:
+    get:
+      operationId: getFlowsCapabilities
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getFlowsCapabilitiesEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+
+  /flows/targets:
+    get:
+      operationId: listFlowsTargets
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listFlowsTargetsEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+
+  /flows/executions:
+    get:
+      operationId: listRealExecutions
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listRealExecutionsEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+
+  /flows/agents:
+    get:
+      operationId: listRealAgents
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listRealAgentsEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+
+  /flows/ssh-trust:
+    get:
+      operationId: listFlowsSSHTrust
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listFlowsSSHTrustEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+    post:
+      operationId: saveFlowsSSHTrust
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/saveFlowsSSHTrustEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowsSSHTrustInput'
+
+  /flows/preflight:
+    post:
+      operationId: preflightFlowsTargets
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/preflightFlowsTargetsEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowsRun'
+
+  /flows/quick-run:
+    post:
+      operationId: createQuickRun
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createQuickRunEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowsRun'
+
+  /flows/{flowId}:
+    get:
+      operationId: getRealFlow
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: flowId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getRealFlowEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+    put:
+      operationId: updateRealFlow
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: flowId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/updateRealFlowEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowsSave'
+
+  /flows/{flowId}/validate:
+    post:
+      operationId: validateRealFlow
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: flowId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/validateRealFlowEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowsValidationRequest'
+
+  /flows/{flowId}/execute:
+    post:
+      operationId: executeRealFlow
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: flowId
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/executeRealFlowEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowsRun'
+
+  /flows/{flowId}/dependencies:
+    get:
+      operationId: getFlowDependencies
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: flowId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getFlowDependenciesEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+
+  /flows/{flowId}/files:
+    get:
+      operationId: getFlowFiles
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: flowId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getFlowFilesEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+
+  /flows/executions/{executionId}:
+    get:
+      operationId: getRealExecution
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: executionId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getRealExecutionEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+
+  /flows/executions/{executionId}/targets:
+    get:
+      operationId: getExecutionTargets
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: executionId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getExecutionTargetsEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+
+  /flows/executions/{executionId}/logs:
+    get:
+      operationId: getExecutionLogs
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: executionId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getExecutionLogsEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+
+  /flows/executions/{executionId}/outputs:
+    get:
+      operationId: getExecutionOutputs
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: executionId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getExecutionOutputsEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+
+  /flows/executions/{executionId}/audit:
+    get:
+      operationId: getExecutionAudit
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: executionId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getExecutionAuditEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+
+  /flows/executions/{executionId}/pause:
+    post:
+      operationId: actionExecutionPause
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: executionId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/actionExecutionPauseEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+
+  /flows/executions/{executionId}/resume:
+    post:
+      operationId: actionExecutionResume
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: executionId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/actionExecutionResumeEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+
+  /flows/executions/{executionId}/kill:
+    post:
+      operationId: actionExecutionKill
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: executionId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/actionExecutionKillEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+
+  /flows/executions/{executionId}/retry-failed-targets:
+    post:
+      operationId: actionExecutionRetryfailedtargets
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: executionId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/actionExecutionRetryfailedtargetsEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+
+  /flows/agents/{agentId}:
+    get:
+      operationId: getRealAgent
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: agentId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getRealAgentEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+
+  /flows/agents/enrollment-tokens:
+    post:
+      operationId: issueAgentEnrollment
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/issueAgentEnrollmentEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowsTokenRequest'
+
+  /flows/agents/{agentId}/approve:
+    post:
+      operationId: agentApprove
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: agentId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/agentApproveEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowsReason'
+
+  /flows/agents/{agentId}/quarantine:
+    post:
+      operationId: agentQuarantine
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: agentId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/agentQuarantineEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowsReason'
+
+  /flows/agents/{agentId}/revoke:
+    post:
+      operationId: agentRevoke
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: agentId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/agentRevokeEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowsReason'
+
+  /flows/agents/{agentId}/tasks:
+    get:
+      operationId: agentTasks
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: agentId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/agentTasksEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+
+  /flows/agents/{agentId}/audit:
+    get:
+      operationId: agentAudit
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: agentId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/agentAuditEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+
+  /flows/executions/{executionId}/events:
+    get:
+      operationId: followRealExecution
+      tags:
+      - FlowsReal
+      parameters:
+      - name: executionId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Authorized Kestra SSE proxy; reconnect refetches current state.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
 components:
   securitySchemes:
     bearerAuth:
@@ -14128,6 +15024,899 @@ components:
           schema:
             $ref: "#/components/schemas/ErrorEnvelope"
   schemas:
+    saveFlowsSSHTrustEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsSSHTrust'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    agentAuditEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowsAudit'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    agentTasksEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowsAudit'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    agentRevokeEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsAction'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    agentQuarantineEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsAction'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    agentApproveEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsAction'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    issueAgentEnrollmentEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsToken'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getRealAgentEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsAgent'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    actionExecutionRetryfailedtargetsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsExecution'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    actionExecutionKillEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsExecution'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    actionExecutionResumeEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsExecution'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    actionExecutionPauseEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsExecution'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getExecutionAuditEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowsAudit'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getExecutionOutputsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsEngine'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getExecutionLogsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowsEngine'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getExecutionTargetsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowsTargetRun'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getRealExecutionEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsExecution'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getFlowFilesEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowsEngine'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getFlowDependenciesEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowsEngine'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getFlowRevisionsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowsEngine'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    executeRealFlowEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsExecution'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    validateRealFlowEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowsEngine'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    updateRealFlowEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsDefinition'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getRealFlowEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsDefinition'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    createQuickRunEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsExecution'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    preflightFlowsTargetsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowsDecision'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    listFlowsSSHTrustEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowsSSHTrust'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    listRealAgentsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowsAgent'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    listRealExecutionsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowsExecution'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    listFlowsTargetsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowsTarget'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getFlowsCapabilitiesEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsCapabilities'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    createRealFlowEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsDefinition'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    listRealFlowsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowsDefinition'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    FlowsSSHTrustInput:
+      type: object
+      additionalProperties: false
+      properties:
+        project_id:
+          type: string
+        asset_id:
+          type: string
+        host:
+          type: string
+        port:
+          type: integer
+        username:
+          type: string
+        secret_ref:
+          type: string
+        known_hosts_ref:
+          type: string
+        status:
+          type: string
+        expected_revision:
+          type: integer
+      required:
+      - project_id
+      - asset_id
+      - host
+      - port
+      - username
+      - secret_ref
+      - known_hosts_ref
+      - status
+      - expected_revision
+    FlowsSSHTrust:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        project_id:
+          type: string
+        asset_id:
+          type: string
+        host:
+          type: string
+        port:
+          type: integer
+        username:
+          type: string
+        secret_ref:
+          type: string
+        known_hosts_ref:
+          type: string
+        status:
+          type: string
+        revision:
+          type: integer
+      required:
+      - id
+      - project_id
+      - asset_id
+      - host
+      - port
+      - username
+      - secret_ref
+      - known_hosts_ref
+      - status
+      - revision
+    FlowsAction:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        state:
+          type: string
+      required:
+      - id
+      - state
+    FlowsValidationRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        source:
+          type: string
+      required:
+      - source
+    FlowsReason:
+      type: object
+      additionalProperties: false
+      properties:
+        reason:
+          type: string
+      required:
+      - reason
+    FlowsToken:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        token:
+          type: string
+        asset_id:
+          type: string
+        expires_at:
+          type: string
+      required:
+      - id
+      - token
+      - asset_id
+      - expires_at
+    FlowsTokenRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        project_id:
+          type: string
+        asset_id:
+          type: string
+      required:
+      - project_id
+      - asset_id
+    FlowsCapabilities:
+      type: object
+      additionalProperties: false
+      properties:
+        engine:
+          type: string
+        version:
+          type: string
+        configured:
+          type: boolean
+        agent_gateway:
+          type: boolean
+        scheduling:
+          type: string
+        native_plugins:
+          type: string
+      required:
+      - engine
+      - version
+      - configured
+      - agent_gateway
+      - scheduling
+      - native_plugins
+    FlowsAudit:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: string
+        actor:
+          type: string
+        action:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+        created_at:
+          type: string
+    FlowsAgent:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        project_id:
+          type: string
+        asset_id:
+          type: string
+        identity:
+          type: object
+          additionalProperties:
+            type: string
+        version:
+          type: string
+        capabilities:
+          type: array
+          items:
+            type: string
+        state:
+          type: string
+        certificate_serial:
+          type: string
+          nullable: true
+        certificate_expires_at:
+          type: string
+          nullable: true
+        last_heartbeat:
+          type: string
+          nullable: true
+        online:
+          type: boolean
+      required:
+      - id
+      - project_id
+      - asset_id
+      - identity
+      - version
+      - capabilities
+      - state
+      - certificate_serial
+      - certificate_expires_at
+      - last_heartbeat
+      - online
+    FlowsExecution:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        project_id:
+          type: string
+        flow_id:
+          type: string
+          nullable: true
+        kestra_id:
+          type: string
+          nullable: true
+        engine_flow_id:
+          type: string
+        flow_revision:
+          type: integer
+        source_module:
+          type: string
+        mode:
+          type: string
+        started_by:
+          type: string
+        created_at:
+          type: string
+        error_code:
+          type: string
+          nullable: true
+        engine:
+          $ref: '#/components/schemas/FlowsEngine'
+        targets:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowsTargetRun'
+      required:
+      - id
+      - project_id
+      - flow_id
+      - kestra_id
+      - engine_flow_id
+      - flow_revision
+      - source_module
+      - mode
+      - started_by
+      - created_at
+      - error_code
+      - engine
+      - targets
+    FlowsTargetRun:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        snapshot:
+          $ref: '#/components/schemas/FlowsTarget'
+        selected_transport:
+          type: string
+        actual_transport:
+          type: string
+          nullable: true
+        state:
+          type: string
+        attempt:
+          type: integer
+        exit_code:
+          type: integer
+          nullable: true
+        stdout:
+          type: string
+        stderr:
+          type: string
+        started_at:
+          type: string
+          nullable: true
+        ended_at:
+          type: string
+          nullable: true
+      required:
+      - id
+      - snapshot
+      - selected_transport
+      - actual_transport
+      - state
+      - attempt
+      - exit_code
+      - stdout
+      - stderr
+      - started_at
+      - ended_at
+    FlowsDecision:
+      type: object
+      additionalProperties: false
+      properties:
+        asset_id:
+          type: string
+        name:
+          type: string
+        revision:
+          type: integer
+        transport:
+          type: string
+        reason:
+          type: string
+        ready:
+          type: boolean
+        target:
+          $ref: '#/components/schemas/FlowsTarget'
+      required:
+      - asset_id
+      - name
+      - revision
+      - transport
+      - reason
+      - ready
+      - target
+    FlowsRun:
+      type: object
+      additionalProperties: false
+      properties:
+        project_id:
+          type: string
+        flow_id:
+          type: string
+        expected_revision:
+          type: integer
+        target_ids:
+          type: array
+          items:
+            type: string
+        kind:
+          type: string
+          enum:
+          - command
+          - bash
+          - python
+        command:
+          type: string
+        transport_policy:
+          type: string
+          enum:
+          - agent_preferred
+          - agent_only
+          - ssh_only
+        timeout_seconds:
+          type: integer
+        target_concurrency:
+          type: integer
+        max_retries:
+          type: integer
+        source_module:
+          type: string
+        parent_id:
+          type: string
+      required:
+      - project_id
+      - target_ids
+      - kind
+      - command
+      - transport_policy
+      - timeout_seconds
+      - target_concurrency
+      - max_retries
+    FlowsTarget:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        project_id:
+          type: string
+        revision:
+          type: integer
+        fields:
+          type: object
+          additionalProperties: true
+        agent_id:
+          type: string
+        agent_online:
+          type: boolean
+        capabilities:
+          type: array
+          items:
+            type: string
+        ssh_profile_id:
+          type: string
+      required:
+      - id
+      - name
+      - type
+      - project_id
+      - revision
+      - fields
+      - agent_id
+      - agent_online
+      - capabilities
+      - ssh_profile_id
+    FlowsSave:
+      type: object
+      additionalProperties: false
+      properties:
+        project_id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        target_type:
+          type: string
+        source:
+          type: string
+        expected_revision:
+          type: integer
+      required:
+      - project_id
+      - name
+      - description
+      - target_type
+      - source
+      - expected_revision
+    FlowsDefinition:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        project_id:
+          type: string
+        namespace:
+          type: string
+        flow_id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        target_type:
+          type: string
+        revision:
+          type: integer
+        source:
+          type: string
+        disabled:
+          type: boolean
+        engine:
+          $ref: '#/components/schemas/FlowsEngine'
+      required:
+      - id
+      - project_id
+      - namespace
+      - flow_id
+      - name
+      - description
+      - target_type
+      - revision
+      - source
+      - disabled
+      - engine
+    FlowsEngine:
+      type: object
+      additionalProperties: true
+      description: Authoritative Kestra DTO; preserve native/plugin extension properties.
+      properties:
+        state:
+          type: object
+          additionalProperties: true
+        tasks:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        taskRunList:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        outputs:
+          type: object
+          additionalProperties: true
+        source:
+          type: string
+        disabled:
+          type: boolean
+        revision:
+          type: integer
+        triggers:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
     InfrastructureQueryPage:
       type: object
       required: [limit, has_more, next_cursor]

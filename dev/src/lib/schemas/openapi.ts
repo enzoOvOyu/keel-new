@@ -3362,10 +3362,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Typed mock view of flows */
-        get: operations["fullflowsflows"];
+        get: operations["listRealFlows"];
         put?: never;
-        post?: never;
+        post: operations["createRealFlow"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3379,8 +3378,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Typed mock view of flow_revisions */
-        get: operations["fullflowrevisionsflowsflowIdrevisions"];
+        get: operations["getFlowRevisions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5460,10 +5458,794 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/flows/capabilities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getFlowsCapabilities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/targets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listFlowsTargets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/executions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listRealExecutions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/agents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listRealAgents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/ssh-trust": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listFlowsSSHTrust"];
+        put?: never;
+        post: operations["saveFlowsSSHTrust"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/preflight": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["preflightFlowsTargets"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/quick-run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createQuickRun"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/{flowId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getRealFlow"];
+        put: operations["updateRealFlow"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/{flowId}/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["validateRealFlow"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/{flowId}/execute": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["executeRealFlow"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/{flowId}/dependencies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getFlowDependencies"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/{flowId}/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getFlowFiles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/executions/{executionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getRealExecution"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/executions/{executionId}/targets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getExecutionTargets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/executions/{executionId}/logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getExecutionLogs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/executions/{executionId}/outputs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getExecutionOutputs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/executions/{executionId}/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getExecutionAudit"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/executions/{executionId}/pause": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["actionExecutionPause"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/executions/{executionId}/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["actionExecutionResume"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/executions/{executionId}/kill": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["actionExecutionKill"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/executions/{executionId}/retry-failed-targets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["actionExecutionRetryfailedtargets"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/agents/{agentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getRealAgent"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/agents/enrollment-tokens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["issueAgentEnrollment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/agents/{agentId}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["agentApprove"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/agents/{agentId}/quarantine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["agentQuarantine"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/agents/{agentId}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["agentRevoke"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/agents/{agentId}/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["agentTasks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/agents/{agentId}/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["agentAudit"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/executions/{executionId}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["followRealExecution"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        saveFlowsSSHTrustEnvelope: {
+            data: components["schemas"]["FlowsSSHTrust"];
+            request_id: string;
+        };
+        agentAuditEnvelope: {
+            data: components["schemas"]["FlowsAudit"][];
+            request_id: string;
+        };
+        agentTasksEnvelope: {
+            data: components["schemas"]["FlowsAudit"][];
+            request_id: string;
+        };
+        agentRevokeEnvelope: {
+            data: components["schemas"]["FlowsAction"];
+            request_id: string;
+        };
+        agentQuarantineEnvelope: {
+            data: components["schemas"]["FlowsAction"];
+            request_id: string;
+        };
+        agentApproveEnvelope: {
+            data: components["schemas"]["FlowsAction"];
+            request_id: string;
+        };
+        issueAgentEnrollmentEnvelope: {
+            data: components["schemas"]["FlowsToken"];
+            request_id: string;
+        };
+        getRealAgentEnvelope: {
+            data: components["schemas"]["FlowsAgent"];
+            request_id: string;
+        };
+        actionExecutionRetryfailedtargetsEnvelope: {
+            data: components["schemas"]["FlowsExecution"];
+            request_id: string;
+        };
+        actionExecutionKillEnvelope: {
+            data: components["schemas"]["FlowsExecution"];
+            request_id: string;
+        };
+        actionExecutionResumeEnvelope: {
+            data: components["schemas"]["FlowsExecution"];
+            request_id: string;
+        };
+        actionExecutionPauseEnvelope: {
+            data: components["schemas"]["FlowsExecution"];
+            request_id: string;
+        };
+        getExecutionAuditEnvelope: {
+            data: components["schemas"]["FlowsAudit"][];
+            request_id: string;
+        };
+        getExecutionOutputsEnvelope: {
+            data: components["schemas"]["FlowsEngine"];
+            request_id: string;
+        };
+        getExecutionLogsEnvelope: {
+            data: components["schemas"]["FlowsEngine"][];
+            request_id: string;
+        };
+        getExecutionTargetsEnvelope: {
+            data: components["schemas"]["FlowsTargetRun"][];
+            request_id: string;
+        };
+        getRealExecutionEnvelope: {
+            data: components["schemas"]["FlowsExecution"];
+            request_id: string;
+        };
+        getFlowFilesEnvelope: {
+            data: components["schemas"]["FlowsEngine"][];
+            request_id: string;
+        };
+        getFlowDependenciesEnvelope: {
+            data: components["schemas"]["FlowsEngine"][];
+            request_id: string;
+        };
+        getFlowRevisionsEnvelope: {
+            data: components["schemas"]["FlowsEngine"][];
+            request_id: string;
+        };
+        executeRealFlowEnvelope: {
+            data: components["schemas"]["FlowsExecution"];
+            request_id: string;
+        };
+        validateRealFlowEnvelope: {
+            data: components["schemas"]["FlowsEngine"][];
+            request_id: string;
+        };
+        updateRealFlowEnvelope: {
+            data: components["schemas"]["FlowsDefinition"];
+            request_id: string;
+        };
+        getRealFlowEnvelope: {
+            data: components["schemas"]["FlowsDefinition"];
+            request_id: string;
+        };
+        createQuickRunEnvelope: {
+            data: components["schemas"]["FlowsExecution"];
+            request_id: string;
+        };
+        preflightFlowsTargetsEnvelope: {
+            data: components["schemas"]["FlowsDecision"][];
+            request_id: string;
+        };
+        listFlowsSSHTrustEnvelope: {
+            data: components["schemas"]["FlowsSSHTrust"][];
+            request_id: string;
+        };
+        listRealAgentsEnvelope: {
+            data: components["schemas"]["FlowsAgent"][];
+            request_id: string;
+        };
+        listRealExecutionsEnvelope: {
+            data: components["schemas"]["FlowsExecution"][];
+            request_id: string;
+        };
+        listFlowsTargetsEnvelope: {
+            data: components["schemas"]["FlowsTarget"][];
+            request_id: string;
+        };
+        getFlowsCapabilitiesEnvelope: {
+            data: components["schemas"]["FlowsCapabilities"];
+            request_id: string;
+        };
+        createRealFlowEnvelope: {
+            data: components["schemas"]["FlowsDefinition"];
+            request_id: string;
+        };
+        listRealFlowsEnvelope: {
+            data: components["schemas"]["FlowsDefinition"][];
+            request_id: string;
+        };
+        FlowsSSHTrustInput: {
+            project_id: string;
+            asset_id: string;
+            host: string;
+            port: number;
+            username: string;
+            secret_ref: string;
+            known_hosts_ref: string;
+            status: string;
+            expected_revision: number;
+        };
+        FlowsSSHTrust: {
+            id: string;
+            project_id: string;
+            asset_id: string;
+            host: string;
+            port: number;
+            username: string;
+            secret_ref: string;
+            known_hosts_ref: string;
+            status: string;
+            revision: number;
+        };
+        FlowsAction: {
+            id: string;
+            state: string;
+        };
+        FlowsValidationRequest: {
+            source: string;
+        };
+        FlowsReason: {
+            reason: string;
+        };
+        FlowsToken: {
+            id: string;
+            token: string;
+            asset_id: string;
+            expires_at: string;
+        };
+        FlowsTokenRequest: {
+            project_id: string;
+            asset_id: string;
+        };
+        FlowsCapabilities: {
+            engine: string;
+            version: string;
+            configured: boolean;
+            agent_gateway: boolean;
+            scheduling: string;
+            native_plugins: string;
+        };
+        FlowsAudit: {
+            id?: string;
+            actor?: string;
+            action?: string;
+            details?: {
+                [key: string]: unknown;
+            };
+            created_at?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        FlowsAgent: {
+            id: string;
+            project_id: string;
+            asset_id: string;
+            identity: {
+                [key: string]: string;
+            };
+            version: string;
+            capabilities: string[];
+            state: string;
+            certificate_serial: string | null;
+            certificate_expires_at: string | null;
+            last_heartbeat: string | null;
+            online: boolean;
+        };
+        FlowsExecution: {
+            id: string;
+            project_id: string;
+            flow_id: string | null;
+            kestra_id: string | null;
+            engine_flow_id: string;
+            flow_revision: number;
+            source_module: string;
+            mode: string;
+            started_by: string;
+            created_at: string;
+            error_code: string | null;
+            engine: components["schemas"]["FlowsEngine"];
+            targets: components["schemas"]["FlowsTargetRun"][];
+        };
+        FlowsTargetRun: {
+            id: string;
+            snapshot: components["schemas"]["FlowsTarget"];
+            selected_transport: string;
+            actual_transport: string | null;
+            state: string;
+            attempt: number;
+            exit_code: number | null;
+            stdout: string;
+            stderr: string;
+            started_at: string | null;
+            ended_at: string | null;
+        };
+        FlowsDecision: {
+            asset_id: string;
+            name: string;
+            revision: number;
+            transport: string;
+            reason: string;
+            ready: boolean;
+            target: components["schemas"]["FlowsTarget"];
+        };
+        FlowsRun: {
+            project_id: string;
+            flow_id?: string;
+            expected_revision?: number;
+            target_ids: string[];
+            /** @enum {string} */
+            kind: "command" | "bash" | "python";
+            command: string;
+            /** @enum {string} */
+            transport_policy: "agent_preferred" | "agent_only" | "ssh_only";
+            timeout_seconds: number;
+            target_concurrency: number;
+            max_retries: number;
+            source_module?: string;
+            parent_id?: string;
+        };
+        FlowsTarget: {
+            id: string;
+            name: string;
+            type: string;
+            project_id: string;
+            revision: number;
+            fields: {
+                [key: string]: unknown;
+            };
+            agent_id: string;
+            agent_online: boolean;
+            capabilities: string[];
+            ssh_profile_id: string;
+        };
+        FlowsSave: {
+            project_id: string;
+            name: string;
+            description: string;
+            target_type: string;
+            source: string;
+            expected_revision: number;
+        };
+        FlowsDefinition: {
+            id: string;
+            project_id: string;
+            namespace: string;
+            flow_id: string;
+            name: string;
+            description: string;
+            target_type: string;
+            revision: number;
+            source: string;
+            disabled: boolean;
+            engine: components["schemas"]["FlowsEngine"];
+        };
+        /** @description Authoritative Kestra DTO; preserve native/plugin extension properties. */
+        FlowsEngine: {
+            state?: {
+                [key: string]: unknown;
+            };
+            tasks?: {
+                [key: string]: unknown;
+            }[];
+            taskRunList?: {
+                [key: string]: unknown;
+            }[];
+            outputs?: {
+                [key: string]: unknown;
+            };
+            source?: string;
+            disabled?: boolean;
+            revision?: number;
+            triggers?: {
+                [key: string]: unknown;
+            }[];
+        } & {
+            [key: string]: unknown;
+        };
         InfrastructureQueryPage: {
             limit: number;
             has_more: boolean;
@@ -23215,14 +23997,10 @@ export interface operations {
             };
         };
     };
-    fullflowsflows: {
+    listRealFlows: {
         parameters: {
             query?: {
                 project_id?: string;
-                cursor?: string;
-                limit?: number;
-                q?: string;
-                sort?: string;
             };
             header?: never;
             path?: never;
@@ -23230,17 +24008,31 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Authorized source records, paginated; missing data is not healthy. */
+            /** @description Real engine/domain result. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["FullFlowsListEnvelope"];
+                    "application/json": components["schemas"]["listRealFlowsEnvelope"];
                 };
             };
-            /** @description Project or resource permission denied */
+            /** @description Permission or project scope denied */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23248,14 +24040,57 @@ export interface operations {
             };
         };
     };
-    fullflowrevisionsflowsflowIdrevisions: {
+    createRealFlow: {
         parameters: {
             query?: {
                 project_id?: string;
-                cursor?: string;
-                limit?: number;
-                q?: string;
-                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowsSave"];
+            };
+        };
+        responses: {
+            /** @description Real engine/domain result. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["createRealFlowEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getFlowRevisions: {
+        parameters: {
+            query?: {
+                project_id?: string;
             };
             header?: never;
             path: {
@@ -23265,17 +24100,31 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Authorized source records, paginated; missing data is not healthy. */
+            /** @description Real engine/domain result. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["FullFlowRevisionsListEnvelope"];
+                    "application/json": components["schemas"]["getFlowRevisionsEnvelope"];
                 };
             };
-            /** @description Project or resource permission denied */
+            /** @description Permission or project scope denied */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -30060,6 +30909,1400 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    getFlowsCapabilities: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getFlowsCapabilitiesEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listFlowsTargets: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listFlowsTargetsEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listRealExecutions: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listRealExecutionsEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listRealAgents: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listRealAgentsEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listFlowsSSHTrust: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listFlowsSSHTrustEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    saveFlowsSSHTrust: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowsSSHTrustInput"];
+            };
+        };
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["saveFlowsSSHTrustEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    preflightFlowsTargets: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowsRun"];
+            };
+        };
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["preflightFlowsTargetsEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createQuickRun: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowsRun"];
+            };
+        };
+        responses: {
+            /** @description Real engine/domain result. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["createQuickRunEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getRealFlow: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                flowId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getRealFlowEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateRealFlow: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                flowId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowsSave"];
+            };
+        };
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["updateRealFlowEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    validateRealFlow: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                flowId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowsValidationRequest"];
+            };
+        };
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["validateRealFlowEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    executeRealFlow: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                flowId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowsRun"];
+            };
+        };
+        responses: {
+            /** @description Real engine/domain result. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["executeRealFlowEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getFlowDependencies: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                flowId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getFlowDependenciesEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getFlowFiles: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                flowId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getFlowFilesEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getRealExecution: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                executionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getRealExecutionEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getExecutionTargets: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                executionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getExecutionTargetsEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getExecutionLogs: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                executionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getExecutionLogsEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getExecutionOutputs: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                executionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getExecutionOutputsEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getExecutionAudit: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                executionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getExecutionAuditEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    actionExecutionPause: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                executionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["actionExecutionPauseEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    actionExecutionResume: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                executionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["actionExecutionResumeEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    actionExecutionKill: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                executionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["actionExecutionKillEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    actionExecutionRetryfailedtargets: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                executionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["actionExecutionRetryfailedtargetsEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getRealAgent: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                agentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getRealAgentEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    issueAgentEnrollment: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowsTokenRequest"];
+            };
+        };
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["issueAgentEnrollmentEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    agentApprove: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                agentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowsReason"];
+            };
+        };
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["agentApproveEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    agentQuarantine: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                agentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowsReason"];
+            };
+        };
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["agentQuarantineEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    agentRevoke: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                agentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowsReason"];
+            };
+        };
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["agentRevokeEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    agentTasks: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                agentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["agentTasksEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    agentAudit: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                agentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["agentAuditEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    followRealExecution: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                executionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized Kestra SSE proxy; reconnect refetches current state. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": string;
+                };
             };
         };
     };

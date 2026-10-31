@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha256"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -15,6 +17,7 @@ import (
 	"io"
 	"keel.local/dev/internal/bom"
 	"keel.local/dev/internal/cmdb"
+	"keel.local/dev/internal/flows"
 	"keel.local/dev/internal/identity"
 	"log"
 	"net/http"
@@ -25,6 +28,7 @@ import (
 )
 
 type Server struct {
+	flows           *flows.Service
 	db              *pgxpool.Pool
 	objects         *minio.Client
 	bucket, project string
@@ -51,6 +55,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		respond(w, 200, map[string]string{"status": "ok"})
 		return
 	}
+	if s.flowsInternal(w, r) {
+		return
+	}
 	if s.authRoute(w, r) {
 		return
 	}
@@ -67,6 +74,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if s.aiProviderRoutes(w, r) {
+		return
+	}
+	if s.flowsRoutes(w, r) {
 		return
 	}
 	if s.cmdbRoutes(w, r) {
@@ -393,7 +403,28 @@ func main() {
 			log.Fatal("bucket initialization failed")
 		}
 	}
-	s := &Server{db, objects, bucket, env("KEEL_PROJECT_ID", "proj-b300-demo")}
+	flowService := &flows.Service{DB: db, Engine: flows.NewKestra()}
+	if address := os.Getenv("KEEL_AGENT_GATEWAY_ADDR"); address != "" {
+		cert, err := tls.LoadX509KeyPair(os.Getenv("KEEL_AGENT_SERVER_CERT"), os.Getenv("KEEL_AGENT_SERVER_KEY"))
+		if err != nil {
+			log.Fatal("agent gateway TLS configuration invalid")
+		}
+		ca, err := os.ReadFile(os.Getenv("KEEL_AGENT_CA_CERT"))
+		if err != nil {
+			log.Fatal("agent CA unavailable")
+		}
+		pool := x509.NewCertPool()
+		if !pool.AppendCertsFromPEM(ca) {
+			log.Fatal("invalid agent CA")
+		}
+		flowService.Gateway = flows.NewGateway(db)
+		go func() {
+			if e := flowService.Gateway.Serve(ctx, address, cert, pool); e != nil {
+				log.Print("agent gateway stopped")
+			}
+		}()
+	}
+	s := &Server{db: db, objects: objects, bucket: bucket, project: env("KEEL_PROJECT_ID", "proj-b300-demo"), flows: flowService}
 	go s.worker(ctx)
 	srv := &http.Server{Addr: env("LISTEN_ADDR", "127.0.0.1:8081"), Handler: s, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 60 * time.Second, WriteTimeout: 60 * time.Second, MaxHeaderBytes: 1 << 20}
 	go func() {
