@@ -78,6 +78,10 @@ func (s *Server) identityRoutes(w http.ResponseWriter, r *http.Request) bool {
 		respond(w, 200, identity.Catalog())
 		return true
 	}
+	if len(p) == 2 && p[0] == "projects" && r.Method == "DELETE" {
+		s.deleteProject(w, r, p[1])
+		return true
+	}
 	if path == "projects" && r.Method == "GET" {
 		respond(w, 200, u.Projects)
 		return true

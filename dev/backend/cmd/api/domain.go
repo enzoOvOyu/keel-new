@@ -510,9 +510,29 @@ func (s *Server) publish(ctx context.Context) {
 			tx.Rollback(ctx)
 			recovery, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
-			s.db.Exec(recovery, "UPDATE outbox_event SET retry_count=retry_count+1,last_error_code='CMDB_PROJECTION_FAILED',next_attempt_at=now()+make_interval(secs=>LEAST(60,POWER(2,LEAST(retry_count,6)))::int) WHERE id=$1 AND published_at IS NULL", id)
+			code := "CMDB_PROJECTION_FAILED"
+			if eventType == "project.objects.delete" {
+				code = "PROJECT_STORAGE_CLEANUP_FAILED"
+			}
+			s.db.Exec(recovery, "UPDATE outbox_event SET retry_count=retry_count+1,last_error_code=$2,next_attempt_at=now()+make_interval(secs=>LEAST(60,POWER(2,LEAST(retry_count,6)))::int) WHERE id=$1 AND published_at IS NULL", id, code)
 		}
 	}()
+	if eventType == "project.objects.delete" {
+		var deletion struct {
+			Prefix string `json:"prefix"`
+		}
+		if json.Unmarshal(raw, &deletion) != nil || deletion.Prefix != project+"/" {
+			return
+		}
+		if e = s.removeProjectObjects(ctx, project); e != nil {
+			return
+		}
+
+		if _, e = tx.Exec(ctx, "UPDATE outbox_event SET published_at=now(),last_error_code=NULL WHERE id=$1", id); e == nil {
+			completed = tx.Commit(ctx) == nil
+		}
+		return
+	}
 	if eventType == "flows.execution" {
 		if e = s.flows.ProjectEvent(ctx, tx, id, project, raw); e != nil {
 			return

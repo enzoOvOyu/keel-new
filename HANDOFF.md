@@ -1,5 +1,9 @@
 # Keel 当前开发交接
 
+## 项目删除功能开发（未部署）
+
+独立工作树 `/home/ubuntu/keel-project-delete-dev`，分支 `feat/project-delete`。实现项目列表删除确认、Session/CSRF及project:delete校验、项目专属数据事务清理和上传对象Outbox重试；保留审计、审批和共享型号/资产。迁移025尚未执行。用户要求停止测试后不再运行检查；共享版本引用修正后未复测，实际限制及检查见 `docs/topology/project-deletion-20261031.md`。此节不改变下方当前运行版本。
+
 ## 当前运行环境 · BOM 新文件根因修复（2026-10-31）
 
 此节覆盖下方旧运行版本。后端 `7a49bca`，分支 `fix/bom-source-closure`，工作树 `/home/ubuntu/keel-bom-closure-dev`；8081 运行 `/tmp/keel-api-bom-v6p-flows-1031`，启动器 `/tmp/keel-bom-v6p-run-api.py`。前端5180、Flows及原配置未替换。部署证据 `/tmp/keel-bom-v6p-20261031/deployment.json`，秘密环境文件不得打印或入Git。

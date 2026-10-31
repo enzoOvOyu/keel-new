@@ -711,6 +711,51 @@ paths:
         required: true
         schema:
           type: string
+    delete:
+      tags: [Identity]
+      operationId: deleteIdentityProject
+      summary: Permanently delete project exclusive data, retaining audit and shared catalogs
+      security:
+        - cookieSession: []
+      parameters:
+        - in: header
+          name: X-CSRF-Token
+          required: true
+          schema: {type: string}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [confirm_name]
+              properties:
+                confirm_name: {type: string}
+      responses:
+        '202':
+          description: Database deleted; object cleanup queued for retry
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, request_id]
+                properties:
+                  request_id: {type: string}
+                  data:
+                    type: object
+                    required: [id, status, storage_status, storage_event_id]
+                    properties:
+                      id: {type: string}
+                      status: {type: string, enum: [deleted]}
+                      storage_status: {type: string, enum: [pending]}
+                      storage_event_id: {type: string}
+        '400': {description: Invalid request}
+        '401': {description: Unauthenticated}
+        '403': {description: Requires project delete permission and CSRF}
+        '404': {description: Project not found}
+        '409': {description: Active tasks, unretired Flows, or referenced data conflict}
+        '422': {description: Project name mismatch}
     get:
       tags:
         - Projects
