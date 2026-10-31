@@ -1,0 +1,54 @@
+{
+  "status": "DEPLOYED_STARTUP_CHECKS_PASS",
+  "source_commit": "ad8918b",
+  "base": "b184645",
+  "original_fix_commits": [
+    "e3f6cd3",
+    "74ab238"
+  ],
+  "integration_commits": [
+    "efcb6ff",
+    "ad8918b"
+  ],
+  "worktree": "/tmp/keel-agent-deploy",
+  "branch": "deploy/bom-agent-topology-1031",
+  "binary": "/tmp/keel-api-agent-topology-1031",
+  "pid": 3494111,
+  "sha256": "abb3ee33bd56c898bdd26663f848c439435e4859c938c0cd3b15ecc59b42374d",
+  "listen": "127.0.0.1:8081",
+  "frontend": "http://localhost:5180",
+  "frontend_source": "/home/ubuntu/keel-visualization-dev/dev",
+  "checks": [
+    {
+      "check": "healthz",
+      "status": 200
+    },
+    {
+      "check": "login",
+      "status": 200
+    },
+    {
+      "check": "cmdb/visualization/subgraph",
+      "status": 200
+    },
+    {
+      "check": "cmdb/visualization/matrix",
+      "status": 200
+    },
+    {
+      "check": "cmdb/visualization/connections",
+      "status": 200
+    },
+    {
+      "check": "cmdb/visualization",
+      "status": 200
+    },
+    {
+      "check": "trace_missing_port",
+      "status": 404,
+      "code": "VISUAL_PORT_NOT_FOUND"
+    }
+  ],
+  "business_acceptance": "NOT RUN; no new recognition or BOM submission",
+  "rollback_binary": "/tmp/keel-api-4541850"
+}

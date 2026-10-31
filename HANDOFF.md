@@ -2,6 +2,12 @@
 
 更新：2026-10-31 UTC。先读本文件，再按下列索引定位；无需重扫全仓。历史交接可用 `git show 6601444:HANDOFF.md` 查阅。
 
+## 2026-10-31 Agent 修复已部署（最新运行状态）
+
+用户明确授权将此前 Agent 修复部署到当前拓扑服务。后端现运行 `/tmp/keel-api-agent-topology-1031`，业务源码 `ad8918b`，独立集成分支 `deploy/bom-agent-topology-1031`、工作区 `/tmp/keel-agent-deploy`；在拓扑基线 `b184645` 上集成原修复 `e3f6cd3`、`74ab238`。8081、原配置/受控秘密工作目录和5180前端保持原入口。下方 `4541850` 二进制信息作为历史记录，已被本段覆盖。
+
+定向 Go API/AI/BOM/CMDB 检查和构建通过；健康、登录、拓扑 subgraph/matrix/connections/兼容查询均通过启动检查，缺失端口 trace 返回404。切换前活动BOM任务为0。没有启动新识别、入库或完整业务验收；此前旧版本首轮测试不能充当修复版验收。证据见 `docs/topology/agent-deployment-20261031.json`。回退后端可恢复 `/tmp/keel-api-4541850`，无需数据库回退。
+
 ## 当前分支与运行环境
 
 - 仓库目标：`enzoOvOyu/keel-new`。工作区 `/home/ubuntu/keel-visualization-dev`，分支 `feat/datacenter-visualization-approved`；未合并 main。

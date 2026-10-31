@@ -125,3 +125,7 @@
 - 四个查询接口200、五个工作区加载通过；记录为 `topology/deployment-validation.json`。未进行完整交互回归、真实导入或规模验收。
 
 回退：停止上述两个 tmux 服务，等待5180/8081释放后，将 API 恢复为 `/tmp/keel-cmdb-api`（同原后端目录/配置），前端恢复从 `/home/ubuntu/keel/dev` 执行原5180启动命令。原目录源代码仍为 `keel-new-main` / `978db7f`，不需要回退数据库。不要在端口尚未释放时直接起第二个监听实例。
+
+## 2026-10-31 · BOM Agent 与新拓扑合并部署
+
+后端运行源码 `ad8918b`（拓扑基线 b184645 + Agent 修复 e3f6cd3/74ab238），独立工作区 `/tmp/keel-agent-deploy`，分支 `deploy/bom-agent-topology-1031`。二进制 `/tmp/keel-api-agent-topology-1031`，启动脚本 `/tmp/keel-start-agent-topology-1031.sh`，tmux `keel-cmdb-api`，仍读取 `/home/ubuntu/keel/dev/backend/.env` 并监听8081。5180前端继续原可视化工作区。无迁移、主分支合并或新增业务测试。启动检查与限制见 `topology/agent-deployment-20261031.json`。停止当前API后，可用同一配置/工作目录运行原 `/tmp/keel-api-4541850` 回退；不要并行启动两个worker。
