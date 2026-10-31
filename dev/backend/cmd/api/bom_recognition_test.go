@@ -133,3 +133,24 @@ func TestReanalysisRemovesUnreviewedDerivedArtifacts(t *testing.T) {
 		t.Fatal("obsolete derived module survived source reanalysis")
 	}
 }
+
+func TestExplicitSourceTypeCorrectsUnreviewedModelClassification(t *testing.T) {
+	s := bom.Sheet{Name: "synthetic-inventory", Cells: []bom.Cell{{Ref: "A1", Row: 1, Column: 1, Value: "设备名称"}, {Ref: "B1", Row: 1, Column: 2, Value: "设备型号"}, {Ref: "C1", Row: 1, Column: 3, Value: "设备类型"}, {Ref: "A2", Row: 2, Column: 1, Value: "synthetic-switch"}, {Ref: "B2", Row: 2, Column: 2, Value: "synthetic-model"}, {Ref: "C2", Row: 2, Column: 3, Value: "Switch"}}}
+	records := bom.PlanningSourceRows(bom.Workbook{Sheets: []bom.Sheet{s}}).Records
+	p := ai.SheetPlan{HeaderRows: []int{1}, Tables: []ai.TablePlan{{Kind: "planned_device", Type: "server", Start: 2, End: 2, Fields: map[string]int{"hostname": 1, "model": 2}}}}
+	records = applySheetPlan(records, s, p, nil)
+	p.Tables[0].Fields["category"] = 3
+	out := applySheetPlan(records, s, p, nil)
+	found := false
+	for _, r := range out {
+		if r.Item.Hostname == "synthetic-switch" {
+			found = true
+			if r.Item.Category != "switch" || r.Item.Sources["category"].Ref != "C2" || r.Ambiguity {
+				t.Fatal("unreviewed model guess overrode source type")
+			}
+		}
+	}
+	if !found {
+		t.Fatal("source device lost")
+	}
+}

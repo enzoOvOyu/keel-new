@@ -328,6 +328,9 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 			if !validSheets[r.Sheet] || (len(selected) > 0 && !affected[fmt.Sprint(r.Sheet, ":", r.Row)]) || r.Imported || r.Ignored || r.Confirmed || r.Method == "manual" || r.Item.Model == "" || (r.Item.Category != "other" && r.Item.Category != "material" && r.Item.Category != "server" && r.Item.Category != "switch" && r.Item.Category != "router") {
 				continue
 			}
+			if sourceCategory(r.Item.Sources["category"]) != "" {
+				continue
+			}
 			description := r.Item.Fields["description"] + " " + r.Item.Fields["specification"] + " source_type=" + r.Item.Category + " record_kind=" + r.Item.Fields["record_kind"]
 			key := strings.TrimSpace(r.Item.Model) + "|" + description
 			gid, exists := groupIDs[key]
@@ -348,7 +351,7 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 		apply := func(c ai.Classification, d ai.Description) {
 			for _, j := range groups[d.ID] {
 				r := &b.Records[j]
-				if r.Item.Sources["category"].Ref != "" && r.Item.Category != "other" && r.Item.Category != "material" && r.Item.Category != c.Type {
+				if sourceCategory(r.Item.Sources["category"]) != "" && r.Item.Category != "other" && r.Item.Category != "material" && r.Item.Category != c.Type {
 					r.Ambiguity = true
 					r.Reason = "分类建议与已有来源类型冲突，保留原类型并要求人工核查：" + c.Type
 					continue
@@ -643,9 +646,13 @@ func applySheetPlan(records []bom.ImportRecord, sheet bom.Sheet, plan ai.SheetPl
 					mapped, ok := t.Types[v]
 					if ok {
 						kind = mapped
+						sources["category"] = cells[record.Row][t.TypeColumn]
 					} else {
 						continue // another typed extractor may handle it; otherwise raw row is retained
 					}
+				}
+				if explicit := sourceCategory(sources["category"]); explicit != "" {
+					kind = explicit
 				}
 				r := record
 				anchor := extractionAnchor(t.Fields)
@@ -665,7 +672,7 @@ func applySheetPlan(records []bom.ImportRecord, sheet bom.Sheet, plan ai.SheetPl
 				}
 				r.Confidence = &t.Confidence
 				r.Ambiguity = false
-				if record.Item.Category != "" && record.Item.Category != "other" && record.Item.Category != "material" && record.Item.Category != kind && extractionAnchorFromItem(record.Item) == anchor {
+				if sourceCategory(record.Item.Sources["category"]) != "" && record.Item.Category != "" && record.Item.Category != "other" && record.Item.Category != "material" && record.Item.Category != kind && extractionAnchorFromItem(record.Item) == anchor {
 					r.Ambiguity = true
 					r.Reason = "重分析分类与已有候选冲突，保留原类型并要求人工核查：" + kind
 					r.Item.Category = record.Item.Category
@@ -733,4 +740,14 @@ func extractionAnchorFromItem(item bom.Item) string {
 		cols[field] = cell.Column
 	}
 	return extractionAnchor(cols)
+}
+
+// Only a literal supported source type is authoritative; model suggestions
+// and ambiguous type labels still require classification and review.
+func sourceCategory(c bom.Cell) string {
+	kind := strings.ToLower(strings.TrimSpace(c.Value))
+	if !c.Sensitive && kind != "other" && bom.KnownImportType(kind) {
+		return kind
+	}
+	return ""
 }

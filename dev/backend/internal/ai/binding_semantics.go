@@ -148,7 +148,7 @@ func normalizeExplicitBindings(s bom.Sheet, p *SheetPlan) {
 		}
 		fields := []string{}
 		if t.Kind == "planned_device" && t.Type != "rack" {
-			fields = []string{"hostname", "model", "serial", "rack", "site", "u_start", "u_height", "management_ip", "mac", "network_role"}
+			fields = []string{"hostname", "model", "category", "serial", "rack", "site", "u_start", "u_height", "management_ip", "mac", "network_role"}
 		}
 		if t.Kind == "physical_connection" {
 			fields = []string{"endpoint_a_device", "endpoint_b_device", "endpoint_a_port", "endpoint_b_port", "model", "endpoint_a_optic", "endpoint_b_optic", "length", "media_type", "speed", "termination_a", "termination_b"}
@@ -271,7 +271,7 @@ func explicitInventoryPlan(s bom.Sheet) (SheetPlan, bool) {
 		return p, false
 	}
 	fields := map[string]int{}
-	for _, f := range []string{"hostname", "model", "serial", "site", "rack", "u_start", "u_height", "rack_height", "management_ip", "mac", "brand", "manufacturer", "network_role", "role", "device_alias"} {
+	for _, f := range []string{"hostname", "model", "category", "serial", "site", "rack", "u_start", "u_height", "rack_height", "management_ip", "mac", "brand", "manufacturer", "network_role", "role", "device_alias"} {
 		if len(cols[f]) == 1 {
 			fields[f] = cols[f][0]
 		}
@@ -343,7 +343,7 @@ func explicitMixedPlan(s bom.Sheet) (SheetPlan, bool) {
 				t.Fields["media_type"] = h["media_type"][0]
 			}
 		} else {
-			for _, f := range []string{"hostname", "model", "serial", "site", "rack", "u_start", "u_height", "management_ip", "mac", "brand", "network_role"} {
+			for _, f := range []string{"hostname", "model", "category", "serial", "site", "rack", "u_start", "u_height", "management_ip", "mac", "brand", "network_role"} {
 				if len(h[f]) == 1 {
 					t.Fields[f] = h[f][0]
 				}

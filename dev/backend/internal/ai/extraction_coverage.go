@@ -149,7 +149,7 @@ func inspectSourceCoverage(s bom.Sheet, p SheetPlan) error {
 				}
 			}
 			// Deterministic diagnostics contain coordinates, never asset values.
-			for _, f := range []string{"hostname", "device_alias", "serial", "model", "management_ip", "mac", "rack", "site", "u_start", "u_height", "endpoint_a_device", "endpoint_a_port", "endpoint_b_device", "endpoint_b_port", "endpoint_a_optic", "endpoint_b_optic", "length", "speed", "media_type"} {
+			for _, f := range []string{"hostname", "device_alias", "serial", "model", "category", "management_ip", "mac", "rack", "site", "u_start", "u_height", "endpoint_a_device", "endpoint_a_port", "endpoint_b_device", "endpoint_b_port", "endpoint_a_optic", "endpoint_b_optic", "length", "speed", "media_type"} {
 				if dualEndpointHeaders(h) && (f == "hostname" || f == "model") {
 					continue
 				}
@@ -214,7 +214,7 @@ func tableTypeMatches(t TablePlan, cells map[int]bom.Cell) bool {
 
 func planMapsCell(p SheetPlan, cells map[int]bom.Cell, row int, field string, col int) bool {
 	for _, t := range p.Tables {
-		if t.Kind != "reference" && row >= t.Start && row <= t.End && t.Fields[field] == col && tableRowPresent(t, cells) && tableTypeMatches(t, cells) {
+		if t.Kind != "reference" && row >= t.Start && row <= t.End && (t.Fields[field] == col || field == "category" && t.TypeColumn == col) && tableRowPresent(t, cells) && tableTypeMatches(t, cells) {
 			return true
 		}
 	}
