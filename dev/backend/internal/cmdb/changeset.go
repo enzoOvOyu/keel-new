@@ -270,7 +270,7 @@ func (s Service) applyChanges(ctx context.Context, tx pgx.Tx, schema Schema, sco
 				return e
 			}
 			touched[c.AssetID] = true
-		case "asset.update", "asset.retire", "asset.replace":
+		case "asset.update", "asset.relocate", "asset.retire", "asset.replace":
 			var raw []byte
 			var kind, life string
 			var current int64
@@ -286,7 +286,15 @@ func (s Service) applyChanges(ctx context.Context, tx pgx.Tx, schema Schema, sco
 			}
 			var attrs map[string]any
 			json.Unmarshal(raw, &attrs)
-			if c.Op == "asset.update" {
+			if c.Op == "asset.relocate" {
+				if err := s.validateRelocation(ctx, tx, project, c.AssetID, attrs, c.Attributes); err != nil {
+					return err
+				}
+				attrs["u_start"] = c.Attributes["u_start"]
+				if _, ok := attrs["rack_u"]; ok {
+					attrs["rack_u"] = c.Attributes["u_start"]
+				}
+			} else if c.Op == "asset.update" {
 				if issues := schema.Validate(kind, c.Attributes, "manual", true); len(issues) > 0 {
 					return &Error{403, "MANUAL_ATTRIBUTE_DENIED", issues}
 				}

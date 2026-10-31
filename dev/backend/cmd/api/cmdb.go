@@ -73,6 +73,15 @@ func (s *Server) cmdbRoutes(w http.ResponseWriter, r *http.Request) bool {
 	defer cancel()
 	r = r.WithContext(ctx)
 	service := cmdbService(s)
+	if path == "cmdb/visualization" && r.Method == "GET" {
+		result, err := service.Visualization(ctx, scope, r.URL.Query().Get("rack_id"), r.URL.Query().Get("focus"))
+		if err != nil {
+			cmdbFailure(w, err)
+		} else {
+			respond(w, 200, result)
+		}
+		return true
+	}
 	p := strings.Split(path, "/")
 	permission := "cmdb:edit"
 	if strings.HasSuffix(path, "/approve") || strings.HasSuffix(path, "/reject") {

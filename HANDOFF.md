@@ -2,13 +2,17 @@
 
 更新：2026-10-30（UTC）。本文件用于切换机器或 Agent 后快速接续，记录实际状态，不代替 PRD，也不代表全平台验收通过。
 
+## 2026-10-31 后续任务变更
+
+用户本轮转向数据中心拓扑与机柜一体化，当前优先级据此更新。新入口 `/topology`、`/racks`，实现/验证/缺口见 `docs/DATACENTER-VISUALIZATION.md`；代码在 `dev/src/features/infrastructure/`、`internal/cmdb/visualization.go`。BOM Agent 未完成状态保持，不因本次可视化开发声称已解决。
+
 ## 1. 先看这里
 
 - 仓库：`git@github.com:enzoOvOyu/keel-new.git`，远端目标分支 **main**；本地分支 `keel-new-main`。
 - 最近代码提交：`0784931`（分析进度加载修复）；前一功能提交 `405becc`（工作簿识别与审核）。本交接文档另行提交。
 - **当前开发应用是 `dev/`**，后端 `dev/backend/`，权威设计文档是根目录 `docs/`。`keel-demo/` 是历史演示副本，不要改错目录。
 - 当前机器前端 **5180**，后端 **8081**。Vite 配置默认仍为 5174，当前通过启动参数覆盖。
-- 当前优先级：完成 **BOM AI 智能识别 Agent**。用户重点测试开局配置和 CMDB，禁止扩展其他模块。
+- 上一任务遗留：**BOM AI 智能识别 Agent** 尚未完成；当前优先级已由上方 2026-10-31 用户新任务替换。
 - **完整自主工具调用 Agent 尚未完成。** 已有持久化任务、Workbook IR、语义提取方案、工具函数、来源追溯和覆盖对账；工具执行顺序仍由程序编排，不能把步骤名称当作完整 Agent 已落地。
 - 本轮只整理交接，不修改业务功能、不重跑业务测试。
 
@@ -139,4 +143,4 @@ npm run generate:api --prefix dev
 
 提交前仅检查本次 diff 与秘密。沿用正确 remote；旧机器 SSH key 为根目录被忽略的 `deploy_key`，新环境需自行配置 Git 授权，不复制到 Git。提交后推送 `origin HEAD:main`。
 
-给下一个 Agent 的开场指令：**先读 HANDOFF.md、AGENTS.md 和索引中的 BOM 两份说明，从现有 runRecognition 接续完成真正的单主 Agent；保留页面和进度修复，不开发固定模式、不重建 CMDB、不扩展范围，只做必要验证。**
+给下一个 Agent 的开场指令：**先读 HANDOFF.md、AGENTS.md 和最新任务增补。当前从 DATACENTER-VISUALIZATION.md 接续拓扑/机柜剩余验收；若用户要求回到 BOM，再从现有 runRecognition 接续单主 Agent。不要自行切换任务、不重建 CMDB、不扩展范围，只做必要验证。**

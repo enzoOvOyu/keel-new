@@ -12,7 +12,8 @@ export const sections:{label:string;entries:Entry[]}[]=[{label:'部署平面',en
 {id:'fabric',label:'Fabric 网络底座',icon:Network,scope:'project',permission:'fabric:read',load:'poll-60s',views:[{id:'readiness',label:'网络就绪验收',load:'on-demand'},{id:'devices',label:'网络设备',load:'SSE'},{id:'topology',label:'Topology 拓扑与布线',load:'on-demand'},{id:'ztp',label:'ZTP 开通',load:'SSE'},{id:'golden',label:'Golden 配置'},{id:'doublecheck',label:'Doublecheck'},{id:'pushjobs',label:'PushJob',load:'SSE'},{id:'lossless',label:'无损健康'},{id:'ddm',label:'光模块 DDM'},{id:'logs',label:'网络日志'},{id:'rules',label:'规则治理'}]},
 {id:'nccl',label:'NCCL',icon:Activity,scope:'project',permission:'test:read',load:'poll-5s',views:[{id:'batches',label:'测试批次'},{id:'reports',label:'测试报告',load:'on-demand'},{id:'baseline',label:'基线对比'},{id:'thresholds',label:'阈值场景'},{id:'trace',label:'网络溯源'}]},
 {id:'cleanup',label:'Cleanup',icon:ShieldCheck,scope:'project',permission:'cleanup:read',load:'poll-5s',views:[{id:'plan',label:'清理计划'},{id:'executions',label:'清理执行'},{id:'archive',label:'归档与签署'},{id:'maintained',label:'维护态转换'}]}]},
-{label:'运维平面',entries:[
+{label:'运维中心',entries:[
+{id:'topology',label:'数据中心拓扑',icon:Network,scope:'cross',permission:'cmdb:read',load:'on-demand'},
 {id:'dashboard',label:'Dashboard',icon:LayoutDashboard,scope:'cross',permission:'dashboard:read',load:'poll-60s'},
 {id:'fleet',label:'Fleet 服务器舰队',icon:Server,scope:'cross',permission:'fleet:read',load:'poll-5s',views:[{id:'servers',label:'服务器列表'},{id:'ports',label:'网口健康',load:'SSE'},{id:'assets',label:'资产台账'},{id:'collections',label:'采集任务'}]},
 {id:'racks',label:'RackView 机柜机房',icon:Box,scope:'cross',permission:'cmdb:read',load:'on-demand'},

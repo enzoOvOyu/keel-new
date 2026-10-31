@@ -4,6 +4,26 @@
  */
 
 export interface paths {
+    "/cmdb/visualization": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Authorized physical infrastructure projection from existing assets and typed relationships
+         * @description On demand. Default returns rack/device summaries and cable device endpoints; rack_id loads local ports/components and touching cables; focus expands up to two physical cable hops. Maximum 20000 source assets; truncated is explicit. No layout writes or logical-to-physical inference.
+         */
+        get: operations["getCMDBVisualization"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/projects/{project_id}/bom-imports": {
         parameters: {
             query?: never;
@@ -5376,6 +5396,41 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        InfrastructureAsset: {
+            id: string;
+            type: string;
+            name: string;
+            project_id: string;
+            revision: number;
+            source: string;
+            /** @description Allowlisted sparse CMDB attributes; missing means unknown, never inferred. */
+            fields: {
+                [key: string]: unknown;
+            };
+        };
+        InfrastructureCable: {
+            id: string;
+            a: string;
+            b: string;
+            device_a: string;
+            device_b: string;
+            fact: string;
+            source: string;
+            fields: {
+                [key: string]: unknown;
+            };
+        };
+        InfrastructureSnapshot: {
+            assets: components["schemas"]["InfrastructureAsset"][];
+            cables: components["schemas"]["InfrastructureCable"][];
+            findings: {
+                asset_id: string;
+                code: string;
+                message: string;
+            }[];
+            total_assets: number;
+            truncated: boolean;
+        };
         ErrorEnvelope: {
             request_id: string;
             error: {
@@ -13135,7 +13190,7 @@ export interface components {
         };
         CmdbChange: {
             /** @enum {unknown} */
-            op: "asset.create" | "asset.update" | "asset.retire" | "asset.replace" | "relationship.upsert" | "relationship.end";
+            op: "asset.create" | "asset.update" | "asset.relocate" | "asset.retire" | "asset.replace" | "relationship.upsert" | "relationship.end";
             asset_id: string;
             asset_type?: string;
             expected_revision: number;
@@ -13782,6 +13837,40 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    getCMDBVisualization: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                rack_id?: string;
+                focus?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scope-filtered CMDB facts, physical cable endpoints and quality findings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        request_id: string;
+                        data: components["schemas"]["InfrastructureSnapshot"];
+                    };
+                };
+            };
+            /** @description CMDB read scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     listRealProjectBOMImports: {
         parameters: {
             query?: never;

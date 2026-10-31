@@ -38,6 +38,28 @@ tags:
   - name: IA
     description: IA v2.3 project scope and lazy detail contracts
 paths:
+  /cmdb/visualization:
+    get:
+      operationId: getCMDBVisualization
+      tags: [CMDB]
+      summary: Authorized physical infrastructure projection from existing assets and typed relationships
+      description: On demand. Default returns rack/device summaries and cable device endpoints; rack_id loads local ports/components and touching cables; focus expands up to two physical cable hops. Maximum 20000 source assets; truncated is explicit. No layout writes or logical-to-physical inference.
+      parameters:
+      - {name: project_id, in: query, schema: {type: string}}
+      - {name: rack_id, in: query, schema: {type: string}}
+      - {name: focus, in: query, schema: {type: string}}
+      responses:
+        '200':
+          description: Scope-filtered CMDB facts, physical cable endpoints and quality findings
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, request_id]
+                properties:
+                  request_id: {type: string}
+                  data: {$ref: '#/components/schemas/InfrastructureSnapshot'}
+        '403': {description: CMDB read scope denied}
   /projects/{project_id}/bom-imports:
     parameters:
       - $ref: "#/components/parameters/ProjectId"
@@ -13980,6 +14002,46 @@ components:
           schema:
             $ref: "#/components/schemas/ErrorEnvelope"
   schemas:
+    InfrastructureAsset:
+      type: object
+      required: [id, type, name, project_id, revision, source, fields]
+      properties:
+        id: {type: string}
+        type: {type: string}
+        name: {type: string}
+        project_id: {type: string}
+        revision: {type: integer}
+        source: {type: string}
+        fields: {type: object, description: 'Allowlisted sparse CMDB attributes; missing means unknown, never inferred.', additionalProperties: true}
+    InfrastructureCable:
+      type: object
+      required: [id, a, b, device_a, device_b, fact, source, fields]
+      properties:
+        id: {type: string}
+        a: {type: string}
+        b: {type: string}
+        device_a: {type: string}
+        device_b: {type: string}
+        fact: {type: string}
+        source: {type: string}
+        fields: {type: object, additionalProperties: true}
+    InfrastructureSnapshot:
+      type: object
+      required: [assets, cables, findings, total_assets, truncated]
+      properties:
+        assets: {type: array, items: {$ref: '#/components/schemas/InfrastructureAsset'}}
+        cables: {type: array, items: {$ref: '#/components/schemas/InfrastructureCable'}}
+        findings:
+          type: array
+          items:
+            type: object
+            required: [asset_id, code, message]
+            properties:
+              asset_id: {type: string}
+              code: {type: string}
+              message: {type: string}
+        total_assets: {type: integer}
+        truncated: {type: boolean}
     ErrorEnvelope:
       type: object
       required:
@@ -37626,6 +37688,7 @@ components:
           enum:
           - asset.create
           - asset.update
+          - asset.relocate
           - asset.retire
           - asset.replace
           - relationship.upsert

@@ -1,0 +1,50 @@
+{
+  "scope": "Synthetic aggregation + ELK layout only, NOT raw full-graph render FPS or production capacity",
+  "rows": [
+    {
+      "synthetic": true,
+      "input_nodes": 100,
+      "input_relations": 300,
+      "render_nodes": 100,
+      "render_edges": 300,
+      "aggregation_ms": 0.54,
+      "elk_ms": 1164.23
+    },
+    {
+      "synthetic": true,
+      "input_nodes": 500,
+      "input_relations": 2000,
+      "render_nodes": 100,
+      "render_edges": 300,
+      "aggregation_ms": 2.6,
+      "elk_ms": 764.19
+    },
+    {
+      "synthetic": true,
+      "input_nodes": 1000,
+      "input_relations": 5000,
+      "render_nodes": 100,
+      "render_edges": 300,
+      "aggregation_ms": 3.27,
+      "elk_ms": 635.88
+    },
+    {
+      "synthetic": true,
+      "input_nodes": 5000,
+      "input_relations": 20000,
+      "render_nodes": 100,
+      "render_edges": 300,
+      "aggregation_ms": 10.38,
+      "elk_ms": 495.56
+    },
+    {
+      "synthetic": true,
+      "input_nodes": 10000,
+      "input_relations": 50000,
+      "render_nodes": 100,
+      "render_edges": 300,
+      "aggregation_ms": 11.6,
+      "elk_ms": 555.1
+    }
+  ]
+}

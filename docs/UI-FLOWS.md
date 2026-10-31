@@ -143,3 +143,8 @@ Fabric无损选择设备/反例→端口→rule@version→五层证据→读取�
 ## 当前 BOM AI 四阶段工作流
 
 上传→后端真实分析进度→分类审核（交换机及端接优先）→冻结范围确认入库。固定模式不再是当前页面入口。失败继续未完成分析；人工编辑、排除/恢复、批量确认在同一工作台，来源和端口在同一 Dialog 内切换，禁止叠层。详见 [BOM-WORKBENCH-V2.md](BOM-WORKBENCH-V2.md)。
+
+
+## 2026-10-31 数据中心可视化增补
+
+新增运维 `/topology` 与真实 CMDB 机柜工作台；投影接口、布局/事实边界、asset.relocate 审核发布、验证记录和未完成项统一见 [DATACENTER-VISUALIZATION.md](DATACENTER-VISUALIZATION.md)，HTTP schema 见 openapi.yaml。沿用原资产身份和权限，不把计划连接或 synthetic 数据视为真机验证。
