@@ -333,7 +333,7 @@ func CompactWorkbench(b *Workbench) {
 
 // Read only a cached scalar; never execute or treat formula syntax/errors as identity.
 func ExtractCellValue(c Cell, field string) string {
-	v := strings.TrimSpace(c.Value)
+	v := RackUnitValue(field, strings.TrimSpace(c.Value))
 	if (c.FormulaBacked || c.Formula != "") && v == "0" && (field == "model" || field == "serial" || field == "device_alias" || field == "endpoint_a_optic" || field == "endpoint_b_optic") {
 		return ""
 	}

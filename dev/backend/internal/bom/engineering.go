@@ -91,3 +91,24 @@ func Engineering(items []Item, caps map[string]map[string]any) []Issue {
 	}
 	return out
 }
+
+// Normalize an explicitly supplied rack-unit value without guessing a range,
+// missing dimension or unit. Source cells remain unchanged.
+func RackUnitValue(field, value string) string {
+	if field != "u_start" && field != "u_height" && field != "rack_height" {
+		return value
+	}
+	text := strings.ToUpper(strings.TrimSpace(value))
+	if strings.HasPrefix(text, "U") {
+		text = strings.TrimSpace(strings.TrimPrefix(text, "U"))
+	} else if strings.HasSuffix(text, "U") {
+		text = strings.TrimSpace(strings.TrimSuffix(text, "U"))
+	} else {
+		return value
+	}
+	n, err := strconv.Atoi(text)
+	if err != nil || n <= 0 {
+		return value
+	}
+	return strconv.Itoa(n)
+}

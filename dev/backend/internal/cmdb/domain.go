@@ -486,10 +486,14 @@ func (s Service) ProjectBOM(ctx context.Context, tx pgx.Tx, event, project, revi
 	for _, item := range items {
 		attrs := map[string]any{}
 		for k, v := range item.Fields {
+			// An absent optional dimension is unknown, never an empty numeric value.
+			if v == "" {
+				continue
+			}
 			if a, ok := schema.Attributes(canonicalKind(bom.AssetType(item)))[k]; ok {
 				attrs[k] = v
 				if a.Type == "Number" {
-					if n, e := strconv.ParseFloat(v, 64); e == nil {
+					if n, e := strconv.ParseFloat(bom.RackUnitValue(k, v), 64); e == nil {
 						attrs[k] = n
 					}
 				}

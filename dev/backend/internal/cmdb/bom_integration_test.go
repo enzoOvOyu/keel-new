@@ -179,3 +179,59 @@ func TestPhysicalComponentOwnerQuery(t *testing.T) {
 		t.Fatal("ambiguous ownership was hidden by component fallback")
 	}
 }
+
+// An explicitly selected local event supplies immutable source evidence; no
+// real workbook values or identities are committed as a fixture.
+func TestBOMProjectionDimensions(t *testing.T) {
+	eventID := os.Getenv("KEEL_CMDB_TEST_OUTBOX_ID")
+	if os.Getenv("KEEL_CMDB_INTEGRATION") != "1" || eventID == "" {
+		t.Skip("explicit local dimensional BOM event required")
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	db, err := pgxpool.New(ctx, os.Getenv("DATABASE_URL"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback(ctx)
+	var project string
+	var raw []byte
+	if err = tx.QueryRow(ctx, "SELECT project_id,payload FROM outbox_event WHERE id=$1", eventID).Scan(&project, &raw); err != nil {
+		t.Fatal(err)
+	}
+	var event struct {
+		Items    []bom.Item `json:"items"`
+		Revision string     `json:"revision_id"`
+	}
+	if err = json.Unmarshal(raw, &event); err != nil {
+		t.Fatal(err)
+	}
+	heightID := ""
+	unknownRack := false
+	for _, item := range event.Items {
+		if item.Fields["u_height"] == "4U" {
+			heightID = item.UID
+		}
+		if bom.AssetType(item) == "rack" && item.Fields["rack_height"] == "" {
+			unknownRack = true
+		}
+	}
+	if heightID == "" || !unknownRack {
+		t.Fatal("selected event lacks explicit U height and unknown rack capacity")
+	}
+	if err = (Service{DB: db}).ProjectBOM(ctx, tx, uuid.NewString(), project, event.Revision, event.Items); err != nil {
+		t.Fatal(err)
+	}
+	var value, typ string
+	if err = tx.QueryRow(ctx, "SELECT payload->>'u_height',jsonb_typeof(payload->'u_height') FROM cmdb_entity WHERE bom_item_uid=$1", heightID).Scan(&value, &typ); err != nil {
+		t.Fatal(err)
+	}
+	if value != "4" || typ != "number" {
+		t.Fatal("explicit U height not converted to numeric CMDB attribute")
+	}
+}

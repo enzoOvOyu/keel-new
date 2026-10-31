@@ -195,3 +195,15 @@ func TestTokenDeviceNameDoesNotRedactInventoryColumn(t *testing.T) {
 		}
 	}
 }
+
+func TestExplicitRackUnitNormalizationPreservesEvidence(t *testing.T) {
+	for _, tc := range []struct{ field, input, want string }{{"u_height", "4U", "4"}, {"u_start", "U28", "28"}, {"rack_height", "42 U", "42"}, {"u_height", "4-6U", "4-6U"}, {"u_height", "unknown", "unknown"}, {"speed", "4U", "4U"}} {
+		cell := Cell{Value: tc.input}
+		if got := ExtractCellValue(cell, tc.field); got != tc.want {
+			t.Fatalf("%s: got %q", tc.field, got)
+		}
+		if cell.Value != tc.input {
+			t.Fatal("source cell changed")
+		}
+	}
+}
