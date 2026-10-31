@@ -1,0 +1,372 @@
+{
+  "status": "FAIL_END_TO_END_BLOCKED",
+  "completed_at": "2026-10-31T07:17:36.508948+00:00",
+  "source_commit": "ad8918b",
+  "method": "Each real workbook: one full reanalysis of the existing isolated import, followed by four recognitions of the same seven Sheet/row coordinates. These were existing batches initially uploaded under the prior deployment, not five fresh uploads. API/database checks only; no new screenshots after user direction.",
+  "summary": {
+    "status": "FAIL_END_TO_END_BLOCKED",
+    "jobs": 10,
+    "raw_ir_unchanged": true,
+    "files": [
+      {
+        "file": "bomv1.xlsx",
+        "rounds": 5,
+        "duplicates": [
+          1296,
+          0,
+          0,
+          0,
+          0
+        ],
+        "network_switch_inventory": [
+          0,
+          0,
+          1,
+          1,
+          1
+        ],
+        "ns_row3_cable_counts": [
+          1,
+          2,
+          2,
+          1,
+          1
+        ],
+        "valid_closed_scopes": 0,
+        "database": {
+          "project_assets": 0,
+          "cmdb_scopes": 0,
+          "submissions": 0,
+          "outbox": 0
+        }
+      },
+      {
+        "file": "netbom.xlsx",
+        "rounds": 5,
+        "duplicates": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "network_switch_inventory": [
+          0,
+          0,
+          0,
+          1,
+          1
+        ],
+        "ns_row3_cable_counts": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "valid_closed_scopes": 0,
+        "database": {
+          "project_assets": 0,
+          "cmdb_scopes": 0,
+          "submissions": 0,
+          "outbox": 0
+        }
+      }
+    ]
+  },
+  "findings": [
+    {
+      "id": "BT-001",
+      "severity": "P0",
+      "issue": "Full Network Information recognition failed; 189 source switch rows were not extracted as switches in either full round. Later targeted passes recognized only the selected row, leaving 188 other inventory rows unresolved.",
+      "impact": "Missing switch inventory prevents complete port/cable graph and network matrices."
+    },
+    {
+      "id": "BT-002",
+      "severity": "P0",
+      "issue": "bomv1 first fixed-agent run produced 1296 duplicate optic candidate ID occurrences; later rounds removed them.",
+      "impact": "Candidate graph changed materially during repeats; first-run recovery was not clean."
+    },
+    {
+      "id": "BT-003",
+      "severity": "P0",
+      "issue": "For bomv1 Cabling_NS row3, cable candidate counts across the five runs were 1,2,2,1,1.",
+      "impact": "Same immutable source row did not produce a stable entity set. Field-presence checks alone cannot establish correctness."
+    },
+    {
+      "id": "BT-004",
+      "severity": "P1",
+      "issue": "Existing full-reanalysis request left five previously failed but newly planned sheets pending with saved plans. The API expands empty record_ids to a nonempty selection; the worker uses nonempty selection to mark previously unrecognized sheets pending.",
+      "impact": "Full versus partial analysis state requires correction/review; global coverage remained blocked.",
+      "evidence": "first-sheet-statuses.json and deployed cmd/api/bom_workbench.go / bom_recognition.go"
+    },
+    {
+      "id": "BT-005",
+      "severity": "BLOCKED",
+      "issue": "Neither project has a valid dependency-closed eligible set. Source/model/identity/endpoint and approval blockers remain. Formal BOM submissions, project assets, CMDB scopes and project Outbox events all remain zero.",
+      "impact": "Actual-file BOM-to-CMDB publication and post-import chart generation are NOT VERIFIED. This does not by itself prove a CMDB projection or renderer defect."
+    },
+    {
+      "id": "BT-006",
+      "severity": "REVIEW",
+      "issue": "7586 cable candidates include 432 from P2P-18 in addition to 7154 rows from the five cabling sheets; physical duplication versus reference/planning content requires source review.",
+      "impact": "Do not use gross candidate cable count as the count of unique physical links."
+    }
+  ],
+  "gate_checks": [
+    {
+      "file": "bomv1.xlsx",
+      "checks": [
+        {
+          "check": "blocked_source_cannot_confirm",
+          "http": 422,
+          "error": "SELECTED_RECORDS_REQUIRE_CORRECTION"
+        },
+        {
+          "check": "unconfirmed_port_submit",
+          "http": 422,
+          "error": "SELECTED_RECORDS_NOT_CONFIRMED_OR_VALID"
+        },
+        {
+          "check": "source_verified_port_confirm",
+          "source_port_value_verified": true,
+          "http": 200,
+          "error": null
+        },
+        {
+          "check": "stale_revision_review",
+          "http": 409,
+          "error": "REVISION_CONFLICT"
+        },
+        {
+          "check": "port_without_closed_dependencies_submit",
+          "attempt": 1,
+          "http": 422,
+          "error": "SELECT_RELATED_DEPENDENCIES"
+        },
+        {
+          "check": "port_without_closed_dependencies_submit",
+          "attempt": 2,
+          "http": 422,
+          "error": "SELECT_RELATED_DEPENDENCIES"
+        }
+      ],
+      "post_review_revision": 13
+    },
+    {
+      "file": "netbom.xlsx",
+      "checks": [
+        {
+          "check": "blocked_source_cannot_confirm",
+          "http": 422,
+          "error": "SELECTED_RECORDS_REQUIRE_CORRECTION"
+        },
+        {
+          "check": "unconfirmed_port_submit",
+          "http": 422,
+          "error": "SELECTED_RECORDS_NOT_CONFIRMED_OR_VALID"
+        },
+        {
+          "check": "source_verified_port_confirm",
+          "source_port_value_verified": true,
+          "http": 200,
+          "error": null
+        },
+        {
+          "check": "stale_revision_review",
+          "http": 409,
+          "error": "REVISION_CONFLICT"
+        },
+        {
+          "check": "port_without_closed_dependencies_submit",
+          "attempt": 1,
+          "http": 422,
+          "error": "SELECT_RELATED_DEPENDENCIES"
+        },
+        {
+          "check": "port_without_closed_dependencies_submit",
+          "attempt": 2,
+          "http": 422,
+          "error": "SELECT_RELATED_DEPENDENCIES"
+        }
+      ],
+      "post_review_revision": 13
+    }
+  ],
+  "synthetic_control": {
+    "scope": "Existing synthetic CMDB read-only control; NOT evidence of actual Excel import success",
+    "checks": [
+      {
+        "check": "existing_synthetic_control_snapshot",
+        "assets": 4703,
+        "cables": 705,
+        "truncated": false,
+        "missing_port_endpoints": 0
+      },
+      {
+        "axis": "server_switch",
+        "rows": 65,
+        "columns": 17,
+        "cells": 65,
+        "included": 641,
+        "excluded": 64,
+        "returned_sum": 641,
+        "coverage": {
+          "returned_cells": 65,
+          "total_cells": 65,
+          "limit": 200,
+          "complete": true
+        },
+        "first_cell_count": 1,
+        "member_cables_returned": 1,
+        "member_page": {
+          "limit": 200,
+          "has_more": false,
+          "next_cursor": null
+        }
+      },
+      {
+        "axis": "leaf_spine",
+        "rows": 16,
+        "columns": 4,
+        "cells": 64,
+        "included": 64,
+        "excluded": 641,
+        "returned_sum": 64,
+        "coverage": {
+          "returned_cells": 64,
+          "total_cells": 64,
+          "limit": 200,
+          "complete": true
+        },
+        "first_cell_count": 1,
+        "member_cables_returned": 1,
+        "member_page": {
+          "limit": 200,
+          "has_more": false,
+          "next_cursor": null
+        }
+      },
+      {
+        "axis": "rack_leaf",
+        "rows": 16,
+        "columns": 16,
+        "cells": 16,
+        "included": 640,
+        "excluded": 65,
+        "returned_sum": 640,
+        "coverage": {
+          "returned_cells": 16,
+          "total_cells": 16,
+          "limit": 200,
+          "complete": true
+        },
+        "first_cell_count": 40,
+        "member_cables_returned": 40,
+        "member_page": {
+          "limit": 200,
+          "has_more": false,
+          "next_cursor": null
+        }
+      },
+      {
+        "axis": "port_pair",
+        "rows": 200,
+        "columns": 200,
+        "cells": 200,
+        "included": 705,
+        "excluded": 0,
+        "returned_sum": 200,
+        "coverage": {
+          "returned_cells": 200,
+          "total_cells": 705,
+          "limit": 200,
+          "complete": false
+        },
+        "first_cell_count": 1,
+        "member_cables_returned": 1,
+        "member_page": {
+          "limit": 200,
+          "has_more": false,
+          "next_cursor": null
+        }
+      },
+      {
+        "check": "registered_control_cable_trace",
+        "http": 200,
+        "segments": 1,
+        "status": null,
+        "error": null
+      }
+    ]
+  },
+  "control_pagination": {
+    "scope": "existing synthetic control, not source workbook acceptance",
+    "pages": 4,
+    "cells": 705,
+    "unique_pairs": 705,
+    "count_sum": 705,
+    "included": 705,
+    "passed": true
+  },
+  "reference_isolation": [
+    {
+      "file": "bomv1.xlsx",
+      "check": "foreign_project_member_ref",
+      "http": 400,
+      "error": "VISUAL_MEMBER_SCOPE_MISMATCH",
+      "assets": 0,
+      "cables": 0
+    },
+    {
+      "file": "bomv1.xlsx",
+      "check": "foreign_project_snapshot",
+      "http": 409,
+      "error": "VISUAL_SNAPSHOT_EXPIRED",
+      "assets": 0
+    },
+    {
+      "file": "netbom.xlsx",
+      "check": "foreign_project_member_ref",
+      "http": 400,
+      "error": "VISUAL_MEMBER_SCOPE_MISMATCH",
+      "assets": 0,
+      "cables": 0
+    },
+    {
+      "file": "netbom.xlsx",
+      "check": "foreign_project_snapshot",
+      "http": 409,
+      "error": "VISUAL_SNAPSHOT_EXPIRED",
+      "assets": 0
+    }
+  ],
+  "limitations": [
+    "No complete manually approved classification gold set for the mixed 778-row server inventory; no overall accuracy percentage claimed.",
+    "No invented serials, speeds, units, U heights, approvals or devices were added to force a successful import.",
+    "Existing synthetic-project checks are controls only, not substitutes for real workbook acceptance.",
+    "Exactly one source-verified draft port was confirmed in each isolated project for negative submit checks; neither was formally committed.",
+    "Source files and private raw snapshots remain outside Git."
+  ],
+  "test_projects": [
+    {
+      "file": "bomv1.xlsx",
+      "project_id": "proj-6275ce26-f6b6-4b10-b200-5d2dd2699cef",
+      "project_name": "独立测试-可清理-BOM拓扑-1031-bomv1-17d855",
+      "project_code": "test-bom-topo-17d855",
+      "id": "80055ea1-5088-4dc6-9485-b8af18a5d909"
+    },
+    {
+      "file": "netbom.xlsx",
+      "project_id": "proj-c6568a0b-4bd7-4df7-b02c-44f41ba7da03",
+      "project_name": "独立测试-可清理-BOM拓扑-1031-netbom-76c5ed",
+      "project_code": "test-bom-topo-76c5ed",
+      "id": "8530ad8b-4104-4c3d-8ded-730b87bd9f84"
+    }
+  ],
+  "raw_evidence": "/tmp/keel-bom-topology-test-20261031/fixed-agent/REPORT.json",
+  "cleanup": "/tmp/keel-bom-topology-test-20261031/cleanup-manifest.json",
+  "business_code_modified": false,
+  "actual_chart_rendering": "NOT RUN; API and DB only per user direction",
+  "original_file_formal_import_and_graphs": "BLOCKED; neither source batch has a dependency-closed valid candidate set"
+}
