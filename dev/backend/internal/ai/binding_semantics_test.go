@@ -6,6 +6,7 @@ import (
 	"keel.local/dev/internal/bom"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 )
@@ -161,5 +162,19 @@ func TestExplicitDeviceTypeCannotDisappearThroughOmittedFilter(t *testing.T) {
 	normalizeExplicitBindings(s, &p)
 	if CheckExtraction(s, p) == nil {
 		t.Fatal("unknown source type guessed")
+	}
+}
+
+func TestChangedHeaderIsNotReportedAsMissingType(t *testing.T) {
+	s := bom.Sheet{}
+	for row, vs := range [][]string{{"设备名称", "设备型号", "SN", "设备类型"}, {"synthetic-a", "synthetic-model", "synthetic-sn", "Switch"}, {"资产编号", "主机名", "角色", "型号", "SN"}, {"synthetic-id", "synthetic-b", "synthetic-role", "synthetic-model", "synthetic-sn-b"}} {
+		for col, v := range vs {
+			s.Cells = append(s.Cells, bom.Cell{Row: row + 1, Column: col + 1, Value: v})
+		}
+	}
+	p := SheetPlan{HeaderRows: []int{1}, Tables: []TablePlan{{Kind: "planned_device", Type: "switch", Start: 2, End: 4, TypeColumn: 4, Types: map[string]string{"Switch": "switch"}, Fields: map[string]int{"hostname": 1, "model": 2, "serial": 3}}}}
+	err := CheckExtraction(s, p)
+	if err == nil || !strings.Contains(err.Error(), "TABLE_CROSSES_HEADER: row=3") {
+		t.Fatal("mixed layout misdiagnosed as missing category", err)
 	}
 }

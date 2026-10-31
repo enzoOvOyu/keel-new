@@ -12,6 +12,31 @@ import (
 // only use explicit source headers and values; they never invent missing assets.
 func inspectSourceCoverage(s bom.Sheet, p SheetPlan) error {
 	rows := bom.MergedSourceCells(s)
+	// A changed header inside a data range is a new table, not a new
+	// type value. Report the structural correction before type filtering.
+	for _, t := range p.Tables {
+		if t.Kind == "reference" {
+			continue
+		}
+		heads := sourceHeaders(s, p, t.Start)
+		for row := t.Start; row <= t.End; row++ {
+			known, conflicts := 0, 0
+			for col, cell := range rows[row] {
+				meaning := bom.Field(cell.Value)
+				if cell.Sensitive || meaning == "" {
+					continue
+				}
+				known++
+				old := bom.Field(heads[col].Value)
+				if old != "" && old != meaning {
+					conflicts++
+				}
+			}
+			if known >= 3 && conflicts >= 2 {
+				return fmt.Errorf("TABLE_CROSSES_HEADER: row=%d column=1; split the table before this changed header, add this header row, and bind the following region independently", row)
+			}
+		}
+	}
 	seen := map[string]bool{}
 	connections := map[string]bool{}
 	for _, t := range p.Tables {
