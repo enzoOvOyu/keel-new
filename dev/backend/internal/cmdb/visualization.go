@@ -277,44 +277,8 @@ func (s Service) visualizationRead(ctx context.Context, scope Scope, rack, focus
 		if known, ok := ownerCache[id]; ok {
 			return known
 		}
-		candidates := map[string]bool{}
-		visited := map[string]bool{}
-		var walk func(string, int)
-		walk = func(current string, depth int) {
-			if depth > 8 || visited[current] {
-				return
-			}
-			visited[current] = true
-			asset := index[current]
-			if asset == nil {
-				return
-			}
-			if asset.Type == "server" || asset.Type == "switch" || asset.Type == "patch_panel" || asset.Type == "pdu" || asset.Type == "device" {
-				candidates[current] = true
-				return
-			}
-			if len(parents[current]) > 0 {
-				for parent := range parents[current] {
-					walk(parent, depth+1)
-				}
-			} else {
-				next := str(asset, "device_id")
-				if next == "" {
-					next = str(asset, "parent_uid")
-				}
-				if next != "" {
-					walk(next, depth+1)
-				}
-			}
-		}
-		walk(id, 0)
-		owner := ""
-		if len(candidates) == 1 {
-			for candidate := range candidates {
-				owner = candidate
-			}
-		}
-		if len(candidates) > 1 {
+		owner, ambiguous := visualPortOwner(id, index, parents)
+		if ambiguous {
 			out.Findings = append(out.Findings, VisualFinding{Asset: id, Code: "OWNER_AMBIGUOUS", Message: "组成关系指向多个设备，不能选任意设备当作端口归属", Severity: "warning", Category: "data_quality"})
 		}
 		ownerCache[id] = owner
@@ -619,4 +583,71 @@ func (s Service) validateRelocation(ctx context.Context, tx pgx.Tx, project, id 
 		}
 	}
 	return rows.Err()
+}
+
+func visualOwnerField(asset *VisualAsset, field string) string {
+	if asset == nil {
+		return ""
+	}
+	value, _ := asset.Fields[field].(string)
+	return value
+}
+
+func visualPortOwner(id string, index map[string]*VisualAsset, parents map[string]map[string]bool) (string, bool) {
+	candidates := map[string]bool{}
+	visited := map[string]bool{}
+	var walk func(string, int)
+	walk = func(current string, depth int) {
+		if depth > 8 || visited[current] {
+			return
+		}
+		visited[current] = true
+		asset := index[current]
+		if asset == nil {
+			return
+		}
+		if asset.Type == "server" || asset.Type == "switch" || asset.Type == "patch_panel" || asset.Type == "pdu" || asset.Type == "device" {
+			candidates[current] = true
+			return
+		}
+		if len(parents[current]) > 0 {
+			for parent := range parents[current] {
+				walk(parent, depth+1)
+			}
+		} else {
+			next := visualOwnerField(asset, "device_id")
+			if next == "" {
+				next = visualOwnerField(asset, "parent_uid")
+			}
+			if next != "" {
+				walk(next, depth+1)
+			}
+		}
+	}
+	walk(id, 0)
+	// Named inventory components can expose physical ports without a
+	// registered enclosing server. Show the explicit direct owner in
+	// that case; never invent a chassis or hide the connection. An
+	// ambiguous enclosing device must still stay ambiguous.
+	if len(candidates) == 0 && index[id] != nil && index[id].Type == "port" {
+		direct := parents[id]
+		if len(direct) == 0 {
+			direct = map[string]bool{visualOwnerField(index[id], "parent_uid"): true}
+		}
+		for parent := range direct {
+			if asset := index[parent]; asset != nil {
+				switch asset.Type {
+				case "gpu", "nic", "psu", "bmc", "component", "optic", "electrical_module", "connector":
+					candidates[parent] = true
+				}
+			}
+		}
+	}
+	owner := ""
+	if len(candidates) == 1 {
+		for candidate := range candidates {
+			owner = candidate
+		}
+	}
+	return owner, len(candidates) > 1
 }

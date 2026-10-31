@@ -191,3 +191,152 @@ func TestAgentStopsWithoutReturningRejectedPlan(t *testing.T) {
 		t.Fatalf("invalid plan escaped loop: calls=%d error=%v", calls, e)
 	}
 }
+
+func TestHeaderRepairRecomputesInventoryEligibility(t *testing.T) {
+	s := bom.Sheet{Name: "inventory"}
+	for row, values := range [][]string{{"Hostname", "Model", "SN", "Rack No"}, {"synthetic-leaf-a", "", "/", "R-A"}, {"synthetic-leaf-b", "synthetic-model", "/", "R-B"}} {
+		for col, v := range values {
+			s.Cells = append(s.Cells, bom.Cell{Sheet: s.Name, Row: row + 1, Column: col + 1, Value: v})
+		}
+	}
+	p := SheetPlan{Purpose: "table", HeaderRows: []int{1}, Tables: []TablePlan{{Kind: "planned_device", Type: "switch", Start: 2, End: 3, Fields: map[string]int{"model": 2, "serial": 3}, Required: []string{"serial"}}}}
+	normalizeSourceBindings(s, &p)
+	if err := CheckExtraction(s, p); err != nil {
+		t.Fatal(err)
+	}
+	if p.Tables[0].Required[0] != "hostname" {
+		t.Fatal("obsolete serial eligibility retained")
+	}
+	for row, cells := range bom.MergedSourceCells(s) {
+		if row > 1 && !tableRowPresent(p.Tables[0], cells) {
+			t.Fatal("explicit device row disappeared")
+		}
+	}
+}
+
+func TestRejectFragmentedCableAndPlanningOnlyConnection(t *testing.T) {
+	s, p := syntheticCablePlan()
+	extra := TablePlan{Kind: "physical_connection", Type: "cable", Start: 2, End: 3, TypeColumn: 6, Types: map[string]string{"100G": "cable", "400G": "cable"}, Fields: map[string]int{"model": 5, "endpoint_a_uid": 1, "endpoint_b_uid": 3}}
+	p.Tables = append(p.Tables, extra)
+	normalizeSourceBindings(s, &p)
+	if err := CheckExtraction(s, p); err != nil || len(p.Tables) != 1 {
+		t.Fatal("fragmented source cable was not repaired into one object", err)
+	}
+	s = bom.Sheet{Name: "estimate", Cells: []bom.Cell{{Row: 1, Column: 1, Value: "A point"}, {Row: 2, Column: 1, Value: "synthetic-location"}}}
+	p = SheetPlan{Purpose: "table", HeaderRows: []int{1}, Tables: []TablePlan{{Kind: "physical_connection", Type: "cable", Start: 2, End: 2, Fields: map[string]int{"endpoint_a_uid": 1, "endpoint_b_uid": 2}}}}
+	if err := CheckExtraction(s, p); err == nil || !strings.Contains(err.Error(), "PHYSICAL_ENDPOINT_BINDING_REQUIRED") {
+		t.Fatal("point estimates treated as physical port IDs", err)
+	}
+	p.Tables[0].Kind = "reference"
+	if err := CheckExtraction(s, p); err != nil {
+		t.Fatal("reference evidence rejected", err)
+	}
+}
+
+func TestAgentPagesOversizedRegionRead(t *testing.T) {
+	s, valid := syntheticCablePlan()
+	calls := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		var body struct {
+			Messages []struct{ Content string } `json:"messages"`
+		}
+		json.NewDecoder(r.Body).Decode(&body)
+		var reply any
+		if calls == 1 {
+			reply = map[string]any{"action": "inspect_region", "sheet_name": s.Name, "start_row": 1, "end_row": 190, "first_column": 1, "last_column": 100}
+		} else {
+			var input struct {
+				History []struct {
+					Truncated    bool
+					Result       []bom.Cell
+					Continuation map[string]int
+				} `json:"tool_history"`
+			}
+			json.Unmarshal([]byte(body.Messages[1].Content), &input)
+			if len(input.History) != 1 || !input.History[0].Truncated || input.History[0].Continuation["returned_end_row"] != 16 || len(input.History[0].Result) == 0 {
+				t.Error("bounded actual source page and continuation absent")
+			}
+			reply = map[string]any{"action": "submit_plan", "plan": valid}
+		}
+		raw, _ := json.Marshal(reply)
+		json.NewEncoder(w).Encode(map[string]any{"choices": []any{map[string]any{"message": map[string]string{"content": string(raw)}}}})
+	}))
+	defer server.Close()
+	provider := Provider{Endpoint: server.URL, Model: "synthetic", Timeout: time.Second}
+	if _, err := provider.PlanSheet(context.Background(), s, PlanningContext{}); err != nil || calls != 2 {
+		t.Fatalf("paged source inspection failed: calls=%d err=%v", calls, err)
+	}
+}
+
+func TestOpticRecipesUseExplicitCableOwnerAndPort(t *testing.T) {
+	s, p := syntheticCablePlan()
+	s.Cells = append(s.Cells, bom.Cell{Row: 1, Column: 7, Value: "本端模块型号"}, bom.Cell{Row: 2, Column: 7, Value: "synthetic-optic"})
+	p.Tables[0].Fields["endpoint_a_optic"] = 7
+	p.Tables = append(p.Tables, TablePlan{Kind: "component", Type: "optic_module", Start: 2, End: 3, Fields: map[string]int{"name": 7, "model": 7}})
+	normalizeSourceBindings(s, &p)
+	component := p.Tables[1]
+	if component.Fields["parent_uid"] != 1 || component.Fields["port_index"] != 2 || component.Fields["model"] != 7 {
+		t.Fatal("explicit cable end module lost its owner or port")
+	}
+	if tableRowPresent(component, bom.MergedSourceCells(s)[3]) {
+		t.Fatal("blank optic field created a module")
+	}
+}
+
+func TestPersistedEmptyDefaultsRestoreWithoutRelaxingModelContract(t *testing.T) {
+	s, p := syntheticCablePlan()
+	p.Tables = []TablePlan{{Kind: "reference", Type: "other", Start: 1, End: 3, Fields: map[string]int{}, Types: nil, Required: nil, Confidence: .8}}
+	p.HeaderRows = nil
+	// Reference-only input has no inventory headers requiring extraction.
+	s = bom.Sheet{Name: "notes", Cells: []bom.Cell{{Row: 1, Column: 1, Value: "synthetic note"}, {Row: 3, Column: 1, Value: "more notes"}}}
+	p.HeaderRows = []int{}
+	raw, _ := json.Marshal(p)
+	if err := validateExtractionSchema(context.Background(), raw); err == nil {
+		t.Fatal("fresh null defaults escaped strict model schema")
+	}
+	restored, err := RestoreExtraction(s, raw)
+	if err != nil {
+		t.Fatal("stored Go empty defaults could not recover", err)
+	}
+	raw, _ = json.Marshal(restored)
+	if err := validateExtractionSchema(context.Background(), raw); err != nil {
+		t.Fatal("saving restored plan would break next resume", err)
+	}
+}
+
+func TestExtractionEquivalenceIgnoresNarrationButDetectsBindingChanges(t *testing.T) {
+	_, a := syntheticCablePlan()
+	_, b := syntheticCablePlan()
+	b.Note = "another explanation"
+	b.Tables[0].Key = "another-key"
+	b.Tables[0].Confidence = .6
+	if !SameExtraction(a, b) {
+		t.Fatal("narration changed extraction scope")
+	}
+	b.Tables[0].Fields["model"] = 7
+	if SameExtraction(a, b) {
+		t.Fatal("changed source binding treated as fully applied")
+	}
+}
+
+func TestCableEndpointLabelCannotCreatePhantomParent(t *testing.T) {
+	s, p := syntheticCablePlan()
+	p.Tables[0].Fields["parent_uid"] = 1
+	normalizeSourceBindings(s, &p)
+	if p.Tables[0].Fields["parent_uid"] != 0 || p.Tables[0].Fields["endpoint_a_device"] != 1 {
+		t.Fatal("cable still depends on a device display label as its parent")
+	}
+}
+
+func TestRowNumberAndFiberCountAreNotParentAndWavelength(t *testing.T) {
+	s, p := syntheticCablePlan()
+	s.Cells = append(s.Cells, bom.Cell{Row: 1, Column: 7, Value: "序号"}, bom.Cell{Row: 2, Column: 7, Value: "1"}, bom.Cell{Row: 1, Column: 8, Value: "Fiber core count"}, bom.Cell{Row: 2, Column: 8, Value: "8"})
+	p.Tables[0].Fields["parent_uid"] = 7
+	p.Tables[0].Fields["wavelength"] = 8
+	normalizeSourceBindings(s, &p)
+	f := p.Tables[0].Fields
+	if f["parent_uid"] != 0 || f["wavelength"] != 0 || f["sequence"] != 7 || f["specification"] != 8 {
+		t.Fatal("source counts created false dependencies or optical properties")
+	}
+}

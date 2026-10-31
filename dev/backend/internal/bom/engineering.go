@@ -38,7 +38,7 @@ func Engineering(items []Item, caps map[string]map[string]any) []Issue {
 			}{{"a", a}, {"b", b}} {
 				expected := i.Fields["endpoint_"+side.Label+"_device"]
 				parent := ids[side.Port.Parent]
-				if side.Port.UID != "" && expected != "" && parent.Hostname != expected {
+				if side.Port.UID != "" && expected != "" && parent.Hostname != expected && parent.Fields["device_alias"] != expected {
 					add(i, "endpoint_"+side.Label+"_uid", "ENDPOINT-SOURCE-CONFLICT", "Selected port owner differs from explicitly mapped device reference")
 				}
 				expectedPort := i.Fields["endpoint_"+side.Label+"_port"]

@@ -274,13 +274,13 @@ func (s *Server) workbenchAPI(w http.ResponseWriter, r *http.Request, id string,
 	for _, v := range req.IDs {
 		selected[v] = true
 	}
-	found := 0
+	found := map[string]bool{}
 	for _, v := range b.Records {
 		if selected[v.ID] {
-			found++
+			found[v.ID] = true
 		}
 	}
-	if found != len(selected) {
+	if len(found) != len(selected) {
 		fail(w, 422, "RECORD_NOT_FOUND")
 		return true
 	}
@@ -293,14 +293,9 @@ func (s *Server) workbenchAPI(w http.ResponseWriter, r *http.Request, id string,
 			fail(w, 422, err.Error())
 			return true
 		}
-		if len(selected) == 0 {
-			for _, v := range b.Records {
-				if !v.Imported && !v.Ignored {
-					selected[v.ID] = true
-				}
-			}
-		}
 		ids := []string{}
+		// Empty is the persisted whole-workbook/resume scope. Expanding it
+		// into candidate IDs loses that distinction and misses absent rows.
 		for _, v := range b.Records {
 			if selected[v.ID] {
 				if v.Imported {
