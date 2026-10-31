@@ -58,6 +58,11 @@ func (s *Server) runJob(ctx context.Context) {
 		return
 	}
 	if kind == "recognize" {
+		var current int
+		if e := s.db.QueryRow(ctx, "SELECT revision FROM bom_import_batch WHERE id=$1", id).Scan(&current); e != nil || current != rev {
+			s.db.Exec(ctx, "UPDATE bom_job SET status='failed',error_code='REVISION_CONFLICT',updated_at=now() WHERE id=$1", job)
+			return
+		}
 		scoped := *s
 		scoped.project = project
 		scoped.runRecognition(ctx, job, id, rev, parameters)

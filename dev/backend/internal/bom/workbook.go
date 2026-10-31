@@ -40,7 +40,7 @@ type Workbook struct {
 
 func Sensitive(s string) bool {
 	s = strings.ToLower(s)
-	for _, x := range []string{"password", "passwd", "密码", "secret", "credential", "token", "private key", "api key"} {
+	for _, x := range []string{"password", "passwd", "密码", "secret", "credential", "token", "private key", "api key", "username", "用户名", "账户", "账号"} {
 		if strings.Contains(s, x) {
 			return true
 		}

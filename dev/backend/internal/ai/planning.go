@@ -51,21 +51,52 @@ type PlanningIdentifier struct {
 
 // Structural sampling keeps all headers and representative category values, not just an arbitrary first row.
 func describeSheet(s bom.Sheet, brief bool) map[string]any {
-	rows := map[int][]map[string]any{}
+	limit := 8
+	if brief {
+		limit = 3
+	}
+	rowSet := map[int]bool{}
 	maxRow := 0
-	distinct := map[int]map[string]int{}
 	for _, c := range s.Cells {
 		if c.Row > maxRow {
 			maxRow = c.Row
 		}
+		if !c.Sensitive && c.Value != "" {
+			rowSet[c.Row] = true
+		}
+	}
+	rowOrder := []int{}
+	for row := range rowSet {
+		rowOrder = append(rowOrder, row)
+	}
+	sort.Ints(rowOrder)
+	if len(rowOrder) > limit {
+		rowOrder = rowOrder[:limit]
+	}
+	sampled := map[int]bool{}
+	for _, row := range rowOrder {
+		sampled[row] = true
+	}
+	rows := map[int][]map[string]any{}
+	distinct := map[int]map[string]int{}
+	saturated := map[int]bool{}
+	for _, c := range s.Cells {
 		if c.Sensitive || c.Value == "" {
 			continue
 		}
-		rows[c.Row] = append(rows[c.Row], map[string]any{"column": c.Column, "cell": c.Ref, "value": c.Value, "is_formula": c.Formula != "", "has_cached_value": c.Value != ""})
-		if distinct[c.Column] == nil {
-			distinct[c.Column] = map[string]int{}
+		if sampled[c.Row] {
+			rows[c.Row] = append(rows[c.Row], map[string]any{"column": c.Column, "cell": c.Ref, "value": c.Value, "is_formula": c.Formula != "", "has_cached_value": c.Value != ""})
 		}
-		distinct[c.Column][c.Value]++
+		if !brief && !saturated[c.Column] {
+			if distinct[c.Column] == nil {
+				distinct[c.Column] = map[string]int{}
+			}
+			distinct[c.Column][c.Value]++
+			if len(distinct[c.Column]) > 64 {
+				delete(distinct, c.Column)
+				saturated[c.Column] = true
+			}
+		}
 	}
 	order := []int{}
 	for row := range rows {
@@ -73,10 +104,6 @@ func describeSheet(s bom.Sheet, brief bool) map[string]any {
 	}
 	sort.Ints(order)
 	sample := []any{}
-	limit := 8
-	if brief {
-		limit = 3
-	}
 	for n, row := range order {
 		if n >= limit {
 			break
@@ -196,7 +223,19 @@ type Classification struct {
 
 func (p *Provider) Classify(ctx context.Context, input []Description, planning PlanningContext) ([]Classification, error) {
 	prompt, _ := prompts.ReadFile("prompts/classification-v1.txt")
-	raw, e := p.completeJSON(ctx, string(prompt), map[string]any{"planning_context": planning.Summary, "items": input, "allowed_types": bom.ImportTypes})
+	local := append([]Description(nil), input...)
+	for j := range local {
+		local[j].ID = j
+	}
+	payload := map[string]any{"planning_context": planning.Summary, "items": local, "allowed_types": bom.ImportTypes}
+	formats := []map[string]any{}
+	if p.JSONMode {
+		formats = append(formats, classificationResponseFormat(len(local)))
+	}
+	raw, e := p.completeJSON(ctx, string(prompt), payload, formats...)
+	if e != nil && len(formats) > 0 && p.HTTPStatus == 400 {
+		raw, e = p.completeJSON(ctx, string(prompt), payload)
+	}
 	if e != nil {
 		return nil, e
 	}
@@ -207,7 +246,7 @@ func (p *Provider) Classify(ctx context.Context, input []Description, planning P
 		return nil, errors.New("AI_CLASSIFICATION_SCHEMA_INVALID")
 	}
 	ids := map[int]bool{}
-	for _, i := range input {
+	for _, i := range local {
 		ids[i.ID] = true
 	}
 	for _, c := range result.Items {
@@ -216,6 +255,9 @@ func (p *Provider) Classify(ctx context.Context, input []Description, planning P
 		}
 		delete(ids, c.ID)
 	}
+	for j := range result.Items {
+		result.Items[j].ID = input[result.Items[j].ID].ID
+	}
 	return result.Items, nil
 }
 
@@ -223,6 +265,9 @@ func (p *Provider) Classify(ctx context.Context, input []Description, planning P
 // with the actual uncovered category values. A sample-only plan cannot silently
 // turn all remaining device roles into one category.
 func inspectExtraction(s bom.Sheet, plan SheetPlan) error {
+	if err := inspectBindingSemantics(s, plan); err != nil {
+		return err
+	}
 	headers := map[int]bom.Cell{}
 	canonical := map[string][]int{}
 	for _, row := range plan.HeaderRows {
@@ -278,6 +323,7 @@ func CheckExtraction(s bom.Sheet, plan SheetPlan) error { return inspectExtracti
 // Explicit source header meanings correct mechanical binding errors; they do not
 // create values. Ambiguous aliases still remain candidates, never formal assets.
 func normalizeSourceBindings(s bom.Sheet, p *SheetPlan) {
+	normalizeExplicitBindings(s, p)
 	heads := map[int]string{}
 	sourceLabels := map[int]string{}
 	columns := map[string][]int{}
@@ -412,6 +458,29 @@ func normalizeSourceBindings(s bom.Sheet, p *SheetPlan) {
 			}
 		}
 	}
+
+	// A cable-end part number alone is not a separately identified physical
+	// module. Its model/source remain on the cable; do not duplicate it as stock.
+	retained := []TablePlan{}
+	for _, t := range p.Tables {
+		covered := false
+		if t.Kind == "component" && (t.Type == "optic_module" || t.Type == "electrical_module") && t.Fields["serial"] == 0 {
+			for _, cable := range p.Tables {
+				if cable.Kind != "physical_connection" || cable.Start > t.Start || cable.End < t.End {
+					continue
+				}
+				for _, side := range []string{"a", "b"} {
+					if t.Fields["model"] > 0 && t.Fields["model"] == cable.Fields["endpoint_"+side+"_optic"] && t.Fields["parent_uid"] == cable.Fields["endpoint_"+side+"_device"] && t.Fields["port_index"] == cable.Fields["endpoint_"+side+"_port"] {
+						covered = true
+					}
+				}
+			}
+		}
+		if !covered {
+			retained = append(retained, t)
+		}
+	}
+	p.Tables = retained
 
 	// A model may split attributes of one source object into two recipes.
 	// Merge only compatible bindings; conflicting source interpretations still fail.

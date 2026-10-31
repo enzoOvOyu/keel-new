@@ -198,7 +198,6 @@ func LinkRecognizedRecords(b *Workbench) {
 			modulesByPort[ownerID(r.Item.Parent)+":"+r.Item.Port] = append(modulesByPort[ownerID(r.Item.Parent)+":"+r.Item.Port], j)
 		}
 	}
-	add := []ImportRecord{}
 	for _, r := range b.Records {
 		if r.Item.Category != "cable" {
 			continue
@@ -234,23 +233,12 @@ func LinkRecognizedRecords(b *Workbench) {
 					continue
 				}
 			}
-			id := StableID("module-candidate:" + key)
-			if ids[id] {
-				// An older conflicting candidate already owns this ID. Keep
-				// the evidence blocked rather than append a duplicate identity.
-				for j := range b.Records {
-					if b.Records[j].ID == id {
-						b.Records[j].Ambiguity = true
-					}
-				}
-				continue
-			}
-			fields := map[string]string{"category": "optic_module", "record_kind": "component", "name": model, "model": model, "parent_uid": owner, "port_index": port}
-			sources := map[string]Cell{"name": r.Item.Sources[f], "model": r.Item.Sources[f], "parent_uid": r.Item.Sources["endpoint_"+side+"_device"], "port_index": r.Item.Sources["endpoint_"+side+"_port"]}
-			add = append(add, ImportRecord{ID: id, Sheet: r.Sheet, Row: r.Row, Raw: r.Raw, Original: owner + " / " + port + " / " + model, Item: Item{UID: id, Sheet: r.Sheet, Category: "optic_module", Model: model, Parent: owner, Port: port, Fields: fields, Sources: sources}, Recognition: "recognized", Method: "source_relation", Confidence: r.Confidence, Reason: "来自布线明细的端口光模块型号；规划关系，尚未声明实物 SN", Issues: []Issue{}})
+			// An endpoint model is a planning requirement, not a serialized installed
+			// module. Keep it on the source cable. Only explicit inventory candidates
+			// may create the physical module; existing ones can be enriched above.
+
 		}
 	}
-	b.Records = append(b.Records, add...)
 	// Expose source-backed endpoint ports as candidates so the user can review the whole graph.
 	items := []Item{}
 	known := map[string]bool{}

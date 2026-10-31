@@ -34,6 +34,14 @@ func (s *Server) loadWorkbench(ctx context.Context, id string) (bom.Workbench, s
 	if e == nil {
 		e = json.Unmarshal(raw, &b)
 	}
+	if e == nil && b.State == "recognizing" {
+		var active bool
+		var code string
+		e = s.db.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM bom_job WHERE import_id=$1 AND kind='recognize' AND status IN ('pending','running')),COALESCE((SELECT error_code FROM bom_job WHERE import_id=$1 AND kind='recognize' ORDER BY created_at DESC LIMIT 1),'RECOGNITION_INTERRUPTED')", id).Scan(&active, &code)
+		if e == nil && !active {
+			b.State, b.Phase, b.Error = "pending_review", "review", code
+		}
+	}
 	return b, mode, e
 }
 func (s *Server) workbenchIssues(ctx context.Context, id string, b *bom.Workbench) []bom.Issue {
@@ -105,14 +113,16 @@ func (s *Server) workbenchAPI(w http.ResponseWriter, r *http.Request, id string,
 		var progress []byte
 		err := s.db.QueryRow(ctx, `WITH snapshot AS MATERIALIZED (
 			SELECT import_mode,revision,
+    EXISTS(SELECT 1 FROM bom_job j WHERE j.import_id=bom_import_batch.id AND j.kind='recognize' AND j.status IN ('pending','running')) active,
+    COALESCE((SELECT j.error_code FROM bom_job j WHERE j.import_id=bom_import_batch.id AND j.kind='recognize' ORDER BY created_at DESC LIMIT 1),'RECOGNITION_INTERRUPTED') job_error,
 				workbench-ARRAY['records','classifications'] AS workbench,
 				COALESCE(jsonb_array_length(NULLIF(workbench->'records','null'::jsonb)),0) AS record_count
 			FROM bom_import_batch WHERE id=$1
 		) SELECT jsonb_build_object(
 			'mode',import_mode,'revision',revision,
-			'state',COALESCE(workbench->>'state','pending_review'),
-			'phase',COALESCE(workbench->>'phase',''),
-			'error',COALESCE(workbench->>'error',''),
+			'state',CASE WHEN workbench->>'state'='recognizing' AND NOT active THEN 'pending_review' ELSE COALESCE(workbench->>'state','pending_review') END,
+			'phase',CASE WHEN workbench->>'state'='recognizing' AND NOT active THEN 'review' ELSE COALESCE(workbench->>'phase','') END,
+			'error',CASE WHEN workbench->>'state'='recognizing' AND NOT active THEN job_error ELSE COALESCE(workbench->>'error','') END,
 			'analysis',workbench->'analysis','coverage',workbench->'coverage',
 			'record_count',record_count,
 			'steps',COALESCE((SELECT jsonb_agg(event ORDER BY position)

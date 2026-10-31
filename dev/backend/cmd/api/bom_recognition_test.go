@@ -123,3 +123,13 @@ func TestFullResumeAppliesPreviouslyPartialSheetWithoutProvider(t *testing.T) {
 		t.Fatal("failed restore overwrote candidates")
 	}
 }
+
+func TestReanalysisRemovesUnreviewedDerivedArtifacts(t *testing.T) {
+	s := bom.Sheet{Name: "notes", Cells: []bom.Cell{{Sheet: "notes", Row: 2, Column: 1, Ref: "A2", Value: "synthetic reference"}}}
+	b := bom.PlanningSourceRows(bom.Workbook{Sheets: []bom.Sheet{s}})
+	b.Records = append(b.Records, bom.ImportRecord{ID: "stale-module", Sheet: "notes", Row: 2, Method: "source_relation", Item: bom.Item{UID: "stale-module", Category: "optic_module", Fields: map[string]string{}}})
+	result := applySheetPlan(b.Records, s, ai.SheetPlan{Purpose: "reference"}, nil)
+	if len(result) != 1 || result[0].ID == "stale-module" || result[0].Item.Category != "other" {
+		t.Fatal("obsolete derived module survived source reanalysis")
+	}
+}

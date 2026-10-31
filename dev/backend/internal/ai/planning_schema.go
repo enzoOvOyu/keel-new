@@ -61,3 +61,14 @@ func extractionResponseFormat(sheet bom.Sheet) map[string]any {
 	}, "action")
 	return map[string]any{"type": "json_schema", "json_schema": map[string]any{"name": "workbook_extraction_action", "strict": false, "schema": schema}}
 }
+
+func classificationResponseFormat(count int) map[string]any {
+	item := map[string]any{"type": "object", "additionalProperties": false, "required": []string{"id", "entity_type", "confidence", "reason"}, "properties": map[string]any{
+		"id":          map[string]any{"type": "integer", "minimum": 0, "maximum": count - 1},
+		"entity_type": map[string]any{"type": "string", "enum": bom.ImportTypes},
+		"confidence":  map[string]any{"type": "number", "minimum": 0, "maximum": 1},
+		"reason":      map[string]any{"type": "string"},
+	}}
+	schema := map[string]any{"type": "object", "additionalProperties": false, "required": []string{"items"}, "properties": map[string]any{"items": map[string]any{"type": "array", "items": item, "minItems": count, "maxItems": count}}}
+	return map[string]any{"type": "json_schema", "json_schema": map[string]any{"name": "bom_classification", "strict": false, "schema": schema}}
+}

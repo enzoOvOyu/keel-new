@@ -261,8 +261,8 @@ func visualCTE() string {
  COALESCE(c.payload->>'media_type',c.payload->'fields'->>'media_type',c.payload->>'cable_type','') media_type,
  COALESCE(c.payload->>'speed',c.payload->'fields'->>'speed','') speed,
  a.port_id a,b.port_id b,oa.id device_a,ob.id device_b,da.asset_type type_a,db.asset_type type_b,
- COALESCE(da.payload->>'role',da.payload->'fields'->>'role','') role_a,
- COALESCE(db.payload->>'role',db.payload->'fields'->>'role','') role_b,
+ COALESCE(NULLIF(da.payload->>'role',''),NULLIF(da.payload->'fields'->>'role',''),da.payload->>'network_role',da.payload->'fields'->>'network_role','') role_a,
+ COALESCE(NULLIF(db.payload->>'role',''),NULLIF(db.payload->'fields'->>'role',''),db.payload->>'network_role',db.payload->'fields'->>'network_role','') role_b,
  CASE WHEN la.from_uid IS NOT NULL THEN la.rack_id ELSE pra.item_uid END rack_a,
  CASE WHEN lb.from_uid IS NOT NULL THEN lb.rack_id ELSE prb.item_uid END rack_b
  FROM visible c

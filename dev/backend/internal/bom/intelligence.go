@@ -119,10 +119,22 @@ var sheetReference = regexp.MustCompile(`(?:'([^']+)'|([\p{L}\p{N}_ -]+))!\$?([A
 func (ir *WorkbookIR) CrossSheetResolve(name string) []Cell {
 	out := []Cell{}
 	seen := map[string]bool{}
+	wanted := map[string]bool{}
+	for _, c := range ir.bySheet[name].Cells {
+		for _, m := range sheetReference.FindAllStringSubmatch(c.Formula, -1) {
+			sheet := m[1]
+			if sheet == "" {
+				sheet = m[2]
+			}
+			wanted[sheet+":"+m[3]+m[4]] = true
+		}
+	}
 	index := map[string]Cell{}
 	for _, s := range ir.Workbook.Sheets {
 		for _, c := range s.Cells {
-			index[s.Name+":"+c.Ref] = c
+			if wanted[s.Name+":"+c.Ref] {
+				index[s.Name+":"+c.Ref] = c
+			}
 		}
 	}
 	for _, c := range ir.bySheet[name].Cells {

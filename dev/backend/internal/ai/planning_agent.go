@@ -28,6 +28,12 @@ func (p *Provider) PlanSheetWithWorkbook(ctx context.Context, ir *bom.WorkbookIR
 	if !ok {
 		return result, errors.New("UNKNOWN_SOURCE_SHEET")
 	}
+	if explicit, ok := explicitInventoryPlan(s); ok {
+		if e := CheckPlanRevision(s, explicit, previous); e == nil {
+			explicit.Steps = []bom.AgentStep{{Tool: "analyze_sheet", Sheet: name, State: "succeeded", Detail: "explicit inventory headers bound locally; category still requires classification and review", At: time.Now().UTC().Format(time.RFC3339)}}
+			return explicit, nil
+		}
+	}
 	input := describeSheet(s, false)
 	input["planning_context"] = planning
 	input["allowed_types"] = bom.ImportTypes

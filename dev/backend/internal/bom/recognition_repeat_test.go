@@ -9,6 +9,7 @@ import (
 func TestRecognizedGraphReplayPreservesModuleIdentity(t *testing.T) {
 	b := Workbench{Records: []ImportRecord{
 		{ID: "device-a", Item: Item{UID: "device-a", Category: "server", Hostname: "host-a", Fields: map[string]string{}}},
+		{ID: "explicit-optic", Item: Item{UID: "explicit-optic", Category: "optic_module", Serial: "synthetic-module-serial", Parent: "device-a", Port: "eth0", Model: "synthetic-optic", Fields: map[string]string{}, Sources: map[string]Cell{}}},
 		{ID: "device-b", Item: Item{UID: "device-b", Category: "switch", Hostname: "leaf-b", Fields: map[string]string{}}},
 		{ID: "wire", Item: Item{UID: "wire", Category: "cable", Fields: map[string]string{"endpoint_a_device": "host-a", "endpoint_a_port": "eth0", "endpoint_b_device": "leaf-b", "endpoint_b_port": "Ethernet1/1", "endpoint_a_optic": "synthetic-optic"}, Sources: map[string]Cell{"endpoint_a_device": {Sheet: "cables", Row: 2, Column: 1, Ref: "A2", Value: "host-a"}, "endpoint_a_port": {Sheet: "cables", Row: 2, Column: 2, Ref: "B2", Value: "eth0"}, "endpoint_b_device": {Sheet: "cables", Row: 2, Column: 3, Ref: "C2", Value: "leaf-b"}, "endpoint_b_port": {Sheet: "cables", Row: 2, Column: 4, Ref: "D2", Value: "Ethernet1/1"}}}},
 	}}
@@ -166,5 +167,13 @@ func TestNamedComponentsOwnExplicitPortsWithoutChangingCategory(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestCablePartRequirementDoesNotInventSerializedOptic(t *testing.T) {
+	b := Workbench{Records: []ImportRecord{{ID: "cable", Item: Item{UID: "cable", Category: "cable", Fields: map[string]string{"endpoint_a_device": "synthetic-owner", "endpoint_a_port": "eth1", "endpoint_a_optic": "synthetic-model"}, Sources: map[string]Cell{"endpoint_a_optic": {Sheet: "synthetic", Row: 2, Column: 3, Ref: "C2", Value: "synthetic-model"}}}}}}
+	LinkRecognizedRecords(&b)
+	if len(b.Records) != 1 || b.Records[0].Item.Fields["endpoint_a_optic"] != "synthetic-model" || b.Records[0].Item.Sources["endpoint_a_optic"].Ref != "C2" {
+		t.Fatal("planned part became physical stock or lost provenance")
 	}
 }

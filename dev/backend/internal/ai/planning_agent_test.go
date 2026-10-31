@@ -275,13 +275,10 @@ func TestOpticRecipesUseExplicitCableOwnerAndPort(t *testing.T) {
 	p.Tables[0].Fields["endpoint_a_optic"] = 7
 	p.Tables = append(p.Tables, TablePlan{Kind: "component", Type: "optic_module", Start: 2, End: 3, Fields: map[string]int{"name": 7, "model": 7}})
 	normalizeSourceBindings(s, &p)
-	component := p.Tables[1]
-	if component.Fields["parent_uid"] != 1 || component.Fields["port_index"] != 2 || component.Fields["model"] != 7 {
-		t.Fatal("explicit cable end module lost its owner or port")
+	if len(p.Tables) != 1 || p.Tables[0].Fields["endpoint_a_optic"] != 7 {
+		t.Fatal("model-only module must remain source-backed cable requirement, not duplicate physical inventory")
 	}
-	if tableRowPresent(component, bom.MergedSourceCells(s)[3]) {
-		t.Fatal("blank optic field created a module")
-	}
+
 }
 
 func TestPersistedEmptyDefaultsRestoreWithoutRelaxingModelContract(t *testing.T) {

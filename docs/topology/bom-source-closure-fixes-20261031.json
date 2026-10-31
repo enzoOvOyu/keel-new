@@ -1,0 +1,22 @@
+{
+  "scope": "Confirmed BOM Agent semantic extraction, candidate lifecycle and topology role defects; new workbook acceptance follows code checks",
+  "changes": [
+    "Use unambiguous explicit inventory headers as local candidate recipes; classification/review remains separate.",
+    "Reject point/count columns as physical ports and cable/component kind conflicts; retain cable labels as terminations.",
+    "Preserve endpoint module models on source cables instead of manufacturing serialized module inventory; explicit existing modules remain supported.",
+    "Rebuild unreviewed derived source artifacts on reanalysis, preserving confirmed/manual/imported records.",
+    "Use local classification batch IDs and JSON schema; persist per-batch errors independently of sheet failure counts.",
+    "Bound structural sampling allocations and cross-sheet reference indexing to requested evidence.",
+    "Recover workbench read/retry state from authoritative persisted job state without nested large-JSON rewrites.",
+    "Read BOM network_role consistently in topology matrix and visualization views, preserving explicit role precedence.",
+    "Redact source identities/account data before external model context."
+  ],
+  "checks": {
+    "Go_API_AI_BOM_CMDB": "PASS before final build",
+    "PostgreSQL_BOM_network_role_matrix_scope_and_precedence": "PASS; isolated synthetic project inside rolled-back transaction",
+    "new_real_workbook": "NOT RUN at code commit"
+  },
+  "unchanged_gates": "No invented SN, units, geometry, port rates or model approvals. Missing actual business evidence remains a blocker.",
+  "memory_limit": "Known allocation amplification reduced; repeated full-size runtime OOM recovery is not yet certified.",
+  "source_file": "TX B300 Layout-new.xlsx remains outside Git and is not modified."
+}

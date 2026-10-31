@@ -125,6 +125,9 @@ func (s Service) visualizationRead(ctx context.Context, scope Scope, rack, focus
 				}
 			}
 		}
+		if p["role"] == nil || p["role"] == "" {
+			p["role"] = p["network_role"]
+		}
 		for _, k := range []string{"model", "serial", "hostname", "site", "pod_id", "rack_id", "rack_uid", "rack_u", "u_start", "u_height", "face", "mounting_face", "depth_mm", "width_mm", "role", "health_status", "maintenance_state", "management_ip", "bmc_ip", "device_id", "parent_uid", "physical_name", "port_index", "speed", "media_type", "cable_type", "length_m", "length", "endpoint_a_uid", "endpoint_b_uid", "gpu_count", "gpu_model", "cpu", "cpu_model", "cpu_count", "memory", "memory_gb", "disk", "disk_spec", "nic_count", "nic_model", "bmc_model", "bios_version", "bmc_version", "sku", "mounting_face", "panel_front", "panel_back", "nos_version", "bios_version", "firmware_version", "observed_at", "freshness", "support", "is_demo", "row", "position", "power_capacity_kw", "power_used_kw", "port_count", "is_full_depth", "u_height", "fabric_id", "rail", "technology", "network_role", "vlan", "vrf", "vni", "asn", "bgp_peers", "subnet", "oper_state", "admin_state", "mtu", "permanent_mac", "name", "mac", "panel_rear", "source_ref", "fact_layer", "evidence_refs"} {
 			if v, ok := p[k]; ok {
 				a.Fields[k] = v

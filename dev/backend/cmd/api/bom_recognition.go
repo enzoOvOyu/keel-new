@@ -10,6 +10,7 @@ import (
 	"io"
 	"keel.local/dev/internal/ai"
 	"keel.local/dev/internal/bom"
+	"net"
 	"sort"
 	"strings"
 	"time"
@@ -67,6 +68,7 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 	}
 	if err == nil {
 		err = json.Unmarshal(raw, &wb)
+		raw = nil
 	}
 	// Upgrade cached IR from the immutable object once; never change the uploaded file.
 	if err == nil && len(wb.Sheets) > 0 && wb.Sheets[0].Parser != "excelize-ir/v3" {
@@ -175,6 +177,7 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 		save(false)
 	}
 	completed, failed, inputTokens, outputTokens, calls := 0, 0, 0, 0, 0
+	classificationFailures := 0
 	if provider != nil {
 		inputTokens = provider.TotalInputTokens
 		outputTokens = provider.TotalOutputTokens
@@ -345,7 +348,7 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 		apply := func(c ai.Classification, d ai.Description) {
 			for _, j := range groups[d.ID] {
 				r := &b.Records[j]
-				if r.Item.Category != "other" && r.Item.Category != "material" && r.Item.Category != c.Type {
+				if r.Item.Sources["category"].Ref != "" && r.Item.Category != "other" && r.Item.Category != "material" && r.Item.Category != c.Type {
 					r.Ambiguity = true
 					r.Reason = "分类建议与已有来源类型冲突，保留原类型并要求人工核查：" + c.Type
 					continue
@@ -380,7 +383,14 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 			outputTokens += provider.TotalOutputTokens - beforeOutput
 			calls += provider.Calls - beforeCalls
 			if e != nil {
-				failed++
+				classificationFailures++
+				b.Trace("classify_models", "", "", "failed", fmt.Sprintf("batch=%d items=%d error=%s", start/24+1, end-start, e.Error()))
+				for _, description := range pending[start:end] {
+					for _, index := range groups[description.ID] {
+						b.Records[index].Ambiguity = true
+						b.Records[index].Reason = "分类失败，保留来源候选供审核：" + e.Error()
+					}
+				}
 				continue
 			}
 			for _, c := range classified {
@@ -422,6 +432,8 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 	}
 	if err != nil {
 		b.Error = err.Error()
+	} else if classificationFailures > 0 {
+		b.Error = fmt.Sprintf("%d 个工作表提取失败；%d 个型号分类批次失败，具体错误见分类记录。", failed, classificationFailures)
 	} else if failed > 0 {
 		b.Error = fmt.Sprintf("%d 个工作表识别失败，其他结果已保留；可选择对应 Sheet 后重试。", failed)
 	}
@@ -433,11 +445,14 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 	if err != nil {
 		state = "failed"
 		code = err.Error()
+	} else if classificationFailures > 0 {
+		state = "failed"
+		code = "PARTIAL_CLASSIFICATION"
 	} else if failed > 0 {
 		state = "failed"
 		code = "PARTIAL_SHEET_RECOGNITION"
 	}
-	diag := map[string]any{"schema_version": "workbook-agent/v5", "prompt_version": "workbook-agent/v5", "provider_id": providerID, "completed_sheets": completed, "failed_sheets": failed, "total_sheets": len(b.Sheets), "records": len(b.Records), "model_calls": calls, "input_tokens": inputTokens, "output_tokens": outputTokens, "duration_ms": time.Since(started).Milliseconds(), "error_code": code, "raw_response_stored": false}
+	diag := map[string]any{"schema_version": "workbook-agent/v6", "prompt_version": "workbook-agent/v6", "provider_id": providerID, "completed_sheets": completed, "failed_sheets": failed, "failed_classification_batches": classificationFailures, "total_sheets": len(b.Sheets), "records": len(b.Records), "model_calls": calls, "input_tokens": inputTokens, "output_tokens": outputTokens, "duration_ms": time.Since(started).Milliseconds(), "error_code": code, "raw_response_stored": false}
 	if provider != nil {
 		diag["model"] = provider.Model
 		diag["provider_revision"] = provider.ConfigRevision
@@ -466,20 +481,39 @@ func safeSheet(sheet bom.Sheet) bom.Sheet {
 	safe.Cells = append([]bom.Cell{}, sheet.Cells...)
 	// Only schema/header/model context is required. Do not send known identity or secret columns.
 	identityCols := map[int]bool{}
+	labelCols := map[int]bool{}
 	for _, c := range sheet.Cells {
+		if c.Row > 8 {
+			continue
+		}
 		f := bom.Field(c.Value)
-		if f == "serial" || f == "management_ip" || f == "mac" {
+		label := strings.ToLower(strings.ReplaceAll(c.Value, " ", ""))
+		if f == "serial" || f == "management_ip" || f == "mac" || strings.Contains(label, "ip地址") || strings.Contains(label, "loopback") || strings.Contains(label, "guid") || strings.Contains(label, "username") || strings.Contains(label, "账号") {
 			identityCols[c.Column] = true
+		}
+		if f == "hostname" || f == "endpoint_a_device" || f == "endpoint_b_device" || f == "device_alias" || f == "termination_a" || f == "termination_b" {
+			labelCols[c.Column] = true
 		}
 	}
 	for k := range safe.Cells {
 		c := &safe.Cells[k]
 		if c.Sensitive {
 			c.Value = ""
-		} else if identityCols[c.Column] && bom.Field(c.Value) == "" && bom.ExtractCellValue(*c, "serial") != "" {
+			continue
+		}
+		if bom.Field(c.Value) != "" {
+			continue
+		}
+		_, macErr := net.ParseMAC(c.Value)
+		if net.ParseIP(c.Value) != nil || macErr == nil || identityCols[c.Column] && bom.ExtractCellValue(*c, "serial") != "" {
 			c.Value = "[IDENTITY]"
+			continue
+		}
+		if labelCols[c.Column] && bom.ExtractCellValue(*c, "hostname") != "" {
+			c.Value = "[DEVICE-" + bom.StableID(c.Value) + "]"
 		}
 	}
+
 	return safe
 }
 
@@ -547,7 +581,7 @@ func applySheetPlan(records []bom.ImportRecord, sheet bom.Sheet, plan ai.SheetPl
 	out := []bom.ImportRecord{}
 	seenRows := map[int]bool{}
 	for _, record := range records {
-		if record.Sheet != sheet.Name || record.Imported || record.Ignored || record.Confirmed || record.Method == "manual" || record.Method == "source_relation" || (len(selected) > 0 && !selectedRows[record.Row]) {
+		if record.Sheet != sheet.Name || record.Imported || record.Ignored || record.Confirmed || record.Method == "manual" || (len(selected) > 0 && !selectedRows[record.Row]) {
 			out = append(out, record)
 			continue
 		}
