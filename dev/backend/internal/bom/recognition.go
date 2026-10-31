@@ -1,6 +1,7 @@
 package bom
 
 import (
+	"encoding/json"
 	"sort"
 	"strconv"
 	"strings"
@@ -41,15 +42,60 @@ func PlanningSourceRows(w Workbook) Workbench {
 
 // Link only exact source identities. The result remains a candidate graph until confirmation.
 func LinkRecognizedRecords(b *Workbench) {
+	// Resolvers update field maps. Keep reviewed records isolated and byte-stable.
+	protected := map[string]ImportRecord{}
+	for j, r := range b.Records {
+		if r.Imported || r.Ignored || r.Confirmed || r.Method == "manual" {
+			protected[r.ID] = r
+			raw, _ := json.Marshal(r)
+			var copy ImportRecord
+			json.Unmarshal(raw, &copy)
+			b.Records[j] = copy
+		}
+	}
+	defer func() {
+		for j, r := range b.Records {
+			if old, ok := protected[r.ID]; ok {
+				b.Records[j] = old
+			}
+		}
+	}()
+	// Compare both source labels and resolved references in the same identity space.
+	aliases := map[string]map[string]bool{}
+	ids := map[string]bool{}
+	for _, r := range b.Records {
+		ids[r.ID] = true
+		for _, name := range []string{r.Item.Hostname, r.Item.Serial, r.Item.Fields["device_alias"]} {
+			if name == "" {
+				continue
+			}
+			if aliases[name] == nil {
+				aliases[name] = map[string]bool{}
+			}
+			aliases[name][r.ID] = true
+		}
+	}
+	ownerID := func(name string) string {
+		if ids[name] {
+			return name
+		}
+		if len(aliases[name]) == 1 {
+			for id := range aliases[name] {
+				return id
+			}
+		}
+		return name
+	}
+
 	merged := []ImportRecord{}
 	indices := map[string]int{}
 	for _, r := range b.Records {
 		key := ""
-		if !r.Imported && !r.Ignored && r.Item.Hostname != "" && (r.Item.Category == "server" || r.Item.Category == "switch" || r.Item.Category == "router") {
+		if !r.Imported && !r.Ignored && !r.Confirmed && r.Method != "manual" && r.Item.Hostname != "" && (r.Item.Category == "server" || r.Item.Category == "switch" || r.Item.Category == "router") {
 			key = r.Item.Category + ":" + r.Item.Hostname
 		}
-		if !r.Imported && !r.Ignored && (r.Item.Category == "optic_module" || r.Item.Category == "electrical_module") && r.Item.Fields["record_kind"] != "material_summary" && r.Item.Parent != "" && r.Item.Port != "" {
-			key = r.Item.Category + ":" + r.Item.Parent + ":" + r.Item.Port
+		if !r.Imported && !r.Ignored && !r.Confirmed && r.Method != "manual" && (r.Item.Category == "optic_module" || r.Item.Category == "electrical_module") && r.Item.Fields["record_kind"] != "material_summary" && r.Item.Parent != "" && r.Item.Port != "" {
+			key = r.Item.Category + ":" + ownerID(r.Item.Parent) + ":" + r.Item.Port
 		}
 		if key != "" {
 			if n, ok := indices[key]; ok {
@@ -68,7 +114,9 @@ func LinkRecognizedRecords(b *Workbench) {
 							old.Item.Sources[f] = r.Item.Sources[f]
 						}
 					}
-					old.Raw = append(old.Raw, r.Raw...)
+					if old.ID != r.ID {
+						old.Raw = append(old.Raw, r.Raw...)
+					}
 					continue
 				}
 				old.Ambiguity = true
@@ -84,7 +132,7 @@ func LinkRecognizedRecords(b *Workbench) {
 	moduleKeys := map[string]bool{}
 	for _, r := range b.Records {
 		if r.Item.Category == "optic_module" || r.Item.Category == "electrical_module" {
-			moduleKeys[r.Item.Fields["parent_uid"]+":"+r.Item.Fields["port_index"]+":"+r.Item.Model] = true
+			moduleKeys[ownerID(r.Item.Parent)+":"+r.Item.Port+":"+r.Item.Model] = true
 		}
 	}
 	add := []ImportRecord{}
@@ -100,7 +148,7 @@ func LinkRecognizedRecords(b *Workbench) {
 			if model == "" || model == "/" || model == "-" || owner == "" || port == "" {
 				continue
 			}
-			key := owner + ":" + port + ":" + model
+			key := ownerID(owner) + ":" + port + ":" + model
 			if moduleKeys[key] {
 				continue
 			}
@@ -108,7 +156,7 @@ func LinkRecognizedRecords(b *Workbench) {
 			id := StableID("module-candidate:" + key)
 			fields := map[string]string{"category": "optic_module", "record_kind": "component", "name": model, "model": model, "parent_uid": owner, "port_index": port}
 			sources := map[string]Cell{"name": r.Item.Sources[f], "model": r.Item.Sources[f], "parent_uid": r.Item.Sources["endpoint_"+side+"_device"], "port_index": r.Item.Sources["endpoint_"+side+"_port"]}
-			add = append(add, ImportRecord{ID: id, Sheet: r.Sheet, Row: r.Row, Raw: r.Raw, Original: owner + " / " + port + " / " + model, Item: Item{UID: id, Sheet: r.Sheet, Category: "optic_module", Model: model, Parent: owner, Port: port, Fields: fields, Sources: sources}, Recognition: "recognized", Method: "provider", Confidence: r.Confidence, Reason: "来自布线明细的端口光模块型号；规划关系，尚未声明实物 SN", Issues: []Issue{}})
+			add = append(add, ImportRecord{ID: id, Sheet: r.Sheet, Row: r.Row, Raw: r.Raw, Original: owner + " / " + port + " / " + model, Item: Item{UID: id, Sheet: r.Sheet, Category: "optic_module", Model: model, Parent: owner, Port: port, Fields: fields, Sources: sources}, Recognition: "recognized", Method: "source_relation", Confidence: r.Confidence, Reason: "来自布线明细的端口光模块型号；规划关系，尚未声明实物 SN", Issues: []Issue{}})
 		}
 	}
 	b.Records = append(b.Records, add...)
