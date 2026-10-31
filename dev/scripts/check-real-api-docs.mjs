@@ -20,13 +20,14 @@ for (const entry of registry.operations) {
   check(!ids.has(entry.operation_id), `Duplicate operationId: ${entry.operation_id}`); ids.add(entry.operation_id);
   const operation = api.paths?.[entry.path]?.[entry.method];
   check(operation?.operationId === entry.operation_id, `OpenAPI operation mismatch: ${key}`);
-  const response = operation?.responses?.['200']?.content?.['application/json']?.schema;
-  check(response?.properties?.data?.$ref === `#/components/schemas/${entry.response_schema}`, `Response schema mismatch: ${key}`);
+  const response = operation?.responses?.[entry.response_status || '200']?.content?.[entry.response_media_type || 'application/json']?.schema;
+  if (entry.response_schema) check(response?.$ref === `#/components/schemas/${entry.response_schema}` || response?.properties?.data?.$ref === `#/components/schemas/${entry.response_schema}`, `Response schema mismatch: ${key}`);
+  else check(!!response, `Response media schema missing: ${key}`);
   if (entry.request_schema) check(operation?.requestBody?.content?.['application/json']?.schema?.$ref === `#/components/schemas/${entry.request_schema}`, `Request schema mismatch: ${key}`);
   for (const field of ['handler', 'source', 'documentation']) check(exists(entry[field]), `Missing ${field}: ${entry[field]}`);
   if (entry.verification === 'startup_http_200') check(deployment.api_startup_checks.checks.some(c => c.endpoint === entry.path && c.status === 200), `Missing startup evidence: ${key}`);
 }
-for (const doc of ['HANDOFF.md', 'docs/REAL-API-CONTRACTS.md', 'docs/api/visualization.md']) {
+for (const doc of ['HANDOFF.md', 'docs/REAL-API-CONTRACTS.md', 'docs/api/visualization.md', 'docs/api/flows.md']) {
   for (const match of read(doc).matchAll(/\]\(([^)]+)\)/g)) {
     const target = match[1].split('#')[0];
     if (!target || /^[a-z]+:/i.test(target)) continue;

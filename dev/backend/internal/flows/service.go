@@ -12,7 +12,6 @@ import (
 	"os"
 	"regexp"
 	"strings"
-	"time"
 )
 
 var identifier = regexp.MustCompile(`^[A-Za-z0-9_-]{1,100}$`)
@@ -31,7 +30,38 @@ func (s *Service) Flows(ctx context.Context, p Scope) ([]Flow, error) {
 		}
 		out = append(out, f)
 	}
-	return out, rows.Err()
+	if e = rows.Err(); e != nil {
+		return nil, e
+	}
+	rows.Close()
+	namespaces := map[string]bool{}
+	metadata := map[string]map[string]any{}
+	for _, f := range out {
+		if namespaces[f.Namespace] {
+			continue
+		}
+		namespaces[f.Namespace] = true
+		var values []map[string]any
+		if e = s.Engine.JSON(ctx, "GET", "/flows/"+url.PathEscape(f.Namespace), &values); e != nil {
+			return nil, e
+		}
+		for _, value := range values {
+			metadata[f.Namespace+":"+fmt.Sprint(value["id"])] = value
+		}
+	}
+	for i := range out {
+		f := &out[i]
+		f.Engine = metadata[f.Namespace+":"+f.FlowID]
+		if f.Engine == nil {
+			f.Engine = map[string]any{}
+		}
+		f.Disabled, _ = f.Engine["disabled"].(bool)
+		f.Draft, _ = f.Engine["draft"].(bool)
+		if revision, ok := f.Engine["revision"].(float64); ok {
+			f.Revision = int(revision)
+		}
+	}
+	return out, nil
 }
 func (s *Service) Flow(ctx context.Context, p Scope, id string) (Flow, error) {
 	var f Flow
@@ -47,6 +77,7 @@ func (s *Service) Flow(ctx context.Context, p Scope, id string) (Flow, error) {
 	f.Engine = d
 	f.Source, _ = d["source"].(string)
 	f.Disabled, _ = d["disabled"].(bool)
+	f.Draft, _ = d["draft"].(bool)
 	if rev, ok := d["revision"].(float64); ok {
 		f.Revision = int(rev)
 	}
@@ -62,9 +93,17 @@ func (s *Service) Save(ctx context.Context, p Scope, id string, input SaveFlow) 
 		return empty, e
 	}
 	fid := fmt.Sprint(doc["id"])
-	ns := "keel.p" + strings.ReplaceAll(input.Project, "-", "")
+	ns := Namespace(input.Project)
+	if id != "" {
+		if e := s.DB.QueryRow(ctx, `SELECT namespace FROM flow_binding WHERE id::text=$1 AND project_id=$2`, id, input.Project).Scan(&ns); e != nil {
+			return empty, problem(404, "FLOW_NOT_FOUND")
+		}
+	}
 	if !identifier.MatchString(fid) || fmt.Sprint(doc["namespace"]) != ns {
 		return empty, problem(422, "FLOW_NAMESPACE_SCOPE_INVALID")
+	}
+	if e := ValidatePolicy(input.Source, ns); e != nil {
+		return empty, e
 	}
 	if input.Name == "" || !contains([]string{"server", "switch", "both"}, input.TargetType) {
 		return empty, problem(422, "FLOW_FIELDS_INVALID")
@@ -89,7 +128,7 @@ func (s *Service) Save(ctx context.Context, p Scope, id string, input SaveFlow) 
 			return empty, problem(409, "FLOW_REVISION_CONFLICT")
 		}
 	}
-	engine, e := s.Engine.Save(ctx, input.Source, id != "", ns, fid)
+	engine, e := s.Engine.Save(ctx, input.Source, id != "", ns, fid, input.Draft)
 	if e != nil {
 		return empty, e
 	}
@@ -121,7 +160,7 @@ func contains(a []string, v string) bool {
 	return false
 }
 func (s *Service) Targets(ctx context.Context, p Scope, q string) ([]Target, error) {
-	rows, e := s.DB.Query(ctx, `SELECT c.item_uid,c.name,c.asset_type,sc.project_id,c.version,c.payload || jsonb_build_object('maintenance_state',c.maintenance_state,'lifecycle_state',c.lifecycle_state,'serial',COALESCE(c.serial,c.payload->>'serial')),COALESCE(a.id::text,''),COALESCE(a.state='enrolled' AND a.last_heartbeat>now()-interval '45 seconds' AND a.certificate_expires_at>now(),false),COALESCE(a.capabilities,'[]'),COALESCE(t.id::text,'') FROM cmdb_entity c JOIN cmdb_asset_scope sc ON sc.asset_id=c.item_uid LEFT JOIN flow_agent a ON a.asset_id=c.item_uid AND a.project_id=sc.project_id LEFT JOIN flow_ssh_trust t ON t.asset_id=c.item_uid AND t.project_id=sc.project_id AND t.status='approved' WHERE sc.project_id=ANY($1) AND c.asset_type IN('server','switch','device','machine') AND (c.name ILIKE '%'||$2||'%' OR c.item_uid ILIKE '%'||$2||'%') ORDER BY c.name LIMIT 500`, p.Projects, q)
+	rows, e := s.DB.Query(ctx, `SELECT c.item_uid,c.name,c.asset_type,sc.project_id,c.version,c.payload || jsonb_build_object('maintenance_state',CASE WHEN c.maintenance_state='maintained' OR c.payload->>'maintenance_state'='maintained' OR c.payload->'fields'->>'maintenance_state'='maintained' THEN 'maintained' ELSE c.maintenance_state END,'lifecycle_state',CASE WHEN c.lifecycle_state='maintained' OR c.payload->>'lifecycle_state'='maintained' OR c.payload->'fields'->>'lifecycle_state'='maintained' THEN 'maintained' ELSE c.lifecycle_state END,'serial',COALESCE(c.serial,c.payload->>'serial')),COALESCE(a.id::text,''),COALESCE(a.state='enrolled' AND a.last_heartbeat>now()-interval '45 seconds' AND a.certificate_expires_at>now(),false),COALESCE(a.capabilities,'[]'),COALESCE(t.id::text,'') FROM cmdb_entity c JOIN cmdb_asset_scope sc ON sc.asset_id=c.item_uid LEFT JOIN flow_agent a ON a.asset_id=c.item_uid AND a.project_id=sc.project_id LEFT JOIN flow_ssh_trust t ON t.asset_id=c.item_uid AND t.project_id=sc.project_id AND t.status='approved' WHERE sc.project_id=ANY($1) AND c.asset_type IN('server','switch','device','machine') AND (c.name ILIKE '%'||$2||'%' OR c.item_uid ILIKE '%'||$2||'%') ORDER BY c.name LIMIT 500`, p.Projects, q)
 	if e != nil {
 		return nil, e
 	}
@@ -141,7 +180,19 @@ func (s *Service) Targets(ctx context.Context, p Scope, q string) ([]Target, err
 				}
 			}
 		}
+		allowedFields := map[string]bool{}
+		for _, key := range []string{"os", "os_name", "management_ip", "mgmt_ip", "ip", "lifecycle_state", "lifecycle_status", "maintenance_state", "serial", "machine_id", "dmi_uuid", "hostname", "model", "rack_id", "role", "is_demo"} {
+			allowedFields[key] = true
+		}
+		for key := range t.Fields {
+			if !allowedFields[key] {
+				delete(t.Fields, key)
+			}
+		}
 		json.Unmarshal(caps, &t.Capabilities)
+		if t.Capabilities == nil {
+			t.Capabilities = []string{}
+		}
 		out = append(out, t)
 	}
 	return out, rows.Err()
@@ -153,10 +204,43 @@ func (s *Service) Preflight(ctx context.Context, p Scope, r RunRequest) ([]Decis
 	if e := runValid(r); e != nil {
 		return nil, e
 	}
+	if e := ValidateTaskParameters(r.Kind, r.Command); e != nil {
+		return nil, e
+	}
 	targets, e := s.Targets(ctx, Scope{Projects: []string{r.Project}}, "")
 	if e != nil {
 		return nil, e
 	}
+	unresolved := map[string]bool{}
+	existing, e := s.DB.Query(ctx, `SELECT DISTINCT asset_id FROM flow_execution_target WHERE asset_id=ANY($1) AND state='RECONCILING'`, r.Targets)
+	if e != nil {
+		return nil, e
+	}
+	for existing.Next() {
+		var id string
+		if e = existing.Scan(&id); e != nil {
+			existing.Close()
+			return nil, e
+		}
+		unresolved[id] = true
+	}
+	existing.Close()
+	trusted := map[string]bool{}
+	profiles, e := s.DB.Query(ctx, `SELECT id::text,secret_ref,known_hosts_ref FROM flow_ssh_trust WHERE project_id=$1 AND asset_id=ANY($2) AND status='approved'`, r.Project, r.Targets)
+	if e != nil {
+		return nil, e
+	}
+	for profiles.Next() {
+		var id, key, known string
+		if e = profiles.Scan(&id, &key, &known); e != nil {
+			profiles.Close()
+			return nil, e
+		}
+		_, keyErr := ResolveSecret(key)
+		_, knownErr := ResolveSecret(known)
+		trusted[id] = keyErr == nil && knownErr == nil
+	}
+	profiles.Close()
 	lookup := map[string]Target{}
 	for _, t := range targets {
 		lookup[t.ID] = t
@@ -173,18 +257,43 @@ func (s *Service) Preflight(ctx context.Context, p Scope, r RunRequest) ([]Decis
 			return nil, problem(404, "TARGET_NOT_AUTHORIZED")
 		}
 		cap := "exec.command"
-		if r.Kind != "command" {
+		if r.Kind == "bash" || r.Kind == "python" {
 			cap = "script." + r.Kind
+		} else if r.Kind != "command" {
+			cap = r.Kind
 		}
-		out = append(out, Route(t, r.Policy, cap))
+		if t.SSH != "" && !trusted[t.SSH] {
+			t.SSH = ""
+		}
+		decision := Route(t, r.Policy, cap)
+		if contains([]string{"file.upload", "file.download", "inventory.collect"}, r.Kind) && decision.Transport != "AGENT" {
+			decision.Ready = false
+			decision.Transport = "BLOCKED"
+			decision.Reason = "CAPABILITY_REQUIRES_AGENT"
+		}
+		if t.Type == "switch" && (r.Kind != "command" || !SwitchReadOnly(r.Command)) {
+			decision.Ready = false
+			decision.Transport = "BLOCKED"
+			decision.Reason = "SWITCH_CHANGE_REQUIRES_APPROVED_FABRIC_ADAPTER"
+		}
+		if unresolved[t.ID] {
+			decision.Ready = false
+			decision.Transport = "BLOCKED"
+			decision.Reason = "TARGET_HAS_UNRESOLVED_TASK"
+		}
+		out = append(out, decision)
 	}
 	return out, nil
 }
 func (s *Service) Start(ctx context.Context, p Scope, r RunRequest, key string) (Execution, error) {
+	if r.Flow != "" && len(r.Targets) == 0 {
+		return s.StartNative(ctx, p, r, key)
+	}
 	var empty Execution
 	if key == "" || len(key) > 200 {
 		return empty, problem(400, "IDEMPOTENCY_KEY_REQUIRED")
 	}
+	key = p.User + ":" + r.Source + ":" + r.Flow + ":" + r.Parent + ":" + key
 	if r.Retries != 0 {
 		return empty, problem(422, "SIDE_EFFECT_RETRY_REQUIRES_APPROVED_IDEMPOTENCY")
 	}
@@ -193,6 +302,9 @@ func (s *Service) Start(ctx context.Context, p Scope, r RunRequest, key string) 
 		return empty, e
 	}
 	for _, d := range decisions {
+		if len(r.TargetRevisions) > 0 && r.TargetRevisions[d.Asset] != d.Revision {
+			return empty, problem(409, "PREFLIGHT_TARGET_REVISION_CHANGED")
+		}
 		if !d.Ready {
 			return empty, problem(422, "PREFLIGHT_BLOCKED")
 		}
@@ -201,7 +313,7 @@ func (s *Service) Start(ctx context.Context, p Scope, r RunRequest, key string) 
 	if highRisk.MatchString(r.Command) {
 		return empty, problem(422, "HIGH_RISK_USE_APPROVED_DOMAIN_WORKFLOW")
 	}
-	ns := "keel.p" + strings.ReplaceAll(r.Project, "-", "")
+	ns := Namespace(r.Project)
 	fid := "quick-run"
 	revision := 0
 	if r.Flow != "" {
@@ -209,8 +321,16 @@ func (s *Service) Start(ctx context.Context, p Scope, r RunRequest, key string) 
 		if e != nil {
 			return empty, e
 		}
-		if f.Project != r.Project || f.Revision != r.Revision || f.Disabled {
+		if f.Project != r.Project || f.Revision != r.Revision || f.Disabled || f.Draft {
 			return empty, problem(409, "FLOW_NOT_EXECUTABLE")
+		}
+		if e := ValidatePolicy(f.Source, f.Namespace); e != nil {
+			return empty, e
+		}
+		for _, decision := range decisions {
+			if f.TargetType != "both" && decision.Target.Type != f.TargetType {
+				return empty, problem(422, "FLOW_TARGET_TYPE_MISMATCH")
+			}
 		}
 		ns, fid, revision = f.Namespace, f.FlowID, f.Revision
 	}
@@ -219,6 +339,9 @@ func (s *Service) Start(ctx context.Context, p Scope, r RunRequest, key string) 
 		return empty, e
 	}
 	defer tx.Rollback(ctx)
+	if _, e = tx.Exec(ctx, `SELECT pg_advisory_xact_lock(hashtextextended($1,0))`, r.Project+":"+key); e != nil {
+		return empty, e
+	}
 	id := uuid.NewString()
 	digest := hash(string(raw(r)))
 	var existing, oldHash string
@@ -243,6 +366,10 @@ func (s *Service) Start(ctx context.Context, p Scope, r RunRequest, key string) 
 			return empty, e
 		}
 	}
+	_, e = tx.Exec(ctx, `INSERT INTO outbox_event(id,project_id,event_type,payload) VALUES(gen_random_uuid(),$1,'flows.execution',$2)`, r.Project, raw(ProjectionEvent{Execution: id, Targets: r.Targets, Actor: p.Actor, State: "REQUESTED"}))
+	if e != nil {
+		return empty, e
+	}
 	tokenBytes := make([]byte, 32)
 	rand.Read(tokenBytes)
 	ticket := hex.EncodeToString(tokenBytes)
@@ -253,7 +380,30 @@ func (s *Service) Start(ctx context.Context, p Scope, r RunRequest, key string) 
 	if e = tx.Commit(ctx); e != nil {
 		return empty, e
 	}
-	inputs := map[string]string{"targets": string(raw(r.Targets)), "ticket": ticket}
+	targetsInput := any(r.Targets)
+	v2 := r.Flow == ""
+	if r.Flow != "" {
+		f, err := s.Flow(ctx, p, r.Flow)
+		if err != nil {
+			return empty, err
+		}
+		doc, _ := FlowDocument(f.Source)
+		labels, _ := doc["labels"].([]any)
+		for _, value := range labels {
+			label, _ := value.(map[string]any)
+			if label["key"] == "keel_job_contract" && label["value"] == "v2" {
+				v2 = true
+			}
+		}
+	}
+	if v2 {
+		values := []map[string]string{}
+		for _, decision := range decisions {
+			values = append(values, map[string]string{"asset_id": decision.Asset, "transport": decision.Transport})
+		}
+		targetsInput = values
+	}
+	inputs := map[string]string{"targets": string(raw(targetsInput)), "ticket": ticket}
 	if r.Flow == "" {
 		base := strings.TrimRight(os.Getenv("KEEL_WORKER_CALLBACK_URL"), "/")
 		if base == "" {
@@ -268,7 +418,7 @@ func (s *Service) Start(ctx context.Context, p Scope, r RunRequest, key string) 
 		}
 		s.DB.Exec(ctx, `UPDATE flow_execution_binding SET engine_flow_id=$2 WHERE id=$1`, id, fid)
 	}
-	engine, e := s.Engine.Execute(ctx, ns, fid, revision, inputs)
+	engine, e := s.Engine.Execute(ctx, ns, fid, revision, inputs, id)
 	if e != nil {
 		s.DB.Exec(ctx, `UPDATE flow_execution_binding SET error_code='KESTRA_START_UNKNOWN' WHERE id=$1`, id)
 		return empty, e
@@ -289,7 +439,7 @@ var highRisk = regexp.MustCompile(`(?i)\b(reboot|shutdown|poweroff|mkfs|flashrom
 
 func (s *Service) Execution(ctx context.Context, p Scope, id string) (Execution, error) {
 	var out Execution
-	e := s.DB.QueryRow(ctx, `SELECT id::text,project_id,flow_id::text,kestra_id,engine_flow_id,flow_revision,source_module,mode,requester_id::text,created_at,error_code FROM flow_execution_binding WHERE id::text=$1 AND project_id=ANY($2)`, id, p.Projects).Scan(&out.ID, &out.Project, &out.FlowID, &out.KestraID, &out.Flow, &out.Revision, &out.Source, &out.Mode, &out.Requester, &out.Created, &out.Error)
+	e := s.DB.QueryRow(ctx, `SELECT id::text,project_id,flow_id::text,kestra_id,engine_flow_id,flow_revision,source_module,mode,requester_id::text,created_at,error_code,parent_id::text FROM flow_execution_binding WHERE id::text=$1 AND project_id=ANY($2)`, id, p.Projects).Scan(&out.ID, &out.Project, &out.FlowID, &out.KestraID, &out.Flow, &out.Revision, &out.Source, &out.Mode, &out.Requester, &out.Created, &out.Error, &out.ParentID)
 	if e != nil {
 		return out, problem(404, "EXECUTION_NOT_FOUND")
 	}
@@ -298,6 +448,14 @@ func (s *Service) Execution(ctx context.Context, p Scope, id string) (Execution,
 		if e = s.Engine.JSON(ctx, "GET", "/executions/"+url.PathEscape(*out.KestraID), &out.Engine); e != nil {
 			return out, e
 		}
+	}
+	if state, ok := out.Engine["state"].(map[string]any); ok {
+		if current, ok := state["current"].(string); ok {
+			s.DB.Exec(ctx, `UPDATE flow_execution_binding SET engine_state=$2,state_observed_at=now() WHERE id=$1`, id, current)
+		}
+	}
+	if inputs, ok := out.Engine["inputs"].(map[string]any); ok {
+		delete(inputs, "ticket")
 	}
 	out.Targets = []TargetRun{}
 	rows, e := s.DB.Query(ctx, `SELECT asset_id,snapshot,selected_transport,actual_transport,state,attempt,exit_code,stdout,stderr,started_at,ended_at FROM flow_execution_target WHERE execution_id=$1 ORDER BY asset_id`, id)
@@ -386,8 +544,33 @@ func (s *Service) Action(ctx context.Context, p Scope, id, action string) (Execu
 		return ex, e
 	}
 	response.Body.Close()
+	if action == "kill" {
+		s.DB.Exec(ctx, `DELETE FROM flow_dispatch_ticket WHERE execution_id=$1`, ex.ID)
+	}
 	s.audit(ctx, p, ex.Project, "execution."+action, id, map[string]any{})
 	return s.Execution(ctx, p, id)
 }
 
-var _ = time.Second
+// Restart is an explicit new job for all original targets, with fresh preflight and a new ticket.
+// It never reuses a consumed dispatch ticket or rewrites the original execution history.
+func (s *Service) Restart(ctx context.Context, p Scope, id, key string) (Execution, error) {
+	ex, e := s.Execution(ctx, p, id)
+	if e != nil {
+		return ex, e
+	}
+	state, _ := ex.Engine["state"].(map[string]any)
+	if !contains([]string{"SUCCESS", "FAILED", "WARNING", "KILLED", "CANCELLED"}, fmt.Sprint(state["current"])) {
+		return ex, problem(409, "EXECUTION_NOT_TERMINAL")
+	}
+	var b []byte
+	if e = s.DB.QueryRow(ctx, `SELECT request FROM flow_execution_binding WHERE id=$1`, id).Scan(&b); e != nil {
+		return ex, e
+	}
+	var r RunRequest
+	if e = json.Unmarshal(b, &r); e != nil {
+		return ex, e
+	}
+	r.Parent = id
+	r.Source = "restart"
+	return s.Start(ctx, p, r, key)
+}

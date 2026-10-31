@@ -14066,7 +14066,6 @@ paths:
           description: Invalid input, precondition or unavailable capability
         '503':
           description: Provider not configured
-
   /flows/targets:
     get:
       operationId: listFlowsTargets
@@ -14090,7 +14089,6 @@ paths:
           description: Invalid input, precondition or unavailable capability
         '503':
           description: Provider not configured
-
   /flows/executions:
     get:
       operationId: listRealExecutions
@@ -14101,6 +14099,41 @@ paths:
         name: project_id
         schema:
           type: string
+      - name: cursor
+        in: query
+        schema:
+          type: string
+      - name: q
+        in: query
+        schema:
+          type: string
+      - name: state
+        in: query
+        schema:
+          type: string
+      - name: source
+        in: query
+        schema:
+          type: string
+      - name: flow_id
+        in: query
+        schema:
+          type: string
+      - name: started_by
+        in: query
+        schema:
+          type: string
+      - name: transport
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 50
       responses:
         '200':
           description: Real engine/domain result.
@@ -14114,7 +14147,6 @@ paths:
           description: Invalid input, precondition or unavailable capability
         '503':
           description: Provider not configured
-
   /flows/agents:
     get:
       operationId: listRealAgents
@@ -14138,7 +14170,6 @@ paths:
           description: Invalid input, precondition or unavailable capability
         '503':
           description: Provider not configured
-
   /flows/ssh-trust:
     get:
       operationId: listFlowsSSHTrust
@@ -14190,7 +14221,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FlowsSSHTrustInput'
-
   /flows/preflight:
     post:
       operationId: preflightFlowsTargets
@@ -14220,7 +14250,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FlowsRun'
-
   /flows/quick-run:
     post:
       operationId: createQuickRun
@@ -14250,7 +14279,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FlowsRun'
-
   /flows/{flowId}:
     get:
       operationId: getRealFlow
@@ -14312,7 +14340,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FlowsSave'
-
   /flows/{flowId}/validate:
     post:
       operationId: validateRealFlow
@@ -14347,7 +14374,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FlowsValidationRequest'
-
   /flows/{flowId}/execute:
     post:
       operationId: executeRealFlow
@@ -14382,7 +14408,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FlowsRun'
-
   /flows/{flowId}/dependencies:
     get:
       operationId: getFlowDependencies
@@ -14411,7 +14436,6 @@ paths:
           description: Invalid input, precondition or unavailable capability
         '503':
           description: Provider not configured
-
   /flows/{flowId}/files:
     get:
       operationId: getFlowFiles
@@ -14440,7 +14464,6 @@ paths:
           description: Invalid input, precondition or unavailable capability
         '503':
           description: Provider not configured
-
   /flows/executions/{executionId}:
     get:
       operationId: getRealExecution
@@ -14469,7 +14492,6 @@ paths:
           description: Invalid input, precondition or unavailable capability
         '503':
           description: Provider not configured
-
   /flows/executions/{executionId}/targets:
     get:
       operationId: getExecutionTargets
@@ -14498,7 +14520,6 @@ paths:
           description: Invalid input, precondition or unavailable capability
         '503':
           description: Provider not configured
-
   /flows/executions/{executionId}/logs:
     get:
       operationId: getExecutionLogs
@@ -14514,6 +14535,10 @@ paths:
         required: true
         schema:
           type: string
+      - name: follow
+        in: query
+        schema:
+          type: boolean
       responses:
         '200':
           description: Real engine/domain result.
@@ -14521,13 +14546,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/getExecutionLogsEnvelope'
+            text/event-stream:
+              schema:
+                type: string
         '403':
           description: Permission or project scope denied
         '422':
           description: Invalid input, precondition or unavailable capability
         '503':
           description: Provider not configured
-
   /flows/executions/{executionId}/outputs:
     get:
       operationId: getExecutionOutputs
@@ -14556,7 +14583,6 @@ paths:
           description: Invalid input, precondition or unavailable capability
         '503':
           description: Provider not configured
-
   /flows/executions/{executionId}/audit:
     get:
       operationId: getExecutionAudit
@@ -14585,7 +14611,6 @@ paths:
           description: Invalid input, precondition or unavailable capability
         '503':
           description: Provider not configured
-
   /flows/executions/{executionId}/pause:
     post:
       operationId: actionExecutionPause
@@ -14614,7 +14639,6 @@ paths:
           description: Invalid input, precondition or unavailable capability
         '503':
           description: Provider not configured
-
   /flows/executions/{executionId}/resume:
     post:
       operationId: actionExecutionResume
@@ -14643,7 +14667,6 @@ paths:
           description: Invalid input, precondition or unavailable capability
         '503':
           description: Provider not configured
-
   /flows/executions/{executionId}/kill:
     post:
       operationId: actionExecutionKill
@@ -14672,7 +14695,6 @@ paths:
           description: Invalid input, precondition or unavailable capability
         '503':
           description: Provider not configured
-
   /flows/executions/{executionId}/retry-failed-targets:
     post:
       operationId: actionExecutionRetryfailedtargets
@@ -14701,7 +14723,6 @@ paths:
           description: Invalid input, precondition or unavailable capability
         '503':
           description: Provider not configured
-
   /flows/agents/{agentId}:
     get:
       operationId: getRealAgent
@@ -14730,7 +14751,6 @@ paths:
           description: Invalid input, precondition or unavailable capability
         '503':
           description: Provider not configured
-
   /flows/agents/enrollment-tokens:
     post:
       operationId: issueAgentEnrollment
@@ -14760,7 +14780,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FlowsTokenRequest'
-
   /flows/agents/{agentId}/approve:
     post:
       operationId: agentApprove
@@ -14795,7 +14814,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FlowsReason'
-
   /flows/agents/{agentId}/quarantine:
     post:
       operationId: agentQuarantine
@@ -14830,7 +14848,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FlowsReason'
-
   /flows/agents/{agentId}/revoke:
     post:
       operationId: agentRevoke
@@ -14865,7 +14882,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FlowsReason'
-
   /flows/agents/{agentId}/tasks:
     get:
       operationId: agentTasks
@@ -14894,7 +14910,6 @@ paths:
           description: Invalid input, precondition or unavailable capability
         '503':
           description: Provider not configured
-
   /flows/agents/{agentId}/audit:
     get:
       operationId: agentAudit
@@ -14923,7 +14938,6 @@ paths:
           description: Invalid input, precondition or unavailable capability
         '503':
           description: Provider not configured
-
   /flows/executions/{executionId}/events:
     get:
       operationId: followRealExecution
@@ -14942,7 +14956,211 @@ paths:
             text/event-stream:
               schema:
                 type: string
-
+  /flows/templates:
+    get:
+      operationId: getFlowsTemplate
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getFlowsTemplateEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+  /flows/{flowId}/namespace-file:
+    get:
+      operationId: getNamespaceFile
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: flowId
+        required: true
+        schema:
+          type: string
+      - name: path
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getNamespaceFileEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+    put:
+      operationId: saveNamespaceFile
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: flowId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/saveNamespaceFileEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowsNamespaceFile'
+  /flows/agents/bootstrap:
+    post:
+      operationId: bootstrapFlowsAgent
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bootstrapFlowsAgentEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowsBootstrap'
+  /flows/executions/{executionId}/restart:
+    post:
+      operationId: actionExecutionRestart
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: executionId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/actionExecutionRestartEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+  /flows/executions/{executionId}/artifacts:
+    get:
+      operationId: downloadExecutionArtifact
+      tags:
+      - FlowsReal
+      parameters:
+      - name: executionId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: path
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: project_id
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Only an artifact URI in this authorized execution outputs.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  /flows/agents/register:
+    post:
+      operationId: registerFlowsAgent
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/registerFlowsAgentEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowsEnrollmentInput'
+      security: []
+      description: TLS-only enrollment listener; one-use scoped token, no Session. Returns public certificate/CA only.
 components:
   securitySchemes:
     bearerAuth:
@@ -15024,12 +15242,334 @@ components:
           schema:
             $ref: "#/components/schemas/ErrorEnvelope"
   schemas:
+    FlowsExecutionPage:
+      type: object
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowsExecution'
+        page:
+          $ref: '#/components/schemas/FlowsQueryPage'
+        state_filter_source:
+          type: string
+      required:
+      - items
+      - page
+      - state_filter_source
+    FlowsQueryPage:
+      type: object
+      additionalProperties: false
+      properties:
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+        next_cursor:
+          type: string
+          nullable: true
+      required:
+      - limit
+      - has_more
+      - next_cursor
+    registerFlowsAgentEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsEnrollmentResult'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    FlowsEnrollmentResult:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        state:
+          type: string
+        certificate:
+          type: string
+        ca:
+          type: string
+        expires_at:
+          type: string
+      required:
+      - id
+      - state
+      - certificate
+      - ca
+      - expires_at
+    FlowsEnrollmentInput:
+      type: object
+      additionalProperties: false
+      properties:
+        token:
+          type: string
+          writeOnly: true
+        csr:
+          type: string
+        identity:
+          type: object
+          additionalProperties:
+            type: string
+        version:
+          type: string
+        capabilities:
+          type: array
+          items:
+            type: string
+      required:
+      - token
+      - csr
+      - identity
+      - version
+      - capabilities
+    FlowsValidationResult:
+      type: object
+      additionalProperties: false
+      properties:
+        index:
+          type: integer
+        namespace:
+          type: string
+        flow:
+          type: string
+        constraints:
+          type: string
+        outdated:
+          type: boolean
+        deprecationPaths:
+          type: array
+          items:
+            type: string
+        warnings:
+          type: array
+          items:
+            type: string
+        infos:
+          type: array
+          items:
+            type: string
+      required:
+      - index
+      - outdated
+    FlowsLogEntry:
+      type: object
+      additionalProperties: true
+      properties:
+        timestamp:
+          type: string
+        level:
+          type: string
+        message:
+          type: string
+        taskRunId:
+          type: string
+        executionId:
+          type: string
+    FlowsAgentTaskSummary:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        state:
+          type: string
+        execution_id:
+          type: string
+        updated_at:
+          type: string
+      required:
+      - id
+      - state
+      - execution_id
+      - updated_at
+    FlowsSSHTrustResult:
+      type: object
+      additionalProperties: false
+      properties:
+        asset_id:
+          type: string
+        status:
+          type: string
+      required:
+      - asset_id
+      - status
+    FlowsFileMetadata:
+      type: object
+      additionalProperties: true
+      properties:
+        fileName:
+          type: string
+        type:
+          type: string
+        size:
+          type: integer
+    FlowsDependencyGraph:
+      type: object
+      additionalProperties: false
+      properties:
+        nodes:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              uid:
+                type: string
+              namespace:
+                type: string
+              flow_id:
+                type: string
+              binding_id:
+                type: string
+            required:
+            - uid
+            - namespace
+            - flow_id
+            - binding_id
+        edges:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              source:
+                type: string
+              target:
+                type: string
+              relation:
+                type: object
+                additionalProperties: true
+            required:
+            - source
+            - target
+            - relation
+        partial:
+          type: boolean
+      required:
+      - nodes
+      - edges
+      - partial
+    actionExecutionRestartEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsExecution'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    bootstrapFlowsAgentEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsBootstrapResult'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    saveNamespaceFileEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsNamespaceFile'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getNamespaceFileEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsNamespaceFile'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getFlowsTemplateEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsTemplate'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    FlowsBootstrapResult:
+      type: object
+      additionalProperties: false
+      properties:
+        asset_id:
+          type: string
+        state:
+          type: string
+        version:
+          type: string
+      required:
+      - asset_id
+      - state
+      - version
+    FlowsBootstrap:
+      type: object
+      additionalProperties: false
+      properties:
+        project_id:
+          type: string
+        asset_id:
+          type: string
+        version:
+          type: string
+      required:
+      - project_id
+      - asset_id
+      - version
+    FlowsTemplate:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+        kind:
+          type: string
+        source:
+          type: string
+      required:
+      - name
+      - kind
+      - source
+    FlowsNamespaceFile:
+      type: object
+      additionalProperties: false
+      properties:
+        path:
+          type: string
+        content:
+          type: string
+      required:
+      - path
+      - content
     saveFlowsSSHTrustEnvelope:
       type: object
       additionalProperties: false
       properties:
         data:
-          $ref: '#/components/schemas/FlowsSSHTrust'
+          $ref: '#/components/schemas/FlowsSSHTrustResult'
         request_id:
           type: string
       required:
@@ -15055,7 +15595,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/FlowsAudit'
+            $ref: '#/components/schemas/FlowsAgentTaskSummary'
         request_id:
           type: string
       required:
@@ -15191,7 +15731,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/FlowsEngine'
+            $ref: '#/components/schemas/FlowsLogEntry'
         request_id:
           type: string
       required:
@@ -15228,7 +15768,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/FlowsEngine'
+            $ref: '#/components/schemas/FlowsFileMetadata'
         request_id:
           type: string
       required:
@@ -15239,9 +15779,7 @@ components:
       additionalProperties: false
       properties:
         data:
-          type: array
-          items:
-            $ref: '#/components/schemas/FlowsEngine'
+          $ref: '#/components/schemas/FlowsDependencyGraph'
         request_id:
           type: string
       required:
@@ -15278,7 +15816,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/FlowsEngine'
+            $ref: '#/components/schemas/FlowsValidationResult'
         request_id:
           type: string
       required:
@@ -15361,9 +15899,7 @@ components:
       additionalProperties: false
       properties:
         data:
-          type: array
-          items:
-            $ref: '#/components/schemas/FlowsExecution'
+          $ref: '#/components/schemas/FlowsExecutionPage'
         request_id:
           type: string
       required:
@@ -15543,6 +16079,8 @@ components:
       type: object
       additionalProperties: false
       properties:
+        namespace:
+          type: string
         engine:
           type: string
         version:
@@ -15556,6 +16094,7 @@ components:
         native_plugins:
           type: string
       required:
+      - namespace
       - engine
       - version
       - configured
@@ -15626,6 +16165,9 @@ components:
       type: object
       additionalProperties: false
       properties:
+        parent_id:
+          type: string
+          nullable: true
         id:
           type: string
         project_id:
@@ -15658,6 +16200,7 @@ components:
           items:
             $ref: '#/components/schemas/FlowsTargetRun'
       required:
+      - parent_id
       - id
       - project_id
       - flow_id
@@ -15759,6 +16302,9 @@ components:
           - command
           - bash
           - python
+          - file.upload
+          - file.download
+          - inventory.collect
         command:
           type: string
         transport_policy:
@@ -15775,8 +16321,14 @@ components:
           type: integer
         source_module:
           type: string
-        parent_id:
-          type: string
+        inputs:
+          type: object
+          additionalProperties:
+            type: string
+        target_revisions:
+          type: object
+          additionalProperties:
+            type: integer
       required:
       - project_id
       - target_ids
@@ -15828,6 +16380,8 @@ components:
       type: object
       additionalProperties: false
       properties:
+        draft:
+          type: boolean
         project_id:
           type: string
         name:
@@ -15841,6 +16395,7 @@ components:
         expected_revision:
           type: integer
       required:
+      - draft
       - project_id
       - name
       - description
@@ -15851,6 +16406,8 @@ components:
       type: object
       additionalProperties: false
       properties:
+        draft:
+          type: boolean
         id:
           type: string
         project_id:
@@ -15874,6 +16431,7 @@ components:
         engine:
           $ref: '#/components/schemas/FlowsEngine'
       required:
+      - draft
       - id
       - project_id
       - namespace

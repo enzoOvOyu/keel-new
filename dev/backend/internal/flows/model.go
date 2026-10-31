@@ -5,9 +5,9 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"strings"
 	"time"
 )
 
@@ -29,6 +29,7 @@ type Service struct {
 	Gateway *Gateway
 }
 type Flow struct {
+	Draft       bool           `json:"draft"`
 	ID          string         `json:"id"`
 	Project     string         `json:"project_id"`
 	Namespace   string         `json:"namespace"`
@@ -42,6 +43,7 @@ type Flow struct {
 	Engine      map[string]any `json:"engine"`
 }
 type SaveFlow struct {
+	Draft       bool   `json:"draft"`
 	Project     string `json:"project_id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
@@ -62,18 +64,20 @@ type Target struct {
 	SSH          string         `json:"ssh_profile_id"`
 }
 type RunRequest struct {
-	Project     string   `json:"project_id"`
-	Flow        string   `json:"flow_id"`
-	Revision    int      `json:"expected_revision"`
-	Targets     []string `json:"target_ids"`
-	Kind        string   `json:"kind"`
-	Command     string   `json:"command"`
-	Policy      string   `json:"transport_policy"`
-	Timeout     int      `json:"timeout_seconds"`
-	Concurrency int      `json:"target_concurrency"`
-	Retries     int      `json:"max_retries"`
-	Source      string   `json:"source_module"`
-	Parent      string   `json:"parent_id,omitempty"`
+	Inputs          map[string]string `json:"inputs,omitempty"`
+	TargetRevisions map[string]int64  `json:"target_revisions,omitempty"`
+	Project         string            `json:"project_id"`
+	Flow            string            `json:"flow_id"`
+	Revision        int               `json:"expected_revision"`
+	Targets         []string          `json:"target_ids"`
+	Kind            string            `json:"kind"`
+	Command         string            `json:"command"`
+	Policy          string            `json:"transport_policy"`
+	Timeout         int               `json:"timeout_seconds"`
+	Concurrency     int               `json:"target_concurrency"`
+	Retries         int               `json:"max_retries"`
+	Source          string            `json:"source_module"`
+	Parent          string            `json:"-"`
 }
 type Decision struct {
 	Asset     string `json:"asset_id"`
@@ -98,6 +102,7 @@ type TargetRun struct {
 	Ended    *time.Time `json:"ended_at"`
 }
 type Execution struct {
+	ParentID  *string        `json:"parent_id"`
 	ID        string         `json:"id"`
 	Project   string         `json:"project_id"`
 	FlowID    *string        `json:"flow_id"`
@@ -172,10 +177,13 @@ func runValid(r RunRequest) error {
 	if len(r.Targets) == 0 || len(r.Targets) > 200 {
 		return problem(422, "TARGET_COUNT_INVALID")
 	}
+	if strings.Contains(r.Command, "PRIVATE KEY-----") {
+		return problem(422, "COMMAND_MUST_NOT_CONTAIN_PRIVATE_KEY")
+	}
 	if r.Command == "" || len(r.Command) > 131072 {
 		return problem(422, "COMMAND_INVALID")
 	}
-	if r.Kind != "command" && r.Kind != "bash" && r.Kind != "python" {
+	if !contains([]string{"command", "bash", "python", "file.upload", "file.download", "inventory.collect"}, r.Kind) {
 		return problem(422, "SCRIPT_KIND_INVALID")
 	}
 	if r.Policy != "agent_preferred" && r.Policy != "agent_only" && r.Policy != "ssh_only" {
@@ -187,4 +195,5 @@ func runValid(r RunRequest) error {
 	return nil
 }
 
-var _ = errors.Is
+// Stable, collision-resistant project namespace; existing bindings retain their recorded namespace.
+func Namespace(project string) string { return "keel.p" + hash(project)[:20] }

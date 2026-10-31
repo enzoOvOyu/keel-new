@@ -32,9 +32,34 @@ import (
 
 const version = "0.1.0"
 
-var caps = []string{"exec.command", "script.bash", "script.python", "task.cancel", "task.stream", "inventory.collect"}
+var caps = []string{"exec.command", "script.bash", "script.python", "task.cancel", "task.stream", "inventory.collect", "file.upload", "file.download", "process.control"}
+var taskRegistry = struct {
+	sync.Mutex
+	active map[string]context.CancelFunc
+}{active: map[string]context.CancelFunc{}}
+var outbound = struct {
+	sync.Mutex
+	send chan flows.AgentMessage
+	ctx  context.Context
+}{}
+
+func emitAgent(message flows.AgentMessage) {
+	outbound.Lock()
+	send, ctx := outbound.send, outbound.ctx
+	outbound.Unlock()
+	if send == nil || ctx == nil {
+		return
+	}
+	select {
+	case send <- message:
+	case <-ctx.Done():
+	}
+}
 
 func main() {
+	if os.Getenv("KEEL_AGENT_ALLOWED_SERVICES") != "" {
+		caps = append(caps, "service.control")
+	}
 	gateway := flag.String("gateway", "", "gRPC TLS address")
 	api := flag.String("enroll-url", "", "HTTPS Keel API URL")
 	tokenFile := flag.String("token-file", "", "one-use token file, removed after enrollment")
@@ -50,6 +75,11 @@ func main() {
 		fatal("state unavailable")
 	}
 	os.Chmod(*state, 0700)
+	if *tokenFile != "" {
+		if _, e := os.Stat(*tokenFile); os.IsNotExist(e) {
+			*tokenFile = ""
+		}
+	}
 	if *tokenFile != "" {
 		if e := enroll(*api, *tokenFile, *state); e != nil {
 			fatal("enrollment failed: " + e.Error())
@@ -120,8 +150,9 @@ func enroll(api, tokenFile, dir string) error {
 }
 
 type limitWriter struct {
-	b  bytes.Buffer
-	mu sync.Mutex
+	emit func(string)
+	b    bytes.Buffer
+	mu   sync.Mutex
 }
 
 func (w *limitWriter) Write(p []byte) (int, error) {
@@ -134,6 +165,9 @@ func (w *limitWriter) Write(p []byte) (int, error) {
 			p = p[:space]
 		}
 		w.b.Write(p)
+		if w.emit != nil {
+			w.emit(string(p))
+		}
 	}
 	return n, nil
 }
@@ -162,6 +196,10 @@ func connect(ctx context.Context, address, dir string) error {
 	send := make(chan flows.AgentMessage, 32)
 	sendErr := make(chan error, 1)
 	streamCtx, cancel := context.WithCancel(ctx)
+	outbound.Lock()
+	outbound.send = send
+	outbound.ctx = streamCtx
+	outbound.Unlock()
 	defer cancel()
 	go func() {
 		ticker := time.NewTicker(10 * time.Second)
@@ -181,8 +219,18 @@ func connect(ctx context.Context, address, dir string) error {
 		}
 	}()
 	send <- flows.AgentMessage{Kind: "heartbeat", Version: version, Capabilities: caps}
-	active := map[string]context.CancelFunc{}
-	var mu sync.Mutex
+	entries, _ := filepath.Glob(filepath.Join(dir, "*.json"))
+	for _, entry := range entries {
+		data, err := os.ReadFile(entry)
+		if err == nil {
+			var result flows.Result
+			if json.Unmarshal(data, &result) == nil && result.ID != "" {
+				send <- flows.AgentMessage{Kind: "result", Result: &result}
+			}
+		}
+	}
+	active := taskRegistry.active
+	mu := &taskRegistry.Mutex
 	for {
 		var wire structpb.Struct
 		if e = stream.RecvMsg(&wire); e != nil {
@@ -193,6 +241,15 @@ func connect(ctx context.Context, address, dir string) error {
 			continue
 		}
 		task := *m.Task
+		if m.Kind == "query" {
+			var result flows.Result
+			data, err := os.ReadFile(filepath.Join(dir, flows.Digest([]byte(task.ID))+".json"))
+			if err != nil || json.Unmarshal(data, &result) != nil {
+				result = flows.Result{ID: task.ID, State: "RECONCILING", Exit: -1, Stderr: "No durable outcome; absence is not proof of no execution"}
+			}
+			emitAgent(flows.AgentMessage{Kind: "result", Result: &result})
+			continue
+		}
 		if m.Kind == "cancel" {
 			mu.Lock()
 			if c := active[task.ID]; c != nil {
@@ -214,18 +271,17 @@ func connect(ctx context.Context, address, dir string) error {
 		mu.Unlock()
 		go func() {
 			defer stop()
-			result := execute(taskCtx, dir, task)
+			result := execute(taskCtx, dir, task, func(name, chunk string) {
+				emitAgent(flows.AgentMessage{Kind: "log", Log: &flows.AgentLog{TaskID: task.ID, Stream: name, Chunk: chunk}})
+			})
 			mu.Lock()
 			delete(active, task.ID)
 			mu.Unlock()
-			select {
-			case send <- flows.AgentMessage{Kind: "result", Result: &result}:
-			case <-streamCtx.Done():
-			}
+			emitAgent(flows.AgentMessage{Kind: "result", Result: &result})
 		}()
 	}
 }
-func execute(ctx context.Context, dir string, t flows.Task) flows.Result {
+func execute(ctx context.Context, dir string, t flows.Task, callbacks ...func(string, string)) flows.Result {
 	out := flows.Result{ID: t.ID, State: "FAILED", Exit: -1}
 	if t.SHA256 != flows.Digest([]byte(t.Command)) {
 		out.Stderr = "Script digest mismatch"
@@ -234,11 +290,31 @@ func execute(ctx context.Context, dir string, t flows.Task) flows.Result {
 	journal := filepath.Join(dir, flows.Digest([]byte(t.ID))+".json")
 	if b, e := os.ReadFile(journal); e == nil {
 		json.Unmarshal(b, &out)
+		if out.Digest != t.SHA256 {
+			return flows.Result{ID: t.ID, State: "FAILED", Exit: -1, Stderr: "Task ID reused with different content"}
+		}
 		return out
 	}
 	out.State = "RECONCILING"
+	out.Digest = t.SHA256
 	if e := os.WriteFile(journal, mustJSON(out), 0600); e != nil {
 		return out
+	}
+	if t.Kind == "process.control" || t.Kind == "service.control" {
+		out = controlTask(ctx, dir, t)
+		out.Digest = t.SHA256
+		os.WriteFile(journal, mustJSON(out), 0600)
+		return out
+	}
+	if t.Kind == "file.upload" || t.Kind == "file.download" {
+		out = fileTask(dir, t)
+		out.Digest = t.SHA256
+		os.WriteFile(journal, mustJSON(out), 0600)
+		return out
+	}
+	if t.Kind == "inventory.collect" {
+		t.Kind = "command"
+		t.Command = "uname -srm; hostname; if command -v nvidia-smi >/dev/null 2>&1; then nvidia-smi --query-gpu=name,uuid --format=csv,noheader; else printf GPU_UNSUPPORTED; fi"
 	}
 	ctx, cancel := context.WithTimeout(ctx, time.Duration(t.Timeout)*time.Second)
 	defer cancel()
@@ -256,13 +332,17 @@ func execute(ctx context.Context, dir string, t flows.Task) flows.Result {
 		return out
 	}
 	command := exec.CommandContext(ctx, shell, args...)
-	command.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	command.SysProcAttr = &syscall.SysProcAttr{Setpgid: true, Pdeathsig: syscall.SIGKILL}
 	command.Cancel = func() error { return syscall.Kill(-command.Process.Pid, syscall.SIGKILL) }
 	command.WaitDelay = 2 * time.Second
 	command.Env = []string{"PATH=/usr/local/bin:/usr/bin:/bin", "LANG=C.UTF-8"}
 	command.Dir = dir
 	command.Stdin = strings.NewReader(t.Command)
 	stdout, stderr := &limitWriter{}, &limitWriter{}
+	if len(callbacks) > 0 {
+		stdout.emit = func(chunk string) { callbacks[0]("stdout", chunk) }
+		stderr.emit = func(chunk string) { callbacks[0]("stderr", chunk) }
+	}
 	command.Stdout = stdout
 	command.Stderr = stderr
 	err := command.Run()

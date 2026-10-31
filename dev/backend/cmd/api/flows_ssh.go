@@ -67,7 +67,7 @@ func (s *Server) flowSSH(w http.ResponseWriter, r *http.Request, p flows.Scope) 
 			}
 		}
 	}
-	if !valid || input.Port < 1 || input.Port > 65535 || input.User == "" || (input.Status != "approved" && input.Status != "revoked") {
+	if !valid || input.Port < 1 || input.Port > 65535 || input.User == "" || input.User == "root" || (input.Status != "approved" && input.Status != "revoked") {
 		fail(w, 422, "SSH_TRUST_FACT_INVALID")
 		return nil, nil
 	}

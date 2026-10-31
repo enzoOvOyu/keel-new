@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 )
 
 type BootstrapRequest struct {
@@ -47,6 +46,13 @@ func (s *Service) Bootstrap(ctx context.Context, p Scope, in BootstrapRequest) (
 	if target == nil || target.Type == "switch" || Maintained(*target) || target.SSH == "" {
 		return nil, problem(422, "BOOTSTRAP_TARGET_NOT_READY")
 	}
+	var active bool
+	if e = s.DB.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM flow_agent_task WHERE asset_id=$1 AND state IN('DISPATCHED','RUNNING','RECONCILING'))`, in.Asset).Scan(&active); e != nil {
+		return nil, e
+	}
+	if active {
+		return nil, problem(409, "AGENT_ACTIVE_TASKS_BLOCK_BOOTSTRAP")
+	}
 	var host, user, key, known string
 	var port int
 	e = s.DB.QueryRow(ctx, `SELECT host,port,username,secret_ref,known_hosts_ref FROM flow_ssh_trust WHERE id::text=$1 AND status='approved'`, target.SSH).Scan(&host, &port, &user, &key, &known)
@@ -71,5 +77,3 @@ func (s *Service) Bootstrap(ctx context.Context, p Scope, in BootstrapRequest) (
 	}
 	return map[string]any{"asset_id": in.Asset, "state": "awaiting_registration", "version": in.Version}, nil
 }
-
-var _ = time.Second

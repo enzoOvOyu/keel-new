@@ -51,6 +51,9 @@ func (s *Service) Agents(ctx context.Context, p Scope) ([]Agent, error) {
 		}
 		json.Unmarshal(identity, &a.Identity)
 		json.Unmarshal(caps, &a.Capabilities)
+		if a.Capabilities == nil {
+			a.Capabilities = []string{}
+		}
 		out = append(out, a)
 	}
 	return out, rows.Err()
@@ -88,6 +91,9 @@ func (s *Service) Token(ctx context.Context, p Scope, project, asset string) (ma
 	return map[string]any{"id": id, "token": token, "expires_at": expires, "asset_id": asset}, nil
 }
 func (s *Service) Enroll(ctx context.Context, input EnrollInput) (map[string]any, error) {
+	if input.Version == "" || len(input.Capabilities) == 0 {
+		return nil, problem(422, "AGENT_VERSION_AND_CAPABILITIES_REQUIRED")
+	}
 	block, _ := pem.Decode([]byte(input.CSR))
 	if block == nil {
 		return nil, problem(422, "CSR_INVALID")
@@ -135,7 +141,7 @@ func (s *Service) Enroll(ctx context.Context, input EnrollInput) (map[string]any
 		return nil, problem(403, "ENROLLMENT_TOKEN_INVALID")
 	}
 	var payload []byte
-	e = tx.QueryRow(ctx, `SELECT payload || jsonb_build_object('maintenance_state',maintenance_state,'lifecycle_state',lifecycle_state,'serial',COALESCE(serial,payload->>'serial')) FROM cmdb_entity WHERE item_uid=$1 AND EXISTS(SELECT 1 FROM cmdb_asset_scope WHERE asset_id=item_uid AND project_id=$2)`, asset, project).Scan(&payload)
+	e = tx.QueryRow(ctx, `SELECT payload || jsonb_build_object('maintenance_state',CASE WHEN maintenance_state='maintained' OR payload->>'maintenance_state'='maintained' OR payload->'fields'->>'maintenance_state'='maintained' THEN 'maintained' ELSE maintenance_state END,'lifecycle_state',CASE WHEN lifecycle_state='maintained' OR payload->>'lifecycle_state'='maintained' OR payload->'fields'->>'lifecycle_state'='maintained' THEN 'maintained' ELSE lifecycle_state END,'serial',COALESCE(serial,payload->>'serial')) FROM cmdb_entity WHERE item_uid=$1 AND EXISTS(SELECT 1 FROM cmdb_asset_scope WHERE asset_id=item_uid AND project_id=$2)`, asset, project).Scan(&payload)
 	if e != nil {
 		return nil, e
 	}
@@ -162,6 +168,13 @@ func (s *Service) Enroll(ctx context.Context, input EnrollInput) (map[string]any
 		state = "enrolled"
 	}
 	id := uuid.NewString()
+	var existingID, existingState string
+	if err := tx.QueryRow(ctx, `SELECT id::text,state FROM flow_agent WHERE project_id=$1 AND asset_id=$2 FOR UPDATE`, project, asset).Scan(&existingID, &existingState); err == nil {
+		if existingState == "revoked" {
+			return nil, problem(409, "AGENT_REVOKED_REQUIRES_NEW_AUTHORIZATION")
+		}
+		id = existingID
+	}
 	serial, _ := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
 	expires := time.Now().Add(30 * 24 * time.Hour)
 	template := &x509.Certificate{SerialNumber: serial, Subject: pkix.Name{CommonName: id}, NotBefore: time.Now().Add(-time.Minute), NotAfter: expires, KeyUsage: x509.KeyUsageDigitalSignature, ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth}}
@@ -169,7 +182,7 @@ func (s *Service) Enroll(ctx context.Context, input EnrollInput) (map[string]any
 	if e != nil {
 		return nil, e
 	}
-	_, e = tx.Exec(ctx, `INSERT INTO flow_agent(id,project_id,asset_id,identity,version,capabilities,state,certificate_serial,certificate_expires_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)`, id, project, asset, raw(input.Identity), input.Version, raw(input.Capabilities), state, serial.String(), expires)
+	_, e = tx.Exec(ctx, `INSERT INTO flow_agent(id,project_id,asset_id,identity,version,capabilities,state,certificate_serial,certificate_expires_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) ON CONFLICT(project_id,asset_id) DO UPDATE SET identity=EXCLUDED.identity,version=EXCLUDED.version,capabilities=EXCLUDED.capabilities,state=EXCLUDED.state,certificate_serial=EXCLUDED.certificate_serial,certificate_expires_at=EXCLUDED.certificate_expires_at,last_heartbeat=NULL`, id, project, asset, raw(input.Identity), input.Version, raw(input.Capabilities), state, serial.String(), expires)
 	if e != nil {
 		return nil, problem(409, "AGENT_ALREADY_REGISTERED")
 	}

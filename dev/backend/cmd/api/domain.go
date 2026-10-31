@@ -512,6 +512,15 @@ func (s *Server) publish(ctx context.Context) {
 			s.db.Exec(recovery, "UPDATE outbox_event SET retry_count=retry_count+1,last_error_code='CMDB_PROJECTION_FAILED',next_attempt_at=now()+make_interval(secs=>LEAST(60,POWER(2,LEAST(retry_count,6)))::int) WHERE id=$1 AND published_at IS NULL", id)
 		}
 	}()
+	if eventType == "flows.execution" {
+		if e = s.flows.ProjectEvent(ctx, tx, id, project, raw); e != nil {
+			return
+		}
+		if _, e = tx.Exec(ctx, "UPDATE outbox_event SET published_at=now(),last_error_code=NULL WHERE id=$1", id); e == nil {
+			completed = tx.Commit(ctx) == nil
+		}
+		return
+	}
 	if eventType == "cmdb.changeset.published" {
 		if _, e = tx.Exec(ctx, "INSERT INTO cmdb_ingest_event(event_id,source_type,source_ref) VALUES($1,'manual',$1) ON CONFLICT DO NOTHING", id); e != nil {
 			return

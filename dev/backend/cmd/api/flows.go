@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"io"
@@ -54,6 +56,22 @@ func (s *Server) flowsInternal(w http.ResponseWriter, r *http.Request) bool {
 		}
 		return true
 	}
+	if r.URL.Path == "/api/v1/flows/internal/results" && r.Method == "GET" {
+		var id, project string
+		token := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
+		digest := sha256.Sum256([]byte(token))
+		if e := s.db.QueryRow(r.Context(), `SELECT b.id::text,b.project_id FROM flow_dispatch_ticket t JOIN flow_execution_binding b ON b.id=t.execution_id WHERE t.hash=$1 AND t.expires_at>now()`, hex.EncodeToString(digest[:])).Scan(&id, &project); e != nil {
+			fail(w, 403, "DISPATCH_TICKET_INVALID")
+			return true
+		}
+		ex, e := s.flows.Execution(r.Context(), flows.Scope{Projects: []string{project}}, id)
+		if e != nil {
+			flowsFail(w, e)
+		} else {
+			respond(w, 200, ex.Targets)
+		}
+		return true
+	}
 	if r.URL.Path != "/api/v1/flows/internal/dispatch" {
 		return false
 	}
@@ -62,13 +80,14 @@ func (s *Server) flowsInternal(w http.ResponseWriter, r *http.Request) bool {
 		return true
 	}
 	var input struct {
-		Asset string `json:"asset_id"`
+		Asset    string `json:"asset_id"`
+		Required string `json:"required_transport"`
 	}
 	if !readFlowInput(w, r, &input) {
 		return true
 	}
 	token := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
-	result, e := s.flows.Dispatch(r.Context(), token, input.Asset)
+	result, e := s.flows.Dispatch(r.Context(), token, input.Asset, input.Required)
 	if e != nil {
 		flowsFail(w, e)
 	} else if result.State != "SUCCESS" {
@@ -109,7 +128,20 @@ func (s *Server) flowsRoutes(w http.ResponseWriter, r *http.Request) bool {
 	code := 200
 	switch {
 	case path == "/capabilities" && r.Method == "GET":
-		out = map[string]any{"engine": "Kestra", "version": "2.0.7", "configured": service.Engine.Base != "", "agent_gateway": service.Gateway != nil, "scheduling": "Kestra triggers", "native_plugins": "validated by configured Kestra"}
+		out = map[string]any{"namespace": flows.Namespace(r.URL.Query().Get("project_id")), "engine": "Kestra", "version": "2.0.7", "configured": service.Engine.Base != "", "agent_gateway": service.Gateway != nil, "scheduling": "Kestra triggers", "native_plugins": "validated by configured Kestra"}
+	case path == "/templates" && r.Method == "GET":
+		project := r.URL.Query().Get("project_id")
+		found := false
+		for _, v := range scope.Projects {
+			if v == project {
+				found = true
+			}
+		}
+		if !found {
+			fail(w, 403, "PROJECT_REQUIRED")
+			return true
+		}
+		out, e = service.Template(project)
 	case path == "/targets" && r.Method == "GET":
 		out, e = service.Targets(ctx, scope, r.URL.Query().Get("q"))
 	case path == "/preflight" && r.Method == "POST":
@@ -193,7 +225,7 @@ func (s *Server) flowsRoutes(w http.ResponseWriter, r *http.Request) bool {
 			return true
 		}
 	case path == "/executions" && r.Method == "GET":
-		out, e = service.Executions(ctx, scope)
+		out, e = service.ExecutionPage(ctx, scope, r.URL.Query())
 	case len(parts) >= 2 && parts[0] == "executions":
 		ex, err := service.Execution(ctx, scope, parts[1])
 		if err != nil {
@@ -210,17 +242,39 @@ func (s *Server) flowsRoutes(w http.ResponseWriter, r *http.Request) bool {
 		}
 		action := parts[2]
 		if r.Method == "POST" {
-			if action == "retry-failed-targets" {
+			if action == "restart" {
+				out, e = service.Restart(ctx, scope, ex.ID, r.Header.Get("Idempotency-Key"))
+			} else if action == "retry-failed-targets" {
 				out, e = service.Retry(ctx, scope, ex.ID, r.Header.Get("Idempotency-Key"))
 			} else {
 				out, e = service.Action(ctx, scope, ex.ID, action)
 			}
 			break
 		}
+		if action == "artifacts" && ex.KestraID != nil {
+			uri := r.URL.Query().Get("path")
+			if !flowArtifact(ex.Engine["outputs"], uri) {
+				fail(w, 403, "ARTIFACT_NOT_IN_EXECUTION_OUTPUTS")
+				return true
+			}
+			response, err := service.Engine.Request(ctx, "GET", "/executions/"+url.PathEscape(*ex.KestraID)+"/file?path="+url.QueryEscape(uri), "", nil)
+			if err != nil {
+				flowsFail(w, err)
+				return true
+			}
+			defer response.Body.Close()
+			w.Header().Set("Content-Type", "application/octet-stream")
+			w.Header().Set("Content-Disposition", "attachment")
+			io.Copy(w, response.Body)
+			return true
+		}
 		if action == "targets" {
 			out = ex.Targets
 		} else if action == "outputs" {
 			out = ex.Engine["outputs"]
+			if out == nil {
+				out = map[string]any{}
+			}
 		} else if action == "audit" {
 			out, e = service.ExecutionAudit(ctx, scope, ex.ID)
 		} else if (action == "logs" || action == "events") && ex.KestraID != nil {
@@ -245,6 +299,19 @@ func (s *Server) flowsRoutes(w http.ResponseWriter, r *http.Request) bool {
 		}
 	case len(parts) >= 1:
 		id := parts[0]
+		if len(parts) == 2 && parts[1] == "namespace-file" {
+			input := flows.NamespaceFile{Path: r.URL.Query().Get("path")}
+			if r.Method == "PUT" && !readFlowInput(w, r, &input) {
+				return true
+			}
+			out, e = service.File(ctx, scope, id, r.Method, input)
+			if e != nil {
+				flowsFail(w, e)
+			} else {
+				respond(w, 200, out)
+			}
+			return true
+		}
 		if len(parts) == 1 && r.Method == "GET" {
 			out, e = service.Flow(ctx, scope, id)
 		} else if len(parts) == 1 && r.Method == "PUT" {
@@ -276,7 +343,9 @@ func (s *Server) flowsRoutes(w http.ResponseWriter, r *http.Request) bool {
 				e = err
 				break
 			}
-			if parts[1] == "revisions" || parts[1] == "dependencies" {
+			if parts[1] == "dependencies" {
+				out, e = service.Dependencies(ctx, scope, id)
+			} else if parts[1] == "revisions" {
 				e = service.Engine.JSON(ctx, "GET", "/flows/"+url.PathEscape(f.Namespace)+"/"+url.PathEscape(f.FlowID)+"/"+parts[1], &out)
 			} else if parts[1] == "files" {
 				e = service.Engine.JSON(ctx, "GET", "/namespaces/"+url.PathEscape(f.Namespace)+"/files/directory", &out)
@@ -319,6 +388,11 @@ func (s *Server) flowStream(w http.ResponseWriter, r *http.Request, path, permis
 	for {
 		n, e := res.Body.Read(buf)
 		if n > 0 {
+			subject := subjectOf(r.Context())
+			var valid bool
+			if err := s.db.QueryRow(r.Context(), `SELECT EXISTS(SELECT 1 FROM app_user u JOIN api_session a ON a.user_id=u.id WHERE u.id::text=$1 AND u.status='active' AND u.permission_version=$2 AND a.token_hash=$3 AND a.revoked_at IS NULL AND a.expires_at>now())`, subject.ID, subject.Version, subject.SessionID).Scan(&valid); err != nil || !valid {
+				return
+			}
 			if len(flowScope(r, permission).Projects) == 0 {
 				return
 			}
@@ -331,4 +405,27 @@ func (s *Server) flowStream(w http.ResponseWriter, r *http.Request, path, permis
 			return
 		}
 	}
+}
+
+func flowArtifact(value any, path string) bool {
+	if !strings.HasPrefix(path, "kestra://") {
+		return false
+	}
+	switch v := value.(type) {
+	case string:
+		return v == path
+	case []any:
+		for _, x := range v {
+			if flowArtifact(x, path) {
+				return true
+			}
+		}
+	case map[string]any:
+		for _, x := range v {
+			if flowArtifact(x, path) {
+				return true
+			}
+		}
+	}
+	return false
 }

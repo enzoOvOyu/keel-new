@@ -425,6 +425,25 @@ func main() {
 		}()
 	}
 	s := &Server{db: db, objects: objects, bucket: bucket, project: env("KEEL_PROJECT_ID", "proj-b300-demo"), flows: flowService}
+	if address := os.Getenv("KEEL_AGENT_ENROLL_ADDR"); address != "" {
+		enrollment := &http.Server{Addr: address, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 20 * time.Second, WriteTimeout: 20 * time.Second, Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path != "/api/v1/flows/agents/register" {
+				http.NotFound(w, r)
+				return
+			}
+			s.flowsInternal(w, r)
+		})}
+		go func() { <-ctx.Done(); enrollment.Close() }()
+		go func() {
+			if err := enrollment.ListenAndServeTLS(os.Getenv("KEEL_AGENT_SERVER_CERT"), os.Getenv("KEEL_AGENT_SERVER_KEY")); err != nil && err != http.ErrServerClosed {
+				log.Print("agent enrollment TLS stopped")
+			}
+		}()
+	}
+
+	if flowService.Engine.Base != "" {
+		go flowService.SyncLoop(ctx)
+	}
 	go s.worker(ctx)
 	srv := &http.Server{Addr: env("LISTEN_ADDR", "127.0.0.1:8081"), Handler: s, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 60 * time.Second, WriteTimeout: 60 * time.Second, MaxHeaderBytes: 1 << 20}
 	go func() {

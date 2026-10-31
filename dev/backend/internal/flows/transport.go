@@ -27,6 +27,7 @@ type Task struct {
 	Timeout int    `json:"timeout_seconds"`
 }
 type Result struct {
+	Digest string `json:"request_digest,omitempty"`
 	ID     string `json:"id"`
 	State  string `json:"state"`
 	Exit   int    `json:"exit_code"`
@@ -118,7 +119,11 @@ func RunSSH(ctx context.Context, host string, port int, user, keyRef, knownRef s
 	if task.Kind == "python" {
 		script = "python3 -"
 	}
-	session.Stdin = strings.NewReader(task.Command)
+	if task.Kind == "command" {
+		script = task.Command
+	} else {
+		session.Stdin = strings.NewReader(task.Command)
+	}
 	done := make(chan error, 1)
 	go func() { done <- session.Run(script) }()
 	select {
@@ -147,7 +152,7 @@ func RunSSH(ctx context.Context, host string, port int, user, keyRef, knownRef s
 	}
 	return out, nil
 }
-func (s *Service) Dispatch(ctx context.Context, token, asset string) (Result, error) {
+func (s *Service) Dispatch(ctx context.Context, token, asset string, required ...string) (Result, error) {
 	var id string
 	e := s.DB.QueryRow(ctx, `SELECT execution_id::text FROM flow_dispatch_ticket WHERE hash=$1 AND expires_at>now()`, hash(token)).Scan(&id)
 	if e != nil {
@@ -164,6 +169,9 @@ func (s *Service) Dispatch(ctx context.Context, token, asset string) (Result, er
 	if e != nil {
 		return Result{}, problem(404, "TARGET_NOT_FOUND")
 	}
+	if len(required) > 0 && required[0] != "" && required[0] != transport {
+		return Result{}, problem(409, "FROZEN_TRANSPORT_MISMATCH")
+	}
 	if state != "PENDING" {
 		return Result{}, problem(409, "TARGET_ALREADY_DISPATCHED_RECONCILE")
 	}
@@ -174,7 +182,7 @@ func (s *Service) Dispatch(ctx context.Context, token, asset string) (Result, er
 	// Recheck live lifecycle/identity before dispatch, not only the frozen selection.
 	var payload []byte
 	var revision int64
-	e = tx.QueryRow(ctx, `SELECT payload || jsonb_build_object('maintenance_state',maintenance_state,'lifecycle_state',lifecycle_state),version FROM cmdb_entity WHERE item_uid=$1 AND EXISTS(SELECT 1 FROM cmdb_asset_scope WHERE asset_id=item_uid AND project_id=$2)`, asset, r.Project).Scan(&payload, &revision)
+	e = tx.QueryRow(ctx, `SELECT payload || jsonb_build_object('maintenance_state',CASE WHEN maintenance_state='maintained' OR payload->>'maintenance_state'='maintained' OR payload->'fields'->>'maintenance_state'='maintained' THEN 'maintained' ELSE maintenance_state END,'lifecycle_state',CASE WHEN lifecycle_state='maintained' OR payload->>'lifecycle_state'='maintained' OR payload->'fields'->>'lifecycle_state'='maintained' THEN 'maintained' ELSE lifecycle_state END),version FROM cmdb_entity WHERE item_uid=$1 AND EXISTS(SELECT 1 FROM cmdb_asset_scope WHERE asset_id=item_uid AND project_id=$2)`, asset, r.Project).Scan(&payload, &revision)
 	if e != nil {
 		return Result{}, problem(404, "TARGET_NOT_FOUND")
 	}
@@ -219,7 +227,23 @@ func (s *Service) Dispatch(ctx context.Context, token, asset string) (Result, er
 	if result.State == "" {
 		result.State = "RECONCILING"
 	}
-	s.DB.Exec(context.WithoutCancel(ctx), `UPDATE flow_execution_target SET state=$3,exit_code=$4,stdout=$5,stderr=$6,ended_at=now() WHERE execution_id=$1 AND asset_id=$2`, id, asset, result.State, result.Exit, redactOutput(result.Stdout), redactOutput(result.Stderr))
+	persistCtx := context.WithoutCancel(ctx)
+	resultTx, persistErr := s.DB.Begin(persistCtx)
+	if persistErr != nil {
+		return result, persistErr
+	}
+	defer resultTx.Rollback(persistCtx)
+	_, persistErr = resultTx.Exec(persistCtx, `UPDATE flow_execution_target SET state=$3,exit_code=$4,stdout=$5,stderr=$6,ended_at=now() WHERE execution_id=$1 AND asset_id=$2`, id, asset, result.State, result.Exit, redactOutput(result.Stdout), redactOutput(result.Stderr))
+	if persistErr != nil {
+		return result, persistErr
+	}
+	_, persistErr = resultTx.Exec(persistCtx, `INSERT INTO outbox_event(id,project_id,event_type,payload) VALUES(gen_random_uuid(),$1,'flows.execution',$2)`, r.Project, raw(ProjectionEvent{Execution: id, Targets: []string{asset}, Actor: "job-service", State: result.State}))
+	if persistErr != nil {
+		return result, persistErr
+	}
+	if persistErr = resultTx.Commit(persistCtx); persistErr != nil {
+		return result, persistErr
+	}
 	return result, nil
 }
 func redactOutput(v string) string {

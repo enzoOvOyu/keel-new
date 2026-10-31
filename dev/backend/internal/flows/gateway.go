@@ -12,18 +12,24 @@ import (
 	"google.golang.org/grpc/peer"
 	"google.golang.org/protobuf/types/known/structpb"
 	"net"
+	"strings"
 	"sync"
-	"time"
 )
 
 const GatewayMethod = "/keel.agent.v1.Gateway/Connect"
 
+type AgentLog struct {
+	TaskID string `json:"task_id"`
+	Stream string `json:"stream"`
+	Chunk  string `json:"chunk"`
+}
 type AgentMessage struct {
-	Kind         string   `json:"kind"`
-	Task         *Task    `json:"task,omitempty"`
-	Result       *Result  `json:"result,omitempty"`
-	Version      string   `json:"version,omitempty"`
-	Capabilities []string `json:"capabilities,omitempty"`
+	Log          *AgentLog `json:"log,omitempty"`
+	Kind         string    `json:"kind"`
+	Task         *Task     `json:"task,omitempty"`
+	Result       *Result   `json:"result,omitempty"`
+	Version      string    `json:"version,omitempty"`
+	Capabilities []string  `json:"capabilities,omitempty"`
 }
 
 func Wire(m AgentMessage) *structpb.Struct {
@@ -69,7 +75,7 @@ func (g *Gateway) Connect(stream grpc.ServerStream) error {
 	id := cert.Subject.CommonName
 	serial := cert.SerialNumber.String()
 	var state, dbSerial string
-	if e := g.DB.QueryRow(stream.Context(), `SELECT state,certificate_serial FROM flow_agent WHERE id::text=$1`, id).Scan(&state, &dbSerial); e != nil || state != "enrolled" || dbSerial != serial {
+	if e := g.DB.QueryRow(stream.Context(), `SELECT a.state,a.certificate_serial FROM flow_agent a JOIN cmdb_entity c ON c.item_uid=a.asset_id WHERE a.id::text=$1 AND c.lifecycle_state<>'maintained' AND c.maintenance_state<>'maintained'`, id).Scan(&state, &dbSerial); e != nil || state != "enrolled" || dbSerial != serial {
 		return errors.New("agent not approved")
 	}
 	c := &agentConnection{send: make(chan AgentMessage, 8), pending: map[string]chan Result{}, done: make(chan struct{})}
@@ -91,7 +97,7 @@ func (g *Gateway) Connect(stream grpc.ServerStream) error {
 			}
 			m := Unwire(&wire)
 			var active bool
-			e := g.DB.QueryRow(stream.Context(), `SELECT state='enrolled' AND certificate_serial=$2 AND certificate_expires_at>now() FROM flow_agent WHERE id::text=$1`, id, serial).Scan(&active)
+			e := g.DB.QueryRow(stream.Context(), `SELECT a.state='enrolled' AND a.certificate_serial=$2 AND a.certificate_expires_at>now() AND c.lifecycle_state<>'maintained' AND c.maintenance_state<>'maintained' FROM flow_agent a JOIN cmdb_entity c ON c.item_uid=a.asset_id WHERE a.id::text=$1`, id, serial).Scan(&active)
 			if e != nil || !active {
 				receiveErr <- errors.New("agent revoked")
 				return
@@ -99,7 +105,21 @@ func (g *Gateway) Connect(stream grpc.ServerStream) error {
 			if m.Kind == "heartbeat" {
 				g.DB.Exec(stream.Context(), `UPDATE flow_agent SET last_heartbeat=now(),version=$2,capabilities=$3 WHERE id::text=$1`, id, m.Version, raw(m.Capabilities))
 			}
+			if m.Log != nil && len(m.Log.Chunk) <= 65536 && (m.Log.Stream == "stdout" || m.Log.Stream == "stderr") {
+				parts := strings.SplitN(m.Log.TaskID, ":", 2)
+				if len(parts) == 2 {
+					_, err := g.DB.Exec(stream.Context(), `WITH valid AS(SELECT execution_id,asset_id FROM flow_agent_task WHERE agent_id::text=$1 AND execution_id::text=$2 AND asset_id=$3), changed AS(UPDATE flow_execution_target t SET stdout=CASE WHEN $4='stdout' THEN left(t.stdout||$5,1048576) ELSE t.stdout END,stderr=CASE WHEN $4='stderr' THEN left(t.stderr||$5,1048576) ELSE t.stderr END FROM valid v WHERE t.execution_id=v.execution_id AND t.asset_id=v.asset_id AND t.state IN('RUNNING','RECONCILING') RETURNING t.execution_id,t.asset_id) UPDATE flow_agent_task a SET state='RUNNING',updated_at=now() FROM changed c WHERE a.execution_id=c.execution_id AND a.asset_id=c.asset_id`, id, parts[0], parts[1], m.Log.Stream, redactOutput(m.Log.Chunk))
+					if err != nil {
+						receiveErr <- err
+						return
+					}
+				}
+			}
 			if m.Result != nil {
+				parts := strings.SplitN(m.Result.ID, ":", 2)
+				if len(parts) == 2 && contains([]string{"SUCCESS", "FAILED", "RECONCILING"}, m.Result.State) {
+					g.DB.Exec(stream.Context(), `WITH valid AS(SELECT t.execution_id,t.asset_id FROM flow_agent_task t WHERE t.agent_id::text=$1 AND t.execution_id::text=$2 AND t.asset_id=$3), changed AS(UPDATE flow_execution_target t SET state=$4,exit_code=$5,stdout=$6,stderr=$7,ended_at=now() FROM valid v WHERE t.execution_id=v.execution_id AND t.asset_id=v.asset_id AND t.state IN('RUNNING','RECONCILING') RETURNING t.execution_id,t.asset_id) UPDATE flow_agent_task a SET state=$4,result=$8,updated_at=now() FROM changed c WHERE a.execution_id=c.execution_id AND a.asset_id=c.asset_id`, id, parts[0], parts[1], m.Result.State, m.Result.Exit, redactOutput(m.Result.Stdout), redactOutput(m.Result.Stderr), raw(m.Result))
+				}
 				c.mu.Lock()
 				ch := c.pending[m.Result.ID]
 				c.mu.Unlock()
@@ -168,5 +188,3 @@ func (g *Gateway) Serve(ctx context.Context, address string, cert tls.Certificat
 	go func() { <-ctx.Done(); server.Stop() }()
 	return server.Serve(listener)
 }
-
-var _ = time.Second
