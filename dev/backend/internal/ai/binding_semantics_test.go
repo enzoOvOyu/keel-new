@@ -146,3 +146,20 @@ func TestMixedInventoryAndConnectionUseOwnHeaders(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestExplicitDeviceTypeCannotDisappearThroughOmittedFilter(t *testing.T) {
+	s := bom.Sheet{Cells: []bom.Cell{{Row: 1, Column: 1, Value: "设备名称"}, {Row: 1, Column: 2, Value: "设备型号"}, {Row: 1, Column: 3, Value: "设备类型"}, {Row: 2, Column: 1, Value: "synthetic-device"}, {Row: 2, Column: 2, Value: "synthetic-model"}, {Row: 2, Column: 3, Value: "Switch"}}}
+	p := SheetPlan{HeaderRows: []int{1}, Tables: []TablePlan{{Kind: "planned_device", Type: "other", Start: 2, End: 2, TypeColumn: 3, Types: map[string]string{"Server": "server"}, Fields: map[string]int{"hostname": 1, "model": 2}}}}
+	normalizeExplicitBindings(s, &p)
+	if p.Tables[0].Types["Switch"] != "switch" {
+		t.Fatal("literal source type lost")
+	}
+	if err := CheckExtraction(s, p); err != nil {
+		t.Fatal(err)
+	}
+	s.Cells[5].Value = "unresolved-type"
+	normalizeExplicitBindings(s, &p)
+	if CheckExtraction(s, p) == nil {
+		t.Fatal("unknown source type guessed")
+	}
+}

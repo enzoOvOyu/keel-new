@@ -172,6 +172,33 @@ func normalizeExplicitBindings(s bom.Sheet, p *SheetPlan) {
 				}
 			}
 		}
+		// Preserve literal supported device types omitted from the model's
+		// filter. No inference from model numbers and no duplicate extractor.
+		typeHeader := strings.ToLower(strings.ReplaceAll(strings.TrimSpace(heads[t.TypeColumn].Value), " ", ""))
+		if t.Kind == "planned_device" && t.TypeColumn > 0 && (typeHeader == "设备类型" || typeHeader == "devicetype" || typeHeader == "type") {
+			for _, cell := range s.Cells {
+				if cell.Column != t.TypeColumn || cell.Row < t.Start || cell.Row > t.End || cell.Sensitive {
+					continue
+				}
+				value := strings.TrimSpace(cell.Value)
+				kind := strings.ToLower(value)
+				if kind != "server" && kind != "switch" && kind != "router" {
+					continue
+				}
+				covered := false
+				for _, other := range p.Tables {
+					if other.Kind == t.Kind && cell.Row >= other.Start && cell.Row <= other.End && (other.TypeColumn == 0 || other.TypeColumn == t.TypeColumn && other.Types[value] != "") {
+						covered = true
+					}
+				}
+				if !covered {
+					if t.Types == nil {
+						t.Types = map[string]string{}
+					}
+					t.Types[value] = kind
+				}
+			}
+		}
 		normalizeRowKeys(t)
 	}
 }
