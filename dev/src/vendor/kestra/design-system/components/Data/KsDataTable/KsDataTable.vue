@@ -1,3 +1,4 @@
+<!-- Keel modification: trailing whitespace normalized; source otherwise unchanged. -->
 <template>
     <template v-if="$slots.empty && hasEmpty && showEmpty">
         <slot name="empty" />
@@ -136,11 +137,11 @@
     })
 
     export interface SortItem {
-        column: any; 
-        prop: string | null; 
+        column: any;
+        prop: string | null;
         order: string | null
     }
-    
+
 
     const emit = defineEmits<{
         "page-changed": [payload: {page: number; size: number}]

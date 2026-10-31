@@ -46,7 +46,7 @@
 <script setup lang="ts">
     import {ref} from "vue"
 
-    
+
     import KsExecutionStatus from "./design-system/components/Data/KsExecutionStatus/KsExecutionStatus.vue"
 
     import ArrowExpand from "vue-material-design-icons/ArrowExpand.vue"
