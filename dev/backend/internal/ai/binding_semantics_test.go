@@ -109,3 +109,20 @@ func TestPointSummaryWithoutPortHeadersMayRemainReference(t *testing.T) {
 		t.Fatal("summary forced to invent a physical cable", err)
 	}
 }
+
+func TestRepeatedOpticHeadersFollowBoundEndpointSide(t *testing.T) {
+	s := bom.Sheet{}
+	for row, values := range [][]string{{"设备名称", "端口号", "模块型号", "设备名称", "端口号", "模块型号"}, {"synthetic-left", "p1", "synthetic-module-left", "synthetic-right", "p2", "synthetic-module-right"}} {
+		for col, v := range values {
+			s.Cells = append(s.Cells, bom.Cell{Row: row + 1, Column: col + 1, Value: v})
+		}
+	}
+	p := SheetPlan{HeaderRows: []int{1}, Tables: []TablePlan{{Kind: "physical_connection", Type: "cable", Start: 2, End: 2, Fields: map[string]int{"endpoint_a_device": 4, "endpoint_a_port": 5, "endpoint_b_device": 1, "endpoint_b_port": 2}}}}
+	normalizeExplicitBindings(s, &p)
+	if p.Tables[0].Fields["endpoint_a_optic"] != 6 || p.Tables[0].Fields["endpoint_b_optic"] != 3 {
+		t.Fatal("modules not associated with explicit bound side")
+	}
+	if err := CheckExtraction(s, p); err != nil {
+		t.Fatal(err)
+	}
+}

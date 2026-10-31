@@ -141,6 +141,21 @@ func normalizeExplicitBindings(s bom.Sheet, p *SheetPlan) {
 				t.Fields[f] = columns[f][0]
 			}
 		}
+		// Repeated module headers belong to their explicit device/port group.
+		// Use the already-bound side device, never assume A is the left side.
+		if t.Kind == "physical_connection" && dualEndpointHeaders(columns) && len(columns["model"]) == 2 {
+			devices, ports, models := columns["hostname"], columns["port_index"], columns["model"]
+			if devices[0] < ports[0] && ports[0] < models[0] && models[0] < devices[1] && devices[1] < ports[1] && ports[1] < models[1] {
+				for _, side := range []string{"a", "b"} {
+					field := "endpoint_" + side + "_optic"
+					for k, device := range devices {
+						if t.Fields[field] == 0 && t.Fields["endpoint_"+side+"_device"] == device && t.Fields["endpoint_"+side+"_port"] == ports[k] {
+							t.Fields[field] = models[k]
+						}
+					}
+				}
+			}
+		}
 		normalizeRowKeys(t)
 	}
 }
