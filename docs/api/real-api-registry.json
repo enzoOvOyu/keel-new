@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "updated_at": "2026-10-31",
+  "coverage": "Only visualization operations audited here. Unregistered operations are not assessed, not necessarily unimplemented.",
+  "schema_authority": "docs/openapi.yaml",
+  "code_revision": "4541850",
+  "deployed_revision": "4541850",
+  "deployment_evidence": "docs/topology/deployment-validation.json",
+  "operations": [
+    {
+      "method": "get",
+      "path": "/cmdb/visualization/subgraph",
+      "operation_id": "getCMDBVisualSubgraph",
+      "response_schema": "InfrastructureSubgraph",
+      "implementation": "implemented",
+      "deployment": "deployed",
+      "verification": "startup_http_200",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb/visual_queries.go",
+      "service": "VisualSubgraph",
+      "documentation": "docs/api/visualization.md"
+    },
+    {
+      "method": "get",
+      "path": "/cmdb/visualization/matrix",
+      "operation_id": "getCMDBVisualMatrix",
+      "response_schema": "InfrastructureMatrix",
+      "implementation": "implemented",
+      "deployment": "deployed",
+      "verification": "startup_http_200",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb/visual_queries.go",
+      "service": "VisualMatrix",
+      "documentation": "docs/api/visualization.md"
+    },
+    {
+      "method": "get",
+      "path": "/cmdb/visualization/connections",
+      "operation_id": "getCMDBVisualConnections",
+      "response_schema": "InfrastructureSubgraph",
+      "implementation": "implemented",
+      "deployment": "deployed",
+      "verification": "startup_http_200",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb/visual_queries.go",
+      "service": "VisualConnections",
+      "documentation": "docs/api/visualization.md"
+    },
+    {
+      "method": "post",
+      "path": "/cmdb/visualization/trace",
+      "operation_id": "queryCMDBPhysicalTrace",
+      "response_schema": "InfrastructureTrace",
+      "implementation": "implemented",
+      "deployment": "deployed",
+      "verification": "startup_http_200",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb/visual_queries.go",
+      "service": "VisualTrace",
+      "documentation": "docs/api/visualization.md",
+      "request_schema": "InfrastructureTraceRequest"
+    },
+    {
+      "method": "get",
+      "path": "/cmdb/visualization",
+      "operation_id": "getCMDBVisualization",
+      "response_schema": "InfrastructureSnapshot",
+      "implementation": "implemented",
+      "deployment": "deployed",
+      "verification": "not_probed_in_latest_startup_check",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb/visualization.go",
+      "service": "VisualizationDetail",
+      "documentation": "docs/api/visualization.md"
+    }
+  ]
+}

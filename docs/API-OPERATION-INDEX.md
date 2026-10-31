@@ -1,5 +1,8 @@
 # 当前 API 操作索引
 
+> 当前实现与接续入口：[HANDOFF](../HANDOFF.md)、[真实 API 契约台账](REAL-API-CONTRACTS.md)。设计目录不代表接口已实现或已部署；以台账中的范围和验证证据为准。
+
+
 由当前 openapi.yaml 提取，base URL 为 /api/v1。路径为HTTP路由。BOM真实实施见BOM-REAL-DESIGN；操作存在不等于其他模块已有Go实现。
 
 | 方法 | 路径 | operationId | 状态 |

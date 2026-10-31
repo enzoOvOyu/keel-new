@@ -1,5 +1,8 @@
 # keel API Conventions
 
+> 当前实现与接续入口：[HANDOFF](../HANDOFF.md)、[真实 API 契约台账](REAL-API-CONTRACTS.md)。设计目录不代表接口已实现或已部署；以台账中的范围和验证证据为准。
+
+
 **Status**: normative. HTTP handlers, generated frontend types, integration tests and docs must follow this contract. Detailed endpoint schemas live in `openapi.yaml`; if prose and OpenAPI differ, record and resolve the discrepancy before implementation.
 
 ## 1. Protocol and naming

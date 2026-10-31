@@ -1,5 +1,8 @@
 # keel v3.4 Mock-first 数据演示包
 
+> 当前实现与接续入口：[HANDOFF](../HANDOFF.md)、[真实 API 契约台账](REAL-API-CONTRACTS.md)。设计目录不代表接口已实现或已部署；以台账中的范围和验证证据为准。
+
+
 ## 必读入口
 1. 根目录 `AGENTS.md`：执行约束和全局决策。
 2. `docs/README.md`：文档权威顺序与当前开发策略。

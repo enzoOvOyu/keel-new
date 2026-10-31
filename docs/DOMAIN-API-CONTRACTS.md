@@ -1,5 +1,8 @@
 # DOMAIN-API-CONTRACTS.md — 前端全量 API 资源契约
 
+> 当前实现与接续入口：[HANDOFF](../HANDOFF.md)、[真实 API 契约台账](REAL-API-CONTRACTS.md)。设计目录不代表接口已实现或已部署；以台账中的范围和验证证据为准。
+
+
 > 本文定义 mock-first 阶段前端所需的核心资源模型和操作语义。`openapi.yaml` 是 HTTP wire contract；本文是资源字段/行为的补充说明。若字段冲突，以经审核后的 OpenAPI schema 为准，并同步修订本文。
 
 ## 1. 通用响应
