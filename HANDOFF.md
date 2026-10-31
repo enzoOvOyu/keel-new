@@ -116,3 +116,4 @@
 - 新分支 `feat/jobs-kestra-ui`、独立目录 `/home/ubuntu/keel-kestra-ui-dev`；现有5180/8081未切换到新工作区。
 - 用户要求先提交替换方案，见[Kestra UI替换](docs/flows-redesign/KESTRA-UI-REPLACEMENT.md)。原生Vue组件复用为推荐路线，当前仅源码审查及设计，尚未实施界面替换。
 - 分支携带Quick Run版本冻结、完整原生模板转换、Files脚本载入等未部署修复；之前的构建/定向测试通过不代表原生Vue模块已验收。
+- 用户进一步要求纳入Kestra中有用的遗漏信息页；替换方案已增加LC-01…14：执行时间线/Attempt、恢复重跑、变量文件、指标、依赖、Flow日志/趋势/并发、调度补跑、异常等待视图、全局日志、源码Docs及历史导航。源码中的Enterprise锁定demo页已区分，不计为可直接复用的真实能力；均为方案增补，尚未实现。

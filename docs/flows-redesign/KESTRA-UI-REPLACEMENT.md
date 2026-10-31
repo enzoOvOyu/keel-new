@@ -105,3 +105,67 @@ React路由在`/flows/*`挂载一个Vue应用，提供mount/update/unmount接口
 - `ui/src/override/components/flows/panelDefinition.ts`
 - `ui/src/components/executions/{Executions,ExecutionRoot,Gantt}.vue`
 - `ui/src/components/logs/LogsWrapper.vue`
+
+## 增补：执行生命周期与运维信息页（用户最新纳入范围）
+
+本节扩展前面的六个Execution标签与七个Flow标签，不删除原有能力。依据同一上游commit的 `executionTabs.ts`、`flowTabs.ts`、`useExecutionRoot.ts`、`RunTimeline.vue`、`FlowTriggers.vue`、`FlowConcurrency.vue` 及相关动作组件，已实际查阅源码。以下均为规划纳入，尚未开发或部署。
+
+### 页面入口与密度
+
+仍保留作业平台、Executions、Agents三个侧栏入口。新增能力进入列表视图、Flow上下文或Execution上下文。常用标签固定，低频标签放同一标签栏的“更多”，每项仍有独立URL和深链接；不把十几个标签挤成多行。
+
+- 作业平台默认Flow目录；支持进入“源码搜索”。Flow详情固定总览、编辑、执行、触发器；更多：版本、依赖、日志、指标、并发；Files/模板/Docs继续嵌入编辑器。
+- Executions提供记录、运行概况、异常/等待视图、跨执行日志；“异常/等待”是同一授权查询的保存视图，不另建执行库。运行概况消费真实聚合，不新增与全局运维Dashboard重复的主菜单。
+- Execution详情固定总览、Targets、Gantt/任务、日志、变量与输出；更多：Metrics、Dependencies、Audit/Context。Topology与Gantt互相切换并保留所选任务。原有Artifacts进入变量/文件浏览。
+
+### 新增页面与交互矩阵
+
+| 编号 | 纳入能力与入口 | 对Keel的具体价值及交互 | 上游依据/性质 | 数据与实现前提 |
+|---|---|---|---|---|
+| LC-01 | Execution总览：状态历史时间线 | 显示创建、排队、运行、暂停、继续、终止与结束的真实发生时间；区分排队时长/执行时长。选事件定位相关Attempt、日志或审计 | `overview/Overview.vue`、`RunTimeline.vue`，原生能力 | 引擎state.histories与Keel操作审计分别保留，禁止前端时间动画生成状态 |
+| LC-02 | TaskRun/Attempt详情 | 点击任务打开迭代值、开始结束时间、每次Attempt、错误、超时、Worker引用与对应日志；循环中的单设备失败可精准定位 | `TaskRunLine.vue`、`TaskRunActions.vue`、`logs/TaskRunDetails.vue`、`WorkerInfo.vue` | 引擎TaskRun和设备Task需显式关联；Worker不是设备Agent，不能混为同一身份 |
+| LC-03 | 恢复与重跑操作工作区 | 暂停/恢复/终止、失败目标重试、全部重跑、修改输入后新运行分开；确认页显示设备范围、Revision、前后输入差异、审批和重复执行风险 | Pause/Resume/Restart、`ReplayWithInputs.vue`、`ResumeFromBreakpoint.vue` | 设备执行必须走Keel预检及审批。Replay/从节点恢复/跳过任务只有具备幂等和明确目标恢复契约后开放，不直通引擎API |
+| LC-04 | 执行变量与文件浏览 | 树形查看Inputs、任务输出、迭代输出、类型和文件；支持搜索、复制、文件预览/下载，定位产出任务和源Revision | `outputs/ExecutionVariableExplorer.vue`、`FilePreviewDrawer.vue`、`VarValue.vue` | 变量先脱敏；密钥输入不展示原文。只下载属于当前授权Execution的资源，HTML等文件采用安全预览 |
+| LC-05 | Execution Metrics页 | 展示任务上报计数、耗时、结果数量等带单位指标，按任务/时间筛选，并链接日志。无样本显示未上报 | `ExecutionMetric.vue`、Metrics/MetricsTable | 只消费引擎或任务实际指标；不把它替代Fleet GPU/BMC监控，也不伪造CPU/显存曲线 |
+| LC-06 | Execution Dependencies页 | 展示父子执行、Subflow、重试/重跑谱系、触发来源；点节点查看对应执行，保留返回路径 | `dependencies/Dependencies.vue`、执行Dependencies标签 | 项目授权逐节点过滤；未知外部节点不泄露标识。重试谱系是Keel扩展，不能只凭时间相近推定关系 |
+| LC-07 | Flow日志页 | 跨该Flow多次执行检索错误/任务日志，筛选后跳到精确Execution/TaskRun/Attempt，减少逐个打开执行 | `flowTabs.ts`的logs、`LogsWrapper.vue` | Go提供授权范围内跨执行日志查询、游标/时间窗；不让浏览器遍历全部执行拼接结果 |
+| LC-08 | Flow指标与运行趋势页 | 成功/失败/警告分布、执行次数、耗时分布/趋势、目标失败数、重试次数，按时间/Revision查看 | `FlowMetrics.vue`、Flow Overview；目标汇总为Keel扩展 | 分母与时间窗明确；Kestra成功率与设备成功率分开。P50/P95只有足够实际样本时呈现，不设未经确认的SLO |
+| LC-09 | Flow并发与排队页 | 展示正在运行、待运行、Flow并发限制、目标并发及阻塞原因；链接排队执行，查看限制变更 | `FlowConcurrency.vue`、`admin/ConcurrencyLimits.vue` | 项目级视图默认只读；变更需独立授权和审计。取消排队与强制越过并发是不同动作；不默认开放Force Run/Unqueue绕过控制 |
+| LC-10 | Triggers详情及历史补跑工作区 | 触发类型、启停、上次/下次触发、触发日志、关联执行、错误；Cron补跑选择历史区间并预览次数，支持暂停/恢复/取消 | `FlowTriggers.vue`、`BackfillBanner.vue`、TriggerVars、TriggerEnableDialog | 设备补跑每次生成当前授权范围的独立作业，重新预检审批；不能用引擎原生backfill绕过JobService。下次时间来自引擎，不前端猜算 |
+| LC-11 | Executions运行概况与异常/等待视图 | 运行中、失败、暂停、排队、超时、RECONCILING的紧凑汇总，点击进入对应筛选；批量处置先显示每项可操作性和结果 | `Executions.vue`统计与批量动作；RECONCILING为Keel扩展 | 不强行把通道失联改成引擎失败。批量权限/目标/版本分别核验，不以一项成功代替全批 |
+| LC-12 | 跨执行日志检索 | Executions内“日志”视图，按项目、Flow、执行、设备、任务、等级、时间检索并跳转详情；支持导出当前授权范围结果 | 上游 `/logs` 与 `LogsWrapper.vue`；Keel将其收进Executions | 替代旧“仅单Execution日志”的范围限制；独立日志查询API，不新增侧栏Logs菜单 |
+| LC-13 | Flow源码搜索与插件Docs | 查找脚本/任务类型/输入引用，打开对应Flow Revision；节点选择时显示实际插件说明、参数及示例 | `FlowsSearch.vue`、PluginListWrapper、编辑器Docs面板 | 检索须排除秘密；只展示真实可用的任务Schema和插件，不将整个上游插件目录等同Keel可执行能力 |
+| LC-14 | 执行历史快速导航与版本追溯 | 同一Flow上一条/下一条执行、相同筛选返回、源Revision跳转；新运行可从历史输入生成待确认草稿 | `overview/components/main/PrevNext.vue`、FlowRevisions、ReplayWithInputs | 时间相同需稳定ID排序；每个相邻执行重新授权。不能把原审批、票据或凭据复制进新运行 |
+
+### 不直接复制的页面及原因
+
+源码 `executionTabs.ts` 的Audit/Assets和 `flowTabs.ts` 的Promote/Audit，以及routes中的部分IAM、Instance、Policies等，指向 `components/demo/*` 并标注locked。这些是上游开源前端的演示入口，不是可直接交付的开源完整能力。
+
+- Audit保留Keel真实审计；Assets保留Keel CMDB/设备/报告关联，用原生组件展示，不引入第二资产库。
+- Promote/跨环境发布可保留后续产品议题，本次不开放生产环境发布流程；用户当前要的是执行生命周期管理。
+- Instance/Worker全局管理不作为普通用户页面。TaskRun已有的Worker只读诊断信息纳入LC-02；完整引擎节点管理需管理员权限、实际运行数据与能力核验。
+- 不开放手工Change Status伪造设备通过、强制运行绕过并发、删除原始执行证据或清空设备计数器。界面可展示原生状态与错误，但状态结论必须来自真实执行/验证。
+- Apps、MCP、AI聊天、企业租户/IAM、通用KV和完整Namespace管理与本次作业替换无直接关系；Keel已有AI/RBAC/项目/凭据域，不重复引入。
+
+### 新增API影响清单（设计，尚未冻结OpenAPI）
+
+沿用 `/api/v1/flows`，资源专用Schema需在实现之前写入OpenAPI及生成类型。本节只登记缺口，不宣称接口已存在。
+
+| 查询或操作 | 必要返回/约束 |
+|---|---|
+| execution lifecycle / task-runs / attempts | 状态历史、时间、迭代、错误、每Attempt、worker引用及目标映射；不能仅用当前状态推算历史 |
+| execution variables / files / metrics / dependencies | 脱敏变量树、文件授权引用、带单位的实际指标、带关系类型的执行谱系 |
+| scoped log search / flow source search | 项目/Flow/Execution/TaskRun/设备/时间过滤，服务器分页、游标与授权导出 |
+| flow execution statistics / concurrency | 明确时间窗和分母的聚合、运行/等待队列、限制、排队原因；区分Flow/目标/Worker |
+| trigger details / histories / backfill preview & jobs | 实际触发记录、下次计划、关联Execution、补跑范围/数量/任务状态/逐次预检；不把一次审批当长期补跑授权 |
+| replay request / scoped batch actions | 新的冻结目标/输入/Revision/审批/幂等键；逐项结果，已接受且结果未知时不重复执行 |
+
+高频更新仍按Execution SSE、日志流、页面按需或低频聚合查询分工。历史指标/日志查询不按所有页面统一5秒轮询；没有已确认保留策略/SLO时不自行规定生产默认。
+
+### 开发与验收次序增补
+
+1. 与核心Execution详情一起实现LC-01/02/04/14，形成“看状态→找Attempt→看日志/输出→追溯Revision”的排障路径。
+2. 接入LC-05/06/07/08/12/13，完成指标、依赖和跨执行检索，聚合与查询接口先明确再启用界面。
+3. 实现LC-03/09/10/11的处置和调度管理，先补齐状态/权限/幂等/审批契约，再开放有副作用的操作。
+
+验收额外覆盖：暂停恢复历史、循环某次Attempt失败、排队原因、RECONCILING不盲目重发、变量脱敏/文件权限、失败目标重试与全部重跑区别、历史补跑不绕过审批、跨项目日志与依赖隔离。用户闭环验收与开发必要检查分开记录；不以演示页或图表渲染证明后端能力完成。
