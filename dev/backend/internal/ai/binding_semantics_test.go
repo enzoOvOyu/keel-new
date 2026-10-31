@@ -178,3 +178,39 @@ func TestChangedHeaderIsNotReportedAsMissingType(t *testing.T) {
 		t.Fatal("mixed layout misdiagnosed as missing category", err)
 	}
 }
+
+func TestFullNormalizationKeepsThreeIndependentTableLayouts(t *testing.T) {
+	s := bom.Sheet{}
+	for row, vs := range [][]string{{"资产编号", "设备角色", "设备名称", "设备类型", "品牌", "设备型号", "SN"}, {"synthetic-id", "synthetic-role", "synthetic-a", "Switch", "synthetic-brand", "synthetic-model", "synthetic-sn"}, {"资产编号", "主机名", "角色", "型号", "SN"}, {"synthetic-id-b", "synthetic-b", "synthetic-role", "synthetic-model", "synthetic-sn-b"}, {"设备名称", "端口号", "线缆类型", "模块型号", "设备名称", "端口号", "线缆类型", "模块型号"}, {"synthetic-a", "p1", "synthetic-cable", "synthetic-optic", "synthetic-b", "p2", "synthetic-cable", "synthetic-optic"}} {
+		for col, v := range vs {
+			s.Cells = append(s.Cells, bom.Cell{Row: row + 1, Column: col + 1, Value: v})
+		}
+	}
+	p := SheetPlan{HeaderRows: []int{1, 3, 5}, Tables: []TablePlan{
+		{Kind: "planned_device", Type: "switch", Start: 2, End: 2, Fields: map[string]int{"hostname": 3, "model": 6, "serial": 7}},
+		{Kind: "planned_device", Type: "server", Start: 4, End: 4, Fields: map[string]int{"hostname": 2, "model": 4, "serial": 5}},
+		{Kind: "physical_connection", Type: "cable", Start: 6, End: 6, Fields: map[string]int{"endpoint_a_device": 1, "endpoint_a_port": 2, "endpoint_b_device": 5, "endpoint_b_port": 6, "media_type": 3}},
+	}}
+	normalizeSourceBindings(s, &p)
+	if p.Tables[0].Fields["hostname"] != 3 || p.Tables[1].Fields["hostname"] != 2 {
+		t.Fatal("identity rewritten using another region")
+	}
+	if err := CheckExtraction(s, p); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestMixedTableSchemaAllowsLaterHostnameColumn(t *testing.T) {
+	s := bom.Sheet{Cells: []bom.Cell{{Row: 1, Column: 3, Value: "设备名称"}, {Row: 1, Column: 6, Value: "设备型号"}, {Row: 1, Column: 8, Value: "SN"}, {Row: 12, Column: 2, Value: "主机名"}, {Row: 12, Column: 4, Value: "型号"}, {Row: 12, Column: 6, Value: "SN"}}}
+	var node any = extractionResponseFormat(s)
+	for _, key := range []string{"json_schema", "schema", "properties", "plan", "properties", "tables", "items", "properties", "fields", "properties", "hostname", "enum"} {
+		node = node.(map[string]any)[key]
+	}
+	found := map[int]bool{}
+	for _, col := range node.([]int) {
+		found[col] = true
+	}
+	if !found[2] || !found[3] {
+		t.Fatal("provider schema prohibits the later table's hostname column")
+	}
+}

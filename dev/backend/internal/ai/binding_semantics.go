@@ -11,8 +11,9 @@ import (
 // Recover explicit table headers independently of the model's chosen header row.
 // Only repair an existing extractor: this never invents a table or source value.
 func sourceHeaders(s bom.Sheet, p SheetPlan, tableStart ...int) map[int]bom.Cell {
+	scoped := len(tableStart) > 0 && tableStart[0] > 1
 	limit := 50
-	if len(tableStart) > 0 {
+	if scoped {
 		limit = tableStart[0] - 1
 	}
 	declared := map[int]bool{}
@@ -27,7 +28,7 @@ func sourceHeaders(s bom.Sheet, p SheetPlan, tableStart ...int) map[int]bom.Cell
 	}
 	best := 0
 	for row, score := range scores {
-		if len(tableStart) > 0 {
+		if scoped {
 			if (score >= 3 || declared[row] && score > 0) && row > best {
 				best = row
 			}
@@ -38,12 +39,12 @@ func sourceHeaders(s bom.Sheet, p SheetPlan, tableStart ...int) map[int]bom.Cell
 		}
 	}
 	rows := map[int]bool{}
-	if len(tableStart) == 0 {
+	if !scoped {
 		for _, row := range p.HeaderRows {
 			rows[row] = true
 		}
 	}
-	if scores[best] >= 3 || len(tableStart) > 0 && declared[best] {
+	if scores[best] >= 3 || scoped && declared[best] {
 		rows[best] = true
 	}
 	out := map[int]bom.Cell{}

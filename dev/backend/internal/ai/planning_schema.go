@@ -17,7 +17,7 @@ func extractionResponseFormat(sheet bom.Sheet) map[string]any {
 	fields := map[string]any{}
 	scores := map[int]int{}
 	for _, cell := range sheet.Cells {
-		if cell.Row <= 8 && !cell.Sensitive && bom.Field(cell.Value) != "" {
+		if !cell.Sensitive && bom.Field(cell.Value) != "" {
 			scores[cell.Row]++
 		}
 	}
@@ -30,9 +30,17 @@ func extractionResponseFormat(sheet bom.Sheet) map[string]any {
 	sourceColumns := map[string][]int{}
 	if scores[best] >= 2 {
 		for _, cell := range sheet.Cells {
-			if cell.Row == best && !cell.Sensitive {
+			if (cell.Row == best || scores[cell.Row] >= 3) && !cell.Sensitive {
 				if field := bom.Field(cell.Value); field != "" {
-					sourceColumns[field] = append(sourceColumns[field], cell.Column)
+					seen := false
+					for _, col := range sourceColumns[field] {
+						if col == cell.Column {
+							seen = true
+						}
+					}
+					if !seen {
+						sourceColumns[field] = append(sourceColumns[field], cell.Column)
+					}
 				}
 			}
 		}

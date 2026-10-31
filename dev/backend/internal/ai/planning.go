@@ -274,19 +274,14 @@ func inspectExtraction(s bom.Sheet, plan SheetPlan) error {
 	if err := inspectBindingSemantics(s, plan); err != nil {
 		return err
 	}
-	headers := map[int]bom.Cell{}
-	canonical := map[string][]int{}
-	for _, row := range plan.HeaderRows {
-		for _, c := range s.Cells {
-			if c.Row == row {
-				headers[c.Column] = c
-				if f := bom.Field(c.Value); f != "" {
-					canonical[f] = append(canonical[f], c.Column)
-				}
+	for _, t := range plan.Tables {
+		headers := sourceHeaders(s, plan, t.Start)
+		canonical := map[string][]int{}
+		for col, c := range headers {
+			if f := bom.Field(c.Value); f != "" {
+				canonical[f] = append(canonical[f], col)
 			}
 		}
-	}
-	for _, t := range plan.Tables {
 		if t.Kind == "reference" {
 			continue
 		}
@@ -330,26 +325,22 @@ func CheckExtraction(s bom.Sheet, plan SheetPlan) error { return inspectExtracti
 // create values. Ambiguous aliases still remain candidates, never formal assets.
 func normalizeSourceBindings(s bom.Sheet, p *SheetPlan) {
 	normalizeExplicitBindings(s, p)
-	heads := map[int]string{}
-	sourceLabels := map[int]string{}
-	columns := map[string][]int{}
-	labels := []int{}
-	for _, row := range p.HeaderRows {
-		for _, c := range s.Cells {
-			if c.Row == row {
-				heads[c.Column] = bom.Field(c.Value)
-				sourceLabels[c.Column] = strings.ToLower(strings.ReplaceAll(strings.TrimSpace(c.Value), " ", ""))
-				if heads[c.Column] != "" {
-					columns[heads[c.Column]] = append(columns[heads[c.Column]], c.Column)
-				}
-				if heads[c.Column] == "hostname" {
-					labels = append(labels, c.Column)
-				}
-			}
-		}
-	}
 	for j := range p.Tables {
 		t := &p.Tables[j]
+		heads := map[int]string{}
+		sourceLabels := map[int]string{}
+		columns := map[string][]int{}
+		labels := []int{}
+		for col, c := range sourceHeaders(s, *p, t.Start) {
+			heads[col] = bom.Field(c.Value)
+			sourceLabels[col] = strings.ToLower(strings.ReplaceAll(strings.TrimSpace(c.Value), " ", ""))
+			if heads[col] != "" {
+				columns[heads[col]] = append(columns[heads[col]], col)
+			}
+			if heads[col] == "hostname" {
+				labels = append(labels, col)
+			}
+		}
 		if t.Types == nil {
 			t.Types = map[string]string{}
 		}
@@ -440,6 +431,10 @@ func normalizeSourceBindings(s bom.Sheet, p *SheetPlan) {
 		t := &p.Tables[j]
 		if t.Kind != "component" || (t.Type != "optic_module" && t.Type != "electrical_module") {
 			continue
+		}
+		heads := map[int]string{}
+		for col, c := range sourceHeaders(s, *p, t.Start) {
+			heads[col] = bom.Field(c.Value)
 		}
 		for _, field := range []string{"model", "name", "specification"} {
 			col := t.Fields[field]

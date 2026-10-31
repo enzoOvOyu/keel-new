@@ -48,8 +48,14 @@ func (p *Provider) PlanSheetWithWorkbook(ctx context.Context, ir *bom.WorkbookIR
 	input["regions"] = regions
 	input["allowed_fields"] = bom.ImportFields()
 	headerBindings := []any{}
+	headerScores := map[int]int{}
 	for _, c := range s.Cells {
-		if c.Row <= 8 && !c.Sensitive {
+		if !c.Sensitive && bom.Field(c.Value) != "" {
+			headerScores[c.Row]++
+		}
+	}
+	for _, c := range s.Cells {
+		if (c.Row <= 8 || headerScores[c.Row] >= 3) && !c.Sensitive {
 			if field := bom.Field(c.Value); field != "" {
 				headerBindings = append(headerBindings, map[string]any{"row": c.Row, "column": c.Column, "field": field})
 			}
