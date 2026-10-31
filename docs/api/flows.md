@@ -1,4 +1,4 @@
-# Flows 真实 API 使用契约
+# 作业平台（Flows）真实 API 使用契约
 
 2026-10-31 · `feat/flows-redesign` · 范围仅 Flows/Executions/Agents。字段唯一权威为 [OpenAPI](../openapi.yaml)，前端类型由它生成，不能在本文件复制第二套 DTO。
 
@@ -7,7 +7,7 @@
 - HTTP 前缀 `/api/v1`；页面只调用 `dev/src/lib/api/flows.ts`。Go 路由 `cmd/api/flows.go`，领域服务 `internal/flows/`，迁移021…024。完整实施与限制见 [实施记录](../flows-redesign/implementation.md)。
 - Kestra **2.0.7** 是 Flow/YAML/Revision/Trigger/Execution/TaskRun 的权威；PostgreSQL 保存项目授权、绑定、冻结目标、通道结果、Agent、SSH受控引用、审计与 Outbox，不复制 CMDB 资产。
 - CMDB稳定ID与`cmdb_asset_scope`是目标/项目归属来源。执行快照不随CMDB后续改名变化。Outbox向既有CMDB生命周期追加引用，不改变六阶段结论。
-- 当前经用户授权部署于原入口5180/API8081，运行源码9f16065（含已有BOM修复）；临时5190/8096已关闭。Kestra8095为内部依赖，运行与回退见HANDOFF发布节。
+- 当前沿用5180/API8081，后端为BOM v5集成版本，准确源码和回退以HANDOFF顶部为准。本轮前端整改由5180的开发服务加载，以下新增后端能力尚未发布；禁止用旧分支二进制覆盖BOM修复。
 
 ## 授权、请求与一致性
 
@@ -105,3 +105,16 @@ Bootstrap需运维预置root可信helper、包摘要及HTTPS分发，未对生�
 
 
 开发补齐证据：[新增运行检查](../flows-redesign/completion-runtime-validation.json)、[新增页面检查](../flows-redesign/completion-ui-validation.json)。这与原生产环境部署、真实设备验收是不同状态。
+
+
+## 2026-10-31 UI 整改关联契约增量（后端待部署）
+
+- 界面统一名「作业平台」，技术路由和权限前缀仍是 `flows`。
+- `GET /flows`、`/flows/targets`、`/flows/agents` 增加 `limit=1…200` 与 `offset>=0`，仍返回原数组 envelope。前端 Provider 汇集分页；页间重复身份会显式提示重载，不能无声截断。内部目标身份解析不再套用 HTTP 列表上限。
+- `GET /flows/executions` 增加 RFC3339 `since/until`、`mode`；原 source/transport/started_by 及游标继续生效。非法时间或反向时间范围返回 `EXECUTION_TIME_FILTER_INVALID`。
+- `GET /flows/executions/{executionId}/definition`（`getExecutionDefinition` / `FlowsExecutionDefinition`）：经项目授权，从已冻结的 namespace/engine_flow_id/revision 读取源定义，涵盖 Quick Run。未冻结返回409；历史源定义不可用返回404。不能回退当前最新定义。旧后端下已有 Flow 使用原 revisions API 的准确版本，Quick Run 明确提示缺失能力。
+- `capabilities` 新增 `execution_definition`、`agent_versions`、`bootstrap_ready`、`agent_public_gateway`、`enrollment_url`。只返回能力和公开地址，不返回凭据。
+- 迁移025增加 `flow_sync_cursor`：固定时间窗内按页同步 Kestra 执行发现，避免始终只处理最新100条；另轮询旧活动执行状态。当前部署形态为单同步循环，不声明多实例协调/生产吞吐已验收。
+- UI 调度表单保留保存的脚本类型、超时、目标并发和步骤；从 Flow 更新步骤是显式动作，不被刷新覆盖。
+
+新增接口尚未进行8081联调或迁移执行。已运行检查与剩余缺口见实施记录，不能以生成类型通过冒充接口运行验收。

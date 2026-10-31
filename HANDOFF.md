@@ -1,5 +1,11 @@
 # Keel 当前开发交接
 
+## 作业平台 UI 整改增量 · 2026-10-31
+
+- `feat/flows-redesign` / `/home/ubuntu/keel-flows-dev`：界面统一名「作业平台」，路由/API兼容。Builder、执行详情、筛选、调度参数、Agents等修改见[最新整改记录](docs/flows-redesign/implementation.md)。
+- 5180前端由现有Vite加载；**没有替换下方BOM v5后端**。新增执行定义API、分页/时间筛选/同步游标及迁移025均待后端发布，不能直接用本旧基线覆盖8081。
+- 契约入口：[真实API](docs/api/flows.md)、OpenAPI FlowsReal及生成类型。剩余证书轮换、受控事件触发和ZTP消费者是代码缺口，不能统称待真机测试。
+
 
 ## 当前运行环境 · BOM v5 与 Flows 合并发布（2026-10-31）
 

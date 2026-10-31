@@ -16,8 +16,12 @@ import (
 
 var identifier = regexp.MustCompile(`^[A-Za-z0-9_-]{1,100}$`)
 
-func (s *Service) Flows(ctx context.Context, p Scope) ([]Flow, error) {
-	rows, e := s.DB.Query(ctx, `SELECT id::text,project_id,namespace,flow_id,name,description,target_type,revision FROM flow_binding WHERE project_id=ANY($1) ORDER BY created_at DESC LIMIT 200`, p.Projects)
+func (s *Service) Flows(ctx context.Context, p Scope, paging ...url.Values) ([]Flow, error) {
+	limit, offset, e := collectionWindow(paging)
+	if e != nil {
+		return nil, e
+	}
+	rows, e := s.DB.Query(ctx, `SELECT id::text,project_id,namespace,flow_id,name,description,target_type,revision FROM flow_binding WHERE project_id=ANY($1) ORDER BY created_at DESC,id DESC LIMIT $2 OFFSET $3`, p.Projects, limit, offset)
 	if e != nil {
 		return nil, e
 	}
@@ -159,8 +163,12 @@ func contains(a []string, v string) bool {
 	}
 	return false
 }
-func (s *Service) Targets(ctx context.Context, p Scope, q string) ([]Target, error) {
-	rows, e := s.DB.Query(ctx, `SELECT c.item_uid,c.name,c.asset_type,sc.project_id,c.version,c.payload || jsonb_build_object('maintenance_state',CASE WHEN c.maintenance_state='maintained' OR c.payload->>'maintenance_state'='maintained' OR c.payload->'fields'->>'maintenance_state'='maintained' THEN 'maintained' ELSE c.maintenance_state END,'lifecycle_state',CASE WHEN c.lifecycle_state='maintained' OR c.payload->>'lifecycle_state'='maintained' OR c.payload->'fields'->>'lifecycle_state'='maintained' THEN 'maintained' ELSE c.lifecycle_state END,'serial',COALESCE(c.serial,c.payload->>'serial')),COALESCE(a.id::text,''),COALESCE(a.state='enrolled' AND a.last_heartbeat>now()-interval '45 seconds' AND a.certificate_expires_at>now(),false),COALESCE(a.capabilities,'[]'),COALESCE(t.id::text,'') FROM cmdb_entity c JOIN cmdb_asset_scope sc ON sc.asset_id=c.item_uid LEFT JOIN flow_agent a ON a.asset_id=c.item_uid AND a.project_id=sc.project_id LEFT JOIN flow_ssh_trust t ON t.asset_id=c.item_uid AND t.project_id=sc.project_id AND t.status='approved' WHERE sc.project_id=ANY($1) AND c.asset_type IN('server','switch','device','machine') AND (c.name ILIKE '%'||$2||'%' OR c.item_uid ILIKE '%'||$2||'%') ORDER BY c.name LIMIT 500`, p.Projects, q)
+func (s *Service) Targets(ctx context.Context, p Scope, q string, paging ...url.Values) ([]Target, error) {
+	limit, offset, e := collectionWindow(paging)
+	if e != nil {
+		return nil, e
+	}
+	rows, e := s.DB.Query(ctx, `SELECT c.item_uid,c.name,c.asset_type,sc.project_id,c.version,c.payload || jsonb_build_object('maintenance_state',CASE WHEN c.maintenance_state='maintained' OR c.payload->>'maintenance_state'='maintained' OR c.payload->'fields'->>'maintenance_state'='maintained' THEN 'maintained' ELSE c.maintenance_state END,'lifecycle_state',CASE WHEN c.lifecycle_state='maintained' OR c.payload->>'lifecycle_state'='maintained' OR c.payload->'fields'->>'lifecycle_state'='maintained' THEN 'maintained' ELSE c.lifecycle_state END,'serial',COALESCE(c.serial,c.payload->>'serial')),COALESCE(a.id::text,''),COALESCE(a.state='enrolled' AND a.last_heartbeat>now()-interval '45 seconds' AND a.certificate_expires_at>now(),false),COALESCE(a.capabilities,'[]'),COALESCE(t.id::text,'') FROM cmdb_entity c JOIN cmdb_asset_scope sc ON sc.asset_id=c.item_uid LEFT JOIN flow_agent a ON a.asset_id=c.item_uid AND a.project_id=sc.project_id LEFT JOIN flow_ssh_trust t ON t.asset_id=c.item_uid AND t.project_id=sc.project_id AND t.status='approved' WHERE sc.project_id=ANY($1) AND c.asset_type IN('server','switch','device','machine') AND (c.name ILIKE '%'||$2||'%' OR c.item_uid ILIKE '%'||$2||'%') ORDER BY c.name,c.item_uid,sc.project_id LIMIT $3 OFFSET $4`, p.Projects, q, limit, offset)
 	if e != nil {
 		return nil, e
 	}

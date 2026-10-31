@@ -872,6 +872,20 @@
       "response_schema": "getDeviceStepsEnvelope",
       "deployed_revision": "9f16065",
       "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+    },
+    {
+      "method": "get",
+      "path": "/flows/executions/{executionId}/definition",
+      "operation_id": "getExecutionDefinition",
+      "response_schema": "getExecutionDefinitionEnvelope",
+      "implementation": "implemented",
+      "deployment": "not_deployed",
+      "verification": "go_build_only",
+      "handler": "dev/backend/cmd/api/flows.go",
+      "source": "dev/backend/internal/flows/context.go",
+      "service": "ExecutionDefinition",
+      "documentation": "docs/api/flows.md"
     }
-  ]
+  ],
+  "development_note": "作业平台 UI 整改：新增执行版本定义查询、列表分页、时间筛选和同步游标为分支增量；尚未部署至当前 BOM v5 集成后端。现运行版本以 HANDOFF 顶部为准。"
 }

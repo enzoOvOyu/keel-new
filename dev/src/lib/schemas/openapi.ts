@@ -6116,10 +6116,36 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/flows/executions/{executionId}/definition": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getExecutionDefinition"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        getExecutionDefinitionEnvelope: {
+            data: components["schemas"]["FlowsExecutionDefinition"];
+            request_id: string;
+        };
+        FlowsExecutionDefinition: {
+            namespace: string;
+            flow_id: string;
+            revision: number;
+            source: string;
+        };
         FlowsEventPageEnvelope: {
             data: components["schemas"]["FlowsEvent"][];
             request_id: string;
@@ -6510,6 +6536,11 @@ export interface components {
             agent_gateway: boolean;
             scheduling: string;
             native_plugins: string;
+            agent_versions: string[];
+            execution_definition: boolean;
+            bootstrap_ready: boolean;
+            agent_public_gateway: string;
+            enrollment_url: string;
         };
         FlowsAudit: {
             id?: string;
@@ -24414,6 +24445,8 @@ export interface operations {
         parameters: {
             query?: {
                 project_id?: string;
+                limit?: number;
+                offset?: number;
             };
             header?: never;
             path?: never;
@@ -31372,6 +31405,8 @@ export interface operations {
         parameters: {
             query?: {
                 project_id?: string;
+                limit?: number;
+                offset?: number;
             };
             header?: never;
             path?: never;
@@ -31422,6 +31457,9 @@ export interface operations {
                 flow_id?: string;
                 started_by?: string;
                 transport?: string;
+                since?: string;
+                until?: string;
+                mode?: string;
                 limit?: number;
             };
             header?: never;
@@ -31466,6 +31504,8 @@ export interface operations {
         parameters: {
             query?: {
                 project_id?: string;
+                limit?: number;
+                offset?: number;
             };
             header?: never;
             path?: never;
@@ -33368,6 +33408,51 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["getDeviceStepsEnvelope"];
+                };
+            };
+            /** @description Permission or project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input, precondition or unavailable capability */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Provider not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getExecutionDefinition: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                executionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Real engine/domain result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getExecutionDefinitionEnvelope"];
                 };
             };
             /** @description Permission or project scope denied */

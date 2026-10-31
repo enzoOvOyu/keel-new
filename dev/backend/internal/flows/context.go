@@ -82,3 +82,37 @@ func (s *Service) Template(project string) (map[string]any, error) {
 	doc["source"] = source
 	return doc, nil
 }
+
+// ExecutionDefinition resolves the exact engine revision, including system Quick Runs.
+// It never substitutes the current Flow revision for an unavailable historical one.
+type ExecutionDefinition struct {
+	Namespace string `json:"namespace"`
+	FlowID    string `json:"flow_id"`
+	Revision  int    `json:"revision"`
+	Source    string `json:"source"`
+}
+
+func (s *Service) ExecutionDefinition(ctx context.Context, p Scope, id string) (ExecutionDefinition, error) {
+	var out ExecutionDefinition
+	if err := s.DB.QueryRow(ctx, `SELECT namespace,engine_flow_id,flow_revision FROM flow_execution_binding WHERE id::text=$1 AND project_id=ANY($2)`, id, p.Projects).Scan(&out.Namespace, &out.FlowID, &out.Revision); err != nil {
+		return out, problem(404, "EXECUTION_NOT_FOUND")
+	}
+	if out.Revision < 1 {
+		return out, problem(409, "EXECUTION_DEFINITION_NOT_FROZEN")
+	}
+	var versions []map[string]any
+	if err := s.Engine.JSON(ctx, "GET", "/flows/"+url.PathEscape(out.Namespace)+"/"+url.PathEscape(out.FlowID)+"/revisions", &versions); err != nil {
+		return out, err
+	}
+	for _, version := range versions {
+		revision, ok := version["revision"].(float64)
+		if !ok || int(revision) != out.Revision {
+			continue
+		}
+		out.Source, _ = version["source"].(string)
+		if out.Source != "" {
+			return out, nil
+		}
+	}
+	return out, problem(404, "EXECUTION_DEFINITION_UNAVAILABLE")
+}

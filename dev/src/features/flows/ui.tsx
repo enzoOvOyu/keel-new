@@ -34,7 +34,7 @@ export function Table<T extends {
     onSelect?: (row: T) => void;
 }) {
     const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel(), getSortedRowModel: getSortedRowModel(), getPaginationRowModel: getPaginationRowModel(), initialState: { pagination: { pageSize: 15 } } });
-    return <div className="fl-table"><div className="fl-table-scroll"><table><thead>{table.getHeaderGroups().map(g => <tr key={g.id}>{g.headers.map(h => <th key={h.id}><button onClick={h.column.getToggleSortingHandler()}>{flexRender(h.column.columnDef.header, h.getContext())}{h.column.getIsSorted() === 'asc' ? ' ↑' : h.column.getIsSorted() === 'desc' ? ' ↓' : ''}</button></th>)}</tr>)}</thead><tbody>{table.getRowModel().rows.map(r => <tr key={r.id} tabIndex={onSelect ? 0 : undefined} onKeyDown={e => {
+    return <div className="fl-table"><div className="fl-table-scroll"><table><thead>{table.getHeaderGroups().map(g => <tr key={g.id}>{g.headers.map(h => <th key={h.id}>{h.column.getCanSort()?<button onClick={h.column.getToggleSortingHandler()}>{flexRender(h.column.columnDef.header, h.getContext())}{h.column.getIsSorted() === 'asc' ? ' ↑' : h.column.getIsSorted() === 'desc' ? ' ↓' : ''}</button>:flexRender(h.column.columnDef.header,h.getContext())}</th>)}</tr>)}</thead><tbody>{table.getRowModel().rows.map(r => <tr key={r.id} tabIndex={onSelect ? 0 : undefined} onKeyDown={e => {
                 if (e.key === 'Enter' && e.target === e.currentTarget)
                     onSelect?.(r.original);
             }} onClick={e => {

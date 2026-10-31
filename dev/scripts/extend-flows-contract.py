@@ -17,7 +17,7 @@ ss['FlowsTargetRun']=O(dict(id=S,snapshot=R('FlowsTarget'),selected_transport=S,
 ss['FlowsExecution']=O(dict(parent_id=N(S),id=S,project_id=S,flow_id=N(S),kestra_id=N(S),engine_flow_id=S,flow_revision=I,source_module=S,mode=S,started_by=S,created_at=S,error_code=N(S),engine=R('FlowsEngine'),targets=A('FlowsTargetRun')))
 ss['FlowsAgent']=O(dict(id=S,project_id=S,asset_id=S,identity={'type':'object','additionalProperties':S},version=S,capabilities=A(S),state=S,certificate_serial=N(S),certificate_expires_at=N(S),last_heartbeat=N(S),online=B))
 ss['FlowsAudit']={**J,'properties':dict(id=S,actor=S,action=S,details=J,created_at=S)}
-ss['FlowsCapabilities']=O(dict(namespace=S,engine=S,version=S,configured=B,agent_gateway=B,scheduling=S,native_plugins=S))
+ss['FlowsCapabilities']=O(dict(namespace=S,engine=S,version=S,configured=B,agent_gateway=B,scheduling=S,native_plugins=S,agent_versions=A(S),execution_definition=B,bootstrap_ready=B,agent_public_gateway=S,enrollment_url=S))
 ss['FlowsTokenRequest']=O(dict(project_id=S,asset_id=S));ss['FlowsToken']=O(dict(id=S,token=S,asset_id=S,expires_at=S))
 ss['FlowsReason']=O(dict(reason=S));ss['FlowsValidationRequest']=O(dict(source=S));ss['FlowsAction']=O(dict(id=S,state=S))
 ss['FlowsSSHTrust']=O(dict(id=S,project_id=S,asset_id=S,host=S,port=I,username=S,secret_ref=S,known_hosts_ref=S,status=S,revision=I))
@@ -75,7 +75,7 @@ new['/flows/{flowId}/namespace-file']['get']['parameters'].append({'name':'path'
 ss['FlowsQueryPage']=O(dict(limit=I,has_more=B,next_cursor=N(S)))
 ss['FlowsExecutionPage']=O(dict(items=A('FlowsExecution'),page=R('FlowsQueryPage'),state_filter_source=S))
 op('/flows/executions','get','listRealExecutions','FlowsExecutionPage')
-for name in ['cursor','q','state','source','flow_id','started_by','transport']:new['/flows/executions']['get']['parameters'].append({'name':name,'in':'query','schema':S})
+for name in ['cursor','q','state','source','flow_id','started_by','transport','since','until','mode']:new['/flows/executions']['get']['parameters'].append({'name':name,'in':'query','schema':S})
 new['/flows/executions']['get']['parameters'].append({'name':'limit','in':'query','schema':{'type':'integer','minimum':1,'maximum':100,'default':50}})
 ss['FlowsJobStep']=O(dict(id=S,kind={'type':'string','enum':['command','bash','python']},command=S,depends_on=A(S),inputs={'type':'object','additionalProperties':S}))
 ss['FlowsRun']['properties'].update(dict(steps=A('FlowsJobStep'),approval_id=S,approval_action=S))
@@ -96,6 +96,12 @@ op('/flows/approval-request','post','requestFlowsApproval','FlowsApprovalResult'
 op('/flows/executions/{executionId}/steps','get','getDeviceSteps','FlowsStepResult',many=True)
 events=new['/flows/executions/{executionId}/events']['get'];events['description']='Persisted Keel event journal; Last-Event-ID scoped to execution; replay ascending IDs. Permissions checked on every reconnect and stream lifetime.';events['parameters'] += [{'name':'project_id','in':'query','schema':S},{'name':'Last-Event-ID','in':'header','schema':S},{'name':'after','in':'query','schema':I},{'name':'history','in':'query','schema':B}]
 ss['FlowsEventPageEnvelope']=O(dict(data=A('FlowsEvent'),request_id=S));events['responses']['200']['content']['application/json']={'schema':R('FlowsEventPageEnvelope')}
+
+for path in ['/flows','/flows/targets','/flows/agents']:
+ new[path]['get']['parameters'] += [{'name':'limit','in':'query','schema':{'type':'integer','minimum':1,'maximum':200,'default':200}},{'name':'offset','in':'query','schema':{'type':'integer','minimum':0,'default':0}}]
+
+ss['FlowsExecutionDefinition']=O(dict(namespace=S,flow_id=S,revision=I,source=S))
+op('/flows/executions/{executionId}/definition','get','getExecutionDefinition','FlowsExecutionDefinition')
 
 # Replace whole affected path blocks while keeping all unrelated source text untouched.
 for path,definition in new.items():

@@ -11,6 +11,7 @@ import (
 	"encoding/pem"
 	"github.com/google/uuid"
 	"math/big"
+	"net/url"
 	"os"
 	"time"
 )
@@ -36,8 +37,12 @@ type EnrollInput struct {
 	Capabilities []string          `json:"capabilities"`
 }
 
-func (s *Service) Agents(ctx context.Context, p Scope) ([]Agent, error) {
-	rows, e := s.DB.Query(ctx, `SELECT id::text,project_id,asset_id,identity,version,capabilities,state,certificate_serial,certificate_expires_at,last_heartbeat,COALESCE(state='enrolled' AND last_heartbeat>now()-interval '45 seconds' AND certificate_expires_at>now(),false) FROM flow_agent WHERE project_id=ANY($1) ORDER BY created_at DESC LIMIT 500`, p.Projects)
+func (s *Service) Agents(ctx context.Context, p Scope, paging ...url.Values) ([]Agent, error) {
+	limit, offset, e := collectionWindow(paging)
+	if e != nil {
+		return nil, e
+	}
+	rows, e := s.DB.Query(ctx, `SELECT id::text,project_id,asset_id,identity,version,capabilities,state,certificate_serial,certificate_expires_at,last_heartbeat,COALESCE(state='enrolled' AND last_heartbeat>now()-interval '45 seconds' AND certificate_expires_at>now(),false) FROM flow_agent WHERE project_id=ANY($1) ORDER BY created_at DESC,id DESC LIMIT $2 OFFSET $3`, p.Projects, limit, offset)
 	if e != nil {
 		return nil, e
 	}

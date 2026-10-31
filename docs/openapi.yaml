@@ -9192,6 +9192,19 @@ paths:
         name: project_id
         schema:
           type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+          default: 200
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
       responses:
         '200':
           description: Real engine/domain result.
@@ -14076,6 +14089,19 @@ paths:
         name: project_id
         schema:
           type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+          default: 200
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
       responses:
         '200':
           description: Real engine/domain result.
@@ -14127,6 +14153,18 @@ paths:
         in: query
         schema:
           type: string
+      - name: since
+        in: query
+        schema:
+          type: string
+      - name: until
+        in: query
+        schema:
+          type: string
+      - name: mode
+        in: query
+        schema:
+          type: string
       - name: limit
         in: query
         schema:
@@ -14157,6 +14195,19 @@ paths:
         name: project_id
         schema:
           type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+          default: 200
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
       responses:
         '200':
           description: Real engine/domain result.
@@ -15428,6 +15479,35 @@ paths:
           description: Invalid input, precondition or unavailable capability
         '503':
           description: Provider not configured
+  /flows/executions/{executionId}/definition:
+    get:
+      operationId: getExecutionDefinition
+      tags:
+      - FlowsReal
+      parameters:
+      - in: query
+        name: project_id
+        schema:
+          type: string
+      - in: path
+        name: executionId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Real engine/domain result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getExecutionDefinitionEnvelope'
+        '403':
+          description: Permission or project scope denied
+        '422':
+          description: Invalid input, precondition or unavailable capability
+        '503':
+          description: Provider not configured
+
 components:
   securitySchemes:
     bearerAuth:
@@ -15509,6 +15589,34 @@ components:
           schema:
             $ref: "#/components/schemas/ErrorEnvelope"
   schemas:
+    getExecutionDefinitionEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/FlowsExecutionDefinition'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    FlowsExecutionDefinition:
+      type: object
+      additionalProperties: false
+      properties:
+        namespace:
+          type: string
+        flow_id:
+          type: string
+        revision:
+          type: integer
+        source:
+          type: string
+      required:
+      - namespace
+      - flow_id
+      - revision
+      - source
     FlowsEventPageEnvelope:
       type: object
       additionalProperties: false
@@ -16605,6 +16713,18 @@ components:
           type: string
         native_plugins:
           type: string
+        agent_versions:
+          type: array
+          items:
+            type: string
+        execution_definition:
+          type: boolean
+        bootstrap_ready:
+          type: boolean
+        agent_public_gateway:
+          type: string
+        enrollment_url:
+          type: string
       required:
       - namespace
       - engine
@@ -16613,6 +16733,11 @@ components:
       - agent_gateway
       - scheduling
       - native_plugins
+      - agent_versions
+      - execution_definition
+      - bootstrap_ready
+      - agent_public_gateway
+      - enrollment_url
     FlowsAudit:
       type: object
       additionalProperties: true

@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import YAML from 'yaml';
+import { runDefaults } from './definition';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { flowsKey, flowsApi, type Flow, type Run, type Decision, type JobStep } from '@/lib/api/flows';
@@ -42,8 +43,7 @@ function flowDefaults(flow: Flow) {
     }
     catch { }
     ;
-    const loop = findTask(d.tasks, 'targets'), dispatch = findTask(loop?.tasks, 'agent_task') || findTask(loop?.tasks, 'dispatch');
-    return { steps: ((d.inputs||[]).find((i:any)=>i.id==='steps')?.defaults || []) as JobStep[], policy: String((d.inputs || []).find((i: any) => i.id === 'transport_policy')?.defaults || 'agent_preferred') as Run['transport_policy'], kind: String((d.inputs || []).find((i: any) => i.id === 'kind')?.defaults || 'bash') as Run['kind'], command: String((d.inputs || []).find((i: any) => i.id === 'command')?.defaults || ''), concurrency: Number(loop?.concurrencyLimit || 8), timeout: Math.max(1, Number(String(dispatch?.timeout || 'PT610S').replace(/[^0-9]/g, '')) - 10) };
+    return runDefaults(d);
 }
 
 function findTask(tasks: any[] | undefined, id: string): any { for (const task of tasks || []) { if (task.id === id) return task; const found = findTask([...(task.tasks || []), ...(task.then || []), ...(task.else || [])], id); if (found) return found; } return null; }

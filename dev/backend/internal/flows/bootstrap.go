@@ -77,3 +77,7 @@ func (s *Service) Bootstrap(ctx context.Context, p Scope, in BootstrapRequest) (
 	}
 	return map[string]any{"asset_id": in.Asset, "state": "awaiting_registration", "version": in.Version}, nil
 }
+
+func BootstrapConfigured() bool {
+	return strings.HasPrefix(os.Getenv("KEEL_AGENT_PACKAGE_URL"), "https://") && len(os.Getenv("KEEL_AGENT_PACKAGE_SHA256")) == 64 && strings.HasPrefix(os.Getenv("KEEL_PUBLIC_HTTPS_URL"), "https://") && os.Getenv("KEEL_AGENT_PUBLIC_GATEWAY") != ""
+}

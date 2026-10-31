@@ -1,0 +1,20 @@
+import { useEffect, useRef, useState } from 'react';
+import { Download, Copy, Check } from 'lucide-react';
+import { Button, Search, State, Table } from './ui';
+import type { Engine, Execution } from '@/lib/api/flows';
+function download(name:string,text:string){const url=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
+export function ExecutionLogs({execution,logs}:{execution:Execution;logs:Engine[]}){
+ const [q,setQ]=useState(''),[asset,setAsset]=useState(''),[task,setTask]=useState(''),[level,setLevel]=useState(''),[stream,setStream]=useState('stdout'),[follow,setFollow]=useState(true),[copied,setCopied]=useState(false);
+ const viewport=useRef<HTMLPreElement>(null);const target=execution.targets.find(t=>t.id===asset);
+ const visible=logs.filter((l:any)=>(!level||l.level===level)&&(!task||l.taskId===task)&&String(l.message||'').toLowerCase().includes(q.toLowerCase()));
+ const text=target?(stream==='stdout'?target.stdout:target.stderr).split('\n').filter(l=>l.toLowerCase().includes(q.toLowerCase())).join('\n'):visible.map((l:any)=>`${l.timestamp||''} ${l.level||''} ${l.taskId||''} ${l.message||''}`).join('\n');
+ useEffect(()=>{if(follow&&viewport.current)viewport.current.scrollTop=viewport.current.scrollHeight},[text,follow]);
+ return <><div className="fl-toolbar"><select aria-label="日志来源设备" value={asset} onChange={e=>setAsset(e.target.value)}><option value="">Kestra execution logs</option>{execution.targets.map(t=><option key={t.id} value={t.id}>{t.snapshot.name}</option>)}</select>{target?<select aria-label="Output stream" value={stream} onChange={e=>setStream(e.target.value)}><option>stdout</option><option>stderr</option></select>:<><select aria-label="Log task" value={task} onChange={e=>setTask(e.target.value)}><option value="">所有任务</option>{[...new Set(logs.map(l=>String(l.taskId||'')).filter(Boolean))].map(t=><option key={t}>{t}</option>)}</select><select aria-label="Log level" value={level} onChange={e=>setLevel(e.target.value)}><option value="">所有级别</option>{['TRACE','DEBUG','INFO','WARN','ERROR'].map(l=><option key={l}>{l}</option>)}</select></>}<Search value={q} onChange={setQ} placeholder="搜索日志内容"/><label className="fl-inline"><input type="checkbox" checked={follow} onChange={e=>setFollow(e.target.checked)}/>Follow</label><Button variant="outline" size="sm" onClick={()=>{void navigator.clipboard.writeText(text).then(()=>setCopied(true))}}>{copied?<Check size={14}/>:<Copy size={14}/>}</Button><Button variant="outline" size="sm" onClick={()=>download(`${execution.id}-${asset||'engine'}.log`,text)}><Download size={14}/>Download</Button></div><div className="fl-editor-caption">{target?`${target.snapshot.name} · ${stream} · attempt ${target.attempt}`:'Execution log stream'}<span className="spacer"/>{target?<State value={target.state}/>:`${visible.length} entries`}</div><pre ref={viewport} className="fl-log-stream">{text||'尚无匹配的日志'}</pre></>;
+}
+export function AuditView({records}:{records:Engine[]}){
+ return <Table<any> data={records.map((r,i)=>({...r,id:String(r.id||i)}))} columns={[{accessorKey:'created_at',header:'Time'},{accessorKey:'actor',header:'Actor'},{accessorKey:'action',header:'Action'},{id:'details',header:'Context',cell:({row})=><details><summary>查看操作依据</summary><dl className="fl-properties">{Object.entries(row.original.details||{}).map(([k,v])=><div key={k}><dt>{k}</dt><dd>{typeof v==='object'?JSON.stringify(v):String(v)}</dd></div>)}</dl></details>}]}/>;
+}
+export function OutputView({value}:{value:unknown}){
+ const rows=Object.entries((value&&typeof value==='object'?value:{}) as Record<string,unknown>).map(([id,data])=>({id,data}));
+ return <Table data={rows} columns={[{accessorKey:'id',header:'Task / Output'},{id:'value',header:'Value',cell:({row})=>typeof row.original.data==='object'?<details><summary>展开结构化输出</summary><pre className="fl-code">{JSON.stringify(row.original.data,null,2)}</pre></details>:<code>{String(row.original.data)}</code>}]}/>;
+}

@@ -52,7 +52,20 @@ func (s *Service) ExecutionPage(ctx context.Context, p Scope, q url.Values) (Exe
 			return out, problem(400, "FLOWS_CURSOR_SCOPE_INVALID")
 		}
 	}
-	rows, e := s.DB.Query(ctx, `SELECT b.id::text,b.created_at FROM flow_execution_binding b WHERE b.project_id=ANY($1) AND (b.created_at,b.id)<($2,$3::uuid) AND ($4='' OR b.id::text ILIKE '%'||$4||'%' OR b.engine_flow_id ILIKE '%'||$4||'%' OR EXISTS(SELECT 1 FROM flow_execution_target t WHERE t.execution_id=b.id AND (t.asset_id ILIKE '%'||$4||'%' OR t.snapshot->>'name' ILIKE '%'||$4||'%'))) AND ($5='' OR b.engine_state=$5) AND ($6='' OR b.source_module=$6) AND ($7='' OR b.flow_id::text=$7) AND ($8='' OR b.requester_id::text=$8) AND ($9='' OR EXISTS(SELECT 1 FROM flow_execution_target t WHERE t.execution_id=b.id AND t.actual_transport=$9)) ORDER BY b.created_at DESC,b.id DESC LIMIT $10`, p.Projects, cursor.At, cursor.ID, q.Get("q"), q.Get("state"), q.Get("source"), q.Get("flow_id"), q.Get("started_by"), q.Get("transport"), out.Page.Limit+1)
+	var since, until *time.Time
+	for key, dest := range map[string]**time.Time{"since": &since, "until": &until} {
+		if q.Get(key) != "" {
+			v, err := time.Parse(time.RFC3339, q.Get(key))
+			if err != nil {
+				return out, problem(400, "EXECUTION_TIME_FILTER_INVALID")
+			}
+			*dest = &v
+		}
+	}
+	if since != nil && until != nil && since.After(*until) {
+		return out, problem(400, "EXECUTION_TIME_FILTER_INVALID")
+	}
+	rows, e := s.DB.Query(ctx, `SELECT b.id::text,b.created_at FROM flow_execution_binding b WHERE b.project_id=ANY($1) AND (b.created_at,b.id)<($2,$3::uuid) AND ($4='' OR b.id::text ILIKE '%'||$4||'%' OR b.engine_flow_id ILIKE '%'||$4||'%' OR EXISTS(SELECT 1 FROM flow_execution_target t WHERE t.execution_id=b.id AND (t.asset_id ILIKE '%'||$4||'%' OR t.snapshot->>'name' ILIKE '%'||$4||'%'))) AND ($5='' OR b.engine_state=$5) AND ($6='' OR b.source_module=$6) AND ($7='' OR b.flow_id::text=$7) AND ($8='' OR b.requester_id::text=$8) AND ($9='' OR EXISTS(SELECT 1 FROM flow_execution_target t WHERE t.execution_id=b.id AND t.actual_transport=$9)) AND ($11::timestamptz IS NULL OR b.created_at >= $11) AND ($12::timestamptz IS NULL OR b.created_at <= $12) AND ($13='' OR b.mode=$13) ORDER BY b.created_at DESC,b.id DESC LIMIT $10`, p.Projects, cursor.At, cursor.ID, q.Get("q"), q.Get("state"), q.Get("source"), q.Get("flow_id"), q.Get("started_by"), q.Get("transport"), out.Page.Limit+1, since, until, q.Get("mode"))
 	if e != nil {
 		return out, e
 	}
@@ -91,4 +104,25 @@ func (s *Service) ExecutionPage(ctx context.Context, p Scope, q url.Values) (Exe
 		out.Page.Next = &next
 	}
 	return out, nil
+}
+
+// Internal resolvers must not silently truncate target identities. HTTP lists use explicit pages.
+func collectionWindow(paging []url.Values) (*int, int, error) {
+	if len(paging) == 0 {
+		return nil, 0, nil
+	}
+	limit, offset := 200, 0
+	for key, dest := range map[string]*int{"limit": &limit, "offset": &offset} {
+		if value := paging[0].Get(key); value != "" {
+			n, err := strconv.Atoi(value)
+			if err != nil {
+				return nil, 0, problem(400, "FLOWS_PAGE_INVALID")
+			}
+			*dest = n
+		}
+	}
+	if limit < 1 || limit > 200 || offset < 0 {
+		return nil, 0, problem(400, "FLOWS_PAGE_INVALID")
+	}
+	return &limit, offset, nil
 }
