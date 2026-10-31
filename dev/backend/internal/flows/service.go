@@ -473,12 +473,19 @@ func (s *Service) Start(ctx context.Context, p Scope, r RunRequest, key string) 
 			return empty, problem(503, "CALLBACK_NOT_CONFIGURED")
 		}
 		fid = "quick-" + strings.ReplaceAll(id, "-", "")
-		_, e = s.Engine.Save(ctx, bridgeSource(ns, fid, base, r), false, ns, fid)
+		var saved map[string]any
+		saved, e = s.Engine.Save(ctx, bridgeSource(ns, fid, base, r), false, ns, fid)
 		if e != nil {
 			s.DB.Exec(ctx, `UPDATE flow_execution_binding SET error_code='KESTRA_FLOW_CREATE_FAILED' WHERE id=$1`, id)
 			return empty, e
 		}
-		s.DB.Exec(ctx, `UPDATE flow_execution_binding SET engine_flow_id=$2 WHERE id=$1`, id, fid)
+		revision, e = engineRevision(saved)
+		if e != nil {
+			return empty, e
+		}
+		if _, e = s.DB.Exec(ctx, `UPDATE flow_execution_binding SET engine_flow_id=$2,flow_revision=$3 WHERE id=$1`, id, fid, revision); e != nil {
+			return empty, e
+		}
 	}
 	engine, e := s.Engine.Execute(ctx, ns, fid, revision, inputs, id)
 	if e != nil {

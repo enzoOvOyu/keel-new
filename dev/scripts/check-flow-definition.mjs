@@ -18,3 +18,5 @@ const config={tasks:[task('targets','flow.Loop',{concurrencyLimit:3,tasks:[task(
 assert.equal(m.runDefaults(config).timeout,120);assert.equal(m.runDefaults(config).concurrency,3);assert.equal(m.runDefaults(config).kind,'python');
 assert.throws(()=>m.checkStructure({tasks:'invalid'}));m.checkStructure({tasks:[task('sub','flow.Subflow',{inputs:{key:'value'}})]});
 console.log('PASS: nested branches/layout/delete, same-branch reorder, device DAG/cycle rejection, duration and run defaults, editable YAML structure');
+const native=m.nativeTemplate({id:'job',namespace:'project',inputs:[{id:'ticket',type:'SECRET'}],finally:[task('old_callback')],triggers:[{id:'old'}]},'Loop');
+assert(!m.isControlled(native));assert(!native.finally);assert(!native.triggers);assert.equal(native.tasks[0].tasks[0].id,'log_result');assert.equal(native.inputs[0].id,'items');

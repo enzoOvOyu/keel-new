@@ -1,0 +1,5 @@
+// Keel integration: original Kestra theme rules are scoped by the Vite PostCSS plugin.
+@use '../../vendor/kestra/design-system/assets/styles/ks-tokens';
+@use '../../vendor/kestra/design-system/assets/styles/ks-theme-light';
+@use '../../vendor/kestra/design-system/assets/styles/ks-theme-dark';
+.keel-kestra {--kel-color-primary:#8405ff;--kel-font-family:var(--ks-font-family-sans);min-width:0;--ks-font-size-sm:12px;--ks-font-size-base:14px;--ks-font-size-xs:11px;--ks-font-size-2xs:10px;}

@@ -122,3 +122,32 @@ Kestra2.0.7兼容修正包括Loop替代不存在的ForEach、`fromJson(item.valu
 ## 用户授权发布 · 9f16065
 
 已部署到现有5180/8081；兼容纳入原BOM修复4403c63/9f16065，不修改其实现语义。原数据库应用021…024前保留完整私有dump，未导入隔离合成行。原admin登录/5项只读API/3页面渲染共9项通过，容器回调可达且无票据403。证据[deployment-validation.json](deployment-validation.json)。临时5190/8096与合成Agent关闭；当前运行/回退以HANDOFF顶部发布节为准，不再使用先前隔离环境描述作为当前状态。
+
+## 原生Kestra UI接入 · feat/jobs-kestra-ui · 开发中
+
+- 用户已授权实施，替换方案及LC-01…14为当前范围。新目录`/home/ubuntu/keel-kestra-ui-dev`，原5180/8081没有切换。
+- 已固定上游commit49b62a2，纳入原生KsDataTable/KsTableColumn/KsButton/KsInput/KsExecutionStatus及19个直接依赖文件；许可和来源见`dev/src/vendor/kestra/`。不是完整原生应用已迁移。
+- Vue3挂载到React模块内，原生SFC由Vite Vue插件编译；样式通过PostCSS限定在`.keel-kestra`，主题令牌也作用于模块范围。上游完整UI要求Node24，本次实际证明的是所引入组件子集可在现有Node22/Vite6编译，不代表完整编辑器依赖已验证。
+- 作业列表与Execution列表接入原有Provider，原生分页/搜索/状态/行跳转，运行和QuickRun仍接既有流程。当前是已加载数据的本地分页，不冒充已完成服务端total/统计；执行历史仍通过原游标加载更多。
+- `npm run build`通过；浏览器借助请求拦截加载新分支dist并读取现有API，两原生列表挂载无pageerror/console error。没有新服务/端口，没有改测试数据。检查发现空态翻译键显示已补中文消息，字体按上游16px根字号换算为模块内12/14px，避免Keel根字号压缩原生组件。
+- 尚待：原生多面板编辑器/执行详情及生命周期页、完整KSFilter、URL筛选/列管理/批量动作、服务端目录分页与最近执行摘要。当前不能称为完整前端替换。
+- 保留并迁入此前未发布修复：QuickRun保存真实Revision、历史Execution精确Revision恢复、完整原生模板转换、Files载入任务脚本；Go定向测试及编辑器回归通过，尚未覆盖当前BOM集成二进制。
+- 接入上游RunTimeline.vue（保留许可证，标注Keel导入/日期/类型及popover隔离改动），从真实Execution.state.histories展示状态历史；不填造历史。此组件当前仅完成接线和编译检查，未在真实有历史的执行记录上完成交互验收。
+- Native列表搜索/状态保留在URL；当前仍是过渡目录与已加载执行数据筛选，服务端完整分页/total/聚合尚待实现。
+- 最新分支构建（TypeScript+Vite）通过；[三项浏览器证据](native-ui/validation.json)与[当前原生目录截图](native-ui/catalog.png)已保存。搜索URL/刷新恢复检查通过，无页面或console error；不是编辑器、真实设备或完整生命周期验收。
+
+## 原生编辑器接入增量（开发中）
+
+- 接入上游KsEditor/Monaco和MultiPanelGenericEditorView/MultiPanelTabs，当前YAML与只读结构面板；不是No-code已完成。多面板作用域按项目/Flow隔离，仅持久化布局UID，不保存执行目标或秘密。
+- Vue编辑器通过既有React回调更新同一YAML；只读与保存草稿快捷键受权限/忙状态约束。原生面板组件去除上游外部统计调用，并连接实际快捷键说明面板；弹层保持在模块内。
+- 修复接入时monacoSetup的ASI初始化错误；一次完整构建被137终止，裁减到本期YAML实际使用的generic Worker后构建通过。JSON/TypeScript语义Worker未开放，不暗示支持；源文件语法配色/编辑与Go侧校验继续独立。
+- 浏览器三项检查通过：原生Monaco挂载、实际键盘输入更新YAML、Visual/YAML切换保留内容，无pageerror。证据：[editor-validation.json](native-ui/editor-validation.json)、[截图](native-ui/editor.png)。结构面板动态渲染的间距样式随后定向修正，最终视觉需下一次页面检查；未声称全编辑器验收。
+- Monaco版本0.56与上游一致，附LICENSE/ThirdPartyNotices。新引入的DOMPurify依赖已锁定到修复补丁3.4.17；未进行无关全平台依赖升级。
+
+## 暂停接续 · 用户要求记录后暂停
+
+本次停止开发，当前完整范围约20%（功能估算）。最新接续入口移至HANDOFF顶部，列出全部未完成与环境边界。
+
+暂停前Outputs增量：复用上游SidebarList/explorerSearch和原生搜索/折叠/标签组件，接入当前Execution实际outputs；支持搜索、选择、值预览、复制和完整返回值JSON下载。不是完整Inputs/Variables表达式调试器，现有Artifact授权下载链接继续保留。
+
+`npm run build`通过；浏览器仅注入明确synthetic执行，挂载、搜索选择、下载三项通过，无页面错误，未写业务库/操作设备。证据：[outputs-validation.json](native-ui/outputs-validation.json)、[截图](native-ui/outputs.png)。不是实际引擎产物闭环。
