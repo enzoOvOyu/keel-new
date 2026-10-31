@@ -145,3 +145,8 @@ Flows开发补齐（afe8cb9）：作用域Schedule、多步骤/输出绑定、Na
 API：tmux `keel-cmdb-api`，工作目录`/home/ubuntu/keel/dev/backend`，启动`python3 /tmp/keel-flows-run-deployed-api.py`，二进制`/tmp/keel-api-flows-combined-1031`。启动器使用原私有进程环境与忽略的`.env.deployed`引擎配置；秘密不写本文。Worker URL通过172.22.0.1:5180回调已有前端代理，API保持localhost绑定。
 
 临时5190/8096和合成Agent关闭；不停止正在使用的Kestra/PostgreSQL依赖。发布证据与回退入口见[HANDOFF](../HANDOFF.md)、[deployment-validation](flows-redesign/deployment-validation.json)。本次只读启动检查不等于真实设备验收，不重复运行闭环测试。
+
+
+## 2026-10-31 · BOM Agent 与新拓扑合并部署
+
+后端运行源码 `ad8918b`（拓扑基线 b184645 + Agent 修复 e3f6cd3/74ab238），独立工作区 `/tmp/keel-agent-deploy`，分支 `deploy/bom-agent-topology-1031`。二进制 `/tmp/keel-api-agent-topology-1031`，启动脚本 `/tmp/keel-start-agent-topology-1031.sh`，tmux `keel-cmdb-api`，仍读取 `/home/ubuntu/keel/dev/backend/.env` 并监听8081。5180前端继续原可视化工作区。无迁移、主分支合并或新增业务测试。启动检查与限制见 `topology/agent-deployment-20261031.json`。停止当前API后，可用同一配置/工作目录运行原 `/tmp/keel-api-4541850` 回退；不要并行启动两个worker。
