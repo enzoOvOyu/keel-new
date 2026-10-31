@@ -13,7 +13,7 @@ import '../rack/rack.css';
 import '../rack/spatial.css';
 
 type Props={params:URLSearchParams;set:(values:Record<string,string>)=>void;go:Go};
-const views=[['spatial','空间工作台',Box],['gallery','机柜阵列',LayoutGrid]] as const;
+const views=[['room','3D 机房',Box],['gallery','机柜阵列',LayoutGrid],['spatial','单柜工作台',ScanLine]] as const;
 
 export default function RackPage({params,set,go}:Props){
   const rackApi=useRackModel(),identity=useIdentity(),context=useProject();
@@ -24,6 +24,8 @@ export default function RackPage({params,set,go}:Props){
   const asset=rackApi.asset(selectedId);
   const rackID=params.get('rack')||asset?.fields.rack_id||rackApi.list()[0]?.id||'';
   const view=params.get('view')==='gallery'?'gallery':'spatial';
+  const room=view==='gallery'&&params.get('overlay')==='capacity';
+  const activeView=room?'room':view;
   // No eligible confirmed planning/as-built pair: hide comparison, including old links.
   useEffect(()=>{if(params.get('view')==='compare'){set({view:'spatial'});setViewNotice('对比暂未开放：缺少已确认规划快照与实装记录。')}},[params,set]);
   const overlay=overlayOptions.includes(params.get('overlay') as Overlay)?params.get('overlay') as Overlay:'asset';
@@ -33,14 +35,14 @@ export default function RackPage({params,set,go}:Props){
   function openRack(id:string,asset=''){set({view:'spatial',rack:id,asset,port:'',cable:'',tab:'asset',...(view==='gallery'&&overlay==='capacity'?{camera:'dual'}:{})})}
   return <div className="rack-viz">
     <div className="rv-commandbar"><h1 className="sr-page-title">Spatial Rack<span>机柜工程视图</span></h1>
-      <div className="rv-segment" role="tablist" aria-label="机柜视图">{views.map(([key,label,Icon])=><button key={key} role="tab" aria-selected={view===key} onClick={()=>set({view:key,...(key==='spatial'?{rack:rackID}:{})})}><Icon size={14}/>{label}</button>)}</div>
+      <div className="rv-segment" role="tablist" aria-label="机柜视图">{views.map(([key,label,Icon])=><button key={key} role="tab" aria-selected={activeView===key} onClick={()=>set(key==='room'?{view:'gallery',overlay:'capacity'}:key==='gallery'?{view:'gallery',overlay:'asset'}:{view:'spatial',rack:rackID})}><Icon size={14}/>{label}</button>)}</div>
       <span className="spacer"/>
       <span className="rv-source-tag"><Database size={12}/>CMDB 资产登记</span>
       <Button onClick={()=>showCapabilities(true)}><ScanLine size={14}/>数据能力</Button>
     </div>
     {view==='gallery'?<>
       <div className="rv-filterbar"><SearchBox value={q} onChange={q=>set({q})} placeholder="搜索机柜、设备、型号、SN"/><select aria-label="Pod 筛选" value={pod} onChange={e=>set({pod:e.target.value})}><option value="">所有 Pod</option>{pods.map(p=><option key={p} value={p}>{shortPod(p)}</option>)}</select><span className="spacer"/><OverlayControl value={overlay} onChange={overlay=>set({overlay})}/></div>
-      {overlay==='capacity'?<RoomGallery q={q} pod={pod} current={rackID} params={params} set={set} onOpen={openRack}/>:<Gallery q={q} pod={pod} overlay={overlay} current={rackID} onOpen={openRack}/>}
+      {room?<RoomGallery q={q} pod={pod} current={rackID} params={params} set={set} onOpen={openRack}/>:<Gallery q={q} pod={pod} overlay={overlay} current={rackID} onOpen={openRack}/>}
     </>:!snapshot?<div className="rv-empty"><Database/><h2>找不到此机柜</h2><p>保留 URL 中的对象 ID，不替换成其他资产。</p><Button onClick={()=>set({view:'gallery',rack:'',asset:'',port:'',cable:''})}>返回机柜阵列</Button></div>:<><div className="sr-contextbar"><select aria-label="选择机柜" value={rackID} onChange={e=>openRack(e.target.value)}>{rackApi.list().map(r=><option key={r.id} value={r.id}>{r.name} · {shortPod(r.fields.pod_id)}</option>)}</select><span>{snapshot.height===null?'U 高未知':snapshot.height+'U'}</span><span>{snapshot.placementComplete?`${snapshot.items.length} 设备`:`已加载 ${snapshot.items.length} / ${snapshot.registeredDevices??'未知'} 设备`}</span><span>{snapshot.layout?occupiedText(snapshot)+'U 登记占位':'占位未核算'}</span><span className="spacer"/>{viewNotice&&<small role="status">{viewNotice}</small>}<OverlayControl value={overlay} onChange={overlay=>set({overlay})}/><Button aria-label="保存机柜视图" title="保存当前机柜、对象与视角" onClick={()=>{localStorage.setItem(savedKey,params.toString());setViewNotice('视图已保存')}}><Bookmark size={14}/></Button><Button aria-label="恢复机柜视图" title="恢复已保存的机柜视图" onClick={()=>{const saved=localStorage.getItem(savedKey);if(saved!==null){const restored:Record<string,string>=Object.fromEntries([...params.keys()].map(k=>[k,'']));const savedParams=new URLSearchParams(saved),savedProject=savedParams.get('project_id');if(savedProject&&!context.projects.some(p=>p.id===savedProject)){setViewNotice('保存视图的项目已无访问权限');return}savedParams.delete('device_id');savedParams.delete('drawer');savedParams.forEach((v,k)=>restored[k]=v);set(restored);setViewNotice('视图已恢复')}else setViewNotice('暂无保存视图')}}><RotateCcw size={14}/></Button></div>{!snapshot.placementComplete&&<div className="rv-inline-warning">已加载 {snapshot.loadedDevices} / {snapshot.registeredDevices??'未知'} 条设备位置；当前图不代表完整机柜，未占用空间不作结论。</div>}<SpatialWorkspace key={rackID} {...{params,set,go,snapshot,overlay,selectedId}} onOpen={openRack}/></>}
     <Capabilities open={capabilities} close={()=>showCapabilities(false)}/>
   </div>
