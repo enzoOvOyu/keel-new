@@ -10,7 +10,16 @@ gateway_addr=$4
 case "$api_url" in https://*) ;; *) exit 2 ;; esac
 [ -f "$agent_bin" ] && [ -f "$token_file" ] || exit 2
 id keel-agent >/dev/null 2>&1 || useradd --system --home-dir /var/lib/keel-agent --shell /usr/sbin/nologin keel-agent
-install -m 0755 "$agent_bin" /usr/local/bin/keel-agent
+[ -f /etc/keel-agent/package.sha256 ] || exit 2
+expected_digest=$(cat /etc/keel-agent/package.sha256)
+case "$expected_digest" in *[!a-f0-9]*|'') exit 2 ;; esac
+[ "${#expected_digest}" -eq 64 ] || exit 2
+staged_bin=$(mktemp /usr/local/bin/.keel-agent.XXXXXX)
+trap 'rm -f "$staged_bin"' EXIT
+install -m 0700 "$agent_bin" "$staged_bin"
+printf '%s  %s\n' "$expected_digest" "$staged_bin" | sha256sum -c - >/dev/null
+chmod 0755 "$staged_bin"
+mv "$staged_bin" /usr/local/bin/keel-agent
 install -d -m 0700 -o keel-agent -g keel-agent /var/lib/keel-agent /run/keel-agent
 install -m 0600 -o keel-agent -g keel-agent "$token_file" /run/keel-agent/enrollment-token
 # Values are passed as arguments, never interpreted as shell/systemd directives.
@@ -35,4 +44,5 @@ ReadWritePaths=/var/lib/keel-agent /run/keel-agent
 WantedBy=multi-user.target
 UNIT
 systemctl daemon-reload
-systemctl enable --now keel-agent.service
+systemctl enable keel-agent.service
+systemctl restart keel-agent.service

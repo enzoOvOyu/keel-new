@@ -238,3 +238,10 @@ Go模块化单体中internal/cmdb包含Schema、Domain、Query和ChangeSet服务
 页面按范围和选择按需加载，服务端过滤授权对象，游标绑定当前用户、范围、查询和版本；客户端取消旧范围请求，不复用其他用户或项目缓存。聚合边和矩阵单元格保留成员查询，不以布局产生关系。原全量查询保留兼容，不作为新工作区默认加载方式。契约以 OpenAPI/DOMAIN-API-CONTRACTS 为准，实际完成项与规模限制见 [实施报告](topology/implementation-report.md)。
 
 本轮只在 feature 分支写代码；不自行启动服务、替换现有测试环境或调整数据库。
+
+
+## Flows 包重构实施增补 · 2026-10-31
+
+Flows采用Kestra2.0.7 Adapter + Go Job Service + gRPC mTLS Agent/严格SSH。CMDB保留资产权威，Kestra保留编排状态；目标/通道快照及Outbox归Go服务。
+
+详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。

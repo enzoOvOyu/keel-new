@@ -370,3 +370,10 @@ workspace/mapping按需返回ports/cables及授权peer_ports/peer_devices；关�
 CMDB 可视化扩展复用 `/cmdb/visualization?detail=full`，不建立第二套资产服务。响应 `coverage` 与 `truncated` 是查询完整度，不是设备健康或门禁结果；超限必须缩小范围。`read_at` 不是观测时间，`snapshot_id` 修订指纹不是历史查询游标。详细行为统一见 DOMAIN-API-CONTRACTS 的 VISUAL-REAL-2026-10-31 和 OpenAPI，前端统一使用 `src/lib/api/infrastructure.ts`。
 
 受控可视化分页采用 `InfrastructureSubgraph/InfrastructureMatrix/InfrastructureTrace` 专用OpenAPI结构；新增分页与scope/revision/token规则统一见 DOMAIN-API-CONTRACTS 的 VISUAL-PAGED-2026-10-31。旧 `/cmdb/visualization?detail=full` 保留兼容，不作为正式四页全局下载策略。matrix coverage按cells计量，其他投影按assets计量；`read_at` 始终只是查询时间。
+
+
+## Flows 包重构实施增补 · 2026-10-31
+
+Flows实际接口、项目作用域、幂等/版本、SSE和游标规则以api/flows.md及OpenAPI FlowsReal操作为准；不得把旧Mock端点默认当成真实实现。
+
+详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。

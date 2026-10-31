@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-31T08:31:43.140Z",
+  "environment": "http://127.0.0.1:5190",
+  "scope": "isolated synthetic CMDB and real local Kestra/Agent only; no production devices",
+  "checks": [
+    "Real Flow list rendered; compact columns",
+    "Existing real Flow opens; Visual/YAML share definition, three-column Builder",
+    "Real Revision view loads",
+    "Namespace context loads",
+    "Real local Agent registry and heartbeat render",
+    "Real Agent execution detail, target identity and Task Run Gantt render",
+    "Quick Run target selection, script, transport, real preflight and confirmation; no UI-triggered device execution",
+    "Quick Run Save as Flow creates real draft with canonical v2 Agent/SSH branches and script defaults"
+  ],
+  "errors": [],
+  "failed": []
+}

@@ -201,3 +201,10 @@ Gallery 借鉴 NetBox 的系统登记数据可视化；Dual 借鉴 Rackula 的�
 本轮机柜原型自审落实为业务视角：Front 查设备/型号/安装，Rear 查登记端口/Cable/对端；端口索引不得伪装成实物面板坐标。跨柜连接可按稳定 ID 定位，缺失端点显式终止。Dual-State Comparison 按确认规划与实际数据能力分级，缺合格快照隐藏入口。详细交互与验证见 [机柜设计 §12](rack-visualization.md#12-参考资料自审与本轮修正2026-10-31)。
 
 机柜阵列“空间”模式新增机房级 3D 俯视，参考 Sunbird Data Center CMDB 的整体机房/容量/选中柜立面联动；资产阵列和单柜 SVG 不替换。示意排布、正式坐标边界、Three.js 隔离依赖与操作规范统一见 [rack-visualization.md §4.1a](rack-visualization.md#41a-机柜阵列--空间机房-3d-总览)。
+
+
+## Flows 包重构实施增补 · 2026-10-31
+
+Flows逐页参照包内draw.io八页；实现截图、真实交互范围与限制见实施记录。Visual/YAML/Topology共用canonical YAML，数据由统一真实API Provider返回。
+
+详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。

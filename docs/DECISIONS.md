@@ -80,3 +80,12 @@ PRD §2 已定义 NH 业务职责，但本次要求的六个稳定默认身份�
 用户批准 topology.md V3 与机房原型进入正式前端；先落查询契约和页面逻辑，真实导入由用户后续统一联调。沿用批准 SVG/矩阵/Metro，不为模仿技术名称强制重写为 G6；Three.js 只用于已批准的机房空间模式。规划/观测位置保留分层来源，局部直接物理段不推导交换转发。
 
 开发固定在 `feat/datacenter-visualization-approved` 独立 worktree 和 5182/8082，未经用户指令不合并/发布 main。原 5180/8081 恢复至开发前版本；本轮无 migration 或资产导入。独立服务暂复用原数据库读取，真实写入联调需后续独立配置。实现和未实现边界统一记录于 `docs/topology/implementation-report.md`，不创建第二主设计。
+
+
+## 2026-10-31 · Flows 引擎与作用域最小兼容决策
+
+- 已采用：Kestra2.0.7原生Loop/If/HTTP组合受控Job模板，不假定已安装Keel Java插件；`fromJson(item.value)`与`toJson`经实际运行确认。
+- 已采用：项目namespace使用稳定摘要避免字符清洗碰撞；旧binding编辑保持原namespace。Agent任务接受后未知只能对账，不能重复经SSH执行。
+- 暂受限：CMDB目标Schedule尚无作用域凭据/目标冻结触发适配，不能直接启用；原生无设备Flow调度仍归Kestra。后续需增加受控触发身份/目标组解析，而非Go自建调度器或长期暴露dispatch ticket。
+- 暂受限：原生SSE不是完整持久游标重放，使用当前状态重取和日志去重；每目标多步骤设备插件、生产Bootstrap/审批与规模验收见实施记录，不静默假装实现。
+- 运行隔离：原环境BOM Agent集成源码不在本功能分支，后续部署前需保留这些修复；本轮不合并、不替换原5180/8081。

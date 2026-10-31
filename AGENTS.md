@@ -248,3 +248,11 @@
 - 本模块现已授权真实 Kestra、Go Job Service、Agent/mTLS与SSH双通道实施；保留统一 CMDB/RBAC/Secret引用及维护态IPMI-only。其他模块不随之真实化。
 - 导航严格 Flows（父入口）、Executions、Agents；模板、文件和调度归上下文。保留其他模块使用的共享实现，不批量删除 Mock/API。
 - 进度、契约与未验证事项写入实施记录；不得将引擎HTTP200或编译通过当作真实设备批量验收。
+
+
+### Flows 接续入口与当前限制
+
+- 当前代码在独立`/home/ubuntu/keel-flows-dev`的`feat/flows-redesign`；先查`HANDOFF.md`、`docs/flows-redesign/implementation.md`与`docs/api/flows.md`，不要重复遍历仓库或运行全平台冒烟。
+- 真实API字段只定义于OpenAPI FlowsReal及生成类型。实现/隔离部署/检查/生产未验收分开登记，契约变化同步注册表和使用文档。
+- 原5180/8081不含本分支Flows；本地5190/8096、独立DB/合成资产用于开发验证。未授权不覆盖原环境、合并main或导入生产资产。
+- 目标批次Schedule当前显式阻断；每目标受控单任务/文本Namespace/SSE重取等限制以实施记录为准，不用按钮可见推定完整能力。maintained及接受后不明状态不得通过fallback重跑绕过。

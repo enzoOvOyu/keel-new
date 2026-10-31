@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-31T08:29:04Z",
+  "environment": "isolated5190/8096/8095; separate keel_flows_dev DB",
+  "checks": [
+    "Real Kestra v2 controlled template → mTLS nonroot local Agent → exit0 and exact stdout",
+    "Live target stdout received before completion",
+    "Dispatch ticket redacted from public execution",
+    "Execution cursor returns older distinct row and rejects changed query scope",
+    "Unassigned project query denied403",
+    "Native Kestra Pause → authorized resume → SUCCESS",
+    "Namespace text file save/read roundtrip",
+    "Stale Flow revision rejected409"
+  ],
+  "production_devices": false,
+  "ssh_integration": "TestKestraSSHIntegration PASS; two synthetic SSH protocol endpoints, partial failure, failed-only retry new execution, strict known_hosts, idempotency",
+  "limitations": [
+    "Not production hardware validation",
+    "No 8-device production mixed batch or production Bootstrap installation"
+  ]
+}

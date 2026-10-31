@@ -192,3 +192,10 @@ IA v2.3 插入前端 Mock 阶段：先冻结 IA-V2.3.md 的页面注册、作用
 4. 一次集中执行受影响的类型、构建和纯逻辑检查，更新实施报告和 HANDOFF；真实导入及运行环境联调待用户安排。
 
 仅在 `feat/datacenter-visualization-approved` 开发，未经指令不合并/发布，不自行调整运行环境。详见 [实施报告](topology/implementation-report.md)。
+
+
+## Flows 包重构实施增补 · 2026-10-31
+
+Flows包授权真实全栈实施，在feat/flows-redesign独立工作区交付。当前代码、下一步缺口与运行环境见实施记录；不隐含其他模块真实化或main合并。
+
+详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。

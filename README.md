@@ -30,3 +30,6 @@ MinIO 默认使用本机已有的 `keel-minio:2025-10-15-9e49d5e` 镜像；其�
 
 
 真实项目创建入口：`/projects`，创建后进入该项目BOM。AI接入配置入口：`/admin/ai-provider`，支持OpenAI兼容Chat Completions和Keel mapping协议，配置由Go持久化，密钥不回显。说明见 [项目与AI配置](docs/PROJECT-AI-CONFIGURATION.md)。
+
+
+Flows 功能分支：见 [实施与运行记录](docs/flows-redesign/implementation.md)；原运行环境保持不变。

@@ -313,3 +313,10 @@ FR-28：CMDB升级全链路资产档案。保留跨项目授权与统一设备�
 ## 批准可视化实施映射 · 2026-10-31
 
 既定数据中心拓扑与机柜能力按 [topology.md](topology.md)、机房原型验证记录及引用原型在功能分支落实；本轮不新增交付阶段或平行资产实体。CMDB 稳定身份、位置/物理/逻辑/观测的事实分层、项目授权和既有变更审批保持不变。按需查询、分页、局部缺口与能力不支持须可见，不以当前窗口冒充全域完整。代码、验证及待用户联调范围见 [实施报告](topology/implementation-report.md)。
+
+
+## Flows 包重构实施增补 · 2026-10-31
+
+FR-7 当前实施补充：Flows是CMDB目标批量作业入口；仅Executions与Agents子入口。真实实现范围、限制和旧页面迁移见实施记录；既有六阶段、维护态与审批不改变。
+
+详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。

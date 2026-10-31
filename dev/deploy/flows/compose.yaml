@@ -35,6 +35,8 @@ services:
             username: kestra
             password: ${KESTRA_DB_PASSWORD}
         kestra:
+          encryption:
+            secret-key: ${KESTRA_ENCRYPTION_KEY:?set KESTRA_ENCRYPTION_KEY}
           server:
             basic-auth:
               enabled: true

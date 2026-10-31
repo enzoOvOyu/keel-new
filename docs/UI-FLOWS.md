@@ -179,3 +179,10 @@ Fabric无损选择设备/反例→端口→rule@version→五层证据→读取�
 ## 2026-10-31 · Gallery → Dual → Mapping
 
 机柜阵列搜索/Pod筛选 → 同一 ID 的前后双面 → 选择设备 → Mapping 登记端口 → Cable 双端 → 既有布线矩阵/链路追踪。选择、叠加层和筛选写 URL；实装对比缺快照时只提供来源与缺口入口。展示草稿保存不触发 CMDB 变更。详见 [rack-visualization.md](rack-visualization.md)，本次只替换独立 5181 原型。
+
+
+## Flows 包重构实施增补 · 2026-10-31
+
+入口Flows→创建/模板→Visual或YAML→校验/保存→选择CMDB目标→脚本/通道→真实预检→冻结确认→Execution→失败目标新执行；Files/Triggers/Revisions在Flow详情上下文。
+
+详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。

@@ -1,0 +1,17 @@
+id: native-observe
+# Replace only with capabilities.namespace from the authorized project.
+namespace: keel.REPLACE_WITH_PROJECT_NAMESPACE
+inputs:
+  - id: message
+    type: STRING
+    defaults: observation-only
+tasks:
+  - id: log
+    type: io.kestra.plugin.core.log.Log
+    message: "{{ inputs.message }}"
+triggers:
+  - id: schedule
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 */6 * * *"
+    timezone: UTC
+    disabled: true

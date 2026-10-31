@@ -232,3 +232,10 @@ cmdb_entity稳定text资产键保持历史UUID原值，bom_item_uid保留唯一�
 本轮只复用 cmdb_entity、cmdb_asset_scope、cmdb_relationship、来源与修订，不新增平行设备/线缆/位置表。子图、矩阵、连接分页与 Trace 为查询返回类型，字段权威见 OpenAPI。
 
 `read_at` 为查询时间；`observed_at` 为具体观测时间，不能互换。`snapshot_id` 为当前查询版本指纹，不代表存储了历史快照。`coverage`、分页和 `truncated` 说明当前范围，不得拿局部返回量充当全域总数。关系来源、事实层、修订及端口归属必须可追溯。未知数值保留 null/缺失，明确成员派生的 GPU/NIC 数量须保留依据。机柜占用按 U 区间并集计算，前后视图不重复计数；未知高度不能算作 0U。详见 [实施报告](topology/implementation-report.md)。
+
+
+## Flows 包重构实施增补 · 2026-10-31
+
+复用CMDB asset ID/scope、User与Outbox。迁移021定义FlowBinding、ExecutionBinding/Target、SSHTrust、Agent/Enrollment/Task、DispatchTicket、Audit；022仅引擎状态索引投影，不建平行资产。
+
+详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。

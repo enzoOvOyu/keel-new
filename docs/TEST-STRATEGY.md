@@ -159,3 +159,10 @@ IA验收分层：OpenAPI schema和分页/权限错误契约；ProjectContext单�
 本轮先完成五工作区及专用查询契约，对游标绑定、范围过滤、矩阵成员、缺端/歧义、只沿证据追踪、unknown 和几何占用选择必要纯逻辑反例。前端类型生成与构建检查实际改动；不为了覆盖率重复原型脚本或全平台冒烟。
 
 用户要求仅代码分支隔离：不得为验证自行启动前端/API、运行迁移、导入资产或替换现有 5180/8081。真实数据库导入与全链联调由用户后续统一安排。历史截图/检查保留其当时范围，新增查询没有运行时验收时明确 NOT RUN。统一结果见 [实施报告](topology/implementation-report.md)。
+
+
+## Flows 包重构实施增补 · 2026-10-31
+
+本轮仅Flows规则/契约、真实Kestra+隔离DB+SSH协议端点、本地非rootAgent与定向浏览器检查；不用全平台冒烟替代行为验证，不修改原测试环境。
+
+详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。

@@ -64,3 +64,8 @@ node dev/scripts/check-real-api-docs.mjs
 需要已安装的 `dev/` 依赖，复用现有 YAML 包。检查注册表中的方法/路径、operationId、请求/响应 Schema、实现文件、说明链接及部署证据。它不启动服务、不请求数据库、不调用 AI，不证明 HTTP、权限、SQL语义或性能正确；这些必须有独立验证记录。
 
 新增模块逐步登记，未登记的设计操作不会因此被判定为失败或已实现。
+
+
+## Flows 功能分支真实实现
+
+新增 [Flows 实际契约](api/flows.md)。登记表中的Flows操作只表示独立开发分支实现，运行与检查见[实施记录](flows-redesign/implementation.md)；不继承上方可视化部署4541850的证据，不代表已替换原5180/8081。

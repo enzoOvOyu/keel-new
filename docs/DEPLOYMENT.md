@@ -125,3 +125,10 @@
 - 四个查询接口200、五个工作区加载通过；记录为 `topology/deployment-validation.json`。未进行完整交互回归、真实导入或规模验收。
 
 回退：停止上述两个 tmux 服务，等待5180/8081释放后，将 API 恢复为 `/tmp/keel-cmdb-api`（同原后端目录/配置），前端恢复从 `/home/ubuntu/keel/dev` 执行原5180启动命令。原目录源代码仍为 `keel-new-main` / `978db7f`，不需要回退数据库。不要在端口尚未释放时直接起第二个监听实例。
+
+
+## Flows 包重构实施增补 · 2026-10-31
+
+Flows只启用独立开发服务，不覆盖5180/8081。部署、迁移021/022、私有配置、PKI与Agent前提见../dev/deploy/flows/README.md。切勿将功能分支旧后端覆盖当前环境BOM Agent集成修复。
+
+详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。

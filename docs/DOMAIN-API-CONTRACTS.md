@@ -251,3 +251,10 @@ AIProviderConfiguration/Command/TestCommand/TestResult/Option是系统配置与B
 Fabric 筛选仅使用显式 device/port→logical_membership→network_segment/Fabric 归属及已有fabric字段，不根据线缆生成逻辑网络；`__unassigned__` 是查询筛选值，不是新资产。`unplaced=true` 是位置未分配视图范围，不创建虚拟机柜。搜索兼容顶层属性与旧 `payload.fields`，匹配SN、Hostname、管理/BMC/IP、MAC、physical_name和稳定ID。端口多设备归属保持未知，不使用最小ID或第一条关系代替；矩阵排除缺口，连接页仍保留异常记录。分类空值是未登记，不换算速率、不补零、不自动判健康。超时返回504。
 
 本轮只执行新查询的纯逻辑/契约检查及Go编译，未连接数据库运行这些新端点，未重启服务、未导入/迁移数据；此前full投影性能记录不能当成新分页SQL性能证明。
+
+
+## Flows 包重构实施增补 · 2026-10-31
+
+Flows真实模块契约入口api/flows.md；Kestra编排、Go授权/目标/通道、Agent本地执行职责分离。受限插件与目标Schedule缺口明确拒绝，不发明已安装插件。
+
+详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。

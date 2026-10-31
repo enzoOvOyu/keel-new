@@ -273,3 +273,10 @@ Schema版本激活前检查兼容性与存量数据。ChangeSet为Draft→Review
 - 缺端、歧义、多 Cable 和未加载范围明确展示；仅已加载记录不能推断端口空闲、全域数量或健康。端口有多个候选需用户选择，不默认第一条。
 - 物理追踪只沿有明确来源的端接及已证明的贯通继续；无转发资料时 Logical Trace 不支持，不将设备邻接 BFS 当实际路径。
 - 机柜展示草稿、个人视图和资产安装事实分离；位置变更复用 ChangeSet 审批，不从拖拽直接提交实装位置。没有确认规划与实装配对快照，不生成比较。
+
+
+## Flows 包重构实施增补 · 2026-10-31
+
+执行先冻结授权项目/目标版本/通道，Agent接受后失联进入RECONCILING，仅对账不自动SSH重跑。失败重试创建新Execution，原成功目标不重复执行。
+
+详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。
