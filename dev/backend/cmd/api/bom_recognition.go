@@ -136,20 +136,7 @@ func (s *Server) runRecognition(ctx context.Context, job, id string, rev int, pa
 		b.Sheets = append(b.Sheets, info)
 	}
 	save := func(final bool) bool {
-		bom.CompactWorkbench(&b)
-		data, marshalErr := json.Marshal(b)
-		if marshalErr != nil {
-			return false
-		}
-		query := "UPDATE bom_import_batch SET workbench=$2,updated_at=now() WHERE id=$1 AND revision=$3"
-		args := []any{id, data, rev}
-		if final {
-			draft, _ := json.Marshal(bom.WorkbenchItems(b, s.project))
-			query = "UPDATE bom_import_batch SET workbench=$2,draft=$4,revision=revision+1,reviewed_revision=NULL,updated_at=now() WHERE id=$1 AND revision=$3"
-			args = append(args, draft)
-		}
-		tag, e := s.db.Exec(ctx, query, args...)
-		return e == nil && tag.RowsAffected() == 1
+		return s.saveRecognitionSnapshot(ctx, id, rev, &b, final)
 	}
 	save(false)
 	safeWorkbook := bom.Workbook{}
@@ -750,4 +737,36 @@ func sourceCategory(c bom.Cell) string {
 		return kind
 	}
 	return ""
+}
+
+// Keep checkpoint and final draft atomic while releasing each PostgreSQL JSON
+// input context before parsing the next large document.
+func (s *Server) saveRecognitionSnapshot(ctx context.Context, id string, rev int, b *bom.Workbench, final bool) bool {
+	bom.CompactWorkbench(b)
+	data, err := json.Marshal(b)
+	if err != nil {
+		return false
+	}
+	if !final {
+		tag, err := s.db.Exec(ctx, "UPDATE bom_import_batch SET workbench=$2,updated_at=now() WHERE id=$1 AND revision=$3", id, data, rev)
+		return err == nil && tag.RowsAffected() == 1
+	}
+	tx, err := s.db.Begin(ctx)
+	if err != nil {
+		return false
+	}
+	defer tx.Rollback(ctx)
+	tag, err := tx.Exec(ctx, "UPDATE bom_import_batch SET workbench=$2,revision=revision+1,reviewed_revision=NULL,updated_at=now() WHERE id=$1 AND revision=$3", id, data, rev)
+	if err != nil || tag.RowsAffected() != 1 {
+		return false
+	}
+	data = nil
+	draft, err := json.Marshal(bom.WorkbenchItems(*b, s.project))
+	if err != nil {
+		return false
+	}
+	if _, err = tx.Exec(ctx, "UPDATE bom_import_batch SET draft=$2 WHERE id=$1", id, draft); err != nil {
+		return false
+	}
+	return tx.Commit(ctx) == nil
 }
