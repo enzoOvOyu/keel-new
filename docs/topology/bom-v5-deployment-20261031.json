@@ -1,0 +1,123 @@
+{
+  "status": "DEPLOYED_VERIFIED",
+  "deployed_at": "2026-10-31T09:26:55.236257+00:00",
+  "verified_at": "2026-10-31T09:27:51.783483+00:00",
+  "source_commit": "fdffbcb",
+  "original_fix_commit": "67c7f1d",
+  "flows_base": "6884439",
+  "source_worktree": "/tmp/keel-bom-v5-deploy",
+  "branch": "deploy/bom-v5-flows-1031",
+  "binary": "/tmp/keel-api-bom-v5-flows-1031",
+  "sha256": "42704175d721ecc7a994acaaf14359a98cb349bb49b1bd71bfd2663a22fcd664",
+  "pid": 3708647,
+  "previous_binary": "/tmp/keel-api-flows-combined-1031",
+  "api": "127.0.0.1:8081",
+  "frontend": "http://localhost:5180",
+  "frontend_worktree": "/home/ubuntu/keel-flows-dev/dev",
+  "configuration": "previous process environment byte-identical; original backend cwd preserved",
+  "checks": [
+    {
+      "check": "backend_health",
+      "http": 200
+    },
+    {
+      "check": "frontend_entry",
+      "http": 200
+    },
+    {
+      "check": "existing_admin_login_through_5180",
+      "http": 200
+    },
+    {
+      "check": "flows/capabilities",
+      "http": 200
+    },
+    {
+      "check": "flows",
+      "http": 200
+    },
+    {
+      "check": "flows/agents",
+      "http": 200
+    },
+    {
+      "check": "flows/executions",
+      "http": 200
+    },
+    {
+      "check": "flows/targets",
+      "http": 200
+    },
+    {
+      "check": "ai/provider-options",
+      "http": 200
+    },
+    {
+      "check": "cmdb/visualization?detail=full&limit=5000",
+      "http": 200,
+      "assets": 4703,
+      "cables": 705,
+      "truncated": false
+    },
+    {
+      "check": "cmdb/visualization/subgraph?view=physical&limit=20",
+      "http": 200
+    },
+    {
+      "check": "cmdb/visualization/connections?limit=20",
+      "http": 200
+    },
+    {
+      "check": "cmdb/visualization/matrix?axes=server_switch&limit=20",
+      "http": 200,
+      "included": 641,
+      "excluded": 64
+    },
+    {
+      "check": "cmdb/visualization/matrix?axes=leaf_spine&limit=20",
+      "http": 200,
+      "included": 64,
+      "excluded": 641
+    },
+    {
+      "check": "cmdb/visualization/matrix?axes=rack_leaf&limit=20",
+      "http": 200,
+      "included": 640,
+      "excluded": 65
+    },
+    {
+      "check": "cmdb/visualization/matrix?axes=port_pair&limit=20",
+      "http": 200,
+      "included": 705,
+      "excluded": 0
+    },
+    {
+      "check": "existing_synthetic_physical_trace",
+      "http": 200,
+      "segments": 1
+    },
+    {
+      "check": "existing_isolated_bom_progress",
+      "http": 200
+    }
+  ],
+  "before": {
+    "active_bom_jobs": 0,
+    "flow_executions": 0,
+    "submissions": 8,
+    "assets": 92
+  },
+  "after": {
+    "active_bom_jobs": 0,
+    "flow_executions": 0,
+    "submissions": 8,
+    "assets": 92
+  },
+  "migrations": [],
+  "real_provider_calls": 0,
+  "formal_bom_submissions": 0,
+  "browser_acceptance": "NOT_RUN",
+  "rollback_launcher": "/tmp/keel-bom-v5-rollback-api.py",
+  "startup_launcher": "/tmp/keel-bom-v5-run-api.py",
+  "deployment_note": "Initial script verified the tmux shell PID rather than its API child and stopped after healthy startup; follow-up verified actual executable, compiled revision, full process environment and APIs. No second service restart."
+}
