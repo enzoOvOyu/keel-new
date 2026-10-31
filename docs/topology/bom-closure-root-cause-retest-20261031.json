@@ -1,0 +1,778 @@
+{
+  "status": "FAIL_REAL_SOURCE_BOM_CMDB_TOPOLOGY_CLOSURE",
+  "recorded_at": "2026-10-31T10:08:08.612279+00:00",
+  "runtime": "fdffbcb / /tmp/keel-api-bom-v5-flows-1031",
+  "method": "Two fresh independently marked projects, sequential uploads and one external-provider recognition per unchanged original workbook. API and read-only DB/source comparison. No business code edits, no model/identity/geometry fabrication, no bypass of review. Not five repeats.",
+  "source_integrity": [
+    {
+      "file": "bomv1.xlsx",
+      "same_source_sha256": true
+    },
+    {
+      "file": "netbom.xlsx",
+      "same_source_sha256": true
+    }
+  ],
+  "files": [
+    {
+      "file": "bomv1.xlsx",
+      "project_id": "proj-f389e107-13ff-42c0-8d2b-825ff91cb964",
+      "project_name": "独立测试-可清理-闭环根因-1031-bomv1-05944f",
+      "sha256": "30481c4619366bcdc707c9b58f2118349eb599f4260d5f73010fe3b7a3782558",
+      "id": "d44245ba-a70c-4c5d-9f20-474a9912ef1a",
+      "state": "pending_review",
+      "error": "COVERAGE_REVIEW_REQUIRED",
+      "records": 27681,
+      "categories": {
+        "other": 787,
+        "cable": 8018,
+        "optic_module": 14408,
+        "server": 778,
+        "material": 72,
+        "disk": 2,
+        "cpu": 1,
+        "rack": 1,
+        "switch": 158,
+        "port": 3456
+      },
+      "rules": {
+        "BOM-CATEGORY": 742,
+        "SOURCE-CLASSIFICATION": 787,
+        "BOM-CABLE": 12580,
+        "CABLE-SPEED-EVIDENCE": 8018,
+        "BOM-SERIAL": 14566,
+        "BOM-MODEL": 1126,
+        "OPTIC-PORT": 11096,
+        "CABLE-MEDIA": 432,
+        "BOM-PORT-OCCUPIED": 815,
+        "BOM-IDENTITY": 139,
+        "BOM-CABLE-SELF": 27,
+        "BOM-U-RANGE": 778,
+        "BOM-NETWORK-RANGE": 815,
+        "MODEL-APPROVED-REVISION": 14218,
+        "MATERIAL-PLAN": 255,
+        "BOM-PARENT": 10128,
+        "OPTIC-SPEED": 3312,
+        "OPTIC-TYPE": 3312
+      },
+      "duplicate_ids": 0,
+      "coverage": {
+        "complete": false,
+        "total_cells": 162715,
+        "retained_cells": 162715,
+        "extracted_cells": 76509
+      },
+      "cable_closure": {
+        "direct_blocked": 8018
+      },
+      "cables_by_sheet": {
+        "Cabling_EW_SP-LF": 2592,
+        "Cabling_GB_OUT": 3456,
+        "Cabling_HDD_SSD_CPU": 406,
+        "Cabling_NS": 484,
+        "Cabling_OOB": 648,
+        "P2P-18": 432
+      },
+      "cables_with_two_existing_port_candidates": 0,
+      "failed_sheets": [
+        {
+          "sheet": "Network Information",
+          "error": "AGENT_PLAN_NOT_ACCEPTED: SOURCE_FIELD_UNCOVERED: row=2 column=4 field=hostname; inspect this region and preserve the explicit source field"
+        }
+      ],
+      "source_comparison": [
+        {
+          "sheet": "Network Information",
+          "counts": {
+            "expected_rows": 189,
+            "expected_hostname": 189,
+            "expected_model": 189
+          }
+        },
+        {
+          "sheet": "Server Information",
+          "counts": {
+            "expected_rows": 778,
+            "entity_present": 778,
+            "expected_hostname": 778,
+            "matched_hostname": 778,
+            "expected_model": 778,
+            "matched_model": 778,
+            "all_fields_match": 778
+          }
+        },
+        {
+          "sheet": "Cabling_EW_SP-LF",
+          "counts": {
+            "expected_rows": 2592,
+            "category_present": 2592,
+            "expected_endpoint_a_device": 2592,
+            "matched_endpoint_a_device": 2592,
+            "expected_endpoint_a_port": 2592,
+            "matched_endpoint_a_port": 2592,
+            "expected_endpoint_b_port": 2592,
+            "matched_endpoint_b_port": 2592,
+            "expected_endpoint_b_device": 2592,
+            "matched_endpoint_b_device": 2592,
+            "expected_model": 2592,
+            "cable_model_preserved_in_model_spec_or_name": 2592,
+            "matched_model": 2592,
+            "expected_length": 2592,
+            "matched_length": 2592,
+            "expected_media_type": 2592,
+            "matched_media_type": 2592,
+            "all_fields_match": 2592
+          }
+        },
+        {
+          "sheet": "Cabling_NS",
+          "counts": {
+            "expected_rows": 484,
+            "category_present": 484,
+            "expected_endpoint_a_device": 484,
+            "matched_endpoint_a_device": 484,
+            "expected_endpoint_a_port": 484,
+            "matched_endpoint_a_port": 484,
+            "expected_endpoint_b_port": 484,
+            "matched_endpoint_b_port": 484,
+            "expected_endpoint_b_device": 484,
+            "matched_endpoint_b_device": 484,
+            "expected_model": 484,
+            "cable_model_preserved_in_model_spec_or_name": 484,
+            "matched_model": 484,
+            "expected_length": 484,
+            "matched_length": 484,
+            "expected_media_type": 484,
+            "matched_media_type": 484,
+            "all_fields_match": 484
+          }
+        },
+        {
+          "sheet": "Cabling_GB_OUT",
+          "counts": {
+            "expected_rows": 3456,
+            "category_present": 3456,
+            "expected_endpoint_a_device": 3456,
+            "matched_endpoint_a_device": 3456,
+            "expected_endpoint_a_port": 3456,
+            "matched_endpoint_a_port": 3456,
+            "expected_endpoint_b_port": 3456,
+            "matched_endpoint_b_port": 3456,
+            "expected_endpoint_b_device": 3456,
+            "matched_endpoint_b_device": 3456,
+            "expected_model": 3456,
+            "cable_model_preserved_in_model_spec_or_name": 3456,
+            "matched_model": 3456,
+            "expected_length": 3456,
+            "matched_length": 3456,
+            "expected_media_type": 3456,
+            "matched_media_type": 3456,
+            "all_fields_match": 3456
+          }
+        },
+        {
+          "sheet": "Cabling_OOB",
+          "counts": {
+            "expected_rows": 216,
+            "category_present": 216,
+            "expected_endpoint_a_device": 216,
+            "matched_endpoint_a_device": 216,
+            "expected_endpoint_a_port": 216,
+            "matched_endpoint_a_port": 216,
+            "expected_endpoint_b_port": 216,
+            "matched_endpoint_b_port": 216,
+            "expected_endpoint_b_device": 216,
+            "matched_endpoint_b_device": 216,
+            "expected_model": 216,
+            "cable_model_preserved_in_model_spec_or_name": 216,
+            "matched_model": 216,
+            "expected_length": 216,
+            "matched_length": 216,
+            "expected_media_type": 216,
+            "matched_media_type": 216,
+            "all_fields_match": 216
+          }
+        },
+        {
+          "sheet": "Cabling_HDD_SSD_CPU",
+          "counts": {
+            "expected_rows": 406,
+            "category_present": 406,
+            "expected_endpoint_a_device": 406,
+            "expected_endpoint_a_port": 406,
+            "matched_endpoint_a_port": 406,
+            "expected_endpoint_b_port": 406,
+            "matched_endpoint_b_port": 406,
+            "expected_endpoint_b_device": 406,
+            "expected_model": 406,
+            "cable_model_preserved_in_model_spec_or_name": 406,
+            "matched_model": 406,
+            "expected_length": 406,
+            "matched_length": 406,
+            "expected_media_type": 406,
+            "matched_media_type": 406
+          }
+        }
+      ],
+      "job": {
+        "schema_version": "workbook-agent/v5",
+        "model": "deepseek/deepseek-v4.1-flash-1017",
+        "provider_revision": 5,
+        "error_code": "COVERAGE_REVIEW_REQUIRED",
+        "duration_ms": 397571,
+        "model_calls": 67,
+        "input_tokens": 1028284,
+        "output_tokens": 13097,
+        "failed_sheets": 3,
+        "completed_sheets": 15,
+        "total_sheets": 15
+      }
+    },
+    {
+      "file": "netbom.xlsx",
+      "project_id": "proj-2b53b2bf-9c96-4290-a3b0-0df4f6748114",
+      "project_name": "独立测试-可清理-闭环根因-1031-netbom-08a35c",
+      "sha256": "f954180234216185c0e97daeace4fe2a42e6bf90b1657f75a3247308721d32ec",
+      "id": "1836d51e-b546-4566-89df-c200232acde3",
+      "state": "pending_review",
+      "error": "COVERAGE_REVIEW_REQUIRED",
+      "records": 27949,
+      "categories": {
+        "other": 881,
+        "cable": 8096,
+        "optic_module": 13447,
+        "rack": 800,
+        "server": 778,
+        "material": 85,
+        "port": 3862
+      },
+      "rules": {
+        "BOM-CATEGORY": 878,
+        "SOURCE-CLASSIFICATION": 881,
+        "BOM-CABLE": 11310,
+        "CABLE-SPEED-EVIDENCE": 7586,
+        "BOM-SERIAL": 13440,
+        "BOM-PARENT": 9840,
+        "OPTIC-PORT": 9840,
+        "MODEL-APPROVED-REVISION": 14218,
+        "MATERIAL-PLAN": 1629,
+        "BOM-IDENTITY": 1349,
+        "BOM-RACK": 800,
+        "BOM-U-RANGE": 1576,
+        "BOM-PORT-OCCUPIED": 815,
+        "BOM-CABLE-SELF": 27,
+        "BOM-NETWORK-RANGE": 711,
+        "SOURCE-EVIDENCE": 630,
+        "OPTIC-SPEED": 3600,
+        "OPTIC-TYPE": 3600
+      },
+      "duplicate_ids": 0,
+      "coverage": {
+        "complete": false,
+        "total_cells": 162715,
+        "retained_cells": 162715,
+        "extracted_cells": 88101
+      },
+      "cable_closure": {
+        "direct_blocked": 8096
+      },
+      "cables_by_sheet": {
+        "Cabling_EW_SP-LF": 2592,
+        "Cabling_GB_OUT": 3456,
+        "Cabling_HDD_SSD_CPU": 406,
+        "Cabling_NS": 968,
+        "Cabling_OOB": 216,
+        "P2P-18": 432,
+        "物料": 26
+      },
+      "cables_with_two_existing_port_candidates": 0,
+      "failed_sheets": [
+        {
+          "sheet": "Network Information",
+          "error": "AGENT_PLAN_NOT_ACCEPTED: SOURCE_FIELD_UNCOVERED: row=2 column=11 field=rack; inspect this region and preserve the explicit source field"
+        }
+      ],
+      "source_comparison": [
+        {
+          "sheet": "Network Information",
+          "counts": {
+            "expected_rows": 189,
+            "expected_hostname": 189,
+            "expected_model": 189
+          }
+        },
+        {
+          "sheet": "Server Information",
+          "counts": {
+            "expected_rows": 778,
+            "entity_present": 778,
+            "expected_hostname": 778,
+            "matched_hostname": 778,
+            "expected_model": 778,
+            "matched_model": 778,
+            "all_fields_match": 778
+          }
+        },
+        {
+          "sheet": "Cabling_EW_SP-LF",
+          "counts": {
+            "expected_rows": 2592,
+            "category_present": 2592,
+            "expected_endpoint_a_device": 2592,
+            "matched_endpoint_a_device": 2592,
+            "expected_endpoint_a_port": 2592,
+            "matched_endpoint_a_port": 2592,
+            "expected_endpoint_b_port": 2592,
+            "matched_endpoint_b_port": 2592,
+            "expected_endpoint_b_device": 2592,
+            "expected_model": 2592,
+            "cable_model_preserved_in_model_spec_or_name": 2592,
+            "matched_model": 2592,
+            "expected_length": 2592,
+            "matched_length": 2592,
+            "expected_media_type": 2592,
+            "matched_media_type": 2592
+          }
+        },
+        {
+          "sheet": "Cabling_NS",
+          "counts": {
+            "expected_rows": 484,
+            "category_present": 484,
+            "expected_endpoint_a_device": 484,
+            "matched_endpoint_a_device": 484,
+            "expected_endpoint_a_port": 484,
+            "matched_endpoint_a_port": 484,
+            "expected_endpoint_b_port": 484,
+            "matched_endpoint_b_port": 484,
+            "expected_endpoint_b_device": 484,
+            "matched_endpoint_b_device": 484,
+            "expected_model": 484,
+            "cable_model_preserved_in_model_spec_or_name": 484,
+            "matched_model": 484,
+            "expected_length": 484,
+            "matched_length": 484,
+            "expected_media_type": 484,
+            "matched_media_type": 484,
+            "all_fields_match": 484
+          }
+        },
+        {
+          "sheet": "Cabling_GB_OUT",
+          "counts": {
+            "expected_rows": 3456,
+            "category_present": 3456,
+            "expected_endpoint_a_device": 3456,
+            "matched_endpoint_a_device": 3456,
+            "expected_endpoint_a_port": 3456,
+            "matched_endpoint_a_port": 3456,
+            "expected_endpoint_b_port": 3456,
+            "matched_endpoint_b_port": 3456,
+            "expected_endpoint_b_device": 3456,
+            "matched_endpoint_b_device": 3456,
+            "expected_model": 3456,
+            "cable_model_preserved_in_model_spec_or_name": 3456,
+            "matched_model": 3456,
+            "expected_length": 3456,
+            "matched_length": 3456,
+            "expected_media_type": 3456,
+            "matched_media_type": 3456,
+            "all_fields_match": 3456
+          }
+        },
+        {
+          "sheet": "Cabling_OOB",
+          "counts": {
+            "expected_rows": 216,
+            "category_present": 216,
+            "expected_endpoint_a_device": 216,
+            "matched_endpoint_a_device": 216,
+            "expected_endpoint_a_port": 216,
+            "matched_endpoint_a_port": 216,
+            "expected_endpoint_b_port": 216,
+            "matched_endpoint_b_port": 216,
+            "expected_endpoint_b_device": 216,
+            "matched_endpoint_b_device": 216,
+            "expected_model": 216,
+            "cable_model_preserved_in_model_spec_or_name": 216,
+            "matched_model": 216,
+            "expected_length": 216,
+            "matched_length": 216,
+            "expected_media_type": 216,
+            "matched_media_type": 216,
+            "all_fields_match": 216
+          }
+        },
+        {
+          "sheet": "Cabling_HDD_SSD_CPU",
+          "counts": {
+            "expected_rows": 406,
+            "category_present": 406,
+            "expected_endpoint_a_device": 406,
+            "matched_endpoint_a_device": 406,
+            "expected_endpoint_a_port": 406,
+            "matched_endpoint_a_port": 406,
+            "expected_endpoint_b_port": 406,
+            "matched_endpoint_b_port": 406,
+            "expected_endpoint_b_device": 406,
+            "matched_endpoint_b_device": 406,
+            "expected_model": 406,
+            "cable_model_preserved_in_model_spec_or_name": 406,
+            "matched_model": 406,
+            "expected_length": 406,
+            "matched_length": 406,
+            "expected_media_type": 406,
+            "matched_media_type": 406,
+            "all_fields_match": 406
+          }
+        }
+      ],
+      "job": {
+        "schema_version": "workbook-agent/v5",
+        "model": "deepseek/deepseek-v4.1-flash-1017",
+        "provider_revision": 5,
+        "error_code": "COVERAGE_REVIEW_REQUIRED",
+        "duration_ms": 282077,
+        "model_calls": 49,
+        "input_tokens": 642891,
+        "output_tokens": 14984,
+        "failed_sheets": 3,
+        "completed_sheets": 15,
+        "total_sheets": 15
+      }
+    }
+  ],
+  "gates": [
+    {
+      "file": "bomv1.xlsx",
+      "revision": 2,
+      "checks": [
+        {
+          "action": "records",
+          "http": 422,
+          "error": "SELECTED_RECORDS_REQUIRE_CORRECTION",
+          "source_sheet": "Network Information",
+          "source_row": 2
+        },
+        {
+          "action": "submit",
+          "http": 422,
+          "error": "SELECTED_RECORDS_NOT_CONFIRMED_OR_VALID",
+          "source_sheet": "Network Information",
+          "source_row": 2
+        }
+      ]
+    },
+    {
+      "file": "netbom.xlsx",
+      "revision": 2,
+      "checks": [
+        {
+          "action": "records",
+          "http": 422,
+          "error": "SELECTED_RECORDS_REQUIRE_CORRECTION",
+          "source_sheet": "Network Information",
+          "source_row": 2
+        },
+        {
+          "action": "submit",
+          "http": 422,
+          "error": "SELECTED_RECORDS_NOT_CONFIRMED_OR_VALID",
+          "source_sheet": "Network Information",
+          "source_row": 2
+        }
+      ]
+    }
+  ],
+  "topology_checks": [
+    {
+      "file": "bomv1.xlsx",
+      "project_id": "proj-6275ce26-f6b6-4b10-b200-5d2dd2699cef",
+      "counts": {
+        "submissions": 0,
+        "assets": 0,
+        "outbox": 0
+      },
+      "checks": [
+        {
+          "endpoint": "visualization",
+          "http": 200,
+          "assets": 0,
+          "cables": 0,
+          "error": null
+        },
+        {
+          "axis": "server_switch",
+          "http": 200,
+          "cells": 0,
+          "included": 0,
+          "excluded": 0
+        },
+        {
+          "axis": "leaf_spine",
+          "http": 200,
+          "cells": 0,
+          "included": 0,
+          "excluded": 0
+        },
+        {
+          "axis": "rack_leaf",
+          "http": 200,
+          "cells": 0,
+          "included": 0,
+          "excluded": 0
+        },
+        {
+          "axis": "port_pair",
+          "http": 200,
+          "cells": 0,
+          "included": 0,
+          "excluded": 0
+        }
+      ]
+    },
+    {
+      "file": "netbom.xlsx",
+      "project_id": "proj-c6568a0b-4bd7-4df7-b02c-44f41ba7da03",
+      "counts": {
+        "submissions": 0,
+        "assets": 0,
+        "outbox": 0
+      },
+      "checks": [
+        {
+          "endpoint": "visualization",
+          "http": 200,
+          "assets": 0,
+          "cables": 0,
+          "error": null
+        },
+        {
+          "axis": "server_switch",
+          "http": 200,
+          "cells": 0,
+          "included": 0,
+          "excluded": 0
+        },
+        {
+          "axis": "leaf_spine",
+          "http": 200,
+          "cells": 0,
+          "included": 0,
+          "excluded": 0
+        },
+        {
+          "axis": "rack_leaf",
+          "http": 200,
+          "cells": 0,
+          "included": 0,
+          "excluded": 0
+        },
+        {
+          "axis": "port_pair",
+          "http": 200,
+          "cells": 0,
+          "included": 0,
+          "excluded": 0
+        }
+      ]
+    },
+    {
+      "file": "bomv1.xlsx",
+      "project_id": "proj-f389e107-13ff-42c0-8d2b-825ff91cb964",
+      "counts": {
+        "submissions": 0,
+        "assets": 0,
+        "outbox": 0
+      },
+      "checks": [
+        {
+          "endpoint": "visualization",
+          "http": 200,
+          "assets": 0,
+          "cables": 0,
+          "error": null
+        },
+        {
+          "axis": "server_switch",
+          "http": 200,
+          "cells": 0,
+          "included": 0,
+          "excluded": 0
+        },
+        {
+          "axis": "leaf_spine",
+          "http": 200,
+          "cells": 0,
+          "included": 0,
+          "excluded": 0
+        },
+        {
+          "axis": "rack_leaf",
+          "http": 200,
+          "cells": 0,
+          "included": 0,
+          "excluded": 0
+        },
+        {
+          "axis": "port_pair",
+          "http": 200,
+          "cells": 0,
+          "included": 0,
+          "excluded": 0
+        }
+      ]
+    },
+    {
+      "file": "netbom.xlsx",
+      "project_id": "proj-2b53b2bf-9c96-4290-a3b0-0df4f6748114",
+      "counts": {
+        "submissions": 0,
+        "assets": 0,
+        "outbox": 0
+      },
+      "checks": [
+        {
+          "endpoint": "visualization",
+          "http": 200,
+          "assets": 0,
+          "cables": 0,
+          "error": null
+        },
+        {
+          "axis": "server_switch",
+          "http": 200,
+          "cells": 0,
+          "included": 0,
+          "excluded": 0
+        },
+        {
+          "axis": "leaf_spine",
+          "http": 200,
+          "cells": 0,
+          "included": 0,
+          "excluded": 0
+        },
+        {
+          "axis": "rack_leaf",
+          "http": 200,
+          "cells": 0,
+          "included": 0,
+          "excluded": 0
+        },
+        {
+          "axis": "port_pair",
+          "http": 200,
+          "cells": 0,
+          "included": 0,
+          "excluded": 0
+        }
+      ]
+    }
+  ],
+  "role_contract": {
+    "bomv1.xlsx": {
+      "switches": 189,
+      "network_role_present": 189,
+      "role_present": 0
+    },
+    "netbom.xlsx": {
+      "switches": 189,
+      "network_role_present": 189,
+      "role_present": 0
+    },
+    "sql_readonly_contract_probe": {
+      "matrix_role": "",
+      "stored_network_role": "leaf"
+    }
+  },
+  "sampled_peak_api_rss_mib": 1884,
+  "findings": [
+    {
+      "id": "CLOSE-01",
+      "severity": "P0",
+      "cause": "Core switch inventory extraction fails in both fresh imports despite explicit source headers; bounded Agent correction does not converge. Whole sheet remains raw evidence, not usable device candidates.",
+      "code": "dev/backend/internal/ai/planning_agent.go; extraction_coverage.go",
+      "effect": "Cable endpoints cannot obtain switch owners and stable physical ports."
+    },
+    {
+      "id": "CLOSE-02",
+      "severity": "P0",
+      "cause": "Mapping validation accepts semantic misbindings and inconsistent record-kind/entity-type pairs. P2P A/Z point columns can simultaneously bind device, port and UID; OOB component extractors can emit cable entities.",
+      "code": "dev/backend/internal/ai/planning.go:242; cmd/api/bom_recognition.go:620",
+      "evidence": "Fresh bomv1: P2P 432 extra cable candidates; OOB 648 instead of 216; Server Information source placement-name column bound to VLAN; HDD/SSD/CPU endpoint device bindings use cable label columns 15/16 instead of device columns 3/6. Fresh netbom: NS 968 instead of 484 cable candidates; 26 material-sheet cable candidates; 778 rack candidates from server rows; EW endpoint_b_device maps to cable label column16, differing from source device column6 on all2592 rows.",
+      "effect": "False candidates, invalid endpoints, numerical VLAN errors and incorrect identities."
+    },
+    {
+      "id": "CLOSE-03",
+      "severity": "P0",
+      "cause": "Planning-module generation and formal-asset validation disagree. Linker creates optic_module with record_kind=component while explicitly describing it as planning without SN; serial/type/speed validation then blocks it.",
+      "code": "dev/backend/internal/bom/recognition.go:248; domain.go:112; engineering.go:74",
+      "effect": "Many blocked components cannot be fixed by rerunning model classification or inventing serials."
+    },
+    {
+      "id": "CLOSE-04",
+      "severity": "P0",
+      "cause": "Formal publication prerequisites are unresolved: model catalog bindings, geometry and graph dependency closure.",
+      "evidence": "Current catalog contains four revisions. Historical complete inventories (967 records per workbook) match zero category/model pairs; 189+778 U positions have no u_height/rack_height. Historical direct-clear cables 4078/3456 have zero clear dependency closures.",
+      "code": "cmd/api/profiles.go:121; internal/bom/domain.go:161; cmd/api/domain.go:278",
+      "effect": "Review/submit is correctly blocked; no BOM publication event exists for CMDB to consume. These gaps must be resolved explicitly, not bypassed."
+    },
+    {
+      "id": "CLOSE-05",
+      "severity": "P1",
+      "cause": "BOM to topology role contract mismatch. Projection copies network_role as-is; topology matrix reads only role.",
+      "evidence": "Historical switch candidates have network_role 189/189 but role 0/189 in both workbooks. Exact read-only SQL expression returns empty role for a payload with network_role=leaf.",
+      "code": "internal/cmdb/domain.go:486; visual_queries.go:264; visual_queries.go:619",
+      "effect": "Even after publication, Leaf-Spine and Rack-Leaf can exclude links. Proven by code/data/SQL contract, not by successful real-file publication."
+    },
+    {
+      "id": "CLOSE-06",
+      "severity": "P1",
+      "cause": "Classification batch failures are added to sheet failure counter and their underlying error is discarded. Raw-cell retention completeness is also not semantic correctness.",
+      "code": "cmd/api/bom_recognition.go:382; internal/bom/intelligence.go:206",
+      "effect": "Recognized sheet counts and generic error text obscure actual missing/incorrect entities."
+    },
+    {
+      "id": "CLOSE-07",
+      "severity": "P1",
+      "cause": "Historical repeated-job OOM and stale persisted workbench state remain unresolved. Full workbench/IR decoding, copies and whole-document persistence are visible in code; exact allocation attribution has not been profiled.",
+      "evidence": "Prior API OOM at 2026-10-31 09:42:48 UTC. This fresh sequential run must not be represented as proving repeated-run memory recovery.",
+      "effect": "Reliability defect is separate from the fresh semantic failures; no need to reproduce OOM to establish current publication blockers."
+    }
+  ],
+  "conclusion": "The first broken edge is Agent candidates/relationships to valid reviewable BOM. Zero committed BOM means zero Outbox and zero imported CMDB assets, hence empty topology APIs. Separately the role contract would still impair specific matrices after ingestion. Current evidence does not establish that all CMDB or topology features are otherwise correct.",
+  "next_fix_order": [
+    "Validate source semantics and entity-kind consistency before accepting/caching recipes; converge on the explicit switch inventory and prevent duplicate/reference cables.",
+    "Reconcile planning versus physical component identity with existing domain rules, complete exact model binding and explicitly resolve missing geometry/rates.",
+    "Use one canonical role contract across BOM, CMDB projection and all matrix queries.",
+    "Fix diagnostics and large-workbench lifecycle; then perform one source-verified publish and reconcile formal BOM, Outbox, CMDB relationships and matrix members."
+  ],
+  "limits": [
+    "No successful formal publication of either original workbook; populated imported-project matrices, member drilldown and trace remain BLOCKED.",
+    "No browser/screenshot testing per user preference.",
+    "Source classification gold for all 778 mixed inventory rows has not been manually approved.",
+    "The first harness POST raced asynchronous parsing and got WORKBENCH_NOT_READY; resumed the same project and observed the automatically created job. No duplicate analysis job was launched for that race."
+  ],
+  "private_evidence": "/tmp/keel-closure-retest-20261031",
+  "final_checks": {
+    "health_http": 200,
+    "active_bom_jobs": 0,
+    "new_projects_submissions_assets_outbox": "All zero, verified through scoped SQL and API",
+    "current_run_oom": "No API process restart observed; original PID3726700 remains alive. Prior OOM was not re-tested with repeated jobs.",
+    "health_endpoint": "/healthz",
+    "api_process_exe": "/tmp/keel-api-bom-v5-flows-1031"
+  },
+  "test_projects": [
+    {
+      "name": "独立测试-可清理-闭环根因-1031-bomv1-05944f",
+      "project_id": "proj-f389e107-13ff-42c0-8d2b-825ff91cb964",
+      "import_id": "d44245ba-a70c-4c5d-9f20-474a9912ef1a"
+    },
+    {
+      "name": "独立测试-可清理-闭环根因-1031-netbom-08a35c",
+      "project_id": "proj-2b53b2bf-9c96-4290-a3b0-0df4f6748114",
+      "import_id": "1836d51e-b546-4566-89df-c200232acde3"
+    }
+  ]
+}
