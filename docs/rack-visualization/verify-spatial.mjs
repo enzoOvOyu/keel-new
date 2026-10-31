@@ -37,7 +37,7 @@ try{
  await camera('剖面').click();await detail('安装').click();await page.locator('.sr-constraint-list').waitFor();assert.match(await page.locator('.sr-details').innerText(),/缺.*深度|深度未定|未记录/);await shot('section-1600');
  await detail('容量').click();assert.match(await page.locator('.sr-capacity-number').innerText(),/29.*42/s);assert.match(await page.locator('.sr-capacity-legend').innerText(),/13U/);await shot('capacity-1600');
  pass('剖面显示未知几何，容量复用29U并集/13U未占用');
- await page.goto(base+'?rack=rack-0001&asset=srv-0001');await page.locator('.sr-panel-ports button').first().click();await page.locator('.sr-connection-guide').waitFor();
+ await page.goto(base+'?rack=rack-0001&asset=srv-0001');await camera('背视').click();await page.locator('.sr-scene-svg [data-port="srv-0001-nic-01-p1"]').click();await page.locator('.sr-connection-guide').waitFor();
  assert.match(page.url(),/port=srv-0001-nic-01-p1/);assert.equal(await page.locator('.sr-device.connected').count(),2);
  assert.match(await page.locator('.rv-connection-list').innerText(),/leaf-01/);assert.doesNotMatch(await page.locator('.rv-port-index').innerText(),/GG/);
  await shot('port-mapping-1600');await page.reload();await page.locator('.sr-connection-guide').waitFor();assert.equal(await page.locator('.sr-device.connected').count(),2);
@@ -54,7 +54,7 @@ try{
  await page.getByRole('button',{name:'保存草稿',exact:true}).click();await page.getByRole('button',{name:'确认保存展示草稿',exact:true}).click();await page.getByRole('button',{name:'退出草稿',exact:true}).click();await page.locator('.sr-scene-svg [data-device="srv-0001"][data-u="33"]').waitFor();assert.equal(await device.getAttribute('data-u'),'33');
  pass('0.5U草稿、冲突阻断、撤销、确认保存、退出恢复CMDB登记位置');
  await detail('观测').click();await page.locator('.sr-observation-table').waitFor();assert.equal(await page.locator('.sr-observation-table tbody tr').count(),5);assert.match(await page.locator('.sr-details').innerText(),/unknown/);
- await page.getByRole('tab',{name:'规划 / 实装',exact:true}).click();assert.equal(await page.getByRole('button',{name:'生成差异',exact:true}).isDisabled(),true);
+ assert.equal(await page.getByRole('tab',{name:'规划 / 实装',exact:true}).count(),0);
  assert.deepEqual(errors,[]);assert.deepEqual(requests,[]);pass('无遥测不伪造健康；缺快照不生成Diff；无页面异常及业务API请求');
  writeFileSync(root+'validation-v2.json',JSON.stringify({at:new Date().toISOString(),scope:'isolated spatial rack prototype',results,errors,business_api_requests:requests},null,2)+'\n');
 }finally{await browser.close()}

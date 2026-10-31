@@ -1,0 +1,45 @@
+{
+  "at": "2026-10-31T04:23:44.247Z",
+  "scope": "isolated rack prototype; no production writes",
+  "results": [
+    {
+      "name": "同一资产双面几何；正面资产、背面端接；端口点击定位 Cable；切换保留端口上下文",
+      "status": "PASS"
+    },
+    {
+      "name": "切换设备保留主动选择的详情 Tab",
+      "status": "PASS"
+    },
+    {
+      "name": "柜外端点标注、稳定 ID 跨柜定位及刷新恢复",
+      "status": "PASS"
+    },
+    {
+      "name": "缺失端点不生成完整链路或可点击的假设备",
+      "status": "PASS"
+    },
+    {
+      "name": "展示草稿与 CMDB 登记 U 分开，退出不改变事实",
+      "status": "PASS"
+    },
+    {
+      "name": "缺合格快照时无空对比页面，旧链接回到工作台",
+      "status": "PASS"
+    },
+    {
+      "name": "Gallery 保留16柜、无不可读微型文字、1440px 无横向溢出",
+      "status": "PASS"
+    },
+    {
+      "name": "测试专用几何：全深度/非全深度、背装基准、未知、0U、相向深度冲突；未混入 CMDB",
+      "status": "PASS"
+    },
+    {
+      "name": "补充：双面 SVG 保留端口样式及索引说明，紧凑交换机背视显示端口/端接数",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "business_api_requests": [],
+  "final_visual_check_at": "2026-10-31T04:25:04.343Z"
+}

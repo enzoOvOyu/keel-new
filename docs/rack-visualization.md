@@ -147,11 +147,11 @@ Spatial Rack [空间工作台 | 机柜阵列 | 规划/实装]             [数�
 
 - **整体**：Gallery 对比全部机柜。进入单柜后保留 Pod 分组的范围索引，不让用户丢失当前柜在授权资产范围中的位置；索引只是排版，不是机房坐标。
 - **空间**：固定平行斜投影，参考 Front/Rear 面与 U 轴。柜侧板可隐藏；相机不影响真实位置。当前缺少宽深，参考后平面用细线表示，未知设备深度只画开放引导线，不画虚构实体机箱。
-- **双面**：同屏 Front/Rear，共享 U、选择和缩放。Front 显示资产类别/型号/数量；Rear 显示登记端口数量与端接入口。安装面缺失时均为明确标记的占位投影，不声称这是实际正反面板。
-- **正视 / 背视**：单面放大用于 U 区间核对；背视联动右侧端口索引与线缆。未有面板坐标，不在机箱上假造网口位置。
+- **双面**：同屏 Front/Rear，共享 U、选择和缩放。Front 显示资产类别/型号/数量；Rear 显示可点击登记端口索引与端接数量。点击 Front 设备打开资产，点击 Rear 设备打开端接，点击端口直接定位 Cable 与双端证据。安装面缺失时均为明确标记的占位投影，不声称这是实际正反面板。
+- **正视 / 背视**：正视用于核对设备、型号、资产与安装位置，切换时右侧打开资产；背视用于核查端口、速率、连接和对端，切换时右侧打开面板与端接。两者保留同一资产；端口与线缆上下文在同设备切换时保留。背视图上的端口是带文字说明的可操作索引，不是实际网口坐标。
 - **剖面**：按 U 展示设备高度与深度范围。缺少深度用未定界区间；选中设备集中显示、其他设备弱化。只有设备/机柜深度同时已知时才计算相对长度；仍需安装面/对齐才能作真实净空结论。
 - **聚焦**：弱化不相关对象，保留当前设备及选定 Cable 两端。**分解**只分离选中设备展示平面，保留原位置和引导线；不是实际位置变化、拆卸指令或维护空间验收。
-- 画布点击、柜内树、U 导航和右栏端口索引共用稳定 ID。切换相机保留资产、端口、线缆、详情 Tab；切换机柜清理不属于新柜的选中端点。
+- 画布点击、柜内树、U 导航和右栏端口索引共用稳定 ID。切换设备保留当前详情 Tab；切换正/背视按业务目标打开资产/端接，剖面打开安装，双面点击哪一侧就打开对应工作区；切换机柜清理不属于新柜的选中端点。
 - 当前 1440px 桌面采用约 168px 对象栏 / 剩余空间画布 / 385px 工程栏；1600px 以上右栏 430px。窄屏先收起对象栏，再上下排列，不能通过缩小全部文字维持三栏。
 - 草稿沿用半 U 吸附、冲突/越界检查、撤销/重做与明确确认。保存只写隔离浏览器存储。0U、缺位置或缺高度进入未定位托盘，不从画布丢弃。
 - SVG 导出当前空间或双面视图，带 SYNTHETIC、规划/草稿和非实装测量说明；不对其他未实现格式提供假按钮。
@@ -164,13 +164,38 @@ Spatial Rack [空间工作台 | 机柜阵列 | 规划/实装]             [数�
 - 观测：显示当前能力、时间与历史登记证据；没有有效采集不展示热力图。来源：规划登记、几何字段、缺失实装与实时证据分层展示；保留 synthetic 来源和参考时间，不用参考时间冒充采集时间。
 - 不另建设备抽屉。后续生产实现仍调用已有 ServerDetailDrawer 五 Tab / NetworkDeviceDrawer 八 Tab；本原型使用隔离证据面板，避免加载真实 Provider。
 
-### 4.4 Planned vs As-built
+### 4.4 Dual-State Rack Comparison（数据接入后开放）
 
-当前显示数据前提而非假 Diff：有规划登记，但缺明确批准的比较快照，且没有已确认实装位置。`生成差异` 禁用并说明原因；“查看数据依据”“查看登记立面”可操作。
+**当前入口隐藏**。已审计数据仅有 planned/BOM 登记，未发现可用于比较的已确认规划快照，已确认实装位置为 0。删除原先只有前提说明的空页面；历史 `view=compare` 链接返回工作台并给出一次提示。不能将普通设备状态 `planned`、展示草稿或当前设备复制当成规划基线。不为演示伪造批准版本和 As-built。
 
-未来前提：明确项目/范围、已批准规划版本 ID、实装快照 ID、各字段来源、确认人与时间，双方使用同一稳定资产 ID。比较设备集合、型号、rack_id、U 位与高度；结果为缺失、新增、移位、换型及无法比较。缺测不判一致。设备换件保留旧身份，不通过型号和名称猜匹配。
+#### 比较资格与能力分级
 
-批准规划和现场事实由各自领域负责；CMDB 关联查询。展示草稿、未审核 BOM 与当前位置的复制都不能作为比较基线。原型不生成假时间、批准人或版本。
+首先验证左右两侧分别具备**已确认规划版本**和**合格实际数据**、授权项目及相同统计范围。某级字段存在不等于证据资格成立。数量对比也需要实际盘点范围与时间，不能把 BOM 数量再次当作实际数量。
+
+| 经确认的规划数据 | 所需实际数据 | 开放的比较 | 禁止推断 |
+|---|---|---|---|
+| 只有 BOM 数量 | 同范围实际盘点数量、单位、时间 | 类别/数量差异列表 | 哪一台具体缺失或新增 |
+| 有型号 | 同口径实际型号与数量 | 按型号的数量差异 | 型号相同就认定同一设备 |
+| 有机柜编号 | 实际 rack_id 与归属证据 | 每柜分布差异；有身份映射时定位设备归属差异 | 跨柜移动对象的模糊匹配 |
+| 有 U 位及高度 | 实装 U/高度、安装面、确认记录 | 可绘制两侧立面与位置差异；未配对区域标未匹配 | 仅凭位置判断设备身份 |
+| 有规划设备身份 → CMDB 稳定 ID 映射 | 对应正式资产与实装快照 | 设备级缺失、新增、换型、换柜、移位及完整追溯 | 使用名称相似度静默配对 |
+
+采用各字段能力独立启用；缺少 U 时保留数量/型号比较，不绘制假位置。缺少身份映射时，不以几何靠近自动生成移动箭头。缺少实际证据是“无法比较”，不是“设备缺失”。
+
+#### 页面与交互设计
+
+- 顶部仅保留项目/机柜范围、左侧确认规划版本、右侧实装版本及证据时间，以及 `并排 / 差异覆盖` 切换。没有合格版本的范围不出现在可比较列表。
+- **并排模式**：左侧已确认规划，右侧 CMDB 实际安装；使用同一 U 比例和几何引擎，缩放、滚动及设备选择同步。只在双方有 U/高数据时显示精确立面。任一侧未知的安装面/深度继续采用明确的参考轮廓。
+- **覆盖模式**：同一立面中规划为虚线、实装为实体；移位用起止 U 标签与短连接标注；缺失为空心规划轮廓并标“缺失”，新增实装设备标“新增”，型号差异用型号前后值。颜色为辅助，不能只靠红绿。前后面仍是空间视角，规划/实装是事实层，二者不能混成一个切换器。
+- 画布下方是可筛选差异清单：全部 / 缺失 / 新增 / 型号 / 机柜 / U 位 / 无法比较。选择一行同时定位两侧和右侧证据，选择设备反向定位清单。
+- 右侧显示**规划值 → 实际值**、各自来源/版本/确认时间/稳定资产映射。每条差异可以打开已有来源、ChangeSet、验收记录；不得通过“接受差异”直接覆盖 CMDB。修正走现有业务审核流程。
+- 聚合层只显示已比较/不可比较数量与覆盖比例，不将未匹配对象判相同，不把数据缺失算为施工错误。换件保持旧、新实物身份与关系历史。
+
+#### 最小接入条件
+
+由现有 BOM Revision / CMDB 历史与来源 Adapter 提供规划 `revision_id、confirmed_at、evidence_refs、scope`，实际 `snapshot_id、observed/confirmed_at、evidence_refs、scope`，并按字段提供覆盖和身份映射。只派生 comparison view model，不建平行资产表或新审批规则。失去资格或版本变化使比较结果过期，必须重新选定版本。
+
+验收必须包含：仅数量、型号、机柜、U 位、完整身份映射五种能力；无实际证据、未匹配身份、规划有实装无、实装有规划无、换型、换柜、移位、字段缺测。**本阶段只有完整设计，未开放运行时比较功能**；待合格数据接入后实施，不能把隐藏空页面报告成已完成 Diff。
 
 ### 4.5 Smart Overlays
 
@@ -264,7 +289,7 @@ type DeviceGeometry = {
 | 安装剖面 | http://localhost:5181/rack-detail?rack=rack-0001&asset=srv-0001&camera=section&tab=installation |
 | Capacity | http://localhost:5181/rack-detail?rack=rack-0001&overlay=capacity&tab=capacity |
 | Mapping / 端接 | http://localhost:5181/rack-detail?rack=rack-0001&asset=srv-0001&camera=rear&tab=mapping |
-| Planned / As-built 数据前提 | http://localhost:5181/rack-detail?view=compare&rack=rack-0001 |
+| Dual-State Comparison | 暂不开放入口；数据资格与分级设计见 §4.4 |
 
 实现：[页面](topology/prototype/pages/rack-detail.tsx)、[空间工作台](topology/prototype/rack/SpatialWorkspace.tsx)、[空间投影](topology/prototype/rack/SpatialScene.tsx)、[共享几何](topology/prototype/rack/geometry.ts)、[双面/Gallery](topology/prototype/rack/Elevation.tsx)、[Mapping/来源](topology/prototype/rack/Details.tsx)、[数据适配](topology/prototype/rack/model.ts)。React + SVG，没有增加图形依赖。
 
@@ -274,7 +299,7 @@ node docs/topology/prototype/run.mjs check
 node docs/topology/prototype/run.mjs build
 ```
 
-URL 保留 `view/rack/asset/port/cable/tab/overlay/q/pod/camera/explode/isolate/cutaway`；旧 `view=dual` 链接继续打开双面，不失效。缩放/平移为当前相机局部状态，切换相机适配；未冒充 CMDB 位置。草稿继续隔离于 `keel.topology.prototype.rack-v2.*`，没有真实 CMDB 请求或写入。
+URL 保留 `view/rack/asset/port/cable/tab/face/overlay/q/pod/camera/explode/isolate/cutaway`；旧 `view=dual` 链接继续打开双面，不失效。缩放/平移为当前相机局部状态，切换相机适配；未冒充 CMDB 位置。草稿继续隔离于 `keel.topology.prototype.rack-v2.*`，没有真实 CMDB 请求或写入。
 
 ## 9. 实施顺序与验收标准
 
@@ -283,7 +308,7 @@ URL 保留 `view/rack/asset/port/cable/tab/overlay/q/pod/camera/explode/isolate/
 3. 资产资料补齐后：型号素材、准确 front/rear 面板、0U 侧挂与实装确认；缺一项则只开放对应受支持细节。
 4. 有一对合格快照后：Planned vs As-built 正式 Diff；遥测单独满足证据条件后启用相应 Overlay。
 
-验收：Gallery、空间、剖面与 Dual 的同一资产 U/高完全相同；并集计数不重复；筛选、选择、前后同步、URL 恢复、Mapping 到端接/追踪有效；半 U/0U/越界/安装面冲突准确；未知面/深度/实时监控不伪装已知；草稿保存不改事实；差异前置缺失时不能生成结果；所有原型证据标记 synthetic。
+验收：Gallery、空间、剖面与 Dual 的同一资产 U/高完全相同；并集计数不重复；筛选、选择、前后同步、URL 恢复、Mapping 到端接/追踪有效；半 U/0U/越界/安装面冲突准确；未知面/深度/实时监控不伪装已知；草稿保存不改事实；差异前置缺失时不显示空对比页面；所有原型证据标记 synthetic。
 
 V1 历史检查保留在 [旧验证报告](rack-visualization/validation.md)。当前 V2 检查与截图见 [空间工作台验证记录](rack-visualization/validation-v2.md)。只证明独立原型与几何行为，不证明生产页面、实际设备、三维碰撞、完整工程验收或千卡性能。
 
@@ -300,3 +325,20 @@ V1 历史检查保留在 [旧验证报告](rack-visualization/validation.md)。�
 - **D-RACK-03**：当前不使用 WebGL 增加无数据体积。React + SVG 的平行斜投影足以验证安装/选择/剖面交互；未来毫米几何齐备、明确需要自由相机时再评估渲染适配器。
 - **D-RACK-04**：事实/设计/观测/验收/展示五层互不转正。所有基于未标定宽深的引导面为展示坐标，导出亦明确注明；不从视觉模型反写资产。
 - **D-RACK-05**：当前 default 为单柜工程工作台，但 Gallery 与双面完整保留。用户要求“兼顾整体和细节”，因此单柜左侧保留所有机柜的分组范围索引；不是另一张伪楼面图。
+
+## 12. 参考资料自审与本轮修正（2026-10-31）
+
+| 依据与方法 | 发现的偏差 | 本轮修正 |
+|---|---|---|
+| Rackula 渲染/布局分离；NetBox 同一设备身份 | 正反视角主要换图，右栏业务目标没有改变 | Front 查设备与安装，Rear 查端口与连接；双面点击、端口操作与证据工作区同步，保持同一资产 ID |
+| NetBox Device 的安装面与 full-depth 定义 | 反面全深度被误画为未知；背装深度从正面起算 | 共享 `faceProjection` / `sectionProjection`；明确安装面、对面占用、未知与 0U；背装几何从 rear 基准定位 |
+| 数据事实层与展示层分离 | 草稿 U 被标为“登记位置” | 草稿与登记 U 并列，树/详情/导出/容量标识保持一致，未写入 CMDB |
+| NetBox Visual Explorer 的关系与位置关联 | 跨柜连接落到本柜虚构位置；缺失端点画成完整线 | 柜外端点独立标注机柜/设备/端口并可定位；缺失端点虚线终止，不伪造第二端 |
+| Heer / Shneiderman 的语义缩放与协调视图 | 缩略图文字难读；选择设备跳离当前详情上下文 | Gallery 只保留几何，文本在可读摘要；选设备保持 Tab，按面切换才改变业务焦点 |
+| 确认规划与实际事实各自可追溯 | 缺两侧证据仍保留空对比页面 | 隐藏入口，保留 §4.4 分级比较与 Dual-State 设计，不生成伪差异 |
+
+复用架构保持 `CMDB 投影 → 几何模型 → Gallery / Dual / Spatial SVG → 证据详情`。设备型号素材应挂在已有型号版本，当前仅标准资产轮廓和登记端口索引；未复制 Rackula 代码/运行时，未新建设备库或资产事实源。
+
+本轮研究直接核对 [Rackula 碰撞计算](https://github.com/RackulaLives/Rackula/blob/main/src/lib/utils/collision.ts)、[Rackula 架构](https://github.com/RackulaLives/Rackula/blob/main/docs/reference/ARCHITECTURE.md)、[NetBox Device](https://netbox.readthedocs.io/en/stable/models/dcim/device/)、[Visual Explorer](https://netboxlabs.com/docs/visual-explorer/)、[Sunbird 可视化](https://www.sunbirddcim.com/product/data-center-visualization) 与 [Interactive Dynamics](https://idl.cs.washington.edu/files/2012-InteractiveDynamics-CACM.pdf)。它们分别约束几何、数据来源、空间表达与视图协同；不会因参考产品有照片或实时传感器就假定 Keel 也有。
+
+必要验证及截图见 [本轮自审记录](rack-visualization/review-v3.md)。精确面板素材、真实遥测、合格规划/实装配对、完整毫米级空间验收仍未具备；没有声称完成生产数字孪生。
