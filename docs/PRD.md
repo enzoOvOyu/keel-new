@@ -320,3 +320,5 @@ FR-28：CMDB升级全链路资产档案。保留跨项目授权与统一设备�
 FR-7 当前实施补充：Flows是CMDB目标批量作业入口；仅Executions与Agents子入口。真实实现范围、限制和旧页面迁移见实施记录；既有六阶段、维护态与审批不改变。
 
 详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。
+
+Flows开发补齐（afe8cb9）：作用域Schedule、多步骤/输出绑定、Namespace二进制版本/分发、持久事件游标、审批单次绑定与任务取消已实现；规则和真实证据统一见[实施记录](flows-redesign/implementation.md)及[契约](api/flows.md)，不在本文件重定义。生产设备验收仍单列。

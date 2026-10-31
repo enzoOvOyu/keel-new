@@ -239,3 +239,5 @@ cmdb_entity稳定text资产键保持历史UUID原值，bom_item_uid保留唯一�
 复用CMDB asset ID/scope、User与Outbox。迁移021定义FlowBinding、ExecutionBinding/Target、SSHTrust、Agent/Enrollment/Task、DispatchTicket、Audit；022仅引擎状态索引投影，不建平行资产。
 
 详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。
+
+Flows开发补齐（afe8cb9）：作用域Schedule、多步骤/输出绑定、Namespace二进制版本/分发、持久事件游标、审批单次绑定与任务取消已实现；规则和真实证据统一见[实施记录](flows-redesign/implementation.md)及[契约](api/flows.md)，不在本文件重定义。生产设备验收仍单列。

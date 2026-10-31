@@ -12,7 +12,7 @@
 | `lib/api/domain.ts`、统一 Mock | 其他交付模块仍依赖 | 保留，不批量删除 |
 | 身份/权限 | Go/PostgreSQL 已实现 flows 权限点 | 复用逐请求授权，不写散落角色判断 |
 | CMDB | 真实资产与稳定 ID 已有 | 只查询与保存目标快照，不复制 Inventory |
-| Kestra / Agent / SSH 后端 | 尚未实现；SSH 页面为 Mock 元数据 | 新增模块化底座；现有 SSH 入口增加真实适配，不将 Mock 当作信任 |
+| Kestra / Agent / SSH 后端 | 改造前未实现；SSH 页面为 Mock 元数据 | 新增模块化底座；现有 SSH 入口增加真实适配，不将 Mock 当作信任 |
 
 ## 设计边界
 
@@ -25,7 +25,7 @@
 
 ## 交付实现状态 · 2026-10-31
 
-代码提交：初始底座`63ca2c9`，当前功能`826b964`。此后文档提交不改变运行二进制。运行环境为独立5190/8096/8095，原5180/8081未重启、未迁移、未导入资产；未合并main、未push。
+代码提交：初始底座`63ca2c9`，核心底座`826b964`，开发补齐`afe8cb9`。此后文档提交不改变运行二进制。运行环境为独立5190/8096/8095，原5180/8081未重启、未迁移、未导入资产；未合并main、未push。
 
 | 能力 | 实际实现 | 验证/边界 |
 |---|---|---|
@@ -39,7 +39,7 @@
 | SSH | 系统管理原SSH信任入口改真实受控引用、严格known_hosts、公钥、非root登录、Command/Bash/Python | 真实SSH协议双合成端点通过；没有连接生产交换机 |
 | Bootstrap | HTTPS包/摘要、严格SSH、固定root可信helper、非root服务用户、一次Token注册 | 代码可用；未配置真实包/信任前返回503，不显示成功 |
 | Files/Revisions/Dependencies/Triggers | 实际Namespace文本文件、版本差异/恢复草稿、授权依赖、canonical触发器草稿 | 文件读写/版本冲突验证；原生Schedule由Kestra拥有 |
-| API与存储 | 41个FlowsReal操作、生成TS类型、迁移021/022、绑定与冻结目标、游标、幂等、审计、CMDB Outbox | 独立库已迁移；注册表不冒充41项逐端点验收 |
+| API与存储 | 49个FlowsReal操作、生成TS类型、迁移021…024、绑定与冻结目标、游标、幂等、审计、CMDB Outbox | 独立库已迁移；注册表不冒充49项逐端点验收 |
 
 ## 数据与执行链
 
@@ -54,20 +54,34 @@ Kestra2.0.7兼容修正包括Loop替代不存在的ForEach、`fromJson(item.valu
 - [运行记录](runtime-validation.json)：实际本地非rootAgent/mTLS执行、结束前stdout、退出码0、票据脱敏；Execution游标/筛选绑定、跨项目403；原生Pause→Resume→SUCCESS、Namespace文件读写、旧Revision409。
 - [浏览器记录](ui-validation.json)：8项定向交互通过，页面无pageerror或Flows失败请求。截图见[screenshots](screenshots/)；实际查看Builder与目录截图并修正对比度/单节点过度缩放。
 - `npm run build`（含TypeScript）通过。遗留全局共享mock seed约31MB、既有大chunk/Zod annotation警告仍在，不为本任务重构其他模块。
-- `node dev/scripts/check-real-api-docs.mjs`通过46个登记项（5可视化+41Flows）；只证明Schema/引用一致，不证明所有接口闭环。
+- `node dev/scripts/check-real-api-docs.mjs`通过54个登记项（5可视化+49Flows）；只证明Schema/引用一致，不证明所有接口闭环。
 
-## 明确限制及后续项
+## 本轮开发补齐 · afe8cb9
 
-1. CMDB目标批次Flow的自动Schedule需要额外的作用域Job触发适配器；当前启用会422拒绝。原生安全Flow的Schedule/Webhook/Flow事件可保存并由Kestra执行，最近100项增量发现，不宣称完整历史同步。
-2. 受控批次当前每目标一个任务，可用原生DAG控制包裹；尚非任意多步骤设备插件框架。任意Worker脚本/外部HTTP/引擎秘密上下文不开放，防止绕过项目与凭据边界。
-3. Namespace提供128KiB文本资源，非完整二进制介质版本管理。SSE断线采用状态重取/日志去重，不具备完整持久Last-Event-ID重放保证。
-4. 未执行生产SSH Bootstrap、真实交换机命令验证、生产8目标混合批次、生产规模性能或完整审批集成。普通执行权限不能代替高危审批；交换机写配置仍回Fabric。
-5. 页面表格本地分页与目录上限、Execution游标边界见[真实API契约](../api/flows.md)。不能把上限内演示当作无限规模能力。
-6. 旧BOM/拓扑环境8081包含不在本分支的Agent修复。未来部署需先兼容合入该修复，禁止直接用此分支旧基础覆盖。
+| 之前缺口 | 当前完成的代码与交互 | 实际证据 |
+|---|---|---|
+| CMDB目标批次Schedule | Kestra原生Cron标记Flow + 幂等触发消费；每次重检当前owner授权/Flow版本/目标和通道，Triggers提供独立调度编辑器 | 原生Cron实际触发，创建真实Agent作业成功，检查后停用测试计划 |
+| 每目标多步骤 | Command/Bash/Python、依赖拓扑排序、缺失/循环校验、环境变量传递前序stdout、fail-fast、实时步骤与持久结果；Quick Run编辑/保存、Task Runs查看 | 本地Agent两步骤及输出传递实际通过；依赖循环用例拒绝；浏览器实际保存带steps默认值的Flow |
+| 二进制资源 | 版本/SHA256/并发检查/历史下载/指定版本分发至Agent uploads；Files上下文UI | 含NUL/非文本字节的真实文件保存、实际分发成功 |
+| 持久事件续传 | PostgreSQL事件日志、递增ID、Last-Event-ID/after、history JSON、权限验证与200项分页补齐 | 两次真实SSE重连均只收到更新ID；跨执行游标400 |
+| 审批执行对接 | 复用现有审批/签名；申请附完整冻结作业快照供审核，执行校验SHA/目标版本/领域权限/有效期/当前签署资格；单审批只绑定一次新执行 | 待审批拒绝、自批403、独立DL签署、改脚本拒绝、批准作业成功、重复使用批准409 |
+| 终止链路 | 引擎停止调度 + 精确Agent Task取消/SSH连接中断；未知副作用保留RECONCILING | 实际Agent睡眠任务被终止，后续命令未执行，target FAILED/engine KILLED |
+| 部分失败一致性 | 批次Loop显式transmitFailed=false，不因某目标失败取消其他设备；设备结果与Engine状态分开展示 | 修复定向SSH检查暴露的取消竞态后，部分失败/失败目标新执行/幂等检查通过 |
+
+新增检查：[运行证据](completion-runtime-validation.json)、[6项页面交互](completion-ui-validation.json)、[确认页截图](screenshots/completion-confirm.png)。本轮未运行全平台回归、未导入原环境资产、未连接生产设备。
+
+## 当前能力边界与待设备验收
+
+- 开发补齐已完成上述五项缺口及终止链路，不能把下列部署/适配验收标成真机通过。
+- 每目标最多32步，按确定性顺序执行，不承诺步骤内部并行；单步骤结果/传递值32KiB，超限标注。Agent版本0.2.0/`job.pipeline`能力；旧Agent缺能力时按预检阻断或在接受前选择批准的SSH。
+- Namespace资源≤1MiB；这不是OS镜像仓库。文本编辑128KiB限制保留。事件当前持久保存，没有擅自制定生产保留周期/SLO。
+- 高危作业使用每次冻结范围的独立审批，不能把批准记录当作长期无人值守调度授权；网络变更继续遵循Fabric批准闭环，NH未决规则不变。
+- 生产SSH Bootstrap、真实NOS/发行版、8目标混合设备、生产规模与长期运行验收尚未执行；真实设备与运维预置条件由后续联调提供。
+- 原BOM/拓扑环境8081包含本分支尚未合入的Agent修复，未来部署必须保留该修复；当前仍只运行独立5190/8096，没有合并main。
 
 ## 快速接续索引
 
 - [真实API](../api/flows.md)、[OpenAPI](../openapi.yaml)、[机器注册表](../api/real-api-registry.json)。
 - [本地运行](../../dev/deploy/flows/README.md)、[非秘密配置示例](../../dev/deploy/flows/.env.example)、[原生Flow示例](example-native-flow.yaml)。CMDB批次模板从实际`GET /flows/templates`获取，避免手写第二套协议。
 - `dev/backend/internal/flows/{service,transport,gateway,kestra}.go`：执行主链；`cmd/agent/`：目标端；`cmd/api/flows.go`：路由；`dev/src/features/flows/`：业务页面；`dev/src/lib/api/flows.ts`：唯一页面数据入口。
-- 本文记录实现与检查事实，包中尚受限/未验收项不能标为全部完成。
+- 本文区分开发完成、明确能力边界与未运行的生产设备验收。

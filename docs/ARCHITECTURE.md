@@ -245,3 +245,5 @@ Go模块化单体中internal/cmdb包含Schema、Domain、Query和ChangeSet服务
 Flows采用Kestra2.0.7 Adapter + Go Job Service + gRPC mTLS Agent/严格SSH。CMDB保留资产权威，Kestra保留编排状态；目标/通道快照及Outbox归Go服务。
 
 详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。
+
+Flows开发补齐（afe8cb9）：作用域Schedule、多步骤/输出绑定、Namespace二进制版本/分发、持久事件游标、审批单次绑定与任务取消已实现；规则和真实证据统一见[实施记录](flows-redesign/implementation.md)及[契约](api/flows.md)，不在本文件重定义。生产设备验收仍单列。

@@ -258,3 +258,5 @@ Fabric 筛选仅使用显式 device/port→logical_membership→network_segment/
 Flows真实模块契约入口api/flows.md；Kestra编排、Go授权/目标/通道、Agent本地执行职责分离。受限插件与目标Schedule缺口明确拒绝，不发明已安装插件。
 
 详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。
+
+Flows开发补齐（afe8cb9）：作用域Schedule、多步骤/输出绑定、Namespace二进制版本/分发、持久事件游标、审批单次绑定与任务取消已实现；规则和真实证据统一见[实施记录](flows-redesign/implementation.md)及[契约](api/flows.md)，不在本文件重定义。生产设备验收仍单列。

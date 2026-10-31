@@ -255,4 +255,4 @@
 - 当前代码在独立`/home/ubuntu/keel-flows-dev`的`feat/flows-redesign`；先查`HANDOFF.md`、`docs/flows-redesign/implementation.md`与`docs/api/flows.md`，不要重复遍历仓库或运行全平台冒烟。
 - 真实API字段只定义于OpenAPI FlowsReal及生成类型。实现/隔离部署/检查/生产未验收分开登记，契约变化同步注册表和使用文档。
 - 原5180/8081不含本分支Flows；本地5190/8096、独立DB/合成资产用于开发验证。未授权不覆盖原环境、合并main或导入生产资产。
-- 目标批次Schedule当前显式阻断；每目标受控单任务/文本Namespace/SSE重取等限制以实施记录为准，不用按钮可见推定完整能力。maintained及接受后不明状态不得通过fallback重跑绕过。
+- Flows补齐提交afe8cb9：使用独立作用域Schedule接口，不能向带票据Flow添加不受控触发器；最多32个每目标依赖步骤、1MiB二进制资源、持久事件续传及既有审批一次执行绑定。maintained及接受后不明状态不得通过fallback重跑绕过。生产设备验收未运行，见实施记录。

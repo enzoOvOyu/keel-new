@@ -1,0 +1,31 @@
+{
+  "at": "2026-10-31T08:53:04Z",
+  "pipeline_execution": "53c8724f-162a-48a7-9673-3438fb5e3568",
+  "file_execution": "f7c593f5-d27a-47bc-a6a6-66e6875054c6",
+  "scheduled_flow": "06f0a906-a185-4254-a973-aad239bbba57",
+  "checks": [
+    "Actual local Agent two-step dependency and stdout environment binding",
+    "Per-device step results persisted",
+    "Persisted event history and cursor increment",
+    "Binary immutable revision saved and actual Agent distribution completed",
+    "Kestra Cron fired successfully; test schedule then disabled",
+    "Binary distribution completed on actual local Agent",
+    "Pending approval blocks execution",
+    "Self approval denied403; distinct real DL signed",
+    "Changed command invalidates approved snapshot",
+    "Approved harmless domain job executed through existing approval model",
+    "Native Cron fired and created successful scoped Job; schedule disabled after check",
+    "Agent0.2 pipeline capability negotiated",
+    "Kill reaches actual local process; tail command never executed; target FAILED and engine KILLED",
+    "Two real SSE reconnects replay strictly newer persisted IDs",
+    "Cross-execution event cursor rejected400",
+    "Approval claim rejects a second distinct job409",
+    "Existing approval reviewer API exposes exact frozen job text and SHA for review; no device execution"
+  ],
+  "production_devices": false,
+  "approval_execution": "b27c0051-dc29-4174-84a3-c93ac8a55304",
+  "cancel_execution": "959fc800-db5e-4435-97e8-a067fd7a60dc",
+  "code_revision": "afe8cb9",
+  "ssh_regression": "PASS TestKestraSSHIntegration after fixing per-target failure propagation; actual Kestra + isolated DB + synthetic SSH protocol endpoints",
+  "runtime_revision": "afe8cb9"
+}

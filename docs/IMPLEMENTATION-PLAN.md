@@ -199,3 +199,5 @@ IA v2.3 插入前端 Mock 阶段：先冻结 IA-V2.3.md 的页面注册、作用
 Flows包授权真实全栈实施，在feat/flows-redesign独立工作区交付。当前代码、下一步缺口与运行环境见实施记录；不隐含其他模块真实化或main合并。
 
 详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。
+
+Flows开发补齐（afe8cb9）：作用域Schedule、多步骤/输出绑定、Namespace二进制版本/分发、持久事件游标、审批单次绑定与任务取消已实现；规则和真实证据统一见[实施记录](flows-redesign/implementation.md)及[契约](api/flows.md)，不在本文件重定义。生产设备验收仍单列。

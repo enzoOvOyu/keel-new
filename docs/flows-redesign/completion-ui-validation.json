@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-31T09:07:30.403Z",
+  "environment": "http://127.0.0.1:5190",
+  "checks": [
+    "Target Flow Triggers uses actual CMDB scoped Schedule editor",
+    "Immutable binary revision, SHA and download/distribution actions render from API",
+    "Actual per-device step results appear beside engine Task Runs",
+    "Logs view opens persisted event stream without JavaScript errors",
+    "Multistep Quick Run has working dependencies, preflight, confirm and approval request controls; no device execution from this browser check",
+    "Multistep Quick Run saves actual canonical Flow draft with steps JSON defaults"
+  ],
+  "errors": [],
+  "failed": []
+}

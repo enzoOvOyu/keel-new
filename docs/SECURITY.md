@@ -119,3 +119,5 @@ AI Key仅一次性POST到Go，响应不回显，日志与审计不保存值。�
 Flows秘密仅受控引用；Session/CSRF/RBAC逐请求，SSH严格Host Key，Agent单次TLS注册+mTLS与非root执行。maintained阻断SSH/Agent；不明已接受任务不自动重跑。Bootstrap提权仅预置root可信摘要helper。
 
 详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。
+
+Flows开发补齐（afe8cb9）：作用域Schedule、多步骤/输出绑定、Namespace二进制版本/分发、持久事件游标、审批单次绑定与任务取消已实现；规则和真实证据统一见[实施记录](flows-redesign/implementation.md)及[契约](api/flows.md)，不在本文件重定义。生产设备验收仍单列。

@@ -69,3 +69,5 @@ node dev/scripts/check-real-api-docs.mjs
 ## Flows 功能分支真实实现
 
 新增 [Flows 实际契约](api/flows.md)。登记表中的Flows操作只表示独立开发分支实现，运行与检查见[实施记录](flows-redesign/implementation.md)；不继承上方可视化部署4541850的证据，不代表已替换原5180/8081。
+
+Flows当前登记49个操作（开发补齐afe8cb9），加原5个可视化共54项。新增Schedule/文件版本与分发/步骤/审批/持久事件的契约均在Flows使用文档与OpenAPI；不是逐端点生产验收声明。

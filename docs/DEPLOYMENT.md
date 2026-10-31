@@ -132,3 +132,5 @@
 Flows只启用独立开发服务，不覆盖5180/8081。部署、迁移021/022、私有配置、PKI与Agent前提见../dev/deploy/flows/README.md。切勿将功能分支旧后端覆盖当前环境BOM Agent集成修复。
 
 详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。
+
+Flows开发补齐（afe8cb9）：作用域Schedule、多步骤/输出绑定、Namespace二进制版本/分发、持久事件游标、审批单次绑定与任务取消已实现；规则和真实证据统一见[实施记录](flows-redesign/implementation.md)及[契约](api/flows.md)，不在本文件重定义。生产设备验收仍单列。

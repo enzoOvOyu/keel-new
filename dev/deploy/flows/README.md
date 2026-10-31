@@ -14,7 +14,7 @@ docker compose --env-file dev/deploy/flows/.env.local -f dev/deploy/flows/compos
 
 引擎8095仅监听localhost。storage-init仅初始化命名卷所有权；不挂Docker socket。
 
-应用需要已有Keel schema的独立数据库；本次仅复制原数据库结构至`keel_flows_dev`，没有复制原数据。迁移021、022已应用在该隔离库，不能再重复执行。新建完整环境应按现有迁移顺序001…022执行并记录schema_migration。**现有backend/migrate.sh写死原容器，不可用于本隔离环境**；使用显式DATABASE_URL/psql与版本检查。不要自动删表重建。Kestra库与Keel业务库是两个库。
+应用需要已有Keel schema的独立数据库；本次仅复制原数据库结构至`keel_flows_dev`，没有复制原数据。迁移021…024已应用在该隔离库，不能再重复执行。新建完整环境应按现有迁移顺序001…024执行并记录schema_migration。**现有backend/migrate.sh写死原容器，不可用于本隔离环境**；使用显式DATABASE_URL/psql与版本检查。不要自动删表重建。Kestra库与Keel业务库是两个库。
 
 生成开发PKI（仅首次，工具拒绝覆盖）：
 
@@ -72,3 +72,10 @@ npm run build
 ```
 
 浏览器证据见`docs/flows-redesign/ui-validation.json`，运行证据`runtime-validation.json`。已有检查不重复跑全平台。停止本实例只使用专属PID/Compose项目；不要停止或重启原Keel环境。
+
+
+## 开发补齐与升级
+
+当前Agent0.2.0新增`job.pipeline`能力；旧Agent可继续单任务，不能冒充支持多步骤。迁移023包含Schedule消费、步骤结果、持久事件、文件版本；024绑定审批单次执行。两者已应用到本隔离库，不可重复执行；未应用原业务库。
+
+Cron由Kestra执行，Go不是另一个调度器；当前合成验证计划已停用。新增二进制资源上限1MiB、每目标32步、步骤结果/输入绑定32KiB。Bootstrap上线需要发布0.2.0包并预置对应可信摘要，不使用旧0.1.0包假称支持pipeline。

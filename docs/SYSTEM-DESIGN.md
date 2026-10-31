@@ -280,3 +280,5 @@ Schema版本激活前检查兼容性与存量数据。ChangeSet为Draft→Review
 执行先冻结授权项目/目标版本/通道，Agent接受后失联进入RECONCILING，仅对账不自动SSH重跑。失败重试创建新Execution，原成功目标不重复执行。
 
 详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。
+
+Flows开发补齐（afe8cb9）：作用域Schedule、多步骤/输出绑定、Namespace二进制版本/分发、持久事件游标、审批单次绑定与任务取消已实现；规则和真实证据统一见[实施记录](flows-redesign/implementation.md)及[契约](api/flows.md)，不在本文件重定义。生产设备验收仍单列。

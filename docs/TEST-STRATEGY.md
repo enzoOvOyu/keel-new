@@ -166,3 +166,5 @@ IA验收分层：OpenAPI schema和分页/权限错误契约；ProjectContext单�
 本轮仅Flows规则/契约、真实Kestra+隔离DB+SSH协议端点、本地非rootAgent与定向浏览器检查；不用全平台冒烟替代行为验证，不修改原测试环境。
 
 详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。
+
+Flows开发补齐（afe8cb9）：作用域Schedule、多步骤/输出绑定、Namespace二进制版本/分发、持久事件游标、审批单次绑定与任务取消已实现；规则和真实证据统一见[实施记录](flows-redesign/implementation.md)及[契约](api/flows.md)，不在本文件重定义。生产设备验收仍单列。

@@ -216,3 +216,5 @@ CMDB-D-01…06：服务器→部件→端口→线缆→对端；Diff→来源�
 Flows验收按实施记录的“实际通过/未运行/能力限制”分别登记。本地Agent成功与合成SSH协议检查不替代生产设备、8目标混合批次、Bootstrap及生产审批验收。
 
 详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。
+
+Flows开发补齐（afe8cb9）：作用域Schedule、多步骤/输出绑定、Namespace二进制版本/分发、持久事件游标、审批单次绑定与任务取消已实现；规则和真实证据统一见[实施记录](flows-redesign/implementation.md)及[契约](api/flows.md)，不在本文件重定义。生产设备验收仍单列。

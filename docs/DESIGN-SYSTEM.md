@@ -263,3 +263,5 @@ CMDB左树+主工作区，五视图共享asset/filter URL。目录按类型字�
 Flows定向实施沿用现有token/shadcn；紧凑目录、三栏Builder、Execution六Tab、Quick Run五步弹窗。仅Flows/Executions/Agents菜单；其余资源归Flow上下文，不修改全局主题。
 
 详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。
+
+Flows开发补齐（afe8cb9）：作用域Schedule、多步骤/输出绑定、Namespace二进制版本/分发、持久事件游标、审批单次绑定与任务取消已实现；规则和真实证据统一见[实施记录](flows-redesign/implementation.md)及[契约](api/flows.md)，不在本文件重定义。生产设备验收仍单列。
