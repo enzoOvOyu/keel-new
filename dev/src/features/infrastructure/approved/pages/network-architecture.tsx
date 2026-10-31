@@ -15,7 +15,9 @@ export default function Network({params, set, go}: ViewProps) {
   const [expanded, setExpanded] = useState(false), [biPage, setBiPage] = useState(0);
   const fabric=params.get('fabric')||'';
   const fabrics=data.assets.filter(a=>a.type==='fabric');
-  const fabricIds=[...new Set([...fabrics.map(f=>f.id),...data.assets.map(d=>d.fields.fabric_id).filter(Boolean)])] as string[];
+  const fabricGroups=(queries.groups||[]).filter(g=>g.type==='fabric');
+  const fabricName=(id:string)=>fabricGroups.find(g=>g.id===id)?.name||name(id);
+  const fabricIds=[...new Set([...fabricGroups.map(f=>f.id),...fabrics.map(f=>f.id),...data.assets.map(d=>d.fields.fabric_id).filter(Boolean)])] as string[];
   const memberships=(snapshot.relationships||[]).filter(r=>r.relationship_type==='logical_membership');
   const assignedFabrics=(id:string)=>{
     const refs=new Set([id,...api.ports(id).map(p=>p.id)]),ids=new Set<string>();
@@ -24,7 +26,8 @@ export default function Network({params, set, go}: ViewProps) {
     return ids;
   };
   const assignment=new Map(sw.map(s=>[s.id,assignedFabrics(s.id)]));
-  const fabricMember=(id:string)=>!fabric||(fabric==='__unassigned__'?!(assignment.get(id)?.size):!!assignment.get(id)?.has(fabric));
+  const scopedMatrixIds=new Set([queries.matrix,queries.backbone].flatMap(m=>[...(m?.rows||[]),...(m?.columns||[])].map(a=>a.id)));
+  const fabricMember=(id:string)=>!fabric||scopedMatrixIds.has(id)||(fabric!=='__unassigned__'&&!!assignment.get(id)?.has(fabric));
   const fabricSwitches=sw.filter(s=>fabricMember(s.id));
   const leaves = fabricSwitches.filter(d => podOf(d.id) === pod && d.fields.role === 'leaf');
   const spines = fabricSwitches.filter(d => d.fields.role === 'spine');
@@ -59,7 +62,7 @@ export default function Network({params, set, go}: ViewProps) {
   useEffect(()=>{if(!params.has('pod')&&podIds[0])set({pod:podIds[0]})},[params.get('pod'),podIds[0]]);
   useEffect(()=>{if(mode==='Bipartite'&&!bundleId&&bundles[0])pick(bundles[0].id)},[mode,bundleId,bundles[0]?.id]);
   return <div className="viz-v3">{bundleId&&!active&&<div className="v-exception-line" role="status">所选连接束不在当前授权与筛选范围内，未替换为其他连接。<Button onClick={()=>set({bundle:'',member_query_ref:''})}>清除选中束</Button></div>}
-    <div className="v-command"><span className="v-fabric-name"><i/>网络互联</span><select aria-label="Fabric 范围" value={fabric} onChange={e=>set({fabric:e.target.value,bundle:'',member_query_ref:'',asset:''})}><option value="">全部登记网络域</option><option value="__unassigned__">未分配网络域</option>{fabricIds.map(id=><option key={id} value={id}>{name(id)}</option>)}</select><PodSelect value={pod} all={false} onChange={pod => {set({pod,bundle:'',member_query_ref:'',asset:''}); setExpanded(false);}}/><SearchBox value={q} onChange={q => set({q})} placeholder="高亮交换机或机柜"/><span className="spacer"/><span className="v-outline-label">CMDB 登记物理互联</span></div>
+    <div className="v-command"><span className="v-fabric-name"><i/>网络互联</span><select aria-label="Fabric 范围" value={fabric} onChange={e=>set({fabric:e.target.value,bundle:'',member_query_ref:'',asset:''})}><option value="">全部登记网络域</option><option value="__unassigned__">未分配网络域</option>{fabricIds.map(id=><option key={id} value={id}>{fabricName(id)}</option>)}</select><PodSelect value={pod} all={false} onChange={pod => {set({pod,bundle:'',member_query_ref:'',asset:''}); setExpanded(false);}}/><SearchBox value={q} onChange={q => set({q})} placeholder="高亮交换机或机柜"/><span className="spacer"/><span className="v-outline-label">CMDB 登记物理互联</span></div>
     <div className="v-viewline"><Tabs items={['Fabric Flow', 'Bipartite', '交换机目录']} value={mode} onChange={mode => set({mode})}/><span className="spacer"/><span>{memberCount} 条完整记录 → {bundles.length} 束</span></div>
     <div className={'v-workspace ' + (selected ? 'with-detail' : '')}>
       <div className="v-main-panel">

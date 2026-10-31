@@ -249,8 +249,27 @@ func visualPage(scope Scope, path string, q url.Values, revision, last string, l
 // Every derived join below is between authorized existing entities and typed
 // relations. Geometry, LLDP and display names never create a physical edge.
 func visualCTE() string {
-	return `WITH RECURSIVE visible AS (SELECT e.* FROM cmdb_entity e WHERE ` + Visible("e") + `), rel AS (SELECT r.* FROM cmdb_relationship r JOIN visible a ON a.item_uid=r.from_uid JOIN visible b ON b.item_uid=r.to_uid WHERE r.valid_to IS NULL AND ` + RelationshipVisible("r") + `), location_ranked AS (SELECT r.*,dense_rank() OVER(PARTITION BY from_uid ORDER BY CASE WHEN fact_layer='planned' THEN 0 ELSE 1 END) preference FROM rel r WHERE definition_id='located_in'), locations AS (SELECT from_uid,CASE WHEN count(DISTINCT to_uid)=1 THEN min(to_uid) END rack_id FROM location_ranked WHERE preference=1 GROUP BY from_uid), hierarchy(parent_id,child_id) AS (SELECT from_uid,to_uid FROM rel WHERE definition_id IN('parent','contains') UNION SELECT rack_id,from_uid FROM locations WHERE rack_id IS NOT NULL), scope_nodes(id) AS (SELECT item_uid FROM visible WHERE item_uid=$3 UNION SELECT h.child_id FROM hierarchy h JOIN scope_nodes n ON n.id=h.parent_id), owners(port_id,id,depth,path) AS (SELECT item_uid,item_uid,0,ARRAY[item_uid] FROM visible WHERE asset_type='port' UNION ALL SELECT w.port_id,r.from_uid,w.depth+1,w.path||r.from_uid FROM owners w JOIN rel r ON r.to_uid=w.id AND r.definition_id='contains' WHERE w.depth<8 AND NOT r.from_uid=ANY(w.path)), owner AS (SELECT w.port_id,min(w.id) id FROM owners w JOIN visible d ON d.item_uid=w.id AND d.asset_type IN('server','switch','pdu','patch_panel','device') GROUP BY w.port_id HAVING count(DISTINCT w.id)=1), ranked_ends AS (SELECT r.*,dense_rank() OVER(PARTITION BY from_uid,definition_id ORDER BY CASE WHEN fact_layer='planned' THEN 0 ELSE 1 END) preference FROM rel r WHERE definition_id IN('cable_endpoint_a','cable_endpoint_b')), ends AS (SELECT from_uid,definition_id,CASE WHEN count(DISTINCT to_uid)=1 THEN min(to_uid) END port_id,CASE WHEN count(DISTINCT fact_layer)=1 THEN min(fact_layer) ELSE 'mixed' END fact_layer FROM ranked_ends WHERE preference=1 GROUP BY from_uid,definition_id), con AS (SELECT c.item_uid id,CASE WHEN a.fact_layer=b.fact_layer THEN a.fact_layer ELSE 'mixed' END fact_layer,COALESCE(c.payload->>'media_type',c.payload->'fields'->>'media_type',c.payload->>'cable_type','') media_type,COALESCE(c.payload->>'speed',c.payload->'fields'->>'speed','') speed,a.port_id a,b.port_id b,oa.id device_a,ob.id device_b,da.asset_type type_a,db.asset_type type_b,COALESCE(da.payload->>'role',da.payload->'fields'->>'role','') role_a,COALESCE(db.payload->>'role',db.payload->'fields'->>'role','') role_b,CASE WHEN EXISTS(SELECT 1 FROM locations l WHERE l.from_uid=oa.id) THEN (SELECT l.rack_id FROM locations l WHERE l.from_uid=oa.id) ELSE (SELECT vr.item_uid FROM visible vr WHERE vr.asset_type='rack' AND vr.item_uid=COALESCE(da.payload->>'rack_id',da.payload->'fields'->>'rack_id')) END rack_a,CASE WHEN EXISTS(SELECT 1 FROM locations l WHERE l.from_uid=ob.id) THEN (SELECT l.rack_id FROM locations l WHERE l.from_uid=ob.id) ELSE (SELECT vr.item_uid FROM visible vr WHERE vr.asset_type='rack' AND vr.item_uid=COALESCE(db.payload->>'rack_id',db.payload->'fields'->>'rack_id')) END rack_b FROM visible c LEFT JOIN ends a ON a.from_uid=c.item_uid AND a.definition_id='cable_endpoint_a' LEFT JOIN ends b ON b.from_uid=c.item_uid AND b.definition_id='cable_endpoint_b' LEFT JOIN owner oa ON oa.port_id=a.port_id LEFT JOIN owner ob ON ob.port_id=b.port_id LEFT JOIN visible da ON da.item_uid=oa.id LEFT JOIN visible db ON db.item_uid=ob.id WHERE c.asset_type='cable') `
+	return `WITH RECURSIVE visible AS (SELECT e.* FROM cmdb_entity e WHERE ` + Visible("e") + `), rel AS (SELECT r.from_uid,r.to_uid,r.definition_id,r.fact_layer FROM cmdb_relationship r WHERE r.valid_to IS NULL AND ` + RelationshipVisible("r") + ` AND EXISTS(SELECT 1 FROM visible va WHERE va.item_uid=r.from_uid) AND EXISTS(SELECT 1 FROM visible vb WHERE vb.item_uid=r.to_uid)), location_ranked AS (SELECT r.*,dense_rank() OVER(PARTITION BY from_uid ORDER BY CASE WHEN fact_layer='planned' THEN 0 ELSE 1 END) preference FROM rel r WHERE definition_id='located_in'), locations AS (SELECT from_uid,CASE WHEN count(DISTINCT to_uid)=1 THEN min(to_uid) END rack_id FROM location_ranked WHERE preference=1 GROUP BY from_uid), hierarchy(parent_id,child_id) AS (SELECT from_uid,to_uid FROM rel WHERE definition_id IN('parent','contains') UNION SELECT rack_id,from_uid FROM locations WHERE rack_id IS NOT NULL), scope_nodes(id) AS (SELECT item_uid FROM visible WHERE item_uid=$3 UNION SELECT h.child_id FROM hierarchy h JOIN scope_nodes n ON n.id=h.parent_id), owners(port_id,id,depth,path) AS (SELECT item_uid,item_uid,0,ARRAY[item_uid] FROM visible WHERE asset_type='port' UNION ALL SELECT w.port_id,r.from_uid,w.depth+1,w.path||r.from_uid FROM owners w JOIN rel r ON r.to_uid=w.id AND r.definition_id='contains' WHERE w.depth<8 AND NOT r.from_uid=ANY(w.path)), owner AS (SELECT w.port_id,min(w.id) id FROM owners w JOIN cmdb_entity d ON d.item_uid=w.id AND d.asset_type IN('server','switch','pdu','patch_panel','device') GROUP BY w.port_id HAVING count(DISTINCT w.id)=1), ranked_ends AS (SELECT r.*,dense_rank() OVER(PARTITION BY from_uid,definition_id ORDER BY CASE WHEN fact_layer='planned' THEN 0 ELSE 1 END) preference FROM rel r WHERE definition_id IN('cable_endpoint_a','cable_endpoint_b')), ends AS (SELECT from_uid,definition_id,CASE WHEN count(DISTINCT to_uid)=1 THEN min(to_uid) END port_id,CASE WHEN count(DISTINCT fact_layer)=1 THEN min(fact_layer) ELSE 'mixed' END fact_layer FROM ranked_ends WHERE preference=1 GROUP BY from_uid,definition_id), con AS MATERIALIZED (
+ SELECT c.item_uid id,
+ CASE WHEN a.fact_layer=b.fact_layer THEN a.fact_layer ELSE 'mixed' END fact_layer,
+ COALESCE(c.payload->>'media_type',c.payload->'fields'->>'media_type',c.payload->>'cable_type','') media_type,
+ COALESCE(c.payload->>'speed',c.payload->'fields'->>'speed','') speed,
+ a.port_id a,b.port_id b,oa.id device_a,ob.id device_b,da.asset_type type_a,db.asset_type type_b,
+ COALESCE(da.payload->>'role',da.payload->'fields'->>'role','') role_a,
+ COALESCE(db.payload->>'role',db.payload->'fields'->>'role','') role_b,
+ CASE WHEN la.from_uid IS NOT NULL THEN la.rack_id ELSE pra.item_uid END rack_a,
+ CASE WHEN lb.from_uid IS NOT NULL THEN lb.rack_id ELSE prb.item_uid END rack_b
+ FROM visible c
+ LEFT JOIN ends a ON a.from_uid=c.item_uid AND a.definition_id='cable_endpoint_a'
+ LEFT JOIN ends b ON b.from_uid=c.item_uid AND b.definition_id='cable_endpoint_b'
+ LEFT JOIN owner oa ON oa.port_id=a.port_id LEFT JOIN owner ob ON ob.port_id=b.port_id
+ LEFT JOIN cmdb_entity da ON da.item_uid=oa.id LEFT JOIN cmdb_entity db ON db.item_uid=ob.id
+ LEFT JOIN locations la ON la.from_uid=oa.id LEFT JOIN locations lb ON lb.from_uid=ob.id
+ LEFT JOIN cmdb_entity pra ON pra.asset_type='rack' AND pra.item_uid=COALESCE(da.payload->>'rack_id',da.payload->'fields'->>'rack_id') AND ` + Visible("pra") + `
+ LEFT JOIN cmdb_entity prb ON prb.asset_type='rack' AND prb.item_uid=COALESCE(db.payload->>'rack_id',db.payload->'fields'->>'rack_id') AND ` + Visible("prb") + `
+ WHERE c.asset_type='cable') `
 }
+
 func visualArgs(scope Scope, q url.Values, after string) []any {
 	return append(scope.Args(), q.Get("root_id"), q.Get("fabric_id"), q.Get("q"), after)
 }
@@ -426,8 +445,32 @@ func (s Service) VisualSubgraph(ctx context.Context, scope Scope, q url.Values) 
 	return VisualSubgraph{snapshot, groups, page}, nil
 }
 func visualGroupSQL() string {
-	return visualCTE() + `, descendants(root,id,path) AS (SELECT v.item_uid,v.item_uid,ARRAY[v.item_uid] FROM visible v WHERE v.asset_type IN('data_center','region','pod','rack','fabric') UNION ALL SELECT d.root,h.child_id,d.path||h.child_id FROM descendants d JOIN hierarchy h ON h.parent_id=d.id WHERE cardinality(d.path)<12 AND NOT h.child_id=ANY(d.path)) SELECT g.item_uid,g.name,g.asset_type,count(DISTINCT a.item_uid) FILTER(WHERE a.asset_type IN('server','switch','pdu','patch_panel','device')),count(DISTINCT a.item_uid) FILTER(WHERE a.asset_type='rack'),count(DISTINCT a.item_uid) FILTER(WHERE a.asset_type='server'),count(DISTINCT a.item_uid) FILTER(WHERE a.asset_type='switch'),count(DISTINCT a.item_uid) FILTER(WHERE a.asset_type='gpu'),count(DISTINCT c.id) FROM visible g JOIN descendants d ON d.root=g.item_uid JOIN visible a ON a.item_uid=d.id LEFT JOIN con c ON c.device_a=a.item_uid OR c.device_b=a.item_uid WHERE ($3='' OR g.item_uid IN(SELECT id FROM scope_nodes)) AND ` + `($4='' OR EXISTS(SELECT 1 FROM descendants fd JOIN visible fv ON fv.item_uid=fd.id WHERE fd.root=g.item_uid AND ` + fabricPredicate("fv") + `))` + ` AND ($5='' OR EXISTS(SELECT 1 FROM descendants ds JOIN visible v ON v.item_uid=ds.id WHERE ds.root=g.item_uid AND ` + entitySearch("v") + `)) GROUP BY g.item_uid,g.name,g.asset_type ORDER BY g.item_uid LIMIT 201`
+	// Count assets and Cable memberships independently. Joining every descendant
+	// to every Cable via an OR predicate creates a large intermediate Cartesian
+	// relation and can trigger seconds of planning/JIT even for one small project.
+	return visualCTE() + `, descendants(root,id) AS (
+  SELECT v.item_uid,v.item_uid FROM visible v WHERE v.asset_type IN('data_center','region','pod','rack','fabric')
+  UNION SELECT d.root,h.child_id FROM descendants d JOIN hierarchy h ON h.parent_id=d.id
+ ), asset_counts AS (
+  SELECT d.root,
+   count(*) FILTER(WHERE a.asset_type IN('server','switch','pdu','patch_panel','device')) device_count,
+   count(*) FILTER(WHERE a.asset_type='rack') rack_count,
+   count(*) FILTER(WHERE a.asset_type='server') server_count,
+   count(*) FILTER(WHERE a.asset_type='switch') switch_count,
+   count(*) FILTER(WHERE a.asset_type='gpu') gpu_count
+  FROM descendants d JOIN cmdb_entity a ON a.item_uid=d.id GROUP BY d.root
+ ), cable_members AS (
+  SELECT d.root,c.id FROM descendants d JOIN con c ON c.device_a=d.id
+  UNION SELECT d.root,c.id FROM descendants d JOIN con c ON c.device_b=d.id
+ ), cable_counts AS (SELECT root,count(*) n FROM cable_members GROUP BY root)
+ SELECT g.item_uid,g.name,g.asset_type,ac.device_count,ac.rack_count,ac.server_count,ac.switch_count,ac.gpu_count,COALESCE(cc.n,0)
+ FROM cmdb_entity g JOIN asset_counts ac ON ac.root=g.item_uid LEFT JOIN cable_counts cc ON cc.root=g.item_uid
+ WHERE ($3='' OR g.item_uid IN(SELECT id FROM scope_nodes))
+ AND ($4='' OR EXISTS(SELECT 1 FROM descendants fd JOIN visible fv ON fv.item_uid=fd.id WHERE fd.root=g.item_uid AND ` + fabricPredicate("fv") + `))
+ AND ($5='' OR EXISTS(SELECT 1 FROM descendants ds JOIN visible v ON v.item_uid=ds.id WHERE ds.root=g.item_uid AND ` + entitySearch("v") + `))
+ ORDER BY g.item_uid LIMIT 201`
 }
+
 func (s Service) visualGroups(ctx context.Context, scope Scope, q url.Values) ([]VisualGroup, error) {
 	rows, e := s.DB.Query(ctx, visualGroupSQL(), visualArgs(scope, q, "")[:5]...)
 	if e != nil {
