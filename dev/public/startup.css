@@ -1,0 +1,8 @@
+/* Shared by the initial document and React so startup stays visually stable. */
+.keel-startup{min-height:100vh;display:grid;grid-template-columns:224px minmax(0,1fr);background:#f7f8fc;box-sizing:border-box}
+.keel-startup-side{background:#fff;border-right:1px solid #e6e9f0;padding:26px 22px}
+.keel-startup-line{height:12px;border-radius:4px;background:#e9ecf2;margin-bottom:24px;width:76%}
+.keel-startup-brand{width:84px;height:26px;margin-bottom:46px}
+.keel-startup-main{min-width:0}.keel-startup-header{height:64px;background:#fff;border-bottom:1px solid #e6e9f0}
+.keel-startup-content{padding:32px}.keel-startup-title{width:160px;height:22px;margin-bottom:28px}.keel-startup-surface{height:240px;border:1px solid #e6e9f0;border-radius:8px;background:#fff}
+@media(max-width:760px){.keel-startup{grid-template-columns:68px minmax(0,1fr)}.keel-startup-side{padding:26px 14px}.keel-startup-brand{width:30px}.keel-startup-content{padding:20px}}
