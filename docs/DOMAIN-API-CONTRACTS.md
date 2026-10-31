@@ -229,3 +229,22 @@ AIProviderConfiguration/Command/TestCommand/TestResult/Option是系统配置与B
 投影复核补充：缺失的 `gpu_count`/`nic_count` 仅在源查询未截断且有明确 `contains` 成员时，以唯一组件 ID 确定性计数，并附 `*_count_source` 和关系 ID；没有成员不补零，不覆盖已登记数量。位置附 `position_fact_layer`、`position_source_ref`、`position_revision` 与完整 `located_in_sources`。规划/观测引用不同时保留分层候选并报数据质量提示，不将最后一条随机排序关系当成实际安装；同层多目标不自动选中。Cable 双端事实层不一致使用 `mixed`，两端独立来源仍可查。
 
 `findings[].severity/category` 表达数据质量提示，不是 PASS/FAIL。端口占用、速率不一致、未采集面板等均不能直接宣称设备故障或验机失败；必须通过原业务规则和适用证据判断。可视化不得把所有 warning 统一转换成硬件 FAIL。
+
+## VISUAL-PAGED-2026-10-31 · 正式可视化受控查询
+
+批准设计 §9.3 的四个端点已接入同一 CMDB Service（没有新资产表、布局写入或导入）：
+
+| 端点 | 受控查询与结果 |
+|---|---|
+| `GET /cmdb/visualization/subgraph` | `view=hierarchy/fabric/physical`，`root_id/fabric_id/q/depth`。SQL 先确定最多 200 个种子 ID，再加载其结构上下文；层级 depth1 只设备/位置摘要，depth2 才加载组成和端口。返回兼容 InfrastructureSnapshot 的 `assets/cables/relationships/findings`，另有真实授权 `groups.counts` 与 `page`。 |
+| `GET /cmdb/visualization/matrix` | `axes=server_switch/leaf_spine/rack_leaf/port_pair`，按真实 Cable 双端在 SQL 聚合、按 cell 分页；Axis 仍是原 InfrastructureAsset。`rack_leaf` 仅柜内服务器→Leaf，不混交换机上联。cell 保留分类 `groups(fact_layer/media_type/speed)` 和可回查 `member_query_ref`。 |
+| `GET /cmdb/visualization/connections` | `root_id/asset_id/port_id/member_query_ref/q/status` 先过滤再按 Cable ID 分页；member 引用冻结原范围与分类，不返回整库后客户端筛选。可见孤立资产或端口即使无线缆也返回本体。`status` 当前仅 `all/incomplete`，其余状态必须明确是当前窗口筛选。 |
+| `POST /cmdb/visualization/trace` | body `project_id/mode/from_port_id/to_port_id?/candidate_cable_id?/snapshot_id?`；body/query 项目冲突拒绝，按有效项目重新授权。from/to 必须为可见 PhysicalPort；不存在/不可见/错误类型统一404。多 Cable 为 ambiguous，明确选择的 candidate 仍须属于起始端口。不通过交换机推断内部转发；logical 缺 FIB/VRF 证据返回422。 |
+
+所有分页 `limit=1..200`，默认100。cursor 用进程内 HMAC 验签，绑定用户、`permission_version`、授权 Projects/Pairs、过滤参数及当前资产/关系修订指纹；每次仍重新进行后端授权。进程重启后旧 cursor 明确无效，不作为权限凭据。不同 view/root 可复用同一授权快照指纹；发生变更或复用过期 cursor/snapshot 返回409，不自动续到新快照。没有保留历史快照，`at/evidence_at` 请求422，不能静默返回当前数据。
+
+`groups.counts` 是授权范围现存关系的去重登记计数，非实物验收结论；最多200个group，超过则 `truncated=true` / `coverage.complete=false`。结构上下文最多5000资产、20000关系，任何损失都标partial。subgraph/connections 的coverage计量资产；matrix使用专用 `returned_cells/total_cells`，Cable总数另在included/excluded中，不能混用单位。rack `registered_device_count/placement_coverage/visualization_summary` 区分完整本柜几何与对端摘要，不能把邻接的少量设备当成完整空柜/满柜。正反面容量继续由同一几何区间并集计算，不在API猜测未知U位或深度。
+
+Fabric 筛选仅使用显式 device/port→logical_membership→network_segment/Fabric 归属及已有fabric字段，不根据线缆生成逻辑网络；`__unassigned__` 是查询筛选值，不是新资产。`unplaced=true` 是位置未分配视图范围，不创建虚拟机柜。搜索兼容顶层属性与旧 `payload.fields`，匹配SN、Hostname、管理/BMC/IP、MAC、physical_name和稳定ID。端口多设备归属保持未知，不使用最小ID或第一条关系代替；矩阵排除缺口，连接页仍保留异常记录。分类空值是未登记，不换算速率、不补零、不自动判健康。超时返回504。
+
+本轮只执行新查询的纯逻辑/契约检查及Go编译，未连接数据库运行这些新端点，未重启服务、未导入/迁移数据；此前full投影性能记录不能当成新分页SQL性能证明。

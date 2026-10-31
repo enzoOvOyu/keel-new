@@ -38,6 +38,130 @@ tags:
   - name: IA
     description: IA v2.3 project scope and lazy detail contracts
 paths:
+  /cmdb/visualization/subgraph:
+    get:
+      operationId: getCMDBVisualSubgraph
+      tags: [CMDB]
+      summary: Page hierarchy or physical seed IDs then load bounded structural context
+      parameters:
+      - {name: project_id, in: query, schema: {type: string}}
+      - {name: root_id, in: query, schema: {type: string}, description: Authorized hierarchy root. Missing skips no permission check.}
+      - {name: fabric_id, in: query, schema: {type: string}, description: Explicit membership only; never inferred from Cable.}
+      - {name: q, in: query, schema: {type: string}, description: Search authorized ID/name/SN/Hostname/IP/MAC before pagination.}
+      - {name: unplaced, in: query, schema: {type: boolean, default: false}, description: Unassigned location scope; no synthetic asset ID is created.}
+      - {name: cursor, in: query, schema: {type: string}, description: Signed opaque cursor bound to user, authorization revision, filters and current data revision.}
+      - {name: snapshot_id, in: query, schema: {type: string}, description: Current revision fingerprint; changed revision returns 409, not retained history.}
+      - {name: limit, in: query, schema: {type: integer, minimum: 1, maximum: 200, default: 100}}
+      - {name: view, in: query, schema: {type: string, enum: [hierarchy, fabric, physical], default: hierarchy}}
+      - {name: depth, in: query, schema: {type: integer, enum: [1, 2], default: 1}, description: Level 1 returns geometry summaries; level 2 includes registered composition/ports.}
+      responses:
+        '200':
+          description: Authorized current CMDB projection. Partial page and context coverage are explicit.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, request_id]
+                properties:
+                  request_id: {type: string}
+                  data: {$ref: '#/components/schemas/InfrastructureSubgraph'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '409': {$ref: '#/components/responses/Conflict'}
+        '422': {description: Capability unavailable; no historical replay or logical FIB path available}
+        '504': {description: Bounded query timed out}
+  /cmdb/visualization/matrix:
+    get:
+      operationId: getCMDBVisualMatrix
+      tags: [CMDB]
+      summary: Server aggregated connection cells and evidence-specific member queries
+      parameters:
+      - {name: project_id, in: query, schema: {type: string}}
+      - {name: root_id, in: query, schema: {type: string}, description: Authorized hierarchy root. Missing skips no permission check.}
+      - {name: fabric_id, in: query, schema: {type: string}, description: Explicit membership only; never inferred from Cable.}
+      - {name: q, in: query, schema: {type: string}, description: Search authorized ID/name/SN/Hostname/IP/MAC before pagination.}
+      - {name: unplaced, in: query, schema: {type: boolean, default: false}, description: Unassigned location scope; no synthetic asset ID is created.}
+      - {name: cursor, in: query, schema: {type: string}, description: Signed opaque cursor bound to user, authorization revision, filters and current data revision.}
+      - {name: snapshot_id, in: query, schema: {type: string}, description: Current revision fingerprint; changed revision returns 409, not retained history.}
+      - {name: limit, in: query, schema: {type: integer, minimum: 1, maximum: 200, default: 100}}
+      - {name: axes, in: query, schema: {type: string, enum: [server_switch, leaf_spine, rack_leaf, port_pair], default: server_switch}}
+      responses:
+        '200':
+          description: Authorized current CMDB projection. Partial page and context coverage are explicit.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, request_id]
+                properties:
+                  request_id: {type: string}
+                  data: {$ref: '#/components/schemas/InfrastructureMatrix'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '409': {$ref: '#/components/responses/Conflict'}
+        '422': {description: Capability unavailable; no historical replay or logical FIB path available}
+        '504': {description: Bounded query timed out}
+  /cmdb/visualization/connections:
+    get:
+      operationId: getCMDBVisualConnections
+      tags: [CMDB]
+      summary: Page actual Cable records and authorized dual-end context
+      parameters:
+      - {name: project_id, in: query, schema: {type: string}}
+      - {name: root_id, in: query, schema: {type: string}, description: Authorized hierarchy root. Missing skips no permission check.}
+      - {name: fabric_id, in: query, schema: {type: string}, description: Explicit membership only; never inferred from Cable.}
+      - {name: q, in: query, schema: {type: string}, description: Search authorized ID/name/SN/Hostname/IP/MAC before pagination.}
+      - {name: unplaced, in: query, schema: {type: boolean, default: false}, description: Unassigned location scope; no synthetic asset ID is created.}
+      - {name: cursor, in: query, schema: {type: string}, description: Signed opaque cursor bound to user, authorization revision, filters and current data revision.}
+      - {name: snapshot_id, in: query, schema: {type: string}, description: Current revision fingerprint; changed revision returns 409, not retained history.}
+      - {name: limit, in: query, schema: {type: integer, minimum: 1, maximum: 200, default: 100}}
+      - {name: asset_id, in: query, schema: {type: string}}
+      - {name: port_id, in: query, schema: {type: string}}
+      - {name: member_query_ref, in: query, schema: {type: string}, description: Opaque matrix cell/group reference retaining original scope and category filters.}
+      - {name: status, in: query, schema: {type: string, enum: [all, incomplete], default: all}, description: Other observation states are not supported as global server filters.}
+      - {name: sort, in: query, schema: {type: string, enum: [id], default: id}}
+      responses:
+        '200':
+          description: Authorized current CMDB projection. Partial page and context coverage are explicit.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, request_id]
+                properties:
+                  request_id: {type: string}
+                  data: {$ref: '#/components/schemas/InfrastructureSubgraph'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '409': {$ref: '#/components/responses/Conflict'}
+        '422': {description: Capability unavailable; no historical replay or logical FIB path available}
+        '504': {description: Bounded query timed out}
+  /cmdb/visualization/trace:
+    post:
+      operationId: queryCMDBPhysicalTrace
+      tags: [CMDB]
+      summary: Trace only evidenced physical Cable continuity; do not cross switch ports by inference
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/InfrastructureTraceRequest'}
+      responses:
+        '200':
+          description: Registered continuity and gaps, never a PASS assertion
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, request_id]
+                properties:
+                  request_id: {type: string}
+                  data: {$ref: '#/components/schemas/InfrastructureTrace'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {description: Port missing, invisible or wrong type; existence is not disclosed}
+        '409': {$ref: '#/components/responses/Conflict'}
+        '422': {description: Logical FIB/history unavailable or selected Cable not attached to the source port}
   /cmdb/visualization:
     get:
       operationId: getCMDBVisualization
@@ -14004,6 +14128,119 @@ components:
           schema:
             $ref: "#/components/schemas/ErrorEnvelope"
   schemas:
+    InfrastructureQueryPage:
+      type: object
+      required: [limit, has_more, next_cursor]
+      properties:
+        limit: {type: integer}
+        has_more: {type: boolean}
+        next_cursor: {type: [string, 'null']}
+    InfrastructureGroup:
+      type: object
+      required: [id, name, type, counts]
+      properties:
+        id: {type: string}
+        name: {type: string}
+        type: {type: string}
+        counts:
+          type: object
+          description: Authorized unique registered descendants, independent of the current seed page. These are not verified physical counts.
+          required: [device, rack, server, switch, gpu, cable]
+          properties:
+            device: {type: integer}
+            rack: {type: integer}
+            server: {type: integer}
+            switch: {type: integer}
+            gpu: {type: integer}
+            cable: {type: integer}
+    InfrastructureSubgraph:
+      allOf:
+      - {$ref: '#/components/schemas/InfrastructureSnapshot'}
+      - type: object
+        required: [groups, page]
+        properties:
+          groups: {type: array, items: {$ref: '#/components/schemas/InfrastructureGroup'}}
+          page: {$ref: '#/components/schemas/InfrastructureQueryPage'}
+      description: SQL selects at most 200 seed IDs before loading structural context. Context limit is 5000 assets and 20000 relations; groups limit 200. Any limit loss is partial. Gallery depth1 excludes ports. Rack fields include registered_device_count, placement_coverage and visualization_summary; adjacent racks from connections are summaries only.
+    InfrastructureMatrixGroup:
+      type: object
+      required: [fact_layer, media_type, speed, count, member_query_ref]
+      properties:
+        fact_layer: {type: string}
+        media_type: {type: string, description: Registered medium; empty means unknown.}
+        speed: {type: string, description: Registered speed with original unit; empty means unknown, not zero or negotiated rate.}
+        count: {type: integer}
+        member_query_ref: {type: string}
+    InfrastructureMatrixCell:
+      type: object
+      required: [row_id, column_id, count, member_query_ref, groups]
+      properties:
+        row_id: {type: string}
+        column_id: {type: string}
+        count: {type: integer}
+        member_query_ref: {type: string}
+        groups: {type: array, items: {$ref: '#/components/schemas/InfrastructureMatrixGroup'}}
+    InfrastructureMatrixCoverage:
+      type: object
+      required: [returned_cells, total_cells, limit, complete]
+      properties:
+        returned_cells: {type: integer}
+        total_cells: {type: integer}
+        limit: {type: integer}
+        complete: {type: boolean}
+    InfrastructureMatrix:
+      type: object
+      required: [snapshot_id, rows, columns, cells, included_count, excluded_count, coverage, page]
+      properties:
+        snapshot_id: {type: string}
+        rows: {type: array, items: {$ref: '#/components/schemas/InfrastructureAsset'}}
+        columns: {type: array, items: {$ref: '#/components/schemas/InfrastructureAsset'}}
+        cells: {type: array, items: {$ref: '#/components/schemas/InfrastructureMatrixCell'}}
+        included_count: {type: integer, description: Complete authorized Cable records represented by this axes query across all pages.}
+        excluded_count: {type: integer, description: Records missing endpoints or not applicable to this axes; never silently normal.}
+        coverage: {$ref: '#/components/schemas/InfrastructureMatrixCoverage'}
+        page: {$ref: '#/components/schemas/InfrastructureQueryPage'}
+    InfrastructureTraceRequest:
+      type: object
+      required: [mode, from_port_id]
+      additionalProperties: false
+      properties:
+        project_id: {type: string}
+        mode: {type: string, enum: [physical, logical]}
+        from_port_id: {type: string}
+        to_port_id: {type: string}
+        candidate_cable_id: {type: string, description: Explicit selection from ambiguous attached Cable records; server verifies attachment.}
+        snapshot_id: {type: string}
+    InfrastructureTraceBreakpoint:
+      type: object
+      required: [asset_id, code, reason]
+      properties:
+        asset_id: {type: string}
+        code: {type: string}
+        reason: {type: string}
+    InfrastructureTrace:
+      type: object
+      required: [snapshot_id, assets, relationships, findings, segments, breakpoints, integrity, verification, coverage, reason]
+      properties:
+        snapshot_id: {type: string}
+        assets: {type: array, items: {$ref: '#/components/schemas/InfrastructureAsset'}}
+        relationships: {type: array, items: {$ref: '#/components/schemas/InfrastructureRelationship'}}
+        findings: {type: array, items: {$ref: '#/components/schemas/InfrastructureFinding'}}
+        segments: {type: array, items: {$ref: '#/components/schemas/InfrastructureCable'}}
+        breakpoints: {type: array, items: {$ref: '#/components/schemas/InfrastructureTraceBreakpoint'}}
+        integrity: {type: string, enum: [complete, incomplete, ambiguous, no_record]}
+        verification: {type: string, enum: [unverified]}
+        coverage: {$ref: '#/components/schemas/InfrastructureCoverage'}
+        reason: {type: string}
+    InfrastructureFinding:
+      type: object
+      required: [asset_id, code, message]
+      properties:
+        asset_id: {type: string}
+        code: {type: string}
+        message: {type: string}
+        severity: {type: string, enum: [info, warning, error]}
+        category: {type: string, enum: [data_quality]}
     InfrastructureAsset:
       type: object
       required: [id, type, name, project_id, revision, source, fields]

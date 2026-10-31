@@ -1,14 +1,14 @@
-import {useState} from 'react';
+import {useState,useEffect} from 'react';
 import {ArrowDownUp, UnfoldHorizontal} from 'lucide-react';
 import {useTopologyModel} from '../model';
 import {Button, Tabs, SearchBox, Empty} from '../shared';
-import {AssetRow,FigureHead,GoTo,Legend,MemberLedger,ObjectPanel,PodSelect,keyActivate,type ViewProps,useVisualModel,shortLabel} from '../visual';
+import {AssetRow,FigureHead,GoTo,Legend,MemberLedger,ObjectPanel,PodSelect,keyActivate,type ViewProps,useVisualModel,shortLabel,QueryPager} from '../visual';
 import type {InfraCable} from '@/lib/api/infrastructure';
 
 type FlowNode = {id: string; label: string; sub: string; x: number; y: number; kind: string};
-type Bundle = {id: string; from: string; to: string; members: InfraCable[];layer:string;medium:string;lane:number};
+type Bundle = {id: string; from: string; to: string; members: InfraCable[];count:number;queryRef:string;layer:string;medium:string;lane:number};
 export default function Network({params, set, go}: ViewProps) {
-  const {api,data,devices,racks,name,snapshot}=useTopologyModel();
+  const {api,data,devices,racks,name,snapshot,queries}=useTopologyModel();
   const {complete,incident,podOf,shortPod,sw,podIds}=useVisualModel();
   const pod = params.get('pod') || podIds[0] || '', mode = params.get('mode') || 'Fabric Flow';
   const selected = params.get('asset') || '', bundleId = params.get('bundle') || '', q = params.get('q') || '';
@@ -32,41 +32,39 @@ export default function Network({params, set, go}: ViewProps) {
   const roles = fabricSwitches.filter(d=>!pod||podOf(d.id)===pod||d.fields.role==='spine');
   const nodes: FlowNode[] = [
     ...spines.map((s, i) => ({id: s.id, label: s.name, sub: s.fields.model, x: 30, y: 74 + i * 112, kind: 'spine'})),
-    ...leaves.map((s, i) => ({id: s.id, label: s.name, sub: api.ports(s.id).length + ' 个登记端口', x: 407, y: 74 + i * 112, kind: 'leaf'})),
-    ...pr.map((r, i) => ({id: r.id, label: r.name, sub: devices.filter(d => d.type === 'server' && d.fields.rack_id === r.id).length + ' Servers / 端口分组', x: 783, y: 74 + i * 112, kind: 'group'})),
+    ...leaves.map((s, i) => ({id: s.id, label: s.name, sub: s.fields.port_count!=null?s.fields.port_count+' 个登记端口':api.ports(s.id).length?'已加载 '+api.ports(s.id).length+' 个端口':'端口按需加载', x: 407, y: 74 + i * 112, kind: 'leaf'})),
+    ...pr.map((r, i) => ({id: r.id, label: r.name, sub: '当前窗口 '+devices.filter(d => d.type === 'server' && d.fields.rack_id === r.id).length+' Servers', x: 783, y: 74 + i * 112, kind: 'group'})),
   ];
-  const bundles: Bundle[] = [];
-  function addBundles(from:string,to:string,members:InfraCable[]){
-   const grouped=new Map<string,InfraCable[]>();
-   for(const c of members){const key=[c.fact||'unknown',c.fields.cable_type||'unknown',c.fields.speed||c.fields.speed_gbps||'unknown'].join('|');grouped.set(key,[...(grouped.get(key)||[]),c])}
-   [...grouped.entries()].forEach(([key,list],i)=>bundles.push({id:from+'|'+to+'|'+key,from,to,members:list,layer:list[0].fact||'unknown',medium:list[0].fields.cable_type||'unknown',lane:i}));
-  }
-  for (const l of leaves) {
-    for (const s of spines) {
-      const members = data.cables.filter(c => complete(c) && incident(c, l.id) && incident(c, s.id));
-      if(members.length)addBundles(s.id,l.id,members);
-    }
-    for (const r of pr) {
-      const members = data.cables.filter(c => complete(c) && incident(c, l.id) && [c.device_a, c.device_b].some(id => api.asset(id)?.type === 'server' && api.asset(id)?.fields.rack_id === r.id));
-      if(members.length)addBundles(l.id,r.id,members);
-    }
+  const bundles:Bundle[]=[];
+  for(const source of [queries.backbone,queries.matrix])for(const cell of source?.cells||[]){
+   if(!cell.count)continue;
+   const a=api.asset(cell.row_id),b=api.asset(cell.column_id);if(!a||!b)continue;
+   const from=a.fields.role==='spine'?a.id:b.fields.role==='spine'?b.id:a.type==='rack'?b.id:a.id,to=from===a.id?b.id:a.id;
+   if(!nodes.some(n=>n.id===from)||!nodes.some(n=>n.id===to))continue;
+   const groups=(cell as any).groups?.length?(cell as any).groups:[{count:cell.count,member_query_ref:cell.member_query_ref,fact_layer:'分类汇总',media_type:'展开核查',speed:''}];
+   for(const g of groups){const queryRef=g.member_query_ref||cell.member_query_ref,id=from+'|'+to+'|'+queryRef;
+    const members=(queries.connections?.cables||[]).filter(c=>complete(c)&&[c.device_a,c.device_b].some(d=>incident(c,from))&&(api.asset(to)?.type==='rack'?[c.device_a,c.device_b].some(d=>api.asset(d)?.fields.rack_id===to):incident(c,to)));
+    bundles.push({id,from,to,members,count:g.count,queryRef,layer:g.fact_layer||'未注明',medium:g.media_type||'未注明',lane:bundles.filter(x=>x.from===from&&x.to===to).length});
+   }
   }
   const active = bundles.find(b => b.id === bundleId);
   const nodeMap = new Map(nodes.map(n => [n.id, n]));
-  const memberIds = new Set(bundles.flatMap(b => b.members.map(c => c.id)));
+  const memberCount=bundles.reduce((n,b)=>n+b.count,0);
   const missing = data.cables.filter(c => !complete(c) && (!pod||[c.device_a, c.device_b].some(id => podOf(id) === pod))&&(!fabric||[c.device_a,c.device_b].some(id=>fabricMember(id))));
   const focused = (b: Bundle) => !active && !q || b.id === active?.id || (!!q && [b.from, b.to].some(id => name(id).toLowerCase().includes(q.toLowerCase())));
   const bi = bundleId?active:bundles.find(b => api.asset(b.to)?.type==='rack');
   const currentPage = Math.min(biPage, Math.max(0, Math.ceil((bi?.members.length || 0) / 12) - 1));
   const biVisible = bi?.members.slice(currentPage * 12, currentPage * 12 + 12) || [];
-  function pick(id: string) { set({bundle: id, asset: ''}); setExpanded(false); setBiPage(0); }
-  return <div className="viz-v3">{bundleId&&!active&&<div className="v-exception-line" role="status">所选连接束不在当前授权与筛选范围内，未替换为其他连接。<Button onClick={()=>set({bundle:''})}>清除选中束</Button></div>}
-    <div className="v-command"><span className="v-fabric-name"><i/>网络互联</span><select aria-label="Fabric 范围" value={fabric} onChange={e=>set({fabric:e.target.value,bundle:'',asset:''})}><option value="">全部登记网络域</option><option value="__unassigned__">未分配网络域</option>{fabricIds.map(id=><option key={id} value={id}>{name(id)}</option>)}</select><PodSelect value={pod} all={false} onChange={pod => {set({pod, bundle: '', asset: ''}); setExpanded(false);}}/><SearchBox value={q} onChange={q => set({q})} placeholder="高亮交换机或机柜"/><span className="spacer"/><span className="v-outline-label">CMDB 登记物理互联</span></div>
-    <div className="v-viewline"><Tabs items={['Fabric Flow', 'Bipartite', '交换机目录']} value={mode} onChange={mode => set({mode})}/><span className="spacer"/><span>{memberIds.size} 条完整记录 → {bundles.length} 束</span></div>
+  function pick(id: string) { const b=bundles.find(b=>b.id===id);set({bundle:id,member_query_ref:b?.queryRef||'',asset:''}); setExpanded(false); setBiPage(0); }
+  useEffect(()=>{if(!params.has('pod')&&podIds[0])set({pod:podIds[0]})},[params.get('pod'),podIds[0]]);
+  useEffect(()=>{if(mode==='Bipartite'&&!bundleId&&bundles[0])pick(bundles[0].id)},[mode,bundleId,bundles[0]?.id]);
+  return <div className="viz-v3">{bundleId&&!active&&<div className="v-exception-line" role="status">所选连接束不在当前授权与筛选范围内，未替换为其他连接。<Button onClick={()=>set({bundle:'',member_query_ref:''})}>清除选中束</Button></div>}
+    <div className="v-command"><span className="v-fabric-name"><i/>网络互联</span><select aria-label="Fabric 范围" value={fabric} onChange={e=>set({fabric:e.target.value,bundle:'',member_query_ref:'',asset:''})}><option value="">全部登记网络域</option><option value="__unassigned__">未分配网络域</option>{fabricIds.map(id=><option key={id} value={id}>{name(id)}</option>)}</select><PodSelect value={pod} all={false} onChange={pod => {set({pod,bundle:'',member_query_ref:'',asset:''}); setExpanded(false);}}/><SearchBox value={q} onChange={q => set({q})} placeholder="高亮交换机或机柜"/><span className="spacer"/><span className="v-outline-label">CMDB 登记物理互联</span></div>
+    <div className="v-viewline"><Tabs items={['Fabric Flow', 'Bipartite', '交换机目录']} value={mode} onChange={mode => set({mode})}/><span className="spacer"/><span>{memberCount} 条完整记录 → {bundles.length} 束</span></div>
     <div className={'v-workspace ' + (selected ? 'with-detail' : '')}>
       <div className="v-main-panel">
         <FigureHead title={mode === 'Fabric Flow' ? shortPod(pod) + ' / 分层物理互联' : mode === 'Bipartite' ? 'Bipartite / 精确端点对照' : '交换机目录'}>
-          {active&&<span>{active.layer} · {active.medium}</span>}{expanded && active && active.members.length > 24 && <span>画布展开 24 / {active.members.length} 条，余下见成员表</span>}{active && <><Button onClick={() => set({bundle: ''})}>清除选中束</Button>{mode === 'Fabric Flow' && <Button aria-pressed={expanded} onClick={() => setExpanded(!expanded)}><UnfoldHorizontal size={14}/>{expanded ? '收拢成员' : '展开成员'}</Button>}</>}
+          {active&&<span>{active.layer} · {active.medium}</span>}{expanded && active && active.members.length > 24 && <span>画布展开 24 / {active.members.length} 条，余下见成员表</span>}{active && <><Button onClick={() => set({bundle:'',member_query_ref:''})}>清除选中束</Button>{mode === 'Fabric Flow' && <Button aria-pressed={expanded} onClick={() => setExpanded(!expanded)}><UnfoldHorizontal size={14}/>{expanded ? '收拢成员' : '展开成员'}</Button>}</>}
         </FigureHead>
         {mode === 'Fabric Flow' && !nodes.length?<Empty>当前范围缺少 Spine / Leaf 角色或机柜登记；请查看交换机目录与 CMDB 来源。</Empty>:mode === 'Fabric Flow' ? <div className="v-flow-canvas"><svg viewBox={`0 0 1000 ${Math.max(540,90+Math.max(spines.length,leaves.length,pr.length)*112)}`} aria-label="Fabric Flow 束线图" role="img">
           <text x="30" y="28" className="column-title">01 / SPINE</text><text x="407" y="28" className="column-title">02 / LEAF</text><text x="783" y="28" className="column-title">03 / COMPUTE GROUP</text>
@@ -76,19 +74,19 @@ export default function Network({params, set, go}: ViewProps) {
             const path = `M${x1},${y1} C${x1 + 88},${y1} ${x2 - 88},${y2} ${x2},${y2}`;
             const chosen = active?.id === b.id, dim = !focused(b);
             return <g key={b.id} className={dim ? 'dimmed' : ''}>
-              <path d={path} className={'flow-edge ' + (chosen ? 'selected' : '')} style={{strokeWidth: chosen ? 5 : Math.min(10, 2 + Math.sqrt(b.members.length))}}/>
-              <g className="flow-hit" tabIndex={0} role="button" aria-label={name(b.from) + ' 到 ' + name(b.to) + ' ' + b.members.length + ' 条 '+b.layer+' / '+b.medium} onClick={() => pick(b.id)} onKeyDown={keyActivate(() => pick(b.id))}><path d={path} className="flow-target"/><rect x={(x1+x2)/2-22} y={(y1+y2)/2-12} width="44" height="24" fill="transparent"/></g>
-              {chosen && expanded && b.members.slice(0, 24).map((c, j) => <path key={c.id} d={`M${x1},${y1 + (j - (Math.min(24, b.members.length) - 1) / 2) * 3} C${x1 + 75},${y1 + (j - (Math.min(24, b.members.length) - 1) / 2) * 6} ${x2 - 75},${y2 + (j - (Math.min(24, b.members.length) - 1) / 2) * 6} ${x2},${y2 + (j - (Math.min(24, b.members.length) - 1) / 2) * 3}`} className="flow-strand" tabIndex={0} role="button" aria-label={'线缆 ' + c.id} onClick={() => set({asset: c.id})} onKeyDown={keyActivate(() => set({asset: c.id}))}><title>{c.id}</title></path>)}
-              {(api.asset(b.to)?.type==='rack' || chosen) && <g className="bundle-label" pointerEvents="none"><rect x={(x1 + x2) / 2 - 17} y={(y1 + y2) / 2 - 10} width="34" height="20" rx="6"/><text x={(x1 + x2) / 2} y={(y1 + y2) / 2 + 4} textAnchor="middle">{b.members.length}</text></g>}
+              <path d={path} className={'flow-edge ' + (chosen ? 'selected' : '')} style={{strokeWidth: chosen ? 5 : Math.min(10, 2 + Math.sqrt(b.count))}}/>
+              <g className="flow-hit" tabIndex={0} role="button" aria-label={name(b.from) + ' 到 ' + name(b.to) + ' ' + b.count + ' 条 '+b.layer+' / '+b.medium} onClick={() => pick(b.id)} onKeyDown={keyActivate(() => pick(b.id))}><path d={path} className="flow-target"/><rect x={(x1+x2)/2-22} y={(y1+y2)/2-12} width="44" height="24" fill="transparent"/></g>
+              {chosen && expanded && b.members.slice(0, 24).map((c, j) => <path key={c.id} d={`M${x1},${y1 + (j - (Math.min(24, b.count) - 1) / 2) * 3} C${x1 + 75},${y1 + (j - (Math.min(24, b.count) - 1) / 2) * 6} ${x2 - 75},${y2 + (j - (Math.min(24, b.count) - 1) / 2) * 6} ${x2},${y2 + (j - (Math.min(24, b.count) - 1) / 2) * 3}`} className="flow-strand" tabIndex={0} role="button" aria-label={'线缆 ' + c.id} onClick={() => set({asset: c.id})} onKeyDown={keyActivate(() => set({asset: c.id}))}><title>{c.id}</title></path>)}
+              {(api.asset(b.to)?.type==='rack' || chosen) && <g className="bundle-label" pointerEvents="none"><rect x={(x1 + x2) / 2 - 17} y={(y1 + y2) / 2 - 10} width="34" height="20" rx="6"/><text x={(x1 + x2) / 2} y={(y1 + y2) / 2 + 4} textAnchor="middle">{b.count}</text></g>}
             </g>;
           })}
-          {nodes.map(n => <g key={n.id} role="button" tabIndex={0} aria-label={'查看 ' + n.label} className={'flow-node ' + (selected === n.id ? 'selected' : '')} onClick={() => n.kind === 'group' ? go('rack-detail', {rack:n.id}) : set({asset: n.id})} onKeyDown={keyActivate(() => set({asset: n.id}))}>
+          {nodes.map(n => <g key={n.id} role="button" tabIndex={0} aria-label={'查看 ' + n.label} className={'flow-node ' + (selected === n.id ? 'selected' : '')} onClick={() => n.kind === 'group' ? go('rack-detail', {rack:n.id}) : set({asset: n.id})} onKeyDown={keyActivate(() => n.kind==='group'?go('rack-detail',{rack:n.id}):set({asset:n.id}))}>
             <rect x={n.x} y={n.y} width="184" height="62" rx="7"/>
             <rect x={n.x + 12} y={n.y + 14} width="5" height="31" rx="2" className={'role-bar ' + n.kind}/>
             <text x={n.x + 28} y={n.y + 26} className="node-title" style={{pointerEvents:'auto'}}><title>{n.label}</title>{shortLabel(n.label,23)}</text><text x={n.x + 28} y={n.y + 45} className="svg-small"><title>{n.sub}</title>{shortLabel(n.sub,26)}</text>
           </g>)}
         </svg></div> : mode === 'Bipartite' ? <>
-          <div className="v-inline-control"><label>端点集合 <select aria-label="二分图连接束" value={bi?.id || ''} onChange={e => pick(e.target.value)}>{bundles.map(b => <option key={b.id} value={b.id}>{name(b.from)} ↔ {name(b.to)} / {b.members.length}</option>)}</select></label><span>仅显示 Cable 原始双端</span><span className="spacer"/><Button disabled={!currentPage} onClick={() => setBiPage(currentPage - 1)}>上一组</Button><span>{currentPage + 1}/{Math.max(1, Math.ceil((bi?.members.length || 0) / 12))}</span><Button disabled={(currentPage + 1) * 12 >= (bi?.members.length || 0)} onClick={() => setBiPage(currentPage + 1)}>下一组</Button></div>
+          <div className="v-inline-control"><label>端点集合 <select aria-label="二分图连接束" value={bi?.id || ''} onChange={e => pick(e.target.value)}>{bundles.map(b => <option key={b.id} value={b.id}>{name(b.from)} ↔ {name(b.to)} / {b.count}</option>)}</select></label><span>仅显示 Cable 原始双端</span><span className="spacer"/><Button disabled={!currentPage} onClick={() => setBiPage(currentPage - 1)}>上一组</Button><span>{currentPage + 1}/{Math.max(1, Math.ceil((bi?.members.length || 0) / 12))}</span><Button disabled={(currentPage + 1) * 12 >= (bi?.members.length || 0)} onClick={() => setBiPage(currentPage + 1)}>下一组</Button></div>
           {bi ? <svg className="v-bipartite" viewBox={`0 0 1000 ${Math.max(280, biVisible.length * 48 + 64)}`} role="img" aria-label="端口二分图">
             <text x="32" y="26" className="column-title">A / 设备与端口</text><text x="720" y="26" className="column-title">B / 设备与端口</text>
             {biVisible.map((c, i) => { const y = 65 + i * 48; return <g key={c.id} role="button" tabIndex={0} className="bipartite-row" aria-label={'查看线缆 ' + c.id} onClick={() => set({asset: c.id})} onKeyDown={keyActivate(() => set({asset: c.id}))}>
@@ -98,7 +96,7 @@ export default function Network({params, set, go}: ViewProps) {
             </g>;})}
           </svg> : <Empty>没有端点完整的连接束。</Empty>}
         </> : <div className="v-directory">{roles.filter(d => d.name.toLowerCase().includes(q.toLowerCase())).map(d => <AssetRow key={d.id} a={d} onClick={() => set({asset: d.id})}/>)}</div>}
-        <Legend/>
+        {active&&<div className="v-matrix-key">本束 {active.count} 条；当前加载 {active.members.length} 条，成员按服务端分页核查。</div>}<QueryPager kind="matrix" set={set}/><QueryPager kind="connections" set={set}/><Legend/>
         {missing.length > 0 && <button className="v-exception-line" onClick={() => go('physical-cabling', {pod, state: 'incomplete', mode: 'Cable Inventory'})}>! {missing.length} 条缺端记录未进入束线，去核查 <ArrowDownUp size={13}/></button>}
         {(active || mode === 'Bipartite') && <MemberLedger rows={(active || bi)?.members || []} title="选中连接束 / 原始线缆" onSelect={asset => set({asset})}/>}
       </div>

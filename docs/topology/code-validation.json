@@ -1,0 +1,45 @@
+{
+  "recorded_at": "2026-10-31T05:30:22.197571+00:00",
+  "scope": "feature branch code/contract verification only; no service startup or database connection",
+  "checks": [
+    {
+      "command": "npm run generate:api",
+      "cwd": "dev",
+      "status": "PASS"
+    },
+    {
+      "command": "npm run build",
+      "cwd": "dev",
+      "status": "PASS",
+      "notes": [
+        "TypeScript and Vite build",
+        "Existing chunk-size and Zod annotation warnings retained"
+      ]
+    },
+    {
+      "command": "go test ./internal/cmdb -run 'TestVisual(Query|Placement)' -count=1",
+      "cwd": "dev/backend",
+      "status": "PASS",
+      "top_level_tests": 4,
+      "geometry_counterexamples": 6
+    },
+    {
+      "command": "go build -o /tmp/keel-visualization-contract-check ./cmd/api",
+      "cwd": "dev/backend",
+      "status": "PASS",
+      "binary_executed": false
+    },
+    {
+      "command": "git diff --check",
+      "status": "PASS"
+    }
+  ],
+  "not_run": [
+    "New query database/HTTP integration",
+    "Browser interaction after new query wiring",
+    "Real asset import",
+    "Production-scale performance"
+  ],
+  "environment_changed": false,
+  "database_migration_or_asset_import": false
+}

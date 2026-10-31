@@ -1,9 +1,10 @@
 import {createContext,useContext,useMemo,type ReactNode} from 'react';
-import type {InfraAsset,InfraCable,InfraSnapshot} from '@/lib/api/infrastructure';
+import type {InfraAsset,InfraCable,InfraSnapshot,InfraGroup,InfraMatrix,InfraQuerySnapshot,InfraTrace} from '@/lib/api/infrastructure';
 export type Go=(page:string,params?:Record<string,string>)=>void;
 export const labels:Record<string,string>={unverified:'记录待验证',stale:'观测过期',conflict:'证据冲突',incomplete:'端点缺失',unknown:'未知',maintained:'维护态',unsupported:'不支持',healthy:'证据有效'};
-export function createTopologyModel(snapshot:InfraSnapshot,onOpenDevice?:(asset:InfraAsset)=>void){
- const all=snapshot.assets,ports=all.filter(a=>a.type==='port'),assets=all.filter(a=>a.type!=='port'),racks=assets.filter(a=>a.type==='rack'),devices=assets.filter(a=>['server','switch','patch_panel','pdu'].includes(a.type));
+export type TopologyQueries={groups?:InfraGroup[];matrix?:InfraMatrix;backbone?:InfraMatrix;connections?:InfraQuerySnapshot;trace?:InfraTrace;loading?:boolean;error?:(Error&{status?:number});searchResults?:InfraAsset[]};
+export function createTopologyModel(snapshot:InfraSnapshot,onOpenDevice?:((asset:InfraAsset)=>void),queries:TopologyQueries={}){
+ const all=snapshot.assets,ports=all.filter(a=>a.type==='port'),assets=all.filter(a=>a.type!=='port'),racks=assets.filter(a=>a.type==='rack'),devices=assets.filter(a=>['server','switch','patch_panel','pdu','device'].includes(a.type));
  const index=new Map(all.map(a=>[a.id,a]));
  const cables=snapshot.cables;
  const cableIndex=new Map(cables.map(c=>[c.id,c]));
@@ -21,11 +22,11 @@ export function createTopologyModel(snapshot:InfraSnapshot,onOpenDevice?:(asset:
   if(c.fields.freshness==='stale')return 'stale';
   return 'unverified';
  };
- return {api,data,racks,devices,name,status,labels,openDevice:onOpenDevice,snapshot};
+ return {api,data,racks,devices,name,status,labels,openDevice:onOpenDevice,snapshot,queries};
 }
 export type TopologyModel=ReturnType<typeof createTopologyModel>;
 const Context=createContext<TopologyModel|null>(null);
-export function TopologyModelProvider({snapshot,children,onOpenDevice}:{snapshot:InfraSnapshot;children:ReactNode;onOpenDevice?:(asset:InfraAsset)=>void}){const model=useMemo(()=>createTopologyModel(snapshot,onOpenDevice),[snapshot,onOpenDevice]);return <Context.Provider value={model}>{children}</Context.Provider>}
+export function TopologyModelProvider({snapshot,children,onOpenDevice,queries}:{snapshot:InfraSnapshot;children:ReactNode;onOpenDevice?:(asset:InfraAsset)=>void;queries?:TopologyQueries}){const model=useMemo(()=>createTopologyModel(snapshot,onOpenDevice,queries),[snapshot,onOpenDevice,queries]);return <Context.Provider value={model}>{children}</Context.Provider>}
 export function useTopologyModel(){const m=useContext(Context);if(!m)throw Error('缺少 CMDB 可视化数据范围');return m;}
 export function exportFile(filename:string,text:string,type='text/csv;charset=utf-8'){const u=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=u;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
 export {locationIssues} from '@/lib/api/infrastructure';

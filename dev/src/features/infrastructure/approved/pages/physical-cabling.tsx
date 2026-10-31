@@ -2,10 +2,10 @@ import {useState} from 'react';
 import {Download, Filter, ArrowRight} from 'lucide-react';
 import {useTopologyModel,exportFile} from '../model';
 import {Button, Tabs, SearchBox, Empty, Badge, CableTable} from '../shared';
-import {ConnectionMatrix,FigureHead,Legend,MemberLedger,ObjectPanel,PodSelect,keyActivate,type ViewProps,useVisualModel,shortLabel} from '../visual';
+import {ConnectionMatrix,FigureHead,Legend,MemberLedger,ObjectPanel,PodSelect,keyActivate,type ViewProps,useVisualModel,shortLabel,QueryPager} from '../visual';
 
 export default function Cabling({params, set, go}: ViewProps) {
-  const {api,data,devices,name,status}=useTopologyModel();
+  const {api,data,devices,name,status,queries}=useTopologyModel();
   const {between,cableSearch,complete,incident,podOf,servers,sw}=useVisualModel();
   const mode = params.get('mode') || 'Connection Matrix';
   const q = params.get('q') || '', state = params.get('state') || '';
@@ -14,16 +14,17 @@ export default function Cabling({params, set, go}: ViewProps) {
   const requestedPort=api.asset(params.get('port')||'');
   const asset = params.has('asset')?params.get('asset')!:target?.device_a||requestedPort?.fields.owner_device_id||(!params.has('cable')&&!params.has('port')?devices[0]?.id:'')||'';
   const invalidAsset=!!asset&&!devices.some(d=>d.id===asset),invalidCable=!!params.get('cable')&&!target,invalidPort=!!params.get('port')&&requestedPort?.type!=='port';
-  const pod = params.has('pod') ? params.get('pod')! : String(podOf(asset) || '');
+  const pod = params.get('pod')||'';
   const axis = params.get('axis') || 'servers';
   const row = params.get('row') || '', col = params.get('col') || '';
   const [bioPage, setBioPage] = useState(0);
-  const rows = data.cables.filter(c => (!pod || [podOf(c.device_a), podOf(c.device_b)].includes(pod)) && (!state || status(c) === state) && cableSearch(c, q));
-  const matrixRows = (axis === 'servers' ? servers : sw.filter(s => s.fields.role === 'leaf')).filter(d => (!pod || podOf(d.id) === pod) && (!q || [d.id,d.name,d.fields.management_ip,d.fields.permanent_mac,d.fields.mac,d.fields.serial,...api.connections(d.id).map(c => [c.id, name(c.device_a), name(c.device_b)].join(' '))].join(' ').toLowerCase().includes(q.toLowerCase())));
+  const rows = (queries.connections?.cables||[]).filter(c => (!pod || [podOf(c.device_a), podOf(c.device_b)].includes(pod)) && (!state || status(c) === state));
+  const matrixRows = [...(queries.matrix?.rows||[])];
   const ordering = params.get('order') || 'rack';
   matrixRows.sort((a, b) => ordering === 'connections' ? api.connections(b.id).length - api.connections(a.id).length || a.id.localeCompare(b.id) : ordering === 'name' ? a.name.localeCompare(b.name) : String(a.fields.rack_id).localeCompare(String(b.fields.rack_id)) || a.id.localeCompare(b.id));
-  const matrixCols = sw.filter(s => (axis === 'servers' ? s.fields.role !== 'spine' : s.fields.role === 'spine') && rows.some(c => complete(c) && incident(c, s.id) && matrixRows.some(d => incident(c, d.id))));
-  const matrixIds = new Set(rows.filter(c => complete(c) && matrixRows.some(d => incident(c, d.id)) && matrixCols.some(d => incident(c, d.id))).map(c => c.id));
+  const matrixCols = queries.matrix?.columns||[];
+  const matrixCount = queries.matrix?.included_count;
+  const outsideCount = queries.matrix?.excluded_count;
   const incomplete = rows.filter(c => !complete(c));
   const members = row && col ? between(rows.filter(complete), row, col) : [];
   const local = rows.filter(c => incident(c, asset));
@@ -36,10 +37,10 @@ export default function Cabling({params, set, go}: ViewProps) {
   });
   function pick(id: string) { set({cable: id, port: ''}); }
   function clearCell() { set({row: '', col: ''}); setBioPage(0); }
-  const inventory = params.get('coverage') === 'outside' ? rows.filter(c => !matrixIds.has(c.id)) : rows;
-  return <div className="viz-v3">{(invalidAsset||invalidCable||invalidPort)&&<div className="v-exception-line" role="status">目标对象不存在、未加载或无权访问；未自动替换为其他设备。<Button onClick={()=>set({asset:'',cable:'',port:''})}>清除定位</Button></div>}
-    <div className="v-command"><PodSelect value={pod} onChange={pod => {set({pod, row: '', col: '', cable: '', port: ''}); setBioPage(0);}}/><SearchBox value={q} onChange={q => {set({q}); setBioPage(0);}}/><select aria-label="证据筛选" value={state} onChange={e => {set({state: e.target.value}); setBioPage(0);}}><option value="">全部证据</option><option value="incomplete">端点缺失</option><option value="conflict">证据冲突</option><option value="stale">观测过期</option><option value="unverified">待验证</option></select><span className="spacer"/><Button onClick={() => exportFile('cmdb-connections.csv', 'id,a_port,b_port,evidence\n' + rows.map(c => [c.id, c.a, c.b, status(c)].join(',')).join('\n'))}><Download size={14}/>导出 {rows.length} 条</Button></div>
-    <div className="v-viewline"><Tabs items={['Connection Matrix', 'BioFabric', 'Port Panel', 'Cable Inventory']} value={mode} onChange={mode => set({mode})}/><span className="spacer"/><span>{mode === 'Connection Matrix' ? matrixIds.size + ' 条进入矩阵 / ' : ''}{rows.length} 条范围记录</span></div>
+  const inventory = params.get('coverage') === 'outside' ? rows.filter(c => !complete(c)||![c.device_a,c.device_b].some(id=>matrixRows.some(r=>r.id===id))||![c.device_a,c.device_b].some(id=>matrixCols.some(r=>r.id===id))) : rows;
+  return <div className="viz-v3">{!queries.loading&&(invalidAsset||invalidCable||invalidPort)&&<div className="v-exception-line" role="status">目标对象不存在、未加载或无权访问；未自动替换为其他设备。<Button onClick={()=>set({asset:'',cable:'',port:''})}>清除定位</Button></div>}
+    <div className="v-command"><PodSelect value={pod} onChange={pod => {set({pod, row: '', col: '', cable: '', port: ''}); setBioPage(0);}}/><SearchBox value={q} onChange={q => {set({q}); setBioPage(0);}}/><select aria-label="证据筛选" value={state} onChange={e => {set({state: e.target.value}); setBioPage(0);}}><option value="">全部证据</option><option value="incomplete">端点缺失</option><option value="conflict">当前窗口：证据冲突</option><option value="stale">当前窗口：观测过期</option><option value="unverified">当前窗口：待验证</option></select><span className="spacer"/><Button onClick={() => exportFile('cmdb-connections.csv', 'id,a_port,b_port,evidence\n' + rows.map(c => [c.id, c.a, c.b, status(c)].join(',')).join('\n'))}><Download size={14}/>导出 {rows.length} 条</Button></div>
+    <div className="v-viewline"><Tabs items={['Connection Matrix', 'BioFabric', 'Port Panel', 'Cable Inventory']} value={mode} onChange={mode => set({mode})}/><span className="spacer"/><span>{mode === 'Connection Matrix' ? (matrixCount??'…') + ' 条进入矩阵 / ' : ''}{rows.length} 条当前线缆窗口</span></div>
     <div className={'v-workspace ' + (selection ? 'with-detail' : '')}>
       <div className="v-main-panel">
         <FigureHead title={mode === 'Connection Matrix' ? 'Connection Matrix / 端点核对' : mode === 'BioFabric' ? 'BioFabric / 端口—线缆索引' : mode === 'Port Panel' ? 'Port Panel / 登记端口' : 'Cable Inventory / 物理记录'}>
@@ -48,9 +49,9 @@ export default function Cabling({params, set, go}: ViewProps) {
         </FigureHead>
         {mode === 'Connection Matrix' ? <>
           <ConnectionMatrix rows={matrixRows} cols={matrixCols} cables={rows} selected={row + ':' + col} onCell={(row, col) => {set({row, col, cable: '', port: ''}); setBioPage(0);}}/>
-          <div className="v-matrix-key"><i/>数字 = 完整线缆条数<span>· = 无登记记录</span><span>! = 存在证据异常</span><span className="spacer"/><button className="text-link" onClick={() => set({mode: 'Cable Inventory', coverage: 'outside'})}>其他类型 / 缺端 {rows.length - matrixIds.size} 条</button><span>{matrixRows.length} 行 × {matrixCols.length} 列</span></div>
+          <div className="v-matrix-key"><i/>数字 = 完整线缆条数<span>· = 无登记记录</span><span>! = 存在证据异常</span><span className="spacer"/><button className="text-link" onClick={() => set({mode: 'Cable Inventory', coverage: 'outside'})}>其他类型 / 缺端 {outsideCount??'…'} 条</button><span>{matrixRows.length} 行 × {matrixCols.length} 列</span></div>
           {incomplete.length > 0 && <div className="v-incomplete-tray"><strong>未落入矩阵</strong>{incomplete.map(c => <button key={c.id} onClick={() => pick(c.id)}>{name(c.device_a)} / {name(c.a)} <ArrowRight size={12}/> 端点缺失 <code>{c.id}</code></button>)}</div>}
-          {row && col && <><div className="v-selection-actions"><span>{name(row)} ↔ {name(col)}</span><span className="spacer"/><Button onClick={() => set({mode: 'BioFabric'})}>展开端口关系</Button><Button variant="ghost" onClick={clearCell}>清除单元格</Button></div><MemberLedger rows={members} selected={selection} onSelect={pick}/></>}
+          {row && col && <><QueryPager kind="connections" set={set}/><div className="v-selection-actions"><span>{name(row)} ↔ {name(col)}</span><span className="spacer"/><Button onClick={() => set({mode: 'BioFabric'})}>展开端口关系</Button><Button variant="ghost" onClick={clearCell}>清除单元格</Button></div><MemberLedger rows={members} selected={selection} onSelect={pick}/></>}
         </> : mode === 'BioFabric' ? <>
           <div className="v-inline-control"><span>横线 = 唯一端口 · 竖线 = 唯一线缆 · 方点 = 真实端接</span>{row && col && <Button onClick={clearCell}>清除矩阵范围</Button>}<span className="spacer"/><Button disabled={!page} onClick={() => setBioPage(page - 1)}>上一组</Button><span>{page + 1}/{Math.max(1, Math.ceil(bioAll.length / 24))}</span><Button disabled={(page + 1) * 24 >= bioAll.length} onClick={() => setBioPage(page + 1)}>下一组</Button></div>
           {!bio.length ? <Empty>该设备在当前筛选下没有记录，请切换设备或清除筛选。</Empty> : <div className="v-bio-scroll"><svg width="100%" style={{minWidth: Math.max(750, 300 + bio.length * 27)}} height={92 + portIds.length * 25} role="img" aria-label="BioFabric 端口线缆矩阵">
@@ -80,7 +81,7 @@ export default function Cabling({params, set, go}: ViewProps) {
           })}</div>
           <MemberLedger rows={params.get('port') ? rows.filter(c => incident(c, params.get('port')!)) : local} selected={selection} onSelect={pick}/>
         </> : <>{params.get('coverage') === 'outside' && <div className="v-selection-actions">仅显示未进入当前矩阵的记录<span className="spacer"/><Button onClick={() => set({coverage: ''})}>显示全部范围</Button></div>}<CableTable rows={inventory} selected={selection} onSelect={pick}/></>}
-        <Legend/>
+        <QueryPager kind={mode==='Connection Matrix'?'matrix':'connections'} set={set}/><Legend/>
       </div>
       <ObjectPanel id={selection} go={go} close={() => set({cable: '', port: ''})}/>
     </div>

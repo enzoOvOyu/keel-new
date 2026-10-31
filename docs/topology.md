@@ -2,7 +2,7 @@
 
 更新：2026-10-31。状态：**用户已批准五个原型进入正式实现**。本轮实现与验证记录见 [实施报告](topology/implementation-report.md)。以下审计、研究及原型验证保留其历史范围；不据历史结果宣称正式功能通过。
 
-本文件是四个拓扑模块的主设计。机柜后续独立设计见 [rack-visualization.md](rack-visualization.md)，其 Gallery/Spatial/Dual 原型已替换 5181/rack-detail，正式机柜页面保持不变。V3 依据用户最新纠偏，**只重做全局拓扑、网络架构、物理布线和链路追踪的展示方案与隔离原型**；当时机柜现状冻结。后续用户已单独授权机柜设计，边界见上方链接。保留既有 CMDB 身份、事实/观测分层及接口边界。研究方法与访问限制见 §14；本文明确区分论文结论、Keel 设计推断和已运行原型，不把科研算法名称当成实现证明。本阶段不修改正式页面、数据库、业务 API 或根设计令牌。
+本文件是四个拓扑模块的主设计。机柜后续独立设计见 [rack-visualization.md](rack-visualization.md)，其 Gallery/Spatial/Dual 原型已替换 5181/rack-detail，正式机柜页面保持不变。V3 依据用户最新纠偏，**只重做全局拓扑、网络架构、物理布线和链路追踪的展示方案与隔离原型**；当时机柜现状冻结。后续用户已单独授权机柜设计，边界见上方链接。保留既有 CMDB 身份、事实/观测分层及接口边界。研究方法与访问限制见 §14；本文明确区分论文结论、Keel 设计推断和已运行原型，不把科研算法名称当成实现证明。该限制描述历史原型阶段；用户现已批准在独立功能分支落实正式页面与查询 API。数据库实体和根设计令牌保持不变，运行环境及合并由用户安排。
 ## 1. 产品定位与范围
 
 面向网络工程师、交付工程师和运维人员，回答“在哪、怎样组织、如何端接、凭什么确认”。CMDB 提供资产与持久关系事实；BOM 提供规划来源；配置、观测和验收证据保持领域所有权。可视化是授权查询投影，不是第二资产库。
@@ -244,16 +244,16 @@ npm run build   # 独立 dist，不影响 dev/dist
 | GET /cmdb/dossier/quality | 范围/过滤 | 数据质量，不自动视为硬件故障 |
 | /cmdb/changesets | 现有审核/发布契约 | 正式位置变更；原型不调用 |
 
-### 9.3 下一阶段契约草案（不是已实现 API）
+### 9.3 正式查询契约（功能分支实现，未部署）
 
-不另建 `/topology/*` 平行服务，扩展 CMDB 查询投影。用户确认设计后先在 OpenAPI 收紧专用 Schema，再实现；本阶段不改现有 OpenAPI。
+不另建 `/topology/*` 平行服务，扩展 CMDB 查询投影。用户已批准本轮实现；OpenAPI 的 InfrastructureSubgraph/Matrix/Trace 为代码权威。以下端点在功能分支完成代码接线，不等于已经部署或完成真实数据联调。
 
-| 建议端点 | 必须的输入 | 专用输出与行为 |
+| 端点 | 主要输入 | 专用返回与边界 |
 |---|---|---|
-| GET /cmdb/visualization/subgraph | project_id?, root_id?, view=hierarchy/fabric/physical, fabric_id?, depth=1或2, cursor?, limit≤200, snapshot_id? | VisualSubgraph：snapshot_id、fact_layer、nodes、edges、groups、coverage、next_cursor；聚合边 member_query_ref，不内嵌无限ID |
-| GET /cmdb/visualization/matrix | scope_ids、axes=server_switch/leaf_spine/rack_leaf/port_pair、fabric_id?、snapshot_id | ConnectionMatrix：行列稳定ID与ordering、cells(count/evidence/member_query_ref)、included_count/excluded_count/coverage；缺端另列；count仅完整授权记录 |
-| GET /cmdb/visualization/connections | asset_id/port_id/member_query_ref、status?、sort、cursor、limit | ConnectionPage：Cable、双端port/device、fact_layer、source_ref、evidence_refs、next_cursor；未知端用null与原因 |
-| POST /cmdb/visualization/trace | project_id?、mode=physical/logical、from_port_id、to_port_id?、at?、vrf_id?、snapshot_id | TraceResult：segments、breakpoints、integrity、verification、coverage、reason；只读查询，受现有CSRF约束；无逻辑能力返回422 CAPABILITY_UNAVAILABLE |
+| GET /cmdb/visualization/subgraph | project_id?, root_id?, view=hierarchy/fabric/physical, fabric_id?, depth=1/2, q?, unplaced?, cursor?, limit≤200, snapshot_id? | InfrastructureSubgraph：当前版本指纹、授权资产/类型关系、分组登记统计、coverage 与 page；先 SQL 选种子，后取结构上下文 |
+| GET /cmdb/visualization/matrix | root_id?, axes=server_switch/leaf_spine/rack_leaf/port_pair, fabric_id?, q?, unplaced?, cursor?, snapshot_id? | InfrastructureMatrix：稳定双轴、cells 与事实层/介质/速率分类组、member_query_ref、included/excluded_count、单元格覆盖率、page |
+| GET /cmdb/visualization/connections | asset_id/port_id/member_query_ref、root_id?、q?、unplaced?、status=all/incomplete、cursor?、limit≤200 | InfrastructureSubgraph：Cable 及授权双端、来源、缺口与分页；其他观测状态只在前端明确的当前窗口过滤，不冒充全域过滤 |
+| POST /cmdb/visualization/trace | project_id?, mode=physical/logical, from_port_id, to_port_id?, candidate_cable_id?, snapshot_id? | InfrastructureTrace：登记 segments、breakpoints、integrity、verification、coverage、reason；候选分支显式选择；无逻辑或历史能力返回422 |
 
 Scope 必须基于会话获授权项目求交集；不可把客户端省略 project_id 解释为所有项目。cursor 绑定用户/授权版本/过滤/snapshot；拒绝跨范围复用。返回错误沿用 ErrorEnvelope(request_id,error)，400参数、403权限、404不可见、409快照过期、422不支持、504超时。未完成分页/截断一律 partial，不报告路径完整。端点与观测分别授权，不能用边泄露不可见设备。
 
@@ -278,10 +278,10 @@ Scope 必须基于会话获授权项目求交集；不可把客户端省略 proj
 
 ## 12. 实施顺序与设计决策
 
-1. **当前阶段 V3**：研究六篇资料，整改四页原型与本文；只验证相关交互、截图、类型/构建。四个拓扑页面完成即停，等待用户评审；后续授权的机柜设计独立记录。
-2. **确认后才实施**：补专用查询契约及Scope/Snapshot；拆四个领域ViewModel，保留生产路由与设备抽屉。
-3. 经批准后依次实现全局 Hybrid → 网络语义束线 → 布线 Matrix/BioFabric → Metro/Tree/Table；本轮不安排机柜设计。沿用 CMDB/ChangeSet。
-4. 真实数据质量核查后再做规模基准，不用Demo流畅替代千卡证据。
+1. **历史 V3 设计阶段**：四原型和研究整改完成；后续机柜 Gallery/Spatial/Dual 与机房空间设计获得单独批准，保留历史验证范围。
+2. **本轮已授权代码实施**：五工作区正式前端、受控查询 API、项目/用户/授权版本缓存和跨页面稳定 ID 接线；保留原业务实体和 ChangeSet。
+3. **代码分支隔离**：仅 `feat/datacenter-visualization-approved`，不自动合并 main，不自行启动/替换前端或 API，不迁移数据库。
+4. **用户后续联调**：真实数据导入、运行时五页验收与生产规模性能由用户安排；当前类型/编译/必要纯逻辑结果及未执行项见 [实施报告](topology/implementation-report.md)。
 
 已定：Sidebar唯一模块导航；机柜Mapping保留；继承现有token；原型独立5181；物理trace不穿越交换机；RoCE不是和Ethernet互斥的技术枚举；布局不改实物。
 
@@ -289,7 +289,7 @@ Scope 必须基于会话获授权项目求交集；不可把客户端省略 proj
 
 ## 13. 验收与实际结果
 
-本阶段验收只证明**设计原型**，不证明生产 API、写入、真机和千卡规模能力。
+以下为历史**设计原型**验收表，不证明功能分支的新查询 API、真机或千卡规模。正式实施的代码验证结果与待联调事项见 [实施报告](topology/implementation-report.md)。
 
 | 场景 | 预期 |
 |---|---|

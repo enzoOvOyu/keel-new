@@ -3,7 +3,19 @@ import type {components} from '../schemas/openapi';
 export type InfraAsset=Omit<components['schemas']['InfrastructureAsset'],'fields'>&{fields:Record<string,any>};
 export type InfraCable=Omit<components['schemas']['InfrastructureCable'],'fields'>&{fields:Record<string,any>};
 export type InfraSnapshot=Omit<components['schemas']['InfrastructureSnapshot'],'assets'|'cables'>&{assets:InfraAsset[];cables:InfraCable[]};
+export type InfraPage=components['schemas']['InfrastructureQueryPage'];
+export type InfraGroup=components['schemas']['InfrastructureGroup'];
+export type InfraQuerySnapshot=Omit<components['schemas']['InfrastructureSubgraph'],'assets'|'cables'>&{assets:InfraAsset[];cables:InfraCable[]};
+export type InfraMatrix=Omit<components['schemas']['InfrastructureMatrix'],'rows'|'columns'>&{rows:InfraAsset[];columns:InfraAsset[]};
+export type InfraTrace=Omit<components['schemas']['InfrastructureTrace'],'assets'|'segments'>&{assets:InfraAsset[];segments:InfraCable[]};
+export type InfraTraceRequest=Omit<components['schemas']['InfrastructureTraceRequest'],'project_id'>;
+export type InfraQuery={unplaced?:boolean;root_id?:string;view?:'hierarchy'|'fabric'|'physical';fabric_id?:string;depth?:number;cursor?:string;limit?:number;snapshot_id?:string;q?:string;axes?:string;asset_id?:string;port_id?:string;member_query_ref?:string;status?:string};
+function queryUrl(path:string,project:string|null,query:InfraQuery){return 'visualization/'+path+'?'+new URLSearchParams(Object.entries({...query,...(project?{project_id:project}:{})}).filter(([,v])=>v!==undefined&&v!=='').map(([k,v])=>[k,String(v)]))}
 export const infrastructureApi = {
+  subgraph(project:string|null,query:InfraQuery,signal?:AbortSignal){return cmdbFetch<{data:InfraQuerySnapshot}>(queryUrl('subgraph',project,query),'GET',undefined,signal).then(r=>r.data)},
+  matrix(project:string|null,query:InfraQuery,signal?:AbortSignal){return cmdbFetch<{data:InfraMatrix}>(queryUrl('matrix',project,query),'GET',undefined,signal).then(r=>r.data)},
+  connections(project:string|null,query:InfraQuery,signal?:AbortSignal){return cmdbFetch<{data:InfraQuerySnapshot}>(queryUrl('connections',project,query),'GET',undefined,signal).then(r=>r.data)},
+  trace(project:string|null,query:InfraTraceRequest,signal?:AbortSignal){return cmdbFetch<{data:InfraTrace}>('visualization/trace','POST',{...query,...(project?{project_id:project}:{})},signal).then(r=>r.data)},
   fullSnapshot(project: string | null, signal?: AbortSignal, scope: {rack_id?:string;focus?:string;limit?:number} = {}) {
     return cmdbFetch<{data:InfraSnapshot}>("visualization?"+new URLSearchParams({detail:"full",limit:String(scope.limit??5000),...(project?{project_id:project}:{}),...(scope.rack_id?{rack_id:scope.rack_id}:{}),...(scope.focus?{focus:scope.focus}:{})}),"GET",undefined,signal).then(r=>r.data);
   },

@@ -197,3 +197,15 @@ CMDB-D-01…06：服务器→部件→端口→线缆→对端；Diff→来源�
 ## 2026-10-31 · 数据中心可视化 V3 设计验收
 
 本轮只验收四页隔离原型：Cluster/Hybrid聚合可展开原始成员；Fabric Flow束可转双端检查；Matrix默认可定位Cable且缺端不丢失；BioFabric只有端点方点构成连接；Metro遇缺端停止、Tree关联不冒称冗余。URL刷新恢复对象，原型不请求业务API，不修改机柜与正式系统。研究引用、度量定义与未测项以 [topology.md §13–14](topology.md#13-验收与实际结果) 为准。实际运行记录见 [validation-v3.md](topology/prototype/validation-v3.md)，不得从原型可运行推导千卡规模或真机验收通过。
+
+## 批准五工作区正式接入验收 · 2026-10-31
+
+以 [topology.md](topology.md)、机柜原型及 [实施报告](topology/implementation-report.md) 为范围，历史原型检查不代替新 API 联调验收。
+
+1. 四拓扑各自保留 Hybrid、Fabric Flow、Connection Matrix、Metro/Tree/Table 布局及原型交互，机柜保留 Gallery/3D/Dual/Mapping。
+2. 范围切换取消旧请求；用户/项目/授权版本隔离缓存；无权 ID 不改为其他获授权对象。刷新恢复筛选与稳定 ID。
+3. 矩阵单元格、成员分页和 Trace 引用同一真实 Cable/端口身份；缺端、歧义、截断不显示完整或通过。
+4. 游标无法跨查询/用户/授权范围复用；源版本变化明确返回冲突；页数不足不静默全量下载。
+5. 多 Cable 端口明确选择；柜内/对端定位保持同 ID；缺少位置不展示伪机柜跳转。
+6. 展示草稿不写安装事实；实际位置走现有 ChangeSet；缺规划/实装证据不展示假差异。
+7. 类型、构建与必要纯逻辑检查结果写入实施报告。真实数据导入、运行时联调与生产规模验收由用户安排；未运行保持 NOT RUN。

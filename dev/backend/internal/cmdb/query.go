@@ -12,10 +12,11 @@ import (
 )
 
 type Scope struct {
-	Projects []string
-	Pairs    []string
-	Actor    string
-	UserID   string
+	Projects          []string
+	Pairs             []string
+	Actor             string
+	UserID            string
+	PermissionVersion int64
 }
 
 func Visible(alias string) string {

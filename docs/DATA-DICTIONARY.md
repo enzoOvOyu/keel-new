@@ -226,3 +226,9 @@ cmdb_entity稳定text资产键保持历史UUID原值，bom_item_uid保留唯一�
 ## 2026-10-31 数据中心可视化实现补充
 
 运维入口 `/topology` 与机柜详情复用 CMDB 实体/类型关系，布局草稿与实际位置严格区分；实际 U 位变更通过既有 ChangeSet 的 asset.relocate 审核发布，保持历史、版本、审计和 Outbox。唯一实现边界、数据质量及真实验证记录见 [DATACENTER-VISUALIZATION.md](DATACENTER-VISUALIZATION.md)。未验收能力不得标记完成。
+
+## 可视化查询 DTO（不是新资产实体）· 2026-10-31
+
+本轮只复用 cmdb_entity、cmdb_asset_scope、cmdb_relationship、来源与修订，不新增平行设备/线缆/位置表。子图、矩阵、连接分页与 Trace 为查询返回类型，字段权威见 OpenAPI。
+
+`read_at` 为查询时间；`observed_at` 为具体观测时间，不能互换。`snapshot_id` 为当前查询版本指纹，不代表存储了历史快照。`coverage`、分页和 `truncated` 说明当前范围，不得拿局部返回量充当全域总数。关系来源、事实层、修订及端口归属必须可追溯。未知数值保留 null/缺失，明确成员派生的 GPU/NIC 数量须保留依据。机柜占用按 U 区间并集计算，前后视图不重复计数；未知高度不能算作 0U。详见 [实施报告](topology/implementation-report.md)。

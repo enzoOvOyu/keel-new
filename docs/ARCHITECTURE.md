@@ -230,3 +230,11 @@ Go模块化单体中internal/cmdb包含Schema、Domain、Query和ChangeSet服务
 ## 2026-10-31 数据中心可视化实现补充
 
 运维入口 `/topology` 与机柜详情复用 CMDB 实体/类型关系，布局草稿与实际位置严格区分；实际 U 位变更通过既有 ChangeSet 的 asset.relocate 审核发布，保持历史、版本、审计和 Outbox。唯一实现边界、数据质量及真实验证记录见 [DATACENTER-VISUALIZATION.md](DATACENTER-VISUALIZATION.md)。未验收能力不得标记完成。
+
+## 批准可视化实施边界 · 2026-10-31
+
+五工作区以 [topology.md](topology.md) 和机房原型验证记录为已批准依据，前端保持四种领域表达及机柜共享几何，不以通用 Graph 页面替代。查询投影扩展现有 CMDB Domain/Repository；分页子图、矩阵、连接和追踪不持有新资产身份，不引入图数据库。
+
+页面按范围和选择按需加载，服务端过滤授权对象，游标绑定当前用户、范围、查询和版本；客户端取消旧范围请求，不复用其他用户或项目缓存。聚合边和矩阵单元格保留成员查询，不以布局产生关系。原全量查询保留兼容，不作为新工作区默认加载方式。契约以 OpenAPI/DOMAIN-API-CONTRACTS 为准，实际完成项与规模限制见 [实施报告](topology/implementation-report.md)。
+
+本轮只在 feature 分支写代码；不自行启动服务、替换现有测试环境或调整数据库。

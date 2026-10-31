@@ -3,7 +3,7 @@ import {ArrowUpRight,Columns2,Database,Layers3,Server} from 'lucide-react';
 import {Button} from '../shared';
 import {Elevation} from './Elevation';
 import {roomModel} from './room-model';
-import {shortPod,useRackModel} from './model';
+import {shortPod,useRackModel,gpuText,occupiedText,freeText} from './model';
 import './room.css';
 const RoomScene=lazy(()=>import('./room/RoomScene'));
 type Props={q:string;pod:string;current:string;params:URLSearchParams;set:(v:Record<string,string>)=>void;onOpen:(id:string,asset?:string)=>void};
@@ -11,18 +11,21 @@ export function RoomGallery({q,pod,current,params,set,onOpen}:Props){
   const rackApi=useRackModel();
   const model=useMemo(()=>roomModel(rackApi),[rackApi]),[face,setFace]=useState<'front'|'rear'>('front');
   const visible=useMemo(()=>model.racks.filter(({snapshot:s})=>(!pod||s.rack.fields.pod_id===pod)&&[s.rack.id,s.rack.name,...s.items.flatMap(d=>[d.id,d.name,d.fields.model,d.fields.serial])].join(' ').toLowerCase().includes(q.toLowerCase())),[model,q,pod]);
+  const renderable=useMemo(()=>model.racks.filter(r=>r.snapshot.height!==null&&r.snapshot.height>0),[model]);
   const visibleIds=useMemo(()=>visible.map(r=>r.snapshot.rack.id),[visible]);
+  const unknownHeight=visible.filter(r=>r.snapshot.height===null||r.snapshot.height<=0);
   const selected=visible.find(r=>r.snapshot.rack.id===current)||visible[0],s=selected?.snapshot;
-  const totals=visible.reduce((n,{snapshot:r})=>({u:n.u+(r.height||0),used:n.used+(r.layout?.occupied||0),gpu:n.gpu+r.gpu,servers:n.servers+r.servers,switches:n.switches+r.switches}),{u:0,used:0,gpu:0,servers:0,switches:0});
+  const totals=visible.reduce((n,{snapshot:r})=>({u:n.u+(r.height??0),used:n.used+(r.layout?.occupied??0),gpu:n.gpu+r.gpu,gpuCoverage:n.gpuCoverage+r.gpuCoverage,gpuTotal:n.gpuTotal+r.gpuTotal,gpuComplete:n.gpuComplete&&r.gpuComplete,servers:n.servers+r.servers,switches:n.switches+r.switches,known:n.known+(r.layout&&r.placementComplete?1:0)}),{u:0,used:0,gpu:0,gpuCoverage:0,gpuTotal:0,gpuComplete:true,servers:0,switches:0,known:0});
   const open=(id:string,asset='')=>{const match=q?model.racks.find(r=>r.snapshot.rack.id===id)?.snapshot.items.find(d=>[d.id,d.name,d.fields.model,d.fields.serial].join(' ').toLowerCase().includes(q.toLowerCase())):null;onOpen(id,asset||match?.id||'');};
   return <div className="room-gallery">
-    <div className="room-summary"><b><Layers3 size={15}/>{visible.length} 机柜</b><span>{totals.used} / {totals.u} U 已登记</span><span>{totals.u-totals.used}U 未占用</span><i/><span>{totals.servers} 服务器 · {totals.gpu} GPU · {totals.switches} 交换机</span><span className="spacer"/><span className="room-scale"><i/>U 占用率 <small>0—100%</small></span></div>
+    <div className="room-summary"><b><Layers3 size={15}/>{visible.length} 机柜</b><span>{totals.known?`${totals.known<visible.length?'≥ ':''}${totals.used} / ${totals.u} U 已登记`:'U 占位未知'}</span><span>{totals.known===visible.length?`${totals.u-totals.used}U 未占用`:'未占用空间未知'}{unknownHeight.length?` · ${unknownHeight.length} 柜缺少U高`:''}</span><i/><span>{totals.servers} 服务器 · {gpuText(totals)} GPU · {totals.switches} 交换机</span><span className="spacer"/><span className="room-scale"><i/>U 占用率 <small>0—100% · 灰色未核算</small></span></div>
+    {unknownHeight.length>0&&<div className="sr-alert">U 高未登记，以下机柜不生成三维体积：{unknownHeight.map(r=><button className="text-link" key={r.snapshot.rack.id} onClick={()=>open(r.snapshot.rack.id)}>{r.snapshot.rack.name} ↗ </button>)}</div>}
     <div className="room-workspace">
-      <Suspense fallback={<div className="room-loading">正在加载机房渲染器…</div>}><RoomScene racks={model.racks} visible={visibleIds} selected={s?.rack.id||''} angle={params.get('roomCamera')||'oblique'} onAngle={roomCamera=>set({roomCamera})} onSelect={rack=>set({rack,asset:'',port:'',cable:''})} onOpen={id=>open(id)}/></Suspense>
+      <Suspense fallback={<div className="room-loading">正在加载机房渲染器…</div>}><RoomScene racks={renderable} visible={visibleIds} selected={s?.rack.id||''} angle={params.get('roomCamera')||'oblique'} onAngle={roomCamera=>set({roomCamera})} onSelect={rack=>set({rack,asset:'',port:'',cable:''})} onOpen={id=>open(id)}/></Suspense>
       <aside className="room-inspector">{s?<>
         <div className="room-inspector-heading"><span>{shortPod(s.rack.fields.pod_id)} / 机柜</span><h2>{s.rack.name}</h2><code>{s.rack.id}</code><Button aria-label={`打开 ${s.rack.name} 双面详情`} onClick={()=>open(s.rack.id)}><ArrowUpRight size={16}/></Button></div>
-        <div className="room-rack-capacity"><b>{s.layout?.occupied??'—'}<small> / {s.height??'—'}U</small></b><span>{s.layout?.free??'—'}U 未占用</span><div><i style={{width:`${s.height?(s.layout?.occupied||0)/s.height*100:0}%`}}/></div></div>
-        <div className="room-asset-counts"><span><b>{s.servers}</b>服务器</span><span><b>{s.gpu}</b>GPU</span><span><b>{s.switches}</b>交换机</span></div>
+        <div className="room-rack-capacity"><b>{occupiedText(s)}<small> / {s.height??'—'}U</small></b><span>{freeText(s)}U 未占用</span><div><i style={{width:`${s.height?(s.layout?.occupied||0)/s.height*100:0}%`}}/></div></div>
+        <div className="room-asset-counts"><span><b>{s.servers}</b>服务器</span><span><b>{gpuText(s)}</b>GPU</span><span><b>{s.switches}</b>交换机</span></div>
         <div className="room-elevation-header"><b>登记立面</b><div className="rv-segment" role="tablist" aria-label="机房预览安装面"><button role="tab" aria-selected={face==='front'} onClick={()=>setFace('front')}>Front</button><button role="tab" aria-selected={face==='rear'} onClick={()=>setFace('rear')}>Rear</button></div></div>
         <div className="room-elevation"><Elevation snapshot={s} face={face} overlay="asset" selected={params.get('asset')||''} onSelect={asset=>open(s.rack.id,asset)} onPort={(asset,port)=>set({view:'spatial',rack:s.rack.id,asset,port,camera:'rear',tab:'mapping'})}/></div>
         <Button className="room-open-rack" onClick={()=>open(s.rack.id)}><Columns2 size={13}/>打开机柜双面详情<ArrowUpRight size={13}/></Button>

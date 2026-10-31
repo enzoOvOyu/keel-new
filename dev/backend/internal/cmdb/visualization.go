@@ -76,6 +76,9 @@ func (s Service) Visualization(ctx context.Context, scope Scope, rack, focus str
 	return s.VisualizationDetail(ctx, scope, rack, focus, false, 20000)
 }
 func (s Service) VisualizationDetail(ctx context.Context, scope Scope, rack, focus string, full bool, limit int) (Visualization, error) {
+	return s.visualizationRead(ctx, scope, rack, focus, full, limit, nil)
+}
+func (s Service) visualizationRead(ctx context.Context, scope Scope, rack, focus string, full bool, limit int, sourceIDs []string) (Visualization, error) {
 	out := Visualization{Assets: []VisualAsset{}, Cables: []VisualCable{}, Findings: []VisualFinding{}, Relationships: []VisualRelation{}, ReadAt: time.Now().UTC()}
 	if limit < 1 || limit > 20000 {
 		return out, Reject("VISUALIZATION_LIMIT_INVALID", 400)
@@ -87,7 +90,13 @@ func (s Service) VisualizationDetail(ctx context.Context, scope Scope, rack, foc
 	defer tx.Rollback(ctx)
 	fingerprint := sha256.New()
 
-	rows, e := tx.Query(ctx, `SELECT e.item_uid,e.asset_type,e.name,e.version,e.source_type,e.source_ref,e.freshness,e.payload,count(*) OVER(),(SELECT min(sc.project_id) FROM cmdb_asset_scope sc WHERE sc.asset_id=e.item_uid AND (sc.project_id=ANY($1) OR sc.project_id||':'||sc.asset_id=ANY($2))) FROM cmdb_entity e WHERE `+Visible("e")+` AND e.asset_type IN('data_center','region','pod','rack','server','switch','nic','gpu','port','cable','optic','pdu','patch_panel','component','psu','fabric','network_segment','vlan','vrf','vni','device') ORDER BY e.item_uid LIMIT `+strconv.Itoa(limit+1), scope.Args()...)
+	args := scope.Args()
+	sourceFilter := ""
+	if sourceIDs != nil {
+		args = append(args, sourceIDs)
+		sourceFilter = " AND e.item_uid=ANY($3::text[])"
+	}
+	rows, e := tx.Query(ctx, `SELECT e.item_uid,e.asset_type,e.name,e.version,e.source_type,e.source_ref,e.freshness,e.payload,count(*) OVER(),(SELECT min(sc.project_id) FROM cmdb_asset_scope sc WHERE sc.asset_id=e.item_uid AND (sc.project_id=ANY($1) OR sc.project_id||':'||sc.asset_id=ANY($2))) FROM cmdb_entity e WHERE `+Visible("e")+` AND e.asset_type IN('data_center','region','pod','rack','server','switch','nic','gpu','port','cable','optic','pdu','patch_panel','component','psu','fabric','network_segment','vlan','vrf','vni','device')`+sourceFilter+` ORDER BY e.item_uid LIMIT `+strconv.Itoa(limit+1), args...)
 	if e != nil {
 		return out, e
 	}
@@ -252,25 +261,64 @@ func (s Service) VisualizationDetail(ctx context.Context, scope Scope, rack, foc
 		v, _ := a.Fields[k].(string)
 		return v
 	}
+
+	parents := map[string]map[string]bool{}
+	for _, relation := range out.Relationships {
+		if relation.Type == "contains" || relation.Type == "parent" {
+			if parents[relation.To] == nil {
+				parents[relation.To] = map[string]bool{}
+			}
+			parents[relation.To][relation.From] = true
+		}
+	}
+	ownerCache := map[string]string{}
 	var device func(string) string
 	device = func(id string) string {
-		seen := map[string]bool{}
-		for n := 0; n < 8; n++ {
-			a := index[id]
-			if a == nil || seen[id] {
-				return ""
-			}
-			seen[id] = true
-			if a.Type == "server" || a.Type == "switch" || a.Type == "patch_panel" || a.Type == "pdu" {
-				return id
-			}
-			next := str(a, "device_id")
-			if next == "" {
-				next = str(a, "parent_uid")
-			}
-			id = next
+		if known, ok := ownerCache[id]; ok {
+			return known
 		}
-		return ""
+		candidates := map[string]bool{}
+		visited := map[string]bool{}
+		var walk func(string, int)
+		walk = func(current string, depth int) {
+			if depth > 8 || visited[current] {
+				return
+			}
+			visited[current] = true
+			asset := index[current]
+			if asset == nil {
+				return
+			}
+			if asset.Type == "server" || asset.Type == "switch" || asset.Type == "patch_panel" || asset.Type == "pdu" || asset.Type == "device" {
+				candidates[current] = true
+				return
+			}
+			if len(parents[current]) > 0 {
+				for parent := range parents[current] {
+					walk(parent, depth+1)
+				}
+			} else {
+				next := str(asset, "device_id")
+				if next == "" {
+					next = str(asset, "parent_uid")
+				}
+				if next != "" {
+					walk(next, depth+1)
+				}
+			}
+		}
+		walk(id, 0)
+		owner := ""
+		if len(candidates) == 1 {
+			for candidate := range candidates {
+				owner = candidate
+			}
+		}
+		if len(candidates) > 1 {
+			out.Findings = append(out.Findings, VisualFinding{Asset: id, Code: "OWNER_AMBIGUOUS", Message: "组成关系指向多个设备，不能选任意设备当作端口归属", Severity: "warning", Category: "data_quality"})
+		}
+		ownerCache[id] = owner
+		return owner
 	}
 
 	if !out.Truncated {
@@ -488,51 +536,7 @@ func (s Service) VisualizationDetail(ctx context.Context, scope Scope, rack, foc
 			out.Findings = append(out.Findings, VisualFinding{Asset: a.ID, Code: "PANEL_UNCOLLECTED", Message: "精确正反面板数据未采集，使用通用矢量示意"})
 		}
 	}
-	// Validate the confirmed rack facts independently from the drawing engine.
-	occupiedU := map[string]map[int]string{}
-	numeric := func(v any) int {
-		n, _ := strconv.ParseFloat(fmt.Sprint(v), 64)
-		if math.Trunc(n) != n {
-			return 0
-		}
-		return int(n)
-	}
-	for _, a := range all {
-		if a.Type != "server" && a.Type != "switch" {
-			continue
-		}
-		r := str(a, "rack_id")
-		if rack != "" && r != rack {
-			continue
-		}
-		u := numeric(a.Fields["u_start"])
-		if u == 0 {
-			u = numeric(a.Fields["rack_u"])
-		}
-		h := numeric(a.Fields["u_height"])
-		rackAsset := index[r]
-		if rackAsset == nil {
-			continue
-		}
-		capacity := numeric(rackAsset.Fields["u_height"])
-		if u < 1 || h < 1 {
-			out.Findings = append(out.Findings, VisualFinding{Asset: a.ID, Code: "MISSING_U", Message: "设备 U 位或高度未确认"})
-			continue
-		}
-		if u+h-1 > capacity || h > 1000 {
-			out.Findings = append(out.Findings, VisualFinding{Asset: a.ID, Code: "U_RANGE", Message: "设备超出机柜范围"})
-			continue
-		}
-		if occupiedU[r] == nil {
-			occupiedU[r] = map[int]string{}
-		}
-		for pos := u; pos < u+h; pos++ {
-			if previous := occupiedU[r][pos]; previous != "" {
-				out.Findings = append(out.Findings, VisualFinding{Asset: a.ID, Code: "U_OVERLAP", Message: "U 位与 " + previous + " 重叠"})
-			}
-			occupiedU[r][pos] = a.ID
-		}
-	}
+	out.Findings = append(out.Findings, visualRackPlacementFindings(all, rack)...)
 
 	sort.Slice(cables, func(i, j int) bool { return cables[i].ID < cables[j].ID })
 	out.Cables = cables

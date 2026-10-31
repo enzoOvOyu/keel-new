@@ -6,14 +6,14 @@ import type {InfraAsset, InfraCable} from '@/lib/api/infrastructure';
 
 export type ViewProps = {params: URLSearchParams; set: (p: Record<string, string>) => void; go: Go};
 export function useVisualModel(){
- const {api,data,devices,racks,name,status}=useTopologyModel();
-const podIds = [...new Set([...racks.map(r => String(r.fields.pod_id||'__ungrouped__')),...devices.filter(d=>!racks.some(r=>r.id===d.fields.rack_id)).map(()=>'__ungrouped__')])];
+ const {api,data,devices,racks,name,status,queries}=useTopologyModel();
+const podIds = [...new Set([...racks.map(r => String(r.fields.pod_id||'__ungrouped__')),...(queries.groups||[]).filter(g=>g.type==='pod').map(g=>g.id),...devices.filter(d=>!racks.some(r=>r.id===d.fields.rack_id)).map(()=>'__ungrouped__')])];
 const assetIndex = new Map([...data.assets, ...data.ports].map(a => [a.id, a]));
 const podOf = (id: string) => {
   const a = assetIndex.get(id);
   return a?.type === 'rack' ? a.fields.pod_id||'__ungrouped__' : assetIndex.get(a?.fields.rack_id)?.fields.pod_id||'__ungrouped__';
 };
-const shortPod = (id: string) => id==='__ungrouped__'?'未分组机柜':name(id);
+const shortPod = (id: string) => id==='__ungrouped__'?'未分组机柜':queries.groups?.find(g=>g.id===id)?.name||name(id);
 const complete = (c: InfraCable) => !!(assetIndex.get(c.a)?.type==='port' && assetIndex.get(c.b)?.type==='port' && assetIndex.has(c.device_a) && assetIndex.has(c.device_b) && assetIndex.get(c.a)?.fields.owner_device_id===c.device_a && assetIndex.get(c.b)?.fields.owner_device_id===c.device_b);
 const incident = (c: InfraCable, id: string) => [c.device_a, c.device_b, c.a, c.b, c.id].includes(id);
 const inPod = (c: InfraCable, pod: string) => !pod || [podOf(c.device_a), podOf(c.device_b)].includes(pod);
@@ -80,7 +80,7 @@ export function ConnectionMatrix({rows, cols, cables, selected, onCell, rowLabel
   rows: InfraAsset[]; cols: InfraAsset[]; cables: InfraCable[]; selected: string; onCell: (a: string, b: string) => void; rowLabel?: string;
 }) {
   const {complete,special}=useVisualModel();
-  const {name}=useTopologyModel();
+  const {name,queries}=useTopologyModel();
   const cells = new Map<string, InfraCable[]>();
   const rowSet = new Set(rows.map(a => a.id)), colSet = new Set(cols.map(a => a.id));
   for (const c of cables.filter(complete)) {
@@ -91,11 +91,18 @@ export function ConnectionMatrix({rows, cols, cables, selected, onCell, rowLabel
   }
   return <div className="v-matrix-scroll"><table className="v-matrix"><thead><tr><th>{rowLabel}</th>{cols.map(c => <th key={c.id}><span>{c.name}</span><small>{c.fields.role || c.type}</small></th>)}</tr></thead>
     <tbody>{rows.map(r => <tr key={r.id}><th><strong>{r.name}</strong><small>{name(r.fields.rack_id)}</small></th>{cols.map(c => {
-      const key = r.id + ':' + c.id, members = cells.get(key) || [], issue = members.some(special);
-      return <td key={c.id}><button aria-label={`${r.name} × ${c.name}：${members.length} 条记录`} aria-pressed={selected === key}
-        className={`v-cell ${members.length ? 'recorded' : ''} ${issue ? 'attention' : ''} ${selected === key ? 'chosen' : ''}`}
-        onClick={() => onCell(r.id, c.id)}>{members.length || '·'}{issue && <span className="cell-flag">!</span>}</button></td>;
+      const key = r.id + ':' + c.id, members = cells.get(key) || [], serverCell=queries.matrix?.cells.find(x=>x.row_id===r.id&&x.column_id===c.id),count=queries.matrix?(serverCell?.count||0):members.length,issue = members.some(special);
+      return <td key={c.id}><button aria-label={`${r.name} × ${c.name}：${count} 条记录`} aria-pressed={selected === key}
+        className={`v-cell ${count ? 'recorded' : ''} ${issue ? 'attention' : ''} ${selected === key ? 'chosen' : ''}`}
+        onClick={() => onCell(r.id, c.id)}>{count || '·'}{issue && <span className="cell-flag">!</span>}</button></td>;
     })}</tr>)}</tbody></table>{!rows.length && <Empty>没有匹配的设备。请调整范围或搜索。</Empty>}</div>;
+}
+export function QueryPager({kind,set}:{kind:'connections'|'matrix';set:(p:Record<string,string>)=>void}){
+ const {queries}=useTopologyModel(),page=queries[kind]?.page;
+ if(!page)return null;
+ const key=kind==='matrix'?'matrix_cursor':'connection_cursor',hasCursor=new URLSearchParams(window.location.search).has(key);
+ if(!page.has_more&&!hasCursor)return null;
+ return <div className="pager"><span>当前服务端窗口 · 每批最多 {page.limit} 条{page.has_more?' · 还有后续记录':' · 已到末批'}</span><Button disabled={!hasCursor} onClick={()=>set({[key]:''})}>首批</Button><Button disabled={!page.has_more} onClick={()=>set({[key]:page.next_cursor||''})}>下一批</Button></div>;
 }
 export function GoTo({go, page, params, children}: {go: Go; page: string; params?: Record<string, string>; children: React.ReactNode}) {
   return <Button onClick={() => go(page, params)}>{children}<ArrowUpRight size={13}/></Button>;

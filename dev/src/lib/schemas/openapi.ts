@@ -4,6 +4,74 @@
  */
 
 export interface paths {
+    "/cmdb/visualization/subgraph": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Page hierarchy or physical seed IDs then load bounded structural context */
+        get: operations["getCMDBVisualSubgraph"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/visualization/matrix": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Server aggregated connection cells and evidence-specific member queries */
+        get: operations["getCMDBVisualMatrix"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/visualization/connections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Page actual Cable records and authorized dual-end context */
+        get: operations["getCMDBVisualConnections"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cmdb/visualization/trace": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Trace only evidenced physical Cable continuity; do not cross switch ports by inference */
+        post: operations["queryCMDBPhysicalTrace"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/cmdb/visualization": {
         parameters: {
             query?: never;
@@ -5396,6 +5464,102 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        InfrastructureQueryPage: {
+            limit: number;
+            has_more: boolean;
+            next_cursor: string | null;
+        };
+        InfrastructureGroup: {
+            id: string;
+            name: string;
+            type: string;
+            /** @description Authorized unique registered descendants, independent of the current seed page. These are not verified physical counts. */
+            counts: {
+                device: number;
+                rack: number;
+                server: number;
+                switch: number;
+                gpu: number;
+                cable: number;
+            };
+        };
+        /** @description SQL selects at most 200 seed IDs before loading structural context. Context limit is 5000 assets and 20000 relations; groups limit 200. Any limit loss is partial. Gallery depth1 excludes ports. Rack fields include registered_device_count, placement_coverage and visualization_summary; adjacent racks from connections are summaries only. */
+        InfrastructureSubgraph: components["schemas"]["InfrastructureSnapshot"] & {
+            groups: components["schemas"]["InfrastructureGroup"][];
+            page: components["schemas"]["InfrastructureQueryPage"];
+        };
+        InfrastructureMatrixGroup: {
+            fact_layer: string;
+            /** @description Registered medium; empty means unknown. */
+            media_type: string;
+            /** @description Registered speed with original unit; empty means unknown */
+            speed: string;
+            count: number;
+            member_query_ref: string;
+        };
+        InfrastructureMatrixCell: {
+            row_id: string;
+            column_id: string;
+            count: number;
+            member_query_ref: string;
+            groups: components["schemas"]["InfrastructureMatrixGroup"][];
+        };
+        InfrastructureMatrixCoverage: {
+            returned_cells: number;
+            total_cells: number;
+            limit: number;
+            complete: boolean;
+        };
+        InfrastructureMatrix: {
+            snapshot_id: string;
+            rows: components["schemas"]["InfrastructureAsset"][];
+            columns: components["schemas"]["InfrastructureAsset"][];
+            cells: components["schemas"]["InfrastructureMatrixCell"][];
+            /** @description Complete authorized Cable records represented by this axes query across all pages. */
+            included_count: number;
+            /** @description Records missing endpoints or not applicable to this axes; never silently normal. */
+            excluded_count: number;
+            coverage: components["schemas"]["InfrastructureMatrixCoverage"];
+            page: components["schemas"]["InfrastructureQueryPage"];
+        };
+        InfrastructureTraceRequest: {
+            project_id?: string;
+            /** @enum {string} */
+            mode: "physical" | "logical";
+            from_port_id: string;
+            to_port_id?: string;
+            /** @description Explicit selection from ambiguous attached Cable records; server verifies attachment. */
+            candidate_cable_id?: string;
+            snapshot_id?: string;
+        };
+        InfrastructureTraceBreakpoint: {
+            asset_id: string;
+            code: string;
+            reason: string;
+        };
+        InfrastructureTrace: {
+            snapshot_id: string;
+            assets: components["schemas"]["InfrastructureAsset"][];
+            relationships: components["schemas"]["InfrastructureRelationship"][];
+            findings: components["schemas"]["InfrastructureFinding"][];
+            segments: components["schemas"]["InfrastructureCable"][];
+            breakpoints: components["schemas"]["InfrastructureTraceBreakpoint"][];
+            /** @enum {string} */
+            integrity: "complete" | "incomplete" | "ambiguous" | "no_record";
+            /** @enum {string} */
+            verification: "unverified";
+            coverage: components["schemas"]["InfrastructureCoverage"];
+            reason: string;
+        };
+        InfrastructureFinding: {
+            asset_id: string;
+            code: string;
+            message: string;
+            /** @enum {string} */
+            severity?: "info" | "warning" | "error";
+            /** @enum {string} */
+            category?: "data_quality";
+        };
         InfrastructureAsset: {
             id: string;
             type: string;
@@ -13869,6 +14033,226 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    getCMDBVisualSubgraph: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                /** @description Authorized hierarchy root. Missing skips no permission check. */
+                root_id?: string;
+                /** @description Explicit membership only; never inferred from Cable. */
+                fabric_id?: string;
+                /** @description Search authorized ID/name/SN/Hostname/IP/MAC before pagination. */
+                q?: string;
+                /** @description Unassigned location scope; no synthetic asset ID is created. */
+                unplaced?: boolean;
+                /** @description Signed opaque cursor bound to user */
+                cursor?: string;
+                /** @description Current revision fingerprint; changed revision returns 409 */
+                snapshot_id?: string;
+                limit?: number;
+                view?: "hierarchy" | "fabric" | "physical";
+                /** @description Level 1 returns geometry summaries; level 2 includes registered composition/ports. */
+                depth?: 1 | 2;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized current CMDB projection. Partial page and context coverage are explicit. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        request_id: string;
+                        data: components["schemas"]["InfrastructureSubgraph"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            /** @description Capability unavailable; no historical replay or logical FIB path available */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bounded query timed out */
+            504: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCMDBVisualMatrix: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                /** @description Authorized hierarchy root. Missing skips no permission check. */
+                root_id?: string;
+                /** @description Explicit membership only; never inferred from Cable. */
+                fabric_id?: string;
+                /** @description Search authorized ID/name/SN/Hostname/IP/MAC before pagination. */
+                q?: string;
+                /** @description Unassigned location scope; no synthetic asset ID is created. */
+                unplaced?: boolean;
+                /** @description Signed opaque cursor bound to user */
+                cursor?: string;
+                /** @description Current revision fingerprint; changed revision returns 409 */
+                snapshot_id?: string;
+                limit?: number;
+                axes?: "server_switch" | "leaf_spine" | "rack_leaf" | "port_pair";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized current CMDB projection. Partial page and context coverage are explicit. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        request_id: string;
+                        data: components["schemas"]["InfrastructureMatrix"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            /** @description Capability unavailable; no historical replay or logical FIB path available */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bounded query timed out */
+            504: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCMDBVisualConnections: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                /** @description Authorized hierarchy root. Missing skips no permission check. */
+                root_id?: string;
+                /** @description Explicit membership only; never inferred from Cable. */
+                fabric_id?: string;
+                /** @description Search authorized ID/name/SN/Hostname/IP/MAC before pagination. */
+                q?: string;
+                /** @description Unassigned location scope; no synthetic asset ID is created. */
+                unplaced?: boolean;
+                /** @description Signed opaque cursor bound to user */
+                cursor?: string;
+                /** @description Current revision fingerprint; changed revision returns 409 */
+                snapshot_id?: string;
+                limit?: number;
+                asset_id?: string;
+                port_id?: string;
+                /** @description Opaque matrix cell/group reference retaining original scope and category filters. */
+                member_query_ref?: string;
+                /** @description Other observation states are not supported as global server filters. */
+                status?: "all" | "incomplete";
+                sort?: "id";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized current CMDB projection. Partial page and context coverage are explicit. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        request_id: string;
+                        data: components["schemas"]["InfrastructureSubgraph"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            /** @description Capability unavailable; no historical replay or logical FIB path available */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bounded query timed out */
+            504: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    queryCMDBPhysicalTrace: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InfrastructureTraceRequest"];
+            };
+        };
+        responses: {
+            /** @description Registered continuity and gaps, never a PASS assertion */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        request_id: string;
+                        data: components["schemas"]["InfrastructureTrace"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            403: components["responses"]["Forbidden"];
+            /** @description Port missing */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            409: components["responses"]["Conflict"];
+            /** @description Logical FIB/history unavailable or selected Cable not attached to the source port */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     getCMDBVisualization: {
         parameters: {
             query?: {

@@ -33,7 +33,7 @@ func cmdbEnvelope(w http.ResponseWriter, result map[string]any) {
 	json.NewEncoder(w).Encode(result)
 }
 func cmdbScope(u identity.Subject, project, permission string) cmdb.Scope {
-	scope := cmdb.Scope{Projects: []string{}, Pairs: []string{}, UserID: u.ID, Actor: u.Username}
+	scope := cmdb.Scope{Projects: []string{}, Pairs: []string{}, UserID: u.ID, Actor: u.Username, PermissionVersion: u.Version}
 	for _, p := range u.Projects {
 		if project != "" && p.ID != project {
 			continue
@@ -73,6 +73,53 @@ func (s *Server) cmdbRoutes(w http.ResponseWriter, r *http.Request) bool {
 	defer cancel()
 	r = r.WithContext(ctx)
 	service := cmdbService(s)
+
+	if strings.HasPrefix(path, "cmdb/visualization/") {
+		var result any
+		var err error
+		switch {
+		case path == "cmdb/visualization/subgraph" && r.Method == "GET":
+			result, err = service.VisualSubgraph(ctx, scope, r.URL.Query())
+		case path == "cmdb/visualization/matrix" && r.Method == "GET":
+			result, err = service.VisualMatrix(ctx, scope, r.URL.Query())
+		case path == "cmdb/visualization/connections" && r.Method == "GET":
+			result, err = service.VisualConnections(ctx, scope, r.URL.Query())
+		case path == "cmdb/visualization/trace" && r.Method == "POST":
+			var input cmdb.VisualTraceInput
+			decoder := json.NewDecoder(io.LimitReader(r.Body, 16384))
+			decoder.DisallowUnknownFields()
+			if err = decoder.Decode(&input); err != nil {
+				fail(w, 400, "VISUAL_TRACE_INPUT_INVALID")
+				return true
+			}
+
+			if project != "" && input.Project != "" && project != input.Project {
+				fail(w, 400, "VISUAL_PROJECT_SCOPE_MISMATCH")
+				return true
+			}
+			if input.Project == "" {
+				input.Project = project
+			}
+			traceScope := cmdbScope(u, input.Project, "cmdb:read")
+			if len(traceScope.Projects)+len(traceScope.Pairs) == 0 {
+				fail(w, 403, "CMDB_SCOPE_DENIED")
+				return true
+			}
+			result, err = service.VisualTrace(ctx, traceScope, input)
+		default:
+			return false
+		}
+		if err != nil {
+			if errors.Is(err, context.DeadlineExceeded) || errors.Is(ctx.Err(), context.DeadlineExceeded) {
+				fail(w, 504, "CMDB_QUERY_TIMEOUT")
+				return true
+			}
+			cmdbFailure(w, err)
+		} else {
+			respond(w, 200, result)
+		}
+		return true
+	}
 	if path == "cmdb/visualization" && r.Method == "GET" {
 		full := r.URL.Query().Get("detail") == "full"
 		limit := 20000

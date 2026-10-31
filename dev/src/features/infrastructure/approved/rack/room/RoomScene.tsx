@@ -56,18 +56,18 @@ export default function RoomScene(props:Props){
           cube(group,.75,p.height/20-.012,.018,0,(p.u-1+p.height/2)/20+.08,z*1.035,d.type==='switch'?network:server);
         }
       }
-      const ratio=s.height&&s.layout?s.layout.occupied/s.height:0;
-      const tint=new T.Color('#8dbec5').lerp(new T.Color('#766cc2'),ratio);
+      const ratio=s.height&&s.layout&&s.placementComplete?s.layout.occupied/s.height:null;
+      const tint=ratio===null?new T.Color('#a9b2bf'):new T.Color('#8dbec5').lerp(new T.Color('#766cc2'),ratio);
       const capMat=material('#'+tint.getHexString());
       const cap=cube(group,.78,.025,1.01,0,h+.17,0,capMat);
       // Roof capacity bar, sourced from the shared U interval union.
       cube(group,.7,.026,.12,0,h+.19,.29,frame);
-      if(ratio>0)cube(group,.7*ratio,.027,.12,-.35+.35*ratio,h+.194,.29,server);
+      if(ratio!==null&&ratio>0)cube(group,.7*ratio,.027,.12,-.35+.35*ratio,h+.194,.29,server);
       const selectionBox=new T.BoxGeometry(.98,h+.25,1.22);const edges=new T.EdgesGeometry(selectionBox);selectionBox.dispose();geometries.push(edges);
       const edgeMat=new T.LineBasicMaterial({color:'#7b70df',depthTest:false});materials.push(edgeMat);
       const outline=new T.LineSegments(edges,edgeMat);outline.position.y=h/2+.11;outline.renderOrder=3;outline.visible=false;group.add(outline);
       const label=document.createElement('button');label.className='room-rack-label';label.dataset.rack=s.rack.id;
-      const title=document.createElement('b');title.textContent=s.rack.name;const usage=document.createElement('span');usage.textContent=`${s.layout?.occupied??'—'} / ${s.height??'—'}U`;label.append(title,usage);
+      const title=document.createElement('b');title.textContent=s.rack.name;const usage=document.createElement('span');usage.textContent=`${s.layout?(s.placementComplete?'':'≥ ')+s.layout.occupied:'未知'} / ${s.height??'—'}U`;label.append(title,usage);
       label.setAttribute('aria-label',`选择 ${s.rack.name}`);label.addEventListener('click',()=>latest.current.onSelect(s.rack.id));label.addEventListener('dblclick',()=>latest.current.onOpen(s.rack.id));labelRoot.append(label);
       objects.set(s.rack.id,{group,outline,cap,label,point:new T.Vector3(item.x,h+.44,item.z)});
       group.traverse(o=>{if(o instanceof T.Mesh){o.userData.rack=s.rack.id;pickable.push(o)}});
@@ -83,7 +83,7 @@ export default function RoomScene(props:Props){
       for(const p of podLabels)project(p.element,p.point,props.racks.some(r=>r.pod===p.pod&&visible.has(r.snapshot.rack.id)));
       renderer.render(scene,camera);
       target.dataset.rendered='true';target.dataset.camera=latest.current.angle;
-      target.dataset.visibleRacks=String(visible.size);
+      target.dataset.visibleRacks=String([...objects.keys()].filter(id=>visible.has(id)).length);
     }
     function home(top:boolean){controls.target.set(0,.4,0);camera.zoom=1;camera.position.set(top?0:8,top?22:16,top?.001:18);camera.up.set(0,1,0);camera.updateProjectionMatrix();controls.update();render();}
     function focus(){const o=objects.get(latest.current.selected);if(!o)return;const offset=camera.position.clone().sub(controls.target);controls.target.copy(o.group.position).add(new T.Vector3(0,.7,0));camera.position.copy(controls.target).add(offset);camera.zoom=1.9;camera.updateProjectionMatrix();controls.update();render();}
@@ -102,13 +102,13 @@ export default function RoomScene(props:Props){
   useEffect(()=>{runtime.current?.render()},[props.visible,props.selected]);
   useEffect(()=>{runtime.current?.home(props.angle==='top')},[props.angle]);
   return <section className="room-scene-shell">
-    <div className="room-scene-toolbar"><div className="rv-segment" role="tablist" aria-label="机房视角"><button role="tab" aria-selected={props.angle!=='top'} onClick={()=>props.onAngle('oblique')}><Box size={13}/>3D 俯视</button><button role="tab" aria-selected={props.angle==='top'} onClick={()=>props.onAngle('top')}><ScanLine size={13}/>垂直俯视</button></div><span className="spacer"/><Button onClick={()=>runtime.current?.focus()} disabled={!props.selected}><Focus size={13}/>聚焦机柜</Button><Button aria-label="适配机房视图" onClick={()=>runtime.current?.home(props.angle==='top')}><Expand size={14}/></Button></div>
+    <div className="room-scene-toolbar"><div className="rv-segment" role="tablist" aria-label="机房视角"><button role="tab" aria-selected={props.angle!=='top'} onClick={()=>props.onAngle('oblique')}><Box size={13}/>3D 俯视</button><button role="tab" aria-selected={props.angle==='top'} onClick={()=>props.onAngle('top')}><ScanLine size={13}/>垂直俯视</button></div><span className="spacer"/><Button onClick={()=>runtime.current?.focus()} disabled={!props.selected||!props.racks.some(r=>r.snapshot.rack.id===props.selected)}><Focus size={13}/>聚焦机柜</Button><Button aria-label="适配机房视图" onClick={()=>runtime.current?.home(props.angle==='top')}><Expand size={14}/></Button></div>
     <div className="room-scene" ref={host}>
       <div className="room-label-layer" ref={labels}/>
       {error&&<div className="room-webgl-error" role="alert">{error}</div>}
       <div className="room-view-badge">示意排布 <span>机房坐标尚未采集</span></div>
       <div className="room-controls"><Button aria-label="缩小机房" onClick={()=>runtime.current?.zoom(-.2)}><Minus size={14}/></Button><Button aria-label="放大机房" onClick={()=>runtime.current?.zoom(.2)}><Plus size={14}/></Button></div>
-      {!props.visible.length&&<div className="room-no-match">当前筛选没有匹配机柜</div>}
+      {!props.racks.some(r=>props.visible.includes(r.snapshot.rack.id))&&<div className="room-no-match">{props.visible.length?'当前范围的机柜 U 高未登记，无法生成三维体积':'当前筛选没有匹配机柜'}</div>}
     </div>
     <div className="room-scene-footer"><span>拖动旋转 · Shift + 拖动平移 · 滚轮缩放 · 双击进入机柜</span><span>布局与宽深为示意，不用于安装测量</span></div>
   </section>;
