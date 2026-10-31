@@ -312,6 +312,7 @@ func (s *Server) commit(w http.ResponseWriter, r *http.Request, id string, rev i
 				imported[rec.ID] = bom.WorkbenchItem(rec, s.project)
 			}
 		}
+		resolveImportedReferences(items, wb.Records)
 		items = bom.ResolveWorkbench(bom.EnsureRacks(bom.ExpandPorts(bom.ResolveWorkbench(items))))
 		items = s.existingBOMDependencies(ctx, items)
 		included := map[string]bool{}

@@ -695,3 +695,31 @@ func materialFactsDiffer(a, b bom.Item) bool {
 	}
 	return false
 }
+
+// A later subset references candidate IDs, while committed dependencies live
+// under their stable asset IDs. Resolve that boundary before dependency loading.
+func resolveImportedReferences(items []bom.Item, records []bom.ImportRecord) {
+	aliases := map[string]string{}
+	for _, r := range records {
+		if r.Imported && r.AssetID != "" {
+			aliases[r.ID] = r.AssetID
+		}
+	}
+	for j := range items {
+		item := &items[j]
+		for _, ref := range []struct {
+			field string
+			value *string
+		}{{"parent_uid", &item.Parent}, {"endpoint_a_uid", &item.A}, {"endpoint_b_uid", &item.B}} {
+			if asset := aliases[*ref.value]; asset != "" {
+				*ref.value = asset
+				item.Fields[ref.field] = asset
+			}
+		}
+		for _, field := range []string{"rack_uid", "port_uid"} {
+			if asset := aliases[item.Fields[field]]; asset != "" {
+				item.Fields[field] = asset
+			}
+		}
+	}
+}

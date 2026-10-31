@@ -154,3 +154,15 @@ func TestExplicitSourceTypeCorrectsUnreviewedModelClassification(t *testing.T) {
 		t.Fatal("source device lost")
 	}
 }
+
+func TestLaterSubsetUsesImportedDependencyIdentities(t *testing.T) {
+	records := []bom.ImportRecord{{ID: "device-candidate", Imported: true, AssetID: "device-asset"}, {ID: "port-candidate", Imported: true, AssetID: "port-asset"}, {ID: "pending-port", AssetID: "must-not-use"}}
+	items := []bom.Item{{Category: "port", Parent: "device-candidate", Fields: map[string]string{"parent_uid": "device-candidate"}}, {Category: "cable", A: "port-candidate", B: "pending-port", Fields: map[string]string{"endpoint_a_uid": "port-candidate", "endpoint_b_uid": "pending-port"}}}
+	resolveImportedReferences(items, records)
+	if items[0].Parent != "device-asset" || items[0].Fields["parent_uid"] != "device-asset" || items[1].A != "port-asset" || items[1].Fields["endpoint_a_uid"] != "port-asset" {
+		t.Fatal("committed dependency still uses candidate identity")
+	}
+	if items[1].B != "pending-port" {
+		t.Fatal("uncommitted dependency falsely resolved")
+	}
+}
