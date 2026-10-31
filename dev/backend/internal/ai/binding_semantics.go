@@ -243,6 +243,9 @@ func inspectBindingSemantics(s bom.Sheet, p SheetPlan) error {
 // Unambiguous inventory headers do not need probabilistic column selection.
 // Category remains a candidate for the same semantic classifier and review gates.
 func explicitInventoryPlan(s bom.Sheet) (SheetPlan, bool) {
+	if mixed, ok := explicitMixedPlan(s); ok {
+		return mixed, true
+	}
 	p := SheetPlan{Purpose: "table", HeaderRows: []int{}, Tables: []TablePlan{}, Note: "明确设备清单表头由本地来源规则绑定；型号语义分类与人工审核仍独立执行"}
 	heads := sourceHeaders(s, p)
 	cols := map[string][]int{}
@@ -277,6 +280,80 @@ func explicitInventoryPlan(s bom.Sheet) (SheetPlan, bool) {
 	t := TablePlan{Key: "source-inventory", Kind: "planned_device", Type: "other", Start: row + 1, End: end, Fields: fields, Required: []string{"hostname"}, Types: map[string]string{}, Confidence: 1}
 	p.Tables = append(p.Tables, t)
 	if err := CheckExtraction(s, p); err != nil {
+		return p, false
+	}
+	return p, true
+}
+
+// Reuse explicit header binding for vertically stacked inventory/connection
+// tables. Unknown layouts still go through the agent and independent checks.
+func explicitMixedPlan(s bom.Sheet) (SheetPlan, bool) {
+	rows := map[int]map[string][]int{}
+	end := 0
+	for _, c := range s.Cells {
+		if c.Row > end {
+			end = c.Row
+		}
+		f := bom.Field(c.Value)
+		if c.Sensitive || f == "" {
+			continue
+		}
+		if rows[c.Row] == nil {
+			rows[c.Row] = map[string][]int{}
+		}
+		rows[c.Row][f] = append(rows[c.Row][f], c.Column)
+	}
+	headers := []int{}
+	for row, h := range rows {
+		if len(h) >= 3 && (len(h["hostname"]) == 1 && len(h["model"]) == 1 || dualEndpointHeaders(h)) {
+			headers = append(headers, row)
+		}
+	}
+	sort.Ints(headers)
+	p := SheetPlan{Purpose: "table", HeaderRows: headers, Tables: []TablePlan{}, Note: "按明确表头分别绑定各数据区；分类、来源校验和人工审核仍独立执行"}
+	if len(headers) < 2 {
+		return p, false
+	}
+	for index, row := range headers {
+		last := end
+		if index+1 < len(headers) {
+			last = headers[index+1] - 1
+		}
+		if last <= row {
+			continue
+		}
+		h := rows[row]
+		for f := range h {
+			sort.Ints(h[f])
+		}
+		t := TablePlan{Key: fmt.Sprintf("source-region-%d", row), Kind: "planned_device", Type: "other", Start: row + 1, End: last, Fields: map[string]int{}, Types: map[string]string{}, Confidence: 1}
+		if dualEndpointHeaders(h) {
+			ds, ps := h["hostname"], h["port_index"]
+			if !(ds[0] < ps[0] && ps[0] < ds[1] && ds[1] < ps[1]) {
+				return p, false
+			}
+			t.Kind, t.Type = "physical_connection", "cable"
+			t.Fields = map[string]int{"endpoint_a_device": ds[0], "endpoint_a_port": ps[0], "endpoint_b_device": ds[1], "endpoint_b_port": ps[1]}
+			for _, f := range []string{"length", "speed", "media_type"} {
+				if len(h[f]) == 1 {
+					t.Fields[f] = h[f][0]
+				}
+			}
+			if len(h["media_type"]) == 2 {
+				t.Fields["media_type"] = h["media_type"][0]
+			}
+		} else {
+			for _, f := range []string{"hostname", "model", "serial", "site", "rack", "u_start", "u_height", "management_ip", "mac", "brand", "network_role"} {
+				if len(h[f]) == 1 {
+					t.Fields[f] = h[f][0]
+				}
+			}
+			t.Required = []string{"hostname"}
+		}
+		p.Tables = append(p.Tables, t)
+	}
+	normalizeSourceBindings(s, &p)
+	if CheckExtraction(s, p) != nil {
 		return p, false
 	}
 	return p, true

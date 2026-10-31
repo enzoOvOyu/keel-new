@@ -30,7 +30,7 @@ func (p *Provider) PlanSheetWithWorkbook(ctx context.Context, ir *bom.WorkbookIR
 	}
 	if explicit, ok := explicitInventoryPlan(s); ok {
 		if e := CheckPlanRevision(s, explicit, previous); e == nil {
-			explicit.Steps = []bom.AgentStep{{Tool: "analyze_sheet", Sheet: name, State: "succeeded", Detail: "explicit inventory headers bound locally; category still requires classification and review", At: time.Now().UTC().Format(time.RFC3339)}}
+			explicit.Steps = []bom.AgentStep{{Tool: "analyze_sheet", Sheet: name, State: "succeeded", Detail: "explicit source-region headers bound locally; category still requires classification and review", At: time.Now().UTC().Format(time.RFC3339)}}
 			return explicit, nil
 		}
 	}

@@ -191,6 +191,9 @@ func TestFullNormalizationKeepsThreeIndependentTableLayouts(t *testing.T) {
 		{Kind: "planned_device", Type: "server", Start: 4, End: 4, Fields: map[string]int{"hostname": 2, "model": 4, "serial": 5}},
 		{Kind: "physical_connection", Type: "cable", Start: 6, End: 6, Fields: map[string]int{"endpoint_a_device": 1, "endpoint_a_port": 2, "endpoint_b_device": 5, "endpoint_b_port": 6, "media_type": 3}},
 	}}
+	if local, ok := explicitMixedPlan(s); !ok || len(local.Tables) != 3 {
+		t.Fatal("explicit mixed regions not retained independently")
+	}
 	normalizeSourceBindings(s, &p)
 	if p.Tables[0].Fields["hostname"] != 3 || p.Tables[1].Fields["hostname"] != 2 {
 		t.Fatal("identity rewritten using another region")
