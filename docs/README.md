@@ -107,4 +107,6 @@ Flows 功能分支：见 [实施与运行记录](flows-redesign/implementation.m
 
 最新用户方向见[五步整改方案](intelligent-deployment/FIVE-STEP-REFACTOR-PLAN.txt)：先固定设备关联、机房落位、布线、逻辑网络、电力五步输入及后置流程，再接入资料分拣与分步Agent。本轮只完成方案；当前运行与验收状态以HANDOFF为准。下段为此前P1实施背景。
 
+配套[研究与详细实施方案](intelligent-deployment/RESEARCH-BACKED-IMPLEMENTATION-20261101.txt)记录一手研究依据、文件适配、证据关联、任务预算和独立验收。不能保证任意资料全自动零错误，也不能将人工补齐计为AI识别成功；能力范围和自动化目标尚未验收。
+
 用户已批准从P0进入P1及分批重构。架构与模型见 [P1设计](intelligent-deployment/P1-DESIGN.txt)，已实现/未实现与检查见 [实施记录](intelligent-deployment/implementation.json)。P1模型内核之后已接入首批设备/落位工程工作台、真实API和分域发布，详见实施记录；当前运行环境未切换，开发完成不等于上线或业务验收通过。

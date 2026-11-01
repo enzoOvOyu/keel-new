@@ -1,3 +1,7 @@
+## 已完成里程碑事件：五步开局的研究依据与详细实施设计
+
+完成[研究与实施方案](docs/intelligent-deployment/RESEARCH-BACKED-IMPLEMENTATION-20261101.txt)，补充原生表格/视觉资料适配、分拣与分步Agent、证据关联、固定格式后置链、有限纠错和独立验收。引用一手论文/官方规范，区分预印本报告与本项目验证；无限范围全自动零错误不能保证，人工补齐不能计为AI识别成功，具体范围与自动化目标尚待确认。本次仅设计文档，未改变模型、业务实现、数据库或在线版本。实际检查：文档引用/登记检查与diff格式检查；不代表业务验收或论文实验复现。
+
 ## 已完成里程碑事件：五步固定输入与分步Agent整改方案
 
 用户明确将开局内部收敛为设备关联、机房与落位、连线与布线、逻辑网络、电力五步。已核对现有源码并完成[整改方案](docs/intelligent-deployment/FIVE-STEP-REFACTOR-PLAN.txt)：先固定模板/字段/前置/输出和人工补齐，独立跑通无AI标准链，再新增资料分拣与五个受限提取任务。A端MAC=本端MAC，B端MAC=对端MAC，按对应端点保存。方案列出多来源增量合并、身份/位置/布线/网络/电力关系、UI、代码复用、缺口及各里程碑退出条件。端接类型与机架位示例尚待确认；不阻断其他设计。本次只完成设计与交接记录，未修改业务实现、调用模型、导入测试数据或部署；当前在线版本不变。
@@ -158,7 +162,7 @@ API v12 / 743383f已部署；任务28d974d0-b1e0-4203-9b59-b8daa7d9dfdb使用独
 
 ## 当前在线状态（覆盖下方历史快照）
 
-当前后续开发方向已由用户调整为五步固定输入先行、分步Agent后接入；方案见 `docs/intelligent-deployment/FIVE-STEP-REFACTOR-PLAN.txt`。本轮仅设计，尚未实施，以下在线版本保持。
+当前后续开发方向已由用户调整为五步固定输入先行、分步Agent后接入；方案见 `docs/intelligent-deployment/FIVE-STEP-REFACTOR-PLAN.txt`，研究和验收细则见 `docs/intelligent-deployment/RESEARCH-BACKED-IMPLEMENTATION-20261101.txt`。本轮仅设计，尚未实施，以下在线版本保持。
 
 API v40 / ceab753已部署8081；5180沿用原页面，已在线修正fixture资源断链并验证页面启动。独立TEST-Agent-MM-Ultra-03，项目proj-18101842-d821-4583-9229-a708f995c1c8，来源71a5c797-319b-496d-a6ce-f67c1080439c。Provider仍为用户指定Ultra版本3；默认test/DeepSeek未变，未进行模型对照。
 

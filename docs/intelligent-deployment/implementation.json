@@ -300,6 +300,8 @@
   "next_refactor": {
     "status": "DESIGN_ONLY",
     "plan": "docs/intelligent-deployment/FIVE-STEP-REFACTOR-PLAN.txt",
+    "research_plan": "docs/intelligent-deployment/RESEARCH-BACKED-IMPLEMENTATION-20261101.txt",
+    "recognition_boundary": "Unrestricted automatic recognition with zero errors cannot be guaranteed. Report supported inputs, held-out extraction and relation quality, abstentions and human completion separately; scope and automation targets remain unapproved and unverified.",
     "ordered_steps": [
       "设备关联",
       "机房与落位",
