@@ -154,8 +154,8 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 			return proposal, nil
 		}
 		history = boundedEngineeringHistory(history)
+		active := pending[0]
 		if len(queued) == 0 {
-			active := pending[0]
 			history = engineeringSheetHistory(history, active)
 			sheet, _ := ir.AnalyzeSheet(active)
 			regions := []bom.Region{}
@@ -169,7 +169,11 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 			if len(kinds) > 0 {
 				selected = scopeEngineeringProposalTools(selected, functions, kinds, hooks.Attributes)
 			}
-			raw, err := p.engineeringCompletion(ctx, string(prompt), map[string]any{"workbook": summary, "modules": registry, "attribute_definitions": hooks.Attributes, "history": history, "active_sheet": active, "proposed_region_kinds": kinds, "active_sheet_preview": engineeringSheetPreview(sheet, regions), "region_field_capabilities": engineeringRegionCapabilities(), "pending_sheets": pending, "completed_sheets": len(completed), "turns_remaining": budget - turn}, selected, trace, hooks.Artifact)
+			draft := engineeringCorrectionDraft(history, active)
+			if draft != nil {
+				selected = []any{engineeringCorrectionTool(*draft, active, hooks.Attributes)}
+			}
+			raw, err := p.engineeringCompletion(ctx, string(prompt), map[string]any{"workbook": summary, "modules": registry, "attribute_definitions": hooks.Attributes, "history": history, "active_sheet": active, "draft_to_correct": draft, "proposed_region_kinds": kinds, "active_sheet_preview": engineeringSheetPreview(sheet, regions), "region_field_capabilities": engineeringRegionCapabilities(), "pending_sheets": pending, "completed_sheets": len(completed), "turns_remaining": budget - turn}, selected, trace, hooks.Artifact)
 			if err != nil {
 				return proposal, err
 			}
@@ -187,7 +191,10 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 		raw := queued[0]
 		queued = queued[1:]
 		original := raw
-		raw, normalizationErr := normalizeEngineeringColumns(raw)
+		raw, corrected, normalizationErr := materializeEngineeringCorrection(raw, engineeringCorrectionDraft(history, active), active)
+		if normalizationErr == nil {
+			raw, normalizationErr = normalizeEngineeringColumns(raw)
+		}
 		var err error
 		record := func(tool, state string, value any) error {
 			if hooks.Artifact != nil {
@@ -229,6 +236,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 			err = fmt.Errorf("INVALID_TOOL_JSON")
 		}
 		var result any
+		commitProposal := action.Action == "propose_engineering_model" || corrected
 		if err == nil {
 			switch action.Action {
 			case "inspect_workbook":
@@ -308,7 +316,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 					break
 				}
 				err = engineering.CheckProposal(w, *action.Proposal)
-				if err == nil && action.Action == "propose_engineering_model" {
+				if err == nil && commitProposal {
 					// A commit is bounded to one inspected sheet. Independent sheets survive retries.
 					if action.Sheet == "" && len(action.Proposal.Regions) > 0 {
 						action.Sheet = action.Proposal.Regions[0].Sheet
@@ -336,7 +344,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 							result = map[string]any{"issues": x.Issues, "equipment": len(x.Model.Equipment), "facilities": len(x.Model.Facilities), "placements": len(x.Model.Placements), "mapped_cells": x.MappedCells, "total_cells": x.TotalCells}
 						}
 					}
-					if action.Action == "propose_engineering_model" {
+					if commitProposal {
 						proposal = candidate
 						completed[action.Sheet] = true
 						queued = nil
@@ -371,7 +379,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 			}
 			result = feedback
 		}
-		if action.Action == "propose_engineering_model" && err == nil {
+		if commitProposal && err == nil {
 			detail = fmt.Sprintf("已持久保存 %s 的区域理解（%d/%d Sheet）；未发布正式数据", action.Sheet, len(completed), len(w.Sheets))
 		}
 		if e := record(action.Action, state, result); e != nil {

@@ -1,0 +1,91 @@
+package ai
+
+import (
+	"context"
+	"encoding/json"
+	"keel.local/dev/internal/bom"
+	"keel.local/dev/internal/engineering"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+	"time"
+)
+
+func TestEngineeringCorrectsOneBindingWithoutRegeneratingOtherFields(t *testing.T) {
+	calls, originalPatch := 0, false
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var body map[string]json.RawMessage
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		calls++
+		name, args := "inspect_sheet", map[string]any{"sheet": "synthetic"}
+		if calls == 2 {
+			name = "propose_engineering_model"
+			args["proposal"] = engineering.EngineeringProposal{Summary: "candidate", Modules: []engineering.ModuleDetection{}, Questions: []string{}, Regions: []engineering.RegionMapping{{Sheet: "synthetic", Kind: "equipment", Semantic: "inventory", Bounds: engineering.Bounds{StartRow: 1, EndRow: 2, StartColumn: 1, EndColumn: 2}, HeaderRows: []int{1}, Columns: []engineering.ColumnBinding{{Field: "label", Column: 2}, {Field: "quantity", Column: 1}}, Constants: []engineering.ConstantBinding{}}}}
+		}
+		if calls == 3 {
+			var tools []struct {
+				Function struct {
+					Name string `json:"name"`
+				} `json:"function"`
+			}
+			_ = json.Unmarshal(body["tools"], &tools)
+			if len(tools) != 1 || tools[0].Function.Name != "map_semantic_fields" {
+				t.Errorf("expected a focused correction tool: %+v", tools)
+			}
+			name = "map_semantic_fields"
+			args = map[string]any{"sheet": "synthetic", "region_index": 0, "remove_columns": []string{"quantity"}}
+		}
+		if calls > 3 {
+			t.Error("corrected sheet did not finish")
+		}
+		encoded, _ := json.Marshal(args)
+		_ = json.NewEncoder(w).Encode(map[string]any{"choices": []any{map[string]any{"message": map[string]any{"tool_calls": []any{map[string]any{"function": map[string]any{"name": name, "arguments": string(encoded)}}}}, "finish_reason": "tool_calls"}}})
+	}))
+	defer server.Close()
+	wb := bom.Workbook{Sheets: []bom.Sheet{{Name: "synthetic", Cells: []bom.Cell{{Ref: "A1", Row: 1, Column: 1, Value: "No."}, {Ref: "B1", Row: 1, Column: 2, Value: "Name"}, {Ref: "A2", Row: 2, Column: 1, Value: "1"}, {Ref: "B2", Row: 2, Column: 2, Value: "TEST-DEVICE"}}}}}
+	p := Provider{Endpoint: server.URL, Timeout: time.Second}
+	result, err := p.UnderstandEngineering(context.Background(), wb, func(string, string, string) error { return nil }, EngineeringToolHooks{Artifact: func(_ context.Context, tool, state string, value any) error {
+		if tool == "map_semantic_fields" && state == "succeeded" {
+			request := value.(map[string]any)["request"].(json.RawMessage)
+			var patch map[string]json.RawMessage
+			_ = json.Unmarshal(request, &patch)
+			originalPatch = patch["remove_columns"] != nil && patch["proposal"] == nil
+		}
+		return nil
+	}})
+	if err != nil || calls != 3 || !originalPatch {
+		t.Fatalf("correction failed: %v calls=%d originalPatch=%v", err, calls, originalPatch)
+	}
+	cols := result.Regions[0].Columns
+	if len(cols) != 1 || cols[0].Field != "label" || cols[0].Column != 2 {
+		t.Fatalf("unrelated source binding changed: %+v", cols)
+	}
+}
+
+func TestEngineeringCorrectionRejectsWrongSheetUnknownFieldsAndNoop(t *testing.T) {
+	draft := &engineering.EngineeringProposal{Summary: "draft", Regions: []engineering.RegionMapping{{Sheet: "synthetic", Kind: "equipment", Columns: []engineering.ColumnBinding{{Field: "label", Column: 2}}}}}
+	for _, raw := range []string{
+		`{"action":"map_semantic_fields","sheet":"another","region_index":0,"remove_columns":["label"]}`,
+		`{"action":"map_semantic_fields","sheet":"synthetic","region_index":0}`,
+		`{"action":"map_semantic_fields","sheet":"synthetic","region_index":0,"set_columns":{"label":{"column":3,"invented":true}}}`,
+		`{"action":"map_semantic_fields","sheet":"synthetic","region_index":0,"set_columns":{"label":{"column":3},"label":{"column":4}}}`,
+	} {
+		if _, _, err := materializeEngineeringCorrection([]byte(raw), draft, "synthetic"); err == nil {
+			t.Fatalf("invalid correction accepted: %s", raw)
+		}
+	}
+	if draft.Regions[0].Columns[0].Column != 2 {
+		t.Fatal("rejected correction mutated draft")
+	}
+}
+
+func TestEngineeringCorrectionRestoresOmittedArrayDefaults(t *testing.T) {
+	draft := &engineering.EngineeringProposal{Summary: "draft", Regions: []engineering.RegionMapping{{Sheet: "synthetic", Kind: "equipment", Semantic: "inventory", Bounds: engineering.Bounds{StartRow: 1, EndRow: 2, StartColumn: 1, EndColumn: 3}, HeaderRows: []int{1}, Columns: []engineering.ColumnBinding{{Field: "label", Column: 2}}}}}
+	raw, corrected, err := materializeEngineeringCorrection([]byte(`{"action":"map_semantic_fields","sheet":"synthetic","region_index":0,"set_columns":{"label":{"column":3}}}`), draft, "synthetic")
+	if err != nil || !corrected {
+		t.Fatalf("correction failed: %v", err)
+	}
+	if err := validateEngineeringSchema(context.Background(), raw); err != nil {
+		t.Fatalf("omitted optional arrays became invalid nulls: %v", err)
+	}
+}
