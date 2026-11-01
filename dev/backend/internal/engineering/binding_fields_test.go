@@ -35,3 +35,27 @@ func TestRejectAuxiliaryColumnsMasqueradingAsCableFacts(t *testing.T) {
 		}
 	}
 }
+
+func TestRejectEquipmentMetadataMasqueradingAsTypedFacts(t *testing.T) {
+	for _, tc := range []struct{ header, value, field, errorCode string }{
+		{"Asset ID", "TEST-1", "depth_mm", "HEADER_FIELD_CONFLICT"},
+		{"No.", "42", "quantity", "HEADER_FIELD_CONFLICT"},
+		{"Rack Unit", "36", "height_u", "HEADER_FIELD_CONFLICT"},
+		{"Position label", "TEST-RACK-36", "mount_face", "FIELD_VALUE_CONFLICT"},
+		{"Planning class", "42", "identity_kind", "FIELD_VALUE_CONFLICT"},
+		{"Configuration combo", "synthetic-option", "equipment_type", "FIELD_VALUE_CONFLICT"},
+		{"Device Type", "switch", "equipment_type", ""},
+		{"Rack Unit", "36", "start_u", ""},
+		{"Asset ID", "TEST-1", "label", ""},
+	} {
+		wb := bom.Workbook{Sheets: []bom.Sheet{{Name: "arbitrary", Cells: []bom.Cell{{Ref: "D7", Row: 7, Column: 4, Value: tc.header}, {Ref: "D8", Row: 8, Column: 4, Value: tc.value}}}}}
+		p := EngineeringProposal{Summary: "source mapping", Regions: []RegionMapping{{Sheet: "arbitrary", Kind: "equipment", Bounds: Bounds{StartRow: 7, EndRow: 8, StartColumn: 4, EndColumn: 4}, HeaderRows: []int{7}, Columns: []ColumnBinding{{Field: tc.field, Column: 4}}}}}
+		err := CheckProposal(wb, p)
+		if tc.errorCode == "" && err != nil {
+			t.Fatalf("valid %s rejected: %v", tc.field, err)
+		}
+		if tc.errorCode != "" && (err == nil || !strings.HasPrefix(err.Error(), tc.errorCode)) {
+			t.Fatalf("incorrect %s accepted: %v", tc.field, err)
+		}
+	}
+}

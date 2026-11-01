@@ -121,6 +121,8 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 			}
 		}
 		used := map[string]bool{}
+		bindingConflicts := []string{}
+	columnBindings:
 		for _, c := range r.Columns {
 			if !validRegionField(r.Kind, c.Field) {
 				return fmt.Errorf("FIELD_NOT_SUPPORTED_FOR_REGION: kind=%s field=%s; supported=%s", r.Kind, c.Field, strings.Join(RegionFields(r.Kind), ","))
@@ -135,11 +137,12 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 			for _, headerRow := range r.HeaderRows {
 				ref, _ := excelize.CoordinatesToCellName(c.Column, headerRow)
 				header := cells[ref]
-				if field := bom.Field(header.Value); (field == "manufacturer" || field == "brand") && !strings.HasPrefix(c.Field, "attribute:") {
-					return fmt.Errorf("HEADER_FIELD_CONFLICT: sheet=%s column=%d source_field=%s proposed_field=%s; manufacturer/brand is not an asset identifier, connector or engineering state; retain as unmapped source or an approved typed attribute", r.Sheet, c.Column, field, c.Field)
+				if sourceHeaderConflict(header.Value, c.Field) {
+					bindingConflicts = append(bindingConflicts, fmt.Sprintf("HEADER_FIELD_CONFLICT: sheet=%s column=%d proposed_field=%s; sequence/brand/asset identifiers are not quantities, dimensions or states, and U position is not U height; omit the conflicting binding, retaining its source", r.Sheet, c.Column, c.Field))
+					continue columnBindings
 				}
 			}
-			if c.Field == "length_state" {
+			if allowed := bindingEnum(c.Field); len(allowed) > 0 {
 				for _, cell := range s.Cells {
 					if cell.Column != c.Column || cell.Row < b.StartRow || cell.Row > b.EndRow || cell.Sensitive || strings.TrimSpace(cell.Value) == "" {
 						continue
@@ -151,24 +154,39 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 					if header {
 						continue
 					}
-					switch strings.TrimSpace(cell.Value) {
-					case "estimated", "calculated", "confirmed", "as_built":
-					default:
-						return fmt.Errorf("FIELD_VALUE_CONFLICT: sheet=%s cell=%s field=length_state; expected estimated/calculated/confirmed/as_built, not an arbitrary source value; omit unrelated column binding", r.Sheet, cell.Ref)
+					valid := false
+					for _, value := range allowed {
+						valid = valid || strings.TrimSpace(cell.Value) == value
+					}
+					if !valid {
+						bindingConflicts = append(bindingConflicts, fmt.Sprintf("FIELD_VALUE_CONFLICT: sheet=%s cell=%s field=%s; allowed=%s; do not bind unrelated raw values. Classify with source-backed constants only where evidence supports them, or retain the uncertainty", r.Sheet, cell.Ref, c.Field, strings.Join(allowed, ",")))
+						break
 					}
 				}
 			}
+		}
+		if len(bindingConflicts) > 0 {
+			return fmt.Errorf("%s", strings.Join(bindingConflicts, " | "))
 		}
 		for _, c := range r.Constants {
 			if !validRegionField(r.Kind, c.Field) || used[c.Field] || len(c.EvidenceCells) == 0 {
 				return fmt.Errorf("INVALID_CONSTANT_EVIDENCE: %s", c.Field)
 			}
 			used[c.Field] = true
+			if allowed := bindingEnum(c.Field); len(allowed) > 0 {
+				valid := false
+				for _, value := range allowed {
+					valid = valid || c.Value == value
+				}
+				if !valid {
+					return fmt.Errorf("INVALID_CONSTANT_VALUE: field=%s allowed=%s", c.Field, strings.Join(allowed, ","))
+				}
+			}
 			matches := false
 			for _, ref := range c.EvidenceCells {
 				cell, ok := cells[ref]
 				if !ok || cell.Sensitive {
-					return fmt.Errorf("INVALID_CONSTANT_CELL")
+					return fmt.Errorf("INVALID_CONSTANT_CELL: sheet=%s field=%s cell=%s; use an existing bare cell address in this sheet, not a range or guessed cell", r.Sheet, c.Field, ref)
 				}
 				if strings.TrimSpace(cell.Value) == strings.TrimSpace(c.Value) {
 					matches = true

@@ -68,3 +68,36 @@ func HeaderFields(value string) []string {
 	}
 	return nil
 }
+
+func sourceHeaderConflict(header, field string) bool {
+	if strings.HasPrefix(field, "attribute:") {
+		return false
+	}
+	key := strings.ToLower(strings.NewReplacer(" ", "", "_", "", "-", "", ".", "", "\n", "").Replace(header))
+	switch key {
+	case "manufacturer", "vendor", "brand", "厂家", "厂商", "品牌", "no", "#", "sequence", "序号":
+		return true // No corresponding core engineering field; retain the source.
+	case "assetid", "assetnumber", "资产编号", "资产id":
+		return field != "label" && field != "device"
+	}
+	for _, expected := range HeaderFields(header) {
+		if (expected == "start_u" && field == "height_u") || (expected == "height_u" && field == "start_u") {
+			return true
+		}
+	}
+	return false
+}
+
+func bindingEnum(field string) []string {
+	switch field {
+	case "length_state":
+		return []string{"estimated", "calculated", "confirmed", "as_built"}
+	case "identity_kind":
+		return []string{"planned_instance", "group", "observed_reference"}
+	case "mount_face":
+		return []string{"front", "rear", "both", "unknown"}
+	case "equipment_type":
+		return []string{"server", "switch", "nic", "gpu", "component", "psu", "pdu", "patch_panel", "device"}
+	}
+	return nil
+}
