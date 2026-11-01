@@ -25,3 +25,7 @@ bomv1.xlsx
 # Archived applications must not be restored into the active dev tree.
 /keel-demo/
 /web/
+
+# Isolated jobs UI design preview
+docs/flows-redesign/prototype/node_modules/
+docs/flows-redesign/prototype/dist/

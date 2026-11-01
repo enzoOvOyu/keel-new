@@ -1,5 +1,14 @@
 # Keel 整合交接 · 2026-10-31
 
+## 作业平台UI：用户要求先审阅独立样式原型（2026-11-01）
+
+- 功能分支 `feat/jobs-kestra-ui`，工作区 `/home/ubuntu/keel-kestra-ui-dev`。已同步最新dev基线；业务代码未合并回dev/main，未切换5180/8081。
+- 新原型 [README](docs/flows-redesign/prototype/README.md)，预览 `http://localhost:5181/jobs-preview/index.html#flows`。使用现有5181静态公开目录，不重启服务，不覆盖原拓扑/机柜原型。
+- 包含Flow目录、多面板Visual/YAML/Topology/Files/Docs、Flow上下文、Execution/Gantt/目标/日志/变量、Quick Run和Agents；数据全部synthetic，操作限原型内存，没有业务API、真实设备或数据库调用。原生来源和已适配范围见PROVENANCE。
+- 这是视觉/交互预审，不等于正式UI替换完成。正式开发仍保留约20%的上一轮估算；待用户审阅原型后按确认方向继续，不将样式原型当后端或执行闭环交付。
+- 检查与截图见原型目录validation.json及screenshots。只做本原型构建、浏览器交互和文档检查，不重复业务测试。
+
+
 ## 最新指令：恢复作业平台UI独立开发（2026-11-01）
 
 用户再次明确直接复用Kestra原生UI；已将强制规则写入 [DESIGN-SYSTEM §10](docs/DESIGN-SYSTEM.md#10-作业平台kestra-原生-ui-实施硬规则)，并同步UI-REFERENCE和替换方案状态。旧“不复制Kestra”、强制全部shadcn和旧Flow线框不再适用于作业平台。

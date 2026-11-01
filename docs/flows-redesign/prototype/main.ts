@@ -1,0 +1,10 @@
+import {createApp} from 'vue';
+import {createI18n} from 'vue-i18n';
+import {ElConfigProvider} from 'element-plus';
+import Prototype from './Prototype.vue';
+import {registerNativePanels} from '../../../dev/src/features/jobs-native/native-registration';
+import '../../../dev/src/features/jobs-native/native-theme.scss';
+import './prototype.scss';
+const app=createApp(Prototype);registerNativePanels(app);app.component('ElConfigProvider',ElConfigProvider);
+app.use(createI18n({legacy:false,locale:'zh',missingWarn:false,fallbackWarn:false,messages:{zh:{'Fold content lines':'折叠代码','Unfold content lines':'展开代码',close:'关闭','select view':'选择视图','panel actions':'面板操作',ks_no_data:{no_results:'没有匹配结果',nothing_here:'调整筛选后查看',will_appear:'原型使用独立演示数据'},ks_bulk_select:{selected:'已选择 {count} 项',all:'全部 {count} 项'},block_editor:{card_aria_label:'{id} · {type}',drag_reorder:'拖动排序',delete:'删除节点',duplicate:'复制节点',open_in_split:'分栏打开',empty_add_lead:'添加{label}',inline_add:'添加{label}'},multi_panel_editor:{move_left:'移至左栏',move_right:'移至右栏',close_all_tabs:'关闭标签',close_all_panels:'关闭全部面板',fullscreen:'最大化面板',exit_fullscreen:'恢复布局'},empty:{panels:{title:'打开编辑面板',content:'选择 Visual、YAML 或 Topology'}},variable_explorer:{search:'搜索变量',empty:'没有匹配变量'}}}}));
+app.mount('#app');

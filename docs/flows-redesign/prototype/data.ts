@@ -1,0 +1,32 @@
+/** SYNTHETIC DESIGN DATA ONLY. No real CMDB identity, network call or device execution. */
+export type FlowRow={id:string;name:string;description:string;namespace:string;target:string;state:string;revision:number;cron:string;updated:string;history:string[];project:string};
+const green=['SUCCESS','SUCCESS','SUCCESS','SUCCESS','SUCCESS','SUCCESS','SUCCESS'];
+export const flows:FlowRow[]=[
+ {id:'gpu-preflight',name:'GPU 交付前置检查',description:'硬件清单、驱动与 PCIe 拓扑核对',namespace:'keel.delivery',target:'GPU Server',state:'ENABLED',revision:12,cron:'手动',updated:'6 分钟前',history:[...green.slice(0,5),'FAILED','SUCCESS'],project:'B300 · POD-A'},
+ {id:'roce-health',name:'RoCE 网络健康巡检',description:'端口、PFC / ECN 与链路证据采集',namespace:'keel.network',target:'Switch',state:'ENABLED',revision:8,cron:'每 30 分钟',updated:'12 分钟前',history:[...green.slice(0,6),'RUNNING'],project:'B300 · POD-A'},
+ {id:'nccl-validation',name:'NCCL 集群验证',description:'已验机目标的 AllReduce 测试与报告',namespace:'keel.validation',target:'GPU Server',state:'ENABLED',revision:6,cron:'手动',updated:'34 分钟前',history:['SUCCESS','SUCCESS','FAILED','SUCCESS','SUCCESS','SUCCESS','SUCCESS'],project:'B300 · POD-A'},
+ {id:'firmware-inventory',name:'固件版本采集',description:'只读采集 BIOS、BMC 与 NIC 固件清单',namespace:'keel.inventory',target:'Server',state:'ENABLED',revision:4,cron:'每天 02:00 UTC',updated:'1 小时前',history:green,project:'B300 · POD-A'},
+ {id:'lldp-reconcile',name:'LLDP 双端线序核查',description:'规划连接与双端观测比对',namespace:'keel.network',target:'Mixed',state:'ENABLED',revision:9,cron:'手动',updated:'2 小时前',history:['SUCCESS','SUCCESS','WARNING','SUCCESS','FAILED','SUCCESS','SUCCESS'],project:'B300 · POD-A'},
+ {id:'os-postinstall',name:'OS 安装后验证',description:'操作系统、hostname 与基础服务核对',namespace:'keel.provision',target:'Server',state:'ENABLED',revision:7,cron:'手动',updated:'3 小时前',history:green,project:'B300 · POD-A'},
+ {id:'bmc-collection',name:'维护期 BMC 采集',description:'仅经授权带外通道读取硬件状态',namespace:'keel.operations',target:'Server',state:'ENABLED',revision:3,cron:'每 15 分钟',updated:'4 小时前',history:[...green.slice(0,6),'WARNING'],project:'B300 · POD-A'},
+ {id:'golden-review',name:'Golden 配置复采',description:'批准基线与实际配置差异检查',namespace:'keel.network',target:'Switch',state:'DISABLED',revision:5,cron:'已停用',updated:'昨天',history:green,project:'B300 · POD-A'},
+ {id:'rack-audit',name:'机柜资产一致性检查',description:'资产身份、落位与端口引用审计',namespace:'keel.inventory',target:'Mixed',state:'DRAFT',revision:1,cron:'未配置',updated:'昨天',history:[],project:'B300 · POD-A'},
+ {id:'cleanup-evidence',name:'交付退场证据归档',description:'清理结果、访问撤销与签署证据',namespace:'keel.delivery',target:'Mixed',state:'DRAFT',revision:2,cron:'未配置',updated:'昨天',history:[],project:'B300 · POD-A'},
+ {id:'pod-b-preflight',name:'POD-B 交付前置检查',description:'第二项目独立目标与执行范围',namespace:'keel.delivery',target:'GPU Server',state:'ENABLED',revision:2,cron:'手动',updated:'20 分钟前',history:green,project:'B300 · POD-B'},
+];
+export const initialTasks=[{id:'resolve_targets',type:'io.kestra.plugin.core.log.Log',label:'解析目标范围',description:'冻结本次项目、目标与资产版本',duration:1.8,state:'SUCCESS',start:0},{id:'collect_inventory',type:'io.kestra.plugin.core.flow.Parallel',label:'采集设备清单',description:'按授权通道读取设备信息',duration:13.2,state:'SUCCESS',start:1.8},{id:'validate_topology',type:'io.kestra.plugin.core.log.Log',label:'校验硬件拓扑',description:'GPU、NIC 与 PCIe 检查',duration:9.4,state:'FAILED',start:15},{id:'publish_report',type:'io.kestra.plugin.core.output.OutputValues',label:'汇总报告与证据',description:'记录结果并关联统一工单',duration:0,state:'BLOCKED',start:24.4}];
+export const targets=Array.from({length:32},(_,i)=>({id:`demo-server-${String(i+1).padStart(2,'0')}`,name:`gpu-a${String(i+1).padStart(2,'0')}`,rack:`R${String(Math.floor(i/4)+1).padStart(2,'0')}`,state:i===16||i===23?'FAILED':i===31?'BLOCKED':'SUCCESS',transport:i%5===0?'SSH':'AGENT',elapsed:i===31?'—':`${(18+i%7*.8).toFixed(1)}s`,exit:i===16||i===23?1:i===31?null:0}));
+export const agents=Array.from({length:12},(_,i)=>({id:`demo-agent-${i+1}`,name:`gpu-a${String(i+1).padStart(2,'0')}`,version:'0.2.0',state:i===7?'OFFLINE':i===10?'PENDING':'ONLINE',channel:'mTLS',heartbeat:i===7?'38 分钟前':'8 秒前',tasks:i===1?2:0,certificate:i===9?'7 天后到期':'有效',rack:`R${String(Math.floor(i/4)+1).padStart(2,'0')}`}));
+export const files={'scripts/preflight.sh':'#!/usr/bin/env bash\nset -eu\n# Synthetic prototype script; never executed.\nprintf "Read-only inventory collection\\n"\n','scripts/check_topology.py':'# Synthetic prototype only\nimport json\nprint(json.dumps({"status": "review_required"}))\n','config/thresholds.json':'{\n  "baseline_revision": "demo-baseline-03",\n  "source": "synthetic"\n}\n'};
+export const source=`id: gpu-preflight\nnamespace: keel.delivery\ndescription: GPU 交付前置检查\n\n# Synthetic design preview — no device execution\ninputs:\n  - id: project\n    type: STRING\n    defaults: demo-project-a\n  - id: target_group\n    type: STRING\n    defaults: pod-a-gpu\n\ntasks:\n  - id: resolve_targets\n    type: io.kestra.plugin.core.log.Log\n    message: Freeze authorized device targets\n  - id: collect_inventory\n    type: io.kestra.plugin.core.flow.Parallel\n    tasks:\n      - id: hardware\n        type: io.kestra.plugin.core.log.Log\n        message: Collect read-only hardware evidence\n  - id: validate_topology\n    type: io.kestra.plugin.core.log.Log\n    message: Validate GPU and NIC topology\n  - id: publish_report\n    type: io.kestra.plugin.core.output.OutputValues\n    values:\n      report: synthetic-report.json\n`;
+export const logs=[
+ ['14:32:06.112','INFO','resolve_targets','已冻结 demo-project-a / 32 台目标 / revision 12'],
+ ['14:32:07.924','INFO','collect_inventory','开始只读采集：Agent 25 / SSH 7'],
+ ['14:32:12.105','INFO','collect_inventory','32/32 目标清单返回'],
+ ['14:32:21.028','INFO','validate_topology','开始核对 GPU-NIC 与 PCIe 关系'],
+ ['14:32:24.331','WARN','validate_topology','gpu-a17: NIC 5 的 BDF 与批准基线不一致'],
+ ['14:32:28.210','ERROR','validate_topology','gpu-a17: topology mismatch, exit_code=1'],
+ ['14:32:29.835','ERROR','validate_topology','gpu-a24: required observation missing'],
+ ['14:32:30.512','INFO','publish_report','执行结束：29 成功 / 2 失败 / 1 阻断'],
+];
+export const outputs={summary:{source:'synthetic',targets:32,success:29,failed:2,blocked:1},validation:{baseline_revision:'demo-baseline-03',rule:'PCIe topology',issues:['gpu-a17: topology mismatch','gpu-a24: missing evidence']},report:{filename:'synthetic-report.json',source:'prototype',revision:12}};
