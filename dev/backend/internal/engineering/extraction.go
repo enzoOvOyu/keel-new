@@ -68,7 +68,7 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 	for _, s := range w.Sheets {
 		sheets[s.Name] = s
 	}
-	for _, r := range p.Regions {
+	for regionIndex, r := range p.Regions {
 		s, ok := sheets[r.Sheet]
 		if !ok {
 			return fmt.Errorf("UNKNOWN_SHEET: %s", r.Sheet)
@@ -174,6 +174,19 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 				device, port := side+"_device", side+"_port"
 				if sources[device] > 0 && sources[device] == sources[port] {
 					bindingConflicts = append(bindingConflicts, fmt.Sprintf("FIELD_SOURCE_CONFLICT: sheet=%s field=%s column=%d equals %s; copying a device/rack identifier cannot invent a port. Bind an explicit port source or omit the unknown port; route/quantity summaries are not device-port connections", r.Sheet, port, sources[port], device))
+				}
+			}
+		}
+		if r.Kind == "equipment" && len(r.Columns) > 0 && !used["label"] {
+			for _, headerRow := range r.HeaderRows {
+				for _, cell := range s.Cells {
+					if cell.Row != headerRow || cell.Column < b.StartColumn || cell.Column > b.EndColumn {
+						continue
+					}
+					meaning := bom.Field(cell.Value)
+					if meaning == "hostname" || meaning == "device_alias" {
+						return fmt.Errorf("FIELD_BINDING_REQUIRED: sheet=%s region_index=%d field=label candidate_column=%d; this equipment region has explicit device-name evidence. A label in a separate placement region does not identify the equipment rows. Add label here; retain the placement mapping", r.Sheet, regionIndex, cell.Column)
+					}
 				}
 			}
 		}

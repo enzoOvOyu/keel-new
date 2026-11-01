@@ -23,6 +23,10 @@ func TestRejectAuxiliaryColumnsMasqueradingAsCableFacts(t *testing.T) {
 		{"Fiber core count", "24", "length_state", "FIELD_VALUE_CONFLICT"},
 		{"Length status", "calculated", "length_state", ""},
 		{"Cable tag", "TEST-CABLE", "cable_label", ""},
+		{"A Side Lable Name", "TEST-CABLE-END", "connector_a", "HEADER_FIELD_CONFLICT"},
+		{"Cable Type", "fiber", "connector_z", "HEADER_FIELD_CONFLICT"},
+		{"线缆长度", "100", "distance", "HEADER_FIELD_CONFLICT"},
+		{"A Side Lable Name", "TEST-CABLE-END", "cable_label", ""},
 	} {
 		wb := bom.Workbook{Sheets: []bom.Sheet{{Name: "any customer sheet", Cells: []bom.Cell{{Ref: "C4", Row: 4, Column: 3, Value: tc.header}, {Ref: "C5", Row: 5, Column: 3, Value: tc.value}}}}}
 		p := EngineeringProposal{Summary: "source binding", Regions: []RegionMapping{{Sheet: wb.Sheets[0].Name, Kind: "connection", Bounds: Bounds{StartRow: 4, EndRow: 5, StartColumn: 3, EndColumn: 3}, HeaderRows: []int{4}, Columns: []ColumnBinding{{Field: tc.field, Column: 3}}}}}
@@ -55,6 +59,7 @@ func TestRejectEquipmentMetadataMasqueradingAsTypedFacts(t *testing.T) {
 		{"Position label", "TEST-RACK-36", "mount_face", "FIELD_VALUE_CONFLICT"},
 		{"Planning class", "42", "identity_kind", "FIELD_VALUE_CONFLICT"},
 		{"Configuration combo", "synthetic-option", "equipment_type", "FIELD_VALUE_CONFLICT"},
+		{"Device Role", "leaf", "device", "HEADER_FIELD_CONFLICT"},
 		{"Device Type", "switch", "equipment_type", ""},
 		{"Rack Unit", "36", "start_u", ""},
 		{"Asset ID", "TEST-1", "label", ""},
@@ -81,5 +86,21 @@ func TestConnectionCannotUseDeviceIdentifierAsPort(t *testing.T) {
 	p.Regions[0].Columns[3].Column = 4
 	if err := CheckProposal(w, p); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestNamedEquipmentKeepsIdentityWhenPlacementIsSeparate(t *testing.T) {
+	w := bom.Workbook{Sheets: []bom.Sheet{{Name: "arbitrary", Cells: []bom.Cell{{Ref: "A1", Row: 1, Column: 1, Value: "Device Name"}, {Ref: "B1", Row: 1, Column: 2, Value: "Model"}, {Ref: "C1", Row: 1, Column: 3, Value: "Rack"}, {Ref: "A2", Row: 2, Column: 1, Value: "TEST-DEVICE"}, {Ref: "B2", Row: 2, Column: 2, Value: "TEST-MODEL"}, {Ref: "C2", Row: 2, Column: 3, Value: "TEST-RACK"}}}}}
+	p := EngineeringProposal{Summary: "equipment and placement", Regions: []RegionMapping{{Sheet: "arbitrary", Kind: "equipment", Bounds: Bounds{StartRow: 1, EndRow: 2, StartColumn: 1, EndColumn: 3}, HeaderRows: []int{1}, Columns: []ColumnBinding{{Field: "model", Column: 2}}}, {Sheet: "arbitrary", Kind: "placement", Bounds: Bounds{StartRow: 1, EndRow: 2, StartColumn: 1, EndColumn: 3}, HeaderRows: []int{1}, Columns: []ColumnBinding{{Field: "label", Column: 1}, {Field: "rack", Column: 3}}}}}
+	if err := CheckProposal(w, p); err == nil || !strings.HasPrefix(err.Error(), "FIELD_BINDING_REQUIRED") {
+		t.Fatalf("named equipment became anonymous model group: %v", err)
+	}
+	p.Regions[0].Columns = append(p.Regions[0].Columns, ColumnBinding{Field: "label", Column: 1})
+	if err := CheckProposal(w, p); err != nil {
+		t.Fatal(err)
+	}
+	result, err := ExtractPhysical(w, p, "project", "source", "revision")
+	if err != nil || len(result.Model.Equipment) != 1 || result.Model.Equipment[0].Label != "TEST-DEVICE" || result.Model.Equipment[0].IdentityKind != "planned_instance" {
+		t.Fatalf("equipment identity lost: %+v %v", result.Model.Equipment, err)
 	}
 }

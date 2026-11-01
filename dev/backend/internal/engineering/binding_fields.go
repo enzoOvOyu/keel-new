@@ -86,6 +86,10 @@ func sourceHeaderConflict(header, field string) bool {
 		return false
 	}
 	key := strings.ToLower(strings.NewReplacer(" ", "", "_", "", "-", "", ".", "", "\n", "").Replace(header))
+	switch bom.Field(header) {
+	case "termination_a", "termination_b":
+		return field != "cable_label"
+	}
 	switch key {
 	case "manufacturer", "vendor", "brand", "厂家", "厂商", "品牌", "no", "#", "sequence", "序号":
 		return true // No corresponding core engineering field; retain the source.
@@ -93,6 +97,15 @@ func sourceHeaderConflict(header, field string) bool {
 		return field != "label" && field != "device"
 	}
 	for _, expected := range HeaderFields(header) {
+		if expected == "medium" && (field == "connector_a" || field == "connector_z" || field == "role") {
+			return true
+		}
+		if expected == "length" && field == "distance" {
+			return true
+		}
+		if expected == "role" && (field == "device" || field == "label" || field == "model" || field == "serial") {
+			return true
+		}
 		if expected == "power" || expected == "power_capacity" {
 			switch field {
 			case "power", "power_unit", "power_basis", "power_capacity", "power_capacity_unit", "cooling_capacity", "cooling_capacity_unit", "start_u", "height_u", "depth_mm":

@@ -23,7 +23,7 @@ func engineeringCorrectionDraft(history []any, sheet string) (*engineering.Engin
 		if json.Unmarshal(raw, &step) != nil || step.Action.Proposal == nil || step.Action.Sheet != sheet {
 			continue
 		}
-		for _, prefix := range []string{"FIELD_NOT_SUPPORTED_FOR_REGION", "HEADER_FIELD_CONFLICT", "FIELD_VALUE_CONFLICT", "FIELD_SOURCE_CONFLICT", "REGION_KIND_CONFLICT", "SUPPORTED_HEADER_UNMAPPED", "INCOMPLETE_SHEET_COVERAGE", "INVALID_CONSTANT_VALUE", "INVALID_CONSTANT_CELL", "UNSUPPORTED_CONSTANT_VALUE"} {
+		for _, prefix := range []string{"FIELD_NOT_SUPPORTED_FOR_REGION", "HEADER_FIELD_CONFLICT", "FIELD_VALUE_CONFLICT", "FIELD_SOURCE_CONFLICT", "FIELD_BINDING_REQUIRED", "REGION_KIND_CONFLICT", "SUPPORTED_HEADER_UNMAPPED", "INCOMPLETE_SHEET_COVERAGE", "INVALID_CONSTANT_VALUE", "INVALID_CONSTANT_CELL", "UNSUPPORTED_CONSTANT_VALUE"} {
 			if strings.HasPrefix(step.Result.Error, prefix) {
 				return step.Action.Proposal, step.Result.Error
 			}

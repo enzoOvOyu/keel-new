@@ -1,3 +1,7 @@
+## 已完成里程碑事件：拆分区域保留设备身份及线缆附加字段语义
+
+v37独立复核五张端接7154条八字段再次全部匹配，但NS/OOB额外字段把线缆类型/端点标签当连接器、线长当路径距离；Network把名称仅放在placement，equipment无label会被提成匿名型号组。现明确要求有显式设备名表头的equipment区域绑定自身label，不能由另一个placement区域代替；端点标签、介质、角色、长度的已知语义冲突明确拦截。新增拆分设备/落位仍生成唯一planned_instance的用例及附加字段冲突用例，完整engineering和定向AI检查、v39构建通过。包含v38区域分类误报修复，准备在revision2检查点继续重验；源文件未改，未发布正式数据。
+
 ## 已完成里程碑事件：区分区域分类错误与字段漏映射
 
 v37新一轮完成五张端接与Network候选后，电力表明细已经绑定rack，却因kind=placement被功率域门禁判为“缺少rack”，导致Agent重复修改正确列并NO_PROGRESS。现明确返回REGION_KIND_CONFLICT、区域索引及允许域，并将该轮工具限定为set_kind；分类修正后再检查真正缺失的功率/容量字段。新增真实HTTP协议模拟验证两轮“改分类→补功率/容量”完成，正确rack来源保持；定向AI、完整engineering及v38构建通过。v37候选设备功率表已经是label/model/power/quantity四个正确来源字段，稀疏纠错效果有改善，整本仍未通过。准备在revision2原检查点继续，不重跑已通过来源。
