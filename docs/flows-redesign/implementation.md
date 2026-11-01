@@ -1,5 +1,16 @@
 # 作业平台重构实施记录（技术域 Flows）
 
+## 2026-11-01 作业平台接续检查点
+
+本节只记录用户要求记住的暂停进度，不恢复开发或发布。已核对main合并c6822e8：智能开局工程后续合并没有修改Flows、jobs-native及Flows后端目录，因此原生UI重构仍约20%（该轮完整范围估算，非全平台或后端完成率）。
+
+- 已完成：React/Vue桥与原生样式隔离；Flow/Execution基础列表、搜索与状态URL；RunTimeline接线；KsEditor/Monaco及多面板基础（YAML+只读结构）；Outputs搜索/选择/预览/复制/下载；QuickRun锁定执行修订及模板修复。
+- 下一步起点：原生No-code节点/属性与Topology、Files/Docs；补服务端分页/total/最近执行摘要，然后接完整Execution详情（Gantt、TaskRun、Attempt、日志、变量、指标、依赖）及生命周期页面。
+- 后续软件缺口：完整筛选/列管理/批量操作、并发/排队/补跑/跨执行及源码检索、QuickRun/Agents替换；后端证书轮换、持久批量安装/恢复、设备事件与ZTP消费者。不得称为仅等真机。
+- 已有构建/浏览器检查证据见native-ui目录。Outputs为明确synthetic浏览器数据；不代表真实引擎闭环或完整视觉验收。原生UI未发布到5180。
+- 恢复前先看HANDOFF最新部署节，核验当前main/运行进程。当前前端是工程工作树，API为engineering-5abb94f，不能从旧feat/jobs-kestra-ui基线覆盖工程模块和新迁移。开发应从最新main新建独立分支，复用现有原生UI及有效后端，不重做已完成基础、不重复旧检查、不擅自部署。
+
+
 ## 最新整改状态 · 2026-10-31（覆盖下方“仅待真机验收”的旧结论）
 
 本轮复用 Kestra、Job Service、审批、CMDB、Agent/SSH 和幂等底座，调整现有 `/flows` 页面，不增加入口或启动额外服务。用户最新命名：**作业平台**，不改变 `/flows` 与 Flow/Execution 领域标识。
