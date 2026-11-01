@@ -1,3 +1,8 @@
+## 当前复测切换：免费Lightning模型与模型版本记录
+
+- Ultra免费模型的响应正文超时已通过新诊断确认（response_timeout，120秒）。仅将独立测试Provider `59c504bf-a8c8-42db-9afc-b89f70a0f2d5`更新为`nvidia/nemotron-3.5-lightning:free`、版本2、名称TEST-Agent-Free-Nemotron-Lightning；原test/DeepSeek及默认选择不变。新模型原生工具检查HTTP200、费用0。
+- 工程作业现在在持久步骤记录实际模型和Provider版本，响应中断保留明确错误码。Go构建通过；从同一来源的MinIO检查点继续真实测试，不把旧模型结果混记为新模型验收。
+
 ## 已完成里程碑事件：阻止无新增证据的读取循环
 
 - 完整小表已读完，或同一区域被重复读取时，首轮理解只允许提交提案/明确不确定项；提案仍必须通过Schema和确定性来源校验，不能用假数据绕过。

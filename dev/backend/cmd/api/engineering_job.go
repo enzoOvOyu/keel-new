@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
 	"github.com/xuri/excelize/v2"
@@ -90,6 +91,9 @@ func (s *Server) runEngineeringJob(ctx context.Context) {
 		provider, _, err := s.workbenchProvider(run, importID)
 		e = err
 		if e == nil {
+			e = trace("provider_selected", "succeeded", fmt.Sprintf("使用模型 %s；Provider版本 %d；只生成候选理解", provider.Model, provider.ConfigRevision))
+		}
+		if e == nil {
 			hooks = s.engineeringToolHooks(run, source, expected, wb)
 			hooks.Attributes, e = engineeringAttributeDefinitions(run, s.db, project)
 			if e == nil {
@@ -155,7 +159,7 @@ func (s *Server) runEngineeringJob(ctx context.Context) {
 	if e != nil {
 		state = "failed"
 		value := "ENGINEERING_ANALYSIS_FAILED"
-		for _, allowed := range []string{"AI_PROVIDER_NOT_CONFIGURED", "AI_CREDENTIAL_UNAVAILABLE", "PROVIDER_NOT_AVAILABLE", "PROVIDER_ERROR", "PROVIDER_TIMEOUT_OR_UNAVAILABLE", "ENGINEERING_AGENT_TURN_LIMIT", "REVISION_CONFLICT", "AI_SCHEMA_VALIDATOR_UNAVAILABLE", "ANALYSIS_STORAGE_UNAVAILABLE", "ANALYSIS_ARTIFACT_HASH_MISMATCH", "PROVIDER_OUTPUT_TRUNCATED", "INVALID_JSON"} {
+		for _, allowed := range []string{"AI_PROVIDER_NOT_CONFIGURED", "AI_CREDENTIAL_UNAVAILABLE", "PROVIDER_NOT_AVAILABLE", "PROVIDER_ERROR", "PROVIDER_TIMEOUT_OR_UNAVAILABLE", "PROVIDER_RESPONSE_FAILED", "ENGINEERING_AGENT_TURN_LIMIT", "REVISION_CONFLICT", "AI_SCHEMA_VALIDATOR_UNAVAILABLE", "ANALYSIS_STORAGE_UNAVAILABLE", "ANALYSIS_ARTIFACT_HASH_MISMATCH", "PROVIDER_OUTPUT_TRUNCATED", "INVALID_JSON"} {
 			if strings.HasPrefix(e.Error(), allowed) {
 				value = allowed
 				break
