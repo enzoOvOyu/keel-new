@@ -129,7 +129,7 @@ func (s Service) ProjectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 		// Replace only this project's prior engineering planning relation, preserving
 		// observations and manually confirmed relationships from other sources.
 		sql := `UPDATE cmdb_relationship SET valid_to=now() WHERE project_id=$1 AND definition_id=$2 AND to_uid=$4 AND fact_layer='planned' AND source_ref LIKE 'engineering:%' AND from_uid<>$3 AND valid_to IS NULL`
-		if kind == "located_in" {
+		if kind == "located_in" || kind == "cable_endpoint_a" || kind == "cable_endpoint_b" {
 			sql = `UPDATE cmdb_relationship SET valid_to=now() WHERE project_id=$1 AND definition_id=$2 AND from_uid=$3 AND fact_layer='planned' AND source_ref LIKE 'engineering:%' AND to_uid<>$4 AND valid_to IS NULL`
 		}
 		if _, err := tx.Exec(ctx, sql, project, kind, from, to); err != nil {
@@ -179,6 +179,69 @@ func (s Service) ProjectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 		for _, v := range m.Facilities {
 			if v.ParentID != nil {
 				if e = relation("parent", *v.ParentID, v.EntityID); e != nil {
+					return e
+				}
+			}
+		}
+	case engineering.ConnectivityTarget:
+		done := map[string]bool{}
+		for len(done) < len(m.Ports) {
+			progress := false
+			for _, p := range m.Ports {
+				if done[p.EntityID] {
+					continue
+				}
+				if p.ParentPortID != nil && !done[*p.ParentPortID] {
+					continue
+				}
+				attrs := map[string]any{"physical_name": p.Name, "device_id": p.EquipmentID, "parent_uid": p.EquipmentID, "media_type": p.Medium, "role": p.Role}
+				if p.ParentPortID != nil {
+					attrs["parent_port_id"] = *p.ParentPortID
+				}
+				if p.BreakoutIndex != nil {
+					attrs["breakout_index"] = float64(*p.BreakoutIndex)
+				}
+				if p.RateBPS != nil {
+					attrs["rate_bps"] = float64(*p.RateBPS)
+					attrs["speed"] = strconv.FormatInt(*p.RateBPS, 10) + " bps"
+				}
+				if e = projectAsset(p.EntityID, "port", p.Name, attrs); e != nil {
+					return e
+				}
+				if e = relation("contains", p.EquipmentID, p.EntityID); e != nil {
+					return e
+				}
+				done[p.EntityID] = true
+				progress = true
+			}
+			if !progress {
+				return Reject("BREAKOUT_PARENT_UNRESOLVED", 422)
+			}
+		}
+		for _, c := range m.Connections {
+			path := append([]string{c.APortID}, c.PatchPortIDs...)
+			path = append(path, c.ZPortID)
+			for i := 0; i+1 < len(c.PatchPortIDs); i += 2 {
+				if e = relation("patch_passthrough", c.PatchPortIDs[i], c.PatchPortIDs[i+1]); e != nil {
+					return e
+				}
+			}
+			for i := 0; i < len(path)-1; i += 2 {
+				id := c.EntityID
+				if i > 0 {
+					id = engineering.StableID(project, "connection-segment", c.EntityID+"/"+path[i]+"/"+path[i+1])
+					if _, e = tx.Exec(ctx, `INSERT INTO eng_entity(id,project_id,kind,planning_key) VALUES($1,$2,'connection_segment',$3) ON CONFLICT DO NOTHING`, id, project, id); e != nil {
+						return e
+					}
+				}
+				attrs := map[string]any{"endpoint_a_uid": path[i], "endpoint_b_uid": path[i+1], "connection_plan_id": c.EntityID, "segment_index": float64(i/2 + 1), "record_kind": "planned_connection"}
+				if e = projectAsset(id, "cable", "规划连接 "+strconv.Itoa(i/2+1), attrs); e != nil {
+					return e
+				}
+				if e = relation("cable_endpoint_a", id, path[i]); e != nil {
+					return e
+				}
+				if e = relation("cable_endpoint_b", id, path[i+1]); e != nil {
 					return e
 				}
 			}
@@ -240,7 +303,7 @@ func engineeringPlanningFields(ctx context.Context, tx pgx.Tx, assets []*VisualA
 			return e
 		}
 		switch field {
-		case "rack_uid", "rack_id", "u_start", "u_height", "rack_height", "mounting_face", "depth_mm", "width_mm", "height_mm", "x_mm", "y_mm", "z_mm", "orientation_degrees", "coordinate_frame_id":
+		case "rack_uid", "rack_id", "u_start", "u_height", "rack_height", "mounting_face", "depth_mm", "width_mm", "height_mm", "x_mm", "y_mm", "z_mm", "orientation_degrees", "coordinate_frame_id", "parent_port_id", "breakout_index", "rate_bps":
 			if previous, ok := a.Fields[field]; ok {
 				old, _ := a.Fields["recorded_geometry"].(map[string]any)
 				if old == nil {

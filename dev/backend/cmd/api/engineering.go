@@ -196,6 +196,18 @@ func (s *Server) engineeringRoutes(w http.ResponseWriter, r *http.Request) bool 
 		}
 		return true
 	}
+	if action == "connectivity" && r.Method == "PUT" {
+		var q engineering.ConnectivityEdit
+		if !engineeringDecode(w, r, &q) {
+			return true
+		}
+		if err := s.editEngineeringConnectivity(ctx, id, q, subjectOf(ctx).Username); err != nil {
+			engineeringFailure(w, err)
+		} else {
+			reply(id, 200)
+		}
+		return true
+	}
 	if action == "model" && r.Method == "PUT" {
 		var q engineering.ModelEdit
 		if !engineeringDecode(w, r, &q) {
@@ -332,7 +344,7 @@ func (s *Server) engineeringAction(r *http.Request, source string, q engineering
 	seen := map[string]bool{}
 	for _, t := range q.Targets {
 		valid := false
-		for _, known := range engineering.PhysicalTargets {
+		for _, known := range engineering.PublishTargets {
 			if t == known {
 				valid = true
 			}
@@ -441,8 +453,8 @@ func (s *Server) engineeringAction(r *http.Request, source string, q engineering
 			if !valid {
 				return errors.New("ENGINEERING_REVIEW_REQUIRED")
 			}
-			if target == engineering.PlacementTarget {
-				for _, dependency := range []string{engineering.EquipmentTarget, engineering.FacilityTarget} {
+			if dependencies := engineering.TargetDependencies(target); len(dependencies) > 0 {
+				for _, dependency := range dependencies {
 					if seen[dependency] {
 						continue
 					}
@@ -494,6 +506,18 @@ func engineeringDiff(before, after engineering.PhysicalModel) []engineering.Revi
 		}
 		for _, v := range m.Placements {
 			add(v.EntityID, "placement", v)
+		}
+		for _, v := range m.Ports {
+			add(v.EntityID, "port", v)
+		}
+		for _, v := range m.Connections {
+			add(v.EntityID, "connection", v)
+		}
+		for _, v := range m.Cables {
+			add(v.EntityID, "cable", v)
+		}
+		for _, v := range m.Optics {
+			add(v.EntityID, "optic", v)
 		}
 		return out
 	}

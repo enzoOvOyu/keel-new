@@ -1140,6 +1140,20 @@
       "handler": "dev/backend/cmd/api/engineering_calculation_routes.go",
       "source": "dev/backend/cmd/api/engineering_calculation.go",
       "documentation": "docs/api/engineering.md"
+    },
+    {
+      "method": "put",
+      "path": "/projects/{projectId}/engineering-imports/{engineeringId}/connectivity",
+      "operation_id": "editEngineeringConnectivity",
+      "response_status": "200",
+      "response_schema": "editEngineeringConnectivityEnvelope",
+      "request_schema": "IDEConnectivityEdit",
+      "implementation": "implemented",
+      "deployment": "not_deployed",
+      "verification": "isolated synthetic connectivity publication and topology query; UI acceptance NOT RUN",
+      "handler": "dev/backend/cmd/api/engineering.go",
+      "source": "dev/backend/cmd/api/engineering_connectivity_store.go",
+      "documentation": "docs/api/engineering.md"
     }
   ],
   "development_note": "作业平台 UI 整改：新增执行版本定义查询、列表分页、时间筛选和同步游标为分支增量；尚未部署至当前 BOM v5 集成后端。现运行版本以 HANDOFF 顶部为准。"

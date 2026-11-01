@@ -20,7 +20,7 @@ class Constant(Closed):
 class Region(Closed):
     sheet: str
     bounds: Bounds
-    kind: Literal['equipment','assembly','site','room','rack','placement','other']
+    kind: Literal['equipment','assembly','site','room','rack','placement','port','connection','cable','other']
     semantic: str
     header_rows: list[int]
     columns: list[Column]

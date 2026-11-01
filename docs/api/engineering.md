@@ -28,7 +28,7 @@ AI只调用资料工具并提出区域、字段、模块建议。严格Pydantic 
 
 CMDB复用bom_item和稳定ID，写入planned事实及字段证据。已有Observed payload保持不变，机柜可视化查询读取规划位置并明确来源。项目删除清理专属工程模型/任务；审核与发布审计保留。旧导入使用`?legacy=1`保留入口。
 
-定向检查使用隔离PostgreSQL合成资料，覆盖审核门禁、幂等、分域投影、现有机柜图查询及Observed保护；AI协议使用本地合成模型服务。没有真实AI服务调用、真实XLSX入库、浏览器交互验收、参考Calc对比或第二客户资料验收。连接、线缆、电力、物料、工作量及网络域尚待纵向实施。
+定向检查使用隔离PostgreSQL合成资料，覆盖审核门禁、幂等、分域投影、现有机柜图查询及Observed保护；AI协议使用本地合成模型服务。没有真实AI服务调用、真实XLSX入库、浏览器交互验收、参考Calc对比或第二客户资料验收。电力、物料、工作量及网络域继续纵向实施。
 
 
 ## P3：计算与规则
@@ -57,3 +57,15 @@ CMDB复用bom_item和稳定ID，写入planned事实及字段证据。已有Obser
 每次计算启动独立、无网络、只读根文件系统、去除capabilities的容器；只挂载本次只读输入和独立输出目录。限制CPU、内存、PID和三分钟执行时限，取消后清理容器。LibreOffice通过UNO以NEVER_EXECUTE/NO_UPDATE打开文档，calculateAll后将结果写入副本，原件摘要先校验。API只保存需要的类型化结果与依赖；临时副本在读取后删除。启动方式参考[LibreOffice参数文档](https://help.libreoffice.org/latest/en-GB/text/shared/guide/start_parameters.html)。
 
 已实际检查：隔离Calc合成跨表公式结果20及除零错误；范围/命名区域/循环/动态依赖；规则单位/参考案例/审批；隔离PostgreSQL规则版本/审批/去重/任务执行/缓存与结果分离/证据关联/项目隔离。未执行真实客户资料公式对比或浏览器交互验收。
+
+## S3：连接和线缆
+
+新增 PUT /engineering-imports/{id}/connectivity（bom:edit），精确版本、修改原因和四选一的端口/端接/线缆/光模块需求对象；沿用查询、版本差异、审核及发布接口。OpenAPI 为 IDEConnectivityEdit，不能提交任意对象。
+
+迁移029、030分别增加类型化端口/端接/路径/长度/光模块需求表和CMDB规划属性/配线贯通关系。新增CMDB_PLANNED_CONNECTIVITY及ENGINEERING_CABLING目标，前者依赖设备发布，后者依赖连接发布。线缆工程与采购需求仅发布工程版本，不生成实物光模块或写实际线长。
+
+多轮Agent通过任意区域绑定提取端接两端、父/Breakout子端口、规格、长度与单位、标签、来源路径；按父物理端口去重光模块。配线中间端口必须为有明确依据的入口/出口对，同一节点两端属于同一设备。CMDB复用既有端口/线缆身份和端接关系投影每个外部线段，内部贯通为patch_passthrough关系，不是另一根采购线缆。现有图查询可读取各段；原有单Cable Trace接口仍仅证明单段端接，不宣称多跳追踪验收完成。
+
+Estimated/Calculated/Confirmed/As-built分别保存；公式结果关联独立运行。单位不明、端口重复占用、Breakout循环、规格冲突或标准长度不足只阻断对应域。工作台支持对象修订、配线节点排序、路径段、长度状态与来源证据；规则计算结果应用及重新导入差异在后续统一发布链中接续。
+
+实际通过：合成端口去重/长度状态/速率单位/Breakout与配线缺端检查，隔离PostgreSQL分域审核、Outbox投影、配线外部两段拓扑查询，未写实际线长或采购光模块资产。没有生产迁移、真实资料AI或浏览器验收。

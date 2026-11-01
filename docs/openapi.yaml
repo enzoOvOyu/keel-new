@@ -16231,6 +16231,41 @@ paths:
           description: Version conflict
         '422':
           description: Rule, unit, approval, calculation or schema precondition failed
+  /projects/{projectId}/engineering-imports/{engineeringId}/connectivity:
+    put:
+      operationId: editEngineeringConnectivity
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDEConnectivityEdit'
+      responses:
+        '200':
+          description: New reviewed-draft candidate revision
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/editEngineeringConnectivityEnvelope'
+        '403':
+          description: Denied
+        '409':
+          description: Revision conflict
+        '422':
+          description: Invalid typed engineering entity
 components:
   securitySchemes:
     bearerAuth:
@@ -43345,6 +43380,8 @@ components:
           $ref: '#/components/schemas/IDELengthEvidence'
         spec:
           $ref: '#/components/schemas/IDECableSpec'
+        label:
+          type: string
       required:
       - entity_id
       - revision_id
@@ -43370,11 +43407,14 @@ components:
           type: string
         rate_bps:
           type: integer
+        source_model_label:
+          type: string
       required:
       - id
       - medium
       - connector_a
       - connector_z
+      - source_model_label
       type: object
       x-implementation-status: model-contract-only
     IDECalculationCapabilities:
@@ -44621,16 +44661,36 @@ components:
           type: array
         project_id:
           type: string
+        ports:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEPlannedPort'
+        connections:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEPlannedConnection'
+        cables:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDECablePlan'
+        optics:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEOpticDemand'
       required:
       - equipment
       - assemblies
       - facilities
       - placements
       - project_id
+      - ports
+      - connections
+      - cables
+      - optics
       type: object
       x-implementation-status: model-contract-only
-      description: 'Read aggregate assembled from typed domain tables. Not a persistence
-        JSON payload. First vertical slice: equipment, assemblies, facilities and placements.'
+      description: 'Read aggregate assembled from typed domain tables. Not a persistence JSON payload. First vertical slice: equipment,
+        assemblies, facilities and placements.'
     IDEPlannedConnection:
       additionalProperties: false
       properties:
@@ -44657,6 +44717,8 @@ components:
           items:
             type: string
           type: array
+          description: Ordered entrance/exit port pairs for explicitly evidenced patch-panel passthroughs. Odd counts or different
+            owners block publication.
         provenance_id:
           type: string
         revision_id:
@@ -45532,6 +45594,9 @@ components:
           - rack
           - placement
           - other
+          - port
+          - connection
+          - cable
         semantic:
           type: string
         header_rows:
@@ -45884,6 +45949,8 @@ components:
             - CMDB_PLANNED_EQUIPMENT
             - CMDB_PLANNED_FACILITY
             - CMDB_PLANNED_PLACEMENT
+            - CMDB_PLANNED_CONNECTIVITY
+            - ENGINEERING_CABLING
         decision:
           type: string
           enum:
@@ -46202,6 +46269,77 @@ components:
       properties:
         data:
           $ref: '#/components/schemas/IDECalculationPage'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    IDEOpticDemand:
+      type: object
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        provenance_id:
+          type: string
+        revision_id:
+          type: string
+        physical_port_id:
+          type: string
+        source_model_label:
+          type: string
+        quantity:
+          type: integer
+      required:
+      - entity_id
+      - revision_id
+      - provenance_id
+      - evidence_ids
+      - maturity
+      - attributes
+      - physical_port_id
+      - source_model_label
+      - quantity
+    IDEConnectivityEdit:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_revision:
+          type: integer
+        port:
+          $ref: '#/components/schemas/IDEPlannedPort'
+        connection:
+          $ref: '#/components/schemas/IDEPlannedConnection'
+        cable:
+          $ref: '#/components/schemas/IDECablePlan'
+        optic:
+          $ref: '#/components/schemas/IDEOpticDemand'
+        reason:
+          type: string
+      required:
+      - expected_revision
+      - reason
+    editEngineeringConnectivityEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
         request_id:
           type: string
       required:

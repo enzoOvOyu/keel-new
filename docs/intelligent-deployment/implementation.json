@@ -1,13 +1,13 @@
 {
-  "updated_at": "2026-11-01 03:26:24 UTC",
+  "updated_at": "2026-11-01 03:54:24 UTC",
   "branch": "audit/intelligent-deployment-p0",
-  "scope": "S1 physical vertical slice and P3 calculation/rule vertical slice; remaining domains in progress",
+  "scope": "S1 physical, P3 calculations, S3 connectivity/cabling implemented; remaining domains in progress",
   "phase_status": {
     "P0": "complete; report commit 314126d",
     "P1": "complete: architecture, models, contracts and kernel",
     "P2": "all named tool actions connected to source inspection, typed proposals, dependencies, rules/calculation and deterministic physical validation; domain expansion and acceptance pending",
     "P3": "isolated LibreOffice Provider, formula graph, unit-aware restricted rule AST, human rule approval and durable runs implemented; real Golden Fixture reference acceptance pending",
-    "P4": "first equipment/assembly/facility/placement vertical slice implemented; remaining domain batches pending",
+    "P4": "equipment/facility/placement and connectivity/cabling vertical slices implemented; power/material/workload/network in progress",
     "P5": "physical target review/revisions/Outbox/CMDB receipts implemented; later-domain releases pending",
     "P6": "physical workbench plus calculation/evidence/rule editing and review implemented; remaining domain panels pending; interaction acceptance NOT RUN"
   },
@@ -30,7 +30,10 @@
     "Project-scoped immutable rule versions with exact decimal/unit checks, cases, approval and safe AST evaluation",
     "8 calculation/rule HTTP operations and migration028; per-run/per-formula/per-dependency relational records",
     "Formula-backed model evidence points to calculation runs; incompatible or missing recomputation blocks affected fields",
-    "Calculation workbench with results, dependency details, editable rule expressions/parameters/cases and approval"
+    "Calculation workbench with results, dependency details, editable rule expressions/parameters/cases and approval",
+    "Typed ports/connections/cable routes and separate length states, physical-parent optical demand dedup",
+    "Connectivity and engineering-cabling independent release; CMDB planning segments and evidenced patch passthrough pairs; existing topology queries reused",
+    "Connectivity editor and scoped individual-object revision endpoint; migration029/030"
   ],
   "files": {
     "design": "docs/intelligent-deployment/P1-DESIGN.txt",
@@ -128,6 +131,21 @@
       "check": "P3 TypeScript and real API documentation",
       "result": "PASS",
       "scope": "Final incremental frontend TypeScript check and74 registered operations; no HTTP or browser acceptance"
+    },
+    {
+      "check": "TestConnectivity*",
+      "result": "PASS",
+      "scope": "synthetic physical-port optic dedup, speed units, length state, stock too short, breakout cycles and incomplete patch pair"
+    },
+    {
+      "check": "TestEngineeringConnectivityPublication",
+      "result": "PASS",
+      "scope": "isolated PostgreSQL target review/Outbox/publication and existing topology two segments; no actual length or optic procurement assets"
+    },
+    {
+      "check": "S3 TypeScript, AI protocol, documentation",
+      "result": "PASS",
+      "scope": "incremental TypeScript; synthetic agent tool/schema check;75 registered operations; no browser or real provider acceptance"
     }
   ],
   "not_run": [

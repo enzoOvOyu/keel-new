@@ -5,8 +5,32 @@ import "time"
 const EquipmentTarget = "CMDB_PLANNED_EQUIPMENT"
 const FacilityTarget = "CMDB_PLANNED_FACILITY"
 const PlacementTarget = "CMDB_PLANNED_PLACEMENT"
+const ConnectivityTarget = "CMDB_PLANNED_CONNECTIVITY"
+const CablingTarget = "ENGINEERING_CABLING"
 
 var PhysicalTargets = []string{EquipmentTarget, FacilityTarget, PlacementTarget}
+var PublishTargets = []string{EquipmentTarget, FacilityTarget, PlacementTarget, ConnectivityTarget, CablingTarget}
+
+func TargetDependencies(target string) []string {
+	switch target {
+	case PlacementTarget:
+		return []string{EquipmentTarget, FacilityTarget}
+	case ConnectivityTarget:
+		return []string{EquipmentTarget}
+	case CablingTarget:
+		return []string{ConnectivityTarget}
+	}
+	return nil
+}
+
+type ConnectivityEdit struct {
+	ExpectedRevision int                `json:"expected_revision"`
+	Port             *PlannedPort       `json:"port,omitempty"`
+	Connection       *PlannedConnection `json:"connection,omitempty"`
+	Cable            *CablePlan         `json:"cable,omitempty"`
+	Optic            *OpticDemand       `json:"optic,omitempty"`
+	Reason           string             `json:"reason"`
+}
 
 type ColumnBinding struct {
 	Field  string `json:"field"`

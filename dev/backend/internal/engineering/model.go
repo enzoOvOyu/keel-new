@@ -229,11 +229,12 @@ type ConnectivityPlan struct {
 	Connections []PlannedConnection `json:"connections"`
 }
 type CableSpec struct {
-	ID         ID     `json:"id"`
-	Medium     string `json:"medium"`
-	ConnectorA string `json:"connector_a"`
-	ConnectorZ string `json:"connector_z"`
-	RateBPS    *int64 `json:"rate_bps,omitempty"`
+	ID               ID     `json:"id"`
+	Medium           string `json:"medium"`
+	ConnectorA       string `json:"connector_a"`
+	ConnectorZ       string `json:"connector_z"`
+	RateBPS          *int64 `json:"rate_bps,omitempty"`
+	SourceModelLabel string `json:"source_model_label"`
 }
 type RouteSegment struct {
 	FromID           ID        `json:"from_id"`
@@ -248,6 +249,7 @@ type LengthEvidence struct {
 }
 type CablePlan struct {
 	EntityVersion
+	Label         *string           `json:"label,omitempty"`
 	ConnectionID  ID                `json:"connection_id"`
 	Spec          CableSpec         `json:"spec"`
 	Route         []RouteSegment    `json:"route"`
@@ -257,6 +259,13 @@ type CablePlan struct {
 	SelectedStock *LengthEvidence   `json:"selected_stock,omitempty"`
 	Confirmed     *LengthEvidence   `json:"confirmed,omitempty"`
 	AsBuilt       *LengthEvidence   `json:"as_built,omitempty"`
+}
+
+type OpticDemand struct {
+	EntityVersion
+	PhysicalPortID   ID     `json:"physical_port_id"`
+	SourceModelLabel string `json:"source_model_label"`
+	Quantity         int64  `json:"quantity"`
 }
 type MaterialEstimate struct {
 	EntityVersion

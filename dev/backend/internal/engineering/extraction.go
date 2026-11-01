@@ -23,13 +23,13 @@ func Digest(v any) string {
 	return hex.EncodeToString(h[:])
 }
 func EmptyPhysical(project string) PhysicalModel {
-	return PhysicalModel{ProjectID: project, Equipment: []EquipmentPlan{}, Assemblies: []DeviceAssembly{}, Facilities: []FacilityModel{}, Placements: []RackPlacement{}}
+	return PhysicalModel{ProjectID: project, Equipment: []EquipmentPlan{}, Assemblies: []DeviceAssembly{}, Facilities: []FacilityModel{}, Placements: []RackPlacement{}, Ports: []PlannedPort{}, Connections: []PlannedConnection{}, Cables: []CablePlan{}, Optics: []OpticDemand{}}
 }
 
 var bindingFields = map[string]bool{}
 
 func init() {
-	for _, f := range strings.Fields("label equipment_type model quantity identity_kind serial parent child relation_type slot site room rack capacity_u width_mm height_mm depth_mm x_mm y_mm z_mm orientation_degrees coordinate_frame start_u height_u mount_face") {
+	for _, f := range strings.Fields("label equipment_type model quantity identity_kind serial parent child relation_type slot site room rack capacity_u width_mm height_mm depth_mm x_mm y_mm z_mm orientation_degrees coordinate_frame start_u height_u mount_face device port parent_port breakout_index role rate_bps medium a_device a_port z_device z_port a_parent_port z_parent_port a_optic z_optic connector_a connector_z cable_label cable_model length length_unit length_state standard_length standard_length_unit patch_device patch_port patch_exit_port route_from route_to distance distance_unit") {
 		bindingFields[f] = true
 	}
 }
@@ -62,7 +62,7 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 			return fmt.Errorf("INVALID_REGION: %s", r.Sheet)
 		}
 		switch r.Kind {
-		case "equipment", "assembly", "site", "room", "rack", "placement", "other":
+		case "equipment", "assembly", "site", "room", "rack", "placement", "port", "connection", "cable", "other":
 		default:
 			return fmt.Errorf("UNKNOWN_REGION_KIND")
 		}
@@ -89,7 +89,7 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 				}
 			}
 			switch c.Field {
-			case "equipment_type", "identity_kind", "relation_type", "mount_face":
+			case "equipment_type", "identity_kind", "relation_type", "mount_face", "role", "medium", "length_state":
 				matches = true
 			}
 			if !matches {
@@ -118,6 +118,13 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 	return nil
 }
 
+type rowData struct {
+	kind   string
+	values map[string]string
+	cells  map[string][]bom.Cell
+	units  map[string]string
+}
+
 type Extraction struct {
 	Model                   PhysicalModel
 	Evidence                []SourceEvidence
@@ -141,11 +148,6 @@ func ExtractPhysical(w bom.Workbook, p EngineeringProposal, project, source, rev
 	placements := map[ID]int{}
 	addIssue := func(id, code, field, message, target string) {
 		out.Issues = append(out.Issues, ValidationIssue{ID: StableID(project, "issue", revision+id+code+field), ProjectID: project, RevisionID: revision, EntityID: id, Code: code, Severity: "BLOCK", ModuleID: "workbook_intelligence", Field: field, Message: message, PublishTarget: target, Resolution: "open", EvidenceIDs: []ID{}})
-	}
-	type rowData struct {
-		kind   string
-		values map[string]string
-		cells  map[string][]bom.Cell
 	}
 	rows := []rowData{}
 	for _, region := range p.Regions {
@@ -171,7 +173,7 @@ func ExtractPhysical(w bom.Workbook, p EngineeringProposal, project, source, rev
 			if headers[row] {
 				continue
 			}
-			r := rowData{region.Kind, map[string]string{}, map[string][]bom.Cell{}}
+			r := rowData{kind: region.Kind, values: map[string]string{}, cells: map[string][]bom.Cell{}, units: map[string]string{}}
 			nonempty := false
 			for _, b := range region.Columns {
 				c := index[fmt.Sprintf("%d:%d", row, b.Column)]
@@ -179,6 +181,7 @@ func ExtractPhysical(w bom.Workbook, p EngineeringProposal, project, source, rev
 					continue
 				}
 				r.values[b.Field] = strings.TrimSpace(c.Value)
+				r.units[b.Field] = b.Unit
 				if b.Unit != "" && strings.TrimSpace(c.Value) != "" {
 					r.values[b.Field] = normalizeUnit(c.Value, b.Unit, b.Field)
 				}
@@ -371,6 +374,7 @@ func ExtractPhysical(w bom.Workbook, p EngineeringProposal, project, source, rev
 		}
 		out.Model.Assemblies = append(out.Model.Assemblies, DeviceAssembly{EntityVersion: makeVersion(id, r, "parent", "child", "relation_type", "quantity", "slot"), ParentID: parent, ChildID: child, RelationType: v["relation_type"], Quantity: quantity, SlotLabel: textPtr(v["slot"])})
 	}
+	extractConnectivity(project, source, revision, rows, &out, makeVersion, addIssue)
 	out.MappedCells = len(used)
 	out.Issues = append(out.Issues, ValidatePhysical(out.Model)...)
 	// Omitted regions remain represented by source retention and an explicit issue.

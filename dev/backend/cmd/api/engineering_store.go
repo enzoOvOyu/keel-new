@@ -54,7 +54,7 @@ func engineeringModel(ctx context.Context, q engineeringQuery, revision, project
 	for _, entry := range []struct {
 		table string
 		dest  any
-	}{{"eng_equipment", &m.Equipment}, {"eng_assembly", &m.Assemblies}, {"eng_facility", &m.Facilities}, {"eng_placement", &m.Placements}} {
+	}{{"eng_equipment", &m.Equipment}, {"eng_assembly", &m.Assemblies}, {"eng_facility", &m.Facilities}, {"eng_placement", &m.Placements}, {"eng_port", &m.Ports}, {"eng_connection", &m.Connections}, {"eng_optic_demand", &m.Optics}} {
 		extra := ""
 		switch entry.table {
 		case "eng_facility":
@@ -71,6 +71,9 @@ func engineeringModel(ctx context.Context, q engineeringQuery, revision, project
 			return m, evidence, e
 		}
 	}
+	if e := loadCableRows(ctx, q, revision, &m); e != nil {
+		return m, evidence, e
+	}
 	rows, e := q.Query(ctx, `SELECT id::text,entity_id::text,sheet,cell,field,formula,calculation_run_id::text FROM eng_evidence WHERE revision_id=$1 ORDER BY id`, revision)
 	if e != nil {
 		return m, evidence, e
@@ -86,43 +89,53 @@ func engineeringModel(ctx context.Context, q engineeringQuery, revision, project
 	return m, evidence, rows.Err()
 }
 func targetDigest(m engineering.PhysicalModel, target string) string {
-	// Content digests exclude the container revision; unchanged independent targets
-	// retain their own reviewed revision when another target gets a new head.
-	strip := func(v *engineering.EntityVersion) {
-		v.RevisionID = ""
-		v.ProvenanceID = ""
-		v.EvidenceIDs = nil
-		v.Attributes = nil
-	}
-	m.Equipment = append([]engineering.EquipmentPlan{}, m.Equipment...)
-	m.Assemblies = append([]engineering.DeviceAssembly{}, m.Assemblies...)
-	m.Facilities = append([]engineering.FacilityModel{}, m.Facilities...)
-	m.Placements = append([]engineering.RackPlacement{}, m.Placements...)
-	for i := range m.Equipment {
-		strip(&m.Equipment[i].EntityVersion)
-	}
-	for i := range m.Assemblies {
-		strip(&m.Assemblies[i].EntityVersion)
-	}
-	for i := range m.Facilities {
-		strip(&m.Facilities[i].EntityVersion)
-	}
-	for i := range m.Placements {
-		strip(&m.Placements[i].EntityVersion)
-	}
-	sort.Slice(m.Equipment, func(i, j int) bool { return m.Equipment[i].EntityID < m.Equipment[j].EntityID })
-	sort.Slice(m.Assemblies, func(i, j int) bool { return m.Assemblies[i].EntityID < m.Assemblies[j].EntityID })
-	sort.Slice(m.Facilities, func(i, j int) bool { return m.Facilities[i].EntityID < m.Facilities[j].EntityID })
-	sort.Slice(m.Placements, func(i, j int) bool { return m.Placements[i].EntityID < m.Placements[j].EntityID })
+	return engineeringTargetDigest(m, target, true)
+}
+func engineeringTargetDigest(m engineering.PhysicalModel, target string, maturity bool) string {
+	var values any
 	switch target {
 	case engineering.EquipmentTarget:
-		return engineering.Digest([]any{m.Equipment, m.Assemblies})
+		values = []any{m.Equipment, m.Assemblies}
 	case engineering.FacilityTarget:
-		return engineering.Digest(m.Facilities)
+		values = m.Facilities
 	case engineering.PlacementTarget:
-		return engineering.Digest(m)
+		values = []any{m.Equipment, m.Assemblies, m.Facilities, m.Placements}
+	case engineering.ConnectivityTarget:
+		values = []any{m.Equipment, m.Assemblies, m.Ports, m.Connections}
+	case engineering.CablingTarget:
+		values = []any{m.Cables, m.Optics, m.Ports, m.Connections, m.Facilities, m.Placements}
 	}
-	return ""
+	raw, _ := json.Marshal(values)
+	var canonical any
+	_ = json.Unmarshal(raw, &canonical)
+	var normalize func(any)
+	normalize = func(v any) {
+		switch value := v.(type) {
+		case map[string]any:
+			for _, key := range []string{"revision_id", "provenance_id", "evidence_ids", "calculation_run_id", "attributes"} {
+				delete(value, key)
+			}
+			if !maturity {
+				delete(value, "maturity")
+			}
+			for _, item := range value {
+				normalize(item)
+			}
+		case []any:
+			for _, item := range value {
+				normalize(item)
+			}
+			if len(value) > 0 {
+				if first, ok := value[0].(map[string]any); ok && first["entity_id"] != nil {
+					sort.Slice(value, func(i, j int) bool {
+						return value[i].(map[string]any)["entity_id"].(string) < value[j].(map[string]any)["entity_id"].(string)
+					})
+				}
+			}
+		}
+	}
+	normalize(canonical)
+	return engineering.Digest(canonical)
 }
 func targetHasContent(m engineering.PhysicalModel, t string) bool {
 	switch t {
@@ -132,6 +145,10 @@ func targetHasContent(m engineering.PhysicalModel, t string) bool {
 		return len(m.Facilities) > 0
 	case engineering.PlacementTarget:
 		return len(m.Placements) > 0
+	case engineering.ConnectivityTarget:
+		return len(m.Ports) > 0 || len(m.Connections) > 0
+	case engineering.CablingTarget:
+		return len(m.Cables) > 0 || len(m.Optics) > 0
 	}
 	return false
 }
@@ -189,9 +206,20 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 						fields[difference.EntityID][key] = true
 					}
 				}
+				for key := range before {
+					if _, ok := after[key]; !ok {
+						fields[difference.EntityID][key] = true
+					}
+				}
 			}
 			aliases := map[string]string{"model": "source_model_label", "coordinate_frame": "coordinate_frame_id"}
 			fieldChanged := func(entity, field string) bool {
+				grouped := map[string][]string{"length": {"estimated", "calculated", "confirmed", "as_built"}, "length_unit": {"estimated", "calculated", "confirmed", "as_built"}, "length_state": {"estimated", "calculated", "confirmed", "as_built"}, "standard_length": {"selected_stock"}, "standard_length_unit": {"selected_stock"}, "cable_model": {"spec"}, "connector_a": {"spec"}, "connector_z": {"spec"}, "patch_device": {"patch_port_ids"}, "patch_port": {"patch_port_ids"}, "patch_exit_port": {"patch_port_ids"}, "route_from": {"route"}, "route_to": {"route"}, "distance": {"route"}, "distance_unit": {"route"}}
+				for _, key := range grouped[field] {
+					if fields[entity][key] {
+						return true
+					}
+				}
 				if alias := aliases[field]; alias != "" {
 					field = alias
 				}
@@ -234,7 +262,7 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 				return "", err
 			}
 			proposed := x.Model
-			for _, target := range engineering.PhysicalTargets {
+			for _, target := range engineering.PublishTargets {
 				var protected bool
 				if err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM eng_target WHERE source_id=$1 AND target=$2 AND review_id IS NOT NULL)`, source, target).Scan(&protected); err != nil {
 					return "", err
@@ -253,6 +281,12 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 					x.Model.Facilities = old.Facilities
 				case engineering.PlacementTarget:
 					x.Model.Placements = old.Placements
+				case engineering.ConnectivityTarget:
+					x.Model.Ports = old.Ports
+					x.Model.Connections = old.Connections
+				case engineering.CablingTarget:
+					x.Model.Cables = old.Cables
+					x.Model.Optics = old.Optics
 				}
 			}
 			x.Evidence = append(x.Evidence, oldEvidence...)
@@ -328,6 +362,9 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 			return "", e
 		}
 	}
+	if e = saveConnectivityRows(ctx, tx, revision, &x.Model, insertVersion); e != nil {
+		return "", e
+	}
 	for _, v := range x.Evidence {
 		if !entities[v.EntityID] {
 			continue
@@ -361,7 +398,7 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 			return "", e
 		}
 	}
-	for _, target := range engineering.PhysicalTargets {
+	for _, target := range engineering.PublishTargets {
 		state := "IN_REVIEW"
 		if !targetHasContent(x.Model, target) {
 			state = "NEEDS_INPUT"
@@ -477,22 +514,5 @@ func (s *Server) engineeringWorkspace(ctx context.Context, id string) (engineeri
 }
 
 func suggestionDigest(m engineering.PhysicalModel, target string) string {
-	copyModel := engineering.EmptyPhysical(m.ProjectID)
-	copyModel.Equipment = append(copyModel.Equipment, m.Equipment...)
-	copyModel.Assemblies = append(copyModel.Assemblies, m.Assemblies...)
-	copyModel.Facilities = append(copyModel.Facilities, m.Facilities...)
-	copyModel.Placements = append(copyModel.Placements, m.Placements...)
-	for i := range copyModel.Equipment {
-		copyModel.Equipment[i].Maturity = engineering.Estimated
-	}
-	for i := range copyModel.Assemblies {
-		copyModel.Assemblies[i].Maturity = engineering.Estimated
-	}
-	for i := range copyModel.Facilities {
-		copyModel.Facilities[i].Maturity = engineering.Estimated
-	}
-	for i := range copyModel.Placements {
-		copyModel.Placements[i].Maturity = engineering.Estimated
-	}
-	return targetDigest(copyModel, target)
+	return engineeringTargetDigest(m, target, false)
 }

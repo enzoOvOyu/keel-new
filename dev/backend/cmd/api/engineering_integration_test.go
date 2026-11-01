@@ -33,7 +33,7 @@ func TestEngineeringPhysicalPublication(t *testing.T) {
 	for _, step := range []struct {
 		version int
 		file    string
-	}{{27, "027_engineering_physical.sql"}, {28, "028_engineering_calculation.sql"}} {
+	}{{27, "027_engineering_physical.sql"}, {28, "028_engineering_calculation.sql"}, {29, "029_engineering_connectivity.sql"}, {30, "030_engineering_patch_through.sql"}} {
 		migration, err := os.ReadFile("../../migrations/" + step.file)
 		if err != nil {
 			t.Fatal(err)
@@ -87,7 +87,7 @@ func TestEngineeringPhysicalPublication(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if workspace.Revision != 2 || len(workspace.Targets) != 3 {
+	if workspace.Revision != 2 || len(workspace.Targets) != len(engineering.PublishTargets) {
 		t.Fatalf("bad workspace: %+v", workspace)
 	}
 	model, _, e := engineeringModel(ctx, db, *workspace.HeadRevisionID, svc.project)
@@ -147,7 +147,7 @@ func TestEngineeringPhysicalPublication(t *testing.T) {
 		t.Fatal(e)
 	}
 	for _, v := range workspace.Targets {
-		if v.State != engineering.Published {
+		if (v.Target == engineering.EquipmentTarget || v.Target == engineering.FacilityTarget || v.Target == engineering.PlacementTarget) && v.State != engineering.Published {
 			t.Fatalf("missing receipt: %+v", v)
 		}
 	}
@@ -189,7 +189,7 @@ func TestEngineeringPhysicalPublication(t *testing.T) {
 		t.Fatal(e)
 	}
 	for _, target := range workspace.Targets {
-		if target.Target != engineering.PlacementTarget && target.State != engineering.Published {
+		if (target.Target == engineering.EquipmentTarget || target.Target == engineering.FacilityTarget) && target.State != engineering.Published {
 			t.Fatal("unrelated target invalidated", target)
 		}
 	}

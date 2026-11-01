@@ -80,6 +80,18 @@ func engineeringCalculationEvidence(x *engineering.Extraction, refs map[string]s
 	for _, e := range x.Model.Placements {
 		targets[e.EntityID] = engineering.PlacementTarget
 	}
+	for _, v := range x.Model.Ports {
+		targets[v.EntityID] = engineering.ConnectivityTarget
+	}
+	for _, v := range x.Model.Connections {
+		targets[v.EntityID] = engineering.ConnectivityTarget
+	}
+	for _, v := range x.Model.Cables {
+		targets[v.EntityID] = engineering.CablingTarget
+	}
+	for _, v := range x.Model.Optics {
+		targets[v.EntityID] = engineering.CablingTarget
+	}
 	for i := range x.Evidence {
 		e := &x.Evidence[i]
 		if !e.Formula {
@@ -91,6 +103,29 @@ func engineeringCalculationEvidence(x *engineering.Extraction, refs map[string]s
 			x.Issues = append(x.Issues, engineering.ValidationIssue{ID: uuid.NewString(), EntityID: e.EntityID, Code: "FORMULA_RECALCULATION_REQUIRED", Severity: "BLOCK", ModuleID: "workbook_intelligence", Field: e.Field, Message: "公式字段没有兼容的独立重算结果；缓存仅保留为来源证据", PublishTarget: targets[e.EntityID], EvidenceIDs: []string{e.ID}})
 		}
 	}
+	for i := range x.Model.Cables {
+		c := &x.Model.Cables[i]
+		for _, e := range x.Evidence {
+			if e.EntityID != c.EntityID || e.CalculationRunID == nil {
+				continue
+			}
+			switch e.Field {
+			case "length":
+				if c.Calculated != nil {
+					c.Calculated.CalculationRunID = e.CalculationRunID
+				}
+			case "standard_length":
+				if c.SelectedStock != nil {
+					c.SelectedStock.CalculationRunID = e.CalculationRunID
+				}
+			case "distance":
+				for j := range c.Route {
+					c.Route[j].CalculationRunID = e.CalculationRunID
+				}
+			}
+		}
+	}
+
 }
 
 func (s *Server) queueEngineeringCalculation(ctx context.Context, source string, q engineering.CalculationRequest, actor string) (string, error) {

@@ -6373,6 +6373,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/connectivity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["editEngineeringConnectivity"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -15487,6 +15503,7 @@ export interface components {
             rule_version?: components["schemas"]["IDEVersionReference"];
             selected_stock?: components["schemas"]["IDELengthEvidence"];
             spec: components["schemas"]["IDECableSpec"];
+            label?: string;
         };
         IDECableSpec: {
             connector_a: string;
@@ -15494,6 +15511,7 @@ export interface components {
             id: string;
             medium: string;
             rate_bps?: number;
+            source_model_label: string;
         };
         IDECalculationCapabilities: {
             available: boolean;
@@ -15858,6 +15876,10 @@ export interface components {
             facilities: components["schemas"]["IDEFacilityModel"][];
             placements: components["schemas"]["IDERackPlacement"][];
             project_id: string;
+            ports: components["schemas"]["IDEPlannedPort"][];
+            connections: components["schemas"]["IDEPlannedConnection"][];
+            cables: components["schemas"]["IDECablePlan"][];
+            optics: components["schemas"]["IDEOpticDemand"][];
         };
         IDEPlannedConnection: {
             a_port_id: string;
@@ -15866,6 +15888,7 @@ export interface components {
             evidence_ids: string[];
             /** @enum {string} */
             maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            /** @description Ordered entrance/exit port pairs for explicitly evidenced patch-panel passthroughs. Odd counts or different owners block publication. */
             patch_port_ids: string[];
             provenance_id: string;
             revision_id: string;
@@ -16131,7 +16154,7 @@ export interface components {
             sheet: string;
             bounds: components["schemas"]["IDEBounds"];
             /** @enum {string} */
-            kind: "equipment" | "assembly" | "site" | "room" | "rack" | "placement" | "other";
+            kind: "equipment" | "assembly" | "site" | "room" | "rack" | "placement" | "other" | "port" | "connection" | "cable";
             semantic: string;
             header_rows: number[];
             columns: components["schemas"]["IDEColumnBinding"][];
@@ -16242,7 +16265,7 @@ export interface components {
         };
         IDETargetAction: {
             expected_revision: number;
-            targets: ("CMDB_PLANNED_EQUIPMENT" | "CMDB_PLANNED_FACILITY" | "CMDB_PLANNED_PLACEMENT")[];
+            targets: ("CMDB_PLANNED_EQUIPMENT" | "CMDB_PLANNED_FACILITY" | "CMDB_PLANNED_PLACEMENT" | "CMDB_PLANNED_CONNECTIVITY" | "ENGINEERING_CABLING")[];
             /** @enum {string} */
             decision: "approve" | "reject" | "publish";
             reason: string;
@@ -16349,6 +16372,30 @@ export interface components {
         };
         getEngineeringCalculationEnvelope: {
             data: components["schemas"]["IDECalculationPage"];
+            request_id: string;
+        };
+        IDEOpticDemand: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            entity_id: string;
+            evidence_ids: string[];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            provenance_id: string;
+            revision_id: string;
+            physical_port_id: string;
+            source_model_label: string;
+            quantity: number;
+        };
+        IDEConnectivityEdit: {
+            expected_revision: number;
+            port?: components["schemas"]["IDEPlannedPort"];
+            connection?: components["schemas"]["IDEPlannedConnection"];
+            cable?: components["schemas"]["IDECablePlan"];
+            optic?: components["schemas"]["IDEOpticDemand"];
+            reason: string;
+        };
+        editEngineeringConnectivityEnvelope: {
+            data: components["schemas"]["IDEWorkspace"];
             request_id: string;
         };
     };
@@ -35737,6 +35784,54 @@ export interface operations {
                 content?: never;
             };
             /** @description Rule, unit, approval, calculation or schema precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    editEngineeringConnectivity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEConnectivityEdit"];
+            };
+        };
+        responses: {
+            /** @description New reviewed-draft candidate revision */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["editEngineeringConnectivityEnvelope"];
+                };
+            };
+            /** @description Denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid typed engineering entity */
             422: {
                 headers: {
                     [name: string]: unknown;

@@ -82,11 +82,15 @@ func (q Quantity) Validate() error {
 // PhysicalModel is an API/read aggregate; persistence stores each collection in
 // typed tables. It is not a JSON replacement for the engineering domain schema.
 type PhysicalModel struct {
-	ProjectID  ID               `json:"project_id"`
-	Equipment  []EquipmentPlan  `json:"equipment"`
-	Assemblies []DeviceAssembly `json:"assemblies"`
-	Facilities []FacilityModel  `json:"facilities"`
-	Placements []RackPlacement  `json:"placements"`
+	ProjectID   ID                  `json:"project_id"`
+	Equipment   []EquipmentPlan     `json:"equipment"`
+	Assemblies  []DeviceAssembly    `json:"assemblies"`
+	Facilities  []FacilityModel     `json:"facilities"`
+	Placements  []RackPlacement     `json:"placements"`
+	Ports       []PlannedPort       `json:"ports"`
+	Connections []PlannedConnection `json:"connections"`
+	Cables      []CablePlan         `json:"cables"`
+	Optics      []OpticDemand       `json:"optics"`
 }
 
 func ValidatePhysical(m PhysicalModel) []ValidationIssue {
@@ -286,6 +290,19 @@ func ValidatePhysical(m PhysicalModel) []ValidationIssue {
 		a, b := issues[i], issues[j]
 		return a.PublishTarget+"/"+a.EntityID+"/"+a.Code+"/"+a.Field < b.PublishTarget+"/"+b.EntityID+"/"+b.Code+"/"+b.Field
 	})
+	for _, p := range m.Ports {
+		checkVersion(p.EntityVersion, ConnectivityTarget, "connectivity_cabling")
+	}
+	for _, c := range m.Connections {
+		checkVersion(c.EntityVersion, ConnectivityTarget, "connectivity_cabling")
+	}
+	for _, c := range m.Cables {
+		checkVersion(c.EntityVersion, CablingTarget, "connectivity_cabling")
+	}
+	for _, o := range m.Optics {
+		checkVersion(o.EntityVersion, CablingTarget, "connectivity_cabling")
+	}
+	issues = append(issues, ValidateConnectivity(m)...)
 	return issues
 }
 func reachable(edges map[ID][]ID, from, to ID) bool {

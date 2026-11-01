@@ -69,3 +69,10 @@ export const reviewEngineeringRule=(project:string,id:string,version:number,requ
 export type RuleExpression = Models['IDERuleExpression'];
 export type NamedValue = Models['IDENamedValue'];
 export type TypedValue = Models['IDETypedValue'];
+
+export type OpticDemand = Models['IDEOpticDemand'];
+export type ConnectivityEdit = Models['IDEConnectivityEdit'];
+export const editEngineeringConnectivity=(project:string,id:string,request:ConnectivityEdit)=>bomRequest<EngineeringWorkspace>(engineeringPath(project,id)+'/connectivity','PUT',request);
+
+export type PlannedPort = Models['IDEPlannedPort'];
+export type PlannedConnection = Models['IDEPlannedConnection'];

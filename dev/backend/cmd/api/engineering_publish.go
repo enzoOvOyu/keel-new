@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/jackc/pgx/v5"
+	"keel.local/dev/internal/engineering"
 )
 
 func (s *Server) publishEngineering(ctx context.Context, tx pgx.Tx, event, project string, raw []byte) error {
@@ -40,20 +41,22 @@ func (s *Server) publishEngineering(ctx context.Context, tx pgx.Tx, event, proje
 	if e != nil {
 		return e
 	}
-	if payload.Target == "CMDB_PLANNED_PLACEMENT" {
+	for _, dependency := range engineering.TargetDependencies(payload.Target) {
 		var ready bool
-		if e = tx.QueryRow(ctx, `SELECT count(*)=2 FROM eng_target WHERE source_id=$1 AND target IN('CMDB_PLANNED_EQUIPMENT','CMDB_PLANNED_FACILITY') AND state='PUBLISHED'`, payload.SourceID).Scan(&ready); e != nil {
+		if e = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM eng_target WHERE source_id=$1 AND target=$2 AND state='PUBLISHED')`, payload.SourceID, dependency).Scan(&ready); e != nil {
 			return e
 		}
 		if !ready {
 			return errors.New("ENGINEERING_DEPENDENCY_UNPUBLISHED")
 		}
 	}
-	if _, e = tx.Exec(ctx, `INSERT INTO bom_revision(id,import_id,project_id,digest) VALUES($1,$2,$3,$4) ON CONFLICT DO NOTHING`, payload.PublicationID, importID, project, digest); e != nil {
-		return e
-	}
-	if e = cmdbService(s).ProjectEngineering(ctx, tx, event, project, payload.PublicationID, payload.Target, actor, model); e != nil {
-		return e
+	if payload.Target != engineering.CablingTarget {
+		if _, e = tx.Exec(ctx, `INSERT INTO bom_revision(id,import_id,project_id,digest) VALUES($1,$2,$3,$4) ON CONFLICT DO NOTHING`, payload.PublicationID, importID, project, digest); e != nil {
+			return e
+		}
+		if e = cmdbService(s).ProjectEngineering(ctx, tx, event, project, payload.PublicationID, payload.Target, actor, model); e != nil {
+			return e
+		}
 	}
 	if _, e = tx.Exec(ctx, `UPDATE eng_publication SET state='published',error_code=NULL,receipt=$2,published_at=now() WHERE id=$1`, payload.PublicationID, event); e != nil {
 		return e
