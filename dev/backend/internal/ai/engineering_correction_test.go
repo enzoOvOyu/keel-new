@@ -145,3 +145,33 @@ func TestEngineeringCorrectionReclassifiesRegionWithoutLosingSourceBindings(t *t
 		t.Fatal("source bindings lost or original draft mutated")
 	}
 }
+
+func TestEngineeringCorrectionCoversTitleWithoutCreatingFakeEquipment(t *testing.T) {
+	wb := bom.Workbook{Sheets: []bom.Sheet{{Name: "synthetic", Cells: []bom.Cell{{Ref: "A1", Row: 1, Column: 1, Value: "Equipment project title"}, {Ref: "A2", Row: 2, Column: 1, Value: "Name"}, {Ref: "B2", Row: 2, Column: 2, Value: "Quantity"}, {Ref: "A3", Row: 3, Column: 1, Value: "TEST-DEVICE"}, {Ref: "B3", Row: 3, Column: 2, Value: "1"}}}}}
+	draft := engineering.EngineeringProposal{Summary: "source", Regions: []engineering.RegionMapping{{Sheet: "synthetic", Kind: "equipment", Semantic: "inventory", Bounds: engineering.Bounds{StartRow: 2, EndRow: 3, StartColumn: 1, EndColumn: 2}, HeaderRows: []int{2}, Columns: []engineering.ColumnBinding{{Field: "label", Column: 1}, {Field: "quantity", Column: 2}}}}}
+	issue := engineering.CheckSheetCoverage(wb, draft, "synthetic")
+	if issue == nil {
+		t.Fatal("missing title was not retained")
+	}
+	tool := engineeringCorrectionTool(draft, "synthetic", nil, issue.Error()).(map[string]any)["function"].(map[string]any)
+	props := tool["parameters"].(map[string]any)["properties"].(map[string]any)
+	if props["set_columns"] != nil || props["bounds"] == nil || props["header_rows"] == nil {
+		t.Fatal("coverage correction still exposes unrelated fields")
+	}
+	raw, corrected, err := materializeEngineeringCorrection([]byte(`{"action":"map_semantic_fields","sheet":"synthetic","region_index":0,"bounds":{"start_row":1,"end_row":3,"start_column":1,"end_column":2},"header_rows":[1,2]}`), &draft, "synthetic")
+	if err != nil || !corrected {
+		t.Fatal(err)
+	}
+	if err = validateEngineeringSchema(context.Background(), raw); err != nil {
+		t.Fatal(err)
+	}
+	var action engineeringAction
+	_ = json.Unmarshal(raw, &action)
+	if err = engineering.CheckSheetCoverage(wb, *action.Proposal, "synthetic"); err != nil {
+		t.Fatal(err)
+	}
+	result, err := engineering.ExtractPhysical(wb, *action.Proposal, "project", "source", "revision")
+	if err != nil || len(result.Model.Equipment) != 1 || result.Model.Equipment[0].Label != "TEST-DEVICE" {
+		t.Fatalf("title became an asset: %+v %v", result.Model.Equipment, err)
+	}
+}

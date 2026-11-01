@@ -181,7 +181,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 			callPrompt := string(prompt)
 			input := map[string]any{"workbook": summary, "modules": registry, "attribute_definitions": hooks.Attributes, "history": history, "active_sheet": active, "proposed_region_kinds": kinds, "active_sheet_preview": engineeringSheetPreview(sheet, regions), "region_field_capabilities": engineeringRegionCapabilities(), "pending_sheets": pending, "completed_sheets": len(completed), "turns_remaining": budget - turn}
 			if draft != nil {
-				selected = []any{engineeringCorrectionTool(*draft, active, hooks.Attributes)}
+				selected = []any{engineeringCorrectionTool(*draft, active, hooks.Attributes, draftError)}
 				correctionPrompt, err := prompts.ReadFile("prompts/engineering-correction-v1.txt")
 				if err != nil {
 					return proposal, err

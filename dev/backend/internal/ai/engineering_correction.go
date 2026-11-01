@@ -33,7 +33,7 @@ func engineeringCorrectionDraft(history []any, sheet string) (*engineering.Engin
 	return nil, ""
 }
 
-func engineeringCorrectionTool(draft engineering.EngineeringProposal, sheet string, attributes []engineering.AttributeDefinition) any {
+func engineeringCorrectionTool(draft engineering.EngineeringProposal, sheet string, attributes []engineering.AttributeDefinition, validationError string) any {
 	fields, removable := []string{}, []string{}
 	kinds := []string{"other"}
 	for kind := range engineeringRegionCapabilities() {
@@ -65,16 +65,31 @@ func engineeringCorrectionTool(draft engineering.EngineeringProposal, sheet stri
 	for _, key := range []string{"start_row", "end_row", "start_column", "end_column"} {
 		bounds[key] = map[string]any{"type": "integer", "minimum": 1}
 	}
-	return map[string]any{"type": "function", "function": map[string]any{
+	tool := map[string]any{"type": "function", "function": map[string]any{
 		"name": "map_semantic_fields", "description": "Correct draft_to_correct. Change only specified fields in one region; all other bindings remain unchanged. The entire resulting proposal is validated before saving. Region index is zero-based. Always include set_columns and remove_columns; use {} or [] for an unused operation. Removing an unsupported field requires remove_columns, not an empty call.",
 		"parameters": map[string]any{"type": "object", "additionalProperties": false, "required": []string{"sheet", "region_index", "set_columns", "remove_columns"}, "$defs": definitions, "properties": map[string]any{
 			"sheet": map[string]any{"type": "string", "enum": []string{sheet}}, "region_index": map[string]any{"type": "integer", "minimum": 0, "maximum": len(draft.Regions) - 1},
 			"set_kind":    map[string]any{"type": "string", "enum": kinds, "description": "Correct the region domain only when its source evidence supports that domain; keep existing bindings for validation."},
 			"set_columns": columns, "remove_columns": map[string]any{"type": "array", "items": map[string]any{"type": "string", "enum": removable}},
 			"set_constants": map[string]any{"type": "array", "items": constant}, "remove_constants": map[string]any{"type": "array", "items": map[string]any{"type": "string", "enum": removable}},
-			"bounds": map[string]any{"type": "object", "additionalProperties": false, "properties": bounds, "required": []string{"start_row", "end_row", "start_column", "end_column"}},
+			"bounds":      map[string]any{"type": "object", "additionalProperties": false, "properties": bounds, "required": []string{"start_row", "end_row", "start_column", "end_column"}},
+			"header_rows": map[string]any{"type": "array", "items": map[string]any{"type": "integer", "minimum": 1}, "description": "All title, header, subtotal or footer rows to exclude from entity extraction."},
 		}},
 	}}
+	if strings.HasPrefix(validationError, "INCOMPLETE_SHEET_COVERAGE") {
+		fn := tool["function"].(map[string]any)
+		fn["description"] = "Include the missing source area by correcting bounds of the appropriate region. Preserve field bindings. Set header_rows to exclude titles, headers and totals from entity extraction; retain existing excluded rows."
+		params := fn["parameters"].(map[string]any)
+		props := params["properties"].(map[string]any)
+		focused := map[string]any{}
+		for _, key := range []string{"sheet", "region_index", "bounds", "header_rows"} {
+			focused[key] = props[key]
+		}
+		params["properties"] = focused
+		params["required"] = []string{"sheet", "region_index", "bounds", "header_rows"}
+		delete(params, "$defs")
+	}
+	return tool
 }
 
 func materializeEngineeringCorrection(raw []byte, draft *engineering.EngineeringProposal, sheet string) ([]byte, bool, error) {
@@ -92,6 +107,7 @@ func materializeEngineeringCorrection(raw []byte, draft *engineering.Engineering
 		Constants       []engineering.ConstantBinding `json:"set_constants"`
 		RemoveConstants []string                      `json:"remove_constants"`
 		Bounds          *engineering.Bounds           `json:"bounds"`
+		HeaderRows      *[]int                        `json:"header_rows"`
 	}
 	d := json.NewDecoder(bytes.NewReader(raw))
 	d.DisallowUnknownFields()
@@ -101,7 +117,7 @@ func materializeEngineeringCorrection(raw []byte, draft *engineering.Engineering
 	if patch.Action != "map_semantic_fields" || patch.Sheet != sheet || draft == nil || patch.Region < 0 || patch.Region >= len(draft.Regions) {
 		return raw, false, fmt.Errorf("INVALID_DRAFT_CORRECTION")
 	}
-	if len(patch.Columns) == 0 && len(patch.RemoveColumns) == 0 && len(patch.Constants) == 0 && len(patch.RemoveConstants) == 0 && patch.Bounds == nil && patch.Kind == "" {
+	if len(patch.Columns) == 0 && len(patch.RemoveColumns) == 0 && len(patch.Constants) == 0 && len(patch.RemoveConstants) == 0 && patch.Bounds == nil && patch.Kind == "" && patch.HeaderRows == nil {
 		return raw, false, fmt.Errorf("EMPTY_DRAFT_CORRECTION: provide set_columns, remove_columns, set_constants, remove_constants or bounds; sheet and region_index alone make no change. Correct the outstanding draft validation error")
 	}
 	encoded, _ := json.Marshal(draft)
@@ -173,6 +189,9 @@ func materializeEngineeringCorrection(raw []byte, draft *engineering.Engineering
 	}
 	if patch.Bounds != nil {
 		region.Bounds = *patch.Bounds
+	}
+	if patch.HeaderRows != nil {
+		region.HeaderRows = *patch.HeaderRows
 	}
 	if engineering.Digest(candidate) == engineering.Digest(*draft) {
 		return raw, false, fmt.Errorf("EMPTY_DRAFT_CORRECTION: change the field named in the validation error")
