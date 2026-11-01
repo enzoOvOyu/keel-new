@@ -1,3 +1,9 @@
+## 已完成里程碑事件：用户指定Ultra直接实测并停止
+
+直接使用nvidia/nemotron-3-ultra-550b-a55b:free上传原MM文件到全新独立项目TEST-Agent-MM-Ultra-02，未继承旧模型完成结果。首次读取成功，但连续三次模型提案因connection.fabric、connection.label、cable.label等错误字段被拒绝；还观察到多列重复label。任务最终自行失败ENGINEERING_AGENT_NO_PROGRESS，停止后续重试。0/15表完成，未产生工程实体或发布记录；证据已持久保存。没有可用于量化“比DeepSeek差多少”的同条件成功基线，只能确定本轮未达到Agent可用标准。详见[Ultra实测记录](docs/intelligent-deployment/ultra-model-test-20261101.json)。
+
+用户此前指定HeyGen已在一次合成调用确认其为语音合成模型、不能运行聊天/工具任务；随后用户切换Flint，再明确改为Ultra并要求不核查400。本轮按最后指令直接跑Ultra，未继续其他模型诊断。
+
 ## 已完成里程碑事件：原生工具Schema命名冲突修复
 
 - v16真实调用HTTP400；独立合成请求精确复现上游错误duplicate $defs entry CellBinding has conflicting schemas。上游把不同工具的定义合并到同一命名空间，域收敛工具与全域分类工具发生冲突。
@@ -44,9 +50,9 @@ API v12 / 743383f已部署；任务28d974d0-b1e0-4203-9b59-b8daa7d9dfdb使用独
 
 ## 当前在线状态（覆盖下方历史快照）
 
-API v17 / 0405d93已部署8081；5180保持原页面加工程上传分流。最新真实任务acead157-d064-47e9-b889-39a33a1fb4be使用独立Lightning Provider版本2，已失败ENGINEERING_AGENT_NO_PROGRESS，整本理解未验收；没有继续排队相同失败调用。MinIO解释版本2检查点保留3/15表，6264/7154条端接的八关键字段匹配源基线，967设备未完成验证；EW额外cable_label映射仍可疑，不能泛称全部字段正确。无完整模型/CMDB发布。
+API v17 / 0405d93继续运行8081；5180保持原页面加工程上传分流。最新用户指定Ultra测试项目TEST-Agent-MM-Ultra-02，来源6e1eed2e-03ea-4c02-b75a-a3de1eb98e31，任务1e3ee903-c92b-4abe-9ea4-016f4eb2b98b，已失败ENGINEERING_AGENT_NO_PROGRESS。当前TEST Provider59c504bf-a8c8-42db-9afc-b89f70a0f2d5为nvidia/nemotron-3-ultra-550b-a55b:free，版本3，非默认；原test/DeepSeek未改。
 
-原test/DeepSeek配置未改，最新账户余额$0.003091741；已再次异步请用户充值或配置可用Provider，等待答复。替代免费模型探针未获得可接受结果，详情见agent-repair-test-20261101.json。新Agent实现入口internal/ai/engineering_agent.go；旧BOM重复触发已切断。源码/部署/测试失败与局部证据必须分别记录；不可把此次工程修复宣称为用户的整本理解目标已完成。
+本轮0/15 Sheet通过，工程实体/发布记录均0；原资料和34份MinIO分析产物保留。按照用户“输出差则停”的要求，不再排队重试；没有修改业务代码或重新部署，也不继续核查400。之前Lightning项目3张表/6264条八字段匹配是另一轮局部证据，不能算作本次Ultra成绩。当前仍未完成真实整本理解验收，详情见ultra-model-test-20261101.json。
 
 ## 已完成里程碑事件：按工程域纠错与非法输出恢复
 

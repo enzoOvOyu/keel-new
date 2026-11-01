@@ -114,5 +114,12 @@
     }
   },
   "latest_original_account_balance_usd": 0.003091741,
-  "continuation": "User asked asynchronously to replenish original test account or configure a capable Provider. No claim that a provider change alone guarantees acceptance; continue real tests and necessary fixes. Current independent projects retained for cleanup; no publication."
+  "continuation": "User asked asynchronously to replenish original test account or configure a capable Provider. No claim that a provider change alone guarantees acceptance; continue real tests and necessary fixes. Current independent projects retained for cleanup; no publication.",
+  "user_selected_ultra_retest": {
+    "evidence": "docs/intelligent-deployment/ultra-model-test-20261101.json",
+    "result": "FAILED_ENGINEERING_AGENT_NO_PROGRESS",
+    "project_code": "TEST-Agent-MM-Ultra-02",
+    "accepted_sheets": 0,
+    "further_retries_stopped": true
+  }
 }

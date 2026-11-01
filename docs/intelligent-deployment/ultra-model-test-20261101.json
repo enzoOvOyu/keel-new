@@ -1,0 +1,49 @@
+{
+  "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+  "provider_id": "59c504bf-a8c8-42db-9afc-b89f70a0f2d5",
+  "provider_revision": 3,
+  "runtime_api_revision": "0405d93",
+  "fixture": "MM_Layout_GB300-18_HDD&SSD&CPU-112_V1.1.xlsx",
+  "source_sha256": "30481c4619366bcdc707c9b58f2118349eb599f4260d5f73010fe3b7a3782558",
+  "project_code": "TEST-Agent-MM-Ultra-02",
+  "project_id": "proj-309ea5e0-7544-4675-9b25-db7682073b19",
+  "batch_id": "25fe14c7-e024-4dbf-875b-751de5348b87",
+  "source_id": "6e1eed2e-03ea-4c02-b75a-a3de1eb98e31",
+  "job_id": "1e3ee903-c92b-4abe-9ea4-016f4eb2b98b",
+  "method": "One fresh project/source; direct full workbook Agent run with user-selected Ultra. No reused completed-sheet checkpoint from earlier models.",
+  "result": "FAILED; further retries stopped per user instruction",
+  "error_code": "ENGINEERING_AGENT_NO_PROGRESS",
+  "observations": [
+    "Real model selection recorded as Ultra, Provider revision3",
+    "First source sheet inspected successfully",
+    "Three propose_engineering_model calls rejected: connection.fabric, connection.label, cable.label",
+    "Repeated label bindings assigned to several unrelated columns despite correction feedback",
+    "Some endpoint columns corresponded to source headers, but no complete proposal passed validation",
+    "One HTTP502 transient response occurred; no investigation or separate compatibility probes in this Ultra run"
+  ],
+  "counts": {
+    "rejected_model_proposals": 3,
+    "accepted_sheets": 0,
+    "total_sheets": 15,
+    "source_revision": 1,
+    "engineering_entities": 0,
+    "engineering_publications": 0,
+    "minio_artifacts": 34,
+    "minio_compressed_bytes": 144196
+  },
+  "stopping": "The job had already failed when the stop update was attempted (0 rows changed); no replacement job queued. This is not a manually fabricated failure status.",
+  "comparison_limit": "No equivalent successful whole-workbook DeepSeek result exists, so this run cannot establish a numerical model-quality gap. It fails the current Agent usability criteria.",
+  "code_changes": "None; only the existing nondefault TEST Provider was switched to Ultra. Original default test Provider unchanged.",
+  "evidence_directory": "/home/ubuntu/.local/state/keel-tests/mm-agent-repair",
+  "evidence_files": [
+    "live-ultra-02.json",
+    "ultra-02-workspace-current.private.json",
+    "ultra-02-checkpoint-current.private.json",
+    "ultra-02-checkpoint-coverage.json"
+  ],
+  "not_run": [
+    "Further model retries",
+    "CMDB publication/topology loop",
+    "Build or unrelated regression tests"
+  ]
+}

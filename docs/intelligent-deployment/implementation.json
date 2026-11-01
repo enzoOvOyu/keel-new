@@ -1,7 +1,7 @@
 {
   "updated_at": "2026-11-01T05:29:49.409927+00:00",
   "branch": "dev",
-  "scope": "Agent repair0405d93 deployed. Real MM whole-workbook understanding NOT ACCEPTED: latest free-model task failed ENGINEERING_AGENT_NO_PROGRESS. 3/15 sheet checkpoints and partial source comparisons retained; original default Provider lacks funds. Awaiting viable Provider to continue; historical synthetic checks are not real acceptance.",
+  "scope": "API repair0405d93 remains deployed. Latest user-selected Ultra real workbook test in fresh TEST-Agent-MM-Ultra-02 failed ENGINEERING_AGENT_NO_PROGRESS after three invalid proposals; 0/15 sheets accepted, no engineering entities/publications. Further retries stopped per user instruction. Prior Lightning partial checkpoints are separate evidence, not Ultra results.",
   "phase_status": {
     "P0": "complete; report commit 314126d",
     "P1": "complete: architecture, models, contracts and kernel",
