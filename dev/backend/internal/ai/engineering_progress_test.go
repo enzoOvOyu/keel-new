@@ -27,8 +27,11 @@ func TestEngineeringNativeToolsResumeSheetCheckpoint(t *testing.T) {
 		_ = json.NewDecoder(r.Body).Decode(&body)
 		var toolList []any
 		_ = json.Unmarshal(body["tools"], &toolList)
-		if len(toolList) != 14 {
-			t.Errorf("native tools missing: %d", len(toolList))
+		if calls == 0 && len(toolList) != 1 {
+			t.Errorf("initial source inspection must have one focused tool, got %d", len(toolList))
+		}
+		if calls == 1 && len(toolList) != 6 {
+			t.Errorf("expected six source-analysis tools after inspection, got %d", len(toolList))
 		}
 		for _, tool := range toolList {
 			function := tool.(map[string]any)["function"].(map[string]any)

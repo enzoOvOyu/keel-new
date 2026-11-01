@@ -118,7 +118,16 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 		}
 		history = boundedEngineeringHistory(history)
 		if len(queued) == 0 {
-			raw, err := p.engineeringCompletion(ctx, string(prompt), map[string]any{"workbook": summary, "modules": registry, "attribute_definitions": hooks.Attributes, "history": history, "pending_sheets": pending, "completed_sheets": len(completed), "turns_remaining": budget - turn}, functions, trace)
+			active := pending[0]
+			sheet, _ := ir.AnalyzeSheet(active)
+			regions := []bom.Region{}
+			for _, region := range ir.Regions {
+				if region.Sheet == active {
+					regions = append(regions, region)
+				}
+			}
+			selected := engineeringSourceTools(functions, active, inspected[active])
+			raw, err := p.engineeringCompletion(ctx, string(prompt), map[string]any{"workbook": summary, "modules": registry, "attribute_definitions": hooks.Attributes, "history": history, "active_sheet": active, "active_sheet_preview": engineeringSheetPreview(sheet, regions), "pending_sheets": pending, "completed_sheets": len(completed), "turns_remaining": budget - turn}, selected, trace)
 			if err != nil {
 				return proposal, err
 			}
@@ -460,4 +469,30 @@ func constrainEngineeringTools(functions []any, attributes []engineering.Attribu
 			properties[field].(map[string]any)["enum"] = allowed
 		}
 	}
+}
+
+// Keep source evidence in context until that sheet is understood. This sequences
+// inspection, not engineering-domain applicability or dependency execution.
+func engineeringSourceTools(functions []any, sheet string, inspected bool) []any {
+	selected := []any{}
+	for _, tool := range functions {
+		function := tool.(map[string]any)["function"].(map[string]any)
+		name := function["name"].(string)
+		enabled := name == "inspect_sheet" && !inspected
+		if inspected {
+			switch name {
+			case "inspect_region", "read_range", "inspect_formula", "trace_formula_dependencies", "resolve_cross_sheet_references", "propose_engineering_model":
+				enabled = true
+			}
+		}
+		if !enabled {
+			continue
+		}
+		properties := function["parameters"].(map[string]any)["properties"].(map[string]any)
+		if value, ok := properties["sheet"].(map[string]any); ok {
+			value["enum"] = []string{sheet}
+		}
+		selected = append(selected, tool)
+	}
+	return selected
 }
