@@ -1,5 +1,16 @@
 # Keel 整合交接 · 2026-10-31
 
+## 当前任务：真实资料 → Agent 理解修复（dev，用户授权在线修改及复测）
+
+- **已完成里程碑事件：定位失败根因并部署首批修复。** 实际复现上游HTTP 402，metadata.reason=`in_flight_budget_exhausted`、Retry-After=120；旧实现丢弃原因且直接终止。不是Excel解析失败，也不把合成Provider连通性当资料理解验收。
+- 工程Agent改用原生工具定义，保留严格本地Schema与来源校验；支持一轮多个工具按序执行、逐Sheet检查点、恢复时跳过已完成Sheet。暂时性402/429/502/503/504按Retry-After等待重试，永久402不伪装可重试。
+- 迁移038已应用；工具输入/输出、检查点、最终提案压缩写MinIO项目专属前缀，流式经过私有临时文件；数据库仅登记对象键/大小/摘要/作业关系，工程事实继续使用现有关系表。失败不发布半成品模型；已有检查点可恢复。旧eng_job.proposal不再重复写大提案。
+- 上传新增`import_mode=engineering`，仅解析原始资料，不启动旧BOM Agent；5180维持4064a69前端基线，只更新工程上传Adapter。API来自当前dev修复；没有部署作业平台新UI、合并main或修改真实资产。
+- 运行/回退：`/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair`（私有）；原`engineering-5abb94f`回退版本保留；仍使用原8081/5180、配置、数据库、凭据和MinIO。代码工作树不用于存放在线部署补丁。
+- 已验证：Go构建、原生工具/断点恢复/上游错误分类定向测试通过；真实新上传没有旧bom_job，工具产物在MinIO实际写入且能解压读取。真实MM资料仍在分析中，尚未完成理解验收，不宣称设备/线缆/公式正确。独立项目`TEST-Agent-MM-Repair-01`，本机私有证据`/home/ubuntu/.local/state/keel-tests/mm-agent-repair`。
+- 当前恢复入口：`dev/backend/internal/ai/engineering_agent.go`、`cmd/api/engineering_job.go`、`cmd/api/engineering_artifacts.go`；只推进理解闭环，不扩展CMDB发布/整个平台回归。
+
+
 ## 最新指令：恢复作业平台UI独立开发（2026-11-01）
 
 作业平台UI从最新dev同步到 `feat/jobs-kestra-ui` 后继续，工作区 `/home/ubuntu/keel-kestra-ui-dev`；其他业务继续dev。此前“作业平台也统一dev”和暂停要求被本次指令覆盖。仅开发，不发布、不合并业务代码至dev/main。具体进度继续更新作业平台实施记录。

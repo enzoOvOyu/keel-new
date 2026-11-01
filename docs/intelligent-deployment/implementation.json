@@ -1,7 +1,7 @@
 {
   "updated_at": "2026-11-01T05:29:49.409927+00:00",
-  "branch": "audit/intelligent-deployment-p0",
-  "scope": "P1–P6 code deployed at 5abb94f on existing development environment; real-source/AI/reference/browser acceptance NOT RUN",
+  "branch": "dev",
+  "scope": "Current task: repair real-source Agent understanding with native tools, resumable MinIO artifacts and engineering-only upload. Real MM acceptance in progress; historical P1–P6 synthetic results below are not real-source acceptance.",
   "phase_status": {
     "P0": "complete; report commit 314126d",
     "P1": "complete: architecture, models, contracts and kernel",

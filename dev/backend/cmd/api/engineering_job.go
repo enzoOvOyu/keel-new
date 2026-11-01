@@ -93,13 +93,22 @@ func (s *Server) runEngineeringJob(ctx context.Context) {
 			hooks = s.engineeringToolHooks(run, source, expected, wb)
 			hooks.Attributes, e = engineeringAttributeDefinitions(run, s.db, project)
 			if e == nil {
+				hooks.Resume, e = s.resumeEngineeringAnalysis(run, source, expected)
+			}
+			hooks.Artifact = func(ctx context.Context, tool, state string, value any) error {
+				return s.saveAnalysisArtifact(ctx, job, claim, tool, state, value)
+			}
+			hooks.Checkpoint = func(ctx context.Context, checkpoint ai.EngineeringCheckpoint) error {
+				return s.saveAnalysisArtifact(ctx, job, claim, "checkpoint", "succeeded", checkpoint)
+			}
+			if e == nil {
 				proposal, e = provider.UnderstandEngineering(run, engineeringSafeWorkbook(wb), trace, hooks)
 			}
 		}
 	}
-	if len(proposal.Regions) > 0 {
+	if e == nil && len(proposal.Regions) > 0 {
 		proposal = engineering.ResolveSourceConstants(wb, engineeringSafeWorkbook(wb), proposal)
-		_, saveErr := s.db.Exec(run, `UPDATE eng_job SET proposal=$3 WHERE id=$1 AND claim_id=$2`, job, claim, jsonBytes(proposal))
+		saveErr := s.saveAnalysisArtifact(run, job, claim, "proposal", "succeeded", proposal)
 		if saveErr != nil {
 			e = saveErr
 		} else {
@@ -146,7 +155,7 @@ func (s *Server) runEngineeringJob(ctx context.Context) {
 	if e != nil {
 		state = "failed"
 		value := "ENGINEERING_ANALYSIS_FAILED"
-		for _, allowed := range []string{"AI_PROVIDER_NOT_CONFIGURED", "AI_CREDENTIAL_UNAVAILABLE", "PROVIDER_NOT_AVAILABLE", "PROVIDER_ERROR", "PROVIDER_TIMEOUT_OR_UNAVAILABLE", "ENGINEERING_AGENT_TURN_LIMIT", "REVISION_CONFLICT", "AI_SCHEMA_VALIDATOR_UNAVAILABLE"} {
+		for _, allowed := range []string{"AI_PROVIDER_NOT_CONFIGURED", "AI_CREDENTIAL_UNAVAILABLE", "PROVIDER_NOT_AVAILABLE", "PROVIDER_ERROR", "PROVIDER_TIMEOUT_OR_UNAVAILABLE", "ENGINEERING_AGENT_TURN_LIMIT", "REVISION_CONFLICT", "AI_SCHEMA_VALIDATOR_UNAVAILABLE", "ANALYSIS_STORAGE_UNAVAILABLE", "ANALYSIS_ARTIFACT_HASH_MISMATCH", "PROVIDER_OUTPUT_TRUNCATED", "INVALID_JSON"} {
 			if strings.HasPrefix(e.Error(), allowed) {
 				value = allowed
 				break

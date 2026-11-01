@@ -5,7 +5,7 @@ import (
 	"errors"
 )
 
-//go:embed prompts/*.txt prompts/*.py
+//go:embed prompts/*.txt prompts/*.py prompts/*.json
 var prompts embed.FS
 
 func Prompt(task string) (string, error) {

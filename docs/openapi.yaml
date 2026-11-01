@@ -210,9 +210,9 @@ paths:
                   format: binary
                 import_mode:
                   type: string
-                  enum: [ai]
+                  enum: [ai, engineering]
                   default: ai
-                  description: Current intake is AI-only. Existing fixed/legacy batches remain readable.
+                  description: AI intake. Engineering parses the immutable source without starting legacy BOM recognition; analysis is queued through engineering-imports. Existing fixed/legacy batches remain readable.
                 provider_id:
                   type: string
                   format: uuid

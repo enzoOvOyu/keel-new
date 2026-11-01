@@ -1,6 +1,6 @@
 # 智能开局工程真实接口
 
-更新：2026-11-01。P1–P6代码5abb94f已部署至原5180/8081，迁移027–037已应用。下方阶段检查是历史开发记录，当前部署证据见[部署记录](../intelligent-deployment/deployment-20261101.json)。所有路径使用 `/api/v1` 前缀及现有身份Session、项目授权和CSRF。精确DTO以 `openapi.yaml` 的 `IDE*` 为准。
+更新：2026-11-01。工程Agent修复已在原5180/8081上线，迁移038已应用；前端保留原版本页面，只改变工程上传分流。下方阶段检查是历史开发记录，当前部署证据见[部署记录](../intelligent-deployment/deployment-20261101.json)。所有路径使用 `/api/v1` 前缀及现有身份Session、项目授权和CSRF。精确DTO以 `openapi.yaml` 的 `IDE*` 为准。
 
 统一前缀 `/projects/{projectId}/engineering-imports`，下表 `{id}` 为工程来源ID，不是旧BOM批次ID。
 
@@ -149,3 +149,13 @@ Agent收到项目属性定义，只能引用批准版本，使用`attribute:<id>
 ## 当前环境部署
 
 运行代码5abb94f，原5180/8081与身份/AI/对象存储/Flows配置沿用；Calc以镜像摘要固定版本。四个工程列表GET和Provider选项已通过真实登录后的只读启动检查；33个操作均已随二进制发布，但没有逐个执行写入或完整业务验收。没有导入样本或运行外部AI。部署/备份/迁移/回退证据见上述部署记录。
+
+## 真实资料理解修复：原生工具、MinIO产物和上传分流
+
+工程工作台上传显式传`import_mode=engineering`，解析后通过原`/engineering-imports`关联和`/analyze`排队；不再并行启动旧BOM识别。默认`ai`仍供原BOM流程使用。OpenAPI与前端生成类型同步。
+
+Agent原生工具参数按Pydantic Schema校验，读取脱敏IR，以逐Sheet校验的提案形成可恢复检查点。已完成部分不依赖进程内存；暂时性上游错误保留HTTP状态与白名单原因，不暴露任意错误正文。120秒Retry-After不会被忽略或立即失败。
+
+原件继续存MinIO，结构化工程事实继续存现有关系表。`eng_analysis_artifact`索引MinIO压缩工具结果、检查点和最终提案；按项目目录归属，删除项目沿用原Outbox清理前缀，审计与共享型号保留。作业恢复核对产物SHA256。大对象通过临时文件流式写入，工作上下文只保留最近工具结果。
+
+验证截至本里程碑：原生工具/恢复协议/上游错误分类、Go构建通过；真实上传未启动旧Agent，MinIO产物已读取验证。真实MM理解仍进行中，尚不构成来源、计算或CMDB闭环验收。

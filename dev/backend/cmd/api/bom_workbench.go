@@ -514,7 +514,7 @@ func (s *Server) workbenchAPI(w http.ResponseWriter, r *http.Request, id string,
 func (s *Server) initializeWorkbench(ctx context.Context, id string, wb bom.Workbook) {
 	var mode, project string
 	s.db.QueryRow(ctx, "SELECT import_mode,project_id FROM bom_import_batch WHERE id=$1", id).Scan(&mode, &project)
-	if mode == "legacy" {
+	if mode == "legacy" || mode == "engineering" {
 		return
 	}
 	b := bom.WorkbenchRows(wb)

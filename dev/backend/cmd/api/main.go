@@ -249,7 +249,7 @@ func (s *Server) upload(w http.ResponseWriter, r *http.Request) {
 	if mode == "" {
 		mode = "ai"
 	}
-	if mode != "ai" {
+	if mode != "ai" && mode != "engineering" {
 		fail(w, 400, "INVALID_IMPORT_MODE")
 		return
 	}
@@ -367,7 +367,7 @@ func (s *Server) worker(ctx context.Context) {
 					}
 					profiles, _ := json.Marshal(profileList)
 					initialDraft, initialIssues := []bom.Item{}, []bom.Issue{}
-					if importMode != "ai" {
+					if importMode != "ai" && importMode != "engineering" {
 						initialDraft, initialIssues = bom.Generate(wb, profileList)
 					}
 					issueBytes, _ := json.Marshal(initialIssues)

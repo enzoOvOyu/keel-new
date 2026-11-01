@@ -17157,11 +17157,11 @@ export interface operations {
                     /** Format: binary */
                     file: string;
                     /**
-                     * @description Current intake is AI-only. Existing fixed/legacy batches remain readable.
+                     * @description AI intake. Engineering parses the immutable source without starting legacy BOM recognition; analysis is queued through engineering-imports. Existing fixed/legacy batches remain readable.
                      * @default ai
                      * @enum {string}
                      */
-                    import_mode?: "ai";
+                    import_mode?: "ai" | "engineering";
                     /**
                      * Format: uuid
                      * @description Enabled OpenAI-chat provider; empty selects enabled default.

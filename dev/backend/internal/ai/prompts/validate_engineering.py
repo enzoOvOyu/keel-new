@@ -12,7 +12,7 @@ class Bounds(Closed):
 class Column(Closed):
     field: str
     column: int = Field(ge=1)
-    unit: str
+    unit: str = ""
 class Constant(Closed):
     field: str
     value: str
@@ -32,7 +32,7 @@ class Region(Closed):
     semantic: str
     header_rows: list[int]
     columns: list[Column]
-    constants: list[Constant]
+    constants: list[Constant] = Field(default_factory=list)
 class Module(Closed):
     module_id: str
     applicable: bool
@@ -41,8 +41,8 @@ class Module(Closed):
 class Proposal(Closed):
     summary: str = Field(min_length=1)
     regions: list[Region] = Field(min_length=1)
-    modules: list[Module]
-    questions: list[str]
+    modules: list[Module] = Field(default_factory=list)
+    questions: list[str] = Field(default_factory=list)
 class Quantity(Closed):
     value: str
     unit: str
@@ -114,9 +114,10 @@ class Action(Closed):
         if self.action == "run_calculation" and self.rule_ref is None and not self.cells:
             raise ValueError("formula cells or approved rule required")
         return self
-try:
-    Action.model_validate_json(sys.stdin.buffer.read())
-except Exception as error:
-    if hasattr(error, 'errors'):
-        print('; '.join(str(item['loc'])+':'+item['type'] for item in error.errors(include_input=False))[:1200])
-    sys.exit(1)
+if __name__ == '__main__':
+    try:
+        Action.model_validate_json(sys.stdin.buffer.read())
+    except Exception as error:
+        if hasattr(error, 'errors'):
+            print('; '.join(str(item['loc'])+':'+item['type'] for item in error.errors(include_input=False))[:1200])
+        sys.exit(1)

@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/xuri/excelize/v2"
 	"io"
 	"keel.local/dev/internal/bom"
 	"keel.local/dev/internal/engineering"
 	"strings"
+	"time"
 )
 
 type engineeringAction struct {
@@ -24,7 +26,14 @@ type engineeringAction struct {
 	Inputs   []engineering.NamedValue         `json:"inputs,omitempty"`
 }
 
+type EngineeringCheckpoint struct {
+	Proposal        engineering.EngineeringProposal `json:"proposal"`
+	CompletedSheets []string                        `json:"completed_sheets"`
+}
 type EngineeringToolHooks struct {
+	Resume      *EngineeringCheckpoint
+	Checkpoint  func(context.Context, EngineeringCheckpoint) error
+	Artifact    func(context.Context, string, string, any) error
 	Attributes  []engineering.AttributeDefinition
 	Names       []excelize.DefinedName
 	ProposeRule func(context.Context, engineering.CalculationRule) (engineering.RuleView, error)
@@ -39,9 +48,21 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 	}
 	var graph []engineering.FormulaEvidence
 	var proposal engineering.EngineeringProposal
+	completed := map[string]bool{}
+	if hooks.Resume != nil {
+		proposal = hooks.Resume.Proposal
+		for _, sheet := range hooks.Resume.CompletedSheets {
+			completed[sheet] = true
+		}
+	}
 	prompt, e := prompts.ReadFile("prompts/engineering-v1.txt")
 	if e != nil {
 		return proposal, e
+	}
+	var functions []any
+	toolSchema, _ := prompts.ReadFile("prompts/engineering-tools.json")
+	if err := json.Unmarshal(toolSchema, &functions); err != nil {
+		return proposal, err
 	}
 	ir := bom.NewWorkbookIR(w)
 	history := []any{}
@@ -54,12 +75,48 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 				formulas++
 			}
 		}
-		summary = append(summary, map[string]any{"sheet": s.Name, "cells": len(s.Cells), "merges": s.Merges, "formulas": formulas, "dimension": s.Dimension})
+		summary = append(summary, map[string]any{"sheet": s.Name, "cells": len(s.Cells), "merge_count": len(s.Merges), "formulas": formulas, "dimension": s.Dimension})
 	}
-	for turn := 0; turn < 40; turn++ {
-		raw, err := p.completeJSON(ctx, string(prompt), map[string]any{"workbook": summary, "modules": registry, "attribute_definitions": hooks.Attributes, "history": history, "turns_remaining": 40 - turn})
-		if err != nil {
-			return proposal, err
+	inspected := map[string]bool{}
+	queued := []json.RawMessage{}
+	budget := max(24, len(w.Sheets)*16)
+	for turn := 0; turn < budget; turn++ {
+		pending := []string{}
+		for _, sheet := range w.Sheets {
+			if len(sheet.Cells) > 0 && !completed[sheet.Name] {
+				pending = append(pending, sheet.Name)
+			}
+		}
+		if len(pending) == 0 {
+			return proposal, nil
+		}
+		if len(history) > 6 {
+			history = history[len(history)-6:]
+		}
+		if len(queued) == 0 {
+			raw, err := p.engineeringCompletion(ctx, string(prompt), map[string]any{"workbook": summary, "modules": registry, "attribute_definitions": hooks.Attributes, "history": history, "pending_sheets": pending, "completed_sheets": len(completed), "turns_remaining": budget - turn}, functions, trace)
+			if err != nil {
+				return proposal, err
+			}
+			if len(raw) > 0 && raw[0] == '[' {
+				if err = json.Unmarshal(raw, &queued); err != nil {
+					return proposal, err
+				}
+			} else {
+				queued = append(queued, raw)
+			}
+		}
+		if len(queued) == 0 {
+			return proposal, errors.New("EMPTY_TOOL_RESPONSE")
+		}
+		raw := queued[0]
+		queued = queued[1:]
+		var err error
+		record := func(tool, state string, value any) error {
+			if hooks.Artifact != nil {
+				return hooks.Artifact(ctx, tool, state, map[string]any{"request": json.RawMessage(raw), "result": value})
+			}
+			return nil
 		}
 		if schemaErr := validateEngineeringSchema(ctx, raw); schemaErr != nil {
 			if schemaErr.Error() == "AI_SCHEMA_VALIDATOR_UNAVAILABLE" {
@@ -68,7 +125,10 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 			if e := trace("schema_validation", "rejected", schemaErr.Error()); e != nil {
 				return proposal, e
 			}
-			history = append(history, map[string]string{"error": schemaErr.Error()})
+			if e := record("schema_validation", "rejected", map[string]string{"error": schemaErr.Error()}); e != nil {
+				return proposal, e
+			}
+			history = append(history, map[string]any{"rejected_action": json.RawMessage(raw), "error": schemaErr.Error()})
 			continue
 		}
 		var action engineeringAction
@@ -95,12 +155,16 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 						regions = append(regions, r)
 					}
 				}
-				result = map[string]any{"sheet": s.Name, "merges": s.Merges, "regions": regions}
+				result = engineeringSheetPreview(s, regions)
+				inspected[s.Name] = true
 			case "inspect_region", "read_range":
 				if action.Bounds == nil {
 					err = fmt.Errorf("BOUNDS_REQUIRED")
 				} else {
 					result, err = engineering.SourceRange(w, action.Sheet, *action.Bounds)
+					if err == nil {
+						inspected[action.Sheet] = true
+					}
 				}
 			case "inspect_formula":
 				s, ok := ir.AnalyzeSheet(action.Sheet)
@@ -155,25 +219,24 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 				}
 				err = engineering.CheckProposal(w, *action.Proposal)
 				if err == nil && action.Action == "propose_engineering_model" {
-					covered := map[string]bool{}
+					// A commit is bounded to one inspected sheet. Independent sheets survive retries.
+					if action.Sheet == "" && len(action.Proposal.Regions) > 0 {
+						action.Sheet = action.Proposal.Regions[0].Sheet
+					}
+					if !inspected[action.Sheet] {
+						err = fmt.Errorf("INSPECT_SHEET_BEFORE_PROPOSING")
+					}
 					for _, r := range action.Proposal.Regions {
-						covered[r.Sheet] = true
-					}
-					missing := []string{}
-					for _, s := range w.Sheets {
-						if len(s.Cells) > 0 && !covered[s.Name] {
-							missing = append(missing, s.Name)
+						if r.Sheet != action.Sheet {
+							err = fmt.Errorf("PROPOSE_ONE_SHEET_AT_A_TIME")
 						}
-					}
-					if len(missing) > 0 {
-						err = fmt.Errorf("UNACCOUNTED_SHEETS: %s", strings.Join(missing, ", "))
 					}
 				}
 				if err == nil {
-					proposal = *action.Proposal
-					result = map[string]any{"schema_valid": true, "regions": len(proposal.Regions), "formal_write": false}
+					candidate := mergeEngineeringProposal(proposal, *action.Proposal, action.Sheet)
+					result = map[string]any{"schema_valid": true, "regions": len(candidate.Regions), "formal_write": false}
 					if action.Action == "validate_model" || action.Action == "analyze_validation_issues" {
-						x, extractErr := engineering.ExtractPhysical(w, proposal, "analysis", "source", "revision", hooks.Attributes...)
+						x, extractErr := engineering.ExtractPhysical(w, candidate, "analysis", "source", "revision", hooks.Attributes...)
 						if extractErr != nil {
 							err = extractErr
 						} else {
@@ -181,10 +244,21 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 						}
 					}
 					if action.Action == "propose_engineering_model" {
-						if e := trace(action.Action, "succeeded", "结构化区域、字段及模块提案已校验；等待本地提取与人工审核"); e != nil {
-							return proposal, e
+						next := EngineeringCheckpoint{Proposal: candidate, CompletedSheets: []string{}}
+						for _, sheet := range w.Sheets {
+							if completed[sheet.Name] || sheet.Name == action.Sheet {
+								next.CompletedSheets = append(next.CompletedSheets, sheet.Name)
+							}
 						}
-						return proposal, nil
+						if hooks.Checkpoint != nil {
+							if e := hooks.Checkpoint(ctx, next); e != nil {
+								return proposal, e
+							}
+						}
+						proposal = candidate
+						completed[action.Sheet] = true
+						result = map[string]any{"sheet_saved": action.Sheet, "regions": len(action.Proposal.Regions), "completed_sheets": len(completed), "formal_write": false}
+						history = nil
 					}
 				}
 			default:
@@ -197,6 +271,12 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 			detail = err.Error()
 			result = map[string]string{"error": detail}
 		}
+		if action.Action == "propose_engineering_model" && err == nil {
+			detail = fmt.Sprintf("已持久保存 %s 的区域理解（%d/%d Sheet）；未发布正式数据", action.Sheet, len(completed), len(w.Sheets))
+		}
+		if e := record(action.Action, state, result); e != nil {
+			return proposal, e
+		}
 		if e := trace(action.Action, state, detail); e != nil {
 			return proposal, e
 		}
@@ -206,4 +286,108 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 		}
 	}
 	return proposal, fmt.Errorf("ENGINEERING_AGENT_TURN_LIMIT")
+}
+
+// Only retry an explicit transient provider rejection, honoring its Retry-After.
+func (p *Provider) engineeringCompletion(ctx context.Context, prompt string, input any, functions []any, trace func(string, string, string) error) ([]byte, error) {
+	for attempt := 0; ; attempt++ {
+		raw, err := p.complete(ctx, prompt, input, functions)
+		if err == nil {
+			return raw, nil
+		}
+		var upstream *ProviderError
+		if !errors.As(err, &upstream) || !upstream.Temporary() || attempt >= 3 {
+			_ = trace("provider_request", "failed", err.Error())
+			return nil, err
+		}
+		delay := upstream.RetryAfter
+		if delay <= 0 {
+			delay = time.Duration(1<<attempt) * 5 * time.Second
+		}
+		if e := trace("provider_retry", "waiting", fmt.Sprintf("%s；等待 %.0f 秒后重试当前工具调用，已保存结果保留", upstream.Error(), delay.Seconds())); e != nil {
+			return nil, e
+		}
+		timer := time.NewTimer(delay)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			return nil, ctx.Err()
+		case <-timer.C:
+		}
+	}
+}
+
+func mergeEngineeringProposal(base, part engineering.EngineeringProposal, sheet string) engineering.EngineeringProposal {
+	out := engineering.EngineeringProposal{Summary: base.Summary, Regions: []engineering.RegionMapping{}, Modules: append([]engineering.ModuleDetection{}, base.Modules...), Questions: append([]string{}, base.Questions...)}
+	if sheet != "" {
+		out.Summary += sheet + ": " + part.Summary + "\n"
+	} else if out.Summary == "" {
+		out.Summary = part.Summary
+	}
+	for _, r := range base.Regions {
+		if sheet == "" || r.Sheet != sheet {
+			out.Regions = append(out.Regions, r)
+		}
+	}
+	out.Regions = append(out.Regions, part.Regions...)
+	for _, m := range part.Modules {
+		found := false
+		for i := range out.Modules {
+			old := &out.Modules[i]
+			if old.ModuleID == m.ModuleID {
+				found = true
+				old.Applicable = old.Applicable || m.Applicable
+				old.Sheets = appendUnique(old.Sheets, m.Sheets...)
+				if !strings.Contains(old.Reason, m.Reason) {
+					old.Reason += "; " + m.Reason
+				}
+				break
+			}
+		}
+		if !found {
+			out.Modules = append(out.Modules, m)
+		}
+	}
+	out.Questions = appendUnique(out.Questions, part.Questions...)
+	return out
+}
+func appendUnique(values []string, more ...string) []string {
+	for _, v := range more {
+		found := false
+		for _, old := range values {
+			if old == v {
+				found = true
+				break
+			}
+		}
+		if !found {
+			values = append(values, v)
+		}
+	}
+	return values
+}
+
+// Structural blocks are hints only. The agent still chooses semantics and mappings.
+// Samples bound the prompt while extraction always reads every mapped source row.
+func engineeringSheetPreview(s bom.Sheet, regions []bom.Region) any {
+	rows := map[int]bool{}
+	last := 0
+	for _, r := range regions {
+		if r.Start > last+1 || last == 0 {
+			for row := r.Start; row <= min(r.End, r.Start+5); row++ {
+				rows[row] = true
+			}
+		}
+		last = r.End
+	}
+	if len(regions) > 0 {
+		rows[regions[len(regions)-1].End] = true
+	}
+	samples := []map[string]any{}
+	for _, c := range s.Cells {
+		if rows[c.Row] && !c.Sensitive && len(samples) < 240 {
+			samples = append(samples, map[string]any{"cell": c.Ref, "row": c.Row, "column": c.Column, "value": c.Value, "formula": c.Formula})
+		}
+	}
+	return map[string]any{"sheet": s.Name, "merges": s.Merges, "regions": regions, "sample_cells": samples, "sample_is_not_full_data": true}
 }

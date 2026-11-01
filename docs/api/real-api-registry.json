@@ -1,10 +1,10 @@
 {
   "version": 1,
   "updated_at": "2026-11-01",
-  "coverage": "Current branch deployed on existing 5180/8081. All 33 engineering operations included; four authenticated engineering GETs checked. Historical visualization/Flows evidence retained separately; no claim of full endpoint, real AI/workbook or browser acceptance.",
+  "coverage": "Engineering Agent repair on dev deployed to existing 8081; 5180 retains original frontend with engineering-only upload dispatch. Migration 038, native tool/checkpoint/error tests and real MinIO artifact read verified. Real MM understanding still in progress; not CMDB or full workbook acceptance.",
   "schema_authority": "docs/openapi.yaml",
-  "code_revision": "5abb94f",
-  "deployed_revision": "5abb94f",
+  "code_revision": "dev:engineering-agent-repair (see HANDOFF)",
+  "deployed_revision": "dev:engineering-agent-repair (API); 4064a69 + upload adapter (UI)",
   "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json",
   "operations": [
     {
