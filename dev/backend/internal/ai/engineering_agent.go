@@ -232,8 +232,10 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 				if action.Bounds == nil {
 					err = fmt.Errorf("BOUNDS_REQUIRED")
 				} else {
-					result, err = engineering.SourceRange(w, action.Sheet, *action.Bounds)
+					var cells []bom.Cell
+					cells, err = engineering.SourceRange(w, action.Sheet, *action.Bounds)
 					if err == nil {
+						result = engineeringCellPreview(cells)
 						inspected[action.Sheet] = true
 					}
 				}
@@ -348,7 +350,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 			return proposal, e
 		}
 		if err != nil {
-			key := engineering.Digest(action) + err.Error()
+			key := action.Action + "/" + action.Sheet + "/" + err.Error()
 			rejections[key]++
 			if rejections[key] >= 3 {
 				return proposal, errors.New("ENGINEERING_AGENT_NO_PROGRESS")
@@ -478,7 +480,12 @@ func engineeringSheetPreview(s bom.Sheet, regions []bom.Region) any {
 			}
 		}
 	}
-	return map[string]any{"sheet": s.Name, "merges": s.Merges, "regions": regions, "sample_cells": samples, "header_hints": hints, "sample_is_not_full_data": true}
+	full := engineering.Bounds{StartRow: 1, StartColumn: 1}
+	for _, cell := range s.Cells {
+		full.EndRow = max(full.EndRow, cell.Row)
+		full.EndColumn = max(full.EndColumn, cell.Column)
+	}
+	return map[string]any{"sheet": s.Name, "full_sheet_bounds": full, "merges": s.Merges, "regions": regions, "regions_are_reading_chunks_not_tables": true, "sample_cells": samples, "header_hints": hints, "sample_is_not_full_data": true}
 }
 
 func boundedEngineeringHistory(history []any) []any {
@@ -629,6 +636,19 @@ func engineeringRegionCapabilities() map[string][]string {
 	out := map[string][]string{}
 	for _, kind := range []string{"equipment", "assembly", "site", "room", "rack", "placement", "port", "connection", "cable", "power", "material", "workload"} {
 		out[kind] = engineering.RegionFields(kind)
+	}
+	return out
+}
+
+// Reuse human-review source checks, but omit repeated API bookkeeping from model context.
+func engineeringCellPreview(cells []bom.Cell) []map[string]any {
+	out := make([]map[string]any, 0, len(cells))
+	for _, c := range cells {
+		v := map[string]any{"cell": c.Ref, "row": c.Row, "column": c.Column, "value": c.Value}
+		if c.Formula != "" {
+			v["formula"] = c.Formula
+		}
+		out = append(out, v)
 	}
 	return out
 }

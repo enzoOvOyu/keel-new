@@ -116,6 +116,8 @@ func (p *Provider) complete(ctx context.Context, prompt string, input any, funct
 				contextValues["tool_errors"] = toolErrors
 				contextJSON, _ = json.Marshal(contextValues)
 				messages[1]["content"] = string(contextJSON)
+				feedback, _ := json.Marshal(map[string]any{"tool_errors": toolErrors[len(toolErrors)-1:], "instruction": "Correct this latest tool error using active_sheet_preview; rejected proposals are not evidence."})
+				messages = append(messages, map[string]any{"role": "user", "content": string(feedback)})
 			}
 			payload["messages"] = messages
 		}
