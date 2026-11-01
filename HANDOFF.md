@@ -1,3 +1,7 @@
+## 已完成里程碑事件：纠错工具要求显式编辑参数
+
+v31真实电力分析反复只返回sheet和region_index，未执行字段修改，最终NO_PROGRESS。纠错工具现在要求明确提供set_columns/remove_columns（未用项为空），并解释删除字段不会由set操作代替；保留已有完整候选校验。定向纠错/恢复检查及v33构建通过，包含v32设施层级检查，准备继续原来源；此变化尚不能宣称真实电力理解通过。
+
 ## 已完成里程碑事件：设施层级语义冲突检查
 
 独立检查发现Server候选把Rack Number同时当site、Customer Rack Name当room。现复用已有通用表头语义，拒绝明确site/room/rack之间的错误替代；未知表述仍由Agent判断。补充对应合成关键用例，完整engineering包及局部纠错/反馈AI检查通过，v32构建完成待切换。空修正错误明确要求编辑操作，绑定错误统一使用region_index并说明remove_columns语义。v31已补回Network机柜；按U位置表示归一后967条设备的四个核心字段匹配，但Server额外层级字段仍需纠正，整本未验收。

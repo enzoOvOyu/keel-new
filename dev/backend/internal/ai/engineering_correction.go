@@ -60,8 +60,8 @@ func engineeringCorrectionTool(draft engineering.EngineeringProposal, sheet stri
 		bounds[key] = map[string]any{"type": "integer", "minimum": 1}
 	}
 	return map[string]any{"type": "function", "function": map[string]any{
-		"name": "map_semantic_fields", "description": "Correct draft_to_correct. Change only specified fields in one region; all other bindings remain unchanged. The entire resulting proposal is validated before saving. Region index is zero-based.",
-		"parameters": map[string]any{"type": "object", "additionalProperties": false, "required": []string{"sheet", "region_index"}, "$defs": definitions, "properties": map[string]any{
+		"name": "map_semantic_fields", "description": "Correct draft_to_correct. Change only specified fields in one region; all other bindings remain unchanged. The entire resulting proposal is validated before saving. Region index is zero-based. Always include set_columns and remove_columns; use {} or [] for an unused operation. Removing an unsupported field requires remove_columns, not an empty call.",
+		"parameters": map[string]any{"type": "object", "additionalProperties": false, "required": []string{"sheet", "region_index", "set_columns", "remove_columns"}, "$defs": definitions, "properties": map[string]any{
 			"sheet": map[string]any{"type": "string", "enum": []string{sheet}}, "region_index": map[string]any{"type": "integer", "minimum": 0, "maximum": len(draft.Regions) - 1},
 			"set_columns": columns, "remove_columns": map[string]any{"type": "array", "items": map[string]any{"type": "string", "enum": removable}},
 			"set_constants": map[string]any{"type": "array", "items": constant}, "remove_constants": map[string]any{"type": "array", "items": map[string]any{"type": "string", "enum": removable}},
