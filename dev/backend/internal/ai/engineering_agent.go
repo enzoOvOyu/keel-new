@@ -186,14 +186,20 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 		}
 		raw := queued[0]
 		queued = queued[1:]
+		original := raw
+		raw, normalizationErr := normalizeEngineeringColumns(raw)
 		var err error
 		record := func(tool, state string, value any) error {
 			if hooks.Artifact != nil {
-				return hooks.Artifact(ctx, tool, state, map[string]any{"request": json.RawMessage(raw), "result": value})
+				return hooks.Artifact(ctx, tool, state, map[string]any{"request": json.RawMessage(original), "result": value})
 			}
 			return nil
 		}
-		if schemaErr := validateEngineeringSchema(ctx, raw); schemaErr != nil {
+		schemaErr := normalizationErr
+		if schemaErr == nil {
+			schemaErr = validateEngineeringSchema(ctx, raw)
+		}
+		if schemaErr != nil {
 			queued = nil // Remaining calls were planned without this failure feedback.
 			if schemaErr.Error() == "AI_SCHEMA_VALIDATOR_UNAVAILABLE" {
 				return proposal, schemaErr
@@ -549,18 +555,27 @@ func boundedEngineeringHistory(history []any) []any {
 // Tool examples from a completed/different sheet must not steer a resumed sheet.
 // Full history remains in artifacts; only the active evidence enters this turn.
 func engineeringSheetHistory(history []any, sheet string) []any {
+	type sheetAction struct {
+		Sheet    string `json:"sheet"`
+		Proposal *struct {
+			Regions []struct {
+				Sheet string `json:"sheet"`
+			} `json:"regions"`
+		} `json:"proposal"`
+	}
 	filtered := []any{}
 	for _, entry := range history {
 		raw, _ := json.Marshal(entry)
 		var step struct {
-			Action   engineeringAction `json:"action"`
-			Rejected engineeringAction `json:"rejected_action"`
+			Action   sheetAction `json:"action"`
+			Rejected sheetAction `json:"rejected_action"`
 		}
 		if json.Unmarshal(raw, &step) != nil {
 			continue
 		}
 		matches := step.Action.Sheet == sheet || step.Rejected.Sheet == sheet
-		for _, proposal := range []*engineering.EngineeringProposal{step.Action.Proposal, step.Rejected.Proposal} {
+		for _, action := range []sheetAction{step.Action, step.Rejected} {
+			proposal := action.Proposal
 			if proposal != nil {
 				for _, region := range proposal.Regions {
 					matches = matches || region.Sheet == sheet
@@ -589,9 +604,7 @@ func constrainEngineeringTools(functions []any, attributes []engineering.Attribu
 		function := entry.(map[string]any)["function"].(map[string]any)
 		parameters := function["parameters"].(map[string]any)
 		definitions, _ := parameters["$defs"].(map[string]any)
-		if region, ok := definitions["Region"].(map[string]any); ok {
-			region["properties"].(map[string]any)["columns"].(map[string]any)["description"] = "Only evidenced engineering field bindings, NOT every source column. Region bounds cover the entire table including unbound auxiliary columns. Never shrink bounds when omitting a binding."
-		}
+		engineeringColumnMapSchema(definitions, fields)
 		for _, name := range []string{"Column", "Constant", "CellBinding", "Module"} {
 			definition, ok := definitions[name].(map[string]any)
 			if !ok {
@@ -855,9 +868,10 @@ func scopeEngineeringProposalTools(selected, functions []any, kinds []string, at
 		var copy map[string]any
 		_ = json.Unmarshal(raw, &copy)
 		defs := copy["function"].(map[string]any)["parameters"].(map[string]any)["$defs"].(map[string]any)
-		for _, name := range []string{"Column", "Constant", "CellBinding"} {
+		for _, name := range []string{"Constant", "CellBinding"} {
 			defs[name].(map[string]any)["properties"].(map[string]any)["field"].(map[string]any)["enum"] = fields
 		}
+		engineeringColumnMapSchema(defs, fields)
 		defs["Region"].(map[string]any)["properties"].(map[string]any)["kind"].(map[string]any)["enum"] = appendUnique(append([]string{}, kinds...), "other")
 		namespaceEngineeringDefinitions(copy["function"].(map[string]any)["parameters"].(map[string]any), "mapping_")
 		out[i] = copy

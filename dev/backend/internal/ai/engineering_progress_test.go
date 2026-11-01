@@ -36,7 +36,7 @@ func TestEngineeringNativeToolsResumeSheetCheckpoint(t *testing.T) {
 		for _, tool := range toolList {
 			function := tool.(map[string]any)["function"].(map[string]any)
 			if function["name"] == "propose_engineering_model" {
-				fields := function["parameters"].(map[string]any)["$defs"].(map[string]any)["Column"].(map[string]any)["properties"].(map[string]any)["field"].(map[string]any)["enum"].([]any)
+				fields := function["parameters"].(map[string]any)["$defs"].(map[string]any)["Region"].(map[string]any)["properties"].(map[string]any)["columns"].(map[string]any)["propertyNames"].(map[string]any)["enum"].([]any)
 				found := false
 				for _, field := range fields {
 					if field == "cable_model" {
@@ -415,7 +415,7 @@ func TestMappingToolsFollowAgentDomainWithoutRestrictingReclassification(t *test
 			continue
 		}
 		defs := f["parameters"].(map[string]any)["$defs"].(map[string]any)
-		fields := defs["mapping_Column"].(map[string]any)["properties"].(map[string]any)["field"].(map[string]any)["enum"].([]string)
+		fields := defs["mapping_Region"].(map[string]any)["properties"].(map[string]any)["columns"].(map[string]any)["propertyNames"].(map[string]any)["enum"].([]string)
 		hasEndpoint := false
 		for _, field := range fields {
 			if field == "quantity" {
