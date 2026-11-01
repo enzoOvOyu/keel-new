@@ -156,6 +156,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 		history = boundedEngineeringHistory(history)
 		if len(queued) == 0 {
 			active := pending[0]
+			history = engineeringSheetHistory(history, active)
 			sheet, _ := ir.AnalyzeSheet(active)
 			regions := []bom.Region{}
 			for _, region := range ir.Regions {
@@ -332,6 +333,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 					if action.Action == "propose_engineering_model" {
 						proposal = candidate
 						completed[action.Sheet] = true
+						queued = nil
 						result = map[string]any{"sheet_saved": action.Sheet, "regions": len(action.Proposal.Regions), "completed_sheets": len(completed), "formal_write": false}
 						history = nil
 					}
@@ -542,6 +544,34 @@ func boundedEngineeringHistory(history []any) []any {
 		}
 	}
 	return history
+}
+
+// Tool examples from a completed/different sheet must not steer a resumed sheet.
+// Full history remains in artifacts; only the active evidence enters this turn.
+func engineeringSheetHistory(history []any, sheet string) []any {
+	filtered := []any{}
+	for _, entry := range history {
+		raw, _ := json.Marshal(entry)
+		var step struct {
+			Action   engineeringAction `json:"action"`
+			Rejected engineeringAction `json:"rejected_action"`
+		}
+		if json.Unmarshal(raw, &step) != nil {
+			continue
+		}
+		matches := step.Action.Sheet == sheet || step.Rejected.Sheet == sheet
+		for _, proposal := range []*engineering.EngineeringProposal{step.Action.Proposal, step.Rejected.Proposal} {
+			if proposal != nil {
+				for _, region := range proposal.Regions {
+					matches = matches || region.Sheet == sheet
+				}
+			}
+		}
+		if matches {
+			filtered = append(filtered, entry)
+		}
+	}
+	return filtered
 }
 
 func constrainEngineeringTools(functions []any, attributes []engineering.AttributeDefinition) {

@@ -300,6 +300,18 @@ func TestEngineeringFormulaReadWindowRequiresInterpretation(t *testing.T) {
 	}
 }
 
+func TestEngineeringHistoryKeepsOnlyActiveSheetEvidence(t *testing.T) {
+	history := []any{
+		map[string]any{"action": engineeringAction{Action: "inspect_sheet", Sheet: "completed"}},
+		map[string]any{"action": engineeringAction{Action: "inspect_formula", Sheet: "active", Cell: "B4"}},
+		map[string]any{"rejected_action": engineeringAction{Action: "read_range", Sheet: "active"}, "error": "INVALID_RANGE"},
+	}
+	filtered := engineeringSheetHistory(history, "active")
+	if len(filtered) != 2 {
+		t.Fatalf("lost active errors or retained unrelated context: %+v", filtered)
+	}
+}
+
 func TestEngineeringMissingFormulaProvidesActualReferences(t *testing.T) {
 	calls := 0
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
