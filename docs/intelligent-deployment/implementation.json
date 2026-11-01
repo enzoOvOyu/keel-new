@@ -1,0 +1,299 @@
+{
+  "updated_at": "2026-11-01T05:29:49.409927+00:00",
+  "branch": "audit/intelligent-deployment-p0",
+  "scope": "P1–P6 code deployed at 5abb94f on existing development environment; real-source/AI/reference/browser acceptance NOT RUN",
+  "phase_status": {
+    "P0": "complete; report commit 314126d",
+    "P1": "complete: architecture, models, contracts and kernel",
+    "P2": "Multiround source tools, column and explicit cross-sheet record proposals, deterministic typed extraction, persisted regions/facts/provenance and dynamic module plan connected; real provider/source acceptance NOT RUN",
+    "P3": "isolated LibreOffice Provider, formula graph, unit-aware restricted rule AST, human rule approval and durable runs implemented; real Golden Fixture reference acceptance pending",
+    "P4": "All five typed domain batches, per-segment cable plans and approved typed attributes implemented; Golden receives reviewed input only; real source/customer acceptance NOT RUN",
+    "P5": "Independent domain review/publication plus immutable reimport baseline, explicit difference decisions and same-lineage planning withdrawal implemented; real source acceptance NOT RUN",
+    "P6": "Unified understanding/overview/evidence/calculation/issues/difference/review workspace implemented; input freshness and versioned editor closure complete; browser acceptance NOT RUN"
+  },
+  "implemented": [
+    "Three-layer design, model ownership and relational schema design for all requested common and domain models",
+    "66 closed OpenAPI component schemas including all 14 common models and 10 required domain models",
+    "Go typed models and frontend generated model exports; no untyped map for domain payloads",
+    "Trusted dynamic registry, 10-state transition rules, actual-plan dependency batches and local missing-input propagation",
+    "Revision dependency invalidation limited to consumers; registry output copies cannot mutate trusted definitions",
+    "Equipment quantity/identity, assembly cycle/parent constraints, facility hierarchy, rack bounds, U overlap and front/rear depth validation",
+    "AI approval rejected; exact review revision/digest required; publication requires successful receipt",
+    "Replaceable SpreadsheetCalculationProvider interface; formula/cache/result and rule/run models separated",
+    "11 scoped engineering HTTP operations and relational migration027",
+    "Durable analysis jobs with leases; sanitized IR tools and deterministic local extraction",
+    "Independent exact-revision reviews, idempotent publication and existing Outbox retries",
+    "CMDB planned projection protects Observed payload and uses existing rack visualization",
+    "Unified source/model/evidence/issues/versions/review workbench; legacy import retained",
+    "Replaceable isolated LibreOffice provider: source hash/read-only input, macro/link updates disabled, bounded sandbox, formula/cache/recalculated/error separation",
+    "Formula dependency graph for cell/range/quoted sheet/named range references, explicit cycles/missing/dynamic references",
+    "Project-scoped immutable rule versions with exact decimal/unit checks, cases, approval and safe AST evaluation",
+    "8 calculation/rule HTTP operations and migration028; per-run/per-formula/per-dependency relational records",
+    "Formula-backed model evidence points to calculation runs; incompatible or missing recomputation blocks affected fields",
+    "Calculation workbench with results, dependency details, editable rule expressions/parameters/cases and approval",
+    "Typed ports/connections/cable routes and separate length states, physical-parent optical demand dedup",
+    "Connectivity and engineering-cabling independent release; CMDB planning segments and evidenced patch passthrough pairs; existing topology queries reused",
+    "Connectivity editor and scoped individual-object revision endpoint; migration029/030",
+    "PowerPlan typed tables and parameter workbench, distinct planned/nameplate/measured power and unknown capacities",
+    "Durable intrinsic rack power balance with explicit units and missing-input issues, partial results and cooling/capacity validation",
+    "Batch calculation output application into versioned cable lengths/power fields, run/source/output checks and stale power invalidation",
+    "Material and workload relational estimates with separate required/purchased/spares/gap and quantity/stock/labor values",
+    "Source-driven procurement/labor or approved project rules; no universal procurement formula or invented labor rate",
+    "Persistent workload summary, batch application, stale quantity block and replacement; estimates publish only engineering revisions",
+    "NetworkPlan typed relational submodels for all ten logical planning groups; explicit source facts only",
+    "Published physical revision references, independent network review/publication and guarded Golden input consumption",
+    "Durable ImportPlan/module bindings/typed regions/facts/provenance; actual target/job state projection and applicable intrinsic calculation scheduling",
+    "Explicit source-cell records for transposed/key-value/cross-sheet forms with local extraction and sensitive-cell exclusion",
+    "Unified engineering overview and source evidence browser; stale form saves use frozen revision",
+    "Immutable cross-file source lineage and baseline, explicit reviewed differences with origin evidence preservation",
+    "Superseded planning field history and expired relations; pure planned withdrawals retired and excluded from active topology; Observed untouched",
+    "Explicit physical cable segment specs and stock lengths; workload distribution per external segment",
+    "Project/version-scoped typed extension definitions with human approval, relational value slots and source-bound Agent mapping",
+    "Typed extension review/edit UI and planned CMDB source linkage; missing required fields block their domain",
+    "Relevant cable inputs invalidate retained calculated lengths/derived stock; actual/source evidence remains separate; actionable UI errors and original attribute-version editing"
+  ],
+  "files": {
+    "design": "docs/intelligent-deployment/P1-DESIGN.txt",
+    "openapi": "docs/openapi.yaml",
+    "core": "dev/backend/internal/engineering/",
+    "frontend_types": "dev/src/lib/api/engineering.ts"
+  },
+  "verification": [
+    {
+      "command": "go test ./internal/engineering",
+      "cwd": "dev/backend",
+      "result": "PASS",
+      "cases": 9,
+      "scope": "synthetic kernel unit cases only"
+    },
+    {
+      "command": "go vet ./internal/engineering",
+      "cwd": "dev/backend",
+      "result": "PASS"
+    },
+    {
+      "check": "OpenAPI 66 schema definitions + required 24 models + typed-value valid/invalid cases + old paths/schemas unchanged",
+      "result": "PASS",
+      "tool": "local Python yaml/jsonschema"
+    },
+    {
+      "command": "openapi-typescript docs/openapi.yaml -o dev/src/lib/schemas/openapi.ts",
+      "result": "PASS"
+    },
+    {
+      "command": "tsc --noEmit --strict --skipLibCheck --target ES2022 --module ESNext --moduleResolution bundler dev/src/lib/api/engineering.ts",
+      "result": "PASS",
+      "scope": "engineering contract exports only, not full UI build"
+    },
+    {
+      "command": "node dev/scripts/check-real-api-docs.mjs",
+      "result": "PASS",
+      "scope": "55 existing registered operations; no new HTTP operations"
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS"
+    },
+    {
+      "check": "TestEngineeringPhysicalPublication",
+      "result": "PASS",
+      "scope": "isolated PostgreSQL synthetic project; approval, target receipt, idempotency, duplicate pending denial, observed protection, reviewed reanalysis conflict; no real AI/workbook"
+    },
+    {
+      "check": "3 structural variants plus unknown dimension and invented constant checks",
+      "result": "PASS",
+      "scope": "synthetic mappings, renamed/reordered/shifted regions and units; not cross-customer AI acceptance"
+    },
+    {
+      "check": "TestEngineeringAgentUsesToolsAndRejectsApproval",
+      "result": "PASS",
+      "scope": "synthetic local model protocol, 3 tool calls and strict Pydantic"
+    },
+    {
+      "check": "tsc --noEmit -p dev/tsconfig.json",
+      "result": "PASS",
+      "scope": "frontend type checking only"
+    },
+    {
+      "check": "check-real-api-docs.mjs / git diff --check",
+      "result": "PASS",
+      "scope": "66 registered operations; no HTTP calls"
+    },
+    {
+      "check": "OpenAPI semantic comparison against b25915e",
+      "result": "PASS",
+      "scope": "9 added path entries /11 operations,28 schemas; no existing paths or schemas changed"
+    },
+    {
+      "check": "TestFormulaGraphRangesNamesCyclesAndDynamic / TestRuleUnitsCasesAndApproval",
+      "result": "PASS",
+      "scope": "synthetic reference graph, units, standard size, mismatches and unapproved execution"
+    },
+    {
+      "check": "TestIsolatedCalcReference",
+      "result": "PASS",
+      "scope": "actual isolated LibreOffice against generated XLSX; SUM cross-sheet result20 and divide-by-zero, immutable original"
+    },
+    {
+      "check": "TestEngineeringCalculationPersistenceAndRuleReview",
+      "result": "PASS",
+      "scope": "isolated PostgreSQL; rule version/review/digest, calculation queue/dedup/execution, cache/result/provenance and project isolation; unrelated edits preserve source conflict"
+    },
+    {
+      "check": "TestSourceConstantsResolveOnlyCitedSanitizedValues",
+      "result": "PASS",
+      "scope": "cited local identity restoration without modifying sanitized proposal; ambiguous anonymized literals not guessed"
+    },
+    {
+      "check": "P3 TypeScript and real API documentation",
+      "result": "PASS",
+      "scope": "Final incremental frontend TypeScript check and74 registered operations; no HTTP or browser acceptance"
+    },
+    {
+      "check": "TestConnectivity*",
+      "result": "PASS",
+      "scope": "synthetic physical-port optic dedup, speed units, length state, stock too short, breakout cycles and incomplete patch pair"
+    },
+    {
+      "check": "TestEngineeringConnectivityPublication",
+      "result": "PASS",
+      "scope": "isolated PostgreSQL target review/Outbox/publication and existing topology two segments; no actual length or optic procurement assets"
+    },
+    {
+      "check": "S3 TypeScript, AI protocol, documentation",
+      "result": "PASS",
+      "scope": "incremental TypeScript; synthetic agent tool/schema check;75 registered operations; no browser or real provider acceptance"
+    },
+    {
+      "check": "TestPowerBalanceSeparatesBasisAndUnknown / TestPowerExtractionUsesExplicitUnitsAndBasis",
+      "result": "PASS",
+      "scope": "synthetic explicit-unit basis separation, exact balance, cooling overload and missing input"
+    },
+    {
+      "check": "TestEngineeringPowerCalculationPublication",
+      "result": "PASS",
+      "scope": "isolated PostgreSQL source revision/calculation input/output/application/review/Outbox receipt; no CMDB assets; stale/tampered results rejected and input changes clear old loads"
+    },
+    {
+      "check": "Power Pydantic proposal and incremental frontend TypeScript",
+      "result": "PASS",
+      "scope": "strict synthetic power proposal and static type checking; not AI understanding or browser acceptance"
+    },
+    {
+      "check": "TestWorkloadSummaryUsesStockAndDoesNotInventLabor / TestMaterialRuleAndUnitsRemainExplicit",
+      "result": "PASS",
+      "scope": "synthetic counts and normalized stock distribution, missing stock partial, no assumed procurement gap/labor, unit checks"
+    },
+    {
+      "check": "TestEngineeringEstimatePublicationAndWorkload",
+      "result": "PASS",
+      "scope": "isolated PostgreSQL count3→4, persistent runs and result application, independent estimate review/publish, zero CMDB assets and stale/recalculation replacement"
+    },
+    {
+      "check": "Estimate incremental TypeScript",
+      "result": "PASS",
+      "scope": "static frontend types only; browser acceptance NOT RUN"
+    },
+    {
+      "check": "TestEngineeringNetworkPublicationAndGoldenGate",
+      "result": "PASS",
+      "scope": "isolated DB network roundtrip, draft/physical dependency gates, stale Golden input refusal; no CMDB assets"
+    },
+    {
+      "check": "TestNetworkExtractionCrossRegionOrderAndExplicitFacts and incremental TypeScript",
+      "result": "PASS",
+      "scope": "synthetic cross-region order, no invented physical entities/versions and frontend types"
+    },
+    {
+      "check": "TestRecordBindingsAndIndependentModules",
+      "result": "PASS",
+      "scope": "synthetic transposed/cross-sheet values and typed facts; missing power input does not block equipment; sensitive cell rejected"
+    },
+    {
+      "check": "TestEngineeringIntelligencePersistence",
+      "result": "PASS",
+      "scope": "isolated DB plan/input/facts/source provenance and previous plan, manual revision preserves proposed source facts; module selects workload calculation and shows Processing"
+    },
+    {
+      "check": "S7 synthetic engineering AI protocol and incremental TypeScript",
+      "result": "PASS",
+      "scope": "protocol and type checks only; no real provider or browser acceptance"
+    },
+    {
+      "check": "TestEngineeringReimportReviewedRemoval",
+      "result": "PASS",
+      "scope": "isolated DB reviewed retained value and removals, original provenance, existing topology query, empty target/port retirement, Observed unchanged and stale ancestor receipt"
+    },
+    {
+      "check": "P5 incremental TypeScript",
+      "result": "PASS",
+      "scope": "static types only; no browser acceptance"
+    },
+    {
+      "check": "TestEngineeringConnectivityPublication extended for segment specs; TestCableStockDistributionNeedsEveryPhysicalSegment; TypeScript",
+      "result": "PASS",
+      "scope": "isolated DB 3m/5m independent plans and two topology segments; missing segment remains incomplete; static UI types"
+    },
+    {
+      "check": "TestApprovedTypedAttributeExtraction; TestEngineeringTypedAttributesApprovalAndPublication; synthetic AI protocol; TypeScript",
+      "result": "PASS",
+      "scope": "local synthetic source/schema/isolated DB/CMDB checks; no real provider/source/browser acceptance"
+    },
+    {
+      "check": "TestCableCalculationTracksRelevantInputs; incremental TypeScript",
+      "result": "PASS",
+      "scope": "Synthetic relevant/unrelated rack changes, estimated/calculated/confirmed length changes, derived stock evidence invalidation and source stock preservation; static frontend types only"
+    },
+    {
+      "check": "node dev/scripts/check-real-api-docs.mjs; git diff --check",
+      "result": "PASS",
+      "scope": "88 registered operations and local whitespace check only; no HTTP/DB/AI calls"
+    },
+    {
+      "check": "Deployment build, migrations and runtime readiness",
+      "result": "PASS",
+      "scope": "Go build, frontend bundle, full DB backup/archive index, migrations27–37, original core row counts, health/frontend modules, authenticated engineering GETs, Calc version and Pydantic availability",
+      "evidence": "docs/intelligent-deployment/deployment-20261101.json"
+    }
+  ],
+  "not_run": [
+    "real AI calls",
+    "source workbook reimport",
+    "human Ground Truth acceptance",
+    "UI interaction/visual acceptance",
+    "cross-customer generalization",
+    "smoke/regression suites",
+    "real workbook reference recalculation (synthetic isolated reference passed)",
+    "Full HTTP mutation and live business integration; authenticated read-only startup endpoints passed"
+  ],
+  "deployment": {
+    "deployed": true,
+    "database_changed": true,
+    "http_operations_changed": true,
+    "original_workbooks_modified": false,
+    "live_frontend_changed": true,
+    "scope": "Existing running environment only; branch implementation and isolated checks listed separately",
+    "code_revision": "5abb94f",
+    "evidence": "docs/intelligent-deployment/deployment-20261101.json"
+  },
+  "next_vertical_slice": [],
+  "limits": [
+    "No true AI/source workbook/Golden Fixture/human Ground Truth acceptance",
+    "No browser interaction or cross-customer generalization acceptance",
+    "Formula source/Golden Fixture compatibility and human Ground Truth NOT RUN",
+    "Rule AST rejects unsupported compound-unit operations; dynamic/external spreadsheet dependencies remain partial",
+    "Golden endpoint supplies reviewed planning input only; vendor configuration generation/downloading is outside this engineering module"
+  ],
+  "changes": {
+    "migration_added": "027–037 applied to current development database; isolated checks previously passed",
+    "http_operations_added": 33,
+    "current_environment_changed": true,
+    "original_workbooks_modified": false
+  },
+  "pending_acceptance": [
+    "Real source + real AI + human Ground Truth across engineering domains",
+    "Reference recalculation of real workbook formulas",
+    "Second structurally different real customer source; variants alone do not prove generalization",
+    "Browser interaction and existing CMDB rack/topology acceptance"
+  ]
+}

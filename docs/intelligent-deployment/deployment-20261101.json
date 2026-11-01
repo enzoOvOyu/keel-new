@@ -1,0 +1,141 @@
+{
+  "code_revision": "5abb94f",
+  "branch": "audit/intelligent-deployment-p0",
+  "repository": "enzoOvOyu/keel-new",
+  "environment": "existing development environment",
+  "api": {
+    "port": 8081,
+    "bind": "127.0.0.1",
+    "binary": "/home/ubuntu/.local/state/keel-deployments/engineering-5abb94f/keel-api",
+    "pid": 918666,
+    "sha256": "1569d302a48b78a9800d165993724e8e9ff2b57f15a0ebb19751bb19a1ca85b5",
+    "cwd": "/home/ubuntu/keel/dev/backend",
+    "session": "keel-cmdb-api"
+  },
+  "frontend": {
+    "port": 5180,
+    "cwd": "/home/ubuntu/keel-engineering-p0/dev",
+    "pid": 918818,
+    "session": "keel-dev-5180",
+    "entry": "/p/:projectId/deploy/bom"
+  },
+  "migration": {
+    "previous": 26,
+    "current": 37,
+    "applied": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37
+    ],
+    "database": "keel",
+    "core_project_import_asset_user_counts_unchanged": true,
+    "engineering_sources_created": 0,
+    "engineering_jobs_created": 0
+  },
+  "backup": {
+    "format": "PostgreSQL custom archive",
+    "path": "/home/ubuntu/.local/state/keel-deployments/engineering-5abb94f/before-migration.dump",
+    "bytes": 24108375,
+    "sha256": "d828d64d0beb490af35897bb2feb98dcfa2fe3bcef7f1bdfdcbf3745510becaa",
+    "archive_directory_readable": true,
+    "restore_drill": "NOT RUN"
+  },
+  "configuration": {
+    "api_environment_preserved": true,
+    "added_api_keys": [
+      "KEEL_CALC_IMAGE"
+    ],
+    "calc_image": "sha256:dedd0435aeafef9c8b0bfadf27e505ac1d162783ea2af649bae050aeb19dba70",
+    "calc_version": "LibreOffice 7.4.7.2 40(Build:2)",
+    "schema_validator": "Pydantic 2 available",
+    "configured_ai_provider_options": 1,
+    "external_model_call": "NOT RUN"
+  },
+  "build_checks": {
+    "go_build": "PASS",
+    "frontend_bundle": "PASS: Vite build --minify false, heap limit 768 MB",
+    "typecheck": "Previously passed at 5abb94f; unchanged source, not repeated"
+  },
+  "api_startup_checks": {
+    "checks": [
+      {
+        "endpoint": "/auth/login",
+        "status": 200
+      },
+      {
+        "endpoint": "/projects/{projectId}/engineering-imports",
+        "status": 200
+      },
+      {
+        "endpoint": "/projects/{projectId}/engineering-rules",
+        "status": 200
+      },
+      {
+        "endpoint": "/projects/{projectId}/engineering-attributes",
+        "status": 200
+      },
+      {
+        "endpoint": "/projects/{projectId}/engineering-physical-revisions",
+        "status": 200
+      },
+      {
+        "endpoint": "/ai/provider-options",
+        "status": 200
+      },
+      {
+        "endpoint": "/auth/logout",
+        "status": 200
+      }
+    ],
+    "scope": "Authenticated read-only engineering list/configuration checks via original 5180 proxy; temporary login session logged out"
+  },
+  "frontend_startup_checks": [
+    {
+      "path": "/",
+      "status": 200,
+      "bytes": 1218
+    },
+    {
+      "path": "/healthz",
+      "status": 200,
+      "bytes": 77
+    },
+    {
+      "path": "/api/v1/auth/providers",
+      "status": 200,
+      "bytes": 128
+    },
+    {
+      "path": "/src/features/BOMWorkspace.tsx",
+      "status": 200,
+      "bytes": 3960
+    },
+    {
+      "path": "/src/features/EngineeringWorkbench.tsx",
+      "status": 200,
+      "bytes": 177186
+    }
+  ],
+  "limits": [
+    "No real AI or workbook analysis/import/publication performed",
+    "No browser interaction or visual acceptance",
+    "No full smoke/regression suite",
+    "No real workbook reference calculation, human Ground Truth or cross-customer acceptance"
+  ],
+  "rollback": {
+    "api_launcher": "/tmp/keel-project-delete-deployment-1031/api-run.py",
+    "frontend_launcher": "/tmp/keel-project-delete-deployment-1031/frontend-run.py",
+    "previous_api_revision": "994bb1c",
+    "previous_frontend_revision": "0deb3a6",
+    "database": "Additive migrations retained on application rollback; no automatic down migration; private full backup available"
+  },
+  "private_runtime_directory": "/home/ubuntu/.local/state/keel-deployments/engineering-5abb94f"
+}

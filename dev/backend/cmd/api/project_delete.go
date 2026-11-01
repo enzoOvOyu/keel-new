@@ -51,7 +51,7 @@ func (s *Server) deleteProject(w http.ResponseWriter, r *http.Request, id string
 		return
 	}
 	var busy bool
-	err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM bom_job WHERE project_id=$1 AND status IN ('pending','running')) OR EXISTS(SELECT 1 FROM bom_import_batch WHERE project_id=$1 AND status IN ('UPLOADED','PARSING'))`, id).Scan(&busy)
+	err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM bom_job WHERE project_id=$1 AND status IN ('pending','running')) OR EXISTS(SELECT 1 FROM bom_import_batch WHERE project_id=$1 AND status IN ('UPLOADED','PARSING')) OR EXISTS(SELECT 1 FROM eng_job WHERE project_id=$1 AND state IN ('pending','running')) OR EXISTS(SELECT 1 FROM eng_calculation_run WHERE project_id=$1 AND status IN ('pending','running'))`, id).Scan(&busy)
 	if err != nil {
 		fail(w, 500, "DATABASE_ERROR")
 		return
@@ -121,6 +121,8 @@ func projectDeletionStatements() []string {
 		`DELETE FROM cmdb_entity e WHERE item_uid IN (SELECT asset_id FROM deletion_assets) AND NOT EXISTS(SELECT 1 FROM cmdb_relationship WHERE from_uid=e.item_uid OR to_uid=e.item_uid)`,
 		`DELETE FROM cmdb_ingest_event WHERE event_id IN (SELECT id::text FROM outbox_event WHERE project_id=$1)`,
 		`DELETE FROM outbox_event WHERE project_id=$1`,
+		`DELETE FROM eng_source WHERE project_id=$1`,
+		`DELETE FROM eng_entity WHERE project_id=$1`,
 		`DELETE FROM bom_submission WHERE project_id=$1`,
 		`DELETE FROM project_asset WHERE project_id=$1`,
 		`DELETE FROM bom_item_revision WHERE revision_id IN (SELECT id FROM bom_revision WHERE project_id=$1)`,

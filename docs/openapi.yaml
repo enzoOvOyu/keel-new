@@ -15553,6 +15553,1145 @@ paths:
         '503':
           description: Provider not configured
 
+  /projects/{projectId}/engineering-imports:
+    get:
+      operationId: listEngineeringImports
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listEngineeringImportsEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
+    post:
+      operationId: attachEngineeringSource
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/attachEngineeringSourceEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDEAttachSource'
+  /projects/{projectId}/engineering-imports/{engineeringId}:
+    get:
+      operationId: getEngineeringWorkspace
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getEngineeringWorkspaceEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
+  /projects/{projectId}/engineering-imports/{engineeringId}/analyze:
+    post:
+      operationId: analyzeEngineeringSource
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      responses:
+        '202':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/analyzeEngineeringSourceEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDEExpectedRevision'
+  /projects/{projectId}/engineering-imports/{engineeringId}/model:
+    get:
+      operationId: getEngineeringModel
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: revision_id
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getEngineeringModelEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
+    put:
+      operationId: editEngineeringModel
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/editEngineeringModelEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDEModelEdit'
+  /projects/{projectId}/engineering-imports/{engineeringId}/review:
+    post:
+      operationId: reviewEngineeringTargets
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/reviewEngineeringTargetsEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDETargetAction'
+  /projects/{projectId}/engineering-imports/{engineeringId}/publish:
+    post:
+      operationId: publishEngineeringTargets
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      responses:
+        '202':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/publishEngineeringTargetsEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDETargetAction'
+  /projects/{projectId}/engineering-imports/{engineeringId}/revisions:
+    get:
+      operationId: listEngineeringRevisions
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listEngineeringRevisionsEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
+  /projects/{projectId}/engineering-imports/{engineeringId}/diff:
+    get:
+      operationId: diffEngineeringRevision
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: revision_id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/diffEngineeringRevisionEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
+  /projects/{projectId}/engineering-imports/{engineeringId}/source:
+    get:
+      operationId: readEngineeringSource
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: sheet
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: start_row
+        required: true
+        schema:
+          type: integer
+      - in: query
+        name: end_row
+        required: true
+        schema:
+          type: integer
+      - in: query
+        name: start_column
+        required: true
+        schema:
+          type: integer
+      - in: query
+        name: end_column
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/readEngineeringSourceEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
+  /projects/{projectId}/engineering-rules:
+    get:
+      operationId: listEngineeringRules
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Authorized engineering calculation/rule result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listEngineeringRulesEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Version conflict
+        '422':
+          description: Rule, unit, approval, calculation or schema precondition failed
+    post:
+      operationId: createEngineeringRule
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Authorized engineering calculation/rule result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createEngineeringRuleEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Version conflict
+        '422':
+          description: Rule, unit, approval, calculation or schema precondition failed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDERuleDraft'
+  /projects/{projectId}/engineering-rules/{ruleId}/{version}:
+    get:
+      operationId: getEngineeringRule
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: ruleId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: version
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Authorized engineering calculation/rule result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getEngineeringRuleEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Version conflict
+        '422':
+          description: Rule, unit, approval, calculation or schema precondition failed
+  /projects/{projectId}/engineering-rules/{ruleId}/{version}/review:
+    post:
+      operationId: reviewEngineeringRule
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: ruleId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: version
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Authorized engineering calculation/rule result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/reviewEngineeringRuleEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Version conflict
+        '422':
+          description: Rule, unit, approval, calculation or schema precondition failed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDERuleReview'
+  /projects/{projectId}/engineering-imports/{engineeringId}/calculation-provider:
+    get:
+      operationId: getEngineeringCalculationProvider
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Authorized engineering calculation/rule result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getEngineeringCalculationProviderEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Version conflict
+        '422':
+          description: Rule, unit, approval, calculation or schema precondition failed
+  /projects/{projectId}/engineering-imports/{engineeringId}/calculations:
+    get:
+      operationId: listEngineeringCalculations
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Authorized engineering calculation/rule result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listEngineeringCalculationsEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Version conflict
+        '422':
+          description: Rule, unit, approval, calculation or schema precondition failed
+    post:
+      operationId: runEngineeringCalculation
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      responses:
+        '202':
+          description: Authorized engineering calculation/rule result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runEngineeringCalculationEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Version conflict
+        '422':
+          description: Rule, unit, approval, calculation or schema precondition failed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDECalculationRequest'
+  /projects/{projectId}/engineering-imports/{engineeringId}/calculations/{runId}:
+    get:
+      operationId: getEngineeringCalculation
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: runId
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: offset
+        schema:
+          type: integer
+          minimum: 0
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Authorized engineering calculation/rule result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getEngineeringCalculationEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Version conflict
+        '422':
+          description: Rule, unit, approval, calculation or schema precondition failed
+  /projects/{projectId}/engineering-imports/{engineeringId}/connectivity:
+    put:
+      operationId: editEngineeringConnectivity
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDEConnectivityEdit'
+      responses:
+        '200':
+          description: New reviewed-draft candidate revision
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/editEngineeringConnectivityEnvelope'
+        '403':
+          description: Denied
+        '409':
+          description: Revision conflict
+        '422':
+          description: Invalid typed engineering entity
+  /projects/{projectId}/engineering-imports/{engineeringId}/power:
+    put:
+      operationId: editEngineeringPower
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDEPowerEdit'
+      responses:
+        '200':
+          description: New reviewed-input revision with validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/editEngineeringPowerEnvelope'
+        '403':
+          description: Permission denied
+        '409':
+          description: Revision stale
+        '422':
+          description: Invalid typed model or result binding
+  /projects/{projectId}/engineering-imports/{engineeringId}/calculation-application:
+    post:
+      operationId: applyEngineeringCalculation
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDECalculationApplication'
+      responses:
+        '200':
+          description: New reviewed-input revision with validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/applyEngineeringCalculationEnvelope'
+        '403':
+          description: Permission denied
+        '409':
+          description: Revision stale
+        '422':
+          description: Invalid typed model or result binding
+  /projects/{projectId}/engineering-imports/{engineeringId}/estimates:
+    put:
+      operationId: editEngineeringEstimate
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDEEstimateEdit'
+      responses:
+        '200':
+          description: New estimate revision with validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/editEngineeringEstimateEnvelope'
+        '403':
+          description: Permission denied
+        '409':
+          description: Revision conflict
+        '422':
+          description: Invalid typed estimate
+  /projects/{projectId}/engineering-imports/{engineeringId}/network:
+    put:
+      operationId: editEngineeringNetwork
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Authorized typed engineering result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/editEngineeringNetworkEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped revision not found
+        '409':
+          description: Revision stale or not published
+        '422':
+          description: Invalid network planning facts or dependencies
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDENetworkEdit'
+  /projects/{projectId}/engineering-physical-revisions:
+    get:
+      operationId: listEngineeringPhysicalRevisions
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Authorized typed engineering result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listEngineeringPhysicalRevisionsEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped revision not found
+        '409':
+          description: Revision stale or not published
+        '422':
+          description: Invalid network planning facts or dependencies
+  /projects/{projectId}/engineering-imports/{engineeringId}/golden-input:
+    get:
+      operationId: getEngineeringGoldenInput
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Authorized typed engineering result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getEngineeringGoldenInputEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped revision not found
+        '409':
+          description: Revision stale or not published
+        '422':
+          description: Invalid network planning facts or dependencies
+  /projects/{projectId}/engineering-imports/{engineeringId}/plan:
+    get:
+      operationId: getEngineeringPlan
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: engineeringId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Typed revision intelligence
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getEngineeringPlanEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped source not found
+  /projects/{projectId}/engineering-imports/{engineeringId}/intelligence:
+    get:
+      operationId: getEngineeringIntelligence
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: engineeringId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      responses:
+        '200':
+          description: Typed revision intelligence
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getEngineeringIntelligenceEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped source not found
+  /projects/{projectId}/engineering-imports/{engineeringId}/reimport:
+    post:
+      operationId: reimportEngineeringSource
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: engineeringId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDEReimportRequest'
+      responses:
+        '200':
+          description: Immutable source or reviewed difference draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/reimportEngineeringSourceEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped source not found
+        '409':
+          description: Revision conflict
+        '422':
+          description: Invalid difference decision
+  /projects/{projectId}/engineering-imports/{engineeringId}/difference-review:
+    post:
+      operationId: reviewEngineeringDifferences
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: engineeringId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDEDifferenceReview'
+      responses:
+        '200':
+          description: Immutable source or reviewed difference draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/reviewEngineeringDifferencesEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped source not found
+        '409':
+          description: Revision conflict
+        '422':
+          description: Invalid difference decision
+  /projects/{projectId}/engineering-attributes:
+    get:
+      operationId: listEngineeringAttributes
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Typed project attribute definition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listEngineeringAttributesEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped definition not found
+        '409':
+          description: Definition version conflict
+        '422':
+          description: Invalid typed attribute
+    post:
+      operationId: saveEngineeringAttribute
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Typed project attribute definition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/saveEngineeringAttributeEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped definition not found
+        '409':
+          description: Definition version conflict
+        '422':
+          description: Invalid typed attribute
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDEAttributeDraft'
+  /projects/{projectId}/engineering-attributes/{attributeId}/review:
+    post:
+      operationId: reviewEngineeringAttribute
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: attributeId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Typed project attribute definition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/reviewEngineeringAttributeEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped definition not found
+        '409':
+          description: Definition version conflict
+        '422':
+          description: Invalid typed attribute
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDEAttributeReview'
 components:
   securitySchemes:
     bearerAuth:
@@ -42464,6 +43603,3704 @@ components:
       - data
       - request_id
       additionalProperties: false
+    IDEAdaptiveRoutingPlan:
+      additionalProperties: false
+      properties:
+        enabled:
+          type: boolean
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        fabric_id:
+          type: string
+        policy_ref:
+          type: string
+      required:
+      - fabric_id
+      - enabled
+      - policy_ref
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDEAttributeDefinition:
+      additionalProperties: false
+      properties:
+        approval_status:
+          type: string
+          enum:
+          - draft
+          - approved
+          - retired
+        entity_kind:
+          type: string
+        enum_values:
+          items:
+            type: string
+          type: array
+        id:
+          type: string
+        key:
+          type: string
+        required:
+          type: boolean
+        unit:
+          type: string
+        value_type:
+          type: string
+          enum:
+          - text
+          - decimal
+          - boolean
+          - reference
+        version:
+          type: integer
+          minimum: 1
+      required:
+      - id
+      - version
+      - entity_kind
+      - key
+      - value_type
+      - enum_values
+      - required
+      - approval_status
+      type: object
+      x-implementation-status: model-contract-only
+    IDEAttributeValue:
+      additionalProperties: false
+      properties:
+        definition_id:
+          type: string
+        definition_version:
+          type: integer
+          minimum: 1
+        value:
+          $ref: '#/components/schemas/IDETypedValue'
+      required:
+      - definition_id
+      - definition_version
+      - value
+      type: object
+      x-implementation-status: model-contract-only
+    IDEBFDPlan:
+      additionalProperties: false
+      properties:
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        min_rx_milliseconds:
+          type: integer
+        min_tx_milliseconds:
+          type: integer
+        multiplier:
+          type: integer
+        session_id:
+          type: string
+      required:
+      - session_id
+      - min_tx_milliseconds
+      - min_rx_milliseconds
+      - multiplier
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDEBGPPlan:
+      additionalProperties: false
+      properties:
+        a_interface_id:
+          type: string
+        afi:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        id:
+          type: string
+        local_asn_allocation_id:
+          type: string
+        peer_asn_allocation_id:
+          type: string
+        policy_ref:
+          type: string
+        safi:
+          type: string
+        z_interface_id:
+          type: string
+      required:
+      - id
+      - a_interface_id
+      - z_interface_id
+      - local_asn_allocation_id
+      - peer_asn_allocation_id
+      - afi
+      - safi
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDEBounds:
+      additionalProperties: false
+      properties:
+        end_column:
+          type: integer
+          minimum: 1
+        end_row:
+          type: integer
+          minimum: 1
+        start_column:
+          type: integer
+          minimum: 1
+        start_row:
+          type: integer
+          minimum: 1
+      required:
+      - start_row
+      - end_row
+      - start_column
+      - end_column
+      type: object
+      x-implementation-status: model-contract-only
+    IDECablePlan:
+      additionalProperties: false
+      properties:
+        as_built:
+          $ref: '#/components/schemas/IDELengthEvidence'
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        calculated:
+          $ref: '#/components/schemas/IDELengthEvidence'
+        confirmed:
+          $ref: '#/components/schemas/IDELengthEvidence'
+        connection_id:
+          type: string
+        entity_id:
+          type: string
+        estimated:
+          $ref: '#/components/schemas/IDELengthEvidence'
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        provenance_id:
+          type: string
+        revision_id:
+          type: string
+        route:
+          items:
+            $ref: '#/components/schemas/IDERouteSegment'
+          type: array
+        rule_version:
+          $ref: '#/components/schemas/IDEVersionReference'
+        selected_stock:
+          $ref: '#/components/schemas/IDELengthEvidence'
+        spec:
+          $ref: '#/components/schemas/IDECableSpec'
+        label:
+          type: string
+        segment_index:
+          type: integer
+          minimum: 1
+          description: One-based external physical segment; required for paths containing patch panels.
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - connection_id
+      - spec
+      - route
+      type: object
+      x-implementation-status: model-contract-only
+    IDECableSpec:
+      additionalProperties: false
+      properties:
+        connector_a:
+          type: string
+        connector_z:
+          type: string
+        id:
+          type: string
+        medium:
+          type: string
+        rate_bps:
+          type: integer
+        source_model_label:
+          type: string
+      required:
+      - id
+      - medium
+      - connector_a
+      - connector_z
+      - source_model_label
+      type: object
+      x-implementation-status: model-contract-only
+    IDECalculationCapabilities:
+      additionalProperties: false
+      properties:
+        available:
+          type: boolean
+        formulas:
+          items:
+            type: string
+          type: array
+        id:
+          type: string
+        supports_external_links:
+          type: boolean
+        supports_named_ranges:
+          type: boolean
+        version:
+          type: string
+      required:
+      - id
+      - version
+      - available
+      - formulas
+      - supports_named_ranges
+      - supports_external_links
+      type: object
+      x-implementation-status: model-contract-only
+    IDECalculationError:
+      additionalProperties: false
+      properties:
+        cell:
+          $ref: '#/components/schemas/IDEFormulaCell'
+        code:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
+      type: object
+      x-implementation-status: model-contract-only
+    IDECalculationRule:
+      additionalProperties: false
+      properties:
+        approval_status:
+          type: string
+          enum:
+          - draft
+          - validated
+          - approved
+          - retired
+        dependencies:
+          items:
+            $ref: '#/components/schemas/IDEVersionReference'
+          type: array
+        domain:
+          enum:
+          - source
+          - equipment
+          - facility_placement
+          - power_cooling
+          - connectivity_cabling
+          - material_workload
+          - network_design
+          - validation_release
+          type: string
+        expression:
+          $ref: '#/components/schemas/IDERuleExpression'
+        id:
+          type: string
+        inputs:
+          items:
+            $ref: '#/components/schemas/IDERuleIO'
+          type: array
+        outputs:
+          items:
+            $ref: '#/components/schemas/IDERuleIO'
+          type: array
+        review_decision_id:
+          type: string
+        scope_id:
+          type: string
+        scope_type:
+          type: string
+          enum:
+          - project
+          - customer
+          - domain
+        validation_cases:
+          items:
+            $ref: '#/components/schemas/IDERuleCase'
+          type: array
+        version:
+          type: integer
+          minimum: 1
+      required:
+      - id
+      - version
+      - domain
+      - scope_type
+      - scope_id
+      - inputs
+      - outputs
+      - expression
+      - dependencies
+      - validation_cases
+      - approval_status
+      type: object
+      x-implementation-status: model-contract-only
+    IDECalculationRun:
+      additionalProperties: false
+      properties:
+        compatibility:
+          type: string
+          enum:
+          - compatible
+          - partial
+          - unsupported
+          - unknown
+        errors:
+          items:
+            $ref: '#/components/schemas/IDECalculationError'
+          type: array
+        finished_at:
+          format: date-time
+          type: string
+        formulas:
+          items:
+            $ref: '#/components/schemas/IDEFormulaEvidence'
+          type: array
+        id:
+          type: string
+        input_digest:
+          type: string
+        inputs:
+          items:
+            $ref: '#/components/schemas/IDENamedValue'
+          type: array
+        module_instance_id:
+          type: string
+        outputs:
+          items:
+            $ref: '#/components/schemas/IDENamedValue'
+          type: array
+        project_id:
+          type: string
+        provider_id:
+          type: string
+        provider_version:
+          type: string
+        revision_id:
+          type: string
+        rule:
+          $ref: '#/components/schemas/IDEVersionReference'
+        source_sha256:
+          type: string
+        started_at:
+          format: date-time
+          type: string
+        status:
+          type: string
+          enum:
+          - pending
+          - running
+          - succeeded
+          - partial
+          - failed
+          - unsupported
+      required:
+      - id
+      - project_id
+      - module_instance_id
+      - revision_id
+      - provider_id
+      - provider_version
+      - source_sha256
+      - input_digest
+      - status
+      - compatibility
+      - inputs
+      - outputs
+      - formulas
+      - errors
+      - started_at
+      type: object
+      x-implementation-status: model-contract-only
+      description: An existing formula cache is not a successful recalculation. No calculation provider is implemented by the
+        P1 contract.
+    IDECanonicalEntity:
+      additionalProperties: false
+      properties:
+        bom_item_id:
+          type: string
+        cmdb_asset_id:
+          type: string
+        domain:
+          enum:
+          - source
+          - equipment
+          - facility_placement
+          - power_cooling
+          - connectivity_cabling
+          - material_workload
+          - network_design
+          - validation_release
+          type: string
+        id:
+          type: string
+        kind:
+          type: string
+        planning_key:
+          type: string
+        project_id:
+          type: string
+      required:
+      - id
+      - project_id
+      - domain
+      - kind
+      - planning_key
+      type: object
+      x-implementation-status: model-contract-only
+    IDEConnectivityPlan:
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        connections:
+          items:
+            $ref: '#/components/schemas/IDEPlannedConnection'
+          type: array
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        ports:
+          items:
+            $ref: '#/components/schemas/IDEPlannedPort'
+          type: array
+        provenance_id:
+          type: string
+        revision_id:
+          type: string
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - ports
+      - connections
+      type: object
+      x-implementation-status: model-contract-only
+    IDEDeviceAssembly:
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        child_id:
+          type: string
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        parent_id:
+          type: string
+        provenance_id:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+        relation_type:
+          type: string
+          enum:
+          - contains
+          - installed_in
+          - assembly_member
+        revision_id:
+          type: string
+        slot_label:
+          type: string
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - parent_id
+      - child_id
+      - relation_type
+      - quantity
+      type: object
+      x-implementation-status: model-contract-only
+    IDEDeviceRole:
+      additionalProperties: false
+      properties:
+        equipment_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        plane_id:
+          type: string
+        role:
+          type: string
+      required:
+      - equipment_id
+      - plane_id
+      - role
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDEEVPNVXLANPlan:
+      additionalProperties: false
+      properties:
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        export_targets:
+          items:
+            type: string
+          type: array
+        fabric_id:
+          type: string
+        id:
+          type: string
+        import_targets:
+          items:
+            type: string
+          type: array
+        route_distinguisher:
+          type: string
+        vlan:
+          type: integer
+        vni:
+          type: integer
+        vrf_ref:
+          type: string
+        vtep_allocation_ids:
+          items:
+            type: string
+          type: array
+      required:
+      - id
+      - fabric_id
+      - vni
+      - vtep_allocation_ids
+      - route_distinguisher
+      - import_targets
+      - export_targets
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDEEngineeringModule:
+      additionalProperties: false
+      properties:
+        applicability:
+          type: string
+        calculations:
+          items:
+            type: string
+          type: array
+        dependencies:
+          items:
+            $ref: '#/components/schemas/IDEModuleDependency'
+          type: array
+        domain:
+          enum:
+          - source
+          - equipment
+          - facility_placement
+          - power_cooling
+          - connectivity_cabling
+          - material_workload
+          - network_design
+          - validation_release
+          type: string
+        id:
+          type: string
+        implementation_status:
+          type: string
+          enum:
+          - planned
+          - model_and_validation
+          - implemented
+        inputs:
+          items:
+            $ref: '#/components/schemas/IDEModuleIO'
+          type: array
+        outputs:
+          items:
+            $ref: '#/components/schemas/IDEModuleIO'
+          type: array
+        publish_targets:
+          items:
+            type: string
+          type: array
+        review_gates:
+          items:
+            $ref: '#/components/schemas/IDEReviewGate'
+          type: array
+        title:
+          type: string
+        validations:
+          items:
+            type: string
+          type: array
+        version:
+          type: integer
+          minimum: 1
+      required:
+      - id
+      - version
+      - domain
+      - title
+      - inputs
+      - outputs
+      - dependencies
+      - applicability
+      - calculations
+      - validations
+      - review_gates
+      - publish_targets
+      - implementation_status
+      type: object
+      x-implementation-status: model-contract-only
+    IDEEntityVersion:
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        provenance_id:
+          type: string
+        revision_id:
+          type: string
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      type: object
+      x-implementation-status: model-contract-only
+    IDEEquipmentPlan:
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        entity_id:
+          type: string
+        equipment_type:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        identity_kind:
+          type: string
+          enum:
+          - group
+          - planned_instance
+          - observed_reference
+        label:
+          type: string
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        model_ref:
+          type: string
+        provenance_id:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+        revision_id:
+          type: string
+        serial:
+          type: string
+        source_model_label:
+          type: string
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - equipment_type
+      - source_model_label
+      - quantity
+      - identity_kind
+      - label
+      type: object
+      x-implementation-status: model-contract-only
+    IDEEquipmentPowerProfile:
+      additionalProperties: false
+      properties:
+        basis:
+          type: string
+          enum:
+          - planned
+          - nameplate
+          - measured
+        cooling_type:
+          type: string
+        equipment_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        power:
+          $ref: '#/components/schemas/IDEQuantity'
+      required:
+      - equipment_id
+      - basis
+      - power
+      - cooling_type
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDEEvidenceReference:
+      additionalProperties: false
+      properties:
+        bounds:
+          $ref: '#/components/schemas/IDEBounds'
+        calculation_run_id:
+          type: string
+        id:
+          type: string
+        kind:
+          type: string
+          enum:
+          - input
+          - formula
+          - cached_result
+          - recalculated_result
+          - manual
+          - reference
+        sheet_id:
+          type: string
+        source_id:
+          type: string
+        source_sha256:
+          type: string
+      required:
+      - id
+      - source_id
+      - sheet_id
+      - bounds
+      - kind
+      - source_sha256
+      type: object
+      x-implementation-status: model-contract-only
+    IDEFacilityModel:
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        capacity_u:
+          type: integer
+          minimum: 1
+        coordinate_frame_id:
+          type: string
+        depth_mm:
+          type: string
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        height_mm:
+          type: string
+        kind:
+          type: string
+          enum:
+          - site
+          - room
+          - rack
+        label:
+          type: string
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        orientation_degrees:
+          type: string
+        parent_id:
+          type: string
+        provenance_id:
+          type: string
+        revision_id:
+          type: string
+        width_mm:
+          type: string
+        x_mm:
+          type: string
+        y_mm:
+          type: string
+        z_mm:
+          type: string
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - kind
+      - label
+      type: object
+      x-implementation-status: model-contract-only
+    IDEFormulaCell:
+      additionalProperties: false
+      properties:
+        address:
+          type: string
+        sheet_id:
+          type: string
+      required:
+      - sheet_id
+      - address
+      type: object
+      x-implementation-status: model-contract-only
+    IDEFormulaDependency:
+      additionalProperties: false
+      properties:
+        from:
+          $ref: '#/components/schemas/IDEFormulaCell'
+        kind:
+          type: string
+          enum:
+          - cell
+          - range
+          - named_range
+          - external
+          - dynamic
+          - external_or_structured
+          - unresolved
+          - missing_sheet
+        to_range:
+          type: string
+        to_sheet_id:
+          type: string
+      required:
+      - from
+      - to_sheet_id
+      - to_range
+      - kind
+      type: object
+      x-implementation-status: model-contract-only
+    IDEFormulaEvidence:
+      additionalProperties: false
+      properties:
+        cached_value:
+          $ref: '#/components/schemas/IDETypedValue'
+        cell:
+          $ref: '#/components/schemas/IDEFormulaCell'
+        compatibility:
+          type: string
+          enum:
+          - compatible
+          - partial
+          - unsupported
+          - unknown
+        dependencies:
+          items:
+            $ref: '#/components/schemas/IDEFormulaDependency'
+          type: array
+        dependency_status:
+          type: string
+          enum:
+          - complete
+          - partial
+          - unsupported
+          - cycle
+          - missing
+        error_code:
+          type: string
+        expression:
+          type: string
+        recalculated_value:
+          $ref: '#/components/schemas/IDETypedValue'
+      required:
+      - cell
+      - expression
+      - dependencies
+      - dependency_status
+      - compatibility
+      type: object
+      x-implementation-status: model-contract-only
+    IDEHeaderCell:
+      additionalProperties: false
+      properties:
+        column:
+          type: integer
+          minimum: 1
+        level:
+          type: integer
+          minimum: 1
+        parent:
+          type: string
+        row:
+          type: integer
+          minimum: 1
+      required:
+      - row
+      - column
+      - level
+      type: object
+      x-implementation-status: model-contract-only
+    IDEImportPlan:
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        modules:
+          items:
+            $ref: '#/components/schemas/IDEModuleInstance'
+          type: array
+        previous_plan_id:
+          type: string
+        project_id:
+          type: string
+        source_id:
+          type: string
+        summary:
+          type: string
+        version:
+          type: integer
+          minimum: 1
+      required:
+      - id
+      - project_id
+      - source_id
+      - version
+      - summary
+      - modules
+      type: object
+      x-implementation-status: model-contract-only
+    IDEInputBinding:
+      additionalProperties: false
+      properties:
+        available:
+          type: boolean
+        digest:
+          type: string
+        name:
+          type: string
+        output:
+          type: string
+        producer_instance_id:
+          type: string
+        required:
+          type: boolean
+        revision_id:
+          type: string
+      required:
+      - name
+      - output
+      - required
+      - available
+      type: object
+      x-implementation-status: model-contract-only
+    IDEInterfaceMapping:
+      additionalProperties: false
+      properties:
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        id:
+          type: string
+        logical_name:
+          type: string
+        physical_port_id:
+          type: string
+        plane_id:
+          type: string
+      required:
+      - id
+      - physical_port_id
+      - plane_id
+      - logical_name
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDELengthEvidence:
+      additionalProperties: false
+      properties:
+        calculation_run_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        length:
+          $ref: '#/components/schemas/IDEQuantity'
+      required:
+      - length
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDEMaterialEstimate:
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        calculation_run_id:
+          type: string
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        provenance_id:
+          type: string
+        purchase_gap:
+          $ref: '#/components/schemas/IDEQuantity'
+        purchased:
+          $ref: '#/components/schemas/IDEQuantity'
+        required:
+          $ref: '#/components/schemas/IDEQuantity'
+        revision_id:
+          type: string
+        spares:
+          $ref: '#/components/schemas/IDEQuantity'
+        spec_ref:
+          type: string
+        source_model_label:
+          type: string
+        required_calculation_run_id:
+          type: string
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - spec_ref
+      - required
+      - source_model_label
+      type: object
+      x-implementation-status: model-contract-only
+    IDEModelRevision:
+      additionalProperties: false
+      properties:
+        author_id:
+          type: string
+        author_type:
+          type: string
+          enum:
+          - agent
+          - human
+          - calculation
+          - migration
+        content_digest:
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        id:
+          type: string
+        input_digest:
+          type: string
+        inputs:
+          items:
+            $ref: '#/components/schemas/IDERevisionInput'
+          type: array
+        module_instance_id:
+          type: string
+        parent_id:
+          type: string
+        project_id:
+          type: string
+        sequence:
+          type: integer
+          minimum: 1
+      required:
+      - id
+      - project_id
+      - module_instance_id
+      - sequence
+      - input_digest
+      - content_digest
+      - author_type
+      - author_id
+      - inputs
+      - created_at
+      type: object
+      x-implementation-status: model-contract-only
+    IDEModuleDependency:
+      additionalProperties: false
+      properties:
+        module_id:
+          type: string
+        output:
+          type: string
+        required:
+          type: boolean
+        stage:
+          type: string
+          enum:
+          - process
+          - review
+          - publish
+      required:
+      - module_id
+      - output
+      - required
+      - stage
+      type: object
+      x-implementation-status: model-contract-only
+    IDEModuleIO:
+      additionalProperties: false
+      properties:
+        entity_type:
+          type: string
+        name:
+          type: string
+        required:
+          type: boolean
+      required:
+      - name
+      - entity_type
+      - required
+      type: object
+      x-implementation-status: model-contract-only
+    IDEModuleInstance:
+      additionalProperties: false
+      properties:
+        applicability_reason:
+          type: string
+        definition_id:
+          type: string
+        definition_version:
+          type: integer
+          minimum: 1
+        head_revision_id:
+          type: string
+        id:
+          type: string
+        inputs:
+          items:
+            $ref: '#/components/schemas/IDEInputBinding'
+          type: array
+        state:
+          enum:
+          - NOT_APPLICABLE
+          - DETECTED
+          - NEEDS_INPUT
+          - READY
+          - PROCESSING
+          - IN_REVIEW
+          - APPROVED
+          - PUBLISHED
+          - BLOCKED
+          - STALE
+          type: string
+      required:
+      - id
+      - definition_id
+      - definition_version
+      - state
+      - applicability_reason
+      - inputs
+      type: object
+      x-implementation-status: model-contract-only
+    IDENamedValue:
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+        value:
+          $ref: '#/components/schemas/IDETypedValue'
+      required:
+      - name
+      - value
+      type: object
+      x-implementation-status: model-contract-only
+    IDENetworkAllocation:
+      additionalProperties: false
+      properties:
+        address:
+          type: string
+        asn:
+          type: integer
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        id:
+          type: string
+        interface_id:
+          type: string
+        kind:
+          type: string
+          enum:
+          - ip
+          - asn
+        prefix_length:
+          type: integer
+        vrf_ref:
+          type: string
+      required:
+      - id
+      - kind
+      - entity_id
+      - evidence_ids
+      type: object
+      oneOf:
+      - properties:
+          kind:
+            const: ip
+        required:
+        - address
+        - prefix_length
+        - interface_id
+        not:
+          required:
+          - asn
+      - properties:
+          kind:
+            const: asn
+        required:
+        - asn
+        not:
+          anyOf:
+          - required:
+            - address
+          - required:
+            - prefix_length
+      x-implementation-status: model-contract-only
+    IDENetworkFabric:
+      additionalProperties: false
+      properties:
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        id:
+          type: string
+        kind:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
+      - kind
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDENetworkPlan:
+      additionalProperties: false
+      properties:
+        adaptive_routing:
+          items:
+            $ref: '#/components/schemas/IDEAdaptiveRoutingPlan'
+          type: array
+        allocations:
+          items:
+            $ref: '#/components/schemas/IDENetworkAllocation'
+          type: array
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        bfd:
+          items:
+            $ref: '#/components/schemas/IDEBFDPlan'
+          type: array
+        bgp:
+          items:
+            $ref: '#/components/schemas/IDEBGPPlan'
+          type: array
+        device_roles:
+          items:
+            $ref: '#/components/schemas/IDEDeviceRole'
+          type: array
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        evpn_vxlan:
+          items:
+            $ref: '#/components/schemas/IDEEVPNVXLANPlan'
+          type: array
+        fabrics:
+          items:
+            $ref: '#/components/schemas/IDENetworkFabric'
+          type: array
+        interface_mappings:
+          items:
+            $ref: '#/components/schemas/IDEInterfaceMapping'
+          type: array
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        physical_revision_id:
+          type: string
+        planes:
+          items:
+            $ref: '#/components/schemas/IDENetworkPlane'
+          type: array
+        provenance_id:
+          type: string
+        qos:
+          items:
+            $ref: '#/components/schemas/IDEQoSPlan'
+          type: array
+        revision_id:
+          type: string
+        source_ids:
+          items:
+            type: string
+          type: array
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - physical_revision_id
+      - source_ids
+      - fabrics
+      - planes
+      - device_roles
+      - interface_mappings
+      - allocations
+      - bgp
+      - bfd
+      - qos
+      - adaptive_routing
+      - evpn_vxlan
+      type: object
+      x-implementation-status: model-contract-only
+    IDENetworkPlane:
+      additionalProperties: false
+      properties:
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        fabric_id:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - fabric_id
+      - name
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDEPhysicalModel:
+      additionalProperties: false
+      properties:
+        assemblies:
+          items:
+            $ref: '#/components/schemas/IDEDeviceAssembly'
+          type: array
+        equipment:
+          items:
+            $ref: '#/components/schemas/IDEEquipmentPlan'
+          type: array
+        facilities:
+          items:
+            $ref: '#/components/schemas/IDEFacilityModel'
+          type: array
+        placements:
+          items:
+            $ref: '#/components/schemas/IDERackPlacement'
+          type: array
+        project_id:
+          type: string
+        ports:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEPlannedPort'
+        connections:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEPlannedConnection'
+        cables:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDECablePlan'
+        optics:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEOpticDemand'
+        power_plans:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEPowerPlan'
+        materials:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEMaterialEstimate'
+        workloads:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEWorkloadEstimate'
+        network_plans:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDENetworkPlan'
+      required:
+      - equipment
+      - assemblies
+      - facilities
+      - placements
+      - project_id
+      - ports
+      - connections
+      - cables
+      - optics
+      - power_plans
+      - materials
+      - workloads
+      - network_plans
+      type: object
+      x-implementation-status: model-contract-only
+      description: 'Read aggregate assembled from typed domain tables. Not a persistence JSON payload. First vertical slice: equipment,
+        assemblies, facilities and placements.'
+    IDEPlannedConnection:
+      additionalProperties: false
+      properties:
+        a_port_id:
+          type: string
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        patch_port_ids:
+          items:
+            type: string
+          type: array
+          description: Ordered entrance/exit port pairs for explicitly evidenced patch-panel passthroughs. Odd counts or different
+            owners block publication.
+        provenance_id:
+          type: string
+        revision_id:
+          type: string
+        z_port_id:
+          type: string
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - a_port_id
+      - z_port_id
+      - patch_port_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDEPlannedPort:
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        breakout_index:
+          type: integer
+        entity_id:
+          type: string
+        equipment_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        medium:
+          type: string
+        name:
+          type: string
+        parent_port_id:
+          type: string
+        provenance_id:
+          type: string
+        rate_bps:
+          type: integer
+        revision_id:
+          type: string
+        role:
+          type: string
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - equipment_id
+      - name
+      - role
+      - medium
+      type: object
+      x-implementation-status: model-contract-only
+    IDEPowerPlan:
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        entity_id:
+          type: string
+        equipment_profiles:
+          items:
+            $ref: '#/components/schemas/IDEEquipmentPowerProfile'
+          type: array
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        provenance_id:
+          type: string
+        racks:
+          items:
+            $ref: '#/components/schemas/IDERackPowerPlan'
+          type: array
+        revision_id:
+          type: string
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - equipment_profiles
+      - racks
+      type: object
+      x-implementation-status: model-contract-only
+    IDEProvenance:
+      additionalProperties: false
+      properties:
+        actor_id:
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        id:
+          type: string
+        inputs:
+          items:
+            $ref: '#/components/schemas/IDEProvenanceInput'
+          type: array
+        producer_id:
+          type: string
+        producer_type:
+          type: string
+          enum:
+          - parser
+          - agent
+          - human
+          - calculation
+          - validation
+        producer_version:
+          type: string
+        run_id:
+          type: string
+      required:
+      - id
+      - producer_type
+      - producer_id
+      - producer_version
+      - run_id
+      - inputs
+      - created_at
+      type: object
+      x-implementation-status: model-contract-only
+    IDEProvenanceInput:
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        kind:
+          type: string
+          enum:
+          - evidence
+          - fact
+          - entity
+        revision_id:
+          type: string
+      required:
+      - kind
+      - id
+      type: object
+      x-implementation-status: model-contract-only
+    IDEPublishRecord:
+      additionalProperties: false
+      properties:
+        created_at:
+          format: date-time
+          type: string
+        digest:
+          type: string
+        error_code:
+          type: string
+        id:
+          type: string
+        idempotency_key:
+          type: string
+        module_instance_id:
+          type: string
+        outbox_event_id:
+          type: string
+        project_id:
+          type: string
+        published_at:
+          format: date-time
+          type: string
+        receipt:
+          type: string
+        review_id:
+          type: string
+        revision_id:
+          type: string
+        state:
+          type: string
+          enum:
+          - pending
+          - published
+          - failed
+        target:
+          type: string
+      required:
+      - id
+      - project_id
+      - module_instance_id
+      - revision_id
+      - review_id
+      - target
+      - idempotency_key
+      - digest
+      - state
+      - outbox_event_id
+      - created_at
+      type: object
+      x-implementation-status: model-contract-only
+    IDEQoSPlan:
+      additionalProperties: false
+      properties:
+        ecn_enabled:
+          type: boolean
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        id:
+          type: string
+        interface_ids:
+          items:
+            type: string
+          type: array
+        lossless_priorities:
+          items:
+            type: integer
+          type: array
+        pfc_enabled:
+          type: boolean
+        policy_ref:
+          type: string
+        roce_version:
+          type: integer
+      required:
+      - id
+      - interface_ids
+      - lossless_priorities
+      - evidence_ids
+      type: object
+      x-implementation-status: model-contract-only
+    IDEQuantity:
+      additionalProperties: false
+      properties:
+        unit:
+          type: string
+          minLength: 1
+        value:
+          type: string
+          pattern: ^-?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)$
+      required:
+      - value
+      - unit
+      type: object
+      x-implementation-status: model-contract-only
+    IDERackPlacement:
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        depth_mm:
+          type: string
+        entity_id:
+          type: string
+        equipment_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        height_u:
+          type: integer
+          minimum: 1
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        mount_face:
+          type: string
+          enum:
+          - front
+          - rear
+          - both
+          - unknown
+        provenance_id:
+          type: string
+        rack_id:
+          type: string
+        revision_id:
+          type: string
+        start_u:
+          type: integer
+          minimum: 1
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - equipment_id
+      - rack_id
+      - mount_face
+      type: object
+      x-implementation-status: model-contract-only
+    IDERackPowerPlan:
+      additionalProperties: false
+      properties:
+        calculation_run_id:
+          type: string
+        capacity:
+          $ref: '#/components/schemas/IDEQuantity'
+        planned_load:
+          $ref: '#/components/schemas/IDEQuantity'
+        rack_id:
+          type: string
+        remaining:
+          $ref: '#/components/schemas/IDEQuantity'
+        cooling_capacity:
+          $ref: '#/components/schemas/IDEQuantity'
+        cooling_type:
+          type: string
+      required:
+      - rack_id
+      - cooling_type
+      type: object
+      x-implementation-status: model-contract-only
+    IDEReviewDecision:
+      additionalProperties: false
+      properties:
+        actor_id:
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        decision:
+          type: string
+          enum:
+          - approve
+          - reject
+        digest:
+          type: string
+        id:
+          type: string
+        module_instance_id:
+          type: string
+        project_id:
+          type: string
+        reason:
+          type: string
+        revision_id:
+          type: string
+      required:
+      - id
+      - project_id
+      - module_instance_id
+      - revision_id
+      - digest
+      - decision
+      - actor_id
+      - reason
+      - created_at
+      type: object
+      x-implementation-status: model-contract-only
+    IDEReviewGate:
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        permission:
+          type: string
+        target:
+          type: string
+      required:
+      - id
+      - permission
+      - target
+      type: object
+      x-implementation-status: model-contract-only
+    IDERevisionInput:
+      additionalProperties: false
+      properties:
+        digest:
+          type: string
+        id:
+          type: string
+        kind:
+          type: string
+        revision_id:
+          type: string
+      required:
+      - kind
+      - id
+      - revision_id
+      - digest
+      type: object
+      x-implementation-status: model-contract-only
+    IDERouteSegment:
+      additionalProperties: false
+      properties:
+        calculation_run_id:
+          type: string
+        distance:
+          $ref: '#/components/schemas/IDEQuantity'
+        from_id:
+          type: string
+        to_id:
+          type: string
+      required:
+      - from_id
+      - to_id
+      type: object
+      x-implementation-status: model-contract-only
+    IDERuleCase:
+      additionalProperties: false
+      properties:
+        expected:
+          items:
+            $ref: '#/components/schemas/IDENamedValue'
+          type: array
+        id:
+          type: string
+        inputs:
+          items:
+            $ref: '#/components/schemas/IDENamedValue'
+          type: array
+        tolerance:
+          type: string
+      required:
+      - id
+      - inputs
+      - expected
+      - tolerance
+      type: object
+      x-implementation-status: model-contract-only
+    IDERuleExpression:
+      additionalProperties: false
+      properties:
+        arguments:
+          items:
+            $ref: '#/components/schemas/IDERuleExpression'
+          type: array
+        input:
+          type: string
+        literal:
+          $ref: '#/components/schemas/IDEQuantity'
+        operator:
+          type: string
+          enum:
+          - input
+          - literal
+          - add
+          - subtract
+          - multiply
+          - divide
+          - min
+          - max
+          - ceil
+          - floor
+          - abs
+          - select_ceiling
+          - outputs
+          - output
+      required:
+      - operator
+      - arguments
+      type: object
+      x-implementation-status: model-contract-only
+    IDERuleIO:
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+        required:
+          type: boolean
+        unit:
+          type: string
+        value_type:
+          type: string
+          enum:
+          - text
+          - decimal
+          - boolean
+          - reference
+      required:
+      - name
+      - value_type
+      - unit
+      - required
+      type: object
+      x-implementation-status: model-contract-only
+    IDESemanticFact:
+      additionalProperties: false
+      properties:
+        claim_status:
+          type: string
+          enum:
+          - proposed
+          - accepted
+          - rejected
+        id:
+          type: string
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        predicate:
+          type: string
+        project_id:
+          type: string
+        provenance_id:
+          type: string
+        region_id:
+          type: string
+        revision_id:
+          type: string
+        subject_id:
+          type: string
+        value:
+          $ref: '#/components/schemas/IDETypedValue'
+      required:
+      - id
+      - project_id
+      - revision_id
+      - region_id
+      - predicate
+      - value
+      - claim_status
+      - maturity
+      - provenance_id
+      type: object
+      x-implementation-status: model-contract-only
+    IDETypedValue:
+      additionalProperties: false
+      properties:
+        boolean:
+          type: boolean
+        decimal:
+          type: string
+          pattern: ^-?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)$
+        kind:
+          type: string
+          enum:
+          - text
+          - decimal
+          - boolean
+          - reference
+        reference:
+          type: string
+        text:
+          type: string
+        unit:
+          type: string
+          minLength: 1
+      required:
+      - kind
+      type: object
+      oneOf:
+      - properties:
+          kind:
+            const: text
+        required:
+        - kind
+        - text
+        not:
+          anyOf:
+          - required:
+            - decimal
+          - required:
+            - boolean
+          - required:
+            - reference
+          - required:
+            - unit
+      - properties:
+          kind:
+            const: decimal
+        required:
+        - kind
+        - decimal
+        - unit
+        not:
+          anyOf:
+          - required:
+            - text
+          - required:
+            - boolean
+          - required:
+            - reference
+      - properties:
+          kind:
+            const: boolean
+        required:
+        - kind
+        - boolean
+        not:
+          anyOf:
+          - required:
+            - text
+          - required:
+            - decimal
+          - required:
+            - reference
+          - required:
+            - unit
+      - properties:
+          kind:
+            const: reference
+        required:
+        - kind
+        - reference
+        not:
+          anyOf:
+          - required:
+            - text
+          - required:
+            - decimal
+          - required:
+            - boolean
+          - required:
+            - unit
+      x-implementation-status: model-contract-only
+    IDEValidationIssue:
+      additionalProperties: false
+      properties:
+        code:
+          type: string
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        field:
+          type: string
+        message:
+          type: string
+        module_id:
+          type: string
+        publish_target:
+          type: string
+        severity:
+          type: string
+          enum:
+          - BLOCK
+          - WARNING
+          - INFO
+        id:
+          type: string
+        project_id:
+          type: string
+        revision_id:
+          type: string
+        resolution:
+          type: string
+          enum:
+          - open
+          - resolved
+          - waived
+        rule_version:
+          $ref: '#/components/schemas/IDEVersionReference'
+      required:
+      - code
+      - severity
+      - module_id
+      - entity_id
+      - field
+      - message
+      - publish_target
+      - evidence_ids
+      - id
+      - project_id
+      - revision_id
+      - resolution
+      type: object
+      x-implementation-status: model-contract-only
+    IDEVersionReference:
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        version:
+          type: integer
+          minimum: 1
+      required:
+      - id
+      - version
+      type: object
+      x-implementation-status: model-contract-only
+    IDEWorkbookRegion:
+      additionalProperties: false
+      properties:
+        bounds:
+          $ref: '#/components/schemas/IDEBounds'
+        headers:
+          items:
+            $ref: '#/components/schemas/IDEHeaderCell'
+          type: array
+        id:
+          type: string
+        kind:
+          type: string
+          enum:
+          - table
+          - grid
+          - parameters
+          - narrative
+          - unknown
+        merges:
+          items:
+            $ref: '#/components/schemas/IDEBounds'
+          type: array
+        semantic_label:
+          type: string
+        sheet_id:
+          type: string
+        source_id:
+          type: string
+      required:
+      - id
+      - source_id
+      - sheet_id
+      - bounds
+      - kind
+      - semantic_label
+      - headers
+      - merges
+      type: object
+      x-implementation-status: model-contract-only
+    IDEWorkbookSource:
+      additionalProperties: false
+      properties:
+        byte_size:
+          type: integer
+        created_at:
+          format: date-time
+          type: string
+        document_id:
+          type: string
+        filename:
+          type: string
+        id:
+          type: string
+        import_id:
+          type: string
+        parser_version:
+          type: string
+        project_id:
+          type: string
+        sha256:
+          type: string
+      required:
+      - id
+      - project_id
+      - import_id
+      - document_id
+      - sha256
+      - filename
+      - byte_size
+      - parser_version
+      - created_at
+      type: object
+      x-implementation-status: model-contract-only
+      description: Metadata only. Object credentials and the complete source workbook are never exposed to the model or committed
+        to Git.
+    IDEWorkloadEstimate:
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        calculation_run_id:
+          type: string
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        labor_hours:
+          $ref: '#/components/schemas/IDEQuantity'
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        provenance_id:
+          type: string
+        quantity:
+          $ref: '#/components/schemas/IDEQuantity'
+        revision_id:
+          type: string
+        spec_ref:
+          type: string
+        standard_length:
+          $ref: '#/components/schemas/IDEQuantity'
+        work_type:
+          type: string
+        source_model_label:
+          type: string
+        quantity_calculation_run_id:
+          type: string
+      required:
+      - entity_id
+      - revision_id
+      - evidence_ids
+      - provenance_id
+      - maturity
+      - attributes
+      - work_type
+      - quantity
+      - source_model_label
+      type: object
+      x-implementation-status: model-contract-only
+    IDEColumnBinding:
+      type: object
+      additionalProperties: false
+      properties:
+        field:
+          type: string
+        column:
+          type: integer
+          minimum: 1
+        unit:
+          type: string
+      required:
+      - field
+      - column
+      - unit
+    IDEConstantBinding:
+      type: object
+      additionalProperties: false
+      properties:
+        field:
+          type: string
+        value:
+          type: string
+        evidence_cells:
+          type: array
+          items:
+            type: string
+      required:
+      - field
+      - value
+      - evidence_cells
+    IDERegionMapping:
+      type: object
+      additionalProperties: false
+      properties:
+        sheet:
+          type: string
+        bounds:
+          $ref: '#/components/schemas/IDEBounds'
+        kind:
+          type: string
+          enum:
+          - equipment
+          - assembly
+          - site
+          - room
+          - rack
+          - placement
+          - other
+          - port
+          - connection
+          - cable
+          - power
+          - material
+          - workload
+          - network_fabric
+          - network_plane
+          - network_role
+          - network_interface
+          - network_allocation
+          - network_bgp
+          - network_bfd
+          - network_qos
+          - network_ar
+          - network_evpn
+        semantic:
+          type: string
+        header_rows:
+          type: array
+          items:
+            type: integer
+        columns:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEColumnBinding'
+        constants:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEConstantBinding'
+        records:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDERecordBinding'
+      required:
+      - sheet
+      - bounds
+      - kind
+      - semantic
+      - header_rows
+      - columns
+      - constants
+    IDEModuleDetection:
+      type: object
+      additionalProperties: false
+      properties:
+        module_id:
+          type: string
+        applicable:
+          type: boolean
+        reason:
+          type: string
+        sheets:
+          type: array
+          items:
+            type: string
+      required:
+      - module_id
+      - applicable
+      - reason
+      - sheets
+    IDEEngineeringProposal:
+      type: object
+      additionalProperties: false
+      properties:
+        summary:
+          type: string
+        regions:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDERegionMapping'
+        modules:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEModuleDetection'
+        questions:
+          type: array
+          items:
+            type: string
+      required:
+      - summary
+      - regions
+      - modules
+      - questions
+    IDESourceEvidence:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        sheet:
+          type: string
+        cell:
+          type: string
+        field:
+          type: string
+        entity_id:
+          type: string
+        formula:
+          type: boolean
+        calculation_run_id:
+          type: string
+        source_id:
+          type: string
+      required:
+      - id
+      - sheet
+      - cell
+      - field
+      - entity_id
+      - formula
+    IDETargetStatus:
+      type: object
+      additionalProperties: false
+      properties:
+        target:
+          type: string
+        state:
+          enum:
+          - NOT_APPLICABLE
+          - DETECTED
+          - NEEDS_INPUT
+          - READY
+          - PROCESSING
+          - IN_REVIEW
+          - APPROVED
+          - PUBLISHED
+          - BLOCKED
+          - STALE
+          type: string
+        revision_id:
+          type: string
+        digest:
+          type: string
+        review_id:
+          type: string
+        publication_id:
+          type: string
+        error_code:
+          type: string
+      required:
+      - target
+      - state
+      - revision_id
+      - digest
+    IDEEngineeringJob:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        state:
+          type: string
+          enum:
+          - pending
+          - running
+          - succeeded
+          - failed
+        error_code:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - state
+      - created_at
+      - updated_at
+    IDEEngineeringStep:
+      type: object
+      additionalProperties: false
+      properties:
+        sequence:
+          type: integer
+        tool:
+          type: string
+        detail:
+          type: string
+        state:
+          type: string
+        at:
+          type: string
+          format: date-time
+      required:
+      - sequence
+      - tool
+      - detail
+      - state
+      - at
+    IDEWorkspace:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        project_id:
+          type: string
+        import_id:
+          type: string
+        filename:
+          type: string
+        sha256:
+          type: string
+        revision:
+          type: integer
+        head_revision_id:
+          type: string
+        summary:
+          type: string
+        total_cells:
+          type: integer
+        mapped_cells:
+          type: integer
+        retained_cells:
+          type: integer
+        modules:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEModuleDetection'
+        targets:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDETargetStatus'
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEValidationIssue'
+        questions:
+          type: array
+          items:
+            type: string
+        latest_job:
+          $ref: '#/components/schemas/IDEEngineeringJob'
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEEngineeringStep'
+        created_at:
+          type: string
+          format: date-time
+        base_revision_id:
+          type: string
+        base_source_id:
+          type: string
+      required:
+      - id
+      - project_id
+      - import_id
+      - filename
+      - sha256
+      - revision
+      - summary
+      - total_cells
+      - mapped_cells
+      - retained_cells
+      - modules
+      - targets
+      - issues
+      - questions
+      - steps
+      - created_at
+    IDERevisionEntry:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        sequence:
+          type: integer
+        actor:
+          type: string
+        origin:
+          type: string
+          enum:
+          - agent
+          - human
+        reason:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - sequence
+      - actor
+      - origin
+      - reason
+      - created_at
+    IDERevisionDifference:
+      type: object
+      additionalProperties: false
+      properties:
+        entity_id:
+          type: string
+        kind:
+          type: string
+        change:
+          type: string
+          enum:
+          - added
+          - removed
+          - changed
+        before:
+          type: string
+        after:
+          type: string
+      required:
+      - entity_id
+      - kind
+      - change
+      - before
+      - after
+    IDEModelView:
+      type: object
+      additionalProperties: false
+      properties:
+        model:
+          $ref: '#/components/schemas/IDEPhysicalModel'
+        evidence:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDESourceEvidence'
+      required:
+      - model
+      - evidence
+    IDEAttachSource:
+      type: object
+      additionalProperties: false
+      properties:
+        import_id:
+          type: string
+      required:
+      - import_id
+    IDEExpectedRevision:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_revision:
+          type: integer
+          minimum: 1
+      required:
+      - expected_revision
+    IDEModelEdit:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_revision:
+          type: integer
+          minimum: 1
+        model:
+          $ref: '#/components/schemas/IDEPhysicalModel'
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - expected_revision
+      - model
+      - reason
+    IDETargetAction:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_revision:
+          type: integer
+          minimum: 1
+        targets:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            type: string
+            enum:
+            - CMDB_PLANNED_EQUIPMENT
+            - CMDB_PLANNED_FACILITY
+            - CMDB_PLANNED_PLACEMENT
+            - CMDB_PLANNED_CONNECTIVITY
+            - ENGINEERING_CABLING
+            - ENGINEERING_POWER
+            - ENGINEERING_MATERIAL
+            - ENGINEERING_WORKLOAD
+            - NETWORK_REVISION
+        decision:
+          type: string
+          enum:
+          - approve
+          - reject
+          - publish
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - expected_revision
+      - targets
+      - decision
+      - reason
+    listEngineeringImportsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    attachEngineeringSourceEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getEngineeringWorkspaceEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    analyzeEngineeringSourceEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getEngineeringModelEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEModelView'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    editEngineeringModelEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    reviewEngineeringTargetsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    publishEngineeringTargetsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    listEngineeringRevisionsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDERevisionEntry'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    diffEngineeringRevisionEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDERevisionDifference'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    readEngineeringSourceEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/BOMSourceCell'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    IDECalculationRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_revision:
+          type: integer
+          minimum: 1
+        rule:
+          $ref: '#/components/schemas/IDEVersionReference'
+        requested_cells:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEFormulaCell'
+          maxItems: 1000
+        inputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDENamedValue'
+        operation:
+          type: string
+          enum:
+          - power_balance
+          - workload_summary
+      required:
+      - expected_revision
+      - requested_cells
+      - inputs
+    IDECalculationPage:
+      type: object
+      additionalProperties: false
+      properties:
+        run:
+          $ref: '#/components/schemas/IDECalculationRun'
+        total_formulas:
+          type: integer
+        offset:
+          type: integer
+        limit:
+          type: integer
+        stale:
+          type: boolean
+      required:
+      - run
+      - total_formulas
+      - offset
+      - limit
+      - stale
+    IDERuleDraft:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_version:
+          type: integer
+          minimum: 0
+        rule:
+          $ref: '#/components/schemas/IDECalculationRule'
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - expected_version
+      - rule
+      - reason
+    IDERuleReview:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_digest:
+          type: string
+        decision:
+          type: string
+          enum:
+          - approve
+          - reject
+          - retire
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - expected_digest
+      - decision
+      - reason
+    IDERuleView:
+      type: object
+      additionalProperties: false
+      properties:
+        rule:
+          $ref: '#/components/schemas/IDECalculationRule'
+        digest:
+          type: string
+      required:
+      - rule
+      - digest
+    listEngineeringRulesEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDERuleView'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    createEngineeringRuleEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDERuleView'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getEngineeringRuleEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDERuleView'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    reviewEngineeringRuleEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDERuleView'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getEngineeringCalculationProviderEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDECalculationCapabilities'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    listEngineeringCalculationsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDECalculationPage'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    runEngineeringCalculationEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDECalculationPage'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getEngineeringCalculationEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDECalculationPage'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    IDEOpticDemand:
+      type: object
+      additionalProperties: false
+      properties:
+        attributes:
+          items:
+            $ref: '#/components/schemas/IDEAttributeValue'
+          type: array
+        entity_id:
+          type: string
+        evidence_ids:
+          items:
+            type: string
+          type: array
+        maturity:
+          enum:
+          - Estimated
+          - Calculated
+          - Confirmed
+          - As-built
+          type: string
+        provenance_id:
+          type: string
+        revision_id:
+          type: string
+        physical_port_id:
+          type: string
+        source_model_label:
+          type: string
+        quantity:
+          type: integer
+      required:
+      - entity_id
+      - revision_id
+      - provenance_id
+      - evidence_ids
+      - maturity
+      - attributes
+      - physical_port_id
+      - source_model_label
+      - quantity
+    IDEConnectivityEdit:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_revision:
+          type: integer
+        port:
+          $ref: '#/components/schemas/IDEPlannedPort'
+        connection:
+          $ref: '#/components/schemas/IDEPlannedConnection'
+        cable:
+          $ref: '#/components/schemas/IDECablePlan'
+        optic:
+          $ref: '#/components/schemas/IDEOpticDemand'
+        reason:
+          type: string
+      required:
+      - expected_revision
+      - reason
+    editEngineeringConnectivityEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    IDEPowerEdit:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_revision:
+          type: integer
+          minimum: 1
+        plan:
+          $ref: '#/components/schemas/IDEPowerPlan'
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - expected_revision
+      - plan
+      - reason
+    IDEResultBinding:
+      type: object
+      additionalProperties: false
+      properties:
+        entity_id:
+          type: string
+        field:
+          type: string
+          enum:
+          - power_load
+          - power_remaining
+          - cable_calculated
+          - cable_selected_stock
+          - material_required
+          - material_gap
+          - workload_quantity
+          - workload_hours
+        output_name:
+          type: string
+      required:
+      - entity_id
+      - field
+      - output_name
+    IDECalculationApplication:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_revision:
+          type: integer
+          minimum: 1
+        run_id:
+          type: string
+        bindings:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEResultBinding'
+          minItems: 1
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - expected_revision
+      - run_id
+      - bindings
+      - reason
+    editEngineeringPowerEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    applyEngineeringCalculationEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    IDEEstimateEdit:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_revision:
+          type: integer
+          minimum: 1
+        material:
+          $ref: '#/components/schemas/IDEMaterialEstimate'
+        workload:
+          $ref: '#/components/schemas/IDEWorkloadEstimate'
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - expected_revision
+      - reason
+    editEngineeringEstimateEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    IDENetworkEdit:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_revision:
+          type: integer
+          minimum: 1
+        plan:
+          $ref: '#/components/schemas/IDENetworkPlan'
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - expected_revision
+      - plan
+      - reason
+    IDEPhysicalRevisionOption:
+      type: object
+      additionalProperties: false
+      properties:
+        revision_id:
+          type: string
+        source_id:
+          type: string
+        publication_id:
+          type: string
+        target:
+          type: string
+        filename:
+          type: string
+        published_at:
+          type: string
+          format: date-time
+      required:
+      - revision_id
+      - source_id
+      - publication_id
+      - target
+      - filename
+      - published_at
+    IDEGoldenInput:
+      type: object
+      additionalProperties: false
+      properties:
+        publication_id:
+          type: string
+        revision_id:
+          type: string
+        plan:
+          $ref: '#/components/schemas/IDENetworkPlan'
+        physical_revision_id:
+          type: string
+      required:
+      - publication_id
+      - revision_id
+      - plan
+      - physical_revision_id
+    editEngineeringNetworkEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    listEngineeringPhysicalRevisionsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEPhysicalRevisionOption'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getEngineeringGoldenInputEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEGoldenInput'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    IDECellBinding:
+      type: object
+      additionalProperties: false
+      properties:
+        field:
+          type: string
+        sheet:
+          type: string
+        cell:
+          type: string
+        unit:
+          type: string
+      required:
+      - field
+      - sheet
+      - cell
+      - unit
+    IDERecordBinding:
+      type: object
+      additionalProperties: false
+      properties:
+        cells:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDECellBinding'
+      required:
+      - cells
+    IDEPlanBlock:
+      type: object
+      additionalProperties: false
+      properties:
+        instance_id:
+          type: string
+        inputs:
+          type: array
+          items:
+            type: string
+      required:
+      - instance_id
+      - inputs
+    IDEPlanView:
+      type: object
+      additionalProperties: false
+      properties:
+        plan:
+          $ref: '#/components/schemas/IDEImportPlan'
+        definitions:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEEngineeringModule'
+        batches:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+        unavailable:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEPlanBlock'
+      required:
+      - plan
+      - definitions
+      - batches
+      - unavailable
+    IDEIntelligenceView:
+      type: object
+      additionalProperties: false
+      properties:
+        regions:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEWorkbookRegion'
+        facts:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDESemanticFact'
+        total_facts:
+          type: integer
+        offset:
+          type: integer
+      required:
+      - regions
+      - facts
+      - total_facts
+      - offset
+    getEngineeringPlanEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEPlanView'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getEngineeringIntelligenceEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEIntelligenceView'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    IDEReimportRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_revision:
+          type: integer
+          minimum: 1
+        import_id:
+          type: string
+      required:
+      - expected_revision
+      - import_id
+    IDEDifferenceResolution:
+      type: object
+      additionalProperties: false
+      properties:
+        target:
+          type: string
+          enum:
+          - CMDB_PLANNED_EQUIPMENT
+          - CMDB_PLANNED_FACILITY
+          - CMDB_PLANNED_PLACEMENT
+          - CMDB_PLANNED_CONNECTIVITY
+          - ENGINEERING_CABLING
+          - ENGINEERING_POWER
+          - ENGINEERING_MATERIAL
+          - ENGINEERING_WORKLOAD
+          - NETWORK_REVISION
+        decision:
+          type: string
+          enum:
+          - accept_incoming
+          - retain_base
+          - retain_current
+      required:
+      - target
+      - decision
+    IDEDifferenceReview:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_revision:
+          type: integer
+          minimum: 1
+        resolutions:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEDifferenceResolution'
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - expected_revision
+      - resolutions
+      - reason
+    reimportEngineeringSourceEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    reviewEngineeringDifferencesEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    IDEAttributeDraft:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_version:
+          type: integer
+          minimum: 0
+        definition:
+          $ref: '#/components/schemas/IDEAttributeDefinition'
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - expected_version
+      - definition
+      - reason
+    IDEAttributeReview:
+      type: object
+      additionalProperties: false
+      properties:
+        version:
+          type: integer
+          minimum: 1
+        decision:
+          type: string
+          enum:
+          - approve
+          - reject
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - version
+      - decision
+      - reason
+    listEngineeringAttributesEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEAttributeDefinition'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    saveEngineeringAttributeEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEAttributeDefinition'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    reviewEngineeringAttributeEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEAttributeDefinition'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
 x-implementation-policy:
   frontend-first: true
   mock-provider-required: true

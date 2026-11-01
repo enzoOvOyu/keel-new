@@ -21746,6 +21746,60 @@
           "models": [],
           "group": "标准 BOM",
           "rules": {}
+        },
+        {
+          "name": "parent_port_id",
+          "label": "父物理端口",
+          "type": "Reference",
+          "required": false,
+          "unique": false,
+          "editable": false,
+          "sources": [
+            "bom",
+            "agent",
+            "bmc",
+            "switch",
+            "derived"
+          ],
+          "models": [],
+          "group": "基础属性",
+          "rules": {}
+        },
+        {
+          "name": "breakout_index",
+          "label": "Breakout序号",
+          "type": "Number",
+          "required": false,
+          "unique": false,
+          "editable": false,
+          "sources": [
+            "bom",
+            "agent",
+            "bmc",
+            "switch",
+            "derived"
+          ],
+          "models": [],
+          "group": "基础属性",
+          "rules": {}
+        },
+        {
+          "name": "rate_bps",
+          "label": "规划速率 bit/s",
+          "type": "Number",
+          "required": false,
+          "unique": false,
+          "editable": false,
+          "sources": [
+            "bom",
+            "agent",
+            "bmc",
+            "switch",
+            "derived"
+          ],
+          "models": [],
+          "group": "基础属性",
+          "rules": {}
         }
       ],
       "allow_extensions": false,
@@ -23082,6 +23136,42 @@
           ],
           "models": [],
           "group": "标准 BOM",
+          "rules": {}
+        },
+        {
+          "name": "connection_plan_id",
+          "label": "连接规划",
+          "type": "Reference",
+          "required": false,
+          "unique": false,
+          "editable": false,
+          "sources": [
+            "bom",
+            "agent",
+            "bmc",
+            "switch",
+            "derived"
+          ],
+          "models": [],
+          "group": "基础属性",
+          "rules": {}
+        },
+        {
+          "name": "segment_index",
+          "label": "路径段序号",
+          "type": "Number",
+          "required": false,
+          "unique": false,
+          "editable": false,
+          "sources": [
+            "bom",
+            "agent",
+            "bmc",
+            "switch",
+            "derived"
+          ],
+          "models": [],
+          "group": "基础属性",
           "rules": {}
         }
       ],
@@ -54241,7 +54331,8 @@
       ],
       "target_types": [
         "component",
-        "port"
+        "port",
+        "device"
       ],
       "direction": "outbound",
       "max_targets": 0,
@@ -54466,6 +54557,24 @@
         "agent",
         "bmc",
         "switch"
+      ]
+    },
+    {
+      "name": "patch_passthrough",
+      "label": "配线节点贯通",
+      "kind": "physical",
+      "source_types": [
+        "port"
+      ],
+      "target_types": [
+        "port"
+      ],
+      "direction": "outbound",
+      "max_targets": 1,
+      "max_sources": 1,
+      "sources": [
+        "bom",
+        "manual"
       ]
     }
   ]

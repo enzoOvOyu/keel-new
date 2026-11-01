@@ -6133,6 +6133,454 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/engineering-imports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listEngineeringImports"];
+        put?: never;
+        post: operations["attachEngineeringSource"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getEngineeringWorkspace"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/analyze": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["analyzeEngineeringSource"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/model": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getEngineeringModel"];
+        put: operations["editEngineeringModel"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["reviewEngineeringTargets"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["publishEngineeringTargets"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/revisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listEngineeringRevisions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/diff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["diffEngineeringRevision"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/source": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["readEngineeringSource"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listEngineeringRules"];
+        put?: never;
+        post: operations["createEngineeringRule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-rules/{ruleId}/{version}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getEngineeringRule"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-rules/{ruleId}/{version}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["reviewEngineeringRule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/calculation-provider": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getEngineeringCalculationProvider"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/calculations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listEngineeringCalculations"];
+        put?: never;
+        post: operations["runEngineeringCalculation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/calculations/{runId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getEngineeringCalculation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/connectivity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["editEngineeringConnectivity"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/power": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["editEngineeringPower"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/calculation-application": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["applyEngineeringCalculation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/estimates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["editEngineeringEstimate"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/network": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["editEngineeringNetwork"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-physical-revisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listEngineeringPhysicalRevisions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/golden-input": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getEngineeringGoldenInput"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getEngineeringPlan"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/intelligence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getEngineeringIntelligence"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/reimport": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["reimportEngineeringSource"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/difference-review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["reviewEngineeringDifferences"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-attributes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listEngineeringAttributes"];
+        put?: never;
+        post: operations["saveEngineeringAttribute"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-attributes/{attributeId}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["reviewEngineeringAttribute"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -15180,6 +15628,1131 @@ export interface components {
         };
         listBOMProviderOptionsEnvelope: {
             data: components["schemas"]["AIProviderOption"][];
+            request_id: string;
+        };
+        IDEAdaptiveRoutingPlan: {
+            enabled: boolean;
+            evidence_ids: string[];
+            fabric_id: string;
+            policy_ref: string;
+        };
+        IDEAttributeDefinition: {
+            /** @enum {string} */
+            approval_status: "draft" | "approved" | "retired";
+            entity_kind: string;
+            enum_values: string[];
+            id: string;
+            key: string;
+            required: boolean;
+            unit?: string;
+            /** @enum {string} */
+            value_type: "text" | "decimal" | "boolean" | "reference";
+            version: number;
+        };
+        IDEAttributeValue: {
+            definition_id: string;
+            definition_version: number;
+            value: components["schemas"]["IDETypedValue"];
+        };
+        IDEBFDPlan: {
+            evidence_ids: string[];
+            min_rx_milliseconds: number;
+            min_tx_milliseconds: number;
+            multiplier: number;
+            session_id: string;
+        };
+        IDEBGPPlan: {
+            a_interface_id: string;
+            afi: string;
+            evidence_ids: string[];
+            id: string;
+            local_asn_allocation_id: string;
+            peer_asn_allocation_id: string;
+            policy_ref?: string;
+            safi: string;
+            z_interface_id: string;
+        };
+        IDEBounds: {
+            end_column: number;
+            end_row: number;
+            start_column: number;
+            start_row: number;
+        };
+        IDECablePlan: {
+            as_built?: components["schemas"]["IDELengthEvidence"];
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            calculated?: components["schemas"]["IDELengthEvidence"];
+            confirmed?: components["schemas"]["IDELengthEvidence"];
+            connection_id: string;
+            entity_id: string;
+            estimated?: components["schemas"]["IDELengthEvidence"];
+            evidence_ids: string[];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            provenance_id: string;
+            revision_id: string;
+            route: components["schemas"]["IDERouteSegment"][];
+            rule_version?: components["schemas"]["IDEVersionReference"];
+            selected_stock?: components["schemas"]["IDELengthEvidence"];
+            spec: components["schemas"]["IDECableSpec"];
+            label?: string;
+            /** @description One-based external physical segment; required for paths containing patch panels. */
+            segment_index?: number;
+        };
+        IDECableSpec: {
+            connector_a: string;
+            connector_z: string;
+            id: string;
+            medium: string;
+            rate_bps?: number;
+            source_model_label: string;
+        };
+        IDECalculationCapabilities: {
+            available: boolean;
+            formulas: string[];
+            id: string;
+            supports_external_links: boolean;
+            supports_named_ranges: boolean;
+            version: string;
+        };
+        IDECalculationError: {
+            cell?: components["schemas"]["IDEFormulaCell"];
+            code: string;
+            message: string;
+        };
+        IDECalculationRule: {
+            /** @enum {string} */
+            approval_status: "draft" | "validated" | "approved" | "retired";
+            dependencies: components["schemas"]["IDEVersionReference"][];
+            /** @enum {string} */
+            domain: "source" | "equipment" | "facility_placement" | "power_cooling" | "connectivity_cabling" | "material_workload" | "network_design" | "validation_release";
+            expression: components["schemas"]["IDERuleExpression"];
+            id: string;
+            inputs: components["schemas"]["IDERuleIO"][];
+            outputs: components["schemas"]["IDERuleIO"][];
+            review_decision_id?: string;
+            scope_id: string;
+            /** @enum {string} */
+            scope_type: "project" | "customer" | "domain";
+            validation_cases: components["schemas"]["IDERuleCase"][];
+            version: number;
+        };
+        /** @description An existing formula cache is not a successful recalculation. No calculation provider is implemented by the P1 contract. */
+        IDECalculationRun: {
+            /** @enum {string} */
+            compatibility: "compatible" | "partial" | "unsupported" | "unknown";
+            errors: components["schemas"]["IDECalculationError"][];
+            /** Format: date-time */
+            finished_at?: string;
+            formulas: components["schemas"]["IDEFormulaEvidence"][];
+            id: string;
+            input_digest: string;
+            inputs: components["schemas"]["IDENamedValue"][];
+            module_instance_id: string;
+            outputs: components["schemas"]["IDENamedValue"][];
+            project_id: string;
+            provider_id: string;
+            provider_version: string;
+            revision_id: string;
+            rule?: components["schemas"]["IDEVersionReference"];
+            source_sha256: string;
+            /** Format: date-time */
+            started_at: string;
+            /** @enum {string} */
+            status: "pending" | "running" | "succeeded" | "partial" | "failed" | "unsupported";
+        };
+        IDECanonicalEntity: {
+            bom_item_id?: string;
+            cmdb_asset_id?: string;
+            /** @enum {string} */
+            domain: "source" | "equipment" | "facility_placement" | "power_cooling" | "connectivity_cabling" | "material_workload" | "network_design" | "validation_release";
+            id: string;
+            kind: string;
+            planning_key: string;
+            project_id: string;
+        };
+        IDEConnectivityPlan: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            connections: components["schemas"]["IDEPlannedConnection"][];
+            entity_id: string;
+            evidence_ids: string[];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            ports: components["schemas"]["IDEPlannedPort"][];
+            provenance_id: string;
+            revision_id: string;
+        };
+        IDEDeviceAssembly: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            child_id: string;
+            entity_id: string;
+            evidence_ids: string[];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            parent_id: string;
+            provenance_id: string;
+            quantity: number;
+            /** @enum {string} */
+            relation_type: "contains" | "installed_in" | "assembly_member";
+            revision_id: string;
+            slot_label?: string;
+        };
+        IDEDeviceRole: {
+            equipment_id: string;
+            evidence_ids: string[];
+            plane_id: string;
+            role: string;
+        };
+        IDEEVPNVXLANPlan: {
+            evidence_ids: string[];
+            export_targets: string[];
+            fabric_id: string;
+            id: string;
+            import_targets: string[];
+            route_distinguisher: string;
+            vlan?: number;
+            vni: number;
+            vrf_ref?: string;
+            vtep_allocation_ids: string[];
+        };
+        IDEEngineeringModule: {
+            applicability: string;
+            calculations: string[];
+            dependencies: components["schemas"]["IDEModuleDependency"][];
+            /** @enum {string} */
+            domain: "source" | "equipment" | "facility_placement" | "power_cooling" | "connectivity_cabling" | "material_workload" | "network_design" | "validation_release";
+            id: string;
+            /** @enum {string} */
+            implementation_status: "planned" | "model_and_validation" | "implemented";
+            inputs: components["schemas"]["IDEModuleIO"][];
+            outputs: components["schemas"]["IDEModuleIO"][];
+            publish_targets: string[];
+            review_gates: components["schemas"]["IDEReviewGate"][];
+            title: string;
+            validations: string[];
+            version: number;
+        };
+        IDEEntityVersion: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            entity_id: string;
+            evidence_ids: string[];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            provenance_id: string;
+            revision_id: string;
+        };
+        IDEEquipmentPlan: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            entity_id: string;
+            equipment_type: string;
+            evidence_ids: string[];
+            /** @enum {string} */
+            identity_kind: "group" | "planned_instance" | "observed_reference";
+            label: string;
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            model_ref?: string;
+            provenance_id: string;
+            quantity: number;
+            revision_id: string;
+            serial?: string;
+            source_model_label: string;
+        };
+        IDEEquipmentPowerProfile: {
+            /** @enum {string} */
+            basis: "planned" | "nameplate" | "measured";
+            cooling_type: string;
+            equipment_id: string;
+            evidence_ids: string[];
+            power: components["schemas"]["IDEQuantity"];
+        };
+        IDEEvidenceReference: {
+            bounds: components["schemas"]["IDEBounds"];
+            calculation_run_id?: string;
+            id: string;
+            /** @enum {string} */
+            kind: "input" | "formula" | "cached_result" | "recalculated_result" | "manual" | "reference";
+            sheet_id: string;
+            source_id: string;
+            source_sha256: string;
+        };
+        IDEFacilityModel: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            capacity_u?: number;
+            coordinate_frame_id?: string;
+            depth_mm?: string;
+            entity_id: string;
+            evidence_ids: string[];
+            height_mm?: string;
+            /** @enum {string} */
+            kind: "site" | "room" | "rack";
+            label: string;
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            orientation_degrees?: string;
+            parent_id?: string;
+            provenance_id: string;
+            revision_id: string;
+            width_mm?: string;
+            x_mm?: string;
+            y_mm?: string;
+            z_mm?: string;
+        };
+        IDEFormulaCell: {
+            address: string;
+            sheet_id: string;
+        };
+        IDEFormulaDependency: {
+            from: components["schemas"]["IDEFormulaCell"];
+            /** @enum {string} */
+            kind: "cell" | "range" | "named_range" | "external" | "dynamic" | "external_or_structured" | "unresolved" | "missing_sheet";
+            to_range: string;
+            to_sheet_id: string;
+        };
+        IDEFormulaEvidence: {
+            cached_value?: components["schemas"]["IDETypedValue"];
+            cell: components["schemas"]["IDEFormulaCell"];
+            /** @enum {string} */
+            compatibility: "compatible" | "partial" | "unsupported" | "unknown";
+            dependencies: components["schemas"]["IDEFormulaDependency"][];
+            /** @enum {string} */
+            dependency_status: "complete" | "partial" | "unsupported" | "cycle" | "missing";
+            error_code?: string;
+            expression: string;
+            recalculated_value?: components["schemas"]["IDETypedValue"];
+        };
+        IDEHeaderCell: {
+            column: number;
+            level: number;
+            parent?: string;
+            row: number;
+        };
+        IDEImportPlan: {
+            id: string;
+            modules: components["schemas"]["IDEModuleInstance"][];
+            previous_plan_id?: string;
+            project_id: string;
+            source_id: string;
+            summary: string;
+            version: number;
+        };
+        IDEInputBinding: {
+            available: boolean;
+            digest?: string;
+            name: string;
+            output: string;
+            producer_instance_id?: string;
+            required: boolean;
+            revision_id?: string;
+        };
+        IDEInterfaceMapping: {
+            evidence_ids: string[];
+            id: string;
+            logical_name: string;
+            physical_port_id: string;
+            plane_id: string;
+        };
+        IDELengthEvidence: {
+            calculation_run_id?: string;
+            evidence_ids: string[];
+            length: components["schemas"]["IDEQuantity"];
+        };
+        IDEMaterialEstimate: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            calculation_run_id?: string;
+            entity_id: string;
+            evidence_ids: string[];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            provenance_id: string;
+            purchase_gap?: components["schemas"]["IDEQuantity"];
+            purchased?: components["schemas"]["IDEQuantity"];
+            required: components["schemas"]["IDEQuantity"];
+            revision_id: string;
+            spares?: components["schemas"]["IDEQuantity"];
+            spec_ref: string;
+            source_model_label: string;
+            required_calculation_run_id?: string;
+        };
+        IDEModelRevision: {
+            author_id: string;
+            /** @enum {string} */
+            author_type: "agent" | "human" | "calculation" | "migration";
+            content_digest: string;
+            /** Format: date-time */
+            created_at: string;
+            id: string;
+            input_digest: string;
+            inputs: components["schemas"]["IDERevisionInput"][];
+            module_instance_id: string;
+            parent_id?: string;
+            project_id: string;
+            sequence: number;
+        };
+        IDEModuleDependency: {
+            module_id: string;
+            output: string;
+            required: boolean;
+            /** @enum {string} */
+            stage: "process" | "review" | "publish";
+        };
+        IDEModuleIO: {
+            entity_type: string;
+            name: string;
+            required: boolean;
+        };
+        IDEModuleInstance: {
+            applicability_reason: string;
+            definition_id: string;
+            definition_version: number;
+            head_revision_id?: string;
+            id: string;
+            inputs: components["schemas"]["IDEInputBinding"][];
+            /** @enum {string} */
+            state: "NOT_APPLICABLE" | "DETECTED" | "NEEDS_INPUT" | "READY" | "PROCESSING" | "IN_REVIEW" | "APPROVED" | "PUBLISHED" | "BLOCKED" | "STALE";
+        };
+        IDENamedValue: {
+            name: string;
+            value: components["schemas"]["IDETypedValue"];
+        };
+        IDENetworkAllocation: {
+            address?: string;
+            asn?: number;
+            entity_id: string;
+            evidence_ids: string[];
+            id: string;
+            interface_id?: string;
+            /** @enum {string} */
+            kind: "ip" | "asn";
+            prefix_length?: number;
+            vrf_ref?: string;
+        } & ({
+            /** @constant */
+            kind?: "ip";
+        } | {
+            /** @constant */
+            kind?: "asn";
+        });
+        IDENetworkFabric: {
+            evidence_ids: string[];
+            id: string;
+            kind: string;
+            name: string;
+        };
+        IDENetworkPlan: {
+            adaptive_routing: components["schemas"]["IDEAdaptiveRoutingPlan"][];
+            allocations: components["schemas"]["IDENetworkAllocation"][];
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            bfd: components["schemas"]["IDEBFDPlan"][];
+            bgp: components["schemas"]["IDEBGPPlan"][];
+            device_roles: components["schemas"]["IDEDeviceRole"][];
+            entity_id: string;
+            evidence_ids: string[];
+            evpn_vxlan: components["schemas"]["IDEEVPNVXLANPlan"][];
+            fabrics: components["schemas"]["IDENetworkFabric"][];
+            interface_mappings: components["schemas"]["IDEInterfaceMapping"][];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            physical_revision_id: string;
+            planes: components["schemas"]["IDENetworkPlane"][];
+            provenance_id: string;
+            qos: components["schemas"]["IDEQoSPlan"][];
+            revision_id: string;
+            source_ids: string[];
+        };
+        IDENetworkPlane: {
+            evidence_ids: string[];
+            fabric_id: string;
+            id: string;
+            name: string;
+        };
+        /** @description Read aggregate assembled from typed domain tables. Not a persistence JSON payload. First vertical slice: equipment, assemblies, facilities and placements. */
+        IDEPhysicalModel: {
+            assemblies: components["schemas"]["IDEDeviceAssembly"][];
+            equipment: components["schemas"]["IDEEquipmentPlan"][];
+            facilities: components["schemas"]["IDEFacilityModel"][];
+            placements: components["schemas"]["IDERackPlacement"][];
+            project_id: string;
+            ports: components["schemas"]["IDEPlannedPort"][];
+            connections: components["schemas"]["IDEPlannedConnection"][];
+            cables: components["schemas"]["IDECablePlan"][];
+            optics: components["schemas"]["IDEOpticDemand"][];
+            power_plans: components["schemas"]["IDEPowerPlan"][];
+            materials: components["schemas"]["IDEMaterialEstimate"][];
+            workloads: components["schemas"]["IDEWorkloadEstimate"][];
+            network_plans: components["schemas"]["IDENetworkPlan"][];
+        };
+        IDEPlannedConnection: {
+            a_port_id: string;
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            entity_id: string;
+            evidence_ids: string[];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            /** @description Ordered entrance/exit port pairs for explicitly evidenced patch-panel passthroughs. Odd counts or different owners block publication. */
+            patch_port_ids: string[];
+            provenance_id: string;
+            revision_id: string;
+            z_port_id: string;
+        };
+        IDEPlannedPort: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            breakout_index?: number;
+            entity_id: string;
+            equipment_id: string;
+            evidence_ids: string[];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            medium: string;
+            name: string;
+            parent_port_id?: string;
+            provenance_id: string;
+            rate_bps?: number;
+            revision_id: string;
+            role: string;
+        };
+        IDEPowerPlan: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            entity_id: string;
+            equipment_profiles: components["schemas"]["IDEEquipmentPowerProfile"][];
+            evidence_ids: string[];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            provenance_id: string;
+            racks: components["schemas"]["IDERackPowerPlan"][];
+            revision_id: string;
+        };
+        IDEProvenance: {
+            actor_id?: string;
+            /** Format: date-time */
+            created_at: string;
+            id: string;
+            inputs: components["schemas"]["IDEProvenanceInput"][];
+            producer_id: string;
+            /** @enum {string} */
+            producer_type: "parser" | "agent" | "human" | "calculation" | "validation";
+            producer_version: string;
+            run_id: string;
+        };
+        IDEProvenanceInput: {
+            id: string;
+            /** @enum {string} */
+            kind: "evidence" | "fact" | "entity";
+            revision_id?: string;
+        };
+        IDEPublishRecord: {
+            /** Format: date-time */
+            created_at: string;
+            digest: string;
+            error_code?: string;
+            id: string;
+            idempotency_key: string;
+            module_instance_id: string;
+            outbox_event_id: string;
+            project_id: string;
+            /** Format: date-time */
+            published_at?: string;
+            receipt?: string;
+            review_id: string;
+            revision_id: string;
+            /** @enum {string} */
+            state: "pending" | "published" | "failed";
+            target: string;
+        };
+        IDEQoSPlan: {
+            ecn_enabled?: boolean;
+            evidence_ids: string[];
+            id: string;
+            interface_ids: string[];
+            lossless_priorities: number[];
+            pfc_enabled?: boolean;
+            policy_ref?: string;
+            roce_version?: number;
+        };
+        IDEQuantity: {
+            unit: string;
+            value: string;
+        };
+        IDERackPlacement: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            depth_mm?: string;
+            entity_id: string;
+            equipment_id: string;
+            evidence_ids: string[];
+            height_u?: number;
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            /** @enum {string} */
+            mount_face: "front" | "rear" | "both" | "unknown";
+            provenance_id: string;
+            rack_id: string;
+            revision_id: string;
+            start_u?: number;
+        };
+        IDERackPowerPlan: {
+            calculation_run_id?: string;
+            capacity?: components["schemas"]["IDEQuantity"];
+            planned_load?: components["schemas"]["IDEQuantity"];
+            rack_id: string;
+            remaining?: components["schemas"]["IDEQuantity"];
+            cooling_capacity?: components["schemas"]["IDEQuantity"];
+            cooling_type: string;
+        };
+        IDEReviewDecision: {
+            actor_id: string;
+            /** Format: date-time */
+            created_at: string;
+            /** @enum {string} */
+            decision: "approve" | "reject";
+            digest: string;
+            id: string;
+            module_instance_id: string;
+            project_id: string;
+            reason: string;
+            revision_id: string;
+        };
+        IDEReviewGate: {
+            id: string;
+            permission: string;
+            target: string;
+        };
+        IDERevisionInput: {
+            digest: string;
+            id: string;
+            kind: string;
+            revision_id: string;
+        };
+        IDERouteSegment: {
+            calculation_run_id?: string;
+            distance?: components["schemas"]["IDEQuantity"];
+            from_id: string;
+            to_id: string;
+        };
+        IDERuleCase: {
+            expected: components["schemas"]["IDENamedValue"][];
+            id: string;
+            inputs: components["schemas"]["IDENamedValue"][];
+            tolerance: string;
+        };
+        IDERuleExpression: {
+            arguments: components["schemas"]["IDERuleExpression"][];
+            input?: string;
+            literal?: components["schemas"]["IDEQuantity"];
+            /** @enum {string} */
+            operator: "input" | "literal" | "add" | "subtract" | "multiply" | "divide" | "min" | "max" | "ceil" | "floor" | "abs" | "select_ceiling" | "outputs" | "output";
+        };
+        IDERuleIO: {
+            name: string;
+            required: boolean;
+            unit: string;
+            /** @enum {string} */
+            value_type: "text" | "decimal" | "boolean" | "reference";
+        };
+        IDESemanticFact: {
+            /** @enum {string} */
+            claim_status: "proposed" | "accepted" | "rejected";
+            id: string;
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            predicate: string;
+            project_id: string;
+            provenance_id: string;
+            region_id: string;
+            revision_id: string;
+            subject_id?: string;
+            value: components["schemas"]["IDETypedValue"];
+        };
+        IDETypedValue: {
+            boolean?: boolean;
+            decimal?: string;
+            /** @enum {string} */
+            kind: "text" | "decimal" | "boolean" | "reference";
+            reference?: string;
+            text?: string;
+            unit?: string;
+        } & ({
+            /** @constant */
+            kind: "text";
+        } | {
+            /** @constant */
+            kind: "decimal";
+        } | {
+            /** @constant */
+            kind: "boolean";
+        } | {
+            /** @constant */
+            kind: "reference";
+        });
+        IDEValidationIssue: {
+            code: string;
+            entity_id: string;
+            evidence_ids: string[];
+            field: string;
+            message: string;
+            module_id: string;
+            publish_target: string;
+            /** @enum {string} */
+            severity: "BLOCK" | "WARNING" | "INFO";
+            id: string;
+            project_id: string;
+            revision_id: string;
+            /** @enum {string} */
+            resolution: "open" | "resolved" | "waived";
+            rule_version?: components["schemas"]["IDEVersionReference"];
+        };
+        IDEVersionReference: {
+            id: string;
+            version: number;
+        };
+        IDEWorkbookRegion: {
+            bounds: components["schemas"]["IDEBounds"];
+            headers: components["schemas"]["IDEHeaderCell"][];
+            id: string;
+            /** @enum {string} */
+            kind: "table" | "grid" | "parameters" | "narrative" | "unknown";
+            merges: components["schemas"]["IDEBounds"][];
+            semantic_label: string;
+            sheet_id: string;
+            source_id: string;
+        };
+        /** @description Metadata only. Object credentials and the complete source workbook are never exposed to the model or committed to Git. */
+        IDEWorkbookSource: {
+            byte_size: number;
+            /** Format: date-time */
+            created_at: string;
+            document_id: string;
+            filename: string;
+            id: string;
+            import_id: string;
+            parser_version: string;
+            project_id: string;
+            sha256: string;
+        };
+        IDEWorkloadEstimate: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            calculation_run_id?: string;
+            entity_id: string;
+            evidence_ids: string[];
+            labor_hours?: components["schemas"]["IDEQuantity"];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            provenance_id: string;
+            quantity: components["schemas"]["IDEQuantity"];
+            revision_id: string;
+            spec_ref?: string;
+            standard_length?: components["schemas"]["IDEQuantity"];
+            work_type: string;
+            source_model_label: string;
+            quantity_calculation_run_id?: string;
+        };
+        IDEColumnBinding: {
+            field: string;
+            column: number;
+            unit: string;
+        };
+        IDEConstantBinding: {
+            field: string;
+            value: string;
+            evidence_cells: string[];
+        };
+        IDERegionMapping: {
+            sheet: string;
+            bounds: components["schemas"]["IDEBounds"];
+            /** @enum {string} */
+            kind: "equipment" | "assembly" | "site" | "room" | "rack" | "placement" | "other" | "port" | "connection" | "cable" | "power" | "material" | "workload" | "network_fabric" | "network_plane" | "network_role" | "network_interface" | "network_allocation" | "network_bgp" | "network_bfd" | "network_qos" | "network_ar" | "network_evpn";
+            semantic: string;
+            header_rows: number[];
+            columns: components["schemas"]["IDEColumnBinding"][];
+            constants: components["schemas"]["IDEConstantBinding"][];
+            records?: components["schemas"]["IDERecordBinding"][];
+        };
+        IDEModuleDetection: {
+            module_id: string;
+            applicable: boolean;
+            reason: string;
+            sheets: string[];
+        };
+        IDEEngineeringProposal: {
+            summary: string;
+            regions: components["schemas"]["IDERegionMapping"][];
+            modules: components["schemas"]["IDEModuleDetection"][];
+            questions: string[];
+        };
+        IDESourceEvidence: {
+            id: string;
+            sheet: string;
+            cell: string;
+            field: string;
+            entity_id: string;
+            formula: boolean;
+            calculation_run_id?: string;
+            source_id?: string;
+        };
+        IDETargetStatus: {
+            target: string;
+            /** @enum {string} */
+            state: "NOT_APPLICABLE" | "DETECTED" | "NEEDS_INPUT" | "READY" | "PROCESSING" | "IN_REVIEW" | "APPROVED" | "PUBLISHED" | "BLOCKED" | "STALE";
+            revision_id: string;
+            digest: string;
+            review_id?: string;
+            publication_id?: string;
+            error_code?: string;
+        };
+        IDEEngineeringJob: {
+            id: string;
+            /** @enum {string} */
+            state: "pending" | "running" | "succeeded" | "failed";
+            error_code?: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        IDEEngineeringStep: {
+            sequence: number;
+            tool: string;
+            detail: string;
+            state: string;
+            /** Format: date-time */
+            at: string;
+        };
+        IDEWorkspace: {
+            id: string;
+            project_id: string;
+            import_id: string;
+            filename: string;
+            sha256: string;
+            revision: number;
+            head_revision_id?: string;
+            summary: string;
+            total_cells: number;
+            mapped_cells: number;
+            retained_cells: number;
+            modules: components["schemas"]["IDEModuleDetection"][];
+            targets: components["schemas"]["IDETargetStatus"][];
+            issues: components["schemas"]["IDEValidationIssue"][];
+            questions: string[];
+            latest_job?: components["schemas"]["IDEEngineeringJob"];
+            steps: components["schemas"]["IDEEngineeringStep"][];
+            /** Format: date-time */
+            created_at: string;
+            base_revision_id?: string;
+            base_source_id?: string;
+        };
+        IDERevisionEntry: {
+            id: string;
+            sequence: number;
+            actor: string;
+            /** @enum {string} */
+            origin: "agent" | "human";
+            reason: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        IDERevisionDifference: {
+            entity_id: string;
+            kind: string;
+            /** @enum {string} */
+            change: "added" | "removed" | "changed";
+            before: string;
+            after: string;
+        };
+        IDEModelView: {
+            model: components["schemas"]["IDEPhysicalModel"];
+            evidence: components["schemas"]["IDESourceEvidence"][];
+        };
+        IDEAttachSource: {
+            import_id: string;
+        };
+        IDEExpectedRevision: {
+            expected_revision: number;
+        };
+        IDEModelEdit: {
+            expected_revision: number;
+            model: components["schemas"]["IDEPhysicalModel"];
+            reason: string;
+        };
+        IDETargetAction: {
+            expected_revision: number;
+            targets: ("CMDB_PLANNED_EQUIPMENT" | "CMDB_PLANNED_FACILITY" | "CMDB_PLANNED_PLACEMENT" | "CMDB_PLANNED_CONNECTIVITY" | "ENGINEERING_CABLING" | "ENGINEERING_POWER" | "ENGINEERING_MATERIAL" | "ENGINEERING_WORKLOAD" | "NETWORK_REVISION")[];
+            /** @enum {string} */
+            decision: "approve" | "reject" | "publish";
+            reason: string;
+        };
+        listEngineeringImportsEnvelope: {
+            data: components["schemas"]["IDEWorkspace"][];
+            request_id: string;
+        };
+        attachEngineeringSourceEnvelope: {
+            data: components["schemas"]["IDEWorkspace"];
+            request_id: string;
+        };
+        getEngineeringWorkspaceEnvelope: {
+            data: components["schemas"]["IDEWorkspace"];
+            request_id: string;
+        };
+        analyzeEngineeringSourceEnvelope: {
+            data: components["schemas"]["IDEWorkspace"];
+            request_id: string;
+        };
+        getEngineeringModelEnvelope: {
+            data: components["schemas"]["IDEModelView"];
+            request_id: string;
+        };
+        editEngineeringModelEnvelope: {
+            data: components["schemas"]["IDEWorkspace"];
+            request_id: string;
+        };
+        reviewEngineeringTargetsEnvelope: {
+            data: components["schemas"]["IDEWorkspace"];
+            request_id: string;
+        };
+        publishEngineeringTargetsEnvelope: {
+            data: components["schemas"]["IDEWorkspace"];
+            request_id: string;
+        };
+        listEngineeringRevisionsEnvelope: {
+            data: components["schemas"]["IDERevisionEntry"][];
+            request_id: string;
+        };
+        diffEngineeringRevisionEnvelope: {
+            data: components["schemas"]["IDERevisionDifference"][];
+            request_id: string;
+        };
+        readEngineeringSourceEnvelope: {
+            data: components["schemas"]["BOMSourceCell"][];
+            request_id: string;
+        };
+        IDECalculationRequest: {
+            expected_revision: number;
+            rule?: components["schemas"]["IDEVersionReference"];
+            requested_cells: components["schemas"]["IDEFormulaCell"][];
+            inputs: components["schemas"]["IDENamedValue"][];
+            /** @enum {string} */
+            operation?: "power_balance" | "workload_summary";
+        };
+        IDECalculationPage: {
+            run: components["schemas"]["IDECalculationRun"];
+            total_formulas: number;
+            offset: number;
+            limit: number;
+            stale: boolean;
+        };
+        IDERuleDraft: {
+            expected_version: number;
+            rule: components["schemas"]["IDECalculationRule"];
+            reason: string;
+        };
+        IDERuleReview: {
+            expected_digest: string;
+            /** @enum {string} */
+            decision: "approve" | "reject" | "retire";
+            reason: string;
+        };
+        IDERuleView: {
+            rule: components["schemas"]["IDECalculationRule"];
+            digest: string;
+        };
+        listEngineeringRulesEnvelope: {
+            data: components["schemas"]["IDERuleView"][];
+            request_id: string;
+        };
+        createEngineeringRuleEnvelope: {
+            data: components["schemas"]["IDERuleView"];
+            request_id: string;
+        };
+        getEngineeringRuleEnvelope: {
+            data: components["schemas"]["IDERuleView"];
+            request_id: string;
+        };
+        reviewEngineeringRuleEnvelope: {
+            data: components["schemas"]["IDERuleView"];
+            request_id: string;
+        };
+        getEngineeringCalculationProviderEnvelope: {
+            data: components["schemas"]["IDECalculationCapabilities"];
+            request_id: string;
+        };
+        listEngineeringCalculationsEnvelope: {
+            data: components["schemas"]["IDECalculationPage"][];
+            request_id: string;
+        };
+        runEngineeringCalculationEnvelope: {
+            data: components["schemas"]["IDECalculationPage"];
+            request_id: string;
+        };
+        getEngineeringCalculationEnvelope: {
+            data: components["schemas"]["IDECalculationPage"];
+            request_id: string;
+        };
+        IDEOpticDemand: {
+            attributes: components["schemas"]["IDEAttributeValue"][];
+            entity_id: string;
+            evidence_ids: string[];
+            /** @enum {string} */
+            maturity: "Estimated" | "Calculated" | "Confirmed" | "As-built";
+            provenance_id: string;
+            revision_id: string;
+            physical_port_id: string;
+            source_model_label: string;
+            quantity: number;
+        };
+        IDEConnectivityEdit: {
+            expected_revision: number;
+            port?: components["schemas"]["IDEPlannedPort"];
+            connection?: components["schemas"]["IDEPlannedConnection"];
+            cable?: components["schemas"]["IDECablePlan"];
+            optic?: components["schemas"]["IDEOpticDemand"];
+            reason: string;
+        };
+        editEngineeringConnectivityEnvelope: {
+            data: components["schemas"]["IDEWorkspace"];
+            request_id: string;
+        };
+        IDEPowerEdit: {
+            expected_revision: number;
+            plan: components["schemas"]["IDEPowerPlan"];
+            reason: string;
+        };
+        IDEResultBinding: {
+            entity_id: string;
+            /** @enum {string} */
+            field: "power_load" | "power_remaining" | "cable_calculated" | "cable_selected_stock" | "material_required" | "material_gap" | "workload_quantity" | "workload_hours";
+            output_name: string;
+        };
+        IDECalculationApplication: {
+            expected_revision: number;
+            run_id: string;
+            bindings: components["schemas"]["IDEResultBinding"][];
+            reason: string;
+        };
+        editEngineeringPowerEnvelope: {
+            data: components["schemas"]["IDEWorkspace"];
+            request_id: string;
+        };
+        applyEngineeringCalculationEnvelope: {
+            data: components["schemas"]["IDEWorkspace"];
+            request_id: string;
+        };
+        IDEEstimateEdit: {
+            expected_revision: number;
+            material?: components["schemas"]["IDEMaterialEstimate"];
+            workload?: components["schemas"]["IDEWorkloadEstimate"];
+            reason: string;
+        };
+        editEngineeringEstimateEnvelope: {
+            data: components["schemas"]["IDEWorkspace"];
+            request_id: string;
+        };
+        IDENetworkEdit: {
+            expected_revision: number;
+            plan: components["schemas"]["IDENetworkPlan"];
+            reason: string;
+        };
+        IDEPhysicalRevisionOption: {
+            revision_id: string;
+            source_id: string;
+            publication_id: string;
+            target: string;
+            filename: string;
+            /** Format: date-time */
+            published_at: string;
+        };
+        IDEGoldenInput: {
+            publication_id: string;
+            revision_id: string;
+            plan: components["schemas"]["IDENetworkPlan"];
+            physical_revision_id: string;
+        };
+        editEngineeringNetworkEnvelope: {
+            data: components["schemas"]["IDEWorkspace"];
+            request_id: string;
+        };
+        listEngineeringPhysicalRevisionsEnvelope: {
+            data: components["schemas"]["IDEPhysicalRevisionOption"][];
+            request_id: string;
+        };
+        getEngineeringGoldenInputEnvelope: {
+            data: components["schemas"]["IDEGoldenInput"];
+            request_id: string;
+        };
+        IDECellBinding: {
+            field: string;
+            sheet: string;
+            cell: string;
+            unit: string;
+        };
+        IDERecordBinding: {
+            cells: components["schemas"]["IDECellBinding"][];
+        };
+        IDEPlanBlock: {
+            instance_id: string;
+            inputs: string[];
+        };
+        IDEPlanView: {
+            plan: components["schemas"]["IDEImportPlan"];
+            definitions: components["schemas"]["IDEEngineeringModule"][];
+            batches: string[][];
+            unavailable: components["schemas"]["IDEPlanBlock"][];
+        };
+        IDEIntelligenceView: {
+            regions: components["schemas"]["IDEWorkbookRegion"][];
+            facts: components["schemas"]["IDESemanticFact"][];
+            total_facts: number;
+            offset: number;
+        };
+        getEngineeringPlanEnvelope: {
+            data: components["schemas"]["IDEPlanView"];
+            request_id: string;
+        };
+        getEngineeringIntelligenceEnvelope: {
+            data: components["schemas"]["IDEIntelligenceView"];
+            request_id: string;
+        };
+        IDEReimportRequest: {
+            expected_revision: number;
+            import_id: string;
+        };
+        IDEDifferenceResolution: {
+            /** @enum {string} */
+            target: "CMDB_PLANNED_EQUIPMENT" | "CMDB_PLANNED_FACILITY" | "CMDB_PLANNED_PLACEMENT" | "CMDB_PLANNED_CONNECTIVITY" | "ENGINEERING_CABLING" | "ENGINEERING_POWER" | "ENGINEERING_MATERIAL" | "ENGINEERING_WORKLOAD" | "NETWORK_REVISION";
+            /** @enum {string} */
+            decision: "accept_incoming" | "retain_base" | "retain_current";
+        };
+        IDEDifferenceReview: {
+            expected_revision: number;
+            resolutions: components["schemas"]["IDEDifferenceResolution"][];
+            reason: string;
+        };
+        reimportEngineeringSourceEnvelope: {
+            data: components["schemas"]["IDEWorkspace"];
+            request_id: string;
+        };
+        reviewEngineeringDifferencesEnvelope: {
+            data: components["schemas"]["IDEWorkspace"];
+            request_id: string;
+        };
+        IDEAttributeDraft: {
+            expected_version: number;
+            definition: components["schemas"]["IDEAttributeDefinition"];
+            reason: string;
+        };
+        IDEAttributeReview: {
+            version: number;
+            /** @enum {string} */
+            decision: "approve" | "reject";
+            reason: string;
+        };
+        listEngineeringAttributesEnvelope: {
+            data: components["schemas"]["IDEAttributeDefinition"][];
+            request_id: string;
+        };
+        saveEngineeringAttributeEnvelope: {
+            data: components["schemas"]["IDEAttributeDefinition"];
+            request_id: string;
+        };
+        reviewEngineeringAttributeEnvelope: {
+            data: components["schemas"]["IDEAttributeDefinition"];
             request_id: string;
         };
     };
@@ -33554,6 +35127,1714 @@ export interface operations {
             };
             /** @description Provider not configured */
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listEngineeringImports: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Project-authorized engineering draft/review/publication result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listEngineeringImportsEnvelope"];
+                };
+            };
+            /** @description Project/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision, active task or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Evidence, schema, dependency or review precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    attachEngineeringSource: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEAttachSource"];
+            };
+        };
+        responses: {
+            /** @description Project-authorized engineering draft/review/publication result */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["attachEngineeringSourceEnvelope"];
+                };
+            };
+            /** @description Project/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision, active task or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Evidence, schema, dependency or review precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getEngineeringWorkspace: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Project-authorized engineering draft/review/publication result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getEngineeringWorkspaceEnvelope"];
+                };
+            };
+            /** @description Project/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision, active task or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Evidence, schema, dependency or review precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    analyzeEngineeringSource: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEExpectedRevision"];
+            };
+        };
+        responses: {
+            /** @description Project-authorized engineering draft/review/publication result */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["analyzeEngineeringSourceEnvelope"];
+                };
+            };
+            /** @description Project/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision, active task or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Evidence, schema, dependency or review precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getEngineeringModel: {
+        parameters: {
+            query?: {
+                revision_id?: string;
+            };
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Project-authorized engineering draft/review/publication result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getEngineeringModelEnvelope"];
+                };
+            };
+            /** @description Project/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision, active task or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Evidence, schema, dependency or review precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    editEngineeringModel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEModelEdit"];
+            };
+        };
+        responses: {
+            /** @description Project-authorized engineering draft/review/publication result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["editEngineeringModelEnvelope"];
+                };
+            };
+            /** @description Project/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision, active task or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Evidence, schema, dependency or review precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    reviewEngineeringTargets: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDETargetAction"];
+            };
+        };
+        responses: {
+            /** @description Project-authorized engineering draft/review/publication result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["reviewEngineeringTargetsEnvelope"];
+                };
+            };
+            /** @description Project/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision, active task or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Evidence, schema, dependency or review precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    publishEngineeringTargets: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDETargetAction"];
+            };
+        };
+        responses: {
+            /** @description Project-authorized engineering draft/review/publication result */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["publishEngineeringTargetsEnvelope"];
+                };
+            };
+            /** @description Project/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision, active task or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Evidence, schema, dependency or review precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listEngineeringRevisions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Project-authorized engineering draft/review/publication result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listEngineeringRevisionsEnvelope"];
+                };
+            };
+            /** @description Project/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision, active task or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Evidence, schema, dependency or review precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    diffEngineeringRevision: {
+        parameters: {
+            query: {
+                revision_id: string;
+            };
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Project-authorized engineering draft/review/publication result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["diffEngineeringRevisionEnvelope"];
+                };
+            };
+            /** @description Project/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision, active task or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Evidence, schema, dependency or review precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    readEngineeringSource: {
+        parameters: {
+            query: {
+                sheet: string;
+                start_row: number;
+                end_row: number;
+                start_column: number;
+                end_column: number;
+            };
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Project-authorized engineering draft/review/publication result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["readEngineeringSourceEnvelope"];
+                };
+            };
+            /** @description Project/permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision, active task or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Evidence, schema, dependency or review precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listEngineeringRules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized engineering calculation/rule result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listEngineeringRulesEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rule, unit, approval, calculation or schema precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createEngineeringRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDERuleDraft"];
+            };
+        };
+        responses: {
+            /** @description Authorized engineering calculation/rule result */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["createEngineeringRuleEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rule, unit, approval, calculation or schema precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getEngineeringRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                ruleId: string;
+                version: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized engineering calculation/rule result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getEngineeringRuleEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rule, unit, approval, calculation or schema precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    reviewEngineeringRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                ruleId: string;
+                version: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDERuleReview"];
+            };
+        };
+        responses: {
+            /** @description Authorized engineering calculation/rule result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["reviewEngineeringRuleEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rule, unit, approval, calculation or schema precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getEngineeringCalculationProvider: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized engineering calculation/rule result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getEngineeringCalculationProviderEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rule, unit, approval, calculation or schema precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listEngineeringCalculations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized engineering calculation/rule result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listEngineeringCalculationsEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rule, unit, approval, calculation or schema precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    runEngineeringCalculation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDECalculationRequest"];
+            };
+        };
+        responses: {
+            /** @description Authorized engineering calculation/rule result */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["runEngineeringCalculationEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rule, unit, approval, calculation or schema precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getEngineeringCalculation: {
+        parameters: {
+            query?: {
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+                runId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized engineering calculation/rule result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getEngineeringCalculationEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rule, unit, approval, calculation or schema precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    editEngineeringConnectivity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEConnectivityEdit"];
+            };
+        };
+        responses: {
+            /** @description New reviewed-draft candidate revision */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["editEngineeringConnectivityEnvelope"];
+                };
+            };
+            /** @description Denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid typed engineering entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    editEngineeringPower: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEPowerEdit"];
+            };
+        };
+        responses: {
+            /** @description New reviewed-input revision with validation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["editEngineeringPowerEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision stale */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid typed model or result binding */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    applyEngineeringCalculation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDECalculationApplication"];
+            };
+        };
+        responses: {
+            /** @description New reviewed-input revision with validation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["applyEngineeringCalculationEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision stale */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid typed model or result binding */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    editEngineeringEstimate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEEstimateEdit"];
+            };
+        };
+        responses: {
+            /** @description New estimate revision with validation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["editEngineeringEstimateEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid typed estimate */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    editEngineeringNetwork: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDENetworkEdit"];
+            };
+        };
+        responses: {
+            /** @description Authorized typed engineering result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["editEngineeringNetworkEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped revision not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision stale or not published */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid network planning facts or dependencies */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listEngineeringPhysicalRevisions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized typed engineering result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listEngineeringPhysicalRevisionsEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped revision not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision stale or not published */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid network planning facts or dependencies */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getEngineeringGoldenInput: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized typed engineering result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getEngineeringGoldenInputEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped revision not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision stale or not published */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid network planning facts or dependencies */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getEngineeringPlan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Typed revision intelligence */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getEngineeringPlanEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped source not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getEngineeringIntelligence: {
+        parameters: {
+            query?: {
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Typed revision intelligence */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getEngineeringIntelligenceEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped source not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    reimportEngineeringSource: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEReimportRequest"];
+            };
+        };
+        responses: {
+            /** @description Immutable source or reviewed difference draft */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["reimportEngineeringSourceEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped source not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid difference decision */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    reviewEngineeringDifferences: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEDifferenceReview"];
+            };
+        };
+        responses: {
+            /** @description Immutable source or reviewed difference draft */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["reviewEngineeringDifferencesEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped source not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid difference decision */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listEngineeringAttributes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Typed project attribute definition */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listEngineeringAttributesEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped definition not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Definition version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid typed attribute */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    saveEngineeringAttribute: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEAttributeDraft"];
+            };
+        };
+        responses: {
+            /** @description Typed project attribute definition */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["saveEngineeringAttributeEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped definition not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Definition version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid typed attribute */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    reviewEngineeringAttribute: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                attributeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEAttributeReview"];
+            };
+        };
+        responses: {
+            /** @description Typed project attribute definition */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["reviewEngineeringAttributeEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped definition not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Definition version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid typed attribute */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

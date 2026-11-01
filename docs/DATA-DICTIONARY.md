@@ -241,3 +241,8 @@ cmdb_entity稳定text资产键保持历史UUID原值，bom_item_uid保留唯一�
 详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。
 
 Flows开发补齐（afe8cb9）：作用域Schedule、多步骤/输出绑定、Namespace二进制版本/分发、持久事件游标、审批单次绑定与任务取消已实现；规则和真实证据统一见[实施记录](flows-redesign/implementation.md)及[契约](api/flows.md)，不在本文件重定义。生产设备验收仍单列。
+
+
+## IDE P1 · 通用智能开局工程模型
+
+新增P1通用及工程域模型使用明确核心字段、关系、版本和约束；有类型扩展不能替代核心对象。正式身份继续映射既有bom_item/CMDB，不建立平行实物资产中心。 详细模型及逻辑表设计见 [P1设计](intelligent-deployment/P1-DESIGN.txt)，机器可读模型在OpenAPI的IDE* Schema。实际状态见 [实施记录](intelligent-deployment/implementation.json)；P1完成不等于新Agent、数据库或发布链已接入。

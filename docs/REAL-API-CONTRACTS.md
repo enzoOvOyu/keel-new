@@ -1,5 +1,7 @@
 # 真实 API 契约与实现台账
 
+> 当前环境已部署智能开局工程代码`5abb94f`（原5180/8081），迁移至037；见[部署证据](intelligent-deployment/deployment-20261101.json)。下方旧模块的运行证据保留为历史，不表示本次复验通过。
+
 更新：2026-10-31。用途：后续迭代先从这里确认接口是否真实实现、部署到哪里、哪些行为已经验证，再定位变更涉及的代码。没有登记的操作不自动判为未实现，也不自动判为可用。
 
 ## 固定入口与权威边界
@@ -71,3 +73,7 @@ node dev/scripts/check-real-api-docs.mjs
 新增 [Flows 实际契约](api/flows.md)。登记表中的Flows操作只表示独立开发分支实现，运行与检查见[实施记录](flows-redesign/implementation.md)；不继承上方可视化部署4541850的证据，不代表已替换原5180/8081。
 
 Flows当前登记49个操作（开发补齐afe8cb9），加原5个可视化共54项。新增Schedule/文件版本与分发/步骤/审批/持久事件的契约均在Flows使用文档与OpenAPI；不是逐端点生产验收声明。
+
+## 智能开局工程
+
+[P1设计](intelligent-deployment/P1-DESIGN.txt)保留三层模型和分域边界。P1–P6已实现并部署，新增33个工程HTTP操作；契约见[工程接口](api/engineering.md)，检查及缺口见[实施记录](intelligent-deployment/implementation.json)。本次四个工程只读GET启动检查通过；真实AI、真实XLSX及跨客户泛化验收未完成。
