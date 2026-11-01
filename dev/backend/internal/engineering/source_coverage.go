@@ -81,24 +81,26 @@ func checkRecognizedTableCoverage(w bom.Workbook, p EngineeringProposal, sheet s
 				kinds["placement"] = true
 			}
 			for _, field := range required {
-				// An ambiguous duplicate header needs semantic review, not forced selection.
-				if len(fields[field]) != 1 {
+				// Multiple candidate headers need a semantic choice, but must not
+				// allow the entire critical relation to disappear.
+				if len(fields[field]) == 0 {
 					continue
 				}
-				column := fields[field][0]
 				mapped := false
 				for _, r := range p.Regions {
-					if r.Sheet != sheet || !kinds[r.Kind] || row > r.Bounds.EndRow || column < r.Bounds.StartColumn || column > r.Bounds.EndColumn {
+					if r.Sheet != sheet || !kinds[r.Kind] || row > r.Bounds.EndRow {
 						continue
 					}
 					for _, c := range r.Columns {
-						if c.Field == field && c.Column == column {
-							mapped = true
+						for _, column := range fields[field] {
+							if c.Field == field && c.Column == column && column >= r.Bounds.StartColumn && column <= r.Bounds.EndColumn {
+								mapped = true
+							}
 						}
 					}
 				}
 				if !mapped {
-					return fmt.Errorf("SUPPORTED_HEADER_UNMAPPED: sheet=%s header_row=%d column=%d field=%s; explicit supported table evidence cannot be discarded as other; map the evidenced column across all data rows", sheet, row, column, field)
+					return fmt.Errorf("SUPPORTED_HEADER_UNMAPPED: sheet=%s header_row=%d candidate_columns=%v field=%s; choose an evidenced source column across all data rows. Duplicate headers do not justify omitting a critical field; keep other valid bindings unchanged", sheet, row, fields[field], field)
 				}
 			}
 		}

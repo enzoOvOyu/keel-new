@@ -89,3 +89,28 @@ func TestEngineeringCorrectionRestoresOmittedArrayDefaults(t *testing.T) {
 		t.Fatalf("omitted optional arrays became invalid nulls: %v", err)
 	}
 }
+
+func TestEngineeringRevalidatesSavedCandidateWithTargetedCorrection(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var body struct {
+			Tools []struct {
+				Function struct {
+					Name string `json:"name"`
+				} `json:"function"`
+			} `json:"tools"`
+		}
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if len(body.Tools) != 1 || body.Tools[0].Function.Name != "map_semantic_fields" {
+			t.Errorf("restored candidate discarded instead of corrected: %+v", body.Tools)
+		}
+		_ = json.NewEncoder(w).Encode(map[string]any{"choices": []any{map[string]any{"message": map[string]string{"content": `{"action":"map_semantic_fields","sheet":"synthetic","region_index":0,"remove_columns":["quantity"]}`}}}})
+	}))
+	defer server.Close()
+	wb := bom.Workbook{Sheets: []bom.Sheet{{Name: "synthetic", Cells: []bom.Cell{{Ref: "A1", Row: 1, Column: 1, Value: "No."}, {Ref: "B1", Row: 1, Column: 2, Value: "Name"}, {Ref: "A2", Row: 2, Column: 1, Value: "1"}, {Ref: "B2", Row: 2, Column: 2, Value: "TEST"}}}}}
+	checkpoint := EngineeringCheckpoint{Version: engineeringCheckpointVersion, CompletedSheets: []string{"synthetic"}, InspectedSheets: []string{"synthetic"}, Proposal: engineering.EngineeringProposal{Summary: "old candidate", Regions: []engineering.RegionMapping{{Sheet: "synthetic", Kind: "equipment", Semantic: "inventory", Bounds: engineering.Bounds{StartRow: 1, EndRow: 2, StartColumn: 1, EndColumn: 2}, HeaderRows: []int{1}, Columns: []engineering.ColumnBinding{{Field: "label", Column: 2}, {Field: "quantity", Column: 1}}}}}}
+	p := Provider{Endpoint: server.URL, Timeout: time.Second}
+	result, err := p.UnderstandEngineering(context.Background(), wb, func(string, string, string) error { return nil }, EngineeringToolHooks{Resume: &checkpoint})
+	if err != nil || p.Calls != 1 || len(result.Regions[0].Columns) != 1 || result.Regions[0].Columns[0].Column != 2 {
+		t.Fatalf("resume correction failed: %v calls=%d", err, p.Calls)
+	}
+}

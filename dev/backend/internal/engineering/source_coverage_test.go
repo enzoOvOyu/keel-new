@@ -2,6 +2,7 @@ package engineering
 
 import (
 	"keel.local/dev/internal/bom"
+	"strings"
 	"testing"
 )
 
@@ -14,6 +15,26 @@ func TestSheetCompletionRequiresNonSampledAreas(t *testing.T) {
 	p.Regions[0].Bounds.EndRow = 90
 	p.Regions = append(p.Regions, RegionMapping{Sheet: "moved", Kind: "other", Bounds: Bounds{StartRow: 100, EndRow: 100, StartColumn: 6, EndColumn: 6}})
 	if err := CheckSheetCoverage(wb, p, "moved"); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDuplicateLocationHeadersRequireAnEvidencedChoice(t *testing.T) {
+	cells := []bom.Cell{}
+	for i, header := range []string{"Hostname", "Model", "Rack", "Rack No", "U Position", "Rack Unit"} {
+		cells = append(cells, bom.Cell{Row: 4, Column: i + 1, Value: header})
+	}
+	wb := bom.Workbook{Sheets: []bom.Sheet{{Name: "arbitrary", Cells: cells}}}
+	p := EngineeringProposal{Regions: []RegionMapping{{Sheet: "arbitrary", Kind: "equipment", Bounds: Bounds{StartRow: 4, EndRow: 4, StartColumn: 1, EndColumn: 6}, Columns: []ColumnBinding{{Field: "label", Column: 1}, {Field: "model", Column: 2}}}}}
+	if err := CheckSheetCoverage(wb, p, "arbitrary"); err == nil || !strings.Contains(err.Error(), "field=rack") {
+		t.Fatalf("duplicate rack headers bypassed coverage: %v", err)
+	}
+	p.Regions[0].Columns = append(p.Regions[0].Columns, ColumnBinding{Field: "rack", Column: 4})
+	if err := CheckSheetCoverage(wb, p, "arbitrary"); err == nil || !strings.Contains(err.Error(), "field=start_u") {
+		t.Fatalf("duplicate U headers bypassed coverage: %v", err)
+	}
+	p.Regions[0].Columns = append(p.Regions[0].Columns, ColumnBinding{Field: "start_u", Column: 6})
+	if err := CheckSheetCoverage(wb, p, "arbitrary"); err != nil {
 		t.Fatal(err)
 	}
 }

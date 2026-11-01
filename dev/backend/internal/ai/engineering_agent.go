@@ -59,6 +59,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 	var graph []engineering.FormulaEvidence
 	var proposal engineering.EngineeringProposal
 	completed := map[string]bool{}
+	resumeFeedback := []any{}
 	if hooks.Resume != nil {
 		proposal = hooks.Resume.Proposal
 		validRegions := []engineering.RegionMapping{}
@@ -69,9 +70,15 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 					part.Regions = append(part.Regions, region)
 				}
 			}
-			if engineering.CheckProposal(w, part) == nil && engineering.CheckSheetCoverage(w, part, sheet) == nil {
+			validationErr := engineering.CheckProposal(w, part)
+			if validationErr == nil {
+				validationErr = engineering.CheckSheetCoverage(w, part, sheet)
+			}
+			if validationErr == nil {
 				completed[sheet] = true
 				validRegions = append(validRegions, part.Regions...)
+			} else {
+				resumeFeedback = append(resumeFeedback, map[string]any{"action": engineeringAction{Action: "propose_engineering_model", Sheet: sheet, Proposal: &part}, "result": map[string]any{"error": validationErr.Error(), "restored_draft": true}})
 			}
 		}
 		proposal.Regions = validRegions
@@ -91,6 +98,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 	if hooks.Resume != nil {
 		history = boundedEngineeringHistory(hooks.Resume.History)
 	}
+	history = append(history, resumeFeedback...)
 	registry := engineering.DefaultRegistry().Definitions()
 	sheetOrder := append([]bom.Sheet{}, w.Sheets...)
 	score := func(sheet bom.Sheet) int {
