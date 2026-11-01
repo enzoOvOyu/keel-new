@@ -16371,6 +16371,100 @@ paths:
           description: Revision conflict
         '422':
           description: Invalid typed estimate
+  /projects/{projectId}/engineering-imports/{engineeringId}/network:
+    put:
+      operationId: editEngineeringNetwork
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Authorized typed engineering result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/editEngineeringNetworkEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped revision not found
+        '409':
+          description: Revision stale or not published
+        '422':
+          description: Invalid network planning facts or dependencies
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDENetworkEdit'
+  /projects/{projectId}/engineering-physical-revisions:
+    get:
+      operationId: listEngineeringPhysicalRevisions
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Authorized typed engineering result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listEngineeringPhysicalRevisionsEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped revision not found
+        '409':
+          description: Revision stale or not published
+        '422':
+          description: Invalid network planning facts or dependencies
+  /projects/{projectId}/engineering-imports/{engineeringId}/golden-input:
+    get:
+      operationId: getEngineeringGoldenInput
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Authorized typed engineering result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getEngineeringGoldenInputEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped revision not found
+        '409':
+          description: Revision stale or not published
+        '422':
+          description: Invalid network planning facts or dependencies
 components:
   securitySchemes:
     bearerAuth:
@@ -44590,6 +44684,8 @@ components:
           - asn
         prefix_length:
           type: integer
+        vrf_ref:
+          type: string
       required:
       - id
       - kind
@@ -44799,6 +44895,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/IDEWorkloadEstimate'
+        network_plans:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDENetworkPlan'
       required:
       - equipment
       - assemblies
@@ -44812,6 +44912,7 @@ components:
       - power_plans
       - materials
       - workloads
+      - network_plans
       type: object
       x-implementation-status: model-contract-only
       description: 'Read aggregate assembled from typed domain tables. Not a persistence JSON payload. First vertical slice: equipment,
@@ -45734,6 +45835,16 @@ components:
           - power
           - material
           - workload
+          - network_fabric
+          - network_plane
+          - network_role
+          - network_interface
+          - network_allocation
+          - network_bgp
+          - network_bfd
+          - network_qos
+          - network_ar
+          - network_evpn
         semantic:
           type: string
         header_rows:
@@ -46091,6 +46202,7 @@ components:
             - ENGINEERING_POWER
             - ENGINEERING_MATERIAL
             - ENGINEERING_WORKLOAD
+            - NETWORK_REVISION
         decision:
           type: string
           enum:
@@ -46596,6 +46708,98 @@ components:
       properties:
         data:
           $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    IDENetworkEdit:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_revision:
+          type: integer
+          minimum: 1
+        plan:
+          $ref: '#/components/schemas/IDENetworkPlan'
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - expected_revision
+      - plan
+      - reason
+    IDEPhysicalRevisionOption:
+      type: object
+      additionalProperties: false
+      properties:
+        revision_id:
+          type: string
+        source_id:
+          type: string
+        publication_id:
+          type: string
+        target:
+          type: string
+        filename:
+          type: string
+        published_at:
+          type: string
+          format: date-time
+      required:
+      - revision_id
+      - source_id
+      - publication_id
+      - target
+      - filename
+      - published_at
+    IDEGoldenInput:
+      type: object
+      additionalProperties: false
+      properties:
+        publication_id:
+          type: string
+        revision_id:
+          type: string
+        plan:
+          $ref: '#/components/schemas/IDENetworkPlan'
+        physical_revision_id:
+          type: string
+      required:
+      - publication_id
+      - revision_id
+      - plan
+      - physical_revision_id
+    editEngineeringNetworkEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    listEngineeringPhysicalRevisionsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEPhysicalRevisionOption'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getEngineeringGoldenInputEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEGoldenInput'
         request_id:
           type: string
       required:

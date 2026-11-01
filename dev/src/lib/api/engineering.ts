@@ -82,3 +82,8 @@ export const editEngineeringPower=(project:string,id:string,request:PowerEdit)=>
 export const applyEngineeringCalculation=(project:string,id:string,request:CalculationApplication)=>bomRequest<EngineeringWorkspace>(engineeringPath(project,id)+'/calculation-application','POST',request);
 export type EstimateEdit = Models['IDEEstimateEdit'];
 export const editEngineeringEstimate=(project:string,id:string,request:EstimateEdit)=>bomRequest<EngineeringWorkspace>(engineeringPath(project,id)+'/estimates','PUT',request);
+export type NetworkEdit = Models['IDENetworkEdit'];
+export const editEngineeringNetwork=(project:string,id:string,request:NetworkEdit)=>bomRequest<EngineeringWorkspace>(engineeringPath(project,id)+'/network','PUT',request);
+export const engineeringPhysicalRevisions=(project:string,signal?:AbortSignal)=>bomRequest<Models['IDEPhysicalRevisionOption'][]>('projects/'+encodeURIComponent(project)+'/engineering-physical-revisions','GET',undefined,undefined,signal);
+export const engineeringModelAt=(project:string,id:string,revision:string,signal?:AbortSignal)=>bomRequest<EngineeringModelView>(engineeringPath(project,id)+'/model?revision_id='+encodeURIComponent(revision),'GET',undefined,undefined,signal);
+export const engineeringGoldenInput=(project:string,id:string,signal?:AbortSignal)=>bomRequest<Models['IDEGoldenInput']>(engineeringPath(project,id)+'/golden-input','GET',undefined,undefined,signal);

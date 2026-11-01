@@ -9,7 +9,7 @@ const ConnectivityTarget = "CMDB_PLANNED_CONNECTIVITY"
 const CablingTarget = "ENGINEERING_CABLING"
 
 var PhysicalTargets = []string{EquipmentTarget, FacilityTarget, PlacementTarget}
-var PublishTargets = []string{EquipmentTarget, FacilityTarget, PlacementTarget, ConnectivityTarget, CablingTarget, PowerTarget, MaterialTarget, WorkloadTarget}
+var PublishTargets = []string{EquipmentTarget, FacilityTarget, PlacementTarget, ConnectivityTarget, CablingTarget, PowerTarget, MaterialTarget, WorkloadTarget, NetworkTarget}
 
 func TargetDependencies(target string) []string {
 	switch target {
@@ -198,4 +198,26 @@ type EstimateEdit struct {
 	Material         *MaterialEstimate `json:"material,omitempty"`
 	Workload         *WorkloadEstimate `json:"workload,omitempty"`
 	Reason           string            `json:"reason"`
+}
+
+const NetworkTarget = "NETWORK_REVISION"
+
+type NetworkEdit struct {
+	ExpectedRevision int         `json:"expected_revision"`
+	Plan             NetworkPlan `json:"plan"`
+	Reason           string      `json:"reason"`
+}
+type PhysicalRevisionOption struct {
+	RevisionID    string    `json:"revision_id"`
+	SourceID      string    `json:"source_id"`
+	PublicationID string    `json:"publication_id"`
+	Target        string    `json:"target"`
+	Filename      string    `json:"filename"`
+	PublishedAt   time.Time `json:"published_at"`
+}
+type GoldenInput struct {
+	PublicationID      string      `json:"publication_id"`
+	RevisionID         string      `json:"revision_id"`
+	Plan               NetworkPlan `json:"plan"`
+	PhysicalRevisionID string      `json:"physical_revision_id"`
 }

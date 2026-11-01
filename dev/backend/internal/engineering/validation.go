@@ -82,18 +82,19 @@ func (q Quantity) Validate() error {
 // PhysicalModel is an API/read aggregate; persistence stores each collection in
 // typed tables. It is not a JSON replacement for the engineering domain schema.
 type PhysicalModel struct {
-	Materials   []MaterialEstimate  `json:"materials"`
-	Workloads   []WorkloadEstimate  `json:"workloads"`
-	PowerPlans  []PowerPlan         `json:"power_plans"`
-	ProjectID   ID                  `json:"project_id"`
-	Equipment   []EquipmentPlan     `json:"equipment"`
-	Assemblies  []DeviceAssembly    `json:"assemblies"`
-	Facilities  []FacilityModel     `json:"facilities"`
-	Placements  []RackPlacement     `json:"placements"`
-	Ports       []PlannedPort       `json:"ports"`
-	Connections []PlannedConnection `json:"connections"`
-	Cables      []CablePlan         `json:"cables"`
-	Optics      []OpticDemand       `json:"optics"`
+	NetworkPlans []NetworkPlan       `json:"network_plans"`
+	Materials    []MaterialEstimate  `json:"materials"`
+	Workloads    []WorkloadEstimate  `json:"workloads"`
+	PowerPlans   []PowerPlan         `json:"power_plans"`
+	ProjectID    ID                  `json:"project_id"`
+	Equipment    []EquipmentPlan     `json:"equipment"`
+	Assemblies   []DeviceAssembly    `json:"assemblies"`
+	Facilities   []FacilityModel     `json:"facilities"`
+	Placements   []RackPlacement     `json:"placements"`
+	Ports        []PlannedPort       `json:"ports"`
+	Connections  []PlannedConnection `json:"connections"`
+	Cables       []CablePlan         `json:"cables"`
+	Optics       []OpticDemand       `json:"optics"`
 }
 
 func ValidatePhysical(m PhysicalModel) []ValidationIssue {
@@ -313,6 +314,9 @@ func ValidatePhysical(m PhysicalModel) []ValidationIssue {
 	}
 	for _, v := range m.Workloads {
 		checkVersion(v.EntityVersion, WorkloadTarget, "material_workload")
+	}
+	for _, v := range m.NetworkPlans {
+		checkVersion(v.EntityVersion, NetworkTarget, "network_design")
 	}
 	issues = append(issues, ValidateEstimates(m)...)
 	issues = append(issues, ValidatePower(m)...)

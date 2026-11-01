@@ -28,7 +28,7 @@ func ResolveSourceConstants(original, sanitized bom.Workbook, p EngineeringPropo
 		for j := range r.Constants {
 			c := &r.Constants[j]
 			switch c.Field {
-			case "equipment_type", "identity_kind", "relation_type", "mount_face", "role", "medium", "length_state", "power_basis", "cooling_type", "work_type":
+			case "equipment_type", "identity_kind", "relation_type", "mount_face", "role", "medium", "length_state", "power_basis", "cooling_type", "work_type", "fabric_kind", "allocation_kind":
 				continue
 			}
 			found, ambiguous := false, false

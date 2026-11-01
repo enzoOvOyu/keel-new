@@ -292,6 +292,7 @@ type WorkloadEstimate struct {
 	CalculationRunID         *ID       `json:"calculation_run_id,omitempty"`
 }
 type NetworkAllocation struct {
+	VRFRef       *ID     `json:"vrf_ref,omitempty"`
 	ID           ID      `json:"id"`
 	Kind         string  `json:"kind"`
 	InterfaceID  *ID     `json:"interface_id,omitempty"`

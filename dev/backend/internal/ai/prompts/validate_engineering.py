@@ -20,7 +20,7 @@ class Constant(Closed):
 class Region(Closed):
     sheet: str
     bounds: Bounds
-    kind: Literal['equipment','assembly','site','room','rack','placement','port','connection','cable','power','material','workload','other']
+    kind: Literal['equipment','assembly','site','room','rack','placement','port','connection','cable','power','material','workload','network_fabric','network_plane','network_role','network_interface','network_allocation','network_bgp','network_bfd','network_qos','network_ar','network_evpn','other']
     semantic: str
     header_rows: list[int]
     columns: list[Column]

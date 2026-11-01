@@ -6437,6 +6437,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/network": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["editEngineeringNetwork"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-physical-revisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listEngineeringPhysicalRevisions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/golden-input": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getEngineeringGoldenInput"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -15879,6 +15927,7 @@ export interface components {
             /** @enum {string} */
             kind: "ip" | "asn";
             prefix_length?: number;
+            vrf_ref?: string;
         } & ({
             /** @constant */
             kind?: "ip";
@@ -15933,6 +15982,7 @@ export interface components {
             power_plans: components["schemas"]["IDEPowerPlan"][];
             materials: components["schemas"]["IDEMaterialEstimate"][];
             workloads: components["schemas"]["IDEWorkloadEstimate"][];
+            network_plans: components["schemas"]["IDENetworkPlan"][];
         };
         IDEPlannedConnection: {
             a_port_id: string;
@@ -16211,7 +16261,7 @@ export interface components {
             sheet: string;
             bounds: components["schemas"]["IDEBounds"];
             /** @enum {string} */
-            kind: "equipment" | "assembly" | "site" | "room" | "rack" | "placement" | "other" | "port" | "connection" | "cable" | "power" | "material" | "workload";
+            kind: "equipment" | "assembly" | "site" | "room" | "rack" | "placement" | "other" | "port" | "connection" | "cable" | "power" | "material" | "workload" | "network_fabric" | "network_plane" | "network_role" | "network_interface" | "network_allocation" | "network_bgp" | "network_bfd" | "network_qos" | "network_ar" | "network_evpn";
             semantic: string;
             header_rows: number[];
             columns: components["schemas"]["IDEColumnBinding"][];
@@ -16322,7 +16372,7 @@ export interface components {
         };
         IDETargetAction: {
             expected_revision: number;
-            targets: ("CMDB_PLANNED_EQUIPMENT" | "CMDB_PLANNED_FACILITY" | "CMDB_PLANNED_PLACEMENT" | "CMDB_PLANNED_CONNECTIVITY" | "ENGINEERING_CABLING" | "ENGINEERING_POWER" | "ENGINEERING_MATERIAL" | "ENGINEERING_WORKLOAD")[];
+            targets: ("CMDB_PLANNED_EQUIPMENT" | "CMDB_PLANNED_FACILITY" | "CMDB_PLANNED_PLACEMENT" | "CMDB_PLANNED_CONNECTIVITY" | "ENGINEERING_CABLING" | "ENGINEERING_POWER" | "ENGINEERING_MATERIAL" | "ENGINEERING_WORKLOAD" | "NETWORK_REVISION")[];
             /** @enum {string} */
             decision: "approve" | "reject" | "publish";
             reason: string;
@@ -16490,6 +16540,38 @@ export interface components {
         };
         editEngineeringEstimateEnvelope: {
             data: components["schemas"]["IDEWorkspace"];
+            request_id: string;
+        };
+        IDENetworkEdit: {
+            expected_revision: number;
+            plan: components["schemas"]["IDENetworkPlan"];
+            reason: string;
+        };
+        IDEPhysicalRevisionOption: {
+            revision_id: string;
+            source_id: string;
+            publication_id: string;
+            target: string;
+            filename: string;
+            /** Format: date-time */
+            published_at: string;
+        };
+        IDEGoldenInput: {
+            publication_id: string;
+            revision_id: string;
+            plan: components["schemas"]["IDENetworkPlan"];
+            physical_revision_id: string;
+        };
+        editEngineeringNetworkEnvelope: {
+            data: components["schemas"]["IDEWorkspace"];
+            request_id: string;
+        };
+        listEngineeringPhysicalRevisionsEnvelope: {
+            data: components["schemas"]["IDEPhysicalRevisionOption"][];
+            request_id: string;
+        };
+        getEngineeringGoldenInputEnvelope: {
+            data: components["schemas"]["IDEGoldenInput"];
             request_id: string;
         };
     };
@@ -36070,6 +36152,162 @@ export interface operations {
                 content?: never;
             };
             /** @description Invalid typed estimate */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    editEngineeringNetwork: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDENetworkEdit"];
+            };
+        };
+        responses: {
+            /** @description Authorized typed engineering result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["editEngineeringNetworkEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped revision not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision stale or not published */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid network planning facts or dependencies */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listEngineeringPhysicalRevisions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized typed engineering result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listEngineeringPhysicalRevisionsEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped revision not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision stale or not published */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid network planning facts or dependencies */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getEngineeringGoldenInput: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized typed engineering result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getEngineeringGoldenInputEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped revision not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision stale or not published */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid network planning facts or dependencies */
             422: {
                 headers: {
                     [name: string]: unknown;

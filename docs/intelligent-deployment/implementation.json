@@ -1,15 +1,15 @@
 {
-  "updated_at": "2026-11-01 04:23:40 UTC",
+  "updated_at": "2026-11-01 04:47:04 UTC",
   "branch": "audit/intelligent-deployment-p0",
-  "scope": "Physical, calculations, connectivity/cabling, power/cooling, material/workload implemented; network and final orchestration/reimport in progress",
+  "scope": "All five domain batches implemented; dynamic persisted orchestration, cross-file reimport and unified UI completion in progress",
   "phase_status": {
     "P0": "complete; report commit 314126d",
     "P1": "complete: architecture, models, contracts and kernel",
     "P2": "all named tool actions connected to source inspection, typed proposals, dependencies, rules/calculation and deterministic physical validation; domain expansion and acceptance pending",
     "P3": "isolated LibreOffice Provider, formula graph, unit-aware restricted rule AST, human rule approval and durable runs implemented; real Golden Fixture reference acceptance pending",
-    "P4": "first four domain batches implemented; network design in progress",
-    "P5": "physical target review/revisions/Outbox/CMDB receipts implemented; later-domain releases pending",
-    "P6": "physical workbench plus calculation/evidence/rule editing and review implemented; remaining domain panels pending; interaction acceptance NOT RUN"
+    "P4": "All five typed domain batches implemented; real Golden Fixture/AI/customer acceptance NOT RUN",
+    "P5": "Independent target review and domain publication implemented; cross-file differences and planning deletion reconciliation pending",
+    "P6": "All domain panels connected; unified layout and final interaction closure in progress; browser acceptance NOT RUN"
   },
   "implemented": [
     "Three-layer design, model ownership and relational schema design for all requested common and domain models",
@@ -39,7 +39,9 @@
     "Batch calculation output application into versioned cable lengths/power fields, run/source/output checks and stale power invalidation",
     "Material and workload relational estimates with separate required/purchased/spares/gap and quantity/stock/labor values",
     "Source-driven procurement/labor or approved project rules; no universal procurement formula or invented labor rate",
-    "Persistent workload summary, batch application, stale quantity block and replacement; estimates publish only engineering revisions"
+    "Persistent workload summary, batch application, stale quantity block and replacement; estimates publish only engineering revisions",
+    "NetworkPlan typed relational submodels for all ten logical planning groups; explicit source facts only",
+    "Published physical revision references, independent network review/publication and guarded Golden input consumption"
   ],
   "files": {
     "design": "docs/intelligent-deployment/P1-DESIGN.txt",
@@ -182,17 +184,27 @@
       "check": "Estimate incremental TypeScript",
       "result": "PASS",
       "scope": "static frontend types only; browser acceptance NOT RUN"
+    },
+    {
+      "check": "TestEngineeringNetworkPublicationAndGoldenGate",
+      "result": "PASS",
+      "scope": "isolated DB network roundtrip, draft/physical dependency gates, stale Golden input refusal; no CMDB assets"
+    },
+    {
+      "check": "TestNetworkExtractionCrossRegionOrderAndExplicitFacts and incremental TypeScript",
+      "result": "PASS",
+      "scope": "synthetic cross-region order, no invented physical entities/versions and frontend types"
     }
   ],
   "not_run": [
-    "API/DB/Outbox integration",
     "real AI calls",
     "source workbook reimport",
-    "reference spreadsheet recalculation",
     "human Ground Truth acceptance",
     "UI interaction/visual acceptance",
     "cross-customer generalization",
-    "smoke/regression suites"
+    "smoke/regression suites",
+    "real workbook reference recalculation (synthetic isolated reference passed)",
+    "HTTP and live environment integration (isolated service/DB/Outbox passed)"
   ],
   "deployment": {
     "deployed": false,
@@ -202,8 +214,9 @@
     "live_frontend_changed": false
   },
   "next_vertical_slice": [
-    "Connectivity and cabling: ports, breakout, endpoints/routes/material linkage and planned CMDB projection",
-    "Power/cooling, material/workload then network planning; no invented missing configuration"
+    "Dynamic durable ImportPlan and source intelligence records",
+    "Cross-source reimport/difference decisions and planning removal",
+    "Unified workbench final interaction closure"
   ],
   "limits": [
     "No current environment migration or deployment",
@@ -212,11 +225,11 @@
     "Approved plan removal/tombstone publication remains to implement; current first-slice UI does not remove published entities",
     "Formula source/Golden Fixture compatibility and human Ground Truth NOT RUN",
     "Rule AST rejects unsupported compound-unit operations; dynamic/external spreadsheet dependencies remain partial",
-    "Remaining connectivity/cabling/power/material/workload/network domain implementations pending"
+    "Golden endpoint supplies reviewed planning input only; vendor configuration generation/downloading is outside this engineering module"
   ],
   "changes": {
-    "migration_added": "027/028, isolated DB only",
-    "http_operations_added": 19,
+    "migration_added": "027–033, isolated DB only",
+    "http_operations_added": 26,
     "current_environment_changed": false,
     "original_workbooks_modified": false
   }

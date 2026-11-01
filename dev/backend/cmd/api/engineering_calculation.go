@@ -89,6 +89,9 @@ func engineeringCalculationEvidence(x *engineering.Extraction, refs map[string]s
 	for _, v := range x.Model.Cables {
 		targets[v.EntityID] = engineering.CablingTarget
 	}
+	for _, v := range x.Model.NetworkPlans {
+		targets[v.EntityID] = engineering.NetworkTarget
+	}
 	for _, v := range x.Model.Materials {
 		targets[v.EntityID] = engineering.MaterialTarget
 	}

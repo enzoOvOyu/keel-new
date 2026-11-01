@@ -71,6 +71,9 @@ func engineeringModel(ctx context.Context, q engineeringQuery, revision, project
 			return m, evidence, e
 		}
 	}
+	if e := loadNetworkRows(ctx, q, revision, &m); e != nil {
+		return m, evidence, e
+	}
 	if e := loadEstimateRows(ctx, q, revision, &m); e != nil {
 		return m, evidence, e
 	}
@@ -108,6 +111,8 @@ func engineeringTargetDigest(m engineering.PhysicalModel, target string, maturit
 		values = []any{m.Equipment, m.Assemblies, m.Facilities, m.Placements}
 	case engineering.ConnectivityTarget:
 		values = []any{m.Equipment, m.Assemblies, m.Ports, m.Connections}
+	case engineering.NetworkTarget:
+		values = m.NetworkPlans
 	case engineering.MaterialTarget:
 		values = m.Materials
 	case engineering.WorkloadTarget:
@@ -159,6 +164,13 @@ func targetHasContent(m engineering.PhysicalModel, t string) bool {
 		return len(m.Placements) > 0
 	case engineering.ConnectivityTarget:
 		return len(m.Ports) > 0 || len(m.Connections) > 0
+	case engineering.NetworkTarget:
+		for _, p := range m.NetworkPlans {
+			if engineering.NetworkHasContent(p) {
+				return true
+			}
+		}
+		return false
 	case engineering.MaterialTarget:
 		return len(m.Materials) > 0
 	case engineering.WorkloadTarget:
@@ -215,6 +227,19 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 		}
 		previousPowerInput = powerInputDigest(old)
 		previousModel = &old
+		if origin == "agent" && len(old.NetworkPlans) > 0 {
+			for i := range x.Model.NetworkPlans {
+				if x.Model.NetworkPlans[i].PhysicalRevisionID == "" {
+					x.Model.NetworkPlans[i].PhysicalRevisionID = old.NetworkPlans[0].PhysicalRevisionID
+				}
+				physical, err := networkPhysicalContext(ctx, tx, s.project, x.Model.NetworkPlans[i])
+				if err != nil {
+					return "", err
+				}
+				engineering.ResolveNetworkPhysical(&x.Model.NetworkPlans[i], physical)
+			}
+		}
+
 		if origin == "human" {
 			fields := map[string]map[string]bool{}
 			for _, difference := range engineeringDiff(old, x.Model) {
@@ -289,7 +314,7 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 				if err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM eng_target WHERE source_id=$1 AND target=$2 AND review_id IS NOT NULL)`, source, target).Scan(&protected); err != nil {
 					return "", err
 				}
-				if !protected && priorOrigin != "human" {
+				if !protected && (priorOrigin != "human" || !targetHasContent(old, target)) {
 					continue
 				}
 				if suggestionDigest(old, target) != suggestionDigest(proposed, target) {
@@ -306,6 +331,8 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 				case engineering.ConnectivityTarget:
 					x.Model.Ports = old.Ports
 					x.Model.Connections = old.Connections
+				case engineering.NetworkTarget:
+					x.Model.NetworkPlans = old.NetworkPlans
 				case engineering.MaterialTarget:
 					x.Model.Materials = old.Materials
 				case engineering.WorkloadTarget:
@@ -323,6 +350,13 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 		for _, d := range engineeringDiff(engineering.EmptyPhysical(s.project), x.Model) {
 			changed[d.EntityID] = true
 		}
+	}
+	for i := range x.Model.NetworkPlans {
+		physical, err := networkPhysicalContext(ctx, tx, s.project, x.Model.NetworkPlans[i])
+		if err != nil {
+			return "", err
+		}
+		engineering.ResolveNetworkPhysical(&x.Model.NetworkPlans[i], physical)
 	}
 	if previousModel != nil {
 		invalidateEstimateInputs(*previousModel, &x.Model)
@@ -413,6 +447,9 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 			return "", e
 		}
 	}
+	if e = saveNetworkRows(ctx, tx, revision, &x.Model, insertVersion); e != nil {
+		return "", e
+	}
 	if e = saveEstimateRows(ctx, tx, revision, &x.Model, insertVersion); e != nil {
 		return "", e
 	}
@@ -438,6 +475,11 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 		}
 	}
 	issues = append(issues, engineering.ValidatePhysical(x.Model)...)
+	networkIssues, networkErr := validateNetworkDomain(ctx, tx, s.project, x.Model)
+	if networkErr != nil {
+		return "", networkErr
+	}
+	issues = append(issues, networkIssues...)
 	staleWorkload, err := staleWorkloadIssues(ctx, tx, x.Model)
 	if err != nil {
 		return "", err

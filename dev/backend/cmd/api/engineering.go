@@ -24,7 +24,11 @@ func engineeringDecode(w http.ResponseWriter, r *http.Request, dst any) bool {
 	return true
 }
 func engineeringFailure(w http.ResponseWriter, e error) {
-	if strings.HasPrefix(e.Error(), "CALC_") {
+	if e.Error() == "NETWORK_PHYSICAL_REVISION_STALE" || e.Error() == "NETWORK_PUBLICATION_REQUIRED" {
+		fail(w, 409, e.Error())
+		return
+	}
+	if strings.HasPrefix(e.Error(), "CALC_") || strings.HasPrefix(e.Error(), "NETWORK_") {
 		fail(w, 422, e.Error())
 		return
 	}
@@ -46,7 +50,7 @@ func engineeringFailure(w http.ResponseWriter, e error) {
 }
 func (s *Server) engineeringRoutes(w http.ResponseWriter, r *http.Request) bool {
 	p := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
-	if len(p) < 5 || p[0] != "api" || p[1] != "v1" || p[2] != "projects" || p[4] != "engineering-imports" {
+	if len(p) < 5 || p[0] != "api" || p[1] != "v1" || p[2] != "projects" || (p[4] != "engineering-imports" && p[4] != "engineering-physical-revisions") {
 		return false
 	}
 	project := p[3]
@@ -75,6 +79,20 @@ func (s *Server) engineeringRoutes(w http.ResponseWriter, r *http.Request) bool 
 	scoped.project = project
 	s = &scoped
 	ctx := r.Context()
+	if p[4] == "engineering-physical-revisions" {
+		if len(p) != 5 || r.Method != "GET" {
+			fail(w, 405, "METHOD_NOT_ALLOWED")
+			return true
+		}
+		values, e := s.engineeringPhysicalRevisions(ctx)
+		if e != nil {
+			engineeringFailure(w, e)
+		} else {
+			respond(w, 200, values)
+		}
+		return true
+	}
+
 	reply := func(id string, status int) {
 		v, e := s.engineeringWorkspace(ctx, id)
 		if e != nil {
@@ -197,6 +215,27 @@ func (s *Server) engineeringRoutes(w http.ResponseWriter, r *http.Request) bool 
 			engineeringFailure(w, e)
 		} else {
 			reply(id, 202)
+		}
+		return true
+	}
+	if action == "network" && r.Method == "PUT" {
+		var q engineering.NetworkEdit
+		if !engineeringDecode(w, r, &q) {
+			return true
+		}
+		if err := s.editEngineeringNetwork(ctx, id, q, subjectOf(ctx).Username); err != nil {
+			engineeringFailure(w, err)
+		} else {
+			reply(id, 200)
+		}
+		return true
+	}
+	if action == "golden-input" && r.Method == "GET" {
+		value, err := s.engineeringGoldenInput(ctx, id)
+		if err != nil {
+			engineeringFailure(w, err)
+		} else {
+			respond(w, 200, value)
 		}
 		return true
 	}
@@ -552,6 +591,9 @@ func engineeringDiff(before, after engineering.PhysicalModel) []engineering.Revi
 		}
 		for _, v := range m.Connections {
 			add(v.EntityID, "connection", v)
+		}
+		for _, v := range m.NetworkPlans {
+			add(v.EntityID, "network_plan", v)
 		}
 		for _, v := range m.Materials {
 			add(v.EntityID, "material_estimate", v)
