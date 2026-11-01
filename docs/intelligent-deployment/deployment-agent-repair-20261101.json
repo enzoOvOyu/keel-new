@@ -1,12 +1,12 @@
 {
-  "code_revision": "6f99330",
+  "code_revision": "0ac58ec",
   "branch": "dev",
   "repository": "enzoOvOyu/keel-new",
   "api": {
     "port": 8081,
-    "binary": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/keel-api-v34",
-    "pid": 1415124,
-    "sha256": "f50de4f51a37733527e9a7f15386f7200364d4ab2ab65f24beab4a7cb2b125c6",
+    "binary": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/keel-api-v35",
+    "pid": 1420933,
+    "sha256": "1edb03254b19a54bf7f0b8798a97c4d3b9542f6f6c9dfb8397d46efedcc8e9a7",
     "cwd": "/home/ubuntu/keel/dev/backend",
     "session": "keel-cmdb-api"
   },
@@ -32,7 +32,7 @@
     "native_tools_checkpoint_and_provider_errors": "PASS",
     "source_upload": "PASS: engineering mode; zero legacy recognition jobs",
     "minio_artifact_write_read": "PASS: actual artifact roundtrip",
-    "full_real_workbook_understanding": "RUNNING: f3a0905f-e0fd-4dab-b229-325361e06ce5; v33 failed on power classification/field loops",
+    "full_real_workbook_understanding": "RUNNING: 016d7561-3851-460f-96a5-a97c218b6a1e; v34 failed on remaining title coverage",
     "frontend_upload_module": "HTTP 200; browser not run",
     "artifact_recovery_scope_hash_cleanup": "PASS: isolated PostgreSQL and synthetic S3, including new service instance restore, wrong project/revision/claim rejection, integrity verification and index cascade",
     "typescript_engineering_adapter": "PASS",
@@ -46,7 +46,8 @@
     "equipment_semantics_and_constant_conflicts": "PASS: targeted AI and complete engineering checks plus build; source metadata/state conflicts and duplicate object constants rejected",
     "targeted_correction_and_duplicate_headers": "PASS: targeted AI tests, complete engineering package and Go build",
     "location_hierarchy_and_edit_parameters": "PASS: engineering package, targeted AI correction/feedback checks and build",
-    "focused_correction_and_reclassification": "PASS: targeted AI correction/resume/no-progress/reclassification cases and build. Earlier full package run exposed an obsolete context assertion; affected tests updated and passed."
+    "focused_correction_and_reclassification": "PASS: targeted AI correction/resume/no-progress/reclassification cases and build. Earlier full package run exposed an obsolete context assertion; affected tests updated and passed.",
+    "coverage_correction_excludes_titles": "PASS: targeted AI correction/resume/no-progress tests, title retained without creating equipment, and Go build"
   },
   "rollback": {
     "api_launcher": "/home/ubuntu/.local/state/keel-deployments/engineering-5abb94f/api-run.py",

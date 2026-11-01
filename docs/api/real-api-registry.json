@@ -1,10 +1,10 @@
 {
   "version": 1,
   "updated_at": "2026-11-01",
-  "coverage": "API6f99330/v34 deployed. Ultra-03 resumes eight saved sheet candidates. Cabling7154 x8 and equipment967 x4 critical source fields matched; Server false location levels corrected. Power and remaining complex sheets unaccepted; no formal publication.",
+  "coverage": "API0ac58ec/v35 deployed: focused coverage correction and excluded title rows. Ultra-03 running; whole workbook not accepted; no formal publication.",
   "schema_authority": "docs/openapi.yaml",
-  "code_revision": "6f99330",
-  "deployed_revision": "6f99330",
+  "code_revision": "0ac58ec",
+  "deployed_revision": "0ac58ec",
   "deployment_evidence": "docs/intelligent-deployment/deployment-agent-repair-20261101.json",
   "operations": [
     {
