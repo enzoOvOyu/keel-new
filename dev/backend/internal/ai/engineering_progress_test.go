@@ -287,6 +287,19 @@ func TestEngineeringRangePagesWithoutLosingRequestedExtent(t *testing.T) {
 	}
 }
 
+func TestEngineeringFormulaReadWindowRequiresInterpretation(t *testing.T) {
+	history := []any{}
+	for i := 0; i < 6; i++ {
+		history = append(history, map[string]any{"action": engineeringAction{Action: "inspect_formula", Sheet: "renamed", Cell: "B4"}, "result": map[string]any{"formula": "1+1"}})
+	}
+	if !engineeringProposalDue(bom.Sheet{Name: "renamed"}, history) {
+		t.Fatal("formula reads never progress to interpretation")
+	}
+	if engineeringProposalDue(bom.Sheet{Name: "different"}, history) {
+		t.Fatal("another sheet's reads forced interpretation")
+	}
+}
+
 func TestEngineeringMissingFormulaProvidesActualReferences(t *testing.T) {
 	calls := 0
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

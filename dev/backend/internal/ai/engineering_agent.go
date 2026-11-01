@@ -376,6 +376,11 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 		if e := persist(); e != nil {
 			return proposal, e
 		}
+		if err == nil {
+			if sheet, ok := ir.AnalyzeSheet(action.Sheet); ok && engineeringProposalDue(sheet, history) {
+				queued = nil // A read batch must not bypass the transition to a proposal.
+			}
+		}
 		if err != nil {
 			queued = nil // Give the model a correction turn before executing dependent calls.
 			key := action.Action + "/" + action.Sheet + "/" + err.Error()
@@ -604,6 +609,7 @@ func engineeringSourceTools(functions []any, sheet string, inspected, propose bo
 // no new evidence, require a proposal/explicit uncertainty instead of looping.
 func engineeringProposalDue(sheet bom.Sheet, history []any) bool {
 	seen := map[string]bool{}
+	reads := 0
 	for _, entry := range history {
 		raw, _ := json.Marshal(entry)
 		var step struct {
@@ -623,6 +629,10 @@ func engineeringProposalDue(sheet bom.Sheet, history []any) bool {
 			continue
 		}
 		action := step.Action
+		switch action.Action {
+		case "inspect_sheet", "inspect_region", "read_range", "inspect_formula", "trace_formula_dependencies", "resolve_cross_sheet_references":
+			reads++
+		}
 		switch action.Action {
 		case "inspect_sheet":
 			var result struct {
@@ -669,7 +679,9 @@ func engineeringProposalDue(sheet bom.Sheet, history []any) bool {
 			}
 		}
 	}
-	return false
+	// Bounded history keeps the latest six steps. A full window of source reads
+	// must produce an interpretation, rather than endlessly replacing evidence.
+	return reads >= 6
 }
 
 // Match the existing BOM Agent's bounded-page behavior. Requested bounds are
