@@ -1,10 +1,10 @@
 {
   "version": 1,
   "updated_at": "2026-11-01",
-  "coverage": "Agent repaire545dfb/v22 deployed8081; engineering upload frontend unchanged. Ultra-03 real analysis running; full workbook understanding pending. No CMDB/topology publication acceptance.",
+  "coverage": "Agent repair31dbe52/v24 deployed8081; engineering upload frontend unchanged. Ultra-03 real analysis running; full workbook understanding pending. No CMDB/topology publication acceptance.",
   "schema_authority": "docs/openapi.yaml",
-  "code_revision": "e545dfb",
-  "deployed_revision": "e545dfb",
+  "code_revision": "31dbe52",
+  "deployed_revision": "31dbe52",
   "deployment_evidence": "docs/intelligent-deployment/deployment-agent-repair-20261101.json",
   "operations": [
     {

@@ -1,7 +1,7 @@
 {
   "updated_at": "2026-11-01T05:29:49.409927+00:00",
   "branch": "dev",
-  "scope": "APIe545dfb/v22 deployed. Ultra-03 continues with model default reasoning, bounded evidence reads, correction feedback and source semantic validation. EW2592 critical rows matched; NS extra fields need correction. Whole workbook acceptance pending.",
+  "scope": "API31dbe52/v24 deployed. Ultra-03 task50a9ba49 continues with original working native tool settings, isolated active-sheet context, bounded reads, batch correction and source validation. Whole workbook acceptance pending.",
   "phase_status": {
     "P0": "complete; report commit 314126d",
     "P1": "complete: architecture, models, contracts and kernel",
