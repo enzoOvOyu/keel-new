@@ -5,9 +5,9 @@
   "project_code": "TEST-Agent-MM-Ultra-03",
   "project_id": "proj-18101842-d821-4583-9229-a708f995c1c8",
   "source_id": "71a5c797-319b-496d-a6ce-f67c1080439c",
-  "job_id": "78becbc5-9e14-4be6-8eff-d5c5dd4e3664",
-  "runtime_revision": "024fe30",
-  "prepared_revision": "024fe30",
+  "job_id": "c3788ecc-f911-465f-bb4c-bc667ca70d8d",
+  "runtime_revision": "ceab753",
+  "prepared_revision": "ceab753",
   "accepted_sheets": 0,
   "total_sheets": 15,
   "limits": [
@@ -28,7 +28,7 @@
   "storage": "Complete tool artifacts/checkpoints remain in MinIO; PostgreSQL stores metadata and typed engineering facts",
   "reasoning_trial": "Default reasoning produced invalid textual tool payloads; restored prior working request settings without changing model",
   "test_scope": "Targeted AI/engineering checks, API build, real API documentation consistency and real workbook analysis only",
-  "equipment_extra_field_review": "Server site/room misbindings corrected in v33 and verified in MinIO; core source comparison passed. Full typed model not yet available.",
+  "equipment_extra_field_review": "Current revision2 re-analysis: Network equipment identity was only bound in its placement region; v39 rejects and corrects this. Server remains pending. Earlier v33 equipment match is historical.",
   "historical_equipment_core_comparison": [
     {
       "sheet": "Network Information",
@@ -164,6 +164,13 @@
     "formal_publications": 0,
     "artifact_storage": "MinIO proposal/checkpoints; immutable typed draft in PostgreSQL"
   },
-  "current_analysis_scope": "Fresh analysis of immutable source at workspace revision2. Prior revision1 checkpoints are not reused across a completed draft revision; earlier source comparisons are references, not new-round acceptance.",
-  "provider_comparison": "Asked asynchronously whether configured testAI/DeepSeek may be used for an independent comparison; no answer received, still Ultra."
+  "current_analysis_scope": "Resume revision2 checkpoints after v37 no-progress; v38-v40 distinguish domain errors, preserve equipment identity, reject extra cable field conflicts and retain pending sheet drafts independently of active history.",
+  "provider_comparison": "Asked asynchronously whether configured testAI/DeepSeek may be used for an independent comparison; no answer received, still Ultra.",
+  "latest_critical_value_check": {
+    "job_id": "78becbc5-9e14-4be6-8eff-d5c5dd4e3664",
+    "cabling_rows": 7154,
+    "matched_fields_per_row": 8,
+    "independent_ooxml_comparison": "PASS",
+    "extra_field_review": "FAIL: connector/label/media/distance conflicts; corrective validation deployed"
+  }
 }

@@ -1,10 +1,10 @@
 {
   "version": 1,
   "updated_at": "2026-11-01",
-  "coverage": "API024fe30/v37 deployed. First full Ultra candidate saved at revision2 but semantic review failed. Fresh revision2 analysis running with power and endpoint source checks. No CMDB publication.",
+  "coverage": "APIceab753/v40 deployed. Ultra-03 resumes failed revision2 analysis using durable per-sheet pending drafts and corrected source-domain/identity validation. First full revision2 draft remains semantically unaccepted; no formal publication.",
   "schema_authority": "docs/openapi.yaml",
-  "code_revision": "024fe30",
-  "deployed_revision": "024fe30",
+  "code_revision": "ceab753",
+  "deployed_revision": "ceab753",
   "deployment_evidence": "docs/intelligent-deployment/deployment-agent-repair-20261101.json",
   "operations": [
     {

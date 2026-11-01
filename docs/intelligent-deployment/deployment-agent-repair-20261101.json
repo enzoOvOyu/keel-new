@@ -1,12 +1,12 @@
 {
-  "code_revision": "024fe30",
+  "code_revision": "ceab753",
   "branch": "dev",
   "repository": "enzoOvOyu/keel-new",
   "api": {
     "port": 8081,
-    "binary": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/keel-api-v37",
-    "pid": 1441786,
-    "sha256": "86c98362ae75d0480478dd676aae753457bebf1d3ed4d86bf4ffa9e5a7efb2eb",
+    "binary": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/keel-api-v40",
+    "pid": 1482891,
+    "sha256": "629fadd342db1ed047d2adaa6d0ee7016df1851098555194c5f4423f434c5686",
     "cwd": "/home/ubuntu/keel/dev/backend",
     "session": "keel-cmdb-api"
   },
@@ -32,7 +32,7 @@
     "native_tools_checkpoint_and_provider_errors": "PASS",
     "source_upload": "PASS: engineering mode; zero legacy recognition jobs",
     "minio_artifact_write_read": "PASS: actual artifact roundtrip",
-    "full_real_workbook_understanding": "IN_PROGRESS: 78becbc5-9e14-4be6-8eff-d5c5dd4e3664 starts from revision2. Previous job completed15 sheets but failed independent semantic review; 3118 draft issues, no publication.",
+    "full_real_workbook_understanding": "IN_PROGRESS: c3788ecc-f911-465f-bb4c-bc667ca70d8d resumes revision2 failed checkpoints. Previous full revision2 draft has not passed independent semantic review.",
     "frontend_upload_module": "HTTP 200; browser not run",
     "artifact_recovery_scope_hash_cleanup": "PASS: isolated PostgreSQL and synthetic S3, including new service instance restore, wrong project/revision/claim rejection, integrity verification and index cascade",
     "typescript_engineering_adapter": "PASS",
@@ -48,7 +48,8 @@
     "location_hierarchy_and_edit_parameters": "PASS: engineering package, targeted AI correction/feedback checks and build",
     "focused_correction_and_reclassification": "PASS: targeted AI correction/resume/no-progress/reclassification cases and build. Earlier full package run exposed an obsolete context assertion; affected tests updated and passed.",
     "coverage_correction_excludes_titles": "PASS: targeted AI correction/resume/no-progress tests, title retained without creating equipment, and Go build",
-    "power_semantics_and_endpoint_sources": "PASS: targeted AI corrections, complete engineering package, and build; device/port cannot share an unsplit source column"
+    "power_semantics_and_endpoint_sources": "PASS: targeted AI corrections, complete engineering package, and build; device/port cannot share an unsplit source column",
+    "domain_identity_pending_drafts": "PASS: engineering package and targeted AI correction/native/resume/no-progress tests, two-sheet serialized restart, plus Go build"
   },
   "rollback": {
     "api_launcher": "/home/ubuntu/.local/state/keel-deployments/engineering-5abb94f/api-run.py",
