@@ -266,6 +266,27 @@ func TestEngineeringBindingErrorsIncludeAllUnsupportedAndDuplicateColumns(t *tes
 	}
 }
 
+func TestEngineeringRangePagesWithoutLosingRequestedExtent(t *testing.T) {
+	wb := bom.Workbook{Sheets: []bom.Sheet{{Name: "renamed", Cells: []bom.Cell{{Ref: "B100", Row: 100, Column: 2, Value: "sample"}, {Ref: "B200", Row: 200, Column: 2, Value: "later"}}}}}
+	bounds := engineering.Bounds{StartRow: 100, EndRow: 200, StartColumn: 2, EndColumn: 2}
+	result, err := engineeringReadRange(wb, "renamed", bounds)
+	if err != nil {
+		t.Fatal(err)
+	}
+	page := result.(map[string]any)
+	if page["requested_bounds"] != bounds || page["returned_bounds"].(engineering.Bounds).EndRow != 131 || page["truncated"] != true || len(page["cells"].([]map[string]any)) != 1 {
+		t.Fatalf("incorrect page: %+v", page)
+	}
+	history := []any{map[string]any{"action": engineeringAction{Action: "read_range", Sheet: "renamed", Bounds: &bounds}, "result": result}}
+	if engineeringProposalDue(wb.Sheets[0], history) {
+		t.Fatal("partial sample mistaken for complete read")
+	}
+	bounds.EndRow = 32
+	if _, err := engineeringReadRange(wb, "renamed", bounds); err == nil {
+		t.Fatal("reversed coordinates accepted")
+	}
+}
+
 func TestEngineeringMissingFormulaProvidesActualReferences(t *testing.T) {
 	calls := 0
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

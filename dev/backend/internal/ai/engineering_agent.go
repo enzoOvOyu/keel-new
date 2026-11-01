@@ -243,10 +243,8 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 				if action.Bounds == nil {
 					err = fmt.Errorf("BOUNDS_REQUIRED")
 				} else {
-					var cells []bom.Cell
-					cells, err = engineering.SourceRange(w, action.Sheet, *action.Bounds)
+					result, err = engineeringReadRange(w, action.Sheet, *action.Bounds)
 					if err == nil {
-						result = engineeringCellPreview(cells)
 						inspected[action.Sheet] = true
 					}
 				}
@@ -642,6 +640,12 @@ func engineeringProposalDue(sheet bom.Sheet, history []any) bool {
 			if action.Bounds == nil {
 				continue
 			}
+			var page struct {
+				Bounds *engineering.Bounds `json:"returned_bounds"`
+			}
+			if json.Unmarshal(step.Result, &page) == nil && page.Bounds != nil {
+				action.Bounds = page.Bounds
+			}
 			key := engineering.Digest(struct {
 				Sheet  string
 				Bounds engineering.Bounds
@@ -664,6 +668,22 @@ func engineeringProposalDue(sheet bom.Sheet, history []any) bool {
 		}
 	}
 	return false
+}
+
+// Match the existing BOM Agent's bounded-page behavior. Requested bounds are
+// never mistaken for the extent actually returned to the model.
+func engineeringReadRange(w bom.Workbook, sheet string, requested engineering.Bounds) (any, error) {
+	if requested.StartRow < 1 || requested.StartColumn < 1 || requested.EndRow < requested.StartRow || requested.EndColumn < requested.StartColumn {
+		return nil, fmt.Errorf("INVALID_RANGE: end_row and end_column are absolute coordinates, not counts; require end_row >= start_row and end_column >= start_column")
+	}
+	returned := requested
+	returned.EndRow = min(requested.EndRow, requested.StartRow+31)
+	returned.EndColumn = min(requested.EndColumn, requested.StartColumn+63)
+	cells, err := engineering.SourceRange(w, sheet, returned)
+	if err != nil {
+		return nil, err
+	}
+	return map[string]any{"requested_bounds": requested, "returned_bounds": returned, "truncated": returned != requested, "cells": engineeringCellPreview(cells), "instruction": "This is a source sample. For the next page use absolute coordinates after returned_bounds; engineering mappings still use the full observed table bounds."}, nil
 }
 
 // Return every invalid column in a rejected proposal, not only the first error.
