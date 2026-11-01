@@ -17,11 +17,12 @@ type InputField struct {
 	Required bool   `json:"required"`
 }
 type InputTable struct {
-	ID        string       `json:"id"`
-	Step      int          `json:"step"`
-	Name      string       `json:"name"`
-	Condition string       `json:"condition"`
-	Fields    []InputField `json:"fields"`
+	SupportsConfirmation bool         `json:"supports_confirmation"`
+	ID                   string       `json:"id"`
+	Step                 int          `json:"step"`
+	Name                 string       `json:"name"`
+	Condition            string       `json:"condition"`
+	Fields               []InputField `json:"fields"`
 }
 type InputCatalog struct {
 	Version string       `json:"version"`
@@ -50,6 +51,10 @@ func StepInputCatalog() InputCatalog {
 	c := InputCatalog{Version: "1", Tables: []InputTable{}}
 	add := func(id string, step int, name, condition, spec string) {
 		t := InputTable{ID: id, Step: step, Name: name, Condition: condition, Fields: []InputField{}}
+		switch id {
+		case "terminations", "rooms", "racks", "equipment_specs", "placements":
+			t.SupportsConfirmation = true
+		}
 		for _, s := range strings.Split(spec, "|") {
 			p := strings.Split(s, ":")
 			code := p[0]
@@ -67,7 +72,7 @@ func StepInputCatalog() InputCatalog {
 	add("rooms", 2, "机房", "场地和机房编码在项目内唯一。", "site_code:场地编码|site_name:场地名称|room_code:机房编码|room_name:机房名称")
 	add("racks", 2, "机柜", "U位检查需要容量U；空间计算需要毫米尺寸。", "room_code:机房编码|rack_code:机柜编码|name:机柜名称|capacity_u?:容量U:positive_integer|width_mm?:宽mm:positive|depth_mm?:深mm:positive|height_mm?:高mm:positive")
 	add("equipment_specs", 2, "设备规格", "U位安装必须提供高度U；规格引用必须经确认。", "serial:设备SN|equipment_type:设备类型|model:型号或规格引用|height_u?:高度U:positive_integer")
-	add("placements", 2, "设备落位", "U位安装要求起始U和占用U；非U安装要求位置编码。", "serial:设备SN|room_code:机房编码|rack_code:机柜编码|mount_type:安装方式|start_u?:起始U:positive_integer|height_u?:占用U:positive_integer|face:安装面|position_code?:非U位置编码")
+	add("placements", 2, "设备落位", "安装方式填u或non_u；安装面填front/rear/both/unknown。u要求起始U和占用U；non_u要求位置编码。", "serial:设备SN|room_code:机房编码|rack_code:机柜编码|mount_type:安装方式|start_u?:起始U:positive_integer|height_u?:占用U:positive_integer|face:安装面|position_code?:非U位置编码")
 	add("port_specs", 3, "端口规格", "Breakout要求父端口和子口序号；其他字段依端接类型。", "serial:设备SN|port:端口|medium:介质|connector:连接器|rate:速率:positive|rate_unit:速率单位|parent_port?:父端口|breakout_index?:Breakout子口序号:positive_integer")
 	add("patch_paths", 3, "配线路径", "有中间配线节点时必填；直连无需此表。", "connection:连接引用|sequence:段序号:positive_integer|device:配线设备引用|in_port:入口端口|out_port:出口端口")
 	add("route_nodes", 3, "路径节点", "坐标计算时必须提供坐标系和X/Y/Z；实测路段可以不填坐标。", "code:节点编码|room_code:机房编码|rack_code?:关联机柜编码|frame?:坐标系|x?:X:number|y?:Y:number|z?:Z:number|unit?:长度单位")

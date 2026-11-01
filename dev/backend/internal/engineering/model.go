@@ -155,6 +155,7 @@ type EquipmentPlan struct {
 	IdentityKind     string  `json:"identity_kind"`
 	Label            string  `json:"label"`
 	Serial           *string `json:"serial,omitempty"`
+	HeightU          *int    `json:"height_u,omitempty"`
 }
 type DeviceAssembly struct {
 	EntityVersion
@@ -167,6 +168,7 @@ type DeviceAssembly struct {
 type FacilityModel struct {
 	EntityVersion
 	Kind               string  `json:"kind"`
+	Code               string  `json:"code,omitempty"`
 	Label              string  `json:"label"`
 	ParentID           *ID     `json:"parent_id,omitempty"`
 	CapacityU          *int    `json:"capacity_u,omitempty"`
@@ -181,12 +183,14 @@ type FacilityModel struct {
 }
 type RackPlacement struct {
 	EntityVersion
-	EquipmentID ID      `json:"equipment_id"`
-	RackID      ID      `json:"rack_id"`
-	StartU      *int    `json:"start_u,omitempty"`
-	HeightU     *int    `json:"height_u,omitempty"`
-	MountFace   string  `json:"mount_face"`
-	DepthMM     *string `json:"depth_mm,omitempty"`
+	EquipmentID      ID      `json:"equipment_id"`
+	RackID           ID      `json:"rack_id"`
+	StartU           *int    `json:"start_u,omitempty"`
+	HeightU          *int    `json:"height_u,omitempty"`
+	MountFace        string  `json:"mount_face"`
+	InstallationType string  `json:"installation_type,omitempty"`
+	PositionCode     string  `json:"position_code,omitempty"`
+	DepthMM          *string `json:"depth_mm,omitempty"`
 }
 type EquipmentPowerProfile struct {
 	EquipmentID ID       `json:"equipment_id"`

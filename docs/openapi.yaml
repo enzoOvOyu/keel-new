@@ -44448,7 +44448,7 @@ components:
       properties:
         attributes:
           items:
-            $ref: '#/components/schemas/IDEAttributeValue'
+            $ref: "#/components/schemas/IDEAttributeValue"
           type: array
         entity_id:
           type: string
@@ -44461,17 +44461,17 @@ components:
         identity_kind:
           type: string
           enum:
-          - group
-          - planned_instance
-          - observed_reference
+            - group
+            - planned_instance
+            - observed_reference
         label:
           type: string
         maturity:
           enum:
-          - Estimated
-          - Calculated
-          - Confirmed
-          - As-built
+            - Estimated
+            - Calculated
+            - Confirmed
+            - As-built
           type: string
         model_ref:
           type: string
@@ -44486,18 +44486,21 @@ components:
           type: string
         source_model_label:
           type: string
+        height_u:
+          type: integer
+          minimum: 1
       required:
-      - entity_id
-      - revision_id
-      - evidence_ids
-      - provenance_id
-      - maturity
-      - attributes
-      - equipment_type
-      - source_model_label
-      - quantity
-      - identity_kind
-      - label
+        - entity_id
+        - revision_id
+        - evidence_ids
+        - provenance_id
+        - maturity
+        - attributes
+        - equipment_type
+        - source_model_label
+        - quantity
+        - identity_kind
+        - label
       type: object
       x-implementation-status: model-contract-only
     IDEEquipmentPowerProfile:
@@ -44565,7 +44568,7 @@ components:
       properties:
         attributes:
           items:
-            $ref: '#/components/schemas/IDEAttributeValue'
+            $ref: "#/components/schemas/IDEAttributeValue"
           type: array
         capacity_u:
           type: integer
@@ -44585,17 +44588,17 @@ components:
         kind:
           type: string
           enum:
-          - site
-          - room
-          - rack
+            - site
+            - room
+            - rack
         label:
           type: string
         maturity:
           enum:
-          - Estimated
-          - Calculated
-          - Confirmed
-          - As-built
+            - Estimated
+            - Calculated
+            - Confirmed
+            - As-built
           type: string
         orientation_degrees:
           type: string
@@ -44613,15 +44616,18 @@ components:
           type: string
         z_mm:
           type: string
+        code:
+          type: string
+          description: Business code within parent facility
       required:
-      - entity_id
-      - revision_id
-      - evidence_ids
-      - provenance_id
-      - maturity
-      - attributes
-      - kind
-      - label
+        - entity_id
+        - revision_id
+        - evidence_ids
+        - provenance_id
+        - maturity
+        - attributes
+        - kind
+        - label
       type: object
       x-implementation-status: model-contract-only
     IDEFormulaCell:
@@ -45567,7 +45573,7 @@ components:
       properties:
         attributes:
           items:
-            $ref: '#/components/schemas/IDEAttributeValue'
+            $ref: "#/components/schemas/IDEAttributeValue"
           type: array
         depth_mm:
           type: string
@@ -45584,18 +45590,18 @@ components:
           minimum: 1
         maturity:
           enum:
-          - Estimated
-          - Calculated
-          - Confirmed
-          - As-built
+            - Estimated
+            - Calculated
+            - Confirmed
+            - As-built
           type: string
         mount_face:
           type: string
           enum:
-          - front
-          - rear
-          - both
-          - unknown
+            - front
+            - rear
+            - both
+            - unknown
         provenance_id:
           type: string
         rack_id:
@@ -45605,16 +45611,23 @@ components:
         start_u:
           type: integer
           minimum: 1
+        installation_type:
+          type: string
+          enum:
+            - u
+            - non_u
+        position_code:
+          type: string
       required:
-      - entity_id
-      - revision_id
-      - evidence_ids
-      - provenance_id
-      - maturity
-      - attributes
-      - equipment_id
-      - rack_id
-      - mount_face
+        - entity_id
+        - revision_id
+        - evidence_ids
+        - provenance_id
+        - maturity
+        - attributes
+        - equipment_id
+        - rack_id
+        - mount_face
       type: object
       x-implementation-status: model-contract-only
     IDERackPowerPlan:
@@ -47448,7 +47461,8 @@ components:
       type: object
       additionalProperties: false
       properties:
-        id: *a1
+        id: &a1
+          type: string
         step:
           type: integer
           minimum: 1
@@ -47459,12 +47473,15 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/IDEInputField"
+        supports_confirmation:
+          type: boolean
       required:
         - id
         - step
         - name
         - condition
         - fields
+        - supports_confirmation
     IDEInputCatalog:
       type: object
       additionalProperties: false
@@ -47554,6 +47571,10 @@ components:
           type: string
           enum:
             - terminations
+            - rooms
+            - racks
+            - equipment_specs
+            - placements
         csv:
           type: string
         expected_revision:

@@ -103,3 +103,5 @@ export const engineeringInputCatalog=(project:string,signal?:AbortSignal)=>bomRe
 export const previewEngineeringInput=(project:string,request:Models['IDEInputPreviewRequest'],signal?:AbortSignal)=>bomRequest<EngineeringInputPreview>('projects/'+encodeURIComponent(project)+'/engineering-inputs/preview','POST',request,undefined,signal);
 export const engineeringInputTemplateURL=(project:string,table:string,format:'csv'|'xlsx')=>'/api/v1/projects/'+encodeURIComponent(project)+'/engineering-inputs/'+encodeURIComponent(table)+'?format='+format;
 export const importEngineeringStandardInput=(project:string,id:string,request:Models['IDEStandardInputRequest'])=>bomRequest<EngineeringWorkspace>(engineeringPath(project,id)+'/standard-input','POST',request);
+
+export type EngineeringStandardInputRequest = Models['IDEStandardInputRequest'];

@@ -161,6 +161,9 @@ func (s Service) ProjectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 				kind = "device"
 			}
 			attrs := map[string]any{"hostname": v.Label, "model": v.SourceModelLabel}
+			if v.HeightU != nil {
+				attrs["height_u"] = float64(*v.HeightU)
+			}
 			if v.Serial != nil {
 				attrs["serial"] = *v.Serial
 			}
@@ -176,7 +179,7 @@ func (s Service) ProjectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 	case engineering.FacilityTarget:
 		for _, v := range m.Facilities {
 			kind := map[string]string{"site": "data_center", "room": "pod", "rack": "rack"}[v.Kind]
-			attrs := map[string]any{"width_mm": number(v.WidthMM), "height_mm": number(v.HeightMM), "depth_mm": number(v.DepthMM), "x_mm": number(v.XMM), "y_mm": number(v.YMM), "z_mm": number(v.ZMM), "orientation_degrees": number(v.OrientationDegrees)}
+			attrs := map[string]any{"code": v.Code, "width_mm": number(v.WidthMM), "height_mm": number(v.HeightMM), "depth_mm": number(v.DepthMM), "x_mm": number(v.XMM), "y_mm": number(v.YMM), "z_mm": number(v.ZMM), "orientation_degrees": number(v.OrientationDegrees)}
 			if v.CapacityU != nil {
 				attrs["u_height"] = float64(*v.CapacityU)
 				attrs["rack_height"] = float64(*v.CapacityU)
@@ -268,14 +271,18 @@ func (s Service) ProjectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 		}
 		for _, v := range m.Placements {
 			eq, ok := equipment[v.EquipmentID]
-			if !ok || v.StartU == nil || v.HeightU == nil {
+			if !ok || (v.InstallationType != "non_u" && (v.StartU == nil || v.HeightU == nil)) || (v.InstallationType == "non_u" && v.PositionCode == "") {
 				return Reject("PLACEMENT_INCOMPLETE", 422)
 			}
 			var kind string
 			if e = tx.QueryRow(ctx, `SELECT asset_type FROM cmdb_entity WHERE item_uid=$1`, eq.EntityID).Scan(&kind); e != nil {
 				return e
 			}
-			attrs := map[string]any{"rack_uid": v.RackID, "rack_id": v.RackID, "u_start": float64(*v.StartU), "u_height": float64(*v.HeightU), "mounting_face": v.MountFace, "depth_mm": number(v.DepthMM)}
+			attrs := map[string]any{"rack_uid": v.RackID, "rack_id": v.RackID, "mounting_face": v.MountFace, "depth_mm": number(v.DepthMM), "installation_type": v.InstallationType, "position_code": v.PositionCode}
+			if v.InstallationType != "non_u" {
+				attrs["u_start"] = float64(*v.StartU)
+				attrs["u_height"] = float64(*v.HeightU)
+			}
 			if e = projectAsset(eq.EntityID, kind, eq.Label, attrs); e != nil {
 				return e
 			}

@@ -131,6 +131,9 @@ func ValidatePhysical(m PhysicalModel) []ValidationIssue {
 		if e.EquipmentType == "" || e.Label == "" || e.Quantity <= 0 {
 			issue("EQUIPMENT_FIELDS_REQUIRED", eqTarget, "equipment", "quantity", "设备类型、标签及正数量必须明确", e.EntityVersion)
 		}
+		if e.HeightU != nil && *e.HeightU <= 0 {
+			issue("EQUIPMENT_HEIGHT_INVALID", eqTarget, "equipment", "height_u", "设备高度必须为正U数", e.EntityVersion)
+		}
 		switch e.IdentityKind {
 		case "group":
 			issue("PLANNING_GROUP_REQUIRES_INSTANCE_IDENTITIES", eqTarget, "equipment", "identity_kind", "设备数量组保留为工程规划，发布物理资产前需明确各实例身份", e.EntityVersion)
@@ -241,12 +244,21 @@ func ValidatePhysical(m PhysicalModel) []ValidationIssue {
 			issue("MULTIPLE_PLACEMENTS", locTarget, "facility_placement", "equipment_id", "同一设备存在多个规划位置", p.EntityVersion)
 		}
 		placed[p.EquipmentID] = true
-		if p.StartU == nil || p.HeightU == nil || *p.StartU <= 0 || *p.HeightU <= 0 {
+		if p.InstallationType == "non_u" {
+			if p.PositionCode == "" || p.StartU != nil || p.HeightU != nil {
+				issue("NON_U_POSITION_REQUIRED", locTarget, "facility_placement", "position_code", "非U安装须提供位置编码，不能混用U位", p.EntityVersion)
+			}
+		} else if p.InstallationType != "" && p.InstallationType != "u" {
+			issue("INSTALLATION_TYPE_INVALID", locTarget, "facility_placement", "installation_type", "安装方式须为u或non_u", p.EntityVersion)
+		} else if p.StartU == nil || p.HeightU == nil || *p.StartU <= 0 || *p.HeightU <= 0 {
 			issue("PLACEMENT_U_REQUIRED", locTarget, "facility_placement", "start_u", "起始U和占用高度未知或无效", p.EntityVersion)
 		} else if rack.CapacityU == nil {
 			issue("PLACEMENT_CAPACITY_UNKNOWN", locTarget, "facility_placement", "rack_id", "机柜容量未知，不能确认落位未越界", p.EntityVersion)
 		} else if *p.StartU > *rack.CapacityU || *p.HeightU > *rack.CapacityU-*p.StartU+1 {
 			issue("PLACEMENT_OUT_OF_BOUNDS", locTarget, "facility_placement", "height_u", "设备占用超出机柜容量", p.EntityVersion)
+		}
+		if p.HeightU != nil && eq.HeightU != nil && *p.HeightU != *eq.HeightU {
+			issue("PLACEMENT_HEIGHT_CONFLICT", locTarget, "facility_placement", "height_u", "设备规格高度与落位占用不一致", p.EntityVersion)
 		}
 		switch p.MountFace {
 		case "front", "rear", "both", "unknown":
@@ -255,6 +267,16 @@ func ValidatePhysical(m PhysicalModel) []ValidationIssue {
 		}
 		if p.DepthMM != nil && !positive(*p.DepthMM) {
 			issue("PLACEMENT_DEPTH_INVALID", locTarget, "facility_placement", "depth_mm", "设备深度须为正毫米数", p.EntityVersion)
+		}
+	}
+	positionCodes := map[string]bool{}
+	for _, p := range m.Placements {
+		if p.InstallationType == "non_u" && p.PositionCode != "" {
+			key := p.RackID + "/" + p.PositionCode
+			if positionCodes[key] {
+				issue("NON_U_POSITION_OCCUPIED", locTarget, "facility_placement", "position_code", "非U安装位置重复占用", p.EntityVersion)
+			}
+			positionCodes[key] = true
 		}
 	}
 	for i, a := range m.Placements {

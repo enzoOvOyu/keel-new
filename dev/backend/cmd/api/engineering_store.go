@@ -440,7 +440,7 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 		if e = insertVersion(&v.EntityVersion, "equipment"); e != nil {
 			return "", e
 		}
-		_, e = tx.Exec(ctx, `INSERT INTO eng_equipment VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)`, revision, v.EntityID, v.EquipmentType, v.ModelRef, v.SourceModelLabel, v.Quantity, v.IdentityKind, v.Label, v.Serial)
+		_, e = tx.Exec(ctx, `INSERT INTO eng_equipment(revision_id,entity_id,equipment_type,model_ref,source_model_label,quantity,identity_kind,label,serial,height_u) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`, revision, v.EntityID, v.EquipmentType, v.ModelRef, v.SourceModelLabel, v.Quantity, v.IdentityKind, v.Label, v.Serial, v.HeightU)
 		if e != nil {
 			return "", e
 		}
@@ -460,7 +460,7 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 		if e = insertVersion(&v.EntityVersion, "facility"); e != nil {
 			return "", e
 		}
-		_, e = tx.Exec(ctx, `INSERT INTO eng_facility VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`, revision, v.EntityID, v.Kind, v.Label, v.ParentID, v.CapacityU, v.WidthMM, v.HeightMM, v.DepthMM, v.XMM, v.YMM, v.ZMM, v.OrientationDegrees, v.CoordinateFrameID)
+		_, e = tx.Exec(ctx, `INSERT INTO eng_facility(revision_id,entity_id,kind,label,parent_id,capacity_u,width_mm,height_mm,depth_mm,x_mm,y_mm,z_mm,orientation_degrees,coordinate_frame_id,code) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`, revision, v.EntityID, v.Kind, v.Label, v.ParentID, v.CapacityU, v.WidthMM, v.HeightMM, v.DepthMM, v.XMM, v.YMM, v.ZMM, v.OrientationDegrees, v.CoordinateFrameID, v.Code)
 		if e != nil {
 			return "", e
 		}
@@ -470,7 +470,7 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 		if e = insertVersion(&v.EntityVersion, "placement"); e != nil {
 			return "", e
 		}
-		_, e = tx.Exec(ctx, `INSERT INTO eng_placement VALUES($1,$2,$3,$4,$5,$6,$7,$8)`, revision, v.EntityID, v.EquipmentID, v.RackID, v.StartU, v.HeightU, v.MountFace, v.DepthMM)
+		_, e = tx.Exec(ctx, `INSERT INTO eng_placement(revision_id,entity_id,equipment_id,rack_id,start_u,height_u,mount_face,depth_mm,installation_type,position_code) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`, revision, v.EntityID, v.EquipmentID, v.RackID, v.StartU, v.HeightU, v.MountFace, v.DepthMM, v.InstallationType, v.PositionCode)
 		if e != nil {
 			return "", e
 		}

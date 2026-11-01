@@ -179,3 +179,5 @@ Agent原生工具参数按Pydantic Schema校验，读取脱敏IR，以逐Sheet�
 `POST /projects/{projectId}/engineering-imports/{sourceId}/standard-input`（开发中未部署）接收IDEStandardInputRequest，当前仅支持terminations八列表。权限bom:edit，沿用Session/CSRF；绑定expected_revision及确认依据。先验证完整CSV，再在项目CMDB范围按SN、设备/端口名解析已有身份；歧义、MAC冲突、端口占用、类型或同向位置冲突阻断。没有现成身份时创建规划草稿；其他工程域增量保留。原始CSV存MinIO，索引与新修订在同事务保存（迁移039）；失败不提交模型。反向重复保持原连接方向，反向位置声明保留在原始补充资料。前端确认后刷新任务版本，仍需现有审核/发布。
 
 迁移039新增端口MAC、端接类型、原始B端位置声明和标准输入来源索引。MAC与类型由工程发布投影为planned事实，Observed保护沿用；声明不等于正式机柜落位。此入口不自动补造型号/高度/网络参数。当前补充来源尚未接入Evidence Explorer逐字段查看，后续四步确认导入和完整闭环仍未完成；这些不以预览成功代替验收。新增错误码STEP_*定位输入、身份、端口、类型、位置或源存储问题；并发版本或运行中分析返回409。未进行数据库、HTTP、浏览器和CMDB发布验收。
+
+标准确认导入已扩展rooms/racks/equipment_specs/placements。InputTable.supports_confirmation由服务端声明，前端据此提供确认入口。机房/机柜编码解析父子关系；设备规格按已确认SN补类型/型号/高度；落位复用设备和机柜ID，编辑保留原落位ID，空白可选规格不清除已有值。安装方式u要求起始U/占用U；non_u要求位置编码且U位字段为空，重复非U位置阻断。机柜越界、U位重叠、规格高度冲突沿用结构校验和发布门禁。迁移040持久设备高度、设施编码和非U位置，CMDB发布保留规划来源；非U位置不伪造U位。尚未进行数据库或已有机柜图的真实验收。

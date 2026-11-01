@@ -15921,6 +15921,7 @@ export interface components {
             revision_id: string;
             serial?: string;
             source_model_label: string;
+            height_u?: number;
         };
         IDEEquipmentPowerProfile: {
             /** @enum {string} */
@@ -15961,6 +15962,8 @@ export interface components {
             x_mm?: string;
             y_mm?: string;
             z_mm?: string;
+            /** @description Business code within parent facility */
+            code?: string;
         };
         IDEFormulaCell: {
             address: string;
@@ -16258,6 +16261,9 @@ export interface components {
             rack_id: string;
             revision_id: string;
             start_u?: number;
+            /** @enum {string} */
+            installation_type?: "u" | "non_u";
+            position_code?: string;
         };
         IDERackPowerPlan: {
             calculation_run_id?: string;
@@ -16838,6 +16844,7 @@ export interface components {
             name: string;
             condition: string;
             fields: components["schemas"]["IDEInputField"][];
+            supports_confirmation: boolean;
         };
         IDEInputCatalog: {
             version: string;
@@ -16869,7 +16876,7 @@ export interface components {
         };
         IDEStandardInputRequest: {
             /** @enum {string} */
-            table_id: "terminations";
+            table_id: "terminations" | "rooms" | "racks" | "equipment_specs" | "placements";
             csv: string;
             expected_revision: number;
             reason: string;

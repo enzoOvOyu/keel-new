@@ -30,11 +30,13 @@ func (s *Server) importStandardInput(ctx context.Context, w engineering.Workspac
 	if e != nil {
 		return e
 	}
-	current, e = s.resolveStandardInputIdentities(ctx, current, q.InputPreviewRequest)
-	if e != nil {
-		return e
+	if q.TableID == "terminations" {
+		current, e = s.resolveStandardInputIdentities(ctx, current, q.InputPreviewRequest)
+		if e != nil {
+			return e
+		}
 	}
-	next, e := engineering.MergeTerminations(current, q.InputPreviewRequest)
+	next, e := engineering.MergeStandardInput(current, q.InputPreviewRequest)
 	if e != nil {
 		return e
 	}
