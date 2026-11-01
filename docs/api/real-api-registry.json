@@ -1,10 +1,10 @@
 {
   "version": 1,
   "updated_at": "2026-11-01",
-  "coverage": "Agent repair f98c8ea on existing 8081, frontend original base with engineering-only upload. Native protocol, per-tool checkpoints, MinIO persistence/scope/hash/cleanup verified; real MM understanding blocked by upstream account funds and NOT ACCEPTED. Historical endpoint evidence remains historical.",
+  "coverage": "Agent repair f435b23 deployed on existing 8081; original frontend base with engineering-only upload. Real MM understanding is IN PROGRESS using independent free Lightning provider and NOT ACCEPTED. Original default DeepSeek remains unchanged. MinIO checkpoints, domain mapping checks and malformed tool output correction implemented; historical endpoint evidence remains historical.",
   "schema_authority": "docs/openapi.yaml",
-  "code_revision": "f98c8ea",
-  "deployed_revision": "f98c8ea",
+  "code_revision": "f435b23",
+  "deployed_revision": "f435b23",
   "deployment_evidence": "docs/intelligent-deployment/deployment-agent-repair-20261101.json",
   "operations": [
     {

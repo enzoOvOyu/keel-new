@@ -1,3 +1,7 @@
+## 当前在线状态（覆盖下方历史快照）
+
+API v10 / f435b23已部署8081，前端5180仍为原页面加工程上传分流。真实任务9cbd085d-0aac-4af6-9200-cec24abf835b使用独立TEST-Agent-Free-Nemotron-Lightning Provider版本2，当前继续测试，整本理解尚未验收。原test/DeepSeek未改动；实际代码、进程和二进制摘要见deployment-agent-repair-20261101.json。没有CMDB发布或改动原Excel。
+
 ## 已完成里程碑事件：按工程域纠错与非法输出恢复
 
 - 真实Lightning任务在两个Sheet后返回INVALID_JSON；此前通过全局字段词表的部分映射也不符合领域含义，不能当成成功。现按实际提取器能力限制每个区域的字段，恢复时重新校验旧检查点并退回不合法的Sheet。

@@ -1,6 +1,6 @@
 # 智能开局工程真实接口
 
-更新：2026-11-01。工程Agent修复已在原5180/8081上线，迁移038已应用；前端保留原版本页面，只改变工程上传分流。下方阶段检查是历史开发记录，当前部署证据见[部署记录](../intelligent-deployment/deployment-20261101.json)。所有路径使用 `/api/v1` 前缀及现有身份Session、项目授权和CSRF。精确DTO以 `openapi.yaml` 的 `IDE*` 为准。
+更新：2026-11-01。工程Agent修复已在原5180/8081上线，迁移038已应用；前端保留原版本页面，只改变工程上传分流。下方阶段检查是历史开发记录，当前部署证据见[部署记录](../intelligent-deployment/deployment-agent-repair-20261101.json)。所有路径使用 `/api/v1` 前缀及现有身份Session、项目授权和CSRF。精确DTO以 `openapi.yaml` 的 `IDE*` 为准。
 
 统一前缀 `/projects/{projectId}/engineering-imports`，下表 `{id}` 为工程来源ID，不是旧BOM批次ID。
 

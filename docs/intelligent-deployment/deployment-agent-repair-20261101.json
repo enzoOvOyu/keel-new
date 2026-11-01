@@ -1,12 +1,12 @@
 {
-  "code_revision": "f98c8ea",
+  "code_revision": "f435b23",
   "branch": "dev",
   "repository": "enzoOvOyu/keel-new",
   "api": {
     "port": 8081,
-    "binary": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/keel-api-v5",
-    "pid": 1015933,
-    "sha256": "fb5c5fda69cc2f68ddc1128d9a57ec38d4dc066124cc4acad35e25e119f96207",
+    "binary": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/keel-api-v10",
+    "pid": 1075375,
+    "sha256": "f31a7836b4b966907e234dc08400355e36e46300967f148c1c80dc208243add7",
     "cwd": "/home/ubuntu/keel/dev/backend",
     "session": "keel-cmdb-api"
   },
@@ -32,7 +32,7 @@
     "native_tools_checkpoint_and_provider_errors": "PASS",
     "source_upload": "PASS: engineering mode; zero legacy recognition jobs",
     "minio_artifact_write_read": "PASS: actual artifact roundtrip",
-    "full_real_workbook_understanding": "NOT ACCEPTED: last v4 real run ended in permanent HTTP 402; v5 recovery/feedback fixes deployed and deterministically tested, no funded real call available",
+    "full_real_workbook_understanding": "IN PROGRESS, NOT ACCEPTED: independent nondefault free Lightning provider; original DeepSeek account insufficient. Invalid domain bindings and malformed JSON observed in prior runs.",
     "frontend_upload_module": "HTTP 200; browser not run",
     "artifact_recovery_scope_hash_cleanup": "PASS: isolated PostgreSQL and synthetic S3, including new service instance restore, wrong project/revision/claim rejection, integrity verification and index cascade",
     "typescript_engineering_adapter": "PASS"

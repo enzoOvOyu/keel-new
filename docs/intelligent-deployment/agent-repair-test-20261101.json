@@ -44,13 +44,21 @@
     "Cross-customer generalization"
   ],
   "private_evidence_directory": "/home/ubuntu/.local/state/keel-tests/mm-agent-repair",
-  "latest_deployed_agent_revision": "f98c8ea",
+  "latest_deployed_agent_revision": "f435b23",
   "resume": "After Provider funding is available, POST analyze on same engineering source at current revision; verify actual source observations before accepting",
   "free_model_followup": {
     "status": "IN_PROGRESS",
     "provider_id": "59c504bf-a8c8-42db-9afc-b89f70a0f2d5",
-    "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "model": "nvidia/nemotron-3.5-lightning:free",
     "project_code": "TEST-Agent-MM-Free-01",
-    "note": "Original default Provider unchanged; no mixed acceptance claim"
+    "note": "Original default Provider unchanged; no mixed acceptance claim",
+    "provider_revision": 2,
+    "job_id": "9cbd085d-0aac-4af6-9200-cec24abf835b",
+    "prior_observations": [
+      "Ultra response_timeout at 120 seconds",
+      "Repeated reads without proposals",
+      "Globally valid but domain-inappropriate mappings accepted then invalidated",
+      "Lightning invalid JSON after partial progress"
+    ]
   }
 }
