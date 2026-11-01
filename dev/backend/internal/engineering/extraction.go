@@ -132,6 +132,32 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 				return fmt.Errorf("FIELD_COLUMN_OUTSIDE_REGION: sheet=%s field=%s column=%d bounds=%d..%d", r.Sheet, c.Field, c.Column, b.StartColumn, b.EndColumn)
 			}
 			used[c.Field] = true
+			for _, headerRow := range r.HeaderRows {
+				ref, _ := excelize.CoordinatesToCellName(c.Column, headerRow)
+				header := cells[ref]
+				if field := bom.Field(header.Value); (field == "manufacturer" || field == "brand") && !strings.HasPrefix(c.Field, "attribute:") {
+					return fmt.Errorf("HEADER_FIELD_CONFLICT: sheet=%s column=%d source_field=%s proposed_field=%s; manufacturer/brand is not an asset identifier, connector or engineering state; retain as unmapped source or an approved typed attribute", r.Sheet, c.Column, field, c.Field)
+				}
+			}
+			if c.Field == "length_state" {
+				for _, cell := range s.Cells {
+					if cell.Column != c.Column || cell.Row < b.StartRow || cell.Row > b.EndRow || cell.Sensitive || strings.TrimSpace(cell.Value) == "" {
+						continue
+					}
+					header := false
+					for _, row := range r.HeaderRows {
+						header = header || row == cell.Row
+					}
+					if header {
+						continue
+					}
+					switch strings.TrimSpace(cell.Value) {
+					case "estimated", "calculated", "confirmed", "as_built":
+					default:
+						return fmt.Errorf("FIELD_VALUE_CONFLICT: sheet=%s cell=%s field=length_state; expected estimated/calculated/confirmed/as_built, not an arbitrary source value; omit unrelated column binding", r.Sheet, cell.Ref)
+					}
+				}
+			}
 		}
 		for _, c := range r.Constants {
 			if !validRegionField(r.Kind, c.Field) || used[c.Field] || len(c.EvidenceCells) == 0 {

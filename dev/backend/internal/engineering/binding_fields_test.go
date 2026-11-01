@@ -15,3 +15,23 @@ func TestRejectDomainInappropriateBindings(t *testing.T) {
 		}
 	}
 }
+
+func TestRejectAuxiliaryColumnsMasqueradingAsCableFacts(t *testing.T) {
+	for _, tc := range []struct{ header, value, field, errorCode string }{
+		{"Manufacturer", "Synthetic Vendor", "cable_label", "HEADER_FIELD_CONFLICT"},
+		{"Brand", "Synthetic Vendor", "connector_a", "HEADER_FIELD_CONFLICT"},
+		{"Fiber core count", "24", "length_state", "FIELD_VALUE_CONFLICT"},
+		{"Length status", "calculated", "length_state", ""},
+		{"Cable tag", "TEST-CABLE", "cable_label", ""},
+	} {
+		wb := bom.Workbook{Sheets: []bom.Sheet{{Name: "any customer sheet", Cells: []bom.Cell{{Ref: "C4", Row: 4, Column: 3, Value: tc.header}, {Ref: "C5", Row: 5, Column: 3, Value: tc.value}}}}}
+		p := EngineeringProposal{Summary: "source binding", Regions: []RegionMapping{{Sheet: wb.Sheets[0].Name, Kind: "connection", Bounds: Bounds{StartRow: 4, EndRow: 5, StartColumn: 3, EndColumn: 3}, HeaderRows: []int{4}, Columns: []ColumnBinding{{Field: tc.field, Column: 3}}}}}
+		err := CheckProposal(wb, p)
+		if tc.errorCode == "" && err != nil {
+			t.Fatalf("valid %s rejected: %v", tc.field, err)
+		}
+		if tc.errorCode != "" && (err == nil || !strings.HasPrefix(err.Error(), tc.errorCode)) {
+			t.Fatalf("incorrect %s mapping accepted: %v", tc.header, err)
+		}
+	}
+}

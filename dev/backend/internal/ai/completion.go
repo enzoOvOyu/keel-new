@@ -48,7 +48,9 @@ func (p *Provider) complete(ctx context.Context, prompt string, input any, funct
 		token = p.TokenParameter
 	}
 	payload[token] = p.TokenBudget
-	if endpoint, err := url.Parse(p.Endpoint); err == nil && endpoint.Hostname() == "openrouter.ai" {
+	// Native tool agents use the selected model's default reasoning behavior.
+	// The legacy JSON-only protocol retains its existing setting.
+	if endpoint, err := url.Parse(p.Endpoint); err == nil && endpoint.Hostname() == "openrouter.ai" && len(functions) == 0 {
 		payload["reasoning"] = map[string]bool{"enabled": false}
 	}
 	if p.JSONMode {
