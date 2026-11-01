@@ -76,3 +76,7 @@ export const editEngineeringConnectivity=(project:string,id:string,request:Conne
 
 export type PlannedPort = Models['IDEPlannedPort'];
 export type PlannedConnection = Models['IDEPlannedConnection'];
+export type PowerEdit = Models['IDEPowerEdit'];
+export type CalculationApplication = Models['IDECalculationApplication'];
+export const editEngineeringPower=(project:string,id:string,request:PowerEdit)=>bomRequest<EngineeringWorkspace>(engineeringPath(project,id)+'/power','PUT',request);
+export const applyEngineeringCalculation=(project:string,id:string,request:CalculationApplication)=>bomRequest<EngineeringWorkspace>(engineeringPath(project,id)+'/calculation-application','POST',request);

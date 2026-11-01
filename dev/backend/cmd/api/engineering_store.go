@@ -71,6 +71,9 @@ func engineeringModel(ctx context.Context, q engineeringQuery, revision, project
 			return m, evidence, e
 		}
 	}
+	if e := loadPowerRows(ctx, q, revision, &m); e != nil {
+		return m, evidence, e
+	}
 	if e := loadCableRows(ctx, q, revision, &m); e != nil {
 		return m, evidence, e
 	}
@@ -102,6 +105,8 @@ func engineeringTargetDigest(m engineering.PhysicalModel, target string, maturit
 		values = []any{m.Equipment, m.Assemblies, m.Facilities, m.Placements}
 	case engineering.ConnectivityTarget:
 		values = []any{m.Equipment, m.Assemblies, m.Ports, m.Connections}
+	case engineering.PowerTarget:
+		values = []any{m.PowerPlans, m.Equipment, m.Facilities, m.Placements}
 	case engineering.CablingTarget:
 		values = []any{m.Cables, m.Optics, m.Ports, m.Connections, m.Facilities, m.Placements}
 	}
@@ -147,6 +152,8 @@ func targetHasContent(m engineering.PhysicalModel, t string) bool {
 		return len(m.Placements) > 0
 	case engineering.ConnectivityTarget:
 		return len(m.Ports) > 0 || len(m.Connections) > 0
+	case engineering.PowerTarget:
+		return len(m.PowerPlans) > 0
 	case engineering.CablingTarget:
 		return len(m.Cables) > 0 || len(m.Optics) > 0
 	}
@@ -188,11 +195,13 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 	}
 
 	changed := map[string]bool{}
+	previousPowerInput := ""
 	if previous != nil {
 		old, oldEvidence, err := engineeringModel(ctx, tx, *previous, s.project)
 		if err != nil {
 			return "", err
 		}
+		previousPowerInput = powerInputDigest(old)
 		if origin == "human" {
 			fields := map[string]map[string]bool{}
 			for _, difference := range engineeringDiff(old, x.Model) {
@@ -284,6 +293,8 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 				case engineering.ConnectivityTarget:
 					x.Model.Ports = old.Ports
 					x.Model.Connections = old.Connections
+				case engineering.PowerTarget:
+					x.Model.PowerPlans = old.PowerPlans
 				case engineering.CablingTarget:
 					x.Model.Cables = old.Cables
 					x.Model.Optics = old.Optics
@@ -296,7 +307,27 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 			changed[d.EntityID] = true
 		}
 	}
+	if previousPowerInput != "" && previousPowerInput != powerInputDigest(x.Model) {
+		for i := range x.Model.PowerPlans {
+			for j := range x.Model.PowerPlans[i].Racks {
+				r := &x.Model.PowerPlans[i].Racks[j]
+				r.PlannedLoad = nil
+				r.Remaining = nil
+				r.CalculationRunID = nil
+			}
+		}
+		kept := []engineering.SourceEvidence{}
+		for _, ev := range x.Evidence {
+			if ev.Field != "power_load" && ev.Field != "power_remaining" {
+				kept = append(kept, ev)
+			}
+		}
+		x.Evidence = kept
+	}
 	if _, e = tx.Exec(ctx, `INSERT INTO eng_revision(id,source_id,sequence,actor,origin,reason,total_cells,mapped_cells,proposal) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)`, revision, source, version+1, actor, origin, reason, x.TotalCells, x.MappedCells, jsonBytes(p)); e != nil {
+		return "", e
+	}
+	if e = verifyEngineeringResults(ctx, tx, source, s.project, x); e != nil {
 		return "", e
 	}
 	entities := map[string]bool{}
@@ -361,6 +392,9 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 		if e != nil {
 			return "", e
 		}
+	}
+	if e = savePowerRows(ctx, tx, revision, &x.Model, insertVersion); e != nil {
+		return "", e
 	}
 	if e = saveConnectivityRows(ctx, tx, revision, &x.Model, insertVersion); e != nil {
 		return "", e

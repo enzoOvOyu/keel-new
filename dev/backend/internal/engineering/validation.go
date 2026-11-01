@@ -82,6 +82,7 @@ func (q Quantity) Validate() error {
 // PhysicalModel is an API/read aggregate; persistence stores each collection in
 // typed tables. It is not a JSON replacement for the engineering domain schema.
 type PhysicalModel struct {
+	PowerPlans  []PowerPlan         `json:"power_plans"`
 	ProjectID   ID                  `json:"project_id"`
 	Equipment   []EquipmentPlan     `json:"equipment"`
 	Assemblies  []DeviceAssembly    `json:"assemblies"`
@@ -302,6 +303,10 @@ func ValidatePhysical(m PhysicalModel) []ValidationIssue {
 	for _, o := range m.Optics {
 		checkVersion(o.EntityVersion, CablingTarget, "connectivity_cabling")
 	}
+	for _, v := range m.PowerPlans {
+		checkVersion(v.EntityVersion, PowerTarget, "power_cooling")
+	}
+	issues = append(issues, ValidatePower(m)...)
 	issues = append(issues, ValidateConnectivity(m)...)
 	return issues
 }

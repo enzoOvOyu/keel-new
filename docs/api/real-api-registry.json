@@ -1154,6 +1154,34 @@
       "handler": "dev/backend/cmd/api/engineering.go",
       "source": "dev/backend/cmd/api/engineering_connectivity_store.go",
       "documentation": "docs/api/engineering.md"
+    },
+    {
+      "method": "put",
+      "path": "/projects/{projectId}/engineering-imports/{engineeringId}/power",
+      "operation_id": "editEngineeringPower",
+      "response_status": "200",
+      "response_schema": "editEngineeringPowerEnvelope",
+      "request_schema": "IDEPowerEdit",
+      "implementation": "implemented",
+      "deployment": "not_deployed",
+      "verification": "isolated synthetic power computation/application/review/publication; UI acceptance NOT RUN",
+      "handler": "dev/backend/cmd/api/engineering.go",
+      "source": "dev/backend/cmd/api/engineering_power.go",
+      "documentation": "docs/api/engineering.md"
+    },
+    {
+      "method": "post",
+      "path": "/projects/{projectId}/engineering-imports/{engineeringId}/calculation-application",
+      "operation_id": "applyEngineeringCalculation",
+      "response_status": "200",
+      "response_schema": "applyEngineeringCalculationEnvelope",
+      "request_schema": "IDECalculationApplication",
+      "implementation": "implemented",
+      "deployment": "not_deployed",
+      "verification": "isolated synthetic power computation/application/review/publication; UI acceptance NOT RUN",
+      "handler": "dev/backend/cmd/api/engineering.go",
+      "source": "dev/backend/cmd/api/engineering_power.go",
+      "documentation": "docs/api/engineering.md"
     }
   ],
   "development_note": "作业平台 UI 整改：新增执行版本定义查询、列表分页、时间筛选和同步游标为分支增量；尚未部署至当前 BOM v5 集成后端。现运行版本以 HANDOFF 顶部为准。"

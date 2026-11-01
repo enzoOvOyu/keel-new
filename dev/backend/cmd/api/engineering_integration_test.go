@@ -33,7 +33,7 @@ func TestEngineeringPhysicalPublication(t *testing.T) {
 	for _, step := range []struct {
 		version int
 		file    string
-	}{{27, "027_engineering_physical.sql"}, {28, "028_engineering_calculation.sql"}, {29, "029_engineering_connectivity.sql"}, {30, "030_engineering_patch_through.sql"}} {
+	}{{27, "027_engineering_physical.sql"}, {28, "028_engineering_calculation.sql"}, {29, "029_engineering_connectivity.sql"}, {30, "030_engineering_patch_through.sql"}, {31, "031_engineering_power.sql"}} {
 		migration, err := os.ReadFile("../../migrations/" + step.file)
 		if err != nil {
 			t.Fatal(err)

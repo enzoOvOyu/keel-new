@@ -197,7 +197,9 @@ type EquipmentPowerProfile struct {
 }
 type RackPowerPlan struct {
 	RackID           ID        `json:"rack_id"`
-	Capacity         Quantity  `json:"capacity"`
+	Capacity         *Quantity `json:"capacity,omitempty"`
+	CoolingCapacity  *Quantity `json:"cooling_capacity,omitempty"`
+	CoolingType      string    `json:"cooling_type"`
 	PlannedLoad      *Quantity `json:"planned_load,omitempty"`
 	Remaining        *Quantity `json:"remaining,omitempty"`
 	CalculationRunID *ID       `json:"calculation_run_id,omitempty"`

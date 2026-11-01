@@ -9,7 +9,7 @@ const ConnectivityTarget = "CMDB_PLANNED_CONNECTIVITY"
 const CablingTarget = "ENGINEERING_CABLING"
 
 var PhysicalTargets = []string{EquipmentTarget, FacilityTarget, PlacementTarget}
-var PublishTargets = []string{EquipmentTarget, FacilityTarget, PlacementTarget, ConnectivityTarget, CablingTarget}
+var PublishTargets = []string{EquipmentTarget, FacilityTarget, PlacementTarget, ConnectivityTarget, CablingTarget, PowerTarget}
 
 func TargetDependencies(target string) []string {
 	switch target {
@@ -39,6 +39,7 @@ type ColumnBinding struct {
 }
 
 type CalculationRequest struct {
+	Operation        string            `json:"operation,omitempty"`
 	ExpectedRevision int               `json:"expected_revision"`
 	Rule             *VersionReference `json:"rule,omitempty"`
 	RequestedCells   []FormulaCell     `json:"requested_cells"`
@@ -168,4 +169,23 @@ type TargetAction struct {
 	Targets          []string `json:"targets"`
 	Decision         string   `json:"decision"`
 	Reason           string   `json:"reason"`
+}
+
+const PowerTarget = "ENGINEERING_POWER"
+
+type PowerEdit struct {
+	ExpectedRevision int       `json:"expected_revision"`
+	Plan             PowerPlan `json:"plan"`
+	Reason           string    `json:"reason"`
+}
+type ResultBinding struct {
+	EntityID   string `json:"entity_id"`
+	Field      string `json:"field"`
+	OutputName string `json:"output_name"`
+}
+type CalculationApplication struct {
+	ExpectedRevision int             `json:"expected_revision"`
+	RunID            string          `json:"run_id"`
+	Bindings         []ResultBinding `json:"bindings"`
+	Reason           string          `json:"reason"`
 }

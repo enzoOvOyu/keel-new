@@ -24,6 +24,10 @@ func engineeringDecode(w http.ResponseWriter, r *http.Request, dst any) bool {
 	return true
 }
 func engineeringFailure(w http.ResponseWriter, e error) {
+	if strings.HasPrefix(e.Error(), "CALC_") {
+		fail(w, 422, e.Error())
+		return
+	}
 	if errors.Is(e, pgx.ErrNoRows) || e.Error() == "NOT_FOUND" {
 		fail(w, 404, "NOT_FOUND")
 		return
@@ -193,6 +197,30 @@ func (s *Server) engineeringRoutes(w http.ResponseWriter, r *http.Request) bool 
 			engineeringFailure(w, e)
 		} else {
 			reply(id, 202)
+		}
+		return true
+	}
+	if action == "power" && r.Method == "PUT" {
+		var q engineering.PowerEdit
+		if !engineeringDecode(w, r, &q) {
+			return true
+		}
+		if err := s.editEngineeringPower(ctx, id, q, subjectOf(ctx).Username); err != nil {
+			engineeringFailure(w, err)
+		} else {
+			reply(id, 200)
+		}
+		return true
+	}
+	if action == "calculation-application" && r.Method == "POST" {
+		var q engineering.CalculationApplication
+		if !engineeringDecode(w, r, &q) {
+			return true
+		}
+		if err := s.applyEngineeringCalculation(ctx, id, q, subjectOf(ctx).Username); err != nil {
+			calculationFailure(w, err)
+		} else {
+			reply(id, 200)
 		}
 		return true
 	}
@@ -512,6 +540,9 @@ func engineeringDiff(before, after engineering.PhysicalModel) []engineering.Revi
 		}
 		for _, v := range m.Connections {
 			add(v.EntityID, "connection", v)
+		}
+		for _, v := range m.PowerPlans {
+			add(v.EntityID, "power_plan", v)
 		}
 		for _, v := range m.Cables {
 			add(v.EntityID, "cable", v)

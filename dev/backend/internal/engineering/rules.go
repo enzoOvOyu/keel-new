@@ -346,3 +346,10 @@ func RunRule(rule CalculationRule, project, revision string, inputs []NamedValue
 	run.FinishedAt = &done
 	return run, err
 }
+
+// EqualQuantities compares exact values after explicit unit normalization.
+func EqualQuantities(a, b Quantity) bool {
+	x, ex := measure(a)
+	y, ey := measure(b)
+	return ex == nil && ey == nil && x.dimension == y.dimension && x.value.Cmp(y.value) == 0
+}

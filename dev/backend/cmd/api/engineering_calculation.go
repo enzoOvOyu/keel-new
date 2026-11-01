@@ -89,6 +89,9 @@ func engineeringCalculationEvidence(x *engineering.Extraction, refs map[string]s
 	for _, v := range x.Model.Cables {
 		targets[v.EntityID] = engineering.CablingTarget
 	}
+	for _, v := range x.Model.PowerPlans {
+		targets[v.EntityID] = engineering.PowerTarget
+	}
 	for _, v := range x.Model.Optics {
 		targets[v.EntityID] = engineering.CablingTarget
 	}
@@ -152,7 +155,13 @@ func (s *Server) queueEngineeringCalculation(ctx context.Context, source string,
 	provider, module := "libreoffice-isolated", "workbook_intelligence"
 	var ruleID *string
 	var ruleVersion *int
-	if q.Rule != nil {
+	if q.Operation != "" {
+		if q.Operation != "power_balance" || q.Rule != nil || len(q.Inputs) > 0 || len(q.RequestedCells) > 0 {
+			return "", errors.New("CALC_OPERATION_INVALID")
+		}
+		provider = "engineering-power-balance"
+		module = "power_cooling"
+	} else if q.Rule != nil {
 		view, err := engineeringRule(ctx, tx, s.project, q.Rule.ID, q.Rule.Version)
 		if err != nil {
 			return "", err
@@ -175,7 +184,7 @@ func (s *Server) queueEngineeringCalculation(ctx context.Context, source string,
 			return "", errors.New("RULE_INPUT_TYPE")
 		}
 	}
-	digest := engineering.Digest([]any{hash, *revision, q.Rule, q.RequestedCells, q.Inputs})
+	digest := engineering.Digest([]any{hash, *revision, q.Operation, q.Rule, q.RequestedCells, q.Inputs})
 	id := uuid.NewString()
 	e = tx.QueryRow(ctx, `INSERT INTO eng_calculation_run(id,project_id,source_id,revision_id,module_instance_id,provider_id,rule_id,rule_version,source_sha256,input_digest,status,actor,requested_cells) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,'pending',$11,$12) ON CONFLICT(source_id,input_digest) WHERE status IN('pending','running') DO UPDATE SET input_digest=excluded.input_digest RETURNING id::text`, id, s.project, source, *revision, module, provider, ruleID, ruleVersion, hash, digest, actor, jsonBytes(q.RequestedCells)).Scan(&id)
 	if e != nil {
@@ -343,7 +352,13 @@ func (s *Server) runEngineeringCalculation(ctx context.Context) {
 		return
 	}
 	run := page.Run
-	if run.Rule != nil {
+	if run.ProviderID == "engineering-power-balance" {
+		var model engineering.PhysicalModel
+		model, _, e = engineeringModel(c, s.db, run.RevisionID, project)
+		if e == nil {
+			run = engineering.PowerBalance(model, run.RevisionID)
+		}
+	} else if run.Rule != nil {
 		view, err := engineeringRule(c, s.db, project, run.Rule.ID, run.Rule.Version)
 		if err == nil {
 			err = s.engineeringRuleDependencies(c, view.Rule)
@@ -436,6 +451,11 @@ func (s *Server) saveEngineeringCalculation(ctx context.Context, claim string, r
 			if _, e = tx.CopyFrom(ctx, pgx.Identifier{entry.table}, entry.columns, pgx.CopyFromRows(entry.rows)); e != nil {
 				return e
 			}
+		}
+	}
+	for _, v := range run.Inputs {
+		if _, e = tx.Exec(ctx, `INSERT INTO eng_calculation_value VALUES($1,'input',$2,$3) ON CONFLICT DO NOTHING`, run.ID, v.Name, jsonBytes(v.Value)); e != nil {
+			return e
 		}
 	}
 	for _, v := range run.Outputs {

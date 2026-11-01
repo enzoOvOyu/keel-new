@@ -16266,6 +16266,76 @@ paths:
           description: Revision conflict
         '422':
           description: Invalid typed engineering entity
+  /projects/{projectId}/engineering-imports/{engineeringId}/power:
+    put:
+      operationId: editEngineeringPower
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDEPowerEdit'
+      responses:
+        '200':
+          description: New reviewed-input revision with validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/editEngineeringPowerEnvelope'
+        '403':
+          description: Permission denied
+        '409':
+          description: Revision stale
+        '422':
+          description: Invalid typed model or result binding
+  /projects/{projectId}/engineering-imports/{engineeringId}/calculation-application:
+    post:
+      operationId: applyEngineeringCalculation
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDECalculationApplication'
+      responses:
+        '200':
+          description: New reviewed-input revision with validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/applyEngineeringCalculationEnvelope'
+        '403':
+          description: Permission denied
+        '409':
+          description: Revision stale
+        '422':
+          description: Invalid typed model or result binding
 components:
   securitySchemes:
     bearerAuth:
@@ -44677,6 +44747,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/IDEOpticDemand'
+        power_plans:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEPowerPlan'
       required:
       - equipment
       - assemblies
@@ -44687,6 +44761,7 @@ components:
       - connections
       - cables
       - optics
+      - power_plans
       type: object
       x-implementation-status: model-contract-only
       description: 'Read aggregate assembled from typed domain tables. Not a persistence JSON payload. First vertical slice: equipment,
@@ -45052,9 +45127,13 @@ components:
           type: string
         remaining:
           $ref: '#/components/schemas/IDEQuantity'
+        cooling_capacity:
+          $ref: '#/components/schemas/IDEQuantity'
+        cooling_type:
+          type: string
       required:
       - rack_id
-      - capacity
+      - cooling_type
       type: object
       x-implementation-status: model-contract-only
     IDEReviewDecision:
@@ -45597,6 +45676,7 @@ components:
           - port
           - connection
           - cable
+          - power
         semantic:
           type: string
         header_rows:
@@ -45951,6 +46031,7 @@ components:
             - CMDB_PLANNED_PLACEMENT
             - CMDB_PLANNED_CONNECTIVITY
             - ENGINEERING_CABLING
+            - ENGINEERING_POWER
         decision:
           type: string
           enum:
@@ -46112,6 +46193,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/IDENamedValue'
+        operation:
+          type: string
+          enum:
+          - power_balance
       required:
       - expected_revision
       - requested_cells
@@ -46335,6 +46420,85 @@ components:
       - expected_revision
       - reason
     editEngineeringConnectivityEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    IDEPowerEdit:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_revision:
+          type: integer
+          minimum: 1
+        plan:
+          $ref: '#/components/schemas/IDEPowerPlan'
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - expected_revision
+      - plan
+      - reason
+    IDEResultBinding:
+      type: object
+      additionalProperties: false
+      properties:
+        entity_id:
+          type: string
+        field:
+          type: string
+          enum:
+          - power_load
+          - power_remaining
+          - cable_calculated
+          - cable_selected_stock
+        output_name:
+          type: string
+      required:
+      - entity_id
+      - field
+      - output_name
+    IDECalculationApplication:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_revision:
+          type: integer
+          minimum: 1
+        run_id:
+          type: string
+        bindings:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEResultBinding'
+          minItems: 1
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - expected_revision
+      - run_id
+      - bindings
+      - reason
+    editEngineeringPowerEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    applyEngineeringCalculationEnvelope:
       type: object
       additionalProperties: false
       properties:

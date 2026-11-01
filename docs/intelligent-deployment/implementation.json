@@ -1,13 +1,13 @@
 {
-  "updated_at": "2026-11-01 03:54:24 UTC",
+  "updated_at": "2026-11-01 04:03:54 UTC",
   "branch": "audit/intelligent-deployment-p0",
-  "scope": "S1 physical, P3 calculations, S3 connectivity/cabling implemented; remaining domains in progress",
+  "scope": "S1 physical, P3 calculations, S3 connectivity/cabling and S4 power/cooling implemented; remaining domains in progress",
   "phase_status": {
     "P0": "complete; report commit 314126d",
     "P1": "complete: architecture, models, contracts and kernel",
     "P2": "all named tool actions connected to source inspection, typed proposals, dependencies, rules/calculation and deterministic physical validation; domain expansion and acceptance pending",
     "P3": "isolated LibreOffice Provider, formula graph, unit-aware restricted rule AST, human rule approval and durable runs implemented; real Golden Fixture reference acceptance pending",
-    "P4": "equipment/facility/placement and connectivity/cabling vertical slices implemented; power/material/workload/network in progress",
+    "P4": "equipment, facility, connectivity/cabling and power/cooling vertical slices implemented; material/workload/network in progress",
     "P5": "physical target review/revisions/Outbox/CMDB receipts implemented; later-domain releases pending",
     "P6": "physical workbench plus calculation/evidence/rule editing and review implemented; remaining domain panels pending; interaction acceptance NOT RUN"
   },
@@ -33,7 +33,10 @@
     "Calculation workbench with results, dependency details, editable rule expressions/parameters/cases and approval",
     "Typed ports/connections/cable routes and separate length states, physical-parent optical demand dedup",
     "Connectivity and engineering-cabling independent release; CMDB planning segments and evidenced patch passthrough pairs; existing topology queries reused",
-    "Connectivity editor and scoped individual-object revision endpoint; migration029/030"
+    "Connectivity editor and scoped individual-object revision endpoint; migration029/030",
+    "PowerPlan typed tables and parameter workbench, distinct planned/nameplate/measured power and unknown capacities",
+    "Durable intrinsic rack power balance with explicit units and missing-input issues, partial results and cooling/capacity validation",
+    "Batch calculation output application into versioned cable lengths/power fields, run/source/output checks and stale power invalidation"
   ],
   "files": {
     "design": "docs/intelligent-deployment/P1-DESIGN.txt",
@@ -146,6 +149,21 @@
       "check": "S3 TypeScript, AI protocol, documentation",
       "result": "PASS",
       "scope": "incremental TypeScript; synthetic agent tool/schema check;75 registered operations; no browser or real provider acceptance"
+    },
+    {
+      "check": "TestPowerBalanceSeparatesBasisAndUnknown / TestPowerExtractionUsesExplicitUnitsAndBasis",
+      "result": "PASS",
+      "scope": "synthetic explicit-unit basis separation, exact balance, cooling overload and missing input"
+    },
+    {
+      "check": "TestEngineeringPowerCalculationPublication",
+      "result": "PASS",
+      "scope": "isolated PostgreSQL source revision/calculation input/output/application/review/Outbox receipt; no CMDB assets; stale/tampered results rejected and input changes clear old loads"
+    },
+    {
+      "check": "Power Pydantic proposal and incremental frontend TypeScript",
+      "result": "PASS",
+      "scope": "strict synthetic power proposal and static type checking; not AI understanding or browser acceptance"
     }
   ],
   "not_run": [

@@ -6389,6 +6389,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/power": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["editEngineeringPower"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/calculation-application": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["applyEngineeringCalculation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -15880,6 +15912,7 @@ export interface components {
             connections: components["schemas"]["IDEPlannedConnection"][];
             cables: components["schemas"]["IDECablePlan"][];
             optics: components["schemas"]["IDEOpticDemand"][];
+            power_plans: components["schemas"]["IDEPowerPlan"][];
         };
         IDEPlannedConnection: {
             a_port_id: string;
@@ -15990,10 +16023,12 @@ export interface components {
         };
         IDERackPowerPlan: {
             calculation_run_id?: string;
-            capacity: components["schemas"]["IDEQuantity"];
+            capacity?: components["schemas"]["IDEQuantity"];
             planned_load?: components["schemas"]["IDEQuantity"];
             rack_id: string;
             remaining?: components["schemas"]["IDEQuantity"];
+            cooling_capacity?: components["schemas"]["IDEQuantity"];
+            cooling_type: string;
         };
         IDEReviewDecision: {
             actor_id: string;
@@ -16154,7 +16189,7 @@ export interface components {
             sheet: string;
             bounds: components["schemas"]["IDEBounds"];
             /** @enum {string} */
-            kind: "equipment" | "assembly" | "site" | "room" | "rack" | "placement" | "other" | "port" | "connection" | "cable";
+            kind: "equipment" | "assembly" | "site" | "room" | "rack" | "placement" | "other" | "port" | "connection" | "cable" | "power";
             semantic: string;
             header_rows: number[];
             columns: components["schemas"]["IDEColumnBinding"][];
@@ -16265,7 +16300,7 @@ export interface components {
         };
         IDETargetAction: {
             expected_revision: number;
-            targets: ("CMDB_PLANNED_EQUIPMENT" | "CMDB_PLANNED_FACILITY" | "CMDB_PLANNED_PLACEMENT" | "CMDB_PLANNED_CONNECTIVITY" | "ENGINEERING_CABLING")[];
+            targets: ("CMDB_PLANNED_EQUIPMENT" | "CMDB_PLANNED_FACILITY" | "CMDB_PLANNED_PLACEMENT" | "CMDB_PLANNED_CONNECTIVITY" | "ENGINEERING_CABLING" | "ENGINEERING_POWER")[];
             /** @enum {string} */
             decision: "approve" | "reject" | "publish";
             reason: string;
@@ -16319,6 +16354,8 @@ export interface components {
             rule?: components["schemas"]["IDEVersionReference"];
             requested_cells: components["schemas"]["IDEFormulaCell"][];
             inputs: components["schemas"]["IDENamedValue"][];
+            /** @enum {string} */
+            operation?: "power_balance";
         };
         IDECalculationPage: {
             run: components["schemas"]["IDECalculationRun"];
@@ -16395,6 +16432,31 @@ export interface components {
             reason: string;
         };
         editEngineeringConnectivityEnvelope: {
+            data: components["schemas"]["IDEWorkspace"];
+            request_id: string;
+        };
+        IDEPowerEdit: {
+            expected_revision: number;
+            plan: components["schemas"]["IDEPowerPlan"];
+            reason: string;
+        };
+        IDEResultBinding: {
+            entity_id: string;
+            /** @enum {string} */
+            field: "power_load" | "power_remaining" | "cable_calculated" | "cable_selected_stock";
+            output_name: string;
+        };
+        IDECalculationApplication: {
+            expected_revision: number;
+            run_id: string;
+            bindings: components["schemas"]["IDEResultBinding"][];
+            reason: string;
+        };
+        editEngineeringPowerEnvelope: {
+            data: components["schemas"]["IDEWorkspace"];
+            request_id: string;
+        };
+        applyEngineeringCalculationEnvelope: {
             data: components["schemas"]["IDEWorkspace"];
             request_id: string;
         };
@@ -35832,6 +35894,102 @@ export interface operations {
                 content?: never;
             };
             /** @description Invalid typed engineering entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    editEngineeringPower: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEPowerEdit"];
+            };
+        };
+        responses: {
+            /** @description New reviewed-input revision with validation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["editEngineeringPowerEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision stale */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid typed model or result binding */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    applyEngineeringCalculation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDECalculationApplication"];
+            };
+        };
+        responses: {
+            /** @description New reviewed-input revision with validation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["applyEngineeringCalculationEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision stale */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid typed model or result binding */
             422: {
                 headers: {
                     [name: string]: unknown;

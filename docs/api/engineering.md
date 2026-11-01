@@ -69,3 +69,13 @@ CMDB复用bom_item和稳定ID，写入planned事实及字段证据。已有Obser
 Estimated/Calculated/Confirmed/As-built分别保存；公式结果关联独立运行。单位不明、端口重复占用、Breakout循环、规格冲突或标准长度不足只阻断对应域。工作台支持对象修订、配线节点排序、路径段、长度状态与来源证据；规则计算结果应用及重新导入差异在后续统一发布链中接续。
 
 实际通过：合成端口去重/长度状态/速率单位/Breakout与配线缺端检查，隔离PostgreSQL分域审核、Outbox投影、配线外部两段拓扑查询，未写实际线长或采购光模块资产。没有生产迁移、真实资料AI或浏览器验收。
+
+## S4：电力、冷却与计算结果应用
+
+新增PUT /engineering-imports/{id}/power（IDEPowerEdit）及POST /engineering-imports/{id}/calculation-application（IDECalculationApplication），均要求bom:edit、精确版本和修改依据。既有calculations请求增加可选operation=power_balance；不能同时指定任意规则或输入参数。迁移031以计划、设备功率、机柜容量/结果三类关系表保存。
+
+功率档案明确planned/nameplate/measured，冷却方式保持来源语义；W/kW做确定性单位换算。内置power_balance/v1只做明确规划功率求和及容量相减，无需客户业务假设。缺少唯一落位、规划功率或容量时返回逐机柜问题和partial/failed，不把缺失当零；不自动应用铭牌、实测值、冗余系数或同时率。客户工程规则仍走独立规则版本和人工审批。
+
+计算输出按明确绑定批量应用到线缆计算长度/标准规格或机柜负荷/余量，创建待审核修订。来源、项目、运行状态、输入版本及输出数值受校验，调用方不能挂一个运行ID并写入任意计算值。调整电力输入或设备/机柜归属后清除过期负荷；保留历史运行和修订。ENGINEERING_POWER独立发布工程版本，不写CMDB观测功率或生成资产。
+
+工作台提供功率依据、设备功率档案、容量/冷却、参数编辑、负荷计算/批量应用、证据及版本校验。通过合成精确2kW负荷/1kW余量、实测分离、缺失不当零、冷却超限；隔离DB验证持久运行/输入输出、应用、审批/发布、拒绝过期和篡改、参数变化清除旧值。严格AI Schema与前端增量TypeScript通过；没有真实资料或浏览器验收。
