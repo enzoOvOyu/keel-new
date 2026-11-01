@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"keel.local/dev/internal/engineering"
+	"sort"
 	"strings"
 )
 
 // A failed candidate remains a draft, not evidence. Local edits let the Agent
 // correct one binding without regenerating unrelated, already inspected fields.
-func engineeringCorrectionDraft(history []any, sheet string) *engineering.EngineeringProposal {
+func engineeringCorrectionDraft(history []any, sheet string) (*engineering.EngineeringProposal, string) {
 	for i := len(history) - 1; i >= 0; i-- {
 		raw, _ := json.Marshal(history[i])
 		var step struct {
@@ -22,18 +23,23 @@ func engineeringCorrectionDraft(history []any, sheet string) *engineering.Engine
 		if json.Unmarshal(raw, &step) != nil || step.Action.Proposal == nil || step.Action.Sheet != sheet {
 			continue
 		}
-		for _, prefix := range []string{"FIELD_NOT_SUPPORTED_FOR_REGION", "HEADER_FIELD_CONFLICT", "FIELD_VALUE_CONFLICT", "SUPPORTED_HEADER_UNMAPPED", "INCOMPLETE_SHEET_COVERAGE", "INVALID_CONSTANT_VALUE", "INVALID_CONSTANT_CELL"} {
+		for _, prefix := range []string{"FIELD_NOT_SUPPORTED_FOR_REGION", "HEADER_FIELD_CONFLICT", "FIELD_VALUE_CONFLICT", "SUPPORTED_HEADER_UNMAPPED", "INCOMPLETE_SHEET_COVERAGE", "INVALID_CONSTANT_VALUE", "INVALID_CONSTANT_CELL", "UNSUPPORTED_CONSTANT_VALUE"} {
 			if strings.HasPrefix(step.Result.Error, prefix) {
-				return step.Action.Proposal
+				return step.Action.Proposal, step.Result.Error
 			}
 		}
-		return nil // Structural errors still need the full proposal tool.
+		return nil, "" // Structural errors still need the full proposal tool.
 	}
-	return nil
+	return nil, ""
 }
 
 func engineeringCorrectionTool(draft engineering.EngineeringProposal, sheet string, attributes []engineering.AttributeDefinition) any {
 	fields, removable := []string{}, []string{}
+	kinds := []string{"other"}
+	for kind := range engineeringRegionCapabilities() {
+		kinds = append(kinds, kind)
+	}
+	sort.Strings(kinds)
 	for _, region := range draft.Regions {
 		fields = appendUnique(fields, engineering.RegionFields(region.Kind)...)
 		for _, c := range region.Columns {
@@ -63,6 +69,7 @@ func engineeringCorrectionTool(draft engineering.EngineeringProposal, sheet stri
 		"name": "map_semantic_fields", "description": "Correct draft_to_correct. Change only specified fields in one region; all other bindings remain unchanged. The entire resulting proposal is validated before saving. Region index is zero-based. Always include set_columns and remove_columns; use {} or [] for an unused operation. Removing an unsupported field requires remove_columns, not an empty call.",
 		"parameters": map[string]any{"type": "object", "additionalProperties": false, "required": []string{"sheet", "region_index", "set_columns", "remove_columns"}, "$defs": definitions, "properties": map[string]any{
 			"sheet": map[string]any{"type": "string", "enum": []string{sheet}}, "region_index": map[string]any{"type": "integer", "minimum": 0, "maximum": len(draft.Regions) - 1},
+			"set_kind":    map[string]any{"type": "string", "enum": kinds, "description": "Correct the region domain only when its source evidence supports that domain; keep existing bindings for validation."},
 			"set_columns": columns, "remove_columns": map[string]any{"type": "array", "items": map[string]any{"type": "string", "enum": removable}},
 			"set_constants": map[string]any{"type": "array", "items": constant}, "remove_constants": map[string]any{"type": "array", "items": map[string]any{"type": "string", "enum": removable}},
 			"bounds": map[string]any{"type": "object", "additionalProperties": false, "properties": bounds, "required": []string{"start_row", "end_row", "start_column", "end_column"}},
@@ -79,6 +86,7 @@ func materializeEngineeringCorrection(raw []byte, draft *engineering.Engineering
 		Action          string                        `json:"action"`
 		Sheet           string                        `json:"sheet"`
 		Region          int                           `json:"region_index"`
+		Kind            string                        `json:"set_kind"`
 		Columns         json.RawMessage               `json:"set_columns"`
 		RemoveColumns   []string                      `json:"remove_columns"`
 		Constants       []engineering.ConstantBinding `json:"set_constants"`
@@ -93,13 +101,16 @@ func materializeEngineeringCorrection(raw []byte, draft *engineering.Engineering
 	if patch.Action != "map_semantic_fields" || patch.Sheet != sheet || draft == nil || patch.Region < 0 || patch.Region >= len(draft.Regions) {
 		return raw, false, fmt.Errorf("INVALID_DRAFT_CORRECTION")
 	}
-	if len(patch.Columns) == 0 && len(patch.RemoveColumns) == 0 && len(patch.Constants) == 0 && len(patch.RemoveConstants) == 0 && patch.Bounds == nil {
+	if len(patch.Columns) == 0 && len(patch.RemoveColumns) == 0 && len(patch.Constants) == 0 && len(patch.RemoveConstants) == 0 && patch.Bounds == nil && patch.Kind == "" {
 		return raw, false, fmt.Errorf("EMPTY_DRAFT_CORRECTION: provide set_columns, remove_columns, set_constants, remove_constants or bounds; sheet and region_index alone make no change. Correct the outstanding draft validation error")
 	}
 	encoded, _ := json.Marshal(draft)
 	var candidate engineering.EngineeringProposal
 	_ = json.Unmarshal(encoded, &candidate)
 	region := &candidate.Regions[patch.Region]
+	if patch.Kind != "" {
+		region.Kind = patch.Kind
+	}
 	remove := func(field string, names []string) bool {
 		for _, name := range names {
 			if field == name {

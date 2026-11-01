@@ -23,6 +23,14 @@ func TestEngineeringCorrectsOneBindingWithoutRegeneratingOtherFields(t *testing.
 			args["proposal"] = engineering.EngineeringProposal{Summary: "candidate", Modules: []engineering.ModuleDetection{}, Questions: []string{}, Regions: []engineering.RegionMapping{{Sheet: "synthetic", Kind: "equipment", Semantic: "inventory", Bounds: engineering.Bounds{StartRow: 1, EndRow: 2, StartColumn: 1, EndColumn: 2}, HeaderRows: []int{1}, Columns: []engineering.ColumnBinding{{Field: "label", Column: 2}, {Field: "quantity", Column: 1}}, Constants: []engineering.ConstantBinding{}}}}
 		}
 		if calls == 3 {
+			var messages []struct {
+				Content string `json:"content"`
+			}
+			_ = json.Unmarshal(body["messages"], &messages)
+			var focus map[string]any
+			if len(messages) != 2 || json.Unmarshal([]byte(messages[1].Content), &focus) != nil || focus["validation_error"] == nil || focus["draft_to_correct"] == nil || focus["workbook"] != nil {
+				t.Errorf("correction lost the actual validation error or retained unrelated tasks: %s", body["messages"])
+			}
 			var tools []struct {
 				Function struct {
 					Name string `json:"name"`
@@ -112,5 +120,28 @@ func TestEngineeringRevalidatesSavedCandidateWithTargetedCorrection(t *testing.T
 	result, err := p.UnderstandEngineering(context.Background(), wb, func(string, string, string) error { return nil }, EngineeringToolHooks{Resume: &checkpoint})
 	if err != nil || p.Calls != 1 || len(result.Regions[0].Columns) != 1 || result.Regions[0].Columns[0].Column != 2 {
 		t.Fatalf("resume correction failed: %v calls=%d", err, p.Calls)
+	}
+}
+
+func TestEngineeringCorrectionReclassifiesRegionWithoutLosingSourceBindings(t *testing.T) {
+	wb := bom.Workbook{Sheets: []bom.Sheet{{Name: "synthetic", Cells: []bom.Cell{{Ref: "A1", Row: 1, Column: 1, Value: "Rack"}, {Ref: "B1", Row: 1, Column: 2, Value: "Power"}, {Ref: "A2", Row: 2, Column: 1, Value: "TEST-RACK"}, {Ref: "B2", Row: 2, Column: 2, Value: "12"}}}}}
+	draft := &engineering.EngineeringProposal{Summary: "source", Regions: []engineering.RegionMapping{{Sheet: "synthetic", Kind: "placement", Semantic: "rack power", Bounds: engineering.Bounds{StartRow: 1, EndRow: 2, StartColumn: 1, EndColumn: 2}, HeaderRows: []int{1}, Columns: []engineering.ColumnBinding{{Field: "rack", Column: 1}, {Field: "power", Column: 2, Unit: "kW"}}}}}
+	if engineering.CheckProposal(wb, *draft) == nil {
+		t.Fatal("wrong domain accepted")
+	}
+	raw, corrected, err := materializeEngineeringCorrection([]byte(`{"action":"map_semantic_fields","sheet":"synthetic","region_index":0,"set_kind":"power","set_columns":{},"remove_columns":[]}`), draft, "synthetic")
+	if err != nil || !corrected {
+		t.Fatalf("classification correction: %v", err)
+	}
+	if err = validateEngineeringSchema(context.Background(), raw); err != nil {
+		t.Fatal(err)
+	}
+	var action engineeringAction
+	_ = json.Unmarshal(raw, &action)
+	if err = engineering.CheckProposal(wb, *action.Proposal); err != nil {
+		t.Fatal(err)
+	}
+	if action.Proposal.Regions[0].Kind != "power" || len(action.Proposal.Regions[0].Columns) != 2 || action.Proposal.Regions[0].Columns[1].Unit != "kW" || draft.Regions[0].Kind != "placement" {
+		t.Fatal("source bindings lost or original draft mutated")
 	}
 }

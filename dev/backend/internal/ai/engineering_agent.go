@@ -177,11 +177,19 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 			if len(kinds) > 0 {
 				selected = scopeEngineeringProposalTools(selected, functions, kinds, hooks.Attributes)
 			}
-			draft := engineeringCorrectionDraft(history, active)
+			draft, draftError := engineeringCorrectionDraft(history, active)
+			callPrompt := string(prompt)
+			input := map[string]any{"workbook": summary, "modules": registry, "attribute_definitions": hooks.Attributes, "history": history, "active_sheet": active, "proposed_region_kinds": kinds, "active_sheet_preview": engineeringSheetPreview(sheet, regions), "region_field_capabilities": engineeringRegionCapabilities(), "pending_sheets": pending, "completed_sheets": len(completed), "turns_remaining": budget - turn}
 			if draft != nil {
 				selected = []any{engineeringCorrectionTool(*draft, active, hooks.Attributes)}
+				correctionPrompt, err := prompts.ReadFile("prompts/engineering-correction-v1.txt")
+				if err != nil {
+					return proposal, err
+				}
+				callPrompt = string(correctionPrompt)
+				input = map[string]any{"active_sheet": active, "draft_to_correct": draft, "validation_error": draftError, "binding_errors": engineeringBindingErrors(*draft, hooks.Attributes), "source_preview": input["active_sheet_preview"]}
 			}
-			raw, err := p.engineeringCompletion(ctx, string(prompt), map[string]any{"workbook": summary, "modules": registry, "attribute_definitions": hooks.Attributes, "history": history, "active_sheet": active, "draft_to_correct": draft, "proposed_region_kinds": kinds, "active_sheet_preview": engineeringSheetPreview(sheet, regions), "region_field_capabilities": engineeringRegionCapabilities(), "pending_sheets": pending, "completed_sheets": len(completed), "turns_remaining": budget - turn}, selected, trace, hooks.Artifact)
+			raw, err := p.engineeringCompletion(ctx, callPrompt, input, selected, trace, hooks.Artifact)
 			if err != nil {
 				return proposal, err
 			}
@@ -199,7 +207,8 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 		raw := queued[0]
 		queued = queued[1:]
 		original := raw
-		raw, corrected, normalizationErr := materializeEngineeringCorrection(raw, engineeringCorrectionDraft(history, active), active)
+		draft, _ := engineeringCorrectionDraft(history, active)
+		raw, corrected, normalizationErr := materializeEngineeringCorrection(raw, draft, active)
 		if normalizationErr == nil {
 			raw, normalizationErr = normalizeEngineeringColumns(raw)
 		}

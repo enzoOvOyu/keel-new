@@ -227,13 +227,11 @@ func TestEngineeringRepeatedBadProposalStopsAndDoesNotPolluteContext(t *testing.
 		if calls > 1 {
 			var input map[string]any
 			_ = json.Unmarshal([]byte(body.Messages[1].Content), &input)
-			if input["tool_errors"] == nil {
-				t.Error("missing correction feedback")
+			if input["validation_error"] == nil || input["draft_to_correct"] == nil || input["workbook"] != nil {
+				t.Error("missing focused draft correction feedback")
 			}
-			feedback := input["tool_errors"].([]any)
-			last := feedback[len(feedback)-1].(map[string]any)
-			bindings, ok := last["binding_errors"].([]any)
-			if !ok || len(bindings) != 1 || bindings[0].(map[string]any)["field"] != "cable_label" || last["next"] == nil {
+			bindings, ok := input["binding_errors"].([]any)
+			if !ok || len(bindings) != 1 || bindings[0].(map[string]any)["field"] != "cable_label" || bindings[0].(map[string]any)["region_index"] != float64(0) {
 				t.Error("specific binding correction lost before model request")
 			}
 			assistantCalls := 0
@@ -242,7 +240,7 @@ func TestEngineeringRepeatedBadProposalStopsAndDoesNotPolluteContext(t *testing.
 					assistantCalls++
 				}
 			}
-			if assistantCalls != 1 {
+			if assistantCalls != 0 {
 				t.Error("rejected proposal reintroduced as an assistant example")
 			}
 		}
