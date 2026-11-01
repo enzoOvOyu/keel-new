@@ -1,12 +1,12 @@
 {
-  "code_revision": "642a0d6",
+  "code_revision": "f98c8ea",
   "branch": "dev",
   "repository": "enzoOvOyu/keel-new",
   "api": {
     "port": 8081,
-    "binary": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/keel-api-v4",
-    "pid": 996483,
-    "sha256": "a56a0547cbf8a9bee0b9c93fc67973aab9b37eee8ca8cfeb51bb4c0071140a2f",
+    "binary": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/keel-api-v5",
+    "pid": 1015933,
+    "sha256": "fb5c5fda69cc2f68ddc1128d9a57ec38d4dc066124cc4acad35e25e119f96207",
     "cwd": "/home/ubuntu/keel/dev/backend",
     "session": "keel-cmdb-api"
   },
@@ -32,9 +32,10 @@
     "native_tools_checkpoint_and_provider_errors": "PASS",
     "source_upload": "PASS: engineering mode; zero legacy recognition jobs",
     "minio_artifact_write_read": "PASS: actual artifact roundtrip",
-    "full_real_workbook_understanding": "IN_PROGRESS; upstream HTTP 402 in_flight_budget_exhausted",
+    "full_real_workbook_understanding": "NOT ACCEPTED: last v4 real run ended in permanent HTTP 402; v5 recovery/feedback fixes deployed and deterministically tested, no funded real call available",
     "frontend_upload_module": "HTTP 200; browser not run",
-    "artifact_recovery_scope_hash_cleanup": "PASS: isolated PostgreSQL and synthetic S3, including new service instance restore, wrong project/revision/claim rejection, integrity verification and index cascade"
+    "artifact_recovery_scope_hash_cleanup": "PASS: isolated PostgreSQL and synthetic S3, including new service instance restore, wrong project/revision/claim rejection, integrity verification and index cascade",
+    "typescript_engineering_adapter": "PASS"
   },
   "rollback": {
     "api_launcher": "/home/ubuntu/.local/state/keel-deployments/engineering-5abb94f/api-run.py",
@@ -55,5 +56,6 @@
       }
     ],
     "scope": "Health and real source upload/attach/analyze/get performed; other historical list startup checks were not repeated"
-  }
+  },
+  "test_evidence": "docs/intelligent-deployment/agent-repair-test-20261101.json"
 }

@@ -1,3 +1,15 @@
+## 当前继续路线：独立免费真实模型复测（不修改原默认Provider）
+
+- 在同一OpenRouter服务发现并实际验证`nvidia/nemotron-3-ultra-550b-a55b:free`原生工具调用HTTP200且费用0；新建非默认Provider `TEST-Agent-Free-Nemotron`，ID `59c504bf-a8c8-42db-9afc-b89f70a0f2d5`。原test/DeepSeek配置完全保留，结果不能混记。
+- 独立项目`TEST-Agent-MM-Free-01` / `proj-2754da3a-cc48-4464-bbf7-ec483cfa4e06`；来源`a5c5d704-9cbd-4b6e-a7d4-15c7fca51222`；作业`69c70880-5861-4ab9-830c-ae8ab0db4931`运行中。15次Sheet读取已经完成，首次提案因未知字段cable_type被拒绝；正在按真实错误继续修复，不宣称已理解成功。
+- 本机资料/证据仍在`/home/ubuntu/.local/state/keel-tests/mm-agent-repair`，新manifest为`live-free.json`。原DeepSeek额度问题保留；异步充值问题仍待答复，但使用该独立免费模型继续推进当前目标。
+
+## 当前验收状态：修复已上线，真实理解尚未通过
+
+- 当前API代码`f98c8ea`，分支dev；逐工具MinIO检查点与网格纠错反馈已部署。原5180只更新上传分流，主分支和其他功能开发未改动。
+- 最后一轮真实MM任务因Provider HTTP 402结束，不能宣称识别完整。项目保留以供充值后继续及用户清理；无CMDB资产和发布记录。详见[真实复测记录](docs/intelligent-deployment/agent-repair-test-20261101.json)。
+- 已完成代码/存储/契约定向验证；未完成整本语义、关键设备/端接覆盖、参考计算和跨客户验收。用户充值/切换有额度Provider的异步问题仍待答复，不擅自更换模型或伪造成功。
+
 ## 已完成里程碑事件：未完成Sheet的逐步恢复与明确映射纠错
 
 - 每个成功工具步骤和Schema纠错反馈均保存检查点，包含有界工具历史、已读取Sheet和已完成Sheet；失败/重启后连未完成Sheet也可恢复，不需要重读整段资料。
@@ -12,7 +24,7 @@
 
 - OpenRouter只读账户查询证实：API Key的limit_remaining约45.14是Key限额，账户total_credits=410、total_usage约409.9931，实际仅余约0.0069美元；不是可用45美元。真实多轮调用持续返回402/in_flight_budget_exhausted。已异步请用户充值当前账户或提供其他可用Provider，用户尚未答复。
 - 当前独立测试项目`proj-bbf16ed0-8dcd-4d95-bdb0-8a4eea3b3a3d`，工程来源`f821c09d-c4c3-4284-8a2c-859e0b8eacfc`，v4任务`d906ba9b-1f23-490b-90dc-9a8f6a40a218`已因不可重试HTTP 402结束；最新账户剩余约0.0031美元，不能覆盖当前请求。未发布资产。不要把已修复协议和存储当整本理解成功。
-- 当前部署API代码642a0d6；[部署记录](docs/intelligent-deployment/deployment-agent-repair-20261101.json)记录二进制摘要、进程、迁移038和回退入口。前端是原4064a69加工程上传Adapter，不含其他分支开发。
+- 当前部署API代码f98c8ea；[部署记录](docs/intelligent-deployment/deployment-agent-repair-20261101.json)记录二进制摘要、进程、迁移038和回退入口。前端是原4064a69加工程上传Adapter，不含其他分支开发。
 
 # Keel 整合交接 · 2026-10-31
 

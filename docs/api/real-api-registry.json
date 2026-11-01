@@ -1,10 +1,10 @@
 {
   "version": 1,
   "updated_at": "2026-11-01",
-  "coverage": "Engineering Agent repair on dev deployed to existing 8081; 5180 retains original frontend with engineering-only upload dispatch. Migration 038, native tool/checkpoint/error tests and real MinIO artifact read verified. Real MM understanding still in progress; not CMDB or full workbook acceptance.",
+  "coverage": "Agent repair f98c8ea on existing 8081, frontend original base with engineering-only upload. Native protocol, per-tool checkpoints, MinIO persistence/scope/hash/cleanup verified; real MM understanding blocked by upstream account funds and NOT ACCEPTED. Historical endpoint evidence remains historical.",
   "schema_authority": "docs/openapi.yaml",
-  "code_revision": "642a0d6",
-  "deployed_revision": "642a0d6",
+  "code_revision": "f98c8ea",
+  "deployed_revision": "f98c8ea",
   "deployment_evidence": "docs/intelligent-deployment/deployment-agent-repair-20261101.json",
   "operations": [
     {

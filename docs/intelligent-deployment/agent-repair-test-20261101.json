@@ -1,0 +1,56 @@
+{
+  "scope": "Original test/DeepSeek provider repair run; independent free real-model run continues separately",
+  "source_sha256": "30481c4619366bcdc707c9b58f2118349eb599f4260d5f73010fe3b7a3782558",
+  "fixture": "MM_Layout_GB300-18_HDD&SSD&CPU-112_V1.1.xlsx",
+  "project_code": "TEST-Agent-MM-Repair-01",
+  "project_id": "proj-bbf16ed0-8dcd-4d95-bdb0-8a4eea3b3a3d",
+  "source_id": "f821c09d-c4c3-4284-8a2c-859e0b8eacfc",
+  "provider": {
+    "name": "test",
+    "model": "deepseek/deepseek-v4.1-flash-1017"
+  },
+  "result": "BLOCKED_EXTERNAL_PROVIDER_BUDGET; real understanding NOT ACCEPTED",
+  "root_causes": [
+    "Engineering upload also queued legacy BOM recognition",
+    "Pseudo JSON tool transcript and monolithic proposal made schema correction unreliable",
+    "Non-200 provider responses collapsed to PROVIDER_ERROR, losing HTTP 402 and Retry-After",
+    "OpenRouter account balance about $0.0031 after final check; key limit_remaining is not account balance"
+  ],
+  "observed_agent_issue": "Layout proposal repeated label columns within one object; rejected by deterministic binding validator; no formal model published",
+  "counts": {
+    "legacy_bom_jobs": 0,
+    "analysis_artifacts": 16,
+    "analysis_artifact_bytes": 18526,
+    "accepted_sheet_checkpoints": 0,
+    "cmdb_project_assets": 0,
+    "engineering_publications": 0
+  },
+  "actual_checks": [
+    "Go API builds passed",
+    "Native tool/checkpoint/provider error unit cases passed",
+    "Unfinished-sheet tool history resume passed",
+    "Engineering package tests passed",
+    "Isolated PostgreSQL + synthetic S3 checkpoint/scope/digest/cleanup checks passed",
+    "Real MinIO tool artifact write/download/decompression verified",
+    "Engineering upload parsed without any legacy recognition job",
+    "Engineering TypeScript contract check passed",
+    "88-operation API documentation consistency passed"
+  ],
+  "not_completed": [
+    "Whole-workbook semantic mapping and coverage",
+    "967 equipment/7154 endpoint source comparison against extracted model",
+    "Formula/reference result comparison in this repair run",
+    "CMDB/topology release loop",
+    "Cross-customer generalization"
+  ],
+  "private_evidence_directory": "/home/ubuntu/.local/state/keel-tests/mm-agent-repair",
+  "latest_deployed_agent_revision": "f98c8ea",
+  "resume": "After Provider funding is available, POST analyze on same engineering source at current revision; verify actual source observations before accepting",
+  "free_model_followup": {
+    "status": "IN_PROGRESS",
+    "provider_id": "59c504bf-a8c8-42db-9afc-b89f70a0f2d5",
+    "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "project_code": "TEST-Agent-MM-Free-01",
+    "note": "Original default Provider unchanged; no mixed acceptance claim"
+  }
+}
