@@ -1,7 +1,7 @@
 {
   "updated_at": "2026-11-01T05:29:49.409927+00:00",
   "branch": "dev",
-  "scope": "API3e5dad5/v29 deployed. Ultra-03 taske66f9d18-c9ea-4d7e-abd6-c49ea65ebede continues with native unique field keys, active-sheet context, source semantic checks and explicit constant-object feedback. 7154 cabling and 967 equipment core rows matched; equipment extra fields and remaining domains not accepted.",
+  "scope": "API42e709d/v31 deployed. Ultra-03 running with duplicate-header critical mapping checks and restored draft correction. Five cabling sheets: 7154 rows x eight source fields matched. Equipment latest candidates still need semantic validation; earlier 967-row core match is historical, not current acceptance.",
   "phase_status": {
     "P0": "complete; report commit 314126d",
     "P1": "complete: architecture, models, contracts and kernel",

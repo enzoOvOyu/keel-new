@@ -1,10 +1,10 @@
 {
   "version": 1,
   "updated_at": "2026-11-01",
-  "coverage": "Agent repair3e5dad5/v29 deployed8081; engineering upload frontend unchanged. Ultra-03 real analysis running; source critical fields verified, full model understanding pending. No CMDB/topology publication acceptance.",
+  "coverage": "API42e709d/v31 deployed. Ultra-03 running with duplicate-header critical mapping checks and restored draft correction. Five cabling sheets: 7154 rows x eight source fields matched. Equipment latest candidates still need semantic validation; earlier 967-row core match is historical, not current acceptance.",
   "schema_authority": "docs/openapi.yaml",
-  "code_revision": "3e5dad5",
-  "deployed_revision": "3e5dad5",
+  "code_revision": "42e709d",
+  "deployed_revision": "42e709d",
   "deployment_evidence": "docs/intelligent-deployment/deployment-agent-repair-20261101.json",
   "operations": [
     {

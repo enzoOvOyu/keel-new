@@ -5,34 +5,12 @@
   "project_code": "TEST-Agent-MM-Ultra-03",
   "project_id": "proj-18101842-d821-4583-9229-a708f995c1c8",
   "source_id": "71a5c797-319b-496d-a6ce-f67c1080439c",
-  "job_id": "e66f9d18-c9ea-4d7e-abd6-c49ea65ebede",
-  "runtime_revision": "3e5dad5",
-  "prepared_revision": "3e5dad5",
+  "job_id": "08cc3e7f-1e31-4f68-9f0c-efdf76ecab66",
+  "runtime_revision": "42e709d",
+  "prepared_revision": "42e709d",
   "accepted_sheets": 5,
   "total_sheets": 15,
   "source_comparison": [
-    {
-      "sheet": "Network Information",
-      "expected_rows": 189,
-      "regions": 1,
-      "field_matches": {
-        "label": 189,
-        "model": 189,
-        "rack": 189,
-        "start_u": 189
-      }
-    },
-    {
-      "sheet": "Server Information",
-      "expected_rows": 778,
-      "regions": 1,
-      "field_matches": {
-        "label": 778,
-        "model": 778,
-        "rack": 778,
-        "start_u": 778
-      }
-    },
     {
       "sheet": "Cabling_EW_SP-LF",
       "expected_rows": 2592,
@@ -120,10 +98,36 @@
     "Queued tool calls continued after failure, causing no-progress before the model saw feedback",
     "Read loop did not require interpretation after bounded evidence",
     "Other-sheet tool context persisted across a resumed/rejected sheet",
-    "Known manufacturer/brand and invalid length-state columns could pass domain vocabulary checks"
+    "Known manufacturer/brand and invalid length-state columns could pass domain vocabulary checks",
+    "Rejected candidates support targeted field correction without replacing valid mappings",
+    "Duplicate headers cannot bypass required relation checks; invalid completed candidates resume as drafts"
   ],
   "storage": "Complete tool artifacts/checkpoints remain in MinIO; PostgreSQL stores metadata and typed engineering facts",
   "reasoning_trial": "Default reasoning produced invalid textual tool payloads; restored prior working request settings without changing model",
   "test_scope": "Targeted AI/engineering checks, API build, real API documentation consistency and real workbook analysis only",
-  "equipment_extra_field_review": "NOT ACCEPTED: core fields match, but metadata misbindings in previous candidates require re-analysis under v28/v29 checks"
+  "equipment_extra_field_review": "NOT ACCEPTED: v30 omitted network rack; device U mappings switched to derived columns and need semantic comparison. v31 revalidates critical duplicate headers.",
+  "historical_equipment_core_comparison": [
+    {
+      "sheet": "Network Information",
+      "expected_rows": 189,
+      "regions": 1,
+      "field_matches": {
+        "label": 189,
+        "model": 189,
+        "rack": 189,
+        "start_u": 189
+      }
+    },
+    {
+      "sheet": "Server Information",
+      "expected_rows": 778,
+      "regions": 1,
+      "field_matches": {
+        "label": 778,
+        "model": 778,
+        "rack": 778,
+        "start_u": 778
+      }
+    }
+  ]
 }
