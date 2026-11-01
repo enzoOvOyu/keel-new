@@ -51,7 +51,7 @@ func (s *Server) deleteProject(w http.ResponseWriter, r *http.Request, id string
 		return
 	}
 	var busy bool
-	err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM bom_job WHERE project_id=$1 AND status IN ('pending','running')) OR EXISTS(SELECT 1 FROM bom_import_batch WHERE project_id=$1 AND status IN ('UPLOADED','PARSING')) OR EXISTS(SELECT 1 FROM eng_job WHERE project_id=$1 AND state IN ('pending','running'))`, id).Scan(&busy)
+	err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM bom_job WHERE project_id=$1 AND status IN ('pending','running')) OR EXISTS(SELECT 1 FROM bom_import_batch WHERE project_id=$1 AND status IN ('UPLOADED','PARSING')) OR EXISTS(SELECT 1 FROM eng_job WHERE project_id=$1 AND state IN ('pending','running')) OR EXISTS(SELECT 1 FROM eng_calculation_run WHERE project_id=$1 AND status IN ('pending','running'))`, id).Scan(&busy)
 	if err != nil {
 		fail(w, 500, "DATABASE_ERROR")
 		return

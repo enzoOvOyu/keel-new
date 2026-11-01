@@ -6277,6 +6277,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/engineering-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listEngineeringRules"];
+        put?: never;
+        post: operations["createEngineeringRule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-rules/{ruleId}/{version}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getEngineeringRule"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-rules/{ruleId}/{version}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["reviewEngineeringRule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/calculation-provider": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getEngineeringCalculationProvider"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/calculations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listEngineeringCalculations"];
+        put?: never;
+        post: operations["runEngineeringCalculation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/calculations/{runId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getEngineeringCalculation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -15597,7 +15693,7 @@ export interface components {
         IDEFormulaDependency: {
             from: components["schemas"]["IDEFormulaCell"];
             /** @enum {string} */
-            kind: "cell" | "range" | "named_range" | "external" | "dynamic";
+            kind: "cell" | "range" | "named_range" | "external" | "dynamic" | "external_or_structured" | "unresolved" | "missing_sheet";
             to_range: string;
             to_sheet_id: string;
         };
@@ -15608,7 +15704,7 @@ export interface components {
             compatibility: "compatible" | "partial" | "unsupported" | "unknown";
             dependencies: components["schemas"]["IDEFormulaDependency"][];
             /** @enum {string} */
-            dependency_status: "complete" | "partial" | "unsupported";
+            dependency_status: "complete" | "partial" | "unsupported" | "cycle" | "missing";
             error_code?: string;
             expression: string;
             recalculated_value?: components["schemas"]["IDETypedValue"];
@@ -15917,7 +16013,7 @@ export interface components {
             input?: string;
             literal?: components["schemas"]["IDEQuantity"];
             /** @enum {string} */
-            operator: "input" | "literal" | "add" | "subtract" | "multiply" | "divide" | "min" | "max" | "ceil" | "floor";
+            operator: "input" | "literal" | "add" | "subtract" | "multiply" | "divide" | "min" | "max" | "ceil" | "floor" | "abs" | "select_ceiling" | "outputs" | "output";
         };
         IDERuleIO: {
             name: string;
@@ -16060,6 +16156,7 @@ export interface components {
             field: string;
             entity_id: string;
             formula: boolean;
+            calculation_run_id?: string;
         };
         IDETargetStatus: {
             target: string;
@@ -16192,6 +16289,66 @@ export interface components {
         };
         readEngineeringSourceEnvelope: {
             data: components["schemas"]["BOMSourceCell"][];
+            request_id: string;
+        };
+        IDECalculationRequest: {
+            expected_revision: number;
+            rule?: components["schemas"]["IDEVersionReference"];
+            requested_cells: components["schemas"]["IDEFormulaCell"][];
+            inputs: components["schemas"]["IDENamedValue"][];
+        };
+        IDECalculationPage: {
+            run: components["schemas"]["IDECalculationRun"];
+            total_formulas: number;
+            offset: number;
+            limit: number;
+            stale: boolean;
+        };
+        IDERuleDraft: {
+            expected_version: number;
+            rule: components["schemas"]["IDECalculationRule"];
+            reason: string;
+        };
+        IDERuleReview: {
+            expected_digest: string;
+            /** @enum {string} */
+            decision: "approve" | "reject" | "retire";
+            reason: string;
+        };
+        IDERuleView: {
+            rule: components["schemas"]["IDECalculationRule"];
+            digest: string;
+        };
+        listEngineeringRulesEnvelope: {
+            data: components["schemas"]["IDERuleView"][];
+            request_id: string;
+        };
+        createEngineeringRuleEnvelope: {
+            data: components["schemas"]["IDERuleView"];
+            request_id: string;
+        };
+        getEngineeringRuleEnvelope: {
+            data: components["schemas"]["IDERuleView"];
+            request_id: string;
+        };
+        reviewEngineeringRuleEnvelope: {
+            data: components["schemas"]["IDERuleView"];
+            request_id: string;
+        };
+        getEngineeringCalculationProviderEnvelope: {
+            data: components["schemas"]["IDECalculationCapabilities"];
+            request_id: string;
+        };
+        listEngineeringCalculationsEnvelope: {
+            data: components["schemas"]["IDECalculationPage"][];
+            request_id: string;
+        };
+        runEngineeringCalculationEnvelope: {
+            data: components["schemas"]["IDECalculationPage"];
+            request_id: string;
+        };
+        getEngineeringCalculationEnvelope: {
+            data: components["schemas"]["IDECalculationPage"];
             request_id: string;
         };
     };
@@ -35156,6 +35313,430 @@ export interface operations {
                 content?: never;
             };
             /** @description Evidence, schema, dependency or review precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listEngineeringRules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized engineering calculation/rule result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listEngineeringRulesEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rule, unit, approval, calculation or schema precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createEngineeringRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDERuleDraft"];
+            };
+        };
+        responses: {
+            /** @description Authorized engineering calculation/rule result */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["createEngineeringRuleEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rule, unit, approval, calculation or schema precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getEngineeringRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                ruleId: string;
+                version: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized engineering calculation/rule result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getEngineeringRuleEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rule, unit, approval, calculation or schema precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    reviewEngineeringRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                ruleId: string;
+                version: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDERuleReview"];
+            };
+        };
+        responses: {
+            /** @description Authorized engineering calculation/rule result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["reviewEngineeringRuleEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rule, unit, approval, calculation or schema precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getEngineeringCalculationProvider: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized engineering calculation/rule result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getEngineeringCalculationProviderEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rule, unit, approval, calculation or schema precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listEngineeringCalculations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized engineering calculation/rule result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listEngineeringCalculationsEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rule, unit, approval, calculation or schema precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    runEngineeringCalculation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDECalculationRequest"];
+            };
+        };
+        responses: {
+            /** @description Authorized engineering calculation/rule result */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["runEngineeringCalculationEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rule, unit, approval, calculation or schema precondition failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getEngineeringCalculation: {
+        parameters: {
+            query?: {
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+                runId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authorized engineering calculation/rule result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getEngineeringCalculationEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rule, unit, approval, calculation or schema precondition failed */
             422: {
                 headers: {
                     [name: string]: unknown;

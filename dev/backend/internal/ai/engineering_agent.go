@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/xuri/excelize/v2"
 	"io"
 	"keel.local/dev/internal/bom"
 	"keel.local/dev/internal/engineering"
@@ -17,10 +18,25 @@ type engineeringAction struct {
 	Bounds   *engineering.Bounds              `json:"bounds,omitempty"`
 	Cell     string                           `json:"cell,omitempty"`
 	Proposal *engineering.EngineeringProposal `json:"proposal,omitempty"`
+	Rule     *engineering.CalculationRule     `json:"rule,omitempty"`
+	RuleRef  *engineering.VersionReference    `json:"rule_ref,omitempty"`
+	Cells    []engineering.FormulaCell        `json:"cells,omitempty"`
+	Inputs   []engineering.NamedValue         `json:"inputs,omitempty"`
+}
+
+type EngineeringToolHooks struct {
+	Names       []excelize.DefinedName
+	ProposeRule func(context.Context, engineering.CalculationRule) (engineering.RuleView, error)
+	Calculate   func(context.Context, *engineering.VersionReference, []engineering.FormulaCell, []engineering.NamedValue) (engineering.CalculationPage, error)
 }
 
 // Only sanitized IR enters the tool loop; this function has no write authority.
-func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, trace func(string, string, string) error) (engineering.EngineeringProposal, error) {
+func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, trace func(string, string, string) error, options ...EngineeringToolHooks) (engineering.EngineeringProposal, error) {
+	var hooks EngineeringToolHooks
+	if len(options) > 0 {
+		hooks = options[0]
+	}
+	var graph []engineering.FormulaEvidence
 	var proposal engineering.EngineeringProposal
 	prompt, e := prompts.ReadFile("prompts/engineering-v1.txt")
 	if e != nil {
@@ -103,16 +119,41 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 					err = fmt.Errorf("CELL_NOT_FOUND")
 				}
 			case "trace_formula_dependencies", "resolve_cross_sheet_references":
-				result = map[string]any{"status": "partial", "references": ir.CrossSheetResolve(action.Sheet), "limitation": "Explicit cross-sheet cell references only; ranges/names/dynamic references are not a complete graph."}
-			case "propose_calculation_rule", "run_calculation":
-				result = map[string]string{"status": "unsupported", "reason": "No approved calculation provider/rule executor for this slice; caches are evidence only."}
+				if graph == nil {
+					graph = engineering.FormulaGraph(w, hooks.Names)
+				}
+				found := []engineering.FormulaEvidence{}
+				total := 0
+				for _, f := range graph {
+					if f.Cell.SheetID == action.Sheet && (action.Cell == "" || f.Cell.Address == action.Cell) {
+						total++
+						if len(found) < 32 {
+							found = append(found, f)
+						}
+					}
+				}
+				result = map[string]any{"formulas": found, "total": total, "truncated": total > len(found)}
+			case "propose_calculation_rule":
+				if action.Rule == nil {
+					err = fmt.Errorf("RULE_REQUIRED")
+				} else if hooks.ProposeRule == nil {
+					err = fmt.Errorf("RULE_REGISTRY_UNAVAILABLE")
+				} else {
+					result, err = hooks.ProposeRule(ctx, *action.Rule)
+				}
+			case "run_calculation":
+				if hooks.Calculate == nil {
+					err = fmt.Errorf("CALC_PROVIDER_UNAVAILABLE")
+				} else {
+					result, err = hooks.Calculate(ctx, action.RuleRef, action.Cells, action.Inputs)
+				}
 			case "classify_information", "map_semantic_fields", "validate_model", "analyze_validation_issues", "propose_engineering_model":
 				if action.Proposal == nil {
 					err = fmt.Errorf("PROPOSAL_REQUIRED")
 					break
 				}
 				err = engineering.CheckProposal(w, *action.Proposal)
-				if err == nil {
+				if err == nil && action.Action == "propose_engineering_model" {
 					covered := map[string]bool{}
 					for _, r := range action.Proposal.Regions {
 						covered[r.Sheet] = true
@@ -130,6 +171,14 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 				if err == nil {
 					proposal = *action.Proposal
 					result = map[string]any{"schema_valid": true, "regions": len(proposal.Regions), "formal_write": false}
+					if action.Action == "validate_model" || action.Action == "analyze_validation_issues" {
+						x, extractErr := engineering.ExtractPhysical(w, proposal, "analysis", "source", "revision")
+						if extractErr != nil {
+							err = extractErr
+						} else {
+							result = map[string]any{"issues": x.Issues, "equipment": len(x.Model.Equipment), "facilities": len(x.Model.Facilities), "placements": len(x.Model.Placements), "mapped_cells": x.MappedCells, "total_cells": x.TotalCells}
+						}
+					}
 					if action.Action == "propose_engineering_model" {
 						if e := trace(action.Action, "succeeded", "结构化区域、字段及模块提案已校验；等待本地提取与人工审核"); e != nil {
 							return proposal, e

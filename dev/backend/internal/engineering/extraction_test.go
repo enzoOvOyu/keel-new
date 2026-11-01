@@ -96,3 +96,17 @@ func ratString(s string) string {
 	}
 	return n.RatString()
 }
+
+func TestSourceConstantsResolveOnlyCitedSanitizedValues(t *testing.T) {
+	raw := bom.Workbook{Sheets: []bom.Sheet{{Name: "Source", Cells: []bom.Cell{{Ref: "A1", Value: "Synthetic site", Row: 1, Column: 1}, {Ref: "A2", Value: "Different synthetic site", Row: 2, Column: 1}}}}}
+	safe := bom.Workbook{Sheets: []bom.Sheet{{Name: "Source", Cells: []bom.Cell{{Ref: "A1", Value: "[LABEL]", Row: 1, Column: 1}, {Ref: "A2", Value: "[LABEL]", Row: 2, Column: 1}}}}}
+	p := EngineeringProposal{Regions: []RegionMapping{{Sheet: "Source", Constants: []ConstantBinding{{Field: "site", Value: "[LABEL]", EvidenceCells: []string{"A1"}}}}}}
+	resolved := ResolveSourceConstants(raw, safe, p)
+	if resolved.Regions[0].Constants[0].Value != "Synthetic site" || p.Regions[0].Constants[0].Value != "[LABEL]" {
+		t.Fatal("cited constant not restored locally or proposal mutated")
+	}
+	p.Regions[0].Constants[0].EvidenceCells = []string{"A1", "A2"}
+	if ResolveSourceConstants(raw, safe, p).Regions[0].Constants[0].Value != "[LABEL]" {
+		t.Fatal("ambiguous anonymized identities guessed")
+	}
+}

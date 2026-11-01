@@ -53,3 +53,19 @@ export const engineeringSource=(project:string,id:string,sheet:string,bounds:Mod
 export const uploadEngineeringWorkbook=async(project:string,file:File,providerId:string)=>{const form=new FormData();form.append('file',file);form.append('import_mode','ai');if(providerId)form.append('provider_id',providerId);return bomRequest<{id:string}>('projects/'+encodeURIComponent(project)+'/bom-imports','POST',form)};
 export const engineeringUploadStatus=(project:string,id:string,signal?:AbortSignal)=>bomRequest<{id:string;status:string;error_code?:string}>('bom-imports/'+encodeURIComponent(id)+'?summary=true&project_id='+encodeURIComponent(project),'GET',undefined,undefined,signal);
 export const engineeringProviders=(project:string,signal?:AbortSignal)=>bomRequest<{id:string;name:string;model:string;is_default:boolean}[]>('ai/provider-options?project_id='+encodeURIComponent(project),'GET',undefined,undefined,signal);
+
+export type EngineeringCalculationPage = Models['IDECalculationPage'];
+export type EngineeringCalculationRequest = Models['IDECalculationRequest'];
+export type EngineeringRuleView = Models['IDERuleView'];
+export const engineeringCalculationProvider=(project:string,id:string,signal?:AbortSignal)=>bomRequest<Models['IDECalculationCapabilities']>(engineeringPath(project,id)+'/calculation-provider','GET',undefined,undefined,signal);
+export const engineeringCalculations=(project:string,id:string,signal?:AbortSignal)=>bomRequest<EngineeringCalculationPage[]>(engineeringPath(project,id)+'/calculations','GET',undefined,undefined,signal);
+export const engineeringCalculation=(project:string,id:string,run:string,offset=0,signal?:AbortSignal)=>bomRequest<EngineeringCalculationPage>(engineeringPath(project,id)+'/calculations/'+encodeURIComponent(run)+'?offset='+offset+'&limit=50','GET',undefined,undefined,signal);
+export const runEngineeringCalculation=(project:string,id:string,request:EngineeringCalculationRequest)=>bomRequest<EngineeringCalculationPage>(engineeringPath(project,id)+'/calculations','POST',request);
+const engineeringRulePath=(project:string)=>'projects/'+encodeURIComponent(project)+'/engineering-rules';
+export const engineeringRules=(project:string,signal?:AbortSignal)=>bomRequest<EngineeringRuleView[]>(engineeringRulePath(project),'GET',undefined,undefined,signal);
+export const createEngineeringRule=(project:string,request:Models['IDERuleDraft'])=>bomRequest<EngineeringRuleView>(engineeringRulePath(project),'POST',request);
+export const reviewEngineeringRule=(project:string,id:string,version:number,request:Models['IDERuleReview'])=>bomRequest<EngineeringRuleView>(engineeringRulePath(project)+'/'+encodeURIComponent(id)+'/'+version+'/review','POST',request);
+
+export type RuleExpression = Models['IDERuleExpression'];
+export type NamedValue = Models['IDENamedValue'];
+export type TypedValue = Models['IDETypedValue'];

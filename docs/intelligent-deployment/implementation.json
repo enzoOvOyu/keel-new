@@ -1,15 +1,15 @@
 {
-  "updated_at": "2026-11-01 02:59:31 UTC",
+  "updated_at": "2026-11-01 03:23:14 UTC",
   "branch": "audit/intelligent-deployment-p0",
-  "scope": "P1 kernel and S1 physical engineering vertical slice; continuing later domains",
+  "scope": "S1 physical vertical slice and P3 calculation/rule vertical slice; remaining domains in progress",
   "phase_status": {
     "P0": "complete; report commit 314126d",
     "P1": "complete: architecture, models, contracts and kernel",
-    "P2": "multiround tools and strict proposal schema connected; formula/rule tools still unsupported",
-    "P3": "interfaces only; next implementation milestone",
+    "P2": "all named tool actions connected to source inspection, typed proposals, dependencies, rules/calculation and deterministic physical validation; domain expansion and acceptance pending",
+    "P3": "isolated LibreOffice Provider, formula graph, unit-aware restricted rule AST, human rule approval and durable runs implemented; real Golden Fixture reference acceptance pending",
     "P4": "first equipment/assembly/facility/placement vertical slice implemented; remaining domain batches pending",
     "P5": "physical target review/revisions/Outbox/CMDB receipts implemented; later-domain releases pending",
-    "P6": "unified first-slice workbench implemented; interaction acceptance NOT RUN"
+    "P6": "physical workbench plus calculation/evidence/rule editing and review implemented; remaining domain panels pending; interaction acceptance NOT RUN"
   },
   "implemented": [
     "Three-layer design, model ownership and relational schema design for all requested common and domain models",
@@ -24,7 +24,13 @@
     "Durable analysis jobs with leases; sanitized IR tools and deterministic local extraction",
     "Independent exact-revision reviews, idempotent publication and existing Outbox retries",
     "CMDB planned projection protects Observed payload and uses existing rack visualization",
-    "Unified source/model/evidence/issues/versions/review workbench; legacy import retained"
+    "Unified source/model/evidence/issues/versions/review workbench; legacy import retained",
+    "Replaceable isolated LibreOffice provider: source hash/read-only input, macro/link updates disabled, bounded sandbox, formula/cache/recalculated/error separation",
+    "Formula dependency graph for cell/range/quoted sheet/named range references, explicit cycles/missing/dynamic references",
+    "Project-scoped immutable rule versions with exact decimal/unit checks, cases, approval and safe AST evaluation",
+    "8 calculation/rule HTTP operations and migration028; per-run/per-formula/per-dependency relational records",
+    "Formula-backed model evidence points to calculation runs; incompatible or missing recomputation blocks affected fields",
+    "Calculation workbench with results, dependency details, editable rule expressions/parameters/cases and approval"
   ],
   "files": {
     "design": "docs/intelligent-deployment/P1-DESIGN.txt",
@@ -97,6 +103,31 @@
       "check": "OpenAPI semantic comparison against b25915e",
       "result": "PASS",
       "scope": "9 added path entries /11 operations,28 schemas; no existing paths or schemas changed"
+    },
+    {
+      "check": "TestFormulaGraphRangesNamesCyclesAndDynamic / TestRuleUnitsCasesAndApproval",
+      "result": "PASS",
+      "scope": "synthetic reference graph, units, standard size, mismatches and unapproved execution"
+    },
+    {
+      "check": "TestIsolatedCalcReference",
+      "result": "PASS",
+      "scope": "actual isolated LibreOffice against generated XLSX; SUM cross-sheet result20 and divide-by-zero, immutable original"
+    },
+    {
+      "check": "TestEngineeringCalculationPersistenceAndRuleReview",
+      "result": "PASS",
+      "scope": "isolated PostgreSQL; rule version/review/digest, calculation queue/dedup/execution, cache/result/provenance and project isolation; unrelated edits preserve source conflict"
+    },
+    {
+      "check": "TestSourceConstantsResolveOnlyCitedSanitizedValues",
+      "result": "PASS",
+      "scope": "cited local identity restoration without modifying sanitized proposal; ambiguous anonymized literals not guessed"
+    },
+    {
+      "check": "P3 TypeScript and real API documentation",
+      "result": "PASS before final case-switch UI addition; incremental check pending",
+      "scope": "74 registered operations; no HTTP or browser acceptance"
     }
   ],
   "not_run": [
@@ -117,19 +148,21 @@
     "live_frontend_changed": false
   },
   "next_vertical_slice": [
-    "Formula dependencies/provider/rule execution with durable calculation records",
-    "Connectivity and cabling vertical slice followed by power/material/workload/network batches"
+    "Connectivity and cabling: ports, breakout, endpoints/routes/material linkage and planned CMDB projection",
+    "Power/cooling, material/workload then network planning; no invented missing configuration"
   ],
   "limits": [
     "No current environment migration or deployment",
     "No true AI/source workbook/Golden Fixture/human Ground Truth acceptance",
     "No browser interaction or cross-customer generalization acceptance",
-    "Formula execution and remaining engineering domains are still pending",
-    "Approved plan removal/tombstone publication remains to implement; current first-slice UI does not remove published entities"
+    "Approved plan removal/tombstone publication remains to implement; current first-slice UI does not remove published entities",
+    "Formula source/Golden Fixture compatibility and human Ground Truth NOT RUN",
+    "Rule AST rejects unsupported compound-unit operations; dynamic/external spreadsheet dependencies remain partial",
+    "Remaining connectivity/cabling/power/material/workload/network domain implementations pending"
   ],
   "changes": {
-    "migration_added": "027_engineering_physical.sql; applied only to isolated synthetic DB",
-    "http_operations_added": 11,
+    "migration_added": "027/028, isolated DB only",
+    "http_operations_added": 19,
     "current_environment_changed": false,
     "original_workbooks_modified": false
   }

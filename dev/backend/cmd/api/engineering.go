@@ -130,8 +130,7 @@ func (s *Server) engineeringRoutes(w http.ResponseWriter, r *http.Request) bool 
 				engineeringFailure(w, errors.New("SOURCE_NOT_PARSED"))
 				return true
 			}
-			id := uuid.NewString()
-			e = s.db.QueryRow(ctx, `INSERT INTO eng_source(id,project_id,import_id) VALUES($1,$2,$3) ON CONFLICT(import_id) DO UPDATE SET import_id=excluded.import_id RETURNING id::text`, id, project, q.ImportID).Scan(&id)
+			id, e := s.attachEngineering(ctx, q.ImportID, subjectOf(ctx).Username)
 			if e != nil {
 				engineeringFailure(w, e)
 				return true

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -13,6 +14,31 @@ import (
 type engineeringQuery interface {
 	Query(context.Context, string, ...any) (pgx.Rows, error)
 	QueryRow(context.Context, string, ...any) pgx.Row
+}
+
+func (s *Server) attachEngineering(ctx context.Context, importID, actor string) (string, error) {
+	tx, e := s.db.Begin(ctx)
+	if e != nil {
+		return "", e
+	}
+	defer tx.Rollback(ctx)
+	id := uuid.NewString()
+	var head *string
+	e = tx.QueryRow(ctx, `INSERT INTO eng_source(id,project_id,import_id) VALUES($1,$2,$3) ON CONFLICT(import_id) DO UPDATE SET import_id=excluded.import_id RETURNING id::text,head_revision_id::text`, id, s.project, importID).Scan(&id, &head)
+	if e != nil {
+		return "", e
+	}
+	if head == nil {
+		revision := uuid.NewString()
+		proposal := engineering.EngineeringProposal{Summary: "原始资料已解析，等待智能理解", Regions: []engineering.RegionMapping{}, Modules: []engineering.ModuleDetection{}, Questions: []string{}}
+		if _, e = tx.Exec(ctx, `INSERT INTO eng_revision(id,source_id,sequence,actor,origin,reason,total_cells,mapped_cells,proposal) SELECT $1,$2,1,$3,'agent','immutable source anchor',COALESCE((SELECT sum(jsonb_array_length(s->'source_cells')) FROM bom_import_batch b,jsonb_array_elements(b.workbook->'sheets') s WHERE b.id=$4),0),0,$5`, revision, id, actor, importID, jsonBytes(proposal)); e != nil {
+			return "", e
+		}
+		if _, e = tx.Exec(ctx, `UPDATE eng_source SET head_revision_id=$2 WHERE id=$1`, id, revision); e != nil {
+			return "", e
+		}
+	}
+	return id, tx.Commit(ctx)
 }
 
 func engineeringModel(ctx context.Context, q engineeringQuery, revision, project string) (engineering.PhysicalModel, []engineering.SourceEvidence, error) {
@@ -45,14 +71,14 @@ func engineeringModel(ctx context.Context, q engineeringQuery, revision, project
 			return m, evidence, e
 		}
 	}
-	rows, e := q.Query(ctx, `SELECT id::text,entity_id::text,sheet,cell,field,formula FROM eng_evidence WHERE revision_id=$1 ORDER BY id`, revision)
+	rows, e := q.Query(ctx, `SELECT id::text,entity_id::text,sheet,cell,field,formula,calculation_run_id::text FROM eng_evidence WHERE revision_id=$1 ORDER BY id`, revision)
 	if e != nil {
 		return m, evidence, e
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var v engineering.SourceEvidence
-		if e = rows.Scan(&v.ID, &v.EntityID, &v.Sheet, &v.Cell, &v.Field, &v.Formula); e != nil {
+		if e = rows.Scan(&v.ID, &v.EntityID, &v.Sheet, &v.Cell, &v.Field, &v.Formula, &v.CalculationRunID); e != nil {
 			return m, evidence, e
 		}
 		evidence = append(evidence, v)
@@ -151,8 +177,56 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 			return "", err
 		}
 		if origin == "human" {
+			fields := map[string]map[string]bool{}
 			for _, difference := range engineeringDiff(old, x.Model) {
 				changed[difference.EntityID] = true
+				before, after := map[string]json.RawMessage{}, map[string]json.RawMessage{}
+				_ = json.Unmarshal([]byte(difference.Before), &before)
+				_ = json.Unmarshal([]byte(difference.After), &after)
+				fields[difference.EntityID] = map[string]bool{}
+				for key, value := range after {
+					if !bytes.Equal(value, before[key]) {
+						fields[difference.EntityID][key] = true
+					}
+				}
+			}
+			aliases := map[string]string{"model": "source_model_label", "coordinate_frame": "coordinate_frame_id"}
+			fieldChanged := func(entity, field string) bool {
+				if alias := aliases[field]; alias != "" {
+					field = alias
+				}
+				return fields[entity][field]
+			}
+			kept := []engineering.SourceEvidence{}
+			for _, e := range x.Evidence {
+				if !fieldChanged(e.EntityID, e.Field) {
+					kept = append(kept, e)
+				}
+			}
+			x.Evidence = kept
+			rows, err := tx.Query(ctx, `SELECT id::text,entity_id::text,code,severity,module_id,field,message,target FROM eng_issue WHERE revision_id=$1 AND module_id='workbook_intelligence'`, *previous)
+			if err != nil {
+				return "", err
+			}
+			for rows.Next() {
+				var issue engineering.ValidationIssue
+				if err = rows.Scan(&issue.ID, &issue.EntityID, &issue.Code, &issue.Severity, &issue.ModuleID, &issue.Field, &issue.Message, &issue.PublishTarget); err != nil {
+					break
+				}
+				if fieldChanged(issue.EntityID, issue.Field) {
+					continue
+				}
+				if issue.Code == "REANALYSIS_REVIEWED_CONFLICT" && targetDigest(old, issue.PublishTarget) != targetDigest(x.Model, issue.PublishTarget) {
+					continue
+				}
+				x.Issues = append(x.Issues, issue)
+			}
+			if err == nil {
+				err = rows.Err()
+			}
+			rows.Close()
+			if err != nil {
+				return "", err
 			}
 		} else {
 			var priorOrigin string
@@ -258,7 +332,7 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 		if !entities[v.EntityID] {
 			continue
 		}
-		if _, e = tx.Exec(ctx, `INSERT INTO eng_evidence VALUES($1,$2,$3,$4,$5,$6,$7) ON CONFLICT DO NOTHING`, revision, v.EntityID, v.ID, v.Sheet, v.Cell, v.Field, v.Formula); e != nil {
+		if _, e = tx.Exec(ctx, `INSERT INTO eng_evidence VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT DO NOTHING`, revision, v.EntityID, v.ID, v.Sheet, v.Cell, v.Field, v.Formula, v.CalculationRunID); e != nil {
 			return "", e
 		}
 	}

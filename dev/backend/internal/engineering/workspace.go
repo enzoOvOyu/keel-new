@@ -13,6 +13,34 @@ type ColumnBinding struct {
 	Column int    `json:"column"`
 	Unit   string `json:"unit"`
 }
+
+type CalculationRequest struct {
+	ExpectedRevision int               `json:"expected_revision"`
+	Rule             *VersionReference `json:"rule,omitempty"`
+	RequestedCells   []FormulaCell     `json:"requested_cells"`
+	Inputs           []NamedValue      `json:"inputs"`
+}
+type CalculationPage struct {
+	Run           CalculationRun `json:"run"`
+	TotalFormulas int            `json:"total_formulas"`
+	Offset        int            `json:"offset"`
+	Limit         int            `json:"limit"`
+	Stale         bool           `json:"stale"`
+}
+type RuleDraft struct {
+	ExpectedVersion int             `json:"expected_version"`
+	Rule            CalculationRule `json:"rule"`
+	Reason          string          `json:"reason"`
+}
+type RuleReview struct {
+	ExpectedDigest string `json:"expected_digest"`
+	Decision       string `json:"decision"`
+	Reason         string `json:"reason"`
+}
+type RuleView struct {
+	Rule   CalculationRule `json:"rule"`
+	Digest string          `json:"digest"`
+}
 type ConstantBinding struct {
 	Field         string   `json:"field"`
 	Value         string   `json:"value"`
@@ -40,12 +68,13 @@ type EngineeringProposal struct {
 	Questions []string          `json:"questions"`
 }
 type SourceEvidence struct {
-	ID       ID     `json:"id"`
-	Sheet    string `json:"sheet"`
-	Cell     string `json:"cell"`
-	Field    string `json:"field"`
-	EntityID ID     `json:"entity_id"`
-	Formula  bool   `json:"formula"`
+	ID               ID     `json:"id"`
+	Sheet            string `json:"sheet"`
+	Cell             string `json:"cell"`
+	Field            string `json:"field"`
+	EntityID         ID     `json:"entity_id"`
+	Formula          bool   `json:"formula"`
+	CalculationRunID *ID    `json:"calculation_run_id,omitempty"`
 }
 type TargetStatus struct {
 	Target        string      `json:"target"`

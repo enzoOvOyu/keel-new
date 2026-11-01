@@ -35,12 +35,62 @@ class Proposal(Closed):
     regions: list[Region] = Field(min_length=1)
     modules: list[Module]
     questions: list[str]
+class Quantity(Closed):
+    value: str
+    unit: str
+class TypedValue(Closed):
+    kind: Literal['decimal','text','boolean','reference']
+    text: str | None = None
+    decimal: str | None = None
+    boolean: bool | None = None
+    reference: str | None = None
+    unit: str | None = None
+class NamedValue(Closed):
+    name: str
+    value: TypedValue
+class RuleIO(Closed):
+    name: str
+    value_type: str
+    unit: str
+    required: bool
+class Expression(Closed):
+    operator: Literal['input','literal','add','subtract','multiply','divide','min','max','ceil','floor','abs','select_ceiling','outputs','output']
+    input: str | None = None
+    literal: Quantity | None = None
+    arguments: list['Expression']
+class VersionReference(Closed):
+    id: str
+    version: int = Field(ge=1)
+class RuleCase(Closed):
+    id: str
+    inputs: list[NamedValue]
+    expected: list[NamedValue]
+    tolerance: str
+class Rule(Closed):
+    id: str
+    version: int = Field(ge=1)
+    domain: Literal['source','equipment','facility_placement','power_cooling','connectivity_cabling','material_workload','network_design','validation_release']
+    scope_type: Literal['project','customer','domain']
+    scope_id: str
+    inputs: list[RuleIO]
+    outputs: list[RuleIO]
+    expression: Expression
+    dependencies: list[VersionReference]
+    validation_cases: list[RuleCase]
+    approval_status: Literal['draft']
+class FormulaCell(Closed):
+    sheet_id: str
+    address: str
 class Action(Closed):
     action: Literal['inspect_workbook','inspect_sheet','inspect_region','read_range','inspect_formula','trace_formula_dependencies','classify_information','map_semantic_fields','resolve_cross_sheet_references','propose_engineering_model','propose_calculation_rule','run_calculation','validate_model','analyze_validation_issues']
     sheet: str | None = None
     bounds: Bounds | None = None
     cell: str | None = None
     proposal: Proposal | None = None
+    rule: Rule | None = None
+    rule_ref: VersionReference | None = None
+    cells: list[FormulaCell] | None = Field(default=None, max_length=32)
+    inputs: list[NamedValue] | None = None
     @model_validator(mode='after')
     def arguments(self):
         if self.action in ('inspect_sheet','inspect_region','read_range','inspect_formula','trace_formula_dependencies','resolve_cross_sheet_references') and not self.sheet:
@@ -51,6 +101,10 @@ class Action(Closed):
             raise ValueError('cell required')
         if self.action in ('classify_information','map_semantic_fields','propose_engineering_model','validate_model','analyze_validation_issues') and self.proposal is None:
             raise ValueError('proposal required')
+        if self.action == "propose_calculation_rule" and self.rule is None:
+            raise ValueError("rule required")
+        if self.action == "run_calculation" and self.rule_ref is None and not self.cells:
+            raise ValueError("formula cells or approved rule required")
         return self
 try:
     Action.model_validate_json(sys.stdin.buffer.read())
