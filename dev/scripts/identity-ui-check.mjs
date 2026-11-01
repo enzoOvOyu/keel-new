@@ -1,4 +1,4 @@
-import {chromium} from '../../keel-demo/node_modules/playwright/index.mjs';import fs from 'node:fs';
+import {chromium} from 'playwright';import fs from 'node:fs';
 const config=Object.fromEntries(fs.readFileSync('dev/backend/.env','utf8').split('\n').filter(l=>l.includes('=')).map(l=>l.split(/=(.*)/s).slice(0,2)));
 const b=await chromium.launch({args:['--no-sandbox']});const p=await b.newPage({viewport:{width:1440,height:1000}});p.setDefaultTimeout(15000);const errors=[];p.on('pageerror',e=>errors.push(e.message));const checked=[];const name='ui-auth-'+Date.now();let uid;
 try{

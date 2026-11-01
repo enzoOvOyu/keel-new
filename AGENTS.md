@@ -1,5 +1,15 @@
 # AGENTS.md — Codex 执行约束
 
+## 开发分支与 Demo 隔离（2026-11-01，优先于旧分支说明）
+
+- 后续业务开发统一在 Git `dev` 分支进行，应用源代码目录为 `dev/`；默认工作区 `/home/ubuntu/keel-dev`。开始前确认分支及工作区状态，不在 `main`、归档Tag或旧功能/部署工作区继续开发。
+- `main` 保留稳定整合版本；开发提交推送 `origin/dev`。只有用户明确要求合并/发布时才更新main或切换运行服务。本次一次性的Demo清理同步main/dev不构成后续自动合并授权。
+- 作业平台接续也从最新dev继续，保留已有有效实现；旧feat/jobs-kestra-ui仅作历史参考，不从旧基线覆盖新工程代码。
+- 旧独立演示历史归档为 `archive/keel-mock-first-20261101`；清理前完整代码归档为 `archive/pre-dev-cleanup-20261101`。归档只读，不合并到dev，不启动其Compose或复用其node_modules。
+- 当前工程不再保留旧keel-demo/和web/应用。Mock仍可用于未接真实接口的模块，统一复用dev中的Adapter及现有fixtures，不删除有效演示数据或另建应用。
+- Git分支、源代码目录与运行环境是不同概念：建立dev不意味着重启5180/8081，也不迁移数据库、凭据或原始文件。旧运行工作区保持原样，发布按用户明确安排。
+
+
 ## 进度交接与真实 API 契约维护（2026-10-31）
 
 - 接续开发先读 `HANDOFF.md` → `docs/REAL-API-CONTRACTS.md` → 本次涉及的模块契约；按索引定位代码，不重复遍历全仓。
@@ -41,7 +51,7 @@
 - **CMDB 全链自动沉淀**：从原始 BOM 导入任务、源文件与映射证据开始，所有后续标准实体、资产变化、采集、执行、门禁、网络配置、测试、工单、审批、交付与维护态数据均自动建立 CMDB 记录或关联。CMDB 是统一资产视图与生命周期/关系投影，不是第二套独立写入事实源；通过同事务 Outbox/幂等消费者维护，失败可重放。
 - **UI 质量优先**：不得仅用默认 shadcn 卡片拼页面。实现前必须阅读 `docs/DESIGN-SYSTEM.md` 与 `docs/UI-REFERENCE.md`，按页面线框图、信息层级、密度、状态和交互规范实现；每个主要页面都需有 mock 数据和可点选闭环。
 - **真实开局 Excel**：`TX B300 Layout-new.xlsx` 是非标准开局资料样本。按 `docs/EXCEL-IMPORT-PROFILE.md` 设计解析器；不得将该原文件、真实凭据或敏感数据复制进 Git、fixture、提示词或外部 AI 请求。原始文件中的明文凭据必须被识别为敏感信息，只提取 Vault 引用/提示，绝不导入密码值。
-- **契约先行**：前端全量模块先以 OpenAPI 定义 API，再以 mock adapter 实现。每个页面只能依赖 `keel-demo/src/lib/api`（应用目录内为 `src/lib/api`） 暴露的类型化接口，不得直接写死散落在组件内的假数据。mock 与真实 API 必须使用相同请求/响应类型。
+- **契约先行**：前端全量模块先以 OpenAPI 定义 API，再以 mock adapter 实现。每个页面只能依赖 `dev/src/lib/api`（应用目录内为 `src/lib/api`） 暴露的类型化接口，不得直接写死散落在组件内的假数据。mock 与真实 API 必须使用相同请求/响应类型。
 
 ## 1. 开工顺序
 1. 阅读本文件与 `docs/README.md`（若本文件位于仓库根目录，按实际路径定位）。
@@ -93,7 +103,7 @@
 1. P0 先建立全局壳层、路由、设计 token、类型化 API client、mock provider、统一状态组件。
 2. 先把所有主菜单页面做成可交互 mock 原型，优先覆盖项目总览、BOM 导入、CMDB、Flow 列表、执行详情、交换机/服务器资产、网络交付、六阶段交付主链路、工单、监控、模板/介质/参数。
 3. 所有列表、筛选、排序、分页、抽屉、确认框、批量选择、任务日志、状态变更必须可操作；不允许“看起来像按钮但没行为”。
-4. mock 必须从 API provider 返回，集中在 `keel-demo/fixtures/demo-full-64-b300`，由 `src/lib/api` Provider 读取；组件里禁止内嵌大段业务假数据。
+4. mock 必须从 API provider 返回，集中在 `fixtures/demo-full-64-b300`，由 `src/lib/api` Provider 读取；组件里禁止内嵌大段业务假数据。
 5. 后端接入按模块逐个替换 provider；不得重写 UI 或更改 API 语义。OpenAPI 与 mock 类型、真实 Go handler 以同一契约生成/校验。
 6. 视觉验收必须对照 `docs/UI-REFERENCE.md` 和 `docs/DESIGN-SYSTEM.md`，桌面端优先，支持窄屏基本适配；关键页面需提供截图/浏览器检查结果。
 

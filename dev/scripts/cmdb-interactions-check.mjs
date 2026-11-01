@@ -1,4 +1,4 @@
-import{chromium}from'../../keel-demo/node_modules/playwright/index.mjs';import fs from'node:fs';
+import{chromium}from'playwright';import fs from'node:fs';
 const env=Object.fromEntries(fs.readFileSync('dev/backend/.env','utf8').split('\n').filter(l=>l.includes('=')).map(l=>l.split(/=(.*)/s).slice(0,2)));const b=await chromium.launch();const p=await b.newPage({viewport:{width:1440,height:1000}});p.setDefaultTimeout(15000);const errors=[];const checks=[];p.on('pageerror',e=>errors.push(e.message));const base='http://localhost:5174';
 try{
 const login=await p.request.post(base+'/api/v1/auth/login',{data:{username:env.KEEL_LOGIN_USER||'admin',password:env.KEEL_LOGIN_PASSWORD}});if(!login.ok())throw Error('login failed');

@@ -1,6 +1,6 @@
 # Keel dev — BOM 智能开局配置
 
-前端从 keel-demo 复制到 dev，原 demo 5180 保留。BOM 六步工作台接真实 Go/PostgreSQL/MinIO；其他域仍明确使用原合成 Mock，不冒充真实设备后端。
+本目录是唯一应用开发入口，后续统一在Git dev分支开发；旧Demo已归档，不再独立运行。下文保留历史BOM实施说明，最新状态以根HANDOFF为准。BOM 六步工作台接真实 Go/PostgreSQL/MinIO；其他域仍明确使用原合成 Mock，不冒充真实设备后端。
 
 ## 启动
 

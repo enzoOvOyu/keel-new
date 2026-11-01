@@ -1,4 +1,4 @@
-import {chromium} from '../../keel-demo/node_modules/playwright/index.mjs';import fs from 'node:fs';import crypto from 'node:crypto';
+import {chromium} from 'playwright';import fs from 'node:fs';import crypto from 'node:crypto';
 const env=Object.fromEntries(fs.readFileSync('dev/backend/.env','utf8').split('\n').filter(l=>l.includes('=')).map(l=>l.split(/=(.*)/s).slice(0,2)));
 const browser=await chromium.launch({headless:true});const contexts=[];const created=[];const checks=[];const captures=[];const errors=[];const failed=[];const timings={};const project='proj-b300-demo',base='http://localhost:5174/api/v1';let admin;
 function assert(v,msg){if(!v)throw Error(msg)}

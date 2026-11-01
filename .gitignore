@@ -21,3 +21,7 @@ dev/backend/.secrets/
 
 # Private real workbook supplied for local BOM validation.
 bomv1.xlsx
+
+# Archived applications must not be restored into the active dev tree.
+/keel-demo/
+/web/

@@ -1,5 +1,14 @@
 # Keel 整合交接 · 2026-10-31
 
+## 当前开发约定：dev统一入口，旧Demo归档（2026-11-01）
+
+- 后续开发统一Git `dev`、代码目录 `dev/`，工作区 `/home/ubuntu/keel-dev`。main保留稳定版本；不再从旧作业平台或部署分支继续堆补丁。作业平台仍约20%且暂停，下一次接续按下方清单在最新dev完成。
+- 旧Demo历史Tag `archive/keel-mock-first-20261101` 保留4492819及其347个不在当前main祖先链的提交；旧应用完整快照Tag `archive/pre-dev-cleanup-20261101` 保留fc07c70。Tag已推送后才删除本地/远端demo分支。
+- 本次移除keel-demo/及旧web/，根Compose只保留PostgreSQL/Redis/MinIO；dev脚本不再依赖旧Demo的node_modules或向旧目录复制契约。保留现有fixtures、原型、业务代码和真实数据。
+- 本次是代码/Git整理，不执行docker up/down、服务切换、数据库迁移、AI调用或业务测试。现有5180/8081/5181及其他工作区原样保留，不把新dev工作区冒称当前运行环境。
+- 实际验证：归档Tag已推送；更新的JS/Python脚本语法检查通过；Compose配置仅返回minio/postgres/redis；88项真实API登记/423项设计操作的文档引用检查通过；暂存和未暂存差异检查通过。没有运行完整构建、业务回归或浏览器检查。
+
+
 作业平台继续开发先读 [2026-11-01接续检查点](docs/flows-redesign/implementation.md#2026-11-01-作业平台接续检查点)：原生UI仍约20%，保持暂停；已明确下步顺序和保护最新工程部署的边界。
 
 ## 当前交接：用户认可进度，合并智能开局工程至 main

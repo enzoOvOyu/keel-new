@@ -1,9 +1,0 @@
-{
-  "checks": [
-    "initial selected device trace",
-    "mouse selects server and resolves 10 cables",
-    "previous-device trace cleared",
-    "mouse selects switch and resolves ports",
-    "rack change resets selected device"
-  ]
-}

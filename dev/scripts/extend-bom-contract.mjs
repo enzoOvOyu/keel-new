@@ -1,4 +1,4 @@
-import fs from 'node:fs';import YAML from '../../keel-demo/node_modules/yaml/dist/index.js';
+import fs from 'node:fs';import YAML from 'yaml';
 const p='../../docs/openapi.yaml';const spec=YAML.parse(fs.readFileSync(new URL(p,import.meta.url),'utf8'));const S=spec.components.schemas;const str={type:'string'},int={type:'integer'},bool={type:'boolean'};const ref=n=>({$ref:'#/components/schemas/'+n});const arr=x=>({type:'array',items:x});const obj=(properties,required=Object.keys(properties))=>({type:'object',properties,required});
 S.BOMSourceCell=obj({source_cell:str,source_row:int,source_column:int,original_value:str,formula:str,hidden:bool,sensitive:bool,sheet_name:str},['source_cell','source_row','source_column','original_value','hidden','sensitive']);
 S.BOMDraftItem=obj({status:str,item_uid:str,category:str,serial:str,hostname:str,model:str,parent_uid:str,port_index:str,endpoint_a_uid:str,endpoint_b_uid:str,fields:{type:'object',additionalProperties:str},sources:{type:'object',additionalProperties:ref('BOMSourceCell')},sheet_name:str},['item_uid','category','serial','hostname','model','parent_uid','port_index','endpoint_a_uid','endpoint_b_uid','fields','sources','sheet_name']);
@@ -51,5 +51,5 @@ operation('/auth/logout','post','logoutBOMLocalSession',null,obj({status:str}));
 S.BOMPlacementCommand=obj({revision:int,item_uid:str,site:str,rack:str,u_start:int,u_height:int,rack_height:int,sheet_name:str,source_cell:str,reason:str});operation('/bom-imports/{import_id}/placements','patch','confirmBOMPlacement','BOMPlacementCommand',obj({revision:int}));
 S.BOMManualCorrection=obj({source_file:str,actor:str,reason:str,before:str,after:str,observed_at:{type:'string',format:'date-time'},source_kind:{type:'string',const:'manual'}});Object.assign(S.BOMDraftItem.properties,{manual_corrections:{type:'object',additionalProperties:ref('BOMManualCorrection')},sub_type:str});
 Object.assign(S.BOMItem.properties,{manual_corrections:{type:'object',additionalProperties:ref('BOMManualCorrection')}});
-const raw=YAML.stringify(spec,{aliasDuplicateObjects:false,lineWidth:0});for(const p of ['docs/openapi.yaml','keel-demo/docs/openapi.yaml'])fs.writeFileSync(new URL('../../'+p,import.meta.url),raw);
+const raw=YAML.stringify(spec,{aliasDuplicateObjects:false,lineWidth:0});for(const p of ['docs/openapi.yaml'])fs.writeFileSync(new URL('../../'+p,import.meta.url),raw);
 console.log('BOM dedicated schema extensions written');

@@ -1,35 +1,20 @@
-# Keel 本地开发
+# Keel 开发入口
 
-继续开发或切换环境先读 [HANDOFF.md](HANDOFF.md)：当前真实开发目录、启动方式、进度、未完成项与迁移说明。
+后续开发统一使用 **Git `dev` 分支**，应用代码位于 **`dev/`**。默认工作区 `/home/ubuntu/keel-dev`；继续任务先读 [HANDOFF](HANDOFF.md) 和 [执行约束](AGENTS.md)。`main` 为稳定整合分支，未经用户要求不自动合并或部署。
 
-当前交付演示项目位于 [`keel-demo/`](keel-demo/README.md)，访问地址为 <http://localhost:5180>。
-启动演示：在 `keel-demo/` 目录执行 `docker compose up -d`。
-下方是基础开发环境说明。
+## 当前应用与依赖
 
-设计规范见 [docs/README.md](docs/README.md)。当前开发入口为 dev/，认证、BOM 和 CMDB 已接 Go/PostgreSQL；其余业务页面仍通过统一 Mock Provider 演示。
+- 前端：`dev/`，React + TypeScript + Vite；安装及构建为 `cd dev && npm ci && npm run build`。
+- 后端：`dev/backend/`，Go；配置、启动和显式迁移见 [部署说明](docs/DEPLOYMENT.md)。凭据和原始Excel不入Git。
+- 根 `compose.yaml` 只提供PostgreSQL、Redis、MinIO。按需启动：`docker compose up -d postgres redis minio`；不再提供旧Web/Demo入口。不要为整理Git执行down或删除数据卷。
+- 当前服务仍为5180前端、8081 API、5181独立设计原型；运行工作区及二进制独立于Git分支，本次整理没有重启或迁移它们。新的dev工作区不会自动成为已部署环境。
+- 统一契约与真实实现范围见 [真实API入口](docs/REAL-API-CONTRACTS.md)。未接真实后端的领域继续使用dev中明确标记的Mock Adapter及现有fixtures。
 
-1. 可选：`cp .env.example .env`，按需调整本地配置。
-2. `docker compose up -d --build` 启动服务；`docker compose ps` 查看状态。
-3. 前端：<http://localhost:5174>；MinIO 控制台：<http://localhost:9001>。PostgreSQL、Redis 和 MinIO API 分别绑定本机 5432、6379、9000 端口。
-4. `docker compose stop` 停止服务；数据保存在独立 Docker volumes 中。不要使用 `down -v`，除非明确要删除本地数据。
+## 旧演示归档
 
-默认凭据仅适用于本机开发，正式环境应使用密钥管理。MinIO bucket 在接入对象存储时创建；目前不自动创建。前端依赖更新后重新执行 `docker compose up -d --build`。在 dev 目录运行 `npm ci && npm run build` 构建前端；后端启动和迁移见 `docs/DEPLOYMENT.md`。
+旧 `keel-demo/` 与 `web/` 已从当前应用树移除；有效的 `dev/`、`docs/`、`fixtures/` 保留。
 
-MinIO 默认使用本机已有的 `keel-minio:2025-10-15-9e49d5e` 镜像；其他机器需提供兼容的 MinIO 镜像并通过 `MINIO_IMAGE` 配置。
+- `archive/keel-mock-first-20261101`：独立旧Demo分支及其完整历史。
+- `archive/pre-dev-cleanup-20261101`：本次清理前完整main快照，包含旧应用目录。
 
-
-## 2026-10-30 全量数据包接入
-最新权威演示数据为 `fixtures/demo-full-64-b300/demo-seed.json`（来源 `keel-ia-v2.4-full-demo-pack.zip`），覆盖83个集合和33个工作簿结构Sheet。停止在运行时合并旧扩展种子或额外A100资产；其他两个项目仅上下文，不虚构额外设备。导入检查见 `docs/IA24-DATA-IMPORT-REPORT.json`，覆盖见 `docs/IA-V2.4-MOCK-COVERAGE.md`。真实Excel仍未提供；workbook-profile只作为提供的结构元数据，不等于本轮实际检查原工作簿。新包的旧PRD不能删去FR-18…24或放宽既有IPMI-only；不可解析项目成员不得自动授权。
-
-
-当前执行阶段为用户明确授权的IA v2.4前端Mock实施。OPS“本次只改设计文档”是历史设计阶段限制，不阻止本轮已授权的前端工作；保持IPMI-only及其他业务安全约束。当前导航、页面与真实验证记录见 `docs/IA24-IMPLEMENTATION-MATRIX.md`。不得把历史计划或只通过构建当作已完成业务验收。
-
-## 真实 CMDB 开发切片
-
-开发前端 http://localhost:5174 通过 Adapter 接入 Go/PostgreSQL CMDB；原演示保留5180。模型、接口、迁移、Schema扩展及真实/合成边界见 [CMDB真实设计](docs/CMDB-REAL-DESIGN.md)。保留原导航、主题及服务器五/交换机八Tab抽屉，其他未接入领域仍为明确Mock。
-
-
-真实项目创建入口：`/projects`，创建后进入该项目BOM。AI接入配置入口：`/admin/ai-provider`，支持OpenAI兼容Chat Completions和Keel mapping协议，配置由Go持久化，密钥不回显。说明见 [项目与AI配置](docs/PROJECT-AI-CONFIGURATION.md)。
-
-
-Flows 功能分支：见 [实施与运行记录](docs/flows-redesign/implementation.md)；原运行环境保持不变。
+归档仅供查阅，需要查看时在单独目录检出对应Tag，禁止合并到dev或启动旧演示覆盖现有端口。整理详情见 [交接记录](HANDOFF.md)。

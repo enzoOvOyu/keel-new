@@ -1,7 +1,0 @@
-{
-  "source": "synthetic_demo_only",
-  "changed_server_lldp_refs": [],
-  "rule": "switch-normalized-observation reverse relation, preserve endpoint mismatch and source_original",
-  "cable_endpoints_changed": false,
-  "verification": "NOT RUN"
-}

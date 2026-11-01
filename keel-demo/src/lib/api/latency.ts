@@ -1,2 +1,0 @@
-import {mockApi} from './index';
-export async function mockLatency(signal?:AbortSignal){if(signal?.aborted)throw new DOMException('Aborted','AbortError');if(mockApi.scenario!=='slow-loading')return;await new Promise<void>((resolve,reject)=>{const abort=()=>{clearTimeout(timer);reject(new DOMException('Aborted','AbortError'))};const timer=setTimeout(()=>{signal?.removeEventListener('abort',abort);resolve()},1500);signal?.addEventListener('abort',abort,{once:true})});}
