@@ -5,9 +5,9 @@
   "project_code": "TEST-Agent-MM-Ultra-03",
   "project_id": "proj-18101842-d821-4583-9229-a708f995c1c8",
   "source_id": "71a5c797-319b-496d-a6ce-f67c1080439c",
-  "job_id": "1f8db3ea-9902-4e94-9b91-a3cda90ea9af",
-  "runtime_revision": "fe6564d",
-  "prepared_revision": "fe6564d",
+  "job_id": "f3a0905f-e0fd-4dab-b229-325361e06ce5",
+  "runtime_revision": "6f99330",
+  "prepared_revision": "6f99330",
   "accepted_sheets": 5,
   "total_sheets": 15,
   "source_comparison": [
@@ -105,7 +105,7 @@
   "storage": "Complete tool artifacts/checkpoints remain in MinIO; PostgreSQL stores metadata and typed engineering facts",
   "reasoning_trial": "Default reasoning produced invalid textual tool payloads; restored prior working request settings without changing model",
   "test_scope": "Targeted AI/engineering checks, API build, real API documentation consistency and real workbook analysis only",
-  "equipment_extra_field_review": "NOT ACCEPTED: normalized critical fields match; extra site/room values require correction under v33 checks",
+  "equipment_extra_field_review": "Server site/room misbindings corrected in v33 and verified in MinIO; core source comparison passed. Full typed model not yet available.",
   "historical_equipment_core_comparison": [
     {
       "sheet": "Network Information",

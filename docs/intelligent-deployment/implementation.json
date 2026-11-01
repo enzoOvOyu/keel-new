@@ -1,7 +1,7 @@
 {
   "updated_at": "2026-11-01T05:29:49.409927+00:00",
   "branch": "dev",
-  "scope": "APIfe6564d/v33 deployed. Ultra-03 running; 7154 cabling rows x eight critical fields verified and 967 device rows x four core fields match after source position normalization. Extra site/room misbindings and complex sheets remain unaccepted. No CMDB publication.",
+  "scope": "API6f99330/v34 deployed. Ultra-03 resumes eight saved sheet candidates. Cabling7154 x8 and equipment967 x4 critical source fields matched; Server false location levels corrected. Power and remaining complex sheets unaccepted; no formal publication.",
   "phase_status": {
     "P0": "complete; report commit 314126d",
     "P1": "complete: architecture, models, contracts and kernel",
