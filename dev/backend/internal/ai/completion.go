@@ -199,6 +199,9 @@ func (p *Provider) complete(ctx context.Context, prompt string, input any, funct
 	}
 	p.Raw = append([]byte{}, raw...)
 	var response struct {
+		Error *struct {
+			Code int `json:"code"`
+		} `json:"error"`
 		Choices []struct {
 			Message struct {
 				Content   string `json:"content"`
@@ -216,7 +219,13 @@ func (p *Provider) complete(ctx context.Context, prompt string, input any, funct
 			Output *int `json:"completion_tokens"`
 		} `json:"usage"`
 	}
-	if json.Unmarshal(raw, &response) != nil || len(response.Choices) != 1 {
+	if json.Unmarshal(raw, &response) != nil {
+		return nil, errors.New("SCHEMA_VALIDATION_FAILED")
+	}
+	if response.Error != nil && response.Error.Code >= 400 && response.Error.Code <= 599 {
+		return nil, &ProviderError{Status: response.Error.Code, Reason: "upstream_error_envelope"}
+	}
+	if len(response.Choices) != 1 {
 		return nil, errors.New("SCHEMA_VALIDATION_FAILED")
 	}
 	if response.Choices[0].Finish == "length" {

@@ -1,3 +1,7 @@
+## 已完成里程碑事件：工具唯一键Schema简化与上游错误信封识别
+
+v26任务92fa07b9收到HTTP200但正文error.code=502且无choices，原客户端误报SCHEMA_VALIDATION_FAILED，未查询400原因。现按正文错误码识别Provider临时错误，不把其当作AI提案；原生列映射Schema改用已有标准properties/additionalProperties形式声明明确字段键。唯一键、作用域、原生工具及HTTP200错误信封定向检查和构建通过，v27继续同一来源；先前五张端接检查点保留。
+
 ## 已完成里程碑事件：工具字段绑定改为唯一键结构
 
 v24任务50a9ba49在Network Information反复输出label/model重复绑定后失败；五张端接7154条有效检查点保留。原生工具的columns现采用字段名到列号/单位的对象映射，再无损转换为既有规范数组；重复JSON键明确拒绝，未知属性仍由严格Schema拒绝，原始模型工具参数保存MinIO，不静默覆盖。内部模型、公共API、旧检查点数组结构不变。非法新结构的纠错上下文仍按Sheet保留。完整AI包、追加唯一键/历史隔离定向检查与Go构建通过；v26准备继续同一来源。

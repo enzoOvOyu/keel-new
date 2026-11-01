@@ -36,9 +36,9 @@ func TestEngineeringNativeToolsResumeSheetCheckpoint(t *testing.T) {
 		for _, tool := range toolList {
 			function := tool.(map[string]any)["function"].(map[string]any)
 			if function["name"] == "propose_engineering_model" {
-				fields := function["parameters"].(map[string]any)["$defs"].(map[string]any)["Region"].(map[string]any)["properties"].(map[string]any)["columns"].(map[string]any)["propertyNames"].(map[string]any)["enum"].([]any)
+				fields := function["parameters"].(map[string]any)["$defs"].(map[string]any)["Region"].(map[string]any)["properties"].(map[string]any)["columns"].(map[string]any)["properties"].(map[string]any)
 				found := false
-				for _, field := range fields {
+				for field := range fields {
 					if field == "cable_model" {
 						found = true
 					}
@@ -110,6 +110,19 @@ func TestProviderErrorPreservesSafeTransientReason(t *testing.T) {
 			t.Fatal("raw upstream error exposed")
 		}
 		server.Close()
+	}
+}
+
+func TestProviderHTTP200ErrorEnvelopeRemainsRetryable(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{"id":"synthetic","error":{"code":502,"message":"private upstream detail must not leak"}}`))
+	}))
+	defer server.Close()
+	p := Provider{Endpoint: server.URL, Timeout: time.Second}
+	_, err := p.completeJSON(context.Background(), "synthetic", map[string]string{})
+	var upstream *ProviderError
+	if !errors.As(err, &upstream) || upstream.Status != 502 || !upstream.Temporary() || upstream.Reason != "upstream_error_envelope" {
+		t.Fatalf("wrong error classification: %v", err)
 	}
 }
 
@@ -415,9 +428,9 @@ func TestMappingToolsFollowAgentDomainWithoutRestrictingReclassification(t *test
 			continue
 		}
 		defs := f["parameters"].(map[string]any)["$defs"].(map[string]any)
-		fields := defs["mapping_Region"].(map[string]any)["properties"].(map[string]any)["columns"].(map[string]any)["propertyNames"].(map[string]any)["enum"].([]string)
+		fields := defs["mapping_Region"].(map[string]any)["properties"].(map[string]any)["columns"].(map[string]any)["properties"].(map[string]any)
 		hasEndpoint := false
-		for _, field := range fields {
+		for field := range fields {
 			if field == "quantity" {
 				t.Error("quantity leaked into connection mapping")
 			}

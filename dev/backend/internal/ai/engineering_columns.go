@@ -18,10 +18,13 @@ func engineeringColumnMapSchema(definitions map[string]any, fields []string) {
 		"properties": map[string]any{"column": map[string]any{"type": "integer", "minimum": 1}, "unit": map[string]any{"type": "string"}},
 		"required":   []string{"column"},
 	}
+	properties := map[string]any{}
+	for _, field := range fields {
+		properties[field] = map[string]any{"$ref": "#/$defs/ColumnPosition"}
+	}
 	region["properties"].(map[string]any)["columns"] = map[string]any{
-		"type": "object", "propertyNames": map[string]any{"enum": fields},
-		"additionalProperties": map[string]any{"$ref": "#/$defs/ColumnPosition"},
-		"description":          "Map each evidenced engineering field ONCE to {column: absolute_column_number, unit: optional_unit}. Omit unsupported fields. Region bounds still cover unbound source columns.",
+		"type": "object", "properties": properties, "additionalProperties": false,
+		"description": "Map each evidenced engineering field ONCE to {column: absolute_column_number, unit: optional_unit}. Omit unsupported fields. Region bounds still cover unbound source columns.",
 	}
 	delete(definitions, "Column")
 }
