@@ -1,3 +1,9 @@
+## 已完成里程碑事件：首轮提示与错误上下文收敛
+
+- 同一Lightning模型在独立、打乱列顺序的简短语义探针中映射正确；不能仅归因模型能力。真实工作流中长全域提示、重复错误提案污染上下文，导致按词表顺序编列号。当前v10任务已受控停止，状态TEST_STOPPED_REPEATED_SEMANTIC_ERROR，无成功模型。
+- 首轮理解改用精简来源专用提示，复用注册表和字段能力；错误提案完整留MinIO，下一轮只带具体工具错误，不把错误大提案作为assistant示例。相同错误提案连续三次失败明确结束为ENGINEERING_AGENT_NO_PROGRESS，保留检查点。
+- 完整AI包检查（精简提示/反馈）及新增重复错误停止用例通过，Go构建通过。继续同一独立来源真实复测，不把简短语义探针当整本验收。
+
 ## 当前在线状态（覆盖下方历史快照）
 
 API v10 / f435b23已部署8081，前端5180仍为原页面加工程上传分流。真实任务9cbd085d-0aac-4af6-9200-cec24abf835b使用独立TEST-Agent-Free-Nemotron-Lightning Provider版本2，当前继续测试，整本理解尚未验收。原test/DeepSeek未改动；实际代码、进程和二进制摘要见deployment-agent-repair-20261101.json。没有CMDB发布或改动原Excel。

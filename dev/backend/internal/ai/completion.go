@@ -70,6 +70,7 @@ func (p *Provider) complete(ctx context.Context, prompt string, input any, funct
 			contextJSON, _ := json.Marshal(contextValues)
 			messages := []map[string]any{{"role": "system", "content": prompt}, {"role": "user", "content": string(contextJSON)}}
 			history, _ := values["history"].([]any)
+			toolErrors := []map[string]any{}
 			for i, entry := range history {
 				encoded, _ := json.Marshal(entry)
 				var item struct {
@@ -94,15 +95,27 @@ func (p *Provider) complete(ctx context.Context, prompt string, input any, funct
 				if name == "" {
 					continue
 				}
+				failure := item.Error
+				if result, ok := item.Result.(map[string]any); ok {
+					if detail, ok := result["error"].(string); ok {
+						failure = detail
+					}
+				}
+				if failure != "" {
+					toolErrors = append(toolErrors, map[string]any{"tool": name, "error": failure})
+					continue // Keep rejected large proposals in artifacts, not as examples to imitate.
+				}
 				delete(args, "action")
 				arguments, _ := json.Marshal(args)
 				id := fmt.Sprintf("history_%d", i)
 				result := item.Result
-				if item.Error != "" {
-					result = map[string]string{"error": item.Error}
-				}
 				resultJSON, _ := json.Marshal(result)
 				messages = append(messages, map[string]any{"role": "assistant", "tool_calls": []any{map[string]any{"id": id, "type": "function", "function": map[string]any{"name": name, "arguments": string(arguments)}}}}, map[string]any{"role": "tool", "tool_call_id": id, "content": string(resultJSON)})
+			}
+			if len(toolErrors) > 0 {
+				contextValues["tool_errors"] = toolErrors
+				contextJSON, _ = json.Marshal(contextValues)
+				messages[1]["content"] = string(contextJSON)
 			}
 			payload["messages"] = messages
 		}

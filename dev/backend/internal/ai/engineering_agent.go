@@ -69,7 +69,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 		}
 		proposal.Regions = validRegions
 	}
-	prompt, e := prompts.ReadFile("prompts/engineering-v1.txt")
+	prompt, e := prompts.ReadFile("prompts/engineering-source-v1.txt")
 	if e != nil {
 		return proposal, e
 	}
@@ -135,6 +135,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 	}
 	queued := []json.RawMessage{}
 	budget := max(24, len(w.Sheets)*16)
+	rejections := map[string]int{}
 	for turn := 0; turn < budget; turn++ {
 		pending := []string{}
 		for _, sheet := range sheetOrder {
@@ -193,6 +194,11 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 			history = append(history, map[string]any{"rejected_action": json.RawMessage(raw), "error": schemaErr.Error()})
 			if e := persist(); e != nil {
 				return proposal, e
+			}
+			key := engineering.Digest(string(raw)) + schemaErr.Error()
+			rejections[key]++
+			if rejections[key] >= 3 {
+				return proposal, errors.New("ENGINEERING_AGENT_NO_PROGRESS")
 			}
 			continue
 		}
@@ -337,6 +343,13 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 		history = boundedEngineeringHistory(append(history, map[string]any{"action": action, "result": result}))
 		if e := persist(); e != nil {
 			return proposal, e
+		}
+		if err != nil {
+			key := engineering.Digest(action) + err.Error()
+			rejections[key]++
+			if rejections[key] >= 3 {
+				return proposal, errors.New("ENGINEERING_AGENT_NO_PROGRESS")
+			}
 		}
 	}
 	return proposal, fmt.Errorf("ENGINEERING_AGENT_TURN_LIMIT")

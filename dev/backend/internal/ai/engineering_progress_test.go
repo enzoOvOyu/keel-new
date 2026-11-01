@@ -199,3 +199,46 @@ func TestEngineeringCorrectsMalformedToolOutputWithoutAcceptingIt(t *testing.T) 
 		t.Fatalf("correction failed: %s %v calls=%d archived=%d", raw, err, calls, archived)
 	}
 }
+
+func TestEngineeringRepeatedBadProposalStopsAndDoesNotPolluteContext(t *testing.T) {
+	calls := 0
+	bad := `{"action":"propose_engineering_model","sheet":"synthetic","proposal":{"summary":"bad mapping","regions":[{"sheet":"synthetic","bounds":{"start_row":1,"end_row":2,"start_column":1,"end_column":1},"kind":"power","semantic":"synthetic power","header_rows":[1],"columns":[{"field":"cable_label","column":1}]}]}}`
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var body struct {
+			Messages []struct {
+				Role    string `json:"role"`
+				Content string `json:"content"`
+			} `json:"messages"`
+		}
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if calls > 1 {
+			var input map[string]any
+			_ = json.Unmarshal([]byte(body.Messages[1].Content), &input)
+			if input["tool_errors"] == nil {
+				t.Error("missing correction feedback")
+			}
+			assistantCalls := 0
+			for _, m := range body.Messages {
+				if m.Role == "assistant" {
+					assistantCalls++
+				}
+			}
+			if assistantCalls != 1 {
+				t.Error("rejected proposal reintroduced as an assistant example")
+			}
+		}
+		content := bad
+		if calls == 0 {
+			content = `{"action":"inspect_sheet","sheet":"synthetic"}`
+		}
+		calls++
+		_ = json.NewEncoder(w).Encode(map[string]any{"choices": []any{map[string]any{"message": map[string]string{"content": content}}}})
+	}))
+	defer server.Close()
+	p := Provider{Endpoint: server.URL, Timeout: time.Second}
+	wb := bom.Workbook{Sheets: []bom.Sheet{{Name: "synthetic", Cells: []bom.Cell{{Ref: "A1", Row: 1, Column: 1, Value: "Power"}, {Ref: "A2", Row: 2, Column: 1, Value: "2"}}}}}
+	_, err := p.UnderstandEngineering(context.Background(), wb, func(string, string, string) error { return nil })
+	if err == nil || err.Error() != "ENGINEERING_AGENT_NO_PROGRESS" || calls != 4 {
+		t.Fatalf("unbounded errors: %v calls=%d", err, calls)
+	}
+}
