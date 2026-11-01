@@ -79,6 +79,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if s.flowsRoutes(w, r) {
 		return
 	}
+	if s.engineeringRoutes(w, r) {
+		return
+	}
 	if s.cmdbRoutes(w, r) {
 		return
 	}
@@ -446,6 +449,7 @@ func main() {
 		go flowService.SyncLoop(ctx)
 	}
 	go s.worker(ctx)
+	go s.engineeringWorker(ctx)
 	srv := &http.Server{Addr: env("LISTEN_ADDR", "127.0.0.1:8081"), Handler: s, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 60 * time.Second, WriteTimeout: 60 * time.Second, MaxHeaderBytes: 1 << 20}
 	go func() {
 		<-ctx.Done()

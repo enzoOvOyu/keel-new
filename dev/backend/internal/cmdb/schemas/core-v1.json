@@ -54241,7 +54241,8 @@
       ],
       "target_types": [
         "component",
-        "port"
+        "port",
+        "device"
       ],
       "direction": "outbound",
       "max_targets": 0,

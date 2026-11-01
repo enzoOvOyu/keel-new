@@ -1,5 +1,4 @@
-// P1 model contracts only. HTTP operations/providers are introduced with their
-// implemented vertical slice; these exports do not imply a deployed endpoint.
+// Typed engineering contracts and the first physical-model HTTP adapter.
 import type {components} from '../schemas/openapi';
 type Models = components['schemas'];
 export type WorkbookSource = Models['IDEWorkbookSource'];
@@ -31,3 +30,26 @@ export type NetworkPlan = Models['IDENetworkPlan'];
 export type PhysicalModel = Models['IDEPhysicalModel'];
 export type AttributeDefinition = Models['IDEAttributeDefinition'];
 export type AttributeValue = Models['IDEAttributeValue'];
+
+import {bomRequest} from './realBom';
+export type EngineeringWorkspace = Models['IDEWorkspace'];
+export type EngineeringModelView = Models['IDEModelView'];
+export type EngineeringRevision = Models['IDERevisionEntry'];
+export type EngineeringDifference = Models['IDERevisionDifference'];
+export type EngineeringTargetAction = Models['IDETargetAction'];
+export type SourceEvidence = Models['IDESourceEvidence'];
+const engineeringPath=(project:string,id?:string)=>'projects/'+encodeURIComponent(project)+'/engineering-imports'+(id?'/'+encodeURIComponent(id):'');
+export const engineeringImports=(project:string,signal?:AbortSignal)=>bomRequest<EngineeringWorkspace[]>(engineeringPath(project),'GET',undefined,undefined,signal);
+export const attachEngineeringSource=(project:string,importId:string)=>bomRequest<EngineeringWorkspace>(engineeringPath(project),'POST',{import_id:importId});
+export const engineeringWorkspace=(project:string,id:string,signal?:AbortSignal)=>bomRequest<EngineeringWorkspace>(engineeringPath(project,id),'GET',undefined,undefined,signal);
+export const engineeringModel=(project:string,id:string,signal?:AbortSignal)=>bomRequest<EngineeringModelView>(engineeringPath(project,id)+'/model','GET',undefined,undefined,signal);
+export const analyzeEngineering=(project:string,id:string,revision:number)=>bomRequest<EngineeringWorkspace>(engineeringPath(project,id)+'/analyze','POST',{expected_revision:revision});
+export const saveEngineeringModel=(project:string,id:string,request:Models['IDEModelEdit'])=>bomRequest<EngineeringWorkspace>(engineeringPath(project,id)+'/model','PUT',request);
+export const reviewEngineering=(project:string,id:string,request:EngineeringTargetAction)=>bomRequest<EngineeringWorkspace>(engineeringPath(project,id)+'/review','POST',request);
+export const publishEngineering=(project:string,id:string,request:EngineeringTargetAction,key:string)=>bomRequest<EngineeringWorkspace>(engineeringPath(project,id)+'/publish','POST',request,key);
+export const engineeringRevisions=(project:string,id:string,signal?:AbortSignal)=>bomRequest<EngineeringRevision[]>(engineeringPath(project,id)+'/revisions','GET',undefined,undefined,signal);
+export const engineeringDiff=(project:string,id:string,revision:string,signal?:AbortSignal)=>bomRequest<EngineeringDifference[]>(engineeringPath(project,id)+'/diff?revision_id='+encodeURIComponent(revision),'GET',undefined,undefined,signal);
+export const engineeringSource=(project:string,id:string,sheet:string,bounds:Models['IDEBounds'],signal?:AbortSignal)=>bomRequest<Models['BOMSourceCell'][]>(engineeringPath(project,id)+'/source?'+new URLSearchParams({sheet,...Object.fromEntries(Object.entries(bounds).map(([k,v])=>[k,String(v)]))}),'GET',undefined,undefined,signal);
+export const uploadEngineeringWorkbook=async(project:string,file:File,providerId:string)=>{const form=new FormData();form.append('file',file);form.append('import_mode','ai');if(providerId)form.append('provider_id',providerId);return bomRequest<{id:string}>('projects/'+encodeURIComponent(project)+'/bom-imports','POST',form)};
+export const engineeringUploadStatus=(project:string,id:string,signal?:AbortSignal)=>bomRequest<{id:string;status:string;error_code?:string}>('bom-imports/'+encodeURIComponent(id)+'?summary=true&project_id='+encodeURIComponent(project),'GET',undefined,undefined,signal);
+export const engineeringProviders=(project:string,signal?:AbortSignal)=>bomRequest<{id:string;name:string;model:string;is_default:boolean}[]>('ai/provider-options?project_id='+encodeURIComponent(project),'GET',undefined,undefined,signal);

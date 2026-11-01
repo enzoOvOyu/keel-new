@@ -1,15 +1,15 @@
 {
-  "updated_at": "2026-10-31",
+  "updated_at": "2026-11-01 02:59:31 UTC",
   "branch": "audit/intelligent-deployment-p0",
-  "scope": "P1 architecture and typed engineering kernel",
+  "scope": "P1 kernel and S1 physical engineering vertical slice; continuing later domains",
   "phase_status": {
     "P0": "complete; report commit 314126d",
     "P1": "complete: architecture, models, contracts and kernel",
-    "P2": "not implemented; existing Agent remains unchanged",
-    "P3": "provider and rule/run interfaces only; no calculation engine implementation",
-    "P4": "equipment/assembly/facility/placement model and pure validation only; vertical integration not implemented",
-    "P5": "state/review/receipt preconditions only; persistence and publishers not integrated",
-    "P6": "not implemented; existing UI unchanged"
+    "P2": "multiround tools and strict proposal schema connected; formula/rule tools still unsupported",
+    "P3": "interfaces only; next implementation milestone",
+    "P4": "first equipment/assembly/facility/placement vertical slice implemented; remaining domain batches pending",
+    "P5": "physical target review/revisions/Outbox/CMDB receipts implemented; later-domain releases pending",
+    "P6": "unified first-slice workbench implemented; interaction acceptance NOT RUN"
   },
   "implemented": [
     "Three-layer design, model ownership and relational schema design for all requested common and domain models",
@@ -19,7 +19,12 @@
     "Revision dependency invalidation limited to consumers; registry output copies cannot mutate trusted definitions",
     "Equipment quantity/identity, assembly cycle/parent constraints, facility hierarchy, rack bounds, U overlap and front/rear depth validation",
     "AI approval rejected; exact review revision/digest required; publication requires successful receipt",
-    "Replaceable SpreadsheetCalculationProvider interface; formula/cache/result and rule/run models separated"
+    "Replaceable SpreadsheetCalculationProvider interface; formula/cache/result and rule/run models separated",
+    "11 scoped engineering HTTP operations and relational migration027",
+    "Durable analysis jobs with leases; sanitized IR tools and deterministic local extraction",
+    "Independent exact-revision reviews, idempotent publication and existing Outbox retries",
+    "CMDB planned projection protects Observed payload and uses existing rack visualization",
+    "Unified source/model/evidence/issues/versions/review workbench; legacy import retained"
   ],
   "files": {
     "design": "docs/intelligent-deployment/P1-DESIGN.txt",
@@ -62,6 +67,36 @@
     {
       "command": "git diff --check",
       "result": "PASS"
+    },
+    {
+      "check": "TestEngineeringPhysicalPublication",
+      "result": "PASS",
+      "scope": "isolated PostgreSQL synthetic project; approval, target receipt, idempotency, duplicate pending denial, observed protection, reviewed reanalysis conflict; no real AI/workbook"
+    },
+    {
+      "check": "3 structural variants plus unknown dimension and invented constant checks",
+      "result": "PASS",
+      "scope": "synthetic mappings, renamed/reordered/shifted regions and units; not cross-customer AI acceptance"
+    },
+    {
+      "check": "TestEngineeringAgentUsesToolsAndRejectsApproval",
+      "result": "PASS",
+      "scope": "synthetic local model protocol, 3 tool calls and strict Pydantic"
+    },
+    {
+      "check": "tsc --noEmit -p dev/tsconfig.json",
+      "result": "PASS",
+      "scope": "frontend type checking only"
+    },
+    {
+      "check": "check-real-api-docs.mjs / git diff --check",
+      "result": "PASS",
+      "scope": "66 registered operations; no HTTP calls"
+    },
+    {
+      "check": "OpenAPI semantic comparison against b25915e",
+      "result": "PASS",
+      "scope": "9 added path entries /11 operations,28 schemas; no existing paths or schemas changed"
     }
   ],
   "not_run": [
@@ -82,16 +117,20 @@
     "live_frontend_changed": false
   },
   "next_vertical_slice": [
-    "Create source/module/revision and first-domain migrations from P1 schema design",
-    "Implement typed engineering HTTP contracts and durable service operations",
-    "Integrate multiround source tools and engineering proposals with existing Provider/job infrastructure",
-    "Review exact revisions and publish planned identities/placement through transaction and Outbox; protect observed facts",
-    "Connect unified workbench to existing CMDB rack view"
+    "Formula dependencies/provider/rule execution with durable calculation records",
+    "Connectivity and cabling vertical slice followed by power/material/workload/network batches"
   ],
   "limits": [
-    "The new kernel is not yet called by the current Agent/API/UI. It does not change current BOM behavior.",
-    "No provider implementation: source cache cannot be treated as a successful calculation.",
-    "No completed first vertical business chain or full P2–P6 acceptance is claimed.",
-    "Existing P0 source counts and arithmetic observations are historical evidence, not new test results."
-  ]
+    "No current environment migration or deployment",
+    "No true AI/source workbook/Golden Fixture/human Ground Truth acceptance",
+    "No browser interaction or cross-customer generalization acceptance",
+    "Formula execution and remaining engineering domains are still pending",
+    "Approved plan removal/tombstone publication remains to implement; current first-slice UI does not remove published entities"
+  ],
+  "changes": {
+    "migration_added": "027_engineering_physical.sql; applied only to isolated synthetic DB",
+    "http_operations_added": 11,
+    "current_environment_changed": false,
+    "original_workbooks_modified": false
+  }
 }

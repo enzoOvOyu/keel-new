@@ -15553,6 +15553,404 @@ paths:
         '503':
           description: Provider not configured
 
+  /projects/{projectId}/engineering-imports:
+    get:
+      operationId: listEngineeringImports
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listEngineeringImportsEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
+    post:
+      operationId: attachEngineeringSource
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/attachEngineeringSourceEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDEAttachSource'
+  /projects/{projectId}/engineering-imports/{engineeringId}:
+    get:
+      operationId: getEngineeringWorkspace
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getEngineeringWorkspaceEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
+  /projects/{projectId}/engineering-imports/{engineeringId}/analyze:
+    post:
+      operationId: analyzeEngineeringSource
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      responses:
+        '202':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/analyzeEngineeringSourceEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDEExpectedRevision'
+  /projects/{projectId}/engineering-imports/{engineeringId}/model:
+    get:
+      operationId: getEngineeringModel
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: revision_id
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getEngineeringModelEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
+    put:
+      operationId: editEngineeringModel
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/editEngineeringModelEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDEModelEdit'
+  /projects/{projectId}/engineering-imports/{engineeringId}/review:
+    post:
+      operationId: reviewEngineeringTargets
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/reviewEngineeringTargetsEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDETargetAction'
+  /projects/{projectId}/engineering-imports/{engineeringId}/publish:
+    post:
+      operationId: publishEngineeringTargets
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      responses:
+        '202':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/publishEngineeringTargetsEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDETargetAction'
+  /projects/{projectId}/engineering-imports/{engineeringId}/revisions:
+    get:
+      operationId: listEngineeringRevisions
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listEngineeringRevisionsEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
+  /projects/{projectId}/engineering-imports/{engineeringId}/diff:
+    get:
+      operationId: diffEngineeringRevision
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: revision_id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/diffEngineeringRevisionEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
+  /projects/{projectId}/engineering-imports/{engineeringId}/source:
+    get:
+      operationId: readEngineeringSource
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: sheet
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: start_row
+        required: true
+        schema:
+          type: integer
+      - in: query
+        name: end_row
+        required: true
+        schema:
+          type: integer
+      - in: query
+        name: start_column
+        required: true
+        schema:
+          type: integer
+      - in: query
+        name: end_column
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Project-authorized engineering draft/review/publication result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/readEngineeringSourceEnvelope'
+        '403':
+          description: Project/permission denied
+        '404':
+          description: Scoped resource not found
+        '409':
+          description: Revision, active task or idempotency conflict
+        '422':
+          description: Evidence, schema, dependency or review precondition failed
 components:
   securitySchemes:
     bearerAuth:
@@ -44796,6 +45194,548 @@ components:
       - quantity
       type: object
       x-implementation-status: model-contract-only
+    IDEColumnBinding:
+      type: object
+      additionalProperties: false
+      properties:
+        field:
+          type: string
+        column:
+          type: integer
+          minimum: 1
+        unit:
+          type: string
+      required:
+      - field
+      - column
+      - unit
+    IDEConstantBinding:
+      type: object
+      additionalProperties: false
+      properties:
+        field:
+          type: string
+        value:
+          type: string
+        evidence_cells:
+          type: array
+          items:
+            type: string
+      required:
+      - field
+      - value
+      - evidence_cells
+    IDERegionMapping:
+      type: object
+      additionalProperties: false
+      properties:
+        sheet:
+          type: string
+        bounds:
+          $ref: '#/components/schemas/IDEBounds'
+        kind:
+          type: string
+          enum:
+          - equipment
+          - assembly
+          - site
+          - room
+          - rack
+          - placement
+          - other
+        semantic:
+          type: string
+        header_rows:
+          type: array
+          items:
+            type: integer
+        columns:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEColumnBinding'
+        constants:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEConstantBinding'
+      required:
+      - sheet
+      - bounds
+      - kind
+      - semantic
+      - header_rows
+      - columns
+      - constants
+    IDEModuleDetection:
+      type: object
+      additionalProperties: false
+      properties:
+        module_id:
+          type: string
+        applicable:
+          type: boolean
+        reason:
+          type: string
+        sheets:
+          type: array
+          items:
+            type: string
+      required:
+      - module_id
+      - applicable
+      - reason
+      - sheets
+    IDEEngineeringProposal:
+      type: object
+      additionalProperties: false
+      properties:
+        summary:
+          type: string
+        regions:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDERegionMapping'
+        modules:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEModuleDetection'
+        questions:
+          type: array
+          items:
+            type: string
+      required:
+      - summary
+      - regions
+      - modules
+      - questions
+    IDESourceEvidence:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        sheet:
+          type: string
+        cell:
+          type: string
+        field:
+          type: string
+        entity_id:
+          type: string
+        formula:
+          type: boolean
+      required:
+      - id
+      - sheet
+      - cell
+      - field
+      - entity_id
+      - formula
+    IDETargetStatus:
+      type: object
+      additionalProperties: false
+      properties:
+        target:
+          type: string
+        state:
+          enum:
+          - NOT_APPLICABLE
+          - DETECTED
+          - NEEDS_INPUT
+          - READY
+          - PROCESSING
+          - IN_REVIEW
+          - APPROVED
+          - PUBLISHED
+          - BLOCKED
+          - STALE
+          type: string
+        revision_id:
+          type: string
+        digest:
+          type: string
+        review_id:
+          type: string
+        publication_id:
+          type: string
+        error_code:
+          type: string
+      required:
+      - target
+      - state
+      - revision_id
+      - digest
+    IDEEngineeringJob:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        state:
+          type: string
+          enum:
+          - pending
+          - running
+          - succeeded
+          - failed
+        error_code:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - state
+      - created_at
+      - updated_at
+    IDEEngineeringStep:
+      type: object
+      additionalProperties: false
+      properties:
+        sequence:
+          type: integer
+        tool:
+          type: string
+        detail:
+          type: string
+        state:
+          type: string
+        at:
+          type: string
+          format: date-time
+      required:
+      - sequence
+      - tool
+      - detail
+      - state
+      - at
+    IDEWorkspace:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        project_id:
+          type: string
+        import_id:
+          type: string
+        filename:
+          type: string
+        sha256:
+          type: string
+        revision:
+          type: integer
+        head_revision_id:
+          type: string
+        summary:
+          type: string
+        total_cells:
+          type: integer
+        mapped_cells:
+          type: integer
+        retained_cells:
+          type: integer
+        modules:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEModuleDetection'
+        targets:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDETargetStatus'
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEValidationIssue'
+        questions:
+          type: array
+          items:
+            type: string
+        latest_job:
+          $ref: '#/components/schemas/IDEEngineeringJob'
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEEngineeringStep'
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - project_id
+      - import_id
+      - filename
+      - sha256
+      - revision
+      - summary
+      - total_cells
+      - mapped_cells
+      - retained_cells
+      - modules
+      - targets
+      - issues
+      - questions
+      - steps
+      - created_at
+    IDERevisionEntry:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        sequence:
+          type: integer
+        actor:
+          type: string
+        origin:
+          type: string
+          enum:
+          - agent
+          - human
+        reason:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - sequence
+      - actor
+      - origin
+      - reason
+      - created_at
+    IDERevisionDifference:
+      type: object
+      additionalProperties: false
+      properties:
+        entity_id:
+          type: string
+        kind:
+          type: string
+        change:
+          type: string
+          enum:
+          - added
+          - removed
+          - changed
+        before:
+          type: string
+        after:
+          type: string
+      required:
+      - entity_id
+      - kind
+      - change
+      - before
+      - after
+    IDEModelView:
+      type: object
+      additionalProperties: false
+      properties:
+        model:
+          $ref: '#/components/schemas/IDEPhysicalModel'
+        evidence:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDESourceEvidence'
+      required:
+      - model
+      - evidence
+    IDEAttachSource:
+      type: object
+      additionalProperties: false
+      properties:
+        import_id:
+          type: string
+      required:
+      - import_id
+    IDEExpectedRevision:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_revision:
+          type: integer
+          minimum: 1
+      required:
+      - expected_revision
+    IDEModelEdit:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_revision:
+          type: integer
+          minimum: 1
+        model:
+          $ref: '#/components/schemas/IDEPhysicalModel'
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - expected_revision
+      - model
+      - reason
+    IDETargetAction:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_revision:
+          type: integer
+          minimum: 1
+        targets:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            type: string
+            enum:
+            - CMDB_PLANNED_EQUIPMENT
+            - CMDB_PLANNED_FACILITY
+            - CMDB_PLANNED_PLACEMENT
+        decision:
+          type: string
+          enum:
+          - approve
+          - reject
+          - publish
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - expected_revision
+      - targets
+      - decision
+      - reason
+    listEngineeringImportsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    attachEngineeringSourceEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getEngineeringWorkspaceEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    analyzeEngineeringSourceEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getEngineeringModelEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEModelView'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    editEngineeringModelEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    reviewEngineeringTargetsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    publishEngineeringTargetsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    listEngineeringRevisionsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDERevisionEntry'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    diffEngineeringRevisionEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDERevisionDifference'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    readEngineeringSourceEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/BOMSourceCell'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
 x-implementation-policy:
   frontend-first: true
   mock-provider-required: true

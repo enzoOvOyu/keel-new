@@ -72,6 +72,6 @@ node dev/scripts/check-real-api-docs.mjs
 
 Flows当前登记49个操作（开发补齐afe8cb9），加原5个可视化共54项。新增Schedule/文件版本与分发/步骤/审批/持久事件的契约均在Flows使用文档与OpenAPI；不是逐端点生产验收声明。
 
-## 智能开局工程 P1 模型契约
+## 智能开局工程
 
-OpenAPI新增 `IDE*` 闭合模型Schema；没有新增或修改HTTP操作。Go类型与前端生成类型见 [P1实施记录](intelligent-deployment/implementation.json)，领域边界见 [P1设计](intelligent-deployment/P1-DESIGN.txt)。当前仅模型、模块计划及校验内核，不登记为真实工程API已实现/已部署。后续按首批纵向链接入Handler、Adapter及发布消费者时再逐操作登记。
+[P1设计](intelligent-deployment/P1-DESIGN.txt)保留三层模型和分域边界。S1已增加11个真实HTTP操作、类型化存储、Agent多轮工具、独立审核与Outbox planned投影，契约见[工程接口](api/engineering.md)，实际检查及缺口见[实施记录](intelligent-deployment/implementation.json)。没有部署到当前环境，也没有声称真实AI、真实XLSX及跨客户泛化验收通过。

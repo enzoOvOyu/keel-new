@@ -1,13 +1,24 @@
 # Keel 当前开发交接
 
-## 当前任务：通用智能开局工程重构（P1已完成）
+## 本轮里程碑时间线（UTC，2026-11-01）
 
-用户批准在 `audit/intelligent-deployment-p0` 继续，工作树 `/home/ubuntu/keel-engineering-p0`。P0审计314126d；P1设计提交582b19e。入口 `docs/intelligent-deployment/P1-DESIGN.txt`，实际实施/检查状态 `docs/intelligent-deployment/implementation.json`。
+- 02:23:42：继续首批纵向链开发。已起草结构化存储迁移027、工作台/任务/区域映射类型；尚未完成集成，未应用迁移、未部署。用户要求：每个里程碑记录真实时间与检查结果，持续推进至开发完成。
+- 02:51:42：首批后端闭环定向检查通过。隔离数据库 `keel_engineering_dbf4e8ad88` 的合成资料完成类型化草案、人工审核、分域Outbox投影、幂等重放、现有机柜图查询；规划U位修改保留Observed原payload及无关域发布状态。没有真实AI/原始XLSX入库、没有当前环境迁移或部署。工作台已接接口，正在完成类型与Agent协议检查，尚未提交本阶段。
 
-本次新增66个闭合OpenAPI模型Schema、Go类型、前端类型导出；`internal/engineering`实现可信模块注册、10状态门禁、依赖分批/局部阻断、消费者STALE传播，以及设备/组合/位置确定性校验。Formula Provider仅接口，未实现Calc或规则执行器。9项内核单元检查、go vet、契约Schema/增量TS/文档检查通过；没有跑冒烟、回归、真实AI或导入。
+- 02:59:31：S1开发里程碑。新增合成检查验证在途重复发布拒绝、已确认值保护、结构变体和单位换算；隔离数据库链、AI协议、TS、文档一致性均通过。真实资料与当前环境未验证/未部署。记录后提交并继续计算与后续工程域。
 
-**当前业务行为未切换。** 新内核尚未接入现有Agent、HTTP、数据库和工作台，首条设备→落位→发布→CMDB链尚未完成；不能将本次P1交付称为新Agent已可用。没有迁移/部署/线上数据变化。下一完整纵向链按实施记录接入来源、持久任务、分域审核与Outbox planned投影，保护Observed并复用原机柜图。不恢复旧Agent修补或同时实施全部工程域。
 
+## 当前任务：通用智能开局工程重构（S1开发完成，继续P3及后续工程域）
+
+用户要求持续开发并记录每个里程碑时间。分支`audit/intelligent-deployment-p0`，工作树`/home/ubuntu/keel-engineering-p0`，origin必须为enzoOvOyu/keel-new。P0=314126d，P1设计=582b19e，P1内核=b25915e。
+
+首批完整开发链已接入：原始来源→多轮Agent区域/字段建议→确定性设备/组合/场地/落位模型→独立审核→事务Outbox planned投影→原CMDB机柜图。11个HTTP操作、迁移027及统一工程工作台已实现，历史导入保留。当前运行环境未部署、原业务库没有应用新迁移。
+
+定向隔离数据库链检查、结构变体/单位/未知值检查、AI多轮协议/Pydantic约束、TypeScript与接口文档校验通过。AI使用本地合成协议服务；没有真实AI、真实XLSX、浏览器交互、参考公式引擎或跨客户验收。各项检查详情见`docs/intelligent-deployment/implementation.json`，接口见`docs/api/engineering.md`。
+
+下一步：P3可替换公式计算Provider、依赖和工程规则执行；随后依次扩展连接/线缆、电力/冷却、物料/工程量及网络规划。当前公式调用明确unsupported，不算完整P2/P3实现。设备组不能直接发布成实例；其他域资料保留为来源。未完成边界不能包装成整个任务已完成。
+
+隔离检查数据库`keel_engineering_dbf4e8ad88`仅合成项目，复用同一隔离库做必要定向检查；开发结束时可删除此库。生产`keel`未写入。私有运行脚本`/tmp/keel-engineering-run-integration.py`及状态文件只在本机，不入Git。
 
 ## 用户决定：停止旧Agent补丁并重新开发开局配置
 

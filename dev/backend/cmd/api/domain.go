@@ -514,9 +514,21 @@ func (s *Server) publish(ctx context.Context) {
 			if eventType == "project.objects.delete" {
 				code = "PROJECT_STORAGE_CLEANUP_FAILED"
 			}
+			if eventType == "engineering.published" {
+				s.db.Exec(recovery, "UPDATE eng_publication SET state='failed',error_code='CMDB_PROJECTION_RETRYING' WHERE outbox_id=$1 AND state<>'published'", id)
+			}
 			s.db.Exec(recovery, "UPDATE outbox_event SET retry_count=retry_count+1,last_error_code=$2,next_attempt_at=now()+make_interval(secs=>LEAST(60,POWER(2,LEAST(retry_count,6)))::int) WHERE id=$1 AND published_at IS NULL", id, code)
 		}
 	}()
+	if eventType == "engineering.published" {
+		if e = s.publishEngineering(ctx, tx, id, project, raw); e != nil {
+			return
+		}
+		if _, e = tx.Exec(ctx, "UPDATE outbox_event SET published_at=now(),last_error_code=NULL WHERE id=$1", id); e == nil {
+			completed = tx.Commit(ctx) == nil
+		}
+		return
+	}
 	if eventType == "project.objects.delete" {
 		var deletion struct {
 			Prefix string `json:"prefix"`

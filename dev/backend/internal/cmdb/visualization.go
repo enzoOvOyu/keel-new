@@ -191,6 +191,10 @@ func (s Service) visualizationRead(ctx context.Context, scope Scope, rack, focus
 	}
 	rels.Close()
 
+	if e = engineeringPlanningFields(ctx, tx, all); e != nil {
+		return out, e
+	}
+
 	// A planned physical fact and an observed claim remain distinct. Avoid
 	// silently selecting whichever relation happens to sort last by UUID.
 	for _, asset := range all {

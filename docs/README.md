@@ -105,4 +105,4 @@ Flows 功能分支：见 [实施与运行记录](flows-redesign/implementation.m
 
 ## 当前智能开局工程重构
 
-用户已批准从P0进入P1及分批重构。架构与模型见 [P1设计](intelligent-deployment/P1-DESIGN.txt)，已实现/未实现与检查见 [实施记录](intelligent-deployment/implementation.json)。本次只完成模型契约和内核，原Agent/页面/运行环境没有切换；不能按设计存在推定新能力已上线。
+用户已批准从P0进入P1及分批重构。架构与模型见 [P1设计](intelligent-deployment/P1-DESIGN.txt)，已实现/未实现与检查见 [实施记录](intelligent-deployment/implementation.json)。P1模型内核之后已接入首批设备/落位工程工作台、真实API和分域发布，详见实施记录；当前运行环境未切换，开发完成不等于上线或业务验收通过。

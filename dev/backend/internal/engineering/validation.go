@@ -125,6 +125,7 @@ func ValidatePhysical(m PhysicalModel) []ValidationIssue {
 		}
 		switch e.IdentityKind {
 		case "group":
+			issue("PLANNING_GROUP_REQUIRES_INSTANCE_IDENTITIES", eqTarget, "equipment", "identity_kind", "设备数量组保留为工程规划，发布物理资产前需明确各实例身份", e.EntityVersion)
 			if e.Serial != nil && *e.Serial != "" {
 				issue("GROUP_SERIAL_INVALID", eqTarget, "equipment", "serial", "数量组不能共享单个实物SN", e.EntityVersion)
 			}

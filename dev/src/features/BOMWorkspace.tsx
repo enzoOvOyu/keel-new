@@ -1,2 +1,4 @@
+import {useSearchParams} from 'react-router-dom';
 import {RealBOMWorkspace} from './RealBOMWorkspace';
-export function BOMWorkspace(){return <RealBOMWorkspace/>}
+import {EngineeringWorkbench} from './EngineeringWorkbench';
+export function BOMWorkspace(){const [params]=useSearchParams();return params.get('legacy')==='1'?<RealBOMWorkspace/>:<EngineeringWorkbench/>}
