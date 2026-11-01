@@ -27,7 +27,11 @@ type engineeringAction struct {
 	Inputs   []engineering.NamedValue         `json:"inputs,omitempty"`
 }
 
+// Increment when source interpretation changes invalidate previously accepted mappings.
+const engineeringCheckpointVersion = 2
+
 type EngineeringCheckpoint struct {
+	Version         int                             `json:"version"`
 	Proposal        engineering.EngineeringProposal `json:"proposal"`
 	InspectedSheets []string                        `json:"inspected_sheets"`
 	History         []any                           `json:"history"`
@@ -48,6 +52,9 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 	var hooks EngineeringToolHooks
 	if len(options) > 0 {
 		hooks = options[0]
+	}
+	if hooks.Resume != nil && hooks.Resume.Version != engineeringCheckpointVersion {
+		hooks.Resume = nil
 	}
 	var graph []engineering.FormulaEvidence
 	var proposal engineering.EngineeringProposal
@@ -122,7 +129,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 		if hooks.Checkpoint == nil {
 			return nil
 		}
-		checkpoint := EngineeringCheckpoint{Proposal: proposal, CompletedSheets: []string{}, InspectedSheets: []string{}, History: boundedEngineeringHistory(history)}
+		checkpoint := EngineeringCheckpoint{Version: engineeringCheckpointVersion, Proposal: proposal, CompletedSheets: []string{}, InspectedSheets: []string{}, History: boundedEngineeringHistory(history)}
 		for _, sheet := range w.Sheets {
 			if completed[sheet.Name] {
 				checkpoint.CompletedSheets = append(checkpoint.CompletedSheets, sheet.Name)
@@ -457,6 +464,7 @@ func appendUnique(values []string, more ...string) []string {
 // Structural blocks are hints only. The agent still chooses semantics and mappings.
 // Samples bound the prompt while extraction always reads every mapped source row.
 func engineeringSheetPreview(s bom.Sheet, regions []bom.Region) any {
+	regions = engineeringSourceSpans(regions)
 	rows := map[int]bool{}
 	last := 0
 	for _, r := range regions {
@@ -485,7 +493,7 @@ func engineeringSheetPreview(s bom.Sheet, regions []bom.Region) any {
 		full.EndRow = max(full.EndRow, cell.Row)
 		full.EndColumn = max(full.EndColumn, cell.Column)
 	}
-	return map[string]any{"sheet": s.Name, "full_sheet_bounds": full, "merges": s.Merges, "regions": regions, "regions_are_reading_chunks_not_tables": true, "sample_cells": samples, "header_hints": hints, "sample_is_not_full_data": true}
+	return map[string]any{"sheet": s.Name, "full_sheet_bounds": full, "merges": s.Merges, "regions": regions, "regions_are_occupied_spans_not_semantic_tables": true, "sample_cells": samples, "header_hints": hints, "sample_is_not_full_data": true}
 }
 
 func boundedEngineeringHistory(history []any) []any {
@@ -651,4 +659,27 @@ func engineeringCellPreview(cells []bom.Cell) []map[string]any {
 		out = append(out, v)
 	}
 	return out
+}
+
+// Undo the IR paging boundary before showing structural spans to the Agent.
+// Blank rows still separate spans; semantic tables remain the Agent's decision.
+func engineeringSourceSpans(chunks []bom.Region) []bom.Region {
+	spans := []bom.Region{}
+	for _, r := range chunks {
+		if len(spans) > 0 {
+			last := &spans[len(spans)-1]
+			if last.Sheet == r.Sheet && r.Start <= last.End+1 {
+				last.End = max(last.End, r.End)
+				last.FirstColumn = min(last.FirstColumn, r.FirstColumn)
+				last.LastColumn = max(last.LastColumn, r.LastColumn)
+				last.Cells += r.Cells
+				a, _ := excelize.CoordinatesToCellName(last.FirstColumn, last.Start)
+				z, _ := excelize.CoordinatesToCellName(last.LastColumn, last.End)
+				last.Range = a + ":" + z
+				continue
+			}
+		}
+		spans = append(spans, r)
+	}
+	return spans
 }

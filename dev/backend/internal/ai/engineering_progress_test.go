@@ -20,7 +20,7 @@ func TestEngineeringNativeToolsResumeSheetCheckpoint(t *testing.T) {
 	makeProposal := func(sheet string) engineering.EngineeringProposal {
 		return engineering.EngineeringProposal{Summary: "Evidence-based inventory", Regions: []engineering.RegionMapping{{Sheet: sheet, Bounds: engineering.Bounds{StartRow: 1, EndRow: 2, StartColumn: 1, EndColumn: 1}, Kind: "equipment", Semantic: "inventory", HeaderRows: []int{1}, Columns: []engineering.ColumnBinding{{Field: "label", Column: 1}}, Constants: []engineering.ConstantBinding{}}}, Modules: []engineering.ModuleDetection{}, Questions: []string{}}
 	}
-	prior := EngineeringCheckpoint{Proposal: makeProposal("previous"), CompletedSheets: []string{"previous"}}
+	prior := EngineeringCheckpoint{Version: engineeringCheckpointVersion, Proposal: makeProposal("previous"), CompletedSheets: []string{"previous"}}
 	calls, saved, artifacts := 0, 0, 0
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var body map[string]json.RawMessage
@@ -240,5 +240,12 @@ func TestEngineeringRepeatedBadProposalStopsAndDoesNotPolluteContext(t *testing.
 	_, err := p.UnderstandEngineering(context.Background(), wb, func(string, string, string) error { return nil })
 	if err == nil || err.Error() != "ENGINEERING_AGENT_NO_PROGRESS" || calls != 4 {
 		t.Fatalf("unbounded errors: %v calls=%d", err, calls)
+	}
+}
+
+func TestSourceSpansHidePagingBoundariesButPreserveBlankSeparators(t *testing.T) {
+	spans := engineeringSourceSpans([]bom.Region{{Sheet: "synthetic", Start: 4, End: 259, FirstColumn: 2, LastColumn: 8}, {Sheet: "synthetic", Start: 260, End: 500, FirstColumn: 3, LastColumn: 9}, {Sheet: "synthetic", Start: 502, End: 510, FirstColumn: 2, LastColumn: 8}})
+	if len(spans) != 2 || spans[0].Start != 4 || spans[0].End != 500 || spans[0].Range != "B4:I500" || spans[1].Start != 502 {
+		t.Fatalf("incorrect source spans: %+v", spans)
 	}
 }
