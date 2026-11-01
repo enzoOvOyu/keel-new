@@ -1,0 +1,128 @@
+{
+  "status": "IN_PROGRESS",
+  "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+  "provider_revision": 3,
+  "project_code": "TEST-Agent-MM-Ultra-03",
+  "project_id": "proj-18101842-d821-4583-9229-a708f995c1c8",
+  "source_id": "71a5c797-319b-496d-a6ce-f67c1080439c",
+  "job_id": "50a9ba49-be28-4832-83a1-f593bcf27228",
+  "runtime_revision": "31dbe52",
+  "prepared_revision": "1df3a86",
+  "accepted_sheets": 5,
+  "total_sheets": 15,
+  "source_comparison": [
+    {
+      "sheet": "Network Information",
+      "expected_rows": 189,
+      "regions": 0,
+      "field_matches": {
+        "label": 0,
+        "model": 0,
+        "rack": 0,
+        "start_u": 0
+      }
+    },
+    {
+      "sheet": "Server Information",
+      "expected_rows": 778,
+      "regions": 0,
+      "field_matches": {
+        "label": 0,
+        "model": 0,
+        "rack": 0,
+        "start_u": 0
+      }
+    },
+    {
+      "sheet": "Cabling_EW_SP-LF",
+      "expected_rows": 2592,
+      "regions": 1,
+      "field_matches": {
+        "a_device": 2592,
+        "a_port": 2592,
+        "z_device": 2592,
+        "z_port": 2592,
+        "cable_model": 2592,
+        "length": 2592,
+        "a_optic": 2592,
+        "z_optic": 2592
+      }
+    },
+    {
+      "sheet": "Cabling_NS",
+      "expected_rows": 484,
+      "regions": 1,
+      "field_matches": {
+        "a_device": 484,
+        "a_port": 484,
+        "z_device": 484,
+        "z_port": 484,
+        "cable_model": 484,
+        "length": 484,
+        "a_optic": 484,
+        "z_optic": 484
+      }
+    },
+    {
+      "sheet": "Cabling_GB_OUT",
+      "expected_rows": 3456,
+      "regions": 1,
+      "field_matches": {
+        "a_device": 3456,
+        "a_port": 3456,
+        "z_device": 3456,
+        "z_port": 3456,
+        "cable_model": 3456,
+        "length": 3456,
+        "a_optic": 3456,
+        "z_optic": 3456
+      }
+    },
+    {
+      "sheet": "Cabling_OOB",
+      "expected_rows": 216,
+      "regions": 1,
+      "field_matches": {
+        "a_device": 216,
+        "a_port": 216,
+        "z_device": 216,
+        "z_port": 216,
+        "cable_model": 216,
+        "length": 216,
+        "a_optic": 216,
+        "z_optic": 216
+      }
+    },
+    {
+      "sheet": "Cabling_HDD_SSD_CPU",
+      "expected_rows": 406,
+      "regions": 1,
+      "field_matches": {
+        "a_device": 406,
+        "a_port": 406,
+        "z_device": 406,
+        "z_port": 406,
+        "cable_model": 406,
+        "length": 406,
+        "a_optic": 406,
+        "z_optic": 406
+      }
+    }
+  ],
+  "limits": [
+    "Source-column and row coverage verified against independent OOXML baseline; not full formula reference calculation or final typed model acceptance",
+    "No formal CMDB publication",
+    "No topology or cross-customer acceptance"
+  ],
+  "root_causes_fixed": [
+    "Only first invalid binding returned; now all invalid/duplicate columns supplied together",
+    "Large source read rejected instead of paged, and reversed absolute coordinates lacked guidance",
+    "Queued tool calls continued after failure, causing no-progress before the model saw feedback",
+    "Read loop did not require interpretation after bounded evidence",
+    "Other-sheet tool context persisted across a resumed/rejected sheet",
+    "Known manufacturer/brand and invalid length-state columns could pass domain vocabulary checks"
+  ],
+  "storage": "Complete tool artifacts/checkpoints remain in MinIO; PostgreSQL stores metadata and typed engineering facts",
+  "reasoning_trial": "Default reasoning produced invalid textual tool payloads; restored prior working request settings without changing model",
+  "test_scope": "Targeted AI/engineering checks, API build, real API documentation consistency and real workbook analysis only"
+}
