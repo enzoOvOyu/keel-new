@@ -1,10 +1,10 @@
 {
   "version": 1,
   "updated_at": "2026-11-01",
-  "coverage": "Agent repair645eeb6/v18 deployed8081; engineering upload frontend unchanged. User-authorized fresh Ultra test in progress; full workbook understanding pending. No CMDB/topology publication acceptance.",
+  "coverage": "Agent repairdef536f/v20 deployed8081; engineering upload frontend unchanged. Ultra-03 real analysis resumed; full workbook understanding pending. No CMDB/topology publication acceptance.",
   "schema_authority": "docs/openapi.yaml",
-  "code_revision": "645eeb6",
-  "deployed_revision": "645eeb6",
+  "code_revision": "def536f",
+  "deployed_revision": "def536f",
   "deployment_evidence": "docs/intelligent-deployment/deployment-agent-repair-20261101.json",
   "operations": [
     {

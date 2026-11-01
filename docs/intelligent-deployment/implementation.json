@@ -1,7 +1,7 @@
 {
   "updated_at": "2026-11-01T05:29:49.409927+00:00",
   "branch": "dev",
-  "scope": "API645eeb6/v18 deployed. User requested continuing repair and real Ultra test; fresh TEST-Agent-MM-Ultra-03 is running, full workbook understanding not yet accepted. Historical Ultra-02 and Lightning outcomes remain separate evidence.",
+  "scope": "APIdef536f/v20 deployed. Ultra-03 analysis resumed after actionable feedback, range paging and first-error batch correction fixes. Whole workbook acceptance pending; historical model runs remain separate.",
   "phase_status": {
     "P0": "complete; report commit 314126d",
     "P1": "complete: architecture, models, contracts and kernel",

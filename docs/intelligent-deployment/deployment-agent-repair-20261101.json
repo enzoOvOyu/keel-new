@@ -1,12 +1,12 @@
 {
-  "code_revision": "645eeb6",
+  "code_revision": "def536f",
   "branch": "dev",
   "repository": "enzoOvOyu/keel-new",
   "api": {
     "port": 8081,
-    "binary": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/keel-api-v18",
-    "pid": 1308752,
-    "sha256": "d1dcae7205f3233316887a39c49cc03bcfa968141768d1d5e8d5213cad6e4c10",
+    "binary": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/keel-api-v20",
+    "pid": 1314776,
+    "sha256": "556d867432acda7fcadf0262cb324e8207bc0f05ef32e670ee0d8a0de9578c8f",
     "cwd": "/home/ubuntu/keel/dev/backend",
     "session": "keel-cmdb-api"
   },
@@ -32,12 +32,13 @@
     "native_tools_checkpoint_and_provider_errors": "PASS",
     "source_upload": "PASS: engineering mode; zero legacy recognition jobs",
     "minio_artifact_write_read": "PASS: actual artifact roundtrip",
-    "full_real_workbook_understanding": "RUNNING: fresh TEST-Agent-MM-Ultra-03; user-selected Ultra, full workbook acceptance pending",
+    "full_real_workbook_understanding": "RUNNING: Ultra-03 source resumed with corrected batch feedback; no accepted complete model yet",
     "frontend_upload_module": "HTTP 200; browser not run",
     "artifact_recovery_scope_hash_cleanup": "PASS: isolated PostgreSQL and synthetic S3, including new service instance restore, wrong project/revision/claim rejection, integrity verification and index cascade",
     "typescript_engineering_adapter": "PASS",
     "scoped_native_tool_protocol": "HTTP400 duplicate $defs conflict independently reproduced; isolated definitions gave HTTP200/tool_calls",
-    "binding_and_formula_feedback": "PASS: internal/ai including corrective feedback and actual formula references"
+    "binding_and_formula_feedback": "PASS: internal/ai including corrective feedback and actual formula references",
+    "range_paging_and_batch_feedback": "PASS: internal/ai and Go build; oversized reads return explicit pages, first rejected call stops queued batch"
   },
   "rollback": {
     "api_launcher": "/home/ubuntu/.local/state/keel-deployments/engineering-5abb94f/api-run.py",
