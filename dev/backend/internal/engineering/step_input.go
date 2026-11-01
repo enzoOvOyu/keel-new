@@ -158,8 +158,7 @@ func PreviewStepInput(q InputPreviewRequest) InputPreview {
 					problem(row, f.Code, "INVALID_MAC", "MAC应为48位地址")
 				}
 			case "number", "positive", "positive_integer":
-				n, e := strconv.ParseFloat(value, 64)
-				if e != nil || strings.EqualFold(value, "nan") || strings.Contains(strings.ToLower(value), "inf") || f.Kind != "number" && n <= 0 {
+				if !decimal(value) || f.Kind != "number" && !positive(value) {
 					problem(row, f.Code, "INVALID_NUMBER", "数值或范围无效")
 				} else if f.Kind == "positive_integer" {
 					if _, e := strconv.ParseUint(value, 10, 64); e != nil {
@@ -174,4 +173,11 @@ func PreviewStepInput(q InputPreviewRequest) InputPreview {
 	}
 	out.Valid = len(out.Issues) == 0
 	return out
+}
+
+// StandardInputRequest confirms a preview into an existing engineering task.
+type StandardInputRequest struct {
+	InputPreviewRequest
+	ExpectedRevision int    `json:"expected_revision"`
+	Reason           string `json:"reason"`
 }

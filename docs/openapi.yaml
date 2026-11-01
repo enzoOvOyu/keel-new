@@ -16770,6 +16770,40 @@ paths:
           description: Project permission denied
         "404":
           description: Unknown input table
+  /projects/{projectId}/engineering-imports/{sourceId}/standard-input:
+    post:
+      operationId: importEngineeringStandardInput
+      tags:
+        - Engineering
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema: &a1
+            type: string
+        - in: path
+          name: sourceId
+          required: true
+          schema: *a1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IDEStandardInputRequest"
+      responses:
+        "200":
+          description: New additive engineering draft revision, not a publication
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getEngineeringWorkspaceEnvelope"
+        "403":
+          description: No project edit permission
+        "409":
+          description: Revision changed or active analysis
+        "422":
+          description: Input, identity, placement or port conflict
 components:
   securitySchemes:
     bearerAuth:
@@ -45229,6 +45263,12 @@ components:
     IDEPlannedConnection:
       additionalProperties: false
       properties:
+        termination_type:
+          type: string
+          description: Original confirmed termination classification
+        b_rack_position:
+          type: string
+          description: Raw B endpoint placement declaration, not resolved RackPlacement
         a_port_id:
           type: string
         attributes:
@@ -45275,6 +45315,9 @@ components:
     IDEPlannedPort:
       additionalProperties: false
       properties:
+        mac:
+          type: string
+          description: MAC of this endpoint port, never a standalone device identity
         attributes:
           items:
             $ref: '#/components/schemas/IDEAttributeValue'
@@ -47498,6 +47541,27 @@ components:
       required:
         - data
         - request_id
+    IDEStandardInputRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - table_id
+        - csv
+        - expected_revision
+        - reason
+      properties:
+        table_id:
+          type: string
+          enum:
+            - terminations
+        csv:
+          type: string
+        expected_revision:
+          type: integer
+          minimum: 1
+        reason:
+          type: string
+          minLength: 1
 x-implementation-policy:
   frontend-first: true
   mock-provider-required: true

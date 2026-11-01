@@ -28,7 +28,7 @@ func saveConnectivityRows(ctx context.Context, tx pgx.Tx, revision string, m *en
 		if e := version(&v.EntityVersion, "port"); e != nil {
 			return e
 		}
-		if _, e := tx.Exec(ctx, `INSERT INTO eng_port VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)`, revision, v.EntityID, v.EquipmentID, v.Name, v.ParentPortID, v.BreakoutIndex, v.Role, v.RateBPS, v.Medium); e != nil {
+		if _, e := tx.Exec(ctx, `INSERT INTO eng_port(revision_id,entity_id,equipment_id,name,parent_port_id,breakout_index,role,rate_bps,medium,mac) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`, revision, v.EntityID, v.EquipmentID, v.Name, v.ParentPortID, v.BreakoutIndex, v.Role, v.RateBPS, v.Medium, v.MAC); e != nil {
 			return e
 		}
 	}
@@ -40,7 +40,7 @@ func saveConnectivityRows(ctx context.Context, tx pgx.Tx, revision string, m *en
 		if v.PatchPortIDs == nil {
 			v.PatchPortIDs = []string{}
 		}
-		if _, e := tx.Exec(ctx, `INSERT INTO eng_connection VALUES($1,$2,$3,$4,$5)`, revision, v.EntityID, v.APortID, v.ZPortID, v.PatchPortIDs); e != nil {
+		if _, e := tx.Exec(ctx, `INSERT INTO eng_connection(revision_id,entity_id,a_port_id,z_port_id,patch_port_ids,termination_type,b_rack_position) VALUES($1,$2,$3,$4,$5,$6,$7)`, revision, v.EntityID, v.APortID, v.ZPortID, v.PatchPortIDs, v.TerminationType, v.BRackPosition); e != nil {
 			return e
 		}
 	}

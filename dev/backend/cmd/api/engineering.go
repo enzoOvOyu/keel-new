@@ -24,6 +24,10 @@ func engineeringDecode(w http.ResponseWriter, r *http.Request, dst any) bool {
 	return true
 }
 func engineeringFailure(w http.ResponseWriter, e error) {
+	if strings.HasPrefix(e.Error(), "STEP_") {
+		fail(w, 422, strings.Split(e.Error(), ":")[0])
+		return
+	}
 	if e.Error() == "NETWORK_PHYSICAL_REVISION_STALE" || e.Error() == "NETWORK_PUBLICATION_REQUIRED" {
 		fail(w, 409, e.Error())
 		return
@@ -192,6 +196,18 @@ func (s *Server) engineeringRoutes(w http.ResponseWriter, r *http.Request) bool 
 	}
 	if len(p) == 6 && r.Method == "GET" {
 		respond(w, 200, workspace)
+		return true
+	}
+	if action == "standard-input" && r.Method == "POST" {
+		var q engineering.StandardInputRequest
+		if !engineeringDecode(w, r, &q) {
+			return true
+		}
+		if e = s.importStandardInput(ctx, workspace, q, subjectOf(ctx).Username); e != nil {
+			engineeringFailure(w, e)
+		} else {
+			reply(id, 200)
+		}
 		return true
 	}
 	if action == "reimport" && r.Method == "POST" {

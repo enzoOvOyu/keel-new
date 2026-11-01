@@ -1439,6 +1439,19 @@
       "source": "dev/backend/internal/engineering/step_input.go",
       "documentation": "docs/api/engineering.md",
       "response_media_type": "text/csv"
+    },
+    {
+      "method": "post",
+      "path": "/projects/{projectId}/engineering-imports/{sourceId}/standard-input",
+      "operation_id": "importEngineeringStandardInput",
+      "request_schema": "IDEStandardInputRequest",
+      "response_schema": "getEngineeringWorkspaceEnvelope",
+      "implementation": "implemented",
+      "deployment": "not_deployed",
+      "verification": "Engineering domain unit tests, API/CMDB compile, TypeScript and documentation passed; database/HTTP/browser/publication NOT RUN",
+      "handler": "dev/backend/cmd/api/engineering.go",
+      "source": "dev/backend/cmd/api/engineering_standard_input.go",
+      "documentation": "docs/api/engineering.md"
     }
   ],
   "development_note": "当前运行ceab753/v40，迁移038；真实MM/Ultra分析提案已完整保存，资料理解验收未通过。当前结论见docs/intelligent-deployment/SOURCE-UNDERSTANDING-REVIEW-20261101.txt；未正式发布、未进行模型对照或跨客户验收。"

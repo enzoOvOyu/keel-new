@@ -6629,6 +6629,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/engineering-imports/{sourceId}/standard-input": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["importEngineeringStandardInput"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -16131,6 +16147,10 @@ export interface components {
             network_plans: components["schemas"]["IDENetworkPlan"][];
         };
         IDEPlannedConnection: {
+            /** @description Original confirmed termination classification */
+            termination_type?: string;
+            /** @description Raw B endpoint placement declaration, not resolved RackPlacement */
+            b_rack_position?: string;
             a_port_id: string;
             attributes: components["schemas"]["IDEAttributeValue"][];
             entity_id: string;
@@ -16144,6 +16164,8 @@ export interface components {
             z_port_id: string;
         };
         IDEPlannedPort: {
+            /** @description MAC of this endpoint port, never a standalone device identity */
+            mac?: string;
             attributes: components["schemas"]["IDEAttributeValue"][];
             breakout_index?: number;
             entity_id: string;
@@ -16844,6 +16866,13 @@ export interface components {
         IDEInputPreviewResponse: {
             data: components["schemas"]["IDEInputPreview"];
             request_id: string;
+        };
+        IDEStandardInputRequest: {
+            /** @enum {string} */
+            table_id: "terminations";
+            csv: string;
+            expected_revision: number;
+            reason: string;
         };
     };
     responses: {
@@ -37027,6 +37056,54 @@ export interface operations {
             };
             /** @description Unknown input table */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    importEngineeringStandardInput: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                sourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEStandardInputRequest"];
+            };
+        };
+        responses: {
+            /** @description New additive engineering draft revision, not a publication */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getEngineeringWorkspaceEnvelope"];
+                };
+            };
+            /** @description No project edit permission */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision changed or active analysis */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, identity, placement or port conflict */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

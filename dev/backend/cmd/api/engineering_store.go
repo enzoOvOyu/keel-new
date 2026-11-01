@@ -202,7 +202,7 @@ func targetBlocked(issues []engineering.ValidationIssue, t string) bool {
 	}
 	return false
 }
-func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expected int, origin, actor, reason string, x engineering.Extraction, p engineering.EngineeringProposal) (string, error) {
+func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expected int, origin, actor, reason string, x engineering.Extraction, p engineering.EngineeringProposal, inputs ...standardInputAttachment) (string, error) {
 	tx, e := s.db.Begin(ctx)
 	if e != nil {
 		return "", e
@@ -403,6 +403,11 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 	}
 	if _, e = tx.Exec(ctx, `INSERT INTO eng_revision(id,source_id,sequence,actor,origin,reason,total_cells,mapped_cells,proposal) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)`, revision, source, version+1, actor, origin, reason, x.TotalCells, x.MappedCells, jsonBytes(p)); e != nil {
 		return "", e
+	}
+	for _, input := range inputs {
+		if _, e = tx.Exec(ctx, `INSERT INTO eng_standard_input_source(id,revision_id,table_id,contract_version,object_key,content_sha256) VALUES($1,$2,$3,'1',$4,$5)`, input.ID, revision, input.TableID, input.ObjectKey, input.SHA256); e != nil {
+			return "", e
+		}
 	}
 	if e = verifyEngineeringResults(ctx, tx, source, s.project, x); e != nil {
 		return "", e

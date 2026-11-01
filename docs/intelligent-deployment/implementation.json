@@ -317,7 +317,14 @@
       "b端机架位组合格式示例"
     ],
     "completed_slices": [
-      "Version 1 five-step template catalog, CSV/XLSX header templates, CSV syntax preview and UI; not model persistence or semantic acceptance"
+      "Version 1 five-step template catalog, CSV/XLSX header templates, CSV syntax preview and UI; not model persistence or semantic acceptance",
+      "Eight-field termination additive draft import, scoped CMDB identity lookup, MinIO input archive and migration 039 endpoint fields implemented; domain unit/compile/type/documentation checks passed; DB/HTTP/browser and publication NOT RUN; not deployed"
+    ],
+    "remaining_slices": [
+      "Source field evidence viewer for supplemental input",
+      "Step 2-5 fixed-format confirmation and full deterministic business path",
+      "New triage and five scoped extraction tasks",
+      "Independent real source and existing visualization acceptance"
     ]
   }
 }

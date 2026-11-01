@@ -1,4 +1,16 @@
 export const engineeringMessages: Record<string, string> = {
+ STEP_TABLE_NOT_SUPPORTED: '此资料类型尚未接入确认建模。',
+ STEP_INPUT_INVALID: '输入仍有格式或缺项问题，请先校验修正。',
+ STEP_MAC_CONFLICT: '端口MAC与已有确认值冲突，请核查来源。',
+ STEP_SERIAL_AMBIGUOUS: '同一SN匹配多个设备，请先处理身份冲突。',
+ STEP_PORT_AMBIGUOUS: '设备端口名称重复，请先处理端口归属。',
+ STEP_CONNECTION_AMBIGUOUS: '已有连接重复，请先核查。',
+ STEP_SELF_CONNECTION: '连接两端不能是同一个端口。',
+ STEP_PORT_OCCUPIED: '端口已连接其他端点，请核查线路。',
+ STEP_TERMINATION_CONFLICT: '端接类型与已有记录不一致，请核查。',
+ STEP_POSITION_CONFLICT: '对端机架位声明与已有记录不一致。',
+ STEP_SOURCE_STORAGE_UNAVAILABLE: '原始输入暂时无法保存，请稍后重试。',
+
   ENGINEERING_SCHEMA_INVALID: '字段格式或修改依据不完整，请核对后保存。',
   ENGINEERING_JOB_ACTIVE: '资料正在分析，请等待本轮完成后再修改。',
   ENGINEERING_TARGET_REQUIRED: '请选择需要处理的工程领域，并填写依据。',

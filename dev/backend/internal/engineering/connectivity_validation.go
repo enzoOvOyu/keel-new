@@ -3,6 +3,7 @@ package engineering
 import (
 	"fmt"
 	"github.com/google/uuid"
+	"net"
 )
 
 func ValidateConnectivity(m PhysicalModel) []ValidationIssue {
@@ -38,6 +39,12 @@ func ValidateConnectivity(m PhysicalModel) []ValidationIssue {
 		eq, ok := equipment[p.EquipmentID]
 		if !ok || eq.IdentityKind == "group" || p.Name == "" {
 			add(p.EntityVersion, "PORT_OWNER_UNRESOLVED", "equipment_id", "端口必须关联唯一设备实例和来源名称", ConnectivityTarget)
+		}
+		if p.MAC != nil {
+			mac, err := net.ParseMAC(*p.MAC)
+			if err != nil || len(mac) != 6 {
+				add(p.EntityVersion, "PORT_MAC_INVALID", "mac", "端口MAC必须为48位地址", ConnectivityTarget)
+			}
 		}
 		key := p.EquipmentID + "/" + p.Name
 		if names[key] {

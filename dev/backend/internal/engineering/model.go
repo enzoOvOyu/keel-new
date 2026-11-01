@@ -211,19 +211,22 @@ type PowerPlan struct {
 }
 type PlannedPort struct {
 	EntityVersion
-	EquipmentID   ID     `json:"equipment_id"`
-	Name          string `json:"name"`
-	ParentPortID  *ID    `json:"parent_port_id,omitempty"`
-	BreakoutIndex *int   `json:"breakout_index,omitempty"`
-	Role          string `json:"role"`
-	RateBPS       *int64 `json:"rate_bps,omitempty"`
-	Medium        string `json:"medium"`
+	EquipmentID   ID      `json:"equipment_id"`
+	Name          string  `json:"name"`
+	MAC           *string `json:"mac,omitempty"`
+	ParentPortID  *ID     `json:"parent_port_id,omitempty"`
+	BreakoutIndex *int    `json:"breakout_index,omitempty"`
+	Role          string  `json:"role"`
+	RateBPS       *int64  `json:"rate_bps,omitempty"`
+	Medium        string  `json:"medium"`
 }
 type PlannedConnection struct {
 	EntityVersion
-	APortID      ID   `json:"a_port_id"`
-	ZPortID      ID   `json:"z_port_id"`
-	PatchPortIDs []ID `json:"patch_port_ids"`
+	APortID         ID     `json:"a_port_id"`
+	ZPortID         ID     `json:"z_port_id"`
+	PatchPortIDs    []ID   `json:"patch_port_ids"`
+	TerminationType string `json:"termination_type,omitempty"`
+	BRackPosition   string `json:"b_rack_position,omitempty"`
 }
 type ConnectivityPlan struct {
 	EntityVersion

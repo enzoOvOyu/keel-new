@@ -175,3 +175,7 @@ Agent原生工具参数按Pydantic Schema校验，读取脱敏IR，以逐Sheet�
 `POST .../engineering-inputs/preview` 接受IDEInputPreviewRequest，返回逐行原值和字段问题。SN等身份字符串不转数字；MAC校验48位格式，数值按类型检查。表头、列序不符明确报错。该接口只做格式预览，不持久化、不认定工程模块就绪、不发布资产，不执行模型调用或规则计算。条件必填及跨表关系尚需后置建模校验。
 
 作用域为项目，读取/下载要求bom:read，预览要求bom:edit并沿用Session/CSRF。查询可按项目缓存目录；预览无缓存。请求沿用8MiB限制。前端提供五步选择、字段说明、XLSX/CSV下载、CSV读取与手动修改、问题表和前20行预览；当前仅标准格式预览已实现，补充入库、XLSX读取及新Agent仍在开发。错误包含403/未知模板404/非法格式400/Schema400；预览中的业务输入错误以200响应issues返回。未运行HTTP或浏览器验收。
+
+`POST /projects/{projectId}/engineering-imports/{sourceId}/standard-input`（开发中未部署）接收IDEStandardInputRequest，当前仅支持terminations八列表。权限bom:edit，沿用Session/CSRF；绑定expected_revision及确认依据。先验证完整CSV，再在项目CMDB范围按SN、设备/端口名解析已有身份；歧义、MAC冲突、端口占用、类型或同向位置冲突阻断。没有现成身份时创建规划草稿；其他工程域增量保留。原始CSV存MinIO，索引与新修订在同事务保存（迁移039）；失败不提交模型。反向重复保持原连接方向，反向位置声明保留在原始补充资料。前端确认后刷新任务版本，仍需现有审核/发布。
+
+迁移039新增端口MAC、端接类型、原始B端位置声明和标准输入来源索引。MAC与类型由工程发布投影为planned事实，Observed保护沿用；声明不等于正式机柜落位。此入口不自动补造型号/高度/网络参数。当前补充来源尚未接入Evidence Explorer逐字段查看，后续四步确认导入和完整闭环仍未完成；这些不以预览成功代替验收。新增错误码STEP_*定位输入、身份、端口、类型、位置或源存储问题；并发版本或运行中分析返回409。未进行数据库、HTTP、浏览器和CMDB发布验收。

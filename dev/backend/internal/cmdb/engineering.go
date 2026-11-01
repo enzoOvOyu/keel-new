@@ -207,6 +207,9 @@ func (s Service) ProjectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 					continue
 				}
 				attrs := map[string]any{"physical_name": p.Name, "device_id": p.EquipmentID, "parent_uid": p.EquipmentID, "media_type": p.Medium, "role": p.Role}
+				if p.MAC != nil {
+					attrs["mac"] = *p.MAC
+				}
 				if p.ParentPortID != nil {
 					attrs["parent_port_id"] = *p.ParentPortID
 				}
@@ -246,7 +249,7 @@ func (s Service) ProjectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 						return e
 					}
 				}
-				attrs := map[string]any{"endpoint_a_uid": path[i], "endpoint_b_uid": path[i+1], "connection_plan_id": c.EntityID, "segment_index": float64(i/2 + 1), "record_kind": "planned_connection"}
+				attrs := map[string]any{"endpoint_a_uid": path[i], "endpoint_b_uid": path[i+1], "connection_plan_id": c.EntityID, "segment_index": float64(i/2 + 1), "record_kind": "planned_connection", "termination_type": c.TerminationType, "b_rack_position_declaration": c.BRackPosition}
 				if e = projectAsset(id, "cable", "规划连接 "+strconv.Itoa(i/2+1), attrs); e != nil {
 					return e
 				}
