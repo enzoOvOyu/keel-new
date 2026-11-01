@@ -1,0 +1,59 @@
+{
+  "code_revision": "642a0d6",
+  "branch": "dev",
+  "repository": "enzoOvOyu/keel-new",
+  "api": {
+    "port": 8081,
+    "binary": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/keel-api-v4",
+    "pid": 996483,
+    "sha256": "a56a0547cbf8a9bee0b9c93fc67973aab9b37eee8ca8cfeb51bb4c0071140a2f",
+    "cwd": "/home/ubuntu/keel/dev/backend",
+    "session": "keel-cmdb-api"
+  },
+  "frontend": {
+    "port": 5180,
+    "pid": 990892,
+    "cwd": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/frontend-source/dev",
+    "base_revision": "4064a69",
+    "change": "Only uploadEngineeringWorkbook sets import_mode=engineering; unrelated native jobs UI not deployed"
+  },
+  "migration": {
+    "previous": 37,
+    "current": 38,
+    "database": "keel"
+  },
+  "backup": {
+    "path": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/before-038.dump",
+    "bytes": 54337456
+  },
+  "configuration": "Original private environment, credentials and MinIO preserved",
+  "checks": {
+    "go_build": "PASS",
+    "native_tools_checkpoint_and_provider_errors": "PASS",
+    "source_upload": "PASS: engineering mode; zero legacy recognition jobs",
+    "minio_artifact_write_read": "PASS: actual artifact roundtrip",
+    "full_real_workbook_understanding": "IN_PROGRESS; upstream HTTP 402 in_flight_budget_exhausted",
+    "frontend_upload_module": "HTTP 200; browser not run",
+    "artifact_recovery_scope_hash_cleanup": "PASS: isolated PostgreSQL and synthetic S3, including new service instance restore, wrong project/revision/claim rejection, integrity verification and index cascade"
+  },
+  "rollback": {
+    "api_launcher": "/home/ubuntu/.local/state/keel-deployments/engineering-5abb94f/api-run.py",
+    "frontend_launcher": "/home/ubuntu/.local/state/keel-deployments/engineering-5abb94f/frontend-run.py",
+    "database": "Additive migration038 retained; no automatic down migration"
+  },
+  "limits": [
+    "Real workbook understanding not yet accepted",
+    "No CMDB/publication/topology acceptance",
+    "No cross-customer/generalization acceptance",
+    "No unrelated full regression"
+  ],
+  "api_startup_checks": {
+    "checks": [
+      {
+        "endpoint": "/healthz",
+        "status": 200
+      }
+    ],
+    "scope": "Health and real source upload/attach/analyze/get performed; other historical list startup checks were not repeated"
+  }
+}
