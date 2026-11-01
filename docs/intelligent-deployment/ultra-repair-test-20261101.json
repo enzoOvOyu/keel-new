@@ -5,12 +5,56 @@
   "project_code": "TEST-Agent-MM-Ultra-03",
   "project_id": "proj-18101842-d821-4583-9229-a708f995c1c8",
   "source_id": "71a5c797-319b-496d-a6ce-f67c1080439c",
-  "job_id": "016d7561-3851-460f-96a5-a97c218b6a1e",
-  "runtime_revision": "0ac58ec",
-  "prepared_revision": "0ac58ec",
-  "accepted_sheets": 5,
+  "job_id": "78becbc5-9e14-4be6-8eff-d5c5dd4e3664",
+  "runtime_revision": "024fe30",
+  "prepared_revision": "024fe30",
+  "accepted_sheets": 0,
   "total_sheets": 15,
-  "source_comparison": [
+  "limits": [
+    "Source-column and row coverage verified against independent OOXML baseline; not full formula reference calculation or final typed model acceptance",
+    "No formal CMDB publication",
+    "No topology or cross-customer acceptance"
+  ],
+  "root_causes_fixed": [
+    "Only first invalid binding returned; now all invalid/duplicate columns supplied together",
+    "Large source read rejected instead of paged, and reversed absolute coordinates lacked guidance",
+    "Queued tool calls continued after failure, causing no-progress before the model saw feedback",
+    "Read loop did not require interpretation after bounded evidence",
+    "Other-sheet tool context persisted across a resumed/rejected sheet",
+    "Known manufacturer/brand and invalid length-state columns could pass domain vocabulary checks",
+    "Rejected candidates support targeted field correction without replacing valid mappings",
+    "Duplicate headers cannot bypass required relation checks; invalid completed candidates resume as drafts"
+  ],
+  "storage": "Complete tool artifacts/checkpoints remain in MinIO; PostgreSQL stores metadata and typed engineering facts",
+  "reasoning_trial": "Default reasoning produced invalid textual tool payloads; restored prior working request settings without changing model",
+  "test_scope": "Targeted AI/engineering checks, API build, real API documentation consistency and real workbook analysis only",
+  "equipment_extra_field_review": "Server site/room misbindings corrected in v33 and verified in MinIO; core source comparison passed. Full typed model not yet available.",
+  "historical_equipment_core_comparison": [
+    {
+      "sheet": "Network Information",
+      "expected_rows": 189,
+      "regions": 1,
+      "field_matches": {
+        "label": 189,
+        "model": 189,
+        "rack": 189,
+        "start_u": 189
+      }
+    },
+    {
+      "sheet": "Server Information",
+      "expected_rows": 778,
+      "regions": 1,
+      "field_matches": {
+        "label": 778,
+        "model": 778,
+        "rack": 778,
+        "start_u": 778
+      }
+    }
+  ],
+  "normalized_equipment_core_scope": "Fixture-only comparison: Rack Unit trailing u-/dash equals numeric helper column. No product value coercion added.",
+  "prior_source_comparison": [
     {
       "sheet": "Cabling_EW_SP-LF",
       "expected_rows": 2592,
@@ -87,50 +131,7 @@
       }
     }
   ],
-  "limits": [
-    "Source-column and row coverage verified against independent OOXML baseline; not full formula reference calculation or final typed model acceptance",
-    "No formal CMDB publication",
-    "No topology or cross-customer acceptance"
-  ],
-  "root_causes_fixed": [
-    "Only first invalid binding returned; now all invalid/duplicate columns supplied together",
-    "Large source read rejected instead of paged, and reversed absolute coordinates lacked guidance",
-    "Queued tool calls continued after failure, causing no-progress before the model saw feedback",
-    "Read loop did not require interpretation after bounded evidence",
-    "Other-sheet tool context persisted across a resumed/rejected sheet",
-    "Known manufacturer/brand and invalid length-state columns could pass domain vocabulary checks",
-    "Rejected candidates support targeted field correction without replacing valid mappings",
-    "Duplicate headers cannot bypass required relation checks; invalid completed candidates resume as drafts"
-  ],
-  "storage": "Complete tool artifacts/checkpoints remain in MinIO; PostgreSQL stores metadata and typed engineering facts",
-  "reasoning_trial": "Default reasoning produced invalid textual tool payloads; restored prior working request settings without changing model",
-  "test_scope": "Targeted AI/engineering checks, API build, real API documentation consistency and real workbook analysis only",
-  "equipment_extra_field_review": "Server site/room misbindings corrected in v33 and verified in MinIO; core source comparison passed. Full typed model not yet available.",
-  "historical_equipment_core_comparison": [
-    {
-      "sheet": "Network Information",
-      "expected_rows": 189,
-      "regions": 1,
-      "field_matches": {
-        "label": 189,
-        "model": 189,
-        "rack": 189,
-        "start_u": 189
-      }
-    },
-    {
-      "sheet": "Server Information",
-      "expected_rows": 778,
-      "regions": 1,
-      "field_matches": {
-        "label": 778,
-        "model": 778,
-        "rack": 778,
-        "start_u": 778
-      }
-    }
-  ],
-  "normalized_equipment_core_comparison": [
+  "prior_normalized_equipment_core_comparison": [
     {
       "sheet": "Network Information",
       "rows": 189,
@@ -152,5 +153,17 @@
       }
     }
   ],
-  "normalized_equipment_core_scope": "Fixture-only comparison: Rack Unit trailing u-/dash equals numeric helper column. No product value coercion added."
+  "previous_completed_analysis": {
+    "job_id": "016d7561-3851-460f-96a5-a97c218b6a1e",
+    "technical_state": "succeeded",
+    "sheets": 15,
+    "draft_revision": 2,
+    "independent_semantic_review": "FAIL",
+    "validation_issues": 3118,
+    "counts_are_not_assets": true,
+    "formal_publications": 0,
+    "artifact_storage": "MinIO proposal/checkpoints; immutable typed draft in PostgreSQL"
+  },
+  "current_analysis_scope": "Fresh analysis of immutable source at workspace revision2. Prior revision1 checkpoints are not reused across a completed draft revision; earlier source comparisons are references, not new-round acceptance.",
+  "provider_comparison": "Asked asynchronously whether configured testAI/DeepSeek may be used for an independent comparison; no answer received, still Ultra."
 }

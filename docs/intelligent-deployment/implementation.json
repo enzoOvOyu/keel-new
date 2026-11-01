@@ -1,7 +1,7 @@
 {
   "updated_at": "2026-11-01T05:29:49.409927+00:00",
   "branch": "dev",
-  "scope": "API0ac58ec/v35 deployed. Ultra-03 continues from saved source candidates; power coverage correction focused on bounds/header exclusions. Whole model not accepted.",
+  "scope": "API024fe30/v37 deployed. Source -> 15-sheet proposal -> MinIO -> draft revision2 technically completed under v35, but semantic review failed. Re-analysis with sparse correction/power/endpoint checks running. No full understanding acceptance.",
   "phase_status": {
     "P0": "complete; report commit 314126d",
     "P1": "complete: architecture, models, contracts and kernel",

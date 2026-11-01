@@ -1,10 +1,10 @@
 {
   "version": 1,
   "updated_at": "2026-11-01",
-  "coverage": "API0ac58ec/v35 deployed: focused coverage correction and excluded title rows. Ultra-03 running; whole workbook not accepted; no formal publication.",
+  "coverage": "API024fe30/v37 deployed. First full Ultra candidate saved at revision2 but semantic review failed. Fresh revision2 analysis running with power and endpoint source checks. No CMDB publication.",
   "schema_authority": "docs/openapi.yaml",
-  "code_revision": "0ac58ec",
-  "deployed_revision": "0ac58ec",
+  "code_revision": "024fe30",
+  "deployed_revision": "024fe30",
   "deployment_evidence": "docs/intelligent-deployment/deployment-agent-repair-20261101.json",
   "operations": [
     {
