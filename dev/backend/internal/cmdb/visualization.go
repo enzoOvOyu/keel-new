@@ -96,7 +96,7 @@ func (s Service) visualizationRead(ctx context.Context, scope Scope, rack, focus
 		args = append(args, sourceIDs)
 		sourceFilter = " AND e.item_uid=ANY($3::text[])"
 	}
-	rows, e := tx.Query(ctx, `SELECT e.item_uid,e.asset_type,e.name,e.version,e.source_type,e.source_ref,e.freshness,e.payload,count(*) OVER(),(SELECT min(sc.project_id) FROM cmdb_asset_scope sc WHERE sc.asset_id=e.item_uid AND (sc.project_id=ANY($1) OR sc.project_id||':'||sc.asset_id=ANY($2))) FROM cmdb_entity e WHERE `+Visible("e")+` AND e.asset_type IN('data_center','region','pod','rack','server','switch','nic','gpu','port','cable','optic','pdu','patch_panel','component','psu','fabric','network_segment','vlan','vrf','vni','device')`+sourceFilter+` ORDER BY e.item_uid LIMIT `+strconv.Itoa(limit+1), args...)
+	rows, e := tx.Query(ctx, `SELECT e.item_uid,e.asset_type,e.name,e.version,e.source_type,e.source_ref,e.freshness,e.payload,count(*) OVER(),(SELECT min(sc.project_id) FROM cmdb_asset_scope sc WHERE sc.asset_id=e.item_uid AND (sc.project_id=ANY($1) OR sc.project_id||':'||sc.asset_id=ANY($2))) FROM cmdb_entity e WHERE `+activeVisualAsset("e")+` AND e.asset_type IN('data_center','region','pod','rack','server','switch','nic','gpu','port','cable','optic','pdu','patch_panel','component','psu','fabric','network_segment','vlan','vrf','vni','device')`+sourceFilter+` ORDER BY e.item_uid LIMIT `+strconv.Itoa(limit+1), args...)
 	if e != nil {
 		return out, e
 	}

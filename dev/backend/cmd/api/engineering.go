@@ -28,6 +28,10 @@ func engineeringFailure(w http.ResponseWriter, e error) {
 		fail(w, 409, e.Error())
 		return
 	}
+	if strings.HasPrefix(e.Error(), "REIMPORT_") {
+		fail(w, 422, e.Error())
+		return
+	}
 	if strings.HasPrefix(e.Error(), "CALC_") || strings.HasPrefix(e.Error(), "NETWORK_") {
 		fail(w, 422, e.Error())
 		return
@@ -64,8 +68,11 @@ func (s *Server) engineeringRoutes(w http.ResponseWriter, r *http.Request) bool 
 		if len(p) == 5 {
 			permission = "bom:import"
 		}
-		if action == "review" {
+		if action == "review" || action == "difference-review" {
 			permission = "bom:review"
+		}
+		if action == "reimport" {
+			permission = "bom:import"
 		}
 		if action == "publish" {
 			permission = "bom:execute"
@@ -175,6 +182,31 @@ func (s *Server) engineeringRoutes(w http.ResponseWriter, r *http.Request) bool 
 	}
 	if len(p) == 6 && r.Method == "GET" {
 		respond(w, 200, workspace)
+		return true
+	}
+	if action == "reimport" && r.Method == "POST" {
+		var q engineering.ReimportRequest
+		if !engineeringDecode(w, r, &q) {
+			return true
+		}
+		next, e := s.reimportEngineering(ctx, workspace, q, subjectOf(ctx).Username)
+		if e != nil {
+			engineeringFailure(w, e)
+		} else {
+			reply(next, 200)
+		}
+		return true
+	}
+	if action == "difference-review" && r.Method == "POST" {
+		var q engineering.DifferenceReview
+		if !engineeringDecode(w, r, &q) {
+			return true
+		}
+		if e = s.reviewEngineeringDifferences(ctx, id, q, subjectOf(ctx).Username); e != nil {
+			engineeringFailure(w, e)
+		} else {
+			reply(id, 200)
+		}
 		return true
 	}
 	if action == "plan" && r.Method == "GET" {
@@ -369,7 +401,7 @@ func (s *Server) engineeringRoutes(w http.ResponseWriter, r *http.Request) bool 
 				revision = *workspace.HeadRevisionID
 			}
 			var belongs bool
-			if e = s.db.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM eng_revision WHERE id::text=$1 AND source_id=$2)`, revision, id).Scan(&belongs); e != nil || !belongs {
+			if e = s.db.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM eng_revision WHERE id::text=$1 AND source_id=$2 UNION ALL SELECT 1 FROM eng_source WHERE id=$2 AND base_revision_id::text=$1)`, revision, id).Scan(&belongs); e != nil || !belongs {
 				fail(w, 404, "NOT_FOUND")
 				return true
 			}

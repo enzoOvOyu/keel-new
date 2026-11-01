@@ -136,6 +136,8 @@ type EngineeringStep struct {
 	At       time.Time `json:"at"`
 }
 type Workspace struct {
+	BaseRevisionID *string           `json:"base_revision_id,omitempty"`
+	BaseSourceID   *string           `json:"base_source_id,omitempty"`
 	ID             ID                `json:"id"`
 	ProjectID      ID                `json:"project_id"`
 	ImportID       ID                `json:"import_id"`
@@ -248,4 +250,18 @@ type IntelligenceView struct {
 	Facts      []SemanticFact   `json:"facts"`
 	TotalFacts int              `json:"total_facts"`
 	Offset     int              `json:"offset"`
+}
+
+type ReimportRequest struct {
+	ExpectedRevision int    `json:"expected_revision"`
+	ImportID         string `json:"import_id"`
+}
+type DifferenceResolution struct {
+	Target   string `json:"target"`
+	Decision string `json:"decision"`
+}
+type DifferenceReview struct {
+	ExpectedRevision int                    `json:"expected_revision"`
+	Resolutions      []DifferenceResolution `json:"resolutions"`
+	Reason           string                 `json:"reason"`
 }

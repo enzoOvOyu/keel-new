@@ -1262,6 +1262,34 @@
       "handler": "dev/backend/cmd/api/engineering.go",
       "source": "dev/backend/cmd/api/engineering_intelligence.go",
       "documentation": "docs/api/engineering.md"
+    },
+    {
+      "method": "post",
+      "path": "/projects/{projectId}/engineering-imports/{engineeringId}/reimport",
+      "operation_id": "reimportEngineeringSource",
+      "response_status": "200",
+      "response_schema": "reimportEngineeringSourceEnvelope",
+      "request_schema": "IDEReimportRequest",
+      "implementation": "implemented",
+      "deployment": "not_deployed",
+      "verification": "isolated synthetic reimport decisions, planning removal and existing topology query; UI and real source acceptance NOT RUN",
+      "handler": "dev/backend/cmd/api/engineering.go",
+      "source": "dev/backend/cmd/api/engineering_reimport.go",
+      "documentation": "docs/api/engineering.md"
+    },
+    {
+      "method": "post",
+      "path": "/projects/{projectId}/engineering-imports/{engineeringId}/difference-review",
+      "operation_id": "reviewEngineeringDifferences",
+      "response_status": "200",
+      "response_schema": "reviewEngineeringDifferencesEnvelope",
+      "request_schema": "IDEDifferenceReview",
+      "implementation": "implemented",
+      "deployment": "not_deployed",
+      "verification": "isolated synthetic reimport decisions, planning removal and existing topology query; UI and real source acceptance NOT RUN",
+      "handler": "dev/backend/cmd/api/engineering.go",
+      "source": "dev/backend/cmd/api/engineering_reimport.go",
+      "documentation": "docs/api/engineering.md"
     }
   ],
   "development_note": "作业平台 UI 整改：新增执行版本定义查询、列表分页、时间筛选和同步游标为分支增量；尚未部署至当前 BOM v5 集成后端。现运行版本以 HANDOFF 顶部为准。"

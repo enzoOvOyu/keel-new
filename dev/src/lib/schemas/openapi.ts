@@ -6517,6 +6517,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/reimport": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["reimportEngineeringSource"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/difference-review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["reviewEngineeringDifferences"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -16370,6 +16402,8 @@ export interface components {
             steps: components["schemas"]["IDEEngineeringStep"][];
             /** Format: date-time */
             created_at: string;
+            base_revision_id?: string;
+            base_source_id?: string;
         };
         IDERevisionEntry: {
             id: string;
@@ -16639,6 +16673,29 @@ export interface components {
         };
         getEngineeringIntelligenceEnvelope: {
             data: components["schemas"]["IDEIntelligenceView"];
+            request_id: string;
+        };
+        IDEReimportRequest: {
+            expected_revision: number;
+            import_id: string;
+        };
+        IDEDifferenceResolution: {
+            /** @enum {string} */
+            target: "CMDB_PLANNED_EQUIPMENT" | "CMDB_PLANNED_FACILITY" | "CMDB_PLANNED_PLACEMENT" | "CMDB_PLANNED_CONNECTIVITY" | "ENGINEERING_CABLING" | "ENGINEERING_POWER" | "ENGINEERING_MATERIAL" | "ENGINEERING_WORKLOAD" | "NETWORK_REVISION";
+            /** @enum {string} */
+            decision: "accept_incoming" | "retain_base" | "retain_current";
+        };
+        IDEDifferenceReview: {
+            expected_revision: number;
+            resolutions: components["schemas"]["IDEDifferenceResolution"][];
+            reason: string;
+        };
+        reimportEngineeringSourceEnvelope: {
+            data: components["schemas"]["IDEWorkspace"];
+            request_id: string;
+        };
+        reviewEngineeringDifferencesEnvelope: {
+            data: components["schemas"]["IDEWorkspace"];
             request_id: string;
         };
     };
@@ -36452,6 +36509,116 @@ export interface operations {
             };
             /** @description Scoped source not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    reimportEngineeringSource: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEReimportRequest"];
+            };
+        };
+        responses: {
+            /** @description Immutable source or reviewed difference draft */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["reimportEngineeringSourceEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped source not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid difference decision */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    reviewEngineeringDifferences: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEDifferenceReview"];
+            };
+        };
+        responses: {
+            /** @description Immutable source or reviewed difference draft */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["reviewEngineeringDifferencesEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped source not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid difference decision */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

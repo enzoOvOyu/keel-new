@@ -18,6 +18,9 @@ func saveEngineeringIntelligence(ctx context.Context, tx pgx.Tx, project, source
 	if _, e := tx.Exec(ctx, `INSERT INTO eng_provenance_input VALUES($1,'source',$2,$3)`, revision, source, previous); e != nil {
 		return e
 	}
+	if _, e := tx.Exec(ctx, `INSERT INTO eng_provenance_input SELECT $1,'source',base_source_id,base_revision_id FROM eng_source WHERE id=$2 AND base_source_id IS NOT NULL`, revision, source); e != nil {
+		return e
+	}
 	plan := engineering.BuildImportPlan(project, source, revision, sequence, p, x.Model)
 	var prior *string
 	if previous != nil {

@@ -16,15 +16,21 @@ type engineeringQuery interface {
 	QueryRow(context.Context, string, ...any) pgx.Row
 }
 
-func (s *Server) attachEngineering(ctx context.Context, importID, actor string) (string, error) {
+func (s *Server) attachEngineering(ctx context.Context, importID, actor string, base ...string) (string, error) {
 	tx, e := s.db.Begin(ctx)
 	if e != nil {
 		return "", e
 	}
 	defer tx.Rollback(ctx)
 	id := uuid.NewString()
+	var baseRevision, baseSource *string
+	if len(base) > 0 {
+		if e = tx.QueryRow(ctx, `SELECT r.id::text,s.id::text FROM eng_revision r JOIN eng_source s ON s.id=r.source_id WHERE r.id::text=$1 AND s.head_revision_id=r.id AND s.project_id=$2 FOR SHARE OF s`, base[0], s.project).Scan(&baseRevision, &baseSource); e != nil {
+			return "", e
+		}
+	}
 	var head *string
-	e = tx.QueryRow(ctx, `INSERT INTO eng_source(id,project_id,import_id) VALUES($1,$2,$3) ON CONFLICT(import_id) DO UPDATE SET import_id=excluded.import_id RETURNING id::text,head_revision_id::text`, id, s.project, importID).Scan(&id, &head)
+	e = tx.QueryRow(ctx, `INSERT INTO eng_source(id,project_id,import_id,base_revision_id,base_source_id) VALUES($1,$2,$3,$4,$5) ON CONFLICT(import_id) DO UPDATE SET import_id=excluded.import_id RETURNING id::text,head_revision_id::text`, id, s.project, importID, baseRevision, baseSource).Scan(&id, &head)
 	if e != nil {
 		return "", e
 	}
@@ -354,6 +360,9 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 			changed[d.EntityID] = true
 		}
 	}
+	if e = applyDifferenceResolutions(ctx, tx, s.project, source, revision, actor, reason, origin, &x); e != nil {
+		return "", e
+	}
 	for i := range x.Model.NetworkPlans {
 		physical, err := networkPhysicalContext(ctx, tx, s.project, x.Model.NetworkPlans[i])
 		if err != nil {
@@ -480,6 +489,11 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 			issues = append(issues, i)
 		}
 	}
+	reimportIssues, reimportErr := reimportValidationIssues(ctx, tx, s.project, source, x.Model)
+	if reimportErr != nil {
+		return "", reimportErr
+	}
+	issues = append(issues, reimportIssues...)
 	issues = append(issues, engineering.ValidatePhysical(x.Model)...)
 	networkIssues, networkErr := validateNetworkDomain(ctx, tx, s.project, x.Model)
 	if networkErr != nil {
@@ -512,6 +526,16 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 		state := "IN_REVIEW"
 		if !targetHasContent(x.Model, target) {
 			state = "NEEDS_INPUT"
+			if previousModel != nil && targetHasContent(*previousModel, target) {
+				state = "IN_REVIEW"
+			}
+			var hadBase bool
+			if e = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM eng_source s JOIN eng_difference_review r ON r.source_id=s.id AND r.base_revision_id=s.base_revision_id WHERE s.id=$1 AND r.target=$2 AND r.decision IN('accept_incoming','retain_current') AND r.incoming_digest=$3)`, source, target, ownTargetDigest(x.Model, target)).Scan(&hadBase); e != nil {
+				return "", e
+			}
+			if hadBase {
+				state = "IN_REVIEW"
+			}
 		}
 		if targetBlocked(issues, target) {
 			state = "BLOCKED"
@@ -544,7 +568,7 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 }
 func (s *Server) engineeringWorkspace(ctx context.Context, id string) (engineering.Workspace, error) {
 	v := engineering.Workspace{Modules: []engineering.ModuleDetection{}, Targets: []engineering.TargetStatus{}, Issues: []engineering.ValidationIssue{}, Questions: []string{}, Steps: []engineering.EngineeringStep{}}
-	e := s.db.QueryRow(ctx, `SELECT s.id::text,s.project_id,s.import_id::text,b.filename,b.content_sha256,s.revision,s.head_revision_id::text,s.summary,s.created_at FROM eng_source s JOIN bom_import_batch b ON b.id=s.import_id WHERE s.id::text=$1 AND s.project_id=$2`, id, s.project).Scan(&v.ID, &v.ProjectID, &v.ImportID, &v.Filename, &v.SHA256, &v.Revision, &v.HeadRevisionID, &v.Summary, &v.CreatedAt)
+	e := s.db.QueryRow(ctx, `SELECT s.id::text,s.project_id,s.import_id::text,b.filename,b.content_sha256,s.revision,s.head_revision_id::text,s.summary,s.created_at,s.base_revision_id::text,s.base_source_id::text FROM eng_source s JOIN bom_import_batch b ON b.id=s.import_id WHERE s.id::text=$1 AND s.project_id=$2`, id, s.project).Scan(&v.ID, &v.ProjectID, &v.ImportID, &v.Filename, &v.SHA256, &v.Revision, &v.HeadRevisionID, &v.Summary, &v.CreatedAt, &v.BaseRevisionID, &v.BaseSourceID)
 	if e != nil {
 		return v, e
 	}

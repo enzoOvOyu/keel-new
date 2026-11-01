@@ -286,7 +286,7 @@ func engineeringPlanningFields(ctx context.Context, tx pgx.Tx, assets []*VisualA
 		projects = append(projects, a.Project)
 		index[a.ID] = a
 	}
-	rows, e := tx.Query(ctx, `SELECT DISTINCT ON(asset_id,field_name) asset_id,field_name,value,source_ref FROM cmdb_field_source WHERE asset_id=ANY($1) AND project_id=ANY($2) AND source_ref LIKE 'engineering:%' AND fact_layer='planned' AND approval_status='approved' ORDER BY asset_id,field_name,updated_at DESC,id DESC`, ids, projects)
+	rows, e := tx.Query(ctx, `SELECT DISTINCT ON(asset_id,field_name) asset_id,field_name,value,source_ref FROM cmdb_field_source WHERE asset_id=ANY($1) AND project_id=ANY($2) AND source_ref LIKE 'engineering:%' AND fact_layer='planned' AND superseded_at IS NULL AND approval_status='approved' ORDER BY asset_id,field_name,updated_at DESC,id DESC`, ids, projects)
 	if e != nil {
 		return e
 	}

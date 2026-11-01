@@ -41,6 +41,15 @@ func (s *Server) publishEngineering(ctx context.Context, tx pgx.Tx, event, proje
 	if e != nil {
 		return e
 	}
+	reimportIssues, e := reimportValidationIssues(ctx, tx, project, payload.SourceID, model)
+	if e != nil {
+		return e
+	}
+	for _, issue := range reimportIssues {
+		if issue.PublishTarget == payload.Target {
+			return errors.New(issue.Code)
+		}
+	}
 	for _, dependency := range engineering.TargetDependencies(payload.Target) {
 		var ready bool
 		if e = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM eng_target WHERE source_id=$1 AND target=$2 AND state='PUBLISHED')`, payload.SourceID, dependency).Scan(&ready); e != nil {
@@ -61,6 +70,13 @@ func (s *Server) publishEngineering(ctx context.Context, tx pgx.Tx, event, proje
 		if _, e = tx.Exec(ctx, `INSERT INTO bom_revision(id,import_id,project_id,digest) VALUES($1,$2,$3,$4) ON CONFLICT DO NOTHING`, payload.PublicationID, importID, project, digest); e != nil {
 			return e
 		}
+		refs, err := previousEngineeringPublications(ctx, tx, project, payload.SourceID, payload.Target, payload.PublicationID)
+		if err != nil {
+			return err
+		}
+		if e = cmdbService(s).ReconcileEngineering(ctx, tx, project, payload.PublicationID, payload.Target, actor, refs, model); e != nil {
+			return e
+		}
 		if e = cmdbService(s).ProjectEngineering(ctx, tx, event, project, payload.PublicationID, payload.Target, actor, model); e != nil {
 			return e
 		}
@@ -68,6 +84,26 @@ func (s *Server) publishEngineering(ctx context.Context, tx pgx.Tx, event, proje
 	if _, e = tx.Exec(ctx, `UPDATE eng_publication SET state='published',error_code=NULL,receipt=$2,published_at=now() WHERE id=$1`, payload.PublicationID, event); e != nil {
 		return e
 	}
+	if _, e = tx.Exec(ctx, `WITH RECURSIVE lineage(id,base_source_id) AS (SELECT id,base_source_id FROM eng_source WHERE id=$1 UNION ALL SELECT s.id,s.base_source_id FROM eng_source s JOIN lineage l ON s.id=l.base_source_id) UPDATE eng_target SET state='STALE' WHERE source_id IN(SELECT id FROM lineage WHERE id<>$1) AND target=$2 AND state='PUBLISHED'`, payload.SourceID, payload.Target); e != nil {
+		return e
+	}
 	_, e = tx.Exec(ctx, `UPDATE eng_target SET state='PUBLISHED' WHERE source_id=$1 AND target=$2 AND publication_id=$3`, payload.SourceID, payload.Target, payload.PublicationID)
 	return e
+}
+
+func previousEngineeringPublications(ctx context.Context, q engineeringQuery, project, source, target, current string) ([]string, error) {
+	rows, e := q.Query(ctx, `WITH RECURSIVE lineage(id,base_source_id) AS (SELECT id,base_source_id FROM eng_source WHERE id=$1 AND project_id=$2 UNION ALL SELECT s.id,s.base_source_id FROM eng_source s JOIN lineage l ON s.id=l.base_source_id WHERE s.project_id=$2) SELECT 'engineering:'||p.id::text FROM eng_publication p WHERE p.source_id IN(SELECT id FROM lineage) AND p.project_id=$2 AND p.target=$3 AND p.id<>$4 AND p.state='published'`, source, project, target, current)
+	if e != nil {
+		return nil, e
+	}
+	defer rows.Close()
+	refs := []string{}
+	for rows.Next() {
+		var ref string
+		if e = rows.Scan(&ref); e != nil {
+			return nil, e
+		}
+		refs = append(refs, ref)
+	}
+	return refs, rows.Err()
 }

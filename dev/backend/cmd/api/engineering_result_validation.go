@@ -74,7 +74,7 @@ func verifyEngineeringResults(ctx context.Context, tx pgx.Tx, source, project st
 	outputs := map[string][]engineering.TypedValue{}
 	for run := range runs {
 		var ok bool
-		if e := tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM eng_calculation_run WHERE id::text=$1 AND project_id=$2 AND source_id=$3 AND status IN('succeeded','partial'))`, run, project, source).Scan(&ok); e != nil {
+		if e := tx.QueryRow(ctx, `WITH RECURSIVE lineage(id,base_source_id) AS (SELECT id,base_source_id FROM eng_source WHERE id=$3 AND project_id=$2 UNION ALL SELECT s.id,s.base_source_id FROM eng_source s JOIN lineage l ON s.id=l.base_source_id WHERE s.project_id=$2) SELECT EXISTS(SELECT 1 FROM eng_calculation_run WHERE id::text=$1 AND project_id=$2 AND source_id IN(SELECT id FROM lineage) AND status IN('succeeded','partial'))`, run, project, source).Scan(&ok); e != nil {
 			return e
 		}
 		if !ok {

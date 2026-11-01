@@ -91,3 +91,5 @@ export type EngineeringPlanView = Models['IDEPlanView'];
 export type EngineeringIntelligenceView = Models['IDEIntelligenceView'];
 export const engineeringPlan=(project:string,id:string,signal?:AbortSignal)=>bomRequest<EngineeringPlanView>(engineeringPath(project,id)+'/plan','GET',undefined,undefined,signal);
 export const engineeringIntelligence=(project:string,id:string,offset=0,signal?:AbortSignal)=>bomRequest<EngineeringIntelligenceView>(engineeringPath(project,id)+'/intelligence?offset='+offset,'GET',undefined,undefined,signal);
+export const reimportEngineeringSource=(project:string,id:string,request:Models['IDEReimportRequest'])=>bomRequest<EngineeringWorkspace>(engineeringPath(project,id)+'/reimport','POST',request);
+export const reviewEngineeringDifferences=(project:string,id:string,request:Models['IDEDifferenceReview'])=>bomRequest<EngineeringWorkspace>(engineeringPath(project,id)+'/difference-review','POST',request);

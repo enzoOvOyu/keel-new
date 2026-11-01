@@ -1,14 +1,14 @@
 {
   "updated_at": "2026-11-01T04:55:37.302212+00:00",
   "branch": "audit/intelligent-deployment-p0",
-  "scope": "Domain batches and durable intelligence/module planning implemented; reimport/diff/reconciliation and final UI closure in progress",
+  "scope": "P1 complete; P2/P3/domain main chains implemented; P5 cross-file review/removal now implemented; P4 typed extensions/segment plans and P6 interaction closure remaining",
   "phase_status": {
     "P0": "complete; report commit 314126d",
     "P1": "complete: architecture, models, contracts and kernel",
     "P2": "Multiround source tools, column and explicit cross-sheet record proposals, deterministic typed extraction, persisted regions/facts/provenance and dynamic module plan connected; real provider/source acceptance NOT RUN",
     "P3": "isolated LibreOffice Provider, formula graph, unit-aware restricted rule AST, human rule approval and durable runs implemented; real Golden Fixture reference acceptance pending",
     "P4": "All five typed domain batches implemented; real Golden Fixture/AI/customer acceptance NOT RUN",
-    "P5": "Independent target review and domain publication implemented; cross-file differences and planning deletion reconciliation pending",
+    "P5": "Independent domain review/publication plus immutable reimport baseline, explicit difference decisions and same-lineage planning withdrawal implemented; real source acceptance NOT RUN",
     "P6": "Unified overview and evidence explorer plus domain editors connected; final reimport/review interactions pending; browser acceptance NOT RUN"
   },
   "implemented": [
@@ -44,7 +44,9 @@
     "Published physical revision references, independent network review/publication and guarded Golden input consumption",
     "Durable ImportPlan/module bindings/typed regions/facts/provenance; actual target/job state projection and applicable intrinsic calculation scheduling",
     "Explicit source-cell records for transposed/key-value/cross-sheet forms with local extraction and sensitive-cell exclusion",
-    "Unified engineering overview and source evidence browser; stale form saves use frozen revision"
+    "Unified engineering overview and source evidence browser; stale form saves use frozen revision",
+    "Immutable cross-file source lineage and baseline, explicit reviewed differences with origin evidence preservation",
+    "Superseded planning field history and expired relations; pure planned withdrawals retired and excluded from active topology; Observed untouched"
   ],
   "files": {
     "design": "docs/intelligent-deployment/P1-DESIGN.txt",
@@ -212,6 +214,16 @@
       "check": "S7 synthetic engineering AI protocol and incremental TypeScript",
       "result": "PASS",
       "scope": "protocol and type checks only; no real provider or browser acceptance"
+    },
+    {
+      "check": "TestEngineeringReimportReviewedRemoval",
+      "result": "PASS",
+      "scope": "isolated DB reviewed retained value and removals, original provenance, existing topology query, empty target/port retirement, Observed unchanged and stale ancestor receipt"
+    },
+    {
+      "check": "P5 incremental TypeScript",
+      "result": "PASS",
+      "scope": "static types only; no browser acceptance"
     }
   ],
   "not_run": [
@@ -232,22 +244,20 @@
     "live_frontend_changed": false
   },
   "next_vertical_slice": [
-    "Cross-file reimport and explicit diff decisions",
-    "Planning removal reconciliation and typed extensions",
-    "Segment-level cable specification and final workbench completion"
+    "P4 segment-specific cable specs and typed extensions",
+    "P6 final review/editor interaction closure"
   ],
   "limits": [
     "No current environment migration or deployment",
     "No true AI/source workbook/Golden Fixture/human Ground Truth acceptance",
     "No browser interaction or cross-customer generalization acceptance",
-    "Approved plan removal/tombstone publication remains to implement; current first-slice UI does not remove published entities",
     "Formula source/Golden Fixture compatibility and human Ground Truth NOT RUN",
     "Rule AST rejects unsupported compound-unit operations; dynamic/external spreadsheet dependencies remain partial",
     "Golden endpoint supplies reviewed planning input only; vendor configuration generation/downloading is outside this engineering module"
   ],
   "changes": {
-    "migration_added": "027–034, isolated DB only",
-    "http_operations_added": 28,
+    "migration_added": "027–035, isolated DB only",
+    "http_operations_added": 30,
     "current_environment_changed": false,
     "original_workbooks_modified": false
   }

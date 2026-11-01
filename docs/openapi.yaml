@@ -16524,6 +16524,80 @@ paths:
           description: Permission denied
         '404':
           description: Scoped source not found
+  /projects/{projectId}/engineering-imports/{engineeringId}/reimport:
+    post:
+      operationId: reimportEngineeringSource
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: engineeringId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDEReimportRequest'
+      responses:
+        '200':
+          description: Immutable source or reviewed difference draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/reimportEngineeringSourceEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped source not found
+        '409':
+          description: Revision conflict
+        '422':
+          description: Invalid difference decision
+  /projects/{projectId}/engineering-imports/{engineeringId}/difference-review:
+    post:
+      operationId: reviewEngineeringDifferences
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: engineeringId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDEDifferenceReview'
+      responses:
+        '200':
+          description: Immutable source or reviewed difference draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/reviewEngineeringDifferencesEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped source not found
+        '409':
+          description: Revision conflict
+        '422':
+          description: Invalid difference decision
 components:
   securitySchemes:
     bearerAuth:
@@ -46131,6 +46205,10 @@ components:
         created_at:
           type: string
           format: date-time
+        base_revision_id:
+          type: string
+        base_source_id:
+          type: string
       required:
       - id
       - project_id
@@ -46973,6 +47051,83 @@ components:
       properties:
         data:
           $ref: '#/components/schemas/IDEIntelligenceView'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    IDEReimportRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_revision:
+          type: integer
+          minimum: 1
+        import_id:
+          type: string
+      required:
+      - expected_revision
+      - import_id
+    IDEDifferenceResolution:
+      type: object
+      additionalProperties: false
+      properties:
+        target:
+          type: string
+          enum:
+          - CMDB_PLANNED_EQUIPMENT
+          - CMDB_PLANNED_FACILITY
+          - CMDB_PLANNED_PLACEMENT
+          - CMDB_PLANNED_CONNECTIVITY
+          - ENGINEERING_CABLING
+          - ENGINEERING_POWER
+          - ENGINEERING_MATERIAL
+          - ENGINEERING_WORKLOAD
+          - NETWORK_REVISION
+        decision:
+          type: string
+          enum:
+          - accept_incoming
+          - retain_base
+          - retain_current
+      required:
+      - target
+      - decision
+    IDEDifferenceReview:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_revision:
+          type: integer
+          minimum: 1
+        resolutions:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEDifferenceResolution'
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - expected_revision
+      - resolutions
+      - reason
+    reimportEngineeringSourceEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    reviewEngineeringDifferencesEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
         request_id:
           type: string
       required:

@@ -179,6 +179,7 @@ type rowData struct {
 }
 
 type Extraction struct {
+	Resolutions             []DifferenceResolution
 	Model                   PhysicalModel
 	Facts                   []SemanticFact
 	Evidence                []SourceEvidence
