@@ -296,5 +296,23 @@
     "Second structurally different real customer source; variants alone do not prove generalization",
     "Browser interaction and existing CMDB rack/topology acceptance"
   ],
-  "source_understanding_review": "docs/intelligent-deployment/SOURCE-UNDERSTANDING-REVIEW-20261101.txt"
+  "source_understanding_review": "docs/intelligent-deployment/SOURCE-UNDERSTANDING-REVIEW-20261101.txt",
+  "next_refactor": {
+    "status": "DESIGN_ONLY",
+    "plan": "docs/intelligent-deployment/FIVE-STEP-REFACTOR-PLAN.txt",
+    "ordered_steps": [
+      "设备关联",
+      "机房与落位",
+      "连线与布线",
+      "逻辑网络",
+      "电力相关"
+    ],
+    "implementation_gate": "Fixed templates, manual completion and deterministic five-step path must pass scoped acceptance before new Agent integration. No implementation or runtime changes in this planning task.",
+    "agent_scope": "New source triage plus five step-scoped extraction tasks sharing existing runtime; standard inputs remain usable without AI.",
+    "confirmed_mac_meaning": "A=本端MAC; B=对端MAC; associate with the corresponding endpoint, not a sole device identity key.",
+    "pending_semantics": [
+      "端接类型值字典示例",
+      "b端机架位组合格式示例"
+    ]
+  }
 }

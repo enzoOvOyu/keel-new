@@ -1,3 +1,7 @@
+## 已完成里程碑事件：五步固定输入与分步Agent整改方案
+
+用户明确将开局内部收敛为设备关联、机房与落位、连线与布线、逻辑网络、电力五步。已核对现有源码并完成[整改方案](docs/intelligent-deployment/FIVE-STEP-REFACTOR-PLAN.txt)：先固定模板/字段/前置/输出和人工补齐，独立跑通无AI标准链，再新增资料分拣与五个受限提取任务。A端MAC=本端MAC，B端MAC=对端MAC，按对应端点保存。方案列出多来源增量合并、身份/位置/布线/网络/电力关系、UI、代码复用、缺口及各里程碑退出条件。端接类型与机架位示例尚待确认；不阻断其他设计。本次只完成设计与交接记录，未修改业务实现、调用模型、导入测试数据或部署；当前在线版本不变。
+
 ## 已完成里程碑事件：恢复前端失效的fixture资源链接
 
 用户报告Vite无法导入demo-seed.json。根因是dev/fixtures/demo-full-64-b300仍指向已删除的../../keel-demo/fixtures/demo-full-64-b300；仓库与当前frontend-source部署均存在同一个断链。已将二者修正为../../fixtures/demo-full-64-b300，复用仓库现有唯一数据源，没有复制种子或修改API/数据库。实际失败的/src/lib/api/index.tsx及入口/src/app/main.tsx均恢复200；无头浏览器使用已有测试会话进入/dashboard，显示“全局交付与运维”，无Vite错误层、pageerror或HTTP失败。只验证本次页面启动故障，没有重跑Agent、平台冒烟或业务回归。
@@ -153,6 +157,8 @@ API v12 / 743383f已部署；任务28d974d0-b1e0-4203-9b59-b8daa7d9dfdb使用独
 - 完整AI包检查（精简提示/反馈）及新增重复错误停止用例通过，Go构建通过。继续同一独立来源真实复测，不把简短语义探针当整本验收。
 
 ## 当前在线状态（覆盖下方历史快照）
+
+当前后续开发方向已由用户调整为五步固定输入先行、分步Agent后接入；方案见 `docs/intelligent-deployment/FIVE-STEP-REFACTOR-PLAN.txt`。本轮仅设计，尚未实施，以下在线版本保持。
 
 API v40 / ceab753已部署8081；5180沿用原页面，已在线修正fixture资源断链并验证页面启动。独立TEST-Agent-MM-Ultra-03，项目proj-18101842-d821-4583-9229-a708f995c1c8，来源71a5c797-319b-496d-a6ce-f67c1080439c。Provider仍为用户指定Ultra版本3；默认test/DeepSeek未变，未进行模型对照。
 
