@@ -1,3 +1,7 @@
+## 已完成里程碑事件：原生工具字段词表与工程模型统一
+
+真实免费模型连续输出不支持的cable_type，说明仅靠提示词列字段不充分。工具参数的Column/Constant/CellBinding.field及Module.module_id现在直接使用现有工程字段/模块注册表枚举，批准的类型扩展按项目版本加入；不建立另一套业务词表。HTTP工具契约定向测试确认cable_model可选、cable_type不被宣告，Go构建通过。继续用已有MinIO检查点验证真实纠错，不放宽本地来源校验。
+
 ## 当前继续路线：独立免费真实模型复测（不修改原默认Provider）
 
 - 在同一OpenRouter服务发现并实际验证`nvidia/nemotron-3-ultra-550b-a55b:free`原生工具调用HTTP200且费用0；新建非默认Provider `TEST-Agent-Free-Nemotron`，ID `59c504bf-a8c8-42db-9afc-b89f70a0f2d5`。原test/DeepSeek配置完全保留，结果不能混记。

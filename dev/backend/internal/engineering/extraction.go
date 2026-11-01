@@ -34,6 +34,17 @@ func init() {
 		bindingFields[f] = true
 	}
 }
+
+// BindingFields is the canonical field vocabulary shared with Agent tool schemas.
+func BindingFields() []string {
+	fields := make([]string, 0, len(bindingFields))
+	for field := range bindingFields {
+		fields = append(fields, field)
+	}
+	sort.Strings(fields)
+	return fields
+}
+
 func sourceCells(w bom.Workbook) map[string]map[string]bom.Cell {
 	out := map[string]map[string]bom.Cell{}
 	for _, sheet := range w.Sheets {

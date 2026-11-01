@@ -66,6 +66,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 	if err := json.Unmarshal(toolSchema, &functions); err != nil {
 		return proposal, err
 	}
+	constrainEngineeringTools(functions, hooks.Attributes)
 	ir := bom.NewWorkbookIR(w)
 	history := []any{}
 	if hooks.Resume != nil {
@@ -427,4 +428,36 @@ func boundedEngineeringHistory(history []any) []any {
 		}
 	}
 	return history
+}
+
+func constrainEngineeringTools(functions []any, attributes []engineering.AttributeDefinition) {
+	fields := engineering.BindingFields()
+	for _, attribute := range attributes {
+		if attribute.ApprovalStatus == "approved" {
+			fields = append(fields, fmt.Sprintf("attribute:%s@%d", attribute.ID, attribute.Version))
+		}
+	}
+	modules := []string{}
+	for _, module := range engineering.DefaultRegistry().Definitions() {
+		modules = append(modules, module.ID)
+	}
+	for _, entry := range functions {
+		function := entry.(map[string]any)["function"].(map[string]any)
+		parameters := function["parameters"].(map[string]any)
+		definitions, _ := parameters["$defs"].(map[string]any)
+		for _, name := range []string{"Column", "Constant", "CellBinding", "Module"} {
+			definition, ok := definitions[name].(map[string]any)
+			if !ok {
+				continue
+			}
+			properties := definition["properties"].(map[string]any)
+			field := "field"
+			allowed := fields
+			if name == "Module" {
+				field = "module_id"
+				allowed = modules
+			}
+			properties[field].(map[string]any)["enum"] = allowed
+		}
+	}
 }

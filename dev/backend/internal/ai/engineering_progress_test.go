@@ -30,6 +30,24 @@ func TestEngineeringNativeToolsResumeSheetCheckpoint(t *testing.T) {
 		if len(toolList) != 14 {
 			t.Errorf("native tools missing: %d", len(toolList))
 		}
+		for _, tool := range toolList {
+			function := tool.(map[string]any)["function"].(map[string]any)
+			if function["name"] == "propose_engineering_model" {
+				fields := function["parameters"].(map[string]any)["$defs"].(map[string]any)["Column"].(map[string]any)["properties"].(map[string]any)["field"].(map[string]any)["enum"].([]any)
+				found := false
+				for _, field := range fields {
+					if field == "cable_model" {
+						found = true
+					}
+					if field == "cable_type" {
+						t.Error("unsupported cable_type advertised")
+					}
+				}
+				if !found {
+					t.Error("canonical cable_model missing from native tool contract")
+				}
+			}
+		}
 		if calls > 0 {
 			var messages []struct {
 				Role    string `json:"role"`
