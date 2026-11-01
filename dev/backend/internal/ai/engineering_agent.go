@@ -28,6 +28,8 @@ type engineeringAction struct {
 
 type EngineeringCheckpoint struct {
 	Proposal        engineering.EngineeringProposal `json:"proposal"`
+	InspectedSheets []string                        `json:"inspected_sheets"`
+	History         []any                           `json:"history"`
 	CompletedSheets []string                        `json:"completed_sheets"`
 }
 type EngineeringToolHooks struct {
@@ -66,6 +68,9 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 	}
 	ir := bom.NewWorkbookIR(w)
 	history := []any{}
+	if hooks.Resume != nil {
+		history = boundedEngineeringHistory(hooks.Resume.History)
+	}
 	registry := engineering.DefaultRegistry().Definitions()
 	summary := []any{}
 	for _, s := range w.Sheets {
@@ -78,6 +83,26 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 		summary = append(summary, map[string]any{"sheet": s.Name, "cells": len(s.Cells), "merge_count": len(s.Merges), "formulas": formulas, "dimension": s.Dimension})
 	}
 	inspected := map[string]bool{}
+	if hooks.Resume != nil {
+		for _, sheet := range hooks.Resume.InspectedSheets {
+			inspected[sheet] = true
+		}
+	}
+	persist := func() error {
+		if hooks.Checkpoint == nil {
+			return nil
+		}
+		checkpoint := EngineeringCheckpoint{Proposal: proposal, CompletedSheets: []string{}, InspectedSheets: []string{}, History: boundedEngineeringHistory(history)}
+		for _, sheet := range w.Sheets {
+			if completed[sheet.Name] {
+				checkpoint.CompletedSheets = append(checkpoint.CompletedSheets, sheet.Name)
+			}
+			if inspected[sheet.Name] {
+				checkpoint.InspectedSheets = append(checkpoint.InspectedSheets, sheet.Name)
+			}
+		}
+		return hooks.Checkpoint(ctx, checkpoint)
+	}
 	queued := []json.RawMessage{}
 	budget := max(24, len(w.Sheets)*16)
 	for turn := 0; turn < budget; turn++ {
@@ -127,6 +152,9 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 				return proposal, e
 			}
 			history = append(history, map[string]any{"rejected_action": json.RawMessage(raw), "error": schemaErr.Error()})
+			if e := persist(); e != nil {
+				return proposal, e
+			}
 			continue
 		}
 		var action engineeringAction
@@ -242,17 +270,6 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 						}
 					}
 					if action.Action == "propose_engineering_model" {
-						next := EngineeringCheckpoint{Proposal: candidate, CompletedSheets: []string{}}
-						for _, sheet := range w.Sheets {
-							if completed[sheet.Name] || sheet.Name == action.Sheet {
-								next.CompletedSheets = append(next.CompletedSheets, sheet.Name)
-							}
-						}
-						if hooks.Checkpoint != nil {
-							if e := hooks.Checkpoint(ctx, next); e != nil {
-								return proposal, e
-							}
-						}
 						proposal = candidate
 						completed[action.Sheet] = true
 						result = map[string]any{"sheet_saved": action.Sheet, "regions": len(action.Proposal.Regions), "completed_sheets": len(completed), "formal_write": false}
@@ -278,9 +295,9 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 		if e := trace(action.Action, state, detail); e != nil {
 			return proposal, e
 		}
-		history = append(history, map[string]any{"action": action, "result": result})
-		if len(history) > 12 {
-			history = history[len(history)-12:]
+		history = boundedEngineeringHistory(append(history, map[string]any{"action": action, "result": result}))
+		if e := persist(); e != nil {
+			return proposal, e
 		}
 	}
 	return proposal, fmt.Errorf("ENGINEERING_AGENT_TURN_LIMIT")

@@ -60,12 +60,12 @@ func TestEngineeringNativeToolsResumeSheetCheckpoint(t *testing.T) {
 	p := Provider{Endpoint: server.URL, Timeout: time.Second, TokenBudget: 2048, JSONMode: true}
 	result, err := p.UnderstandEngineering(context.Background(), wb, func(string, string, string) error { return nil }, EngineeringToolHooks{Resume: &prior, Checkpoint: func(_ context.Context, cp EngineeringCheckpoint) error {
 		saved++
-		if len(cp.CompletedSheets) != 2 || len(cp.Proposal.Regions) != 2 {
+		if saved == 2 && (len(cp.CompletedSheets) != 2 || len(cp.Proposal.Regions) != 2) {
 			t.Errorf("lost prior checkpoint: %+v", cp)
 		}
 		return nil
 	}, Artifact: func(context.Context, string, string, any) error { artifacts++; return nil }})
-	if err != nil || calls != 2 || saved != 1 || artifacts != 2 || len(result.Regions) != 2 {
+	if err != nil || calls != 2 || saved != 2 || artifacts != 2 || len(result.Regions) != 2 {
 		t.Fatalf("progress failure: %v calls=%d saved=%d artifacts=%d", err, calls, saved, artifacts)
 	}
 }
@@ -89,5 +89,54 @@ func TestProviderErrorPreservesSafeTransientReason(t *testing.T) {
 			t.Fatal("raw upstream error exposed")
 		}
 		server.Close()
+	}
+}
+
+func TestEngineeringRestoresUnfinishedSheetToolHistory(t *testing.T) {
+	wb := bom.Workbook{Sheets: []bom.Sheet{{Name: "arbitrary", Cells: []bom.Cell{{Ref: "A1", Row: 1, Column: 1, Value: "Label"}, {Ref: "A2", Row: 2, Column: 1, Value: "synthetic device"}}}}}
+	calls := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		var body struct {
+			Messages []struct {
+				Role string `json:"role"`
+			} `json:"messages"`
+		}
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if calls == 2 {
+			w.WriteHeader(401)
+			return
+		}
+		content := `{"action":"inspect_sheet","sheet":"arbitrary"}`
+		if calls == 3 {
+			if len(body.Messages) < 4 || body.Messages[len(body.Messages)-1].Role != "tool" {
+				t.Error("inspection result lost after restart")
+			}
+			content = `{"action":"propose_engineering_model","sheet":"arbitrary","proposal":{"summary":"source inventory","regions":[{"sheet":"arbitrary","bounds":{"start_row":1,"end_row":2,"start_column":1,"end_column":1},"kind":"equipment","semantic":"inventory","header_rows":[1],"columns":[{"field":"label","column":1,"unit":""}],"constants":[]}],"modules":[],"questions":[]}}`
+		}
+		if calls > 3 {
+			t.Error("unfinished sheet inspection repeated")
+		}
+		_ = json.NewEncoder(w).Encode(map[string]any{"choices": []any{map[string]any{"message": map[string]string{"content": content}, "finish_reason": "stop"}}})
+	}))
+	defer server.Close()
+	var saved *EngineeringCheckpoint
+	hook := func(_ context.Context, cp EngineeringCheckpoint) error {
+		raw, _ := json.Marshal(cp)
+		saved = new(EngineeringCheckpoint)
+		return json.Unmarshal(raw, saved)
+	}
+	p := Provider{Endpoint: server.URL, Timeout: time.Second}
+	trace := func(string, string, string) error { return nil }
+	if _, err := p.UnderstandEngineering(context.Background(), wb, trace, EngineeringToolHooks{Checkpoint: hook}); err == nil {
+		t.Fatal("provider failure falsely succeeded")
+	}
+	if saved == nil || len(saved.History) != 1 || len(saved.InspectedSheets) != 1 || len(saved.CompletedSheets) != 0 {
+		t.Fatal("unfinished tool state not persisted")
+	}
+	resumed := Provider{Endpoint: server.URL, Timeout: time.Second}
+	result, err := resumed.UnderstandEngineering(context.Background(), wb, trace, EngineeringToolHooks{Resume: saved, Checkpoint: hook})
+	if err != nil || len(result.Regions) != 1 || calls != 3 {
+		t.Fatalf("resume failed: %v calls=%d", err, calls)
 	}
 }

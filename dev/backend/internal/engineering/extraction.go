@@ -111,8 +111,14 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 		}
 		used := map[string]bool{}
 		for _, c := range r.Columns {
-			if !validBindingField(c.Field) || used[c.Field] || c.Column < b.StartColumn || c.Column > b.EndColumn {
-				return fmt.Errorf("INVALID_FIELD_BINDING: %s", c.Field)
+			if !validBindingField(c.Field) {
+				return fmt.Errorf("UNKNOWN_FIELD_BINDING: %s", c.Field)
+			}
+			if used[c.Field] {
+				return fmt.Errorf("DUPLICATE_FIELD_BINDING: sheet=%s kind=%s field=%s; split side-by-side tables into separate regions or use records; each field occurs once per object", r.Sheet, r.Kind, c.Field)
+			}
+			if c.Column < b.StartColumn || c.Column > b.EndColumn {
+				return fmt.Errorf("FIELD_COLUMN_OUTSIDE_REGION: sheet=%s field=%s column=%d bounds=%d..%d", r.Sheet, c.Field, c.Column, b.StartColumn, b.EndColumn)
 			}
 			used[c.Field] = true
 		}
