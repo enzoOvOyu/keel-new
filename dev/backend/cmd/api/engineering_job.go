@@ -133,6 +133,8 @@ func (s *Server) runEngineeringJob(ctx context.Context) {
 			}
 			if err != nil {
 				e = err
+			} else if queueErr := s.queuePlanCalculations(run, source, expected+1); queueErr != nil {
+				_ = trace("module_calculation_plan", "partial", "工程草案已保存；适用计算任务未全部排队，可在模块内重新计算")
 			}
 		}
 	}

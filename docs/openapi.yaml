@@ -16465,6 +16465,65 @@ paths:
           description: Revision stale or not published
         '422':
           description: Invalid network planning facts or dependencies
+  /projects/{projectId}/engineering-imports/{engineeringId}/plan:
+    get:
+      operationId: getEngineeringPlan
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: engineeringId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Typed revision intelligence
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getEngineeringPlanEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped source not found
+  /projects/{projectId}/engineering-imports/{engineeringId}/intelligence:
+    get:
+      operationId: getEngineeringIntelligence
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: engineeringId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      responses:
+        '200':
+          description: Typed revision intelligence
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getEngineeringIntelligenceEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped source not found
 components:
   securitySchemes:
     bearerAuth:
@@ -45859,6 +45918,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/IDEConstantBinding'
+        records:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDERecordBinding'
       required:
       - sheet
       - bounds
@@ -45926,6 +45989,8 @@ components:
         formula:
           type: boolean
         calculation_run_id:
+          type: string
+        source_id:
           type: string
       required:
       - id
@@ -46800,6 +46865,114 @@ components:
       properties:
         data:
           $ref: '#/components/schemas/IDEGoldenInput'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    IDECellBinding:
+      type: object
+      additionalProperties: false
+      properties:
+        field:
+          type: string
+        sheet:
+          type: string
+        cell:
+          type: string
+        unit:
+          type: string
+      required:
+      - field
+      - sheet
+      - cell
+      - unit
+    IDERecordBinding:
+      type: object
+      additionalProperties: false
+      properties:
+        cells:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDECellBinding'
+      required:
+      - cells
+    IDEPlanBlock:
+      type: object
+      additionalProperties: false
+      properties:
+        instance_id:
+          type: string
+        inputs:
+          type: array
+          items:
+            type: string
+      required:
+      - instance_id
+      - inputs
+    IDEPlanView:
+      type: object
+      additionalProperties: false
+      properties:
+        plan:
+          $ref: '#/components/schemas/IDEImportPlan'
+        definitions:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEEngineeringModule'
+        batches:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+        unavailable:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEPlanBlock'
+      required:
+      - plan
+      - definitions
+      - batches
+      - unavailable
+    IDEIntelligenceView:
+      type: object
+      additionalProperties: false
+      properties:
+        regions:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEWorkbookRegion'
+        facts:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDESemanticFact'
+        total_facts:
+          type: integer
+        offset:
+          type: integer
+      required:
+      - regions
+      - facts
+      - total_facts
+      - offset
+    getEngineeringPlanEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEPlanView'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    getEngineeringIntelligenceEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEIntelligenceView'
         request_id:
           type: string
       required:

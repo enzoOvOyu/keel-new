@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/xuri/excelize/v2"
 	"keel.local/dev/internal/bom"
 )
 
@@ -33,7 +34,22 @@ func init() {
 		bindingFields[f] = true
 	}
 }
+func sourceCells(w bom.Workbook) map[string]map[string]bom.Cell {
+	out := map[string]map[string]bom.Cell{}
+	for _, sheet := range w.Sheets {
+		out[sheet.Name] = map[string]bom.Cell{}
+		for row, cols := range bom.MergedSourceCells(sheet) {
+			for col, c := range cols {
+				ref, _ := excelize.CoordinatesToCellName(col, row)
+				c.Sheet = sheet.Name
+				out[sheet.Name][ref] = c
+			}
+		}
+	}
+	return out
+}
 func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
+	recordSources := sourceCells(w)
 	if p.Summary == "" || len(p.Regions) == 0 {
 		return fmt.Errorf("ENGINEERING_REGIONS_REQUIRED")
 	}
@@ -65,6 +81,33 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 		case "equipment", "assembly", "site", "room", "rack", "placement", "port", "connection", "cable", "power", "material", "workload", "network_fabric", "network_plane", "network_role", "network_interface", "network_allocation", "network_bgp", "network_bfd", "network_qos", "network_ar", "network_evpn", "other":
 		default:
 			return fmt.Errorf("UNKNOWN_REGION_KIND")
+		}
+		if len(r.Records) > 0 && len(r.Columns) > 0 {
+			return fmt.Errorf("MIXED_REGION_BINDINGS")
+		}
+		for _, record := range r.Records {
+			bound := map[string]bool{}
+			if len(record.Cells) == 0 {
+				return fmt.Errorf("EMPTY_RECORD_BINDING")
+			}
+			for _, b := range record.Cells {
+				if !bindingFields[b.Field] || usedConstant(r.Constants, b.Field) || bound[b.Field] {
+					return fmt.Errorf("INVALID_RECORD_FIELD")
+				}
+				bound[b.Field] = true
+				_, ok := sheets[b.Sheet]
+				if !ok {
+					return fmt.Errorf("UNKNOWN_RECORD_SHEET")
+				}
+				_, _, e := excelize.CellNameToCoordinates(b.Cell)
+				if e != nil {
+					return fmt.Errorf("INVALID_RECORD_CELL")
+				}
+				cell, ok := recordSources[b.Sheet][b.Cell]
+				if !ok || cell.Sensitive {
+					return fmt.Errorf("UNAVAILABLE_RECORD_CELL")
+				}
+			}
 		}
 		used := map[string]bool{}
 		for _, c := range r.Columns {
@@ -118,15 +161,26 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 	return nil
 }
 
+func usedConstant(constants []ConstantBinding, field string) bool {
+	for _, c := range constants {
+		if c.Field == field {
+			return true
+		}
+	}
+	return false
+}
+
 type rowData struct {
-	kind   string
-	values map[string]string
-	cells  map[string][]bom.Cell
-	units  map[string]string
+	regionID string
+	kind     string
+	values   map[string]string
+	cells    map[string][]bom.Cell
+	units    map[string]string
 }
 
 type Extraction struct {
 	Model                   PhysicalModel
+	Facts                   []SemanticFact
 	Evidence                []SourceEvidence
 	Issues                  []ValidationIssue
 	TotalCells, MappedCells int
@@ -150,7 +204,8 @@ func ExtractPhysical(w bom.Workbook, p EngineeringProposal, project, source, rev
 		out.Issues = append(out.Issues, ValidationIssue{ID: StableID(project, "issue", revision+id+code+field), ProjectID: project, RevisionID: revision, EntityID: id, Code: code, Severity: "BLOCK", ModuleID: "workbook_intelligence", Field: field, Message: message, PublishTarget: target, Resolution: "open", EvidenceIDs: []ID{}})
 	}
 	rows := []rowData{}
-	for _, region := range p.Regions {
+	recordSources := sourceCells(w)
+	for regionIndex, region := range p.Regions {
 		if region.Kind == "other" {
 			continue
 		}
@@ -169,11 +224,37 @@ func ExtractPhysical(w bom.Workbook, p EngineeringProposal, project, source, rev
 		for _, h := range region.HeaderRows {
 			headers[h] = true
 		}
+		regionID := StableID(source, "region", fmt.Sprint(regionIndex))
+		for _, record := range region.Records {
+			r := rowData{regionID: regionID, kind: region.Kind, values: map[string]string{}, cells: map[string][]bom.Cell{}, units: map[string]string{}}
+			for _, b := range record.Cells {
+				c := recordSources[b.Sheet][b.Cell]
+				c.Sheet = b.Sheet
+				r.values[b.Field] = strings.TrimSpace(c.Value)
+				if b.Unit != "" {
+					r.values[b.Field] = normalizeUnit(c.Value, b.Unit, b.Field)
+				}
+				r.units[b.Field] = b.Unit
+				r.cells[b.Field] = []bom.Cell{c}
+			}
+			for _, b := range region.Constants {
+				r.values[b.Field] = b.Value
+				for _, ref := range b.EvidenceCells {
+					c := raw[ref]
+					c.Sheet = region.Sheet
+					r.cells[b.Field] = append(r.cells[b.Field], c)
+				}
+			}
+			rows = append(rows, r)
+		}
+		if len(region.Records) > 0 {
+			continue
+		}
 		for row := region.Bounds.StartRow; row <= region.Bounds.EndRow; row++ {
 			if headers[row] {
 				continue
 			}
-			r := rowData{kind: region.Kind, values: map[string]string{}, cells: map[string][]bom.Cell{}, units: map[string]string{}}
+			r := rowData{regionID: regionID, kind: region.Kind, values: map[string]string{}, cells: map[string][]bom.Cell{}, units: map[string]string{}}
 			nonempty := false
 			for _, b := range region.Columns {
 				c := index[fmt.Sprintf("%d:%d", row, b.Column)]
@@ -183,7 +264,10 @@ func ExtractPhysical(w bom.Workbook, p EngineeringProposal, project, source, rev
 				r.values[b.Field] = strings.TrimSpace(c.Value)
 				r.units[b.Field] = b.Unit
 				if b.Unit != "" && strings.TrimSpace(c.Value) != "" {
-					r.values[b.Field] = normalizeUnit(c.Value, b.Unit, b.Field)
+					r.values[b.Field] = strings.TrimSpace(c.Value)
+					if b.Unit != "" {
+						r.values[b.Field] = normalizeUnit(c.Value, b.Unit, b.Field)
+					}
 				}
 				r.cells[b.Field] = []bom.Cell{c}
 				if strings.TrimSpace(c.Value) != "" {
@@ -205,11 +289,22 @@ func ExtractPhysical(w bom.Workbook, p EngineeringProposal, project, source, rev
 	makeVersion := func(id string, r rowData, fields ...string) EntityVersion {
 		v := EntityVersion{EntityID: id, RevisionID: revision, ProvenanceID: source, Maturity: Estimated, EvidenceIDs: []ID{}, Attributes: []AttributeValue{}}
 		for _, f := range fields {
+			if value := r.values[f]; value != "" {
+				typed := TypedValue{Kind: "text", Text: &value}
+				if unit := r.units[f]; decimal(value) && unit != "" {
+					if strings.HasSuffix(f, "_mm") {
+						unit = "mm"
+					}
+					typed = TypedValue{Kind: "decimal", Decimal: &value, Unit: &unit}
+				}
+				subject := id
+				out.Facts = append(out.Facts, SemanticFact{ID: StableID(source, "fact", r.regionID+"/"+id+"/"+f+"/"+value), ProjectID: project, RevisionID: revision, RegionID: r.regionID, SubjectID: &subject, Predicate: f, Value: typed, ClaimStatus: "proposed", Maturity: Estimated, ProvenanceID: source})
+			}
 			for _, c := range r.cells[f] {
 				if c.Ref == "" || c.Sensitive {
 					continue
 				}
-				e := SourceEvidence{ID: StableID(source, "evidence", id+"/"+f+"/"+c.Sheet+"/"+c.Ref), EntityID: id, Sheet: c.Sheet, Cell: c.Ref, Field: f, Formula: c.Formula != ""}
+				e := SourceEvidence{SourceID: source, ID: StableID(source, "evidence", id+"/"+f+"/"+c.Sheet+"/"+c.Ref), EntityID: id, Sheet: c.Sheet, Cell: c.Ref, Field: f, Formula: c.Formula != ""}
 				out.Evidence = append(out.Evidence, e)
 				v.EvidenceIDs = append(v.EvidenceIDs, e.ID)
 				used[c.Sheet+"/"+c.Ref] = true

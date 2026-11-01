@@ -6485,6 +6485,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getEngineeringPlan"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/intelligence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getEngineeringIntelligence"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -16266,6 +16298,7 @@ export interface components {
             header_rows: number[];
             columns: components["schemas"]["IDEColumnBinding"][];
             constants: components["schemas"]["IDEConstantBinding"][];
+            records?: components["schemas"]["IDERecordBinding"][];
         };
         IDEModuleDetection: {
             module_id: string;
@@ -16287,6 +16320,7 @@ export interface components {
             entity_id: string;
             formula: boolean;
             calculation_run_id?: string;
+            source_id?: string;
         };
         IDETargetStatus: {
             target: string;
@@ -16572,6 +16606,39 @@ export interface components {
         };
         getEngineeringGoldenInputEnvelope: {
             data: components["schemas"]["IDEGoldenInput"];
+            request_id: string;
+        };
+        IDECellBinding: {
+            field: string;
+            sheet: string;
+            cell: string;
+            unit: string;
+        };
+        IDERecordBinding: {
+            cells: components["schemas"]["IDECellBinding"][];
+        };
+        IDEPlanBlock: {
+            instance_id: string;
+            inputs: string[];
+        };
+        IDEPlanView: {
+            plan: components["schemas"]["IDEImportPlan"];
+            definitions: components["schemas"]["IDEEngineeringModule"][];
+            batches: string[][];
+            unavailable: components["schemas"]["IDEPlanBlock"][];
+        };
+        IDEIntelligenceView: {
+            regions: components["schemas"]["IDEWorkbookRegion"][];
+            facts: components["schemas"]["IDESemanticFact"][];
+            total_facts: number;
+            offset: number;
+        };
+        getEngineeringPlanEnvelope: {
+            data: components["schemas"]["IDEPlanView"];
+            request_id: string;
+        };
+        getEngineeringIntelligenceEnvelope: {
+            data: components["schemas"]["IDEIntelligenceView"];
             request_id: string;
         };
     };
@@ -36309,6 +36376,82 @@ export interface operations {
             };
             /** @description Invalid network planning facts or dependencies */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getEngineeringPlan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Typed revision intelligence */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getEngineeringPlanEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped source not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getEngineeringIntelligence: {
+        parameters: {
+            query?: {
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Typed revision intelligence */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getEngineeringIntelligenceEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scoped source not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

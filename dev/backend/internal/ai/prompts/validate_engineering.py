@@ -17,7 +17,15 @@ class Constant(Closed):
     field: str
     value: str
     evidence_cells: list[str] = Field(min_length=1)
+class CellBinding(Closed):
+    field: str
+    sheet: str
+    cell: str
+    unit: str
+class RecordBinding(Closed):
+    cells: list[CellBinding] = Field(min_length=1)
 class Region(Closed):
+    records: list[RecordBinding] = Field(default_factory=list)
     sheet: str
     bounds: Bounds
     kind: Literal['equipment','assembly','site','room','rack','placement','port','connection','cable','power','material','workload','network_fabric','network_plane','network_role','network_interface','network_allocation','network_bgp','network_bfd','network_qos','network_ar','network_evpn','other']

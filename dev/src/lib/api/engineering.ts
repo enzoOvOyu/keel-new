@@ -87,3 +87,7 @@ export const editEngineeringNetwork=(project:string,id:string,request:NetworkEdi
 export const engineeringPhysicalRevisions=(project:string,signal?:AbortSignal)=>bomRequest<Models['IDEPhysicalRevisionOption'][]>('projects/'+encodeURIComponent(project)+'/engineering-physical-revisions','GET',undefined,undefined,signal);
 export const engineeringModelAt=(project:string,id:string,revision:string,signal?:AbortSignal)=>bomRequest<EngineeringModelView>(engineeringPath(project,id)+'/model?revision_id='+encodeURIComponent(revision),'GET',undefined,undefined,signal);
 export const engineeringGoldenInput=(project:string,id:string,signal?:AbortSignal)=>bomRequest<Models['IDEGoldenInput']>(engineeringPath(project,id)+'/golden-input','GET',undefined,undefined,signal);
+export type EngineeringPlanView = Models['IDEPlanView'];
+export type EngineeringIntelligenceView = Models['IDEIntelligenceView'];
+export const engineeringPlan=(project:string,id:string,signal?:AbortSignal)=>bomRequest<EngineeringPlanView>(engineeringPath(project,id)+'/plan','GET',undefined,undefined,signal);
+export const engineeringIntelligence=(project:string,id:string,offset=0,signal?:AbortSignal)=>bomRequest<EngineeringIntelligenceView>(engineeringPath(project,id)+'/intelligence?offset='+offset,'GET',undefined,undefined,signal);

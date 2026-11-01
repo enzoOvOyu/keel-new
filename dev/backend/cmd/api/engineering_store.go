@@ -34,6 +34,9 @@ func (s *Server) attachEngineering(ctx context.Context, importID, actor string) 
 		if _, e = tx.Exec(ctx, `INSERT INTO eng_revision(id,source_id,sequence,actor,origin,reason,total_cells,mapped_cells,proposal) SELECT $1,$2,1,$3,'agent','immutable source anchor',COALESCE((SELECT sum(jsonb_array_length(s->'source_cells')) FROM bom_import_batch b,jsonb_array_elements(b.workbook->'sheets') s WHERE b.id=$4),0),0,$5`, revision, id, actor, importID, jsonBytes(proposal)); e != nil {
 			return "", e
 		}
+		if e = saveEngineeringIntelligence(ctx, tx, s.project, id, revision, 1, proposal, engineering.Extraction{Model: engineering.EmptyPhysical(s.project)}, nil); e != nil {
+			return "", e
+		}
 		if _, e = tx.Exec(ctx, `UPDATE eng_source SET head_revision_id=$2 WHERE id=$1`, id, revision); e != nil {
 			return "", e
 		}
@@ -83,14 +86,14 @@ func engineeringModel(ctx context.Context, q engineeringQuery, revision, project
 	if e := loadCableRows(ctx, q, revision, &m); e != nil {
 		return m, evidence, e
 	}
-	rows, e := q.Query(ctx, `SELECT id::text,entity_id::text,sheet,cell,field,formula,calculation_run_id::text FROM eng_evidence WHERE revision_id=$1 ORDER BY id`, revision)
+	rows, e := q.Query(ctx, `SELECT id::text,entity_id::text,sheet,cell,field,formula,calculation_run_id::text,source_id::text FROM eng_evidence WHERE revision_id=$1 ORDER BY id`, revision)
 	if e != nil {
 		return m, evidence, e
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var v engineering.SourceEvidence
-		if e = rows.Scan(&v.ID, &v.EntityID, &v.Sheet, &v.Cell, &v.Field, &v.Formula, &v.CalculationRunID); e != nil {
+		if e = rows.Scan(&v.ID, &v.EntityID, &v.Sheet, &v.Cell, &v.Field, &v.Formula, &v.CalculationRunID, &v.SourceID); e != nil {
 			return m, evidence, e
 		}
 		evidence = append(evidence, v)
@@ -129,7 +132,7 @@ func engineeringTargetDigest(m engineering.PhysicalModel, target string, maturit
 	normalize = func(v any) {
 		switch value := v.(type) {
 		case map[string]any:
-			for _, key := range []string{"revision_id", "provenance_id", "evidence_ids", "calculation_run_id", "attributes"} {
+			for _, key := range []string{"revision_id", "provenance_id", "evidence_ids", "calculation_run_id", "required_calculation_run_id", "quantity_calculation_run_id"} {
 				delete(value, key)
 			}
 			if !maturity {
@@ -394,7 +397,7 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 			return errors.New("EXTENSIONS_REQUIRE_APPROVED_DEFINITION")
 		}
 		v.RevisionID = revision
-		v.ProvenanceID = source
+		v.ProvenanceID = revision
 		if origin == "human" && changed[v.EntityID] {
 			v.Maturity = engineering.Confirmed
 			id := engineering.StableID(source, "manual-evidence", revision+v.EntityID)
@@ -404,7 +407,7 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 		if _, err := tx.Exec(ctx, `INSERT INTO eng_entity(id,project_id,kind,planning_key) VALUES($1::uuid,$2,$3,$1::text) ON CONFLICT(project_id,id) DO NOTHING`, v.EntityID, s.project, kind); err != nil {
 			return err
 		}
-		_, err := tx.Exec(ctx, `INSERT INTO eng_entity_version(revision_id,entity_id,project_id,kind,maturity,provenance_id) VALUES($1,$2,$3,$4,$5,$6)`, revision, v.EntityID, s.project, kind, v.Maturity, source)
+		_, err := tx.Exec(ctx, `INSERT INTO eng_entity_version(revision_id,entity_id,project_id,kind,maturity,provenance_id) VALUES($1,$2,$3,$4,$5,$6)`, revision, v.EntityID, s.project, kind, v.Maturity, revision)
 		return err
 	}
 	for i := range x.Model.Equipment {
@@ -460,10 +463,13 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 		return "", e
 	}
 	for _, v := range x.Evidence {
+		if v.SourceID == "" {
+			v.SourceID = source
+		}
 		if !entities[v.EntityID] {
 			continue
 		}
-		if _, e = tx.Exec(ctx, `INSERT INTO eng_evidence VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT DO NOTHING`, revision, v.EntityID, v.ID, v.Sheet, v.Cell, v.Field, v.Formula, v.CalculationRunID); e != nil {
+		if _, e = tx.Exec(ctx, `INSERT INTO eng_evidence(revision_id,entity_id,id,sheet,cell,field,formula,calculation_run_id,source_id) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) ON CONFLICT DO NOTHING`, revision, v.EntityID, v.ID, v.Sheet, v.Cell, v.Field, v.Formula, v.CalculationRunID, v.SourceID); e != nil {
 			return "", e
 		}
 	}
@@ -524,6 +530,9 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 		if e != nil {
 			return "", e
 		}
+	}
+	if e = saveEngineeringIntelligence(ctx, tx, s.project, source, revision, version+1, p, x, previous); e != nil {
+		return "", e
 	}
 	if _, e = tx.Exec(ctx, `UPDATE eng_source SET revision=revision+1,head_revision_id=$2,summary=$3 WHERE id=$1`, source, revision, p.Summary); e != nil {
 		return "", e

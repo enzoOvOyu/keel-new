@@ -208,7 +208,7 @@ func (r *Registry) PlanBatches(plan ImportPlan) ([][]ID, map[ID][]string, error)
 				if input.Required {
 					edges[m.ID] = append(edges[m.ID], upstream.ID)
 				}
-				if input.Required && (upstream.State == NotApplicable || upstream.State == Blocked || upstream.State == Stale) {
+				if input.Required && (upstream.State == NotApplicable || upstream.State == NeedsInput || upstream.State == Blocked || upstream.State == Stale) {
 					blocked[m.ID] = append(blocked[m.ID], input.Name)
 				}
 			} else if input.Required && (!input.Available || input.RevisionID == nil || *input.RevisionID == "" || input.Digest == nil || *input.Digest == "") {
@@ -388,9 +388,9 @@ func DefaultRegistry() *Registry {
 		{ID: "workbook_intelligence", Domain: SourceDomain, Title: "资料理解", Inputs: []ModuleIO{{"source", "WorkbookSource", true}}, Outputs: []ModuleIO{{"facts", "SemanticFact", false}, {"plan", "ImportPlan", false}}, Applicability: "存在开局资料", Validations: []string{"evidence", "coverage", "schema"}},
 		{ID: "equipment", Domain: EquipmentDomain, Title: "设备与组合", Inputs: []ModuleIO{{"facts", "SemanticFact", true}}, Outputs: []ModuleIO{{"equipment", "EquipmentPlan", false}, {"assemblies", "DeviceAssembly", false}}, Applicability: "资料包含设备身份、型号、数量或部件组合", Validations: []string{"equipment_identity", "assembly_cycle", "source_coverage"}, PublishTargets: []string{"CMDB_PLANNED_EQUIPMENT"}},
 		{ID: "facility_placement", Domain: FacilityDomain, Title: "机房与落位", Inputs: []ModuleIO{{"facts", "SemanticFact", true}, {"equipment", "EquipmentPlan", false}}, Outputs: []ModuleIO{{"facility", "FacilityModel", false}, {"placement", "RackPlacement", false}}, Applicability: "资料包含场地、空间坐标、机柜或安装位置", Validations: []string{"facility_hierarchy", "rack_capacity", "placement_overlap"}, PublishTargets: []string{"CMDB_PLANNED_FACILITY", "CMDB_PLANNED_PLACEMENT"}},
-		{ID: "power_cooling", Domain: PowerDomain, Title: "电力与冷却", Inputs: []ModuleIO{{"facts", "SemanticFact", true}, {"equipment", "EquipmentPlan", false}, {"placement", "RackPlacement", false}}, Outputs: []ModuleIO{{"power", "PowerPlan", false}}, Applicability: "资料包含功率、负载、容量或冷却依据", Calculations: []string{"approved_power_rules"}, Validations: []string{"power_basis", "capacity", "units"}, PublishTargets: []string{"ENGINEERING_POWER"}},
+		{ID: "power_cooling", Domain: PowerDomain, Title: "电力与冷却", Inputs: []ModuleIO{{"facts", "SemanticFact", true}, {"equipment", "EquipmentPlan", false}, {"placement", "RackPlacement", false}}, Outputs: []ModuleIO{{"power", "PowerPlan", false}}, Applicability: "资料包含功率、负载、容量或冷却依据", Calculations: []string{"power_balance", "approved_power_rules"}, Validations: []string{"power_basis", "capacity", "units"}, PublishTargets: []string{"ENGINEERING_POWER"}},
 		{ID: "connectivity_cabling", Domain: ConnectivityDomain, Title: "连接与布线", Inputs: []ModuleIO{{"facts", "SemanticFact", true}, {"equipment", "EquipmentPlan", true}, {"placement", "RackPlacement", false}}, Outputs: []ModuleIO{{"connectivity", "ConnectivityPlan", false}, {"cabling", "CablePlan", false}}, Applicability: "资料包含端接、端口、配线节点、路径或线缆需求", Calculations: []string{"approved_route_rules", "approved_stock_rules", "approved_optic_rules"}, Validations: []string{"endpoints", "port_occupancy", "maturity"}, PublishTargets: []string{"CMDB_PLANNED_CONNECTIVITY", "ENGINEERING_CABLING"}},
-		{ID: "material_workload", Domain: MaterialDomain, Title: "采购与施工", Inputs: []ModuleIO{{"facts", "SemanticFact", true}, {"equipment", "EquipmentPlan", false}, {"cabling", "CablePlan", false}}, Outputs: []ModuleIO{{"material", "MaterialEstimate", false}, {"workload", "WorkloadEstimate", false}}, Applicability: "资料包含采购、需求、备件、安装或施工数量", Calculations: []string{"approved_procurement_rules", "approved_workload_rules"}, Validations: []string{"units", "estimate_not_asset"}, PublishTargets: []string{"ENGINEERING_MATERIAL", "ENGINEERING_WORKLOAD"}},
+		{ID: "material_workload", Domain: MaterialDomain, Title: "采购与施工", Inputs: []ModuleIO{{"facts", "SemanticFact", true}, {"equipment", "EquipmentPlan", false}, {"cabling", "CablePlan", false}}, Outputs: []ModuleIO{{"material", "MaterialEstimate", false}, {"workload", "WorkloadEstimate", false}}, Applicability: "资料包含采购、需求、备件、安装或施工数量", Calculations: []string{"workload_summary", "approved_procurement_rules", "approved_workload_rules"}, Validations: []string{"units", "estimate_not_asset"}, PublishTargets: []string{"ENGINEERING_MATERIAL", "ENGINEERING_WORKLOAD"}},
 		{ID: "network_design", Domain: NetworkDomain, Title: "逻辑网络", Inputs: []ModuleIO{{"facts", "SemanticFact", true}, {"connectivity", "ConnectivityPlan", false}}, Outputs: []ModuleIO{{"network", "NetworkPlan", false}}, Applicability: "存在逻辑网络规划依据；物理链路本身不是协议依据", Validations: []string{"network_source", "allocations", "approved_physical_revision"}, PublishTargets: []string{"NETWORK_REVISION"}},
 		{ID: "validation_release", Domain: ReleaseDomain, Title: "校验审核与发布", Inputs: []ModuleIO{{"plan", "ImportPlan", true}}, Outputs: []ModuleIO{{"issues", "ValidationIssue", false}, {"publication", "PublishRecord", false}}, Applicability: "存在工程模块及其产物", Validations: []string{"cross_domain", "review_version", "publish_target"}},
 	}
@@ -412,14 +412,11 @@ func DefaultRegistry() *Registry {
 	}
 	for i := range defs {
 		defs[i].Version = 1
-		defs[i].ImplementationStatus = "planned"
+		defs[i].ImplementationStatus = "implemented"
 		for _, target := range defs[i].PublishTargets {
 			defs[i].ReviewGates = append(defs[i].ReviewGates, ReviewGate{"human_revision_review", "bom:review", target})
 		}
 	}
-	// These flags describe only the implemented kernel, not an end-to-end module.
-	defs[1].ImplementationStatus = "model_and_validation"
-	defs[2].ImplementationStatus = "model_and_validation"
 	r, err := NewRegistry(defs)
 	if err != nil {
 		panic(err)

@@ -1236,6 +1236,32 @@
       "handler": "dev/backend/cmd/api/engineering.go",
       "source": "dev/backend/cmd/api/engineering_network.go",
       "documentation": "docs/api/engineering.md"
+    },
+    {
+      "method": "get",
+      "path": "/projects/{projectId}/engineering-imports/{engineeringId}/plan",
+      "operation_id": "getEngineeringPlan",
+      "response_status": "200",
+      "response_schema": "getEngineeringPlanEnvelope",
+      "implementation": "implemented",
+      "deployment": "not_deployed",
+      "verification": "isolated synthetic plan/facts/provenance persistence and intrinsic calculation selection; real provider and UI acceptance NOT RUN",
+      "handler": "dev/backend/cmd/api/engineering.go",
+      "source": "dev/backend/cmd/api/engineering_intelligence.go",
+      "documentation": "docs/api/engineering.md"
+    },
+    {
+      "method": "get",
+      "path": "/projects/{projectId}/engineering-imports/{engineeringId}/intelligence",
+      "operation_id": "getEngineeringIntelligence",
+      "response_status": "200",
+      "response_schema": "getEngineeringIntelligenceEnvelope",
+      "implementation": "implemented",
+      "deployment": "not_deployed",
+      "verification": "isolated synthetic plan/facts/provenance persistence and intrinsic calculation selection; real provider and UI acceptance NOT RUN",
+      "handler": "dev/backend/cmd/api/engineering.go",
+      "source": "dev/backend/cmd/api/engineering_intelligence.go",
+      "documentation": "docs/api/engineering.md"
     }
   ],
   "development_note": "作业平台 UI 整改：新增执行版本定义查询、列表分页、时间筛选和同步游标为分支增量；尚未部署至当前 BOM v5 集成后端。现运行版本以 HANDOFF 顶部为准。"

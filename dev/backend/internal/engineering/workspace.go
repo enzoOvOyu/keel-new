@@ -71,7 +71,17 @@ type ConstantBinding struct {
 	Value         string   `json:"value"`
 	EvidenceCells []string `json:"evidence_cells"`
 }
+type CellBinding struct {
+	Field string `json:"field"`
+	Sheet string `json:"sheet"`
+	Cell  string `json:"cell"`
+	Unit  string `json:"unit"`
+}
+type RecordBinding struct {
+	Cells []CellBinding `json:"cells"`
+}
 type RegionMapping struct {
+	Records    []RecordBinding   `json:"records,omitempty"`
 	Sheet      string            `json:"sheet"`
 	Bounds     Bounds            `json:"bounds"`
 	Kind       string            `json:"kind"`
@@ -93,6 +103,7 @@ type EngineeringProposal struct {
 	Questions []string          `json:"questions"`
 }
 type SourceEvidence struct {
+	SourceID         string `json:"source_id,omitempty"`
 	ID               ID     `json:"id"`
 	Sheet            string `json:"sheet"`
 	Cell             string `json:"cell"`
@@ -220,4 +231,21 @@ type GoldenInput struct {
 	RevisionID         string      `json:"revision_id"`
 	Plan               NetworkPlan `json:"plan"`
 	PhysicalRevisionID string      `json:"physical_revision_id"`
+}
+
+type PlanBlock struct {
+	InstanceID string   `json:"instance_id"`
+	Inputs     []string `json:"inputs"`
+}
+type PlanView struct {
+	Plan        ImportPlan          `json:"plan"`
+	Definitions []EngineeringModule `json:"definitions"`
+	Batches     [][]ID              `json:"batches"`
+	Unavailable []PlanBlock         `json:"unavailable"`
+}
+type IntelligenceView struct {
+	Regions    []WorkbookRegion `json:"regions"`
+	Facts      []SemanticFact   `json:"facts"`
+	TotalFacts int              `json:"total_facts"`
+	Offset     int              `json:"offset"`
 }

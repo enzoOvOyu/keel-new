@@ -177,6 +177,29 @@ func (s *Server) engineeringRoutes(w http.ResponseWriter, r *http.Request) bool 
 		respond(w, 200, workspace)
 		return true
 	}
+	if action == "plan" && r.Method == "GET" {
+		value, e := s.engineeringPlan(ctx, workspace)
+		if e != nil {
+			engineeringFailure(w, e)
+		} else {
+			respond(w, 200, value)
+		}
+		return true
+	}
+	if action == "intelligence" && r.Method == "GET" {
+		offset, _ := strconv.Atoi(r.URL.Query().Get("offset"))
+		if offset < 0 {
+			fail(w, 400, "INVALID_OFFSET")
+			return true
+		}
+		value, e := s.engineeringIntelligence(ctx, workspace, offset)
+		if e != nil {
+			engineeringFailure(w, e)
+		} else {
+			respond(w, 200, value)
+		}
+		return true
+	}
 	if action == "analyze" && r.Method == "POST" {
 		var q struct {
 			Expected int `json:"expected_revision"`

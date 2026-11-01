@@ -228,7 +228,7 @@ func (s *Server) queueEngineeringCalculation(ctx context.Context, source string,
 	}
 	digest := engineering.Digest([]any{hash, *revision, q.Operation, q.Rule, q.RequestedCells, q.Inputs})
 	id := uuid.NewString()
-	e = tx.QueryRow(ctx, `INSERT INTO eng_calculation_run(id,project_id,source_id,revision_id,module_instance_id,provider_id,rule_id,rule_version,source_sha256,input_digest,status,actor,requested_cells) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,'pending',$11,$12) ON CONFLICT(source_id,input_digest) WHERE status IN('pending','running') DO UPDATE SET input_digest=excluded.input_digest RETURNING id::text`, id, s.project, source, *revision, module, provider, ruleID, ruleVersion, hash, digest, actor, jsonBytes(q.RequestedCells)).Scan(&id)
+	e = tx.QueryRow(ctx, `INSERT INTO eng_calculation_run(id,project_id,source_id,revision_id,module_instance_id,provider_id,rule_id,rule_version,source_sha256,input_digest,status,actor,requested_cells) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,'pending',$11,$12) ON CONFLICT(source_id,input_digest) WHERE status IN('pending','running') DO UPDATE SET input_digest=excluded.input_digest RETURNING id::text`, id, s.project, source, *revision, engineering.StableID(source, "module", module), provider, ruleID, ruleVersion, hash, digest, actor, jsonBytes(q.RequestedCells)).Scan(&id)
 	if e != nil {
 		return "", e
 	}
