@@ -1,6 +1,6 @@
 # 真实 API 契约与实现台账
 
-> 当前环境已部署智能开局工程代码`5abb94f`（原5180/8081），迁移至037；见[部署证据](intelligent-deployment/deployment-20261101.json)。下方旧模块的运行证据保留为历史，不表示本次复验通过。
+> 当前API部署`ceab753`/v40（8081），前端5180保持，迁移038；见[部署证据](intelligent-deployment/deployment-agent-repair-20261101.json)。真实MM资料已完成15张表候选，首轮理解验收未通过，见[理解审查](intelligent-deployment/SOURCE-UNDERSTANDING-REVIEW-20261101.txt)。下方旧模块运行证据保留为历史。
 
 更新：2026-10-31。用途：后续迭代先从这里确认接口是否真实实现、部署到哪里、哪些行为已经验证，再定位变更涉及的代码。没有登记的操作不自动判为未实现，也不自动判为可用。
 

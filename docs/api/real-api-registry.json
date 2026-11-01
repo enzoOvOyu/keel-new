@@ -1,7 +1,7 @@
 {
   "version": 1,
   "updated_at": "2026-11-01",
-  "coverage": "APIceab753/v40 deployed. Ultra-03 resumes failed revision2 analysis using durable per-sheet pending drafts and corrected source-domain/identity validation. First full revision2 draft remains semantically unaccepted; no formal publication.",
+  "coverage": "API ceab753/v40 deployed. Real Ultra-03 final proposal covers 15 sheets; independent source-understanding review PARTIAL / NOT ACCEPTED. Technical completion and correct source fields do not establish semantic or publication acceptance.",
   "schema_authority": "docs/openapi.yaml",
   "code_revision": "ceab753",
   "deployed_revision": "ceab753",
@@ -1404,5 +1404,5 @@
       "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
     }
   ],
-  "development_note": "运行代码5abb94f，迁移027–037已应用；本次仅部署和启动/受权只读检查。真实资料与跨客户验收尚未执行。"
+  "development_note": "当前运行ceab753/v40，迁移038；真实MM/Ultra分析提案已完整保存，资料理解验收未通过。当前结论见docs/intelligent-deployment/SOURCE-UNDERSTANDING-REVIEW-20261101.txt；未正式发布、未进行模型对照或跨客户验收。"
 }

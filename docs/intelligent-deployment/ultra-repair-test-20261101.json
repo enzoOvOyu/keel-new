@@ -1,5 +1,5 @@
 {
-  "status": "IN_PROGRESS",
+  "status": "PARTIAL_NOT_ACCEPTED",
   "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
   "provider_revision": 3,
   "project_code": "TEST-Agent-MM-Ultra-03",
@@ -28,7 +28,7 @@
   "storage": "Complete tool artifacts/checkpoints remain in MinIO; PostgreSQL stores metadata and typed engineering facts",
   "reasoning_trial": "Default reasoning produced invalid textual tool payloads; restored prior working request settings without changing model",
   "test_scope": "Targeted AI/engineering checks, API build, real API documentation consistency and real workbook analysis only",
-  "equipment_extra_field_review": "Current revision2 re-analysis: Network equipment identity was only bound in its placement region; v39 rejects and corrects this. Server remains pending. Earlier v33 equipment match is historical.",
+  "equipment_extra_field_review": "Current v40 proposal: 189 network + 778 server label/model source values match. Location formatting and split-region model projection are not covered by that result; no claim of complete equipment acceptance.",
   "historical_equipment_core_comparison": [
     {
       "sheet": "Network Information",
@@ -164,13 +164,38 @@
     "formal_publications": 0,
     "artifact_storage": "MinIO proposal/checkpoints; immutable typed draft in PostgreSQL"
   },
-  "current_analysis_scope": "Resume revision2 checkpoints after v37 no-progress; v38-v40 distinguish domain errors, preserve equipment identity, reject extra cable field conflicts and retain pending sheet drafts independently of active history.",
+  "current_analysis_scope": "Final 15-sheet proposal reviewed against P0 and independent OOXML. Current job resumes revision2 checkpoints; not a fresh independent model run. No further field-guard patches or reanalysis started.",
   "provider_comparison": "Asked asynchronously whether configured testAI/DeepSeek may be used for an independent comparison; no answer received, still Ultra.",
   "latest_critical_value_check": {
-    "job_id": "78becbc5-9e14-4be6-8eff-d5c5dd4e3664",
+    "job_id": "c3788ecc-f911-465f-bb4c-bc667ca70d8d",
     "cabling_rows": 7154,
     "matched_fields_per_row": 8,
     "independent_ooxml_comparison": "PASS",
-    "extra_field_review": "FAIL: connector/label/media/distance conflicts; corrective validation deployed"
-  }
+    "scope": "Source values matched across proposed regions, not final extracted relationship correctness. OOB splits endpoint fields across two incomplete regions."
+  },
+  "completed_sheets": 15,
+  "assessment_report": "docs/intelligent-deployment/SOURCE-UNDERSTANDING-REVIEW-20261101.txt",
+  "technical_job_state": "succeeded",
+  "source_understanding_review": {
+    "status": "PARTIAL_NOT_ACCEPTED",
+    "regions": 29,
+    "questions": 33,
+    "summary_characters": 15497,
+    "findings": [
+      "Connection-count descriptions conflict with independent source counts",
+      "Applicable module source lists omit relevant power/equipment/material sheets",
+      "Rack elevation grids lack complete structured device-rack-U relationships",
+      "Rack-pair route summary still classified as device-port connections",
+      "Local formula descriptions are not a complete cross-sheet dependency understanding",
+      "Resume/merge repeats whole-workbook summaries and preserves stale descriptions"
+    ],
+    "current_resumed_job_formula_tools": {
+      "inspect_formula": 5,
+      "trace_formula_dependencies": 0,
+      "resolve_cross_sheet_references": 0
+    },
+    "formal_publications": 0,
+    "model_comparison": "NOT_RUN"
+  },
+  "draft_revision": 3
 }

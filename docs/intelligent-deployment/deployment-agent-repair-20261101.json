@@ -32,7 +32,7 @@
     "native_tools_checkpoint_and_provider_errors": "PASS",
     "source_upload": "PASS: engineering mode; zero legacy recognition jobs",
     "minio_artifact_write_read": "PASS: actual artifact roundtrip",
-    "full_real_workbook_understanding": "IN_PROGRESS: c3788ecc-f911-465f-bb4c-bc667ca70d8d resumes revision2 failed checkpoints. Previous full revision2 draft has not passed independent semantic review.",
+    "full_real_workbook_understanding": "PARTIAL / NOT ACCEPTED: all 15 sheet candidates and full proposal persisted; independent source-understanding review found count, module-source, grid-relation and summary consistency defects.",
     "frontend_upload_module": "HTTP 200; browser not run",
     "artifact_recovery_scope_hash_cleanup": "PASS: isolated PostgreSQL and synthetic S3, including new service instance restore, wrong project/revision/claim rejection, integrity verification and index cascade",
     "typescript_engineering_adapter": "PASS",
@@ -71,5 +71,6 @@
     ],
     "scope": "Health and real source upload/attach/analyze/get performed; other historical list startup checks were not repeated"
   },
-  "test_evidence": "docs/intelligent-deployment/agent-repair-test-20261101.json"
+  "test_evidence": "docs/intelligent-deployment/agent-repair-test-20261101.json",
+  "understanding_review": "docs/intelligent-deployment/SOURCE-UNDERSTANDING-REVIEW-20261101.txt"
 }

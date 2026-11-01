@@ -1,11 +1,11 @@
 {
   "updated_at": "2026-11-01T05:29:49.409927+00:00",
   "branch": "dev",
-  "scope": "APIceab753/v40 deployed. Full source-to-draft path completed once but correctness failed. Pending sheet drafts now survive active-history filtering and restart; named equipment and source-domain feedback corrected. Real same-source analysis continuing.",
+  "scope": "API ceab753/v40 deployed. Real source understanding executed using Ultra; 15-sheet proposal persisted, independent semantic acceptance PARTIAL / NOT ACCEPTED. Implementation of later stages is not real-source business acceptance.",
   "phase_status": {
     "P0": "complete; report commit 314126d",
     "P1": "complete: architecture, models, contracts and kernel",
-    "P2": "Multiround source tools, column and explicit cross-sheet record proposals, deterministic typed extraction, persisted regions/facts/provenance and dynamic module plan connected; real provider/source acceptance NOT RUN",
+    "P2": "Implemented multiround tools and durable artifacts; real MM/Ultra source understanding tested and NOT ACCEPTED. Partial correct source mappings coexist with missing relationships, module evidence and inconsistent summaries.",
     "P3": "isolated LibreOffice Provider, formula graph, unit-aware restricted rule AST, human rule approval and durable runs implemented; real Golden Fixture reference acceptance pending",
     "P4": "All five typed domain batches, per-segment cable plans and approved typed attributes implemented; Golden receives reviewed input only; real source/customer acceptance NOT RUN",
     "P5": "Independent domain review/publication plus immutable reimport baseline, explicit difference decisions and same-lineage planning withdrawal implemented; real source acceptance NOT RUN",
@@ -273,12 +273,12 @@
     "original_workbooks_modified": false,
     "live_frontend_changed": true,
     "scope": "Existing running environment only; branch implementation and isolated checks listed separately",
-    "code_revision": "5abb94f",
-    "evidence": "docs/intelligent-deployment/deployment-20261101.json"
+    "code_revision": "ceab753",
+    "evidence": "docs/intelligent-deployment/deployment-agent-repair-20261101.json"
   },
   "next_vertical_slice": [],
   "limits": [
-    "No true AI/source workbook/Golden Fixture/human Ground Truth acceptance",
+    "Real AI/source test executed; source-understanding acceptance NOT ACCEPTED. Human-reviewed full-domain Golden Fixture acceptance remains incomplete.",
     "No browser interaction or cross-customer generalization acceptance",
     "Formula source/Golden Fixture compatibility and human Ground Truth NOT RUN",
     "Rule AST rejects unsupported compound-unit operations; dynamic/external spreadsheet dependencies remain partial",
@@ -295,5 +295,6 @@
     "Reference recalculation of real workbook formulas",
     "Second structurally different real customer source; variants alone do not prove generalization",
     "Browser interaction and existing CMDB rack/topology acceptance"
-  ]
+  ],
+  "source_understanding_review": "docs/intelligent-deployment/SOURCE-UNDERSTANDING-REVIEW-20261101.txt"
 }
