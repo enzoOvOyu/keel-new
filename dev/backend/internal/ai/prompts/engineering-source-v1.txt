@@ -16,4 +16,6 @@ Use supplied tools only. read_range/inspect_region return at most32 rows and64 c
 
 full_sheet_bounds is the complete used extent. Structural regions describe occupied spans, not necessarily independent tables. Proposals must account for all actual rows to that full extent, not only the preview.
 
+Region BOUNDS and field BINDINGS are different. A table region's bounds include its full width, including helper/manufacturer/count columns. Its columns list contains only the subset with real engineering meanings. Removing an unsupported binding MUST NOT shrink the region bounds. Unbound columns within those bounds are retained source evidence and satisfy source-area coverage without invented fields.
+
 When proposed_region_kinds is supplied, your own previous classification scopes the mapping tool vocabulary. Correct bindings within those domains. If evidence requires a different domain, call classify_information with the revised region kind first; do not force unrelated fields into the current mapping.

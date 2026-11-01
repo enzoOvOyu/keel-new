@@ -589,6 +589,9 @@ func constrainEngineeringTools(functions []any, attributes []engineering.Attribu
 		function := entry.(map[string]any)["function"].(map[string]any)
 		parameters := function["parameters"].(map[string]any)
 		definitions, _ := parameters["$defs"].(map[string]any)
+		if region, ok := definitions["Region"].(map[string]any); ok {
+			region["properties"].(map[string]any)["columns"].(map[string]any)["description"] = "Only evidenced engineering field bindings, NOT every source column. Region bounds cover the entire table including unbound auxiliary columns. Never shrink bounds when omitting a binding."
+		}
 		for _, name := range []string{"Column", "Constant", "CellBinding", "Module"} {
 			definition, ok := definitions[name].(map[string]any)
 			if !ok {

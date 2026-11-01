@@ -45,7 +45,7 @@ func CheckSheetCoverage(w bom.Workbook, p EngineeringProposal, sheet string) err
 	}
 	start, _ := excelize.CoordinatesToCellName(minCol, minRow)
 	end, _ := excelize.CoordinatesToCellName(maxCol, maxRow)
-	return fmt.Errorf("INCOMPLETE_SHEET_COVERAGE: sheet=%s missing_cells=%d uncovered_bounds=%s:%s; extend mappings to all data rows and columns, or retain unknown areas as other regions; preview is not the full table", sheet, missing, start, end)
+	return fmt.Errorf("INCOMPLETE_SHEET_COVERAGE: sheet=%s missing_cells=%d uncovered_bounds=%s:%s; extend REGION BOUNDS to include these source cells, NOT field bindings. A region can include unbound helper/manufacturer/count columns; retain them without inventing engineering fields. Keep valid column bindings unchanged. Only unrelated tables need a separate other region", sheet, missing, start, end)
 }
 
 // Strong, explicit header groups must not be silently downgraded to "other".
