@@ -1,6 +1,6 @@
 ## 已完成里程碑事件：用户指定Ultra直接实测并停止
 
-直接使用nvidia/nemotron-3-ultra-550b-a55b:free上传原MM文件到全新独立项目TEST-Agent-MM-Ultra-02，未继承旧模型完成结果。首次读取成功，但连续三次模型提案因connection.fabric、connection.label、cable.label等错误字段被拒绝；还观察到多列重复label。任务最终自行失败ENGINEERING_AGENT_NO_PROGRESS，停止后续重试。0/15表完成，未产生工程实体或发布记录；证据已持久保存。没有可用于量化“比DeepSeek差多少”的同条件成功基线，只能确定本轮未达到Agent可用标准。详见[Ultra实测记录](docs/intelligent-deployment/ultra-model-test-20261101.json)。
+直接使用nvidia/nemotron-3-ultra-550b-a55b:free上传原MM文件到全新独立项目TEST-Agent-MM-Ultra-02，未继承旧模型完成结果。首次读取成功，但连续三次模型提案因connection.fabric、connection.label、cable.label等错误字段被拒绝；还观察到多列重复label。随后又三次查询不存在的公式单元格（CELL_NOT_FOUND），任务自行失败ENGINEERING_AGENT_NO_PROGRESS，停止后续重试。0/15表完成，未产生工程实体或发布记录；证据已持久保存。没有可用于量化“比DeepSeek差多少”的同条件成功基线，只能确定本轮未达到Agent可用标准。详见[Ultra实测记录](docs/intelligent-deployment/ultra-model-test-20261101.json)。
 
 用户此前指定HeyGen已在一次合成调用确认其为语音合成模型、不能运行聊天/工具任务；随后用户切换Flint，再明确改为Ultra并要求不核查400。本轮按最后指令直接跑Ultra，未继续其他模型诊断。
 

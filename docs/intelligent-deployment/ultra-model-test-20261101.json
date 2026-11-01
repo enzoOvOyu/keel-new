@@ -19,7 +19,8 @@
     "Three propose_engineering_model calls rejected: connection.fabric, connection.label, cable.label",
     "Repeated label bindings assigned to several unrelated columns despite correction feedback",
     "Some endpoint columns corresponded to source headers, but no complete proposal passed validation",
-    "One HTTP502 transient response occurred; no investigation or separate compatibility probes in this Ultra run"
+    "One HTTP502 transient response occurred; no investigation or separate compatibility probes in this Ultra run",
+    "After the rejected proposals, three inspect_formula calls returned CELL_NOT_FOUND; this repeated lack of progress ended the job."
   ],
   "counts": {
     "rejected_model_proposals": 3,
@@ -29,7 +30,8 @@
     "engineering_entities": 0,
     "engineering_publications": 0,
     "minio_artifacts": 34,
-    "minio_compressed_bytes": 144196
+    "minio_compressed_bytes": 144196,
+    "missing_formula_cell_calls": 3
   },
   "stopping": "The job had already failed when the stop update was attempted (0 rows changed); no replacement job queued. This is not a manually fabricated failure status.",
   "comparison_limit": "No equivalent successful whole-workbook DeepSeek result exists, so this run cannot establish a numerical model-quality gap. It fails the current Agent usability criteria.",

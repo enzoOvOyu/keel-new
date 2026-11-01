@@ -1,7 +1,7 @@
 {
   "updated_at": "2026-11-01T05:29:49.409927+00:00",
   "branch": "dev",
-  "scope": "API repair0405d93 remains deployed. Latest user-selected Ultra real workbook test in fresh TEST-Agent-MM-Ultra-02 failed ENGINEERING_AGENT_NO_PROGRESS after three invalid proposals; 0/15 sheets accepted, no engineering entities/publications. Further retries stopped per user instruction. Prior Lightning partial checkpoints are separate evidence, not Ultra results.",
+  "scope": "API repair0405d93 remains deployed. Latest user-selected Ultra real workbook test in fresh TEST-Agent-MM-Ultra-02 failed ENGINEERING_AGENT_NO_PROGRESS after three invalid proposals and three missing-formula-cell calls; 0/15 sheets accepted, no engineering entities/publications. Further retries stopped per user instruction. Prior Lightning partial checkpoints are separate evidence, not Ultra results.",
   "phase_status": {
     "P0": "complete; report commit 314126d",
     "P1": "complete: architecture, models, contracts and kernel",
