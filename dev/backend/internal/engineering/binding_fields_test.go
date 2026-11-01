@@ -40,6 +40,13 @@ func TestRejectEquipmentMetadataMasqueradingAsTypedFacts(t *testing.T) {
 	for _, tc := range []struct{ header, value, field, errorCode string }{
 		{"Asset ID", "TEST-1", "depth_mm", "HEADER_FIELD_CONFLICT"},
 		{"No.", "42", "quantity", "HEADER_FIELD_CONFLICT"},
+		{"设备", "TEST-MODEL", "site", "HEADER_FIELD_CONFLICT"},
+		{"设备", "TEST-MODEL", "height_u", "HEADER_FIELD_CONFLICT"},
+		{"单台功率(kW)", "12", "power_capacity", "HEADER_FIELD_CONFLICT"},
+		{"单台功率(kW)", "12", "power_unit", "HEADER_FIELD_CONFLICT"},
+		{"总MAX(kW)", "24", "start_u", "HEADER_FIELD_CONFLICT"},
+		{"单台功率(kW)", "12", "power", ""},
+		{"Power basis", "12", "power_basis", "FIELD_VALUE_CONFLICT"},
 		{"Rack Unit", "36", "height_u", "HEADER_FIELD_CONFLICT"},
 		{"Rack Number", "TEST-RACK", "site", "HEADER_FIELD_CONFLICT"},
 		{"Customer Rack Name", "TEST-RACK", "room", "HEADER_FIELD_CONFLICT"},

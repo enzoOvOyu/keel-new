@@ -75,6 +75,10 @@ func checkRecognizedTableCoverage(w bom.Workbook, p EngineeringProposal, sheet s
 				required = []string{"a_device", "a_port", "z_device", "z_port", "a_optic", "z_optic", "cable_model", "length"}
 				kinds["connection"] = true
 				kinds["cable"] = true
+			} else if len(fields["rack"]) > 0 && len(fields["power"]) > 0 && len(fields["power_capacity"]) > 0 {
+				required = []string{"rack", "power", "power_capacity"}
+				kinds["power"] = true
+				kinds["rack"] = true
 			} else if len(fields["label"]) > 0 && len(fields["model"]) > 0 && (len(fields["rack"]) > 0 || len(fields["serial"]) > 0) {
 				required = []string{"label", "model", "rack", "start_u"}
 				kinds["equipment"] = true

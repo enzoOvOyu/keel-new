@@ -89,7 +89,7 @@ func TestEngineeringCorrectionRejectsWrongSheetUnknownFieldsAndNoop(t *testing.T
 
 func TestEngineeringCorrectionRestoresOmittedArrayDefaults(t *testing.T) {
 	draft := &engineering.EngineeringProposal{Summary: "draft", Regions: []engineering.RegionMapping{{Sheet: "synthetic", Kind: "equipment", Semantic: "inventory", Bounds: engineering.Bounds{StartRow: 1, EndRow: 2, StartColumn: 1, EndColumn: 3}, HeaderRows: []int{1}, Columns: []engineering.ColumnBinding{{Field: "label", Column: 2}}}}}
-	raw, corrected, err := materializeEngineeringCorrection([]byte(`{"action":"map_semantic_fields","sheet":"synthetic","region_index":0,"set_columns":{"label":{"column":3}}}`), draft, "synthetic")
+	raw, corrected, err := materializeEngineeringCorrection([]byte(`{"action":"map_semantic_fields","sheet":"synthetic","region_index":0,"set_columns":[{"field":"label","column":3}]}`), draft, "synthetic")
 	if err != nil || !corrected {
 		t.Fatalf("correction failed: %v", err)
 	}

@@ -53,6 +53,18 @@ func validRegionField(kind, field string) bool {
 // Unknown customer wording remains for the Agent to interpret from source.
 func HeaderFields(value string) []string {
 	field := bom.Field(value)
+	header := strings.ToLower(strings.ReplaceAll(value, " ", ""))
+	if i := strings.IndexAny(header, "(（"); i >= 0 {
+		header = header[:i]
+	}
+	switch header {
+	case "设备":
+		return []string{"label", "model"}
+	case "power", "单台功率", "单台max功率", "max负载", "总max", "maxload":
+		return []string{"power"}
+	case "机柜容量", "rackpowercapacity":
+		return []string{"power_capacity"}
+	}
 	aliases := map[string][]string{
 		"hostname": {"label", "device"}, "device_alias": {"label", "device"}, "name": {"label"},
 		"endpoint_a_device": {"a_device"}, "endpoint_b_device": {"z_device"}, "endpoint_a_port": {"a_port"}, "endpoint_b_port": {"z_port"},
@@ -81,6 +93,21 @@ func sourceHeaderConflict(header, field string) bool {
 		return field != "label" && field != "device"
 	}
 	for _, expected := range HeaderFields(header) {
+		if expected == "power" || expected == "power_capacity" {
+			switch field {
+			case "power", "power_unit", "power_basis", "power_capacity", "power_capacity_unit", "cooling_capacity", "cooling_capacity_unit", "start_u", "height_u", "depth_mm":
+				return field != expected
+			}
+		}
+		if expected == "model" || bom.Field(header) == "hostname" || bom.Field(header) == "device_alias" {
+			switch field {
+			case "site", "room", "rack", "serial", "role", "start_u", "height_u", "depth_mm":
+				return true
+			}
+		}
+		if expected == "rack" && (field == "start_u" || field == "height_u" || field == "depth_mm") {
+			return true
+		}
 		if (expected == "site" || expected == "room" || expected == "rack") && (field == "site" || field == "room" || field == "rack") && expected != field {
 			return true // Distinct facility levels cannot share an unrelated source identity.
 		}
@@ -99,6 +126,10 @@ func bindingEnum(field string) []string {
 		return []string{"planned_instance", "group", "observed_reference"}
 	case "mount_face":
 		return []string{"front", "rear", "both", "unknown"}
+	case "power_basis":
+		return []string{"planned", "nameplate", "measured"}
+	case "power_unit", "power_capacity_unit", "cooling_capacity_unit":
+		return []string{"W", "kW"}
 	case "equipment_type":
 		return []string{"server", "switch", "nic", "gpu", "component", "psu", "pdu", "patch_panel", "device"}
 	}

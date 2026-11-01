@@ -51,3 +51,16 @@ func TestRecognizedEndpointsCannotBeDowngradedToOther(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestRackPowerEvidenceCannotBeDiscardedAsPlacement(t *testing.T) {
+	w := bom.Workbook{Sheets: []bom.Sheet{{Name: "different customer", Cells: []bom.Cell{{Ref: "A4", Row: 4, Column: 1, Value: "Rack"}, {Ref: "B4", Row: 4, Column: 2, Value: "Max Load(kW)"}, {Ref: "C4", Row: 4, Column: 3, Value: "Rack Power Capacity(kW)"}, {Ref: "A5", Row: 5, Column: 1, Value: "TEST-RACK"}, {Ref: "B5", Row: 5, Column: 2, Value: "10"}, {Ref: "C5", Row: 5, Column: 3, Value: "20"}}}}}
+	p := EngineeringProposal{Summary: "source", Regions: []RegionMapping{{Sheet: "different customer", Kind: "placement", Bounds: Bounds{StartRow: 4, EndRow: 5, StartColumn: 1, EndColumn: 3}, HeaderRows: []int{4}, Columns: []ColumnBinding{{Field: "rack", Column: 1}}}}}
+	if err := CheckSheetCoverage(w, p, "different customer"); err == nil {
+		t.Fatal("critical power fields silently discarded")
+	}
+	p.Regions[0].Kind = "power"
+	p.Regions[0].Columns = append(p.Regions[0].Columns, ColumnBinding{Field: "power", Column: 2, Unit: "kW"}, ColumnBinding{Field: "power_capacity", Column: 3, Unit: "kW"})
+	if err := CheckSheetCoverage(w, p, "different customer"); err != nil {
+		t.Fatal(err)
+	}
+}

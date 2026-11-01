@@ -54,10 +54,7 @@ func engineeringCorrectionTool(draft engineering.EngineeringProposal, sheet stri
 			fields = appendUnique(fields, fmt.Sprintf("attribute:%s@%d", a.ID, a.Version))
 		}
 	}
-	definitions := map[string]any{"Region": map[string]any{"properties": map[string]any{}}}
-	engineeringColumnMapSchema(definitions, fields)
-	columns := definitions["Region"].(map[string]any)["properties"].(map[string]any)["columns"]
-	delete(definitions, "Region")
+	columns := map[string]any{"type": "array", "description": "Sparse edits only; use [] when no column changes are needed. Each field appears once.", "items": map[string]any{"type": "object", "additionalProperties": false, "required": []string{"field", "column"}, "properties": map[string]any{"field": map[string]any{"type": "string", "enum": fields}, "column": map[string]any{"type": "integer", "minimum": 1}, "unit": map[string]any{"type": "string"}}}}
 	constant := map[string]any{"type": "object", "additionalProperties": false, "required": []string{"field", "value", "evidence_cells"}, "properties": map[string]any{
 		"field": map[string]any{"type": "string", "enum": fields}, "value": map[string]any{"type": "string"}, "evidence_cells": map[string]any{"type": "array", "minItems": 1, "items": map[string]any{"type": "string"}},
 	}}
@@ -66,8 +63,8 @@ func engineeringCorrectionTool(draft engineering.EngineeringProposal, sheet stri
 		bounds[key] = map[string]any{"type": "integer", "minimum": 1}
 	}
 	tool := map[string]any{"type": "function", "function": map[string]any{
-		"name": "map_semantic_fields", "description": "Correct draft_to_correct. Change only specified fields in one region; all other bindings remain unchanged. The entire resulting proposal is validated before saving. Region index is zero-based. Always include set_columns and remove_columns; use {} or [] for an unused operation. Removing an unsupported field requires remove_columns, not an empty call.",
-		"parameters": map[string]any{"type": "object", "additionalProperties": false, "required": []string{"sheet", "region_index", "set_columns", "remove_columns"}, "$defs": definitions, "properties": map[string]any{
+		"name": "map_semantic_fields", "description": "Correct draft_to_correct. Change only specified fields in one region; all other bindings remain unchanged. The entire resulting proposal is validated before saving. Region index is zero-based. Always include set_columns and remove_columns; use [] for an unused operation. Removing an unsupported field requires remove_columns, not an empty call.",
+		"parameters": map[string]any{"type": "object", "additionalProperties": false, "required": []string{"sheet", "region_index", "set_columns", "remove_columns"}, "properties": map[string]any{
 			"sheet": map[string]any{"type": "string", "enum": []string{sheet}}, "region_index": map[string]any{"type": "integer", "minimum": 0, "maximum": len(draft.Regions) - 1},
 			"set_kind":    map[string]any{"type": "string", "enum": kinds, "description": "Correct the region domain only when its source evidence supports that domain; keep existing bindings for validation."},
 			"set_columns": columns, "remove_columns": map[string]any{"type": "array", "items": map[string]any{"type": "string", "enum": removable}},
