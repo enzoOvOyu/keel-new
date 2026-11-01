@@ -1402,6 +1402,43 @@
       "request_schema": "IDEAttributeReview",
       "deployed_revision": "5abb94f",
       "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+    },
+    {
+      "method": "get",
+      "path": "/projects/{projectId}/engineering-inputs",
+      "operation_id": "getEngineeringInputCatalog",
+      "implementation": "implemented",
+      "deployment": "not_deployed",
+      "verification": "Go step input unit tests and API package compile passed; TypeScript and documentation checks passed; HTTP/browser NOT RUN",
+      "handler": "dev/backend/cmd/api/engineering_step_input.go",
+      "source": "dev/backend/internal/engineering/step_input.go",
+      "documentation": "docs/api/engineering.md",
+      "response_schema": "IDEInputCatalogResponse"
+    },
+    {
+      "method": "post",
+      "path": "/projects/{projectId}/engineering-inputs/preview",
+      "operation_id": "previewEngineeringInput",
+      "implementation": "implemented",
+      "deployment": "not_deployed",
+      "verification": "Go step input unit tests and API package compile passed; TypeScript and documentation checks passed; HTTP/browser NOT RUN",
+      "handler": "dev/backend/cmd/api/engineering_step_input.go",
+      "source": "dev/backend/internal/engineering/step_input.go",
+      "documentation": "docs/api/engineering.md",
+      "response_schema": "IDEInputPreviewResponse",
+      "request_schema": "IDEInputPreviewRequest"
+    },
+    {
+      "method": "get",
+      "path": "/projects/{projectId}/engineering-inputs/{tableId}",
+      "operation_id": "downloadEngineeringInputTemplate",
+      "implementation": "implemented",
+      "deployment": "not_deployed",
+      "verification": "Go step input unit tests and API package compile passed; TypeScript and documentation checks passed; HTTP/browser NOT RUN",
+      "handler": "dev/backend/cmd/api/engineering_step_input.go",
+      "source": "dev/backend/internal/engineering/step_input.go",
+      "documentation": "docs/api/engineering.md",
+      "response_media_type": "text/csv"
     }
   ],
   "development_note": "当前运行ceab753/v40，迁移038；真实MM/Ultra分析提案已完整保存，资料理解验收未通过。当前结论见docs/intelligent-deployment/SOURCE-UNDERSTANDING-REVIEW-20261101.txt；未正式发布、未进行模型对照或跨客户验收。"

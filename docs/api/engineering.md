@@ -167,3 +167,11 @@ Agent原生工具参数按Pydantic Schema校验，读取脱敏IR，以逐Sheet�
 针对已拒绝候选的字段/覆盖错误，Agent内部map_semantic_fields支持按区域索引局部设置/移除列绑定或常量、修订bounds。未修改字段保留，整个候选仍完整校验；复杂结构错误继续整份提案。工具原始局部请求留MinIO，检查点保存规范候选。该内部工具协议不新增HTTP操作，也不授予正式发布权限。
 
 工程理解内部纠错轮仅携带当前未批准草案、来源与验证错误；`map_semantic_fields`支持基于来源修正区域分类（set_kind），完整Schema/领域/来源检查保持。此为内部工具协议，不改变HTTP契约。
+
+## 五步标准输入契约（开发中，未部署）
+
+`GET /projects/{projectId}/engineering-inputs` 返回版本1的五步模板目录、列名、类型、必填及条件说明。`GET .../engineering-inputs/{tableId}?format=csv|xlsx` 下载仅表头模板；XLSX使用文本表头，不包含真实资料。八列端接模板固定为a端SN/a端MAC/a端端口/b端SN/b端机架位/b端MAC/b端端口/端接类型。
+
+`POST .../engineering-inputs/preview` 接受IDEInputPreviewRequest，返回逐行原值和字段问题。SN等身份字符串不转数字；MAC校验48位格式，数值按类型检查。表头、列序不符明确报错。该接口只做格式预览，不持久化、不认定工程模块就绪、不发布资产，不执行模型调用或规则计算。条件必填及跨表关系尚需后置建模校验。
+
+作用域为项目，读取/下载要求bom:read，预览要求bom:edit并沿用Session/CSRF。查询可按项目缓存目录；预览无缓存。请求沿用8MiB限制。前端提供五步选择、字段说明、XLSX/CSV下载、CSV读取与手动修改、问题表和前20行预览；当前仅标准格式预览已实现，补充入库、XLSX读取及新Agent仍在开发。错误包含403/未知模板404/非法格式400/Schema400；预览中的业务输入错误以200响应issues返回。未运行HTTP或浏览器验收。

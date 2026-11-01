@@ -96,3 +96,9 @@ export const reviewEngineeringDifferences=(project:string,id:string,request:Mode
 export const engineeringAttributes=(project:string,signal?:AbortSignal)=>bomRequest<AttributeDefinition[]>('projects/'+encodeURIComponent(project)+'/engineering-attributes','GET',undefined,undefined,signal);
 export const saveEngineeringAttribute=(project:string,request:Models['IDEAttributeDraft'])=>bomRequest<AttributeDefinition>('projects/'+encodeURIComponent(project)+'/engineering-attributes','POST',request);
 export const reviewEngineeringAttribute=(project:string,id:string,request:Models['IDEAttributeReview'])=>bomRequest<AttributeDefinition>('projects/'+encodeURIComponent(project)+'/engineering-attributes/'+encodeURIComponent(id)+'/review','POST',request);
+
+export type EngineeringInputCatalog = Models['IDEInputCatalog'];
+export type EngineeringInputPreview = Models['IDEInputPreview'];
+export const engineeringInputCatalog=(project:string,signal?:AbortSignal)=>bomRequest<EngineeringInputCatalog>('projects/'+encodeURIComponent(project)+'/engineering-inputs','GET',undefined,undefined,signal);
+export const previewEngineeringInput=(project:string,request:Models['IDEInputPreviewRequest'],signal?:AbortSignal)=>bomRequest<EngineeringInputPreview>('projects/'+encodeURIComponent(project)+'/engineering-inputs/preview','POST',request,undefined,signal);
+export const engineeringInputTemplateURL=(project:string,table:string,format:'csv'|'xlsx')=>'/api/v1/projects/'+encodeURIComponent(project)+'/engineering-inputs/'+encodeURIComponent(table)+'?format='+format;

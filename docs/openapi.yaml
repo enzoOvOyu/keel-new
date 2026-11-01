@@ -16692,6 +16692,84 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/IDEAttributeReview'
+  /projects/{projectId}/engineering-inputs:
+    get:
+      operationId: getEngineeringInputCatalog
+      tags:
+        - Engineering
+      parameters:
+        - &a1
+          in: path
+          name: projectId
+          required: true
+          schema: &a2
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IDEInputCatalogResponse"
+        "403":
+          description: Project permission denied
+  /projects/{projectId}/engineering-inputs/preview:
+    post:
+      operationId: previewEngineeringInput
+      tags:
+        - Engineering
+      parameters:
+        - *a1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IDEInputPreviewRequest"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IDEInputPreviewResponse"
+        "403":
+          description: Project permission denied
+  /projects/{projectId}/engineering-inputs/{tableId}:
+    get:
+      operationId: downloadEngineeringInputTemplate
+      tags:
+        - Engineering
+      parameters:
+        - *a1
+        - in: path
+          name: tableId
+          required: true
+          schema: *a2
+        - in: query
+          name: format
+          schema:
+            type: string
+            enum:
+              - csv
+              - xlsx
+            default: csv
+      responses:
+        "200":
+          description: Header-only version 1 template; all identities remain text
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        "403":
+          description: Project permission denied
+        "404":
+          description: Unknown input table
 components:
   securitySchemes:
     bearerAuth:
@@ -47301,6 +47379,125 @@ components:
       required:
       - data
       - request_id
+    IDEInputField:
+      type: object
+      additionalProperties: false
+      properties:
+        code: &a1
+          type: string
+        label: *a1
+        kind:
+          type: string
+          enum:
+            - text
+            - mac
+            - number
+            - positive
+            - positive_integer
+        required:
+          type: boolean
+      required:
+        - code
+        - label
+        - kind
+        - required
+    IDEInputTable:
+      type: object
+      additionalProperties: false
+      properties:
+        id: *a1
+        step:
+          type: integer
+          minimum: 1
+          maximum: 5
+        name: *a1
+        condition: *a1
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/IDEInputField"
+      required:
+        - id
+        - step
+        - name
+        - condition
+        - fields
+    IDEInputCatalog:
+      type: object
+      additionalProperties: false
+      properties:
+        version: *a1
+        tables:
+          type: array
+          items:
+            $ref: "#/components/schemas/IDEInputTable"
+      required:
+        - version
+        - tables
+    IDEInputPreviewRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        table_id: *a1
+        csv: *a1
+      required:
+        - table_id
+        - csv
+    IDEInputProblem:
+      type: object
+      additionalProperties: false
+      properties:
+        row:
+          type: integer
+        field: *a1
+        code: *a1
+        message: *a1
+      required:
+        - row
+        - field
+        - code
+        - message
+    IDEInputPreview:
+      type: object
+      additionalProperties: false
+      properties:
+        table_id: *a1
+        rows:
+          type: array
+          items:
+            type: array
+            items: *a1
+        issues:
+          type: array
+          items:
+            $ref: "#/components/schemas/IDEInputProblem"
+        valid:
+          type: boolean
+      required:
+        - table_id
+        - rows
+        - issues
+        - valid
+    IDEInputCatalogResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: "#/components/schemas/IDEInputCatalog"
+        request_id: *a1
+      required:
+        - data
+        - request_id
+    IDEInputPreviewResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: "#/components/schemas/IDEInputPreview"
+        request_id: *a1
+      required:
+        - data
+        - request_id
 x-implementation-policy:
   frontend-first: true
   mock-provider-required: true

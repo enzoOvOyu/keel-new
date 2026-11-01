@@ -57,6 +57,9 @@ func engineeringFailure(w http.ResponseWriter, e error) {
 	}
 }
 func (s *Server) engineeringRoutes(w http.ResponseWriter, r *http.Request) bool {
+	if s.engineeringStepInputRoutes(w, r) {
+		return true
+	}
 	if s.engineeringAttributeRoutes(w, r) {
 		return true
 	}

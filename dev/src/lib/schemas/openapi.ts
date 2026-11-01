@@ -6581,6 +6581,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/engineering-inputs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getEngineeringInputCatalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-inputs/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["previewEngineeringInput"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-inputs/{tableId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["downloadEngineeringInputTemplate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -16753,6 +16801,48 @@ export interface components {
         };
         reviewEngineeringAttributeEnvelope: {
             data: components["schemas"]["IDEAttributeDefinition"];
+            request_id: string;
+        };
+        IDEInputField: {
+            code: string;
+            label: string;
+            /** @enum {string} */
+            kind: "text" | "mac" | "number" | "positive" | "positive_integer";
+            required: boolean;
+        };
+        IDEInputTable: {
+            id: string;
+            step: number;
+            name: string;
+            condition: string;
+            fields: components["schemas"]["IDEInputField"][];
+        };
+        IDEInputCatalog: {
+            version: string;
+            tables: components["schemas"]["IDEInputTable"][];
+        };
+        IDEInputPreviewRequest: {
+            table_id: string;
+            csv: string;
+        };
+        IDEInputProblem: {
+            row: number;
+            field: string;
+            code: string;
+            message: string;
+        };
+        IDEInputPreview: {
+            table_id: string;
+            rows: string[][];
+            issues: components["schemas"]["IDEInputProblem"][];
+            valid: boolean;
+        };
+        IDEInputCatalogResponse: {
+            data: components["schemas"]["IDEInputCatalog"];
+            request_id: string;
+        };
+        IDEInputPreviewResponse: {
+            data: components["schemas"]["IDEInputPreview"];
             request_id: string;
         };
     };
@@ -36835,6 +36925,108 @@ export interface operations {
             };
             /** @description Invalid typed attribute */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getEngineeringInputCatalog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IDEInputCatalogResponse"];
+                };
+            };
+            /** @description Project permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    previewEngineeringInput: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEInputPreviewRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IDEInputPreviewResponse"];
+                };
+            };
+            /** @description Project permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    downloadEngineeringInputTemplate: {
+        parameters: {
+            query?: {
+                format?: "csv" | "xlsx";
+            };
+            header?: never;
+            path: {
+                projectId: string;
+                tableId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Header-only version 1 template; all identities remain text */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+            /** @description Project permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unknown input table */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

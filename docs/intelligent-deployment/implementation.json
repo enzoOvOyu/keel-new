@@ -298,7 +298,7 @@
   ],
   "source_understanding_review": "docs/intelligent-deployment/SOURCE-UNDERSTANDING-REVIEW-20261101.txt",
   "next_refactor": {
-    "status": "DESIGN_ONLY",
+    "status": "IN_PROGRESS",
     "plan": "docs/intelligent-deployment/FIVE-STEP-REFACTOR-PLAN.txt",
     "research_plan": "docs/intelligent-deployment/RESEARCH-BACKED-IMPLEMENTATION-20261101.txt",
     "recognition_boundary": "Unrestricted automatic recognition with zero errors cannot be guaranteed. Report supported inputs, held-out extraction and relation quality, abstentions and human completion separately; scope and automation targets remain unapproved and unverified.",
@@ -309,12 +309,15 @@
       "逻辑网络",
       "电力相关"
     ],
-    "implementation_gate": "Fixed templates, manual completion and deterministic five-step path must pass scoped acceptance before new Agent integration. No implementation or runtime changes in this planning task.",
+    "implementation_gate": "User authorized implementation. Complete deterministic five-step persistence, relations and scoped acceptance before Agent integration; template/preview slice implemented, not deployed.",
     "agent_scope": "New source triage plus five step-scoped extraction tasks sharing existing runtime; standard inputs remain usable without AI.",
     "confirmed_mac_meaning": "A=本端MAC; B=对端MAC; associate with the corresponding endpoint, not a sole device identity key.",
     "pending_semantics": [
       "端接类型值字典示例",
       "b端机架位组合格式示例"
+    ],
+    "completed_slices": [
+      "Version 1 five-step template catalog, CSV/XLSX header templates, CSV syntax preview and UI; not model persistence or semantic acceptance"
     ]
   }
 }
