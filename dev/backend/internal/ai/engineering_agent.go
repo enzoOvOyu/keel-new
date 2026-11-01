@@ -193,6 +193,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 			return nil
 		}
 		if schemaErr := validateEngineeringSchema(ctx, raw); schemaErr != nil {
+			queued = nil // Remaining calls were planned without this failure feedback.
 			if schemaErr.Error() == "AI_SCHEMA_VALIDATOR_UNAVAILABLE" {
 				return proposal, schemaErr
 			}
@@ -376,6 +377,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 			return proposal, e
 		}
 		if err != nil {
+			queued = nil // Give the model a correction turn before executing dependent calls.
 			key := action.Action + "/" + action.Sheet + "/" + err.Error()
 			rejections[key]++
 			if rejections[key] >= 3 {

@@ -326,6 +326,44 @@ func TestEngineeringMissingFormulaProvidesActualReferences(t *testing.T) {
 	}
 }
 
+func TestEngineeringBatchFailureReturnsFeedbackBeforeOtherCalls(t *testing.T) {
+	calls, rejected := 0, 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		content := `{"action":"inspect_sheet","sheet":"synthetic"}`
+		if calls == 2 {
+			content = `[{"action":"inspect_formula","sheet":"synthetic","cell":"B2"},{"action":"inspect_formula","sheet":"synthetic","cell":"C2"},{"action":"inspect_formula","sheet":"synthetic","cell":"D2"}]`
+		}
+		if calls == 3 {
+			var body struct {
+				Messages []struct {
+					Content string `json:"content"`
+				} `json:"messages"`
+			}
+			_ = json.NewDecoder(r.Body).Decode(&body)
+			var input map[string]any
+			_ = json.Unmarshal([]byte(body.Messages[1].Content), &input)
+			if len(input["tool_errors"].([]any)) != 1 {
+				t.Fatal("batch errors executed before model could correct")
+			}
+			content = `{"action":"propose_engineering_model","sheet":"synthetic","proposal":{"summary":"source retained","regions":[{"sheet":"synthetic","bounds":{"start_row":1,"end_row":1,"start_column":1,"end_column":1},"kind":"other","semantic":"unmapped source","header_rows":[],"columns":[]}]}}`
+		}
+		_ = json.NewEncoder(w).Encode(map[string]any{"choices": []any{map[string]any{"message": map[string]string{"content": content}}}})
+	}))
+	defer server.Close()
+	p := Provider{Endpoint: server.URL, Timeout: time.Second}
+	wb := bom.Workbook{Sheets: []bom.Sheet{{Name: "synthetic", Cells: []bom.Cell{{Ref: "A1", Row: 1, Column: 1, Value: "Unclassified evidence"}}}}}
+	_, err := p.UnderstandEngineering(context.Background(), wb, func(_, state, _ string) error {
+		if state == "rejected" {
+			rejected++
+		}
+		return nil
+	})
+	if err != nil || calls != 3 || rejected != 1 {
+		t.Fatalf("batch correction failed: %v calls=%d rejected=%d", err, calls, rejected)
+	}
+}
+
 func TestSourceSpansHidePagingBoundariesButPreserveBlankSeparators(t *testing.T) {
 	spans := engineeringSourceSpans([]bom.Region{{Sheet: "synthetic", Start: 4, End: 259, FirstColumn: 2, LastColumn: 8}, {Sheet: "synthetic", Start: 260, End: 500, FirstColumn: 3, LastColumn: 9}, {Sheet: "synthetic", Start: 502, End: 510, FirstColumn: 2, LastColumn: 8}})
 	if len(spans) != 2 || spans[0].Start != 4 || spans[0].End != 500 || spans[0].Range != "B4:I500" || spans[1].Start != 502 {
