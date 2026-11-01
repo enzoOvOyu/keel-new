@@ -4,7 +4,7 @@
 
 - 后续业务开发统一在 Git `dev` 分支进行，应用源代码目录为 `dev/`；默认工作区 `/home/ubuntu/keel-dev`。开始前确认分支及工作区状态，不在 `main`、归档Tag或旧功能/部署工作区继续开发。
 - `main` 保留稳定整合版本；开发提交推送 `origin/dev`。只有用户明确要求合并/发布时才更新main或切换运行服务。本次一次性的Demo清理同步main/dev不构成后续自动合并授权。
-- 作业平台接续也从最新dev继续，保留已有有效实现；旧feat/jobs-kestra-ui仅作历史参考，不从旧基线覆盖新工程代码。
+- 用户2026-11-01例外：作业平台UI在独立 `feat/jobs-kestra-ui` 分支、`/home/ubuntu/keel-kestra-ui-dev` 工作区开发，以最新dev为基线并同步必要更新；该分支代码未经明确要求不合并dev/main、不部署。其他业务继续dev。不得从旧基线覆盖新工程代码。
 - 旧独立演示历史归档为 `archive/keel-mock-first-20261101`；清理前完整代码归档为 `archive/pre-dev-cleanup-20261101`。归档只读，不合并到dev，不启动其Compose或复用其node_modules。
 - 当前工程不再保留旧keel-demo/和web/应用。Mock仍可用于未接真实接口的模块，统一复用dev中的Adapter及现有fixtures，不删除有效演示数据或另建应用。
 - Git分支、源代码目录与运行环境是不同概念：建立dev不意味着重启5180/8081，也不迁移数据库、凭据或原始文件。旧运行工作区保持原样，发布按用户明确安排。
