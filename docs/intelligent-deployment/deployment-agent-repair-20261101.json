@@ -1,12 +1,12 @@
 {
-  "code_revision": "42e709d",
+  "code_revision": "fe6564d",
   "branch": "dev",
   "repository": "enzoOvOyu/keel-new",
   "api": {
     "port": 8081,
-    "binary": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/keel-api-v31",
-    "pid": 1398407,
-    "sha256": "e16658d2d9943e75db80c76ebb5df35fb55576af200a8e18d9a2aa7923673bdd",
+    "binary": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/keel-api-v33",
+    "pid": 1405795,
+    "sha256": "19c86217d2e58ea3a7ec6b84a52e99486df33b28723b05cade9ecfd5dc503f21",
     "cwd": "/home/ubuntu/keel/dev/backend",
     "session": "keel-cmdb-api"
   },
@@ -32,7 +32,7 @@
     "native_tools_checkpoint_and_provider_errors": "PASS",
     "source_upload": "PASS: engineering mode; zero legacy recognition jobs",
     "minio_artifact_write_read": "PASS: actual artifact roundtrip",
-    "full_real_workbook_understanding": "RUNNING: 08cc3e7f-1e31-4f68-9f0c-efdf76ecab66; cabling source mapping confirmed, equipment/power/other domains not accepted",
+    "full_real_workbook_understanding": "RUNNING: 1f8db3ea-9902-4e94-9b91-a3cda90ea9af; v31 failed on repeated empty correction, prior artifacts retained",
     "frontend_upload_module": "HTTP 200; browser not run",
     "artifact_recovery_scope_hash_cleanup": "PASS: isolated PostgreSQL and synthetic S3, including new service instance restore, wrong project/revision/claim rejection, integrity verification and index cascade",
     "typescript_engineering_adapter": "PASS",
@@ -44,7 +44,8 @@
     "model_reasoning_experiment": "Default reasoning produced invalid textual tool payloads; restored original reasoning=false. Same Ultra Provider/model.",
     "native_unique_field_bindings": "PASS: normalization, duplicate JSON key rejection, unknown-property rejection, native vocabulary and real model call; no HTTP contract change",
     "equipment_semantics_and_constant_conflicts": "PASS: targeted AI and complete engineering checks plus build; source metadata/state conflicts and duplicate object constants rejected",
-    "targeted_correction_and_duplicate_headers": "PASS: targeted AI tests, complete engineering package and Go build"
+    "targeted_correction_and_duplicate_headers": "PASS: targeted AI tests, complete engineering package and Go build",
+    "location_hierarchy_and_edit_parameters": "PASS: engineering package, targeted AI correction/feedback checks and build"
   },
   "rollback": {
     "api_launcher": "/home/ubuntu/.local/state/keel-deployments/engineering-5abb94f/api-run.py",

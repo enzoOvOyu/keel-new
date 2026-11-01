@@ -5,9 +5,9 @@
   "project_code": "TEST-Agent-MM-Ultra-03",
   "project_id": "proj-18101842-d821-4583-9229-a708f995c1c8",
   "source_id": "71a5c797-319b-496d-a6ce-f67c1080439c",
-  "job_id": "08cc3e7f-1e31-4f68-9f0c-efdf76ecab66",
-  "runtime_revision": "42e709d",
-  "prepared_revision": "42e709d",
+  "job_id": "1f8db3ea-9902-4e94-9b91-a3cda90ea9af",
+  "runtime_revision": "fe6564d",
+  "prepared_revision": "fe6564d",
   "accepted_sheets": 5,
   "total_sheets": 15,
   "source_comparison": [
@@ -105,7 +105,7 @@
   "storage": "Complete tool artifacts/checkpoints remain in MinIO; PostgreSQL stores metadata and typed engineering facts",
   "reasoning_trial": "Default reasoning produced invalid textual tool payloads; restored prior working request settings without changing model",
   "test_scope": "Targeted AI/engineering checks, API build, real API documentation consistency and real workbook analysis only",
-  "equipment_extra_field_review": "NOT ACCEPTED: v30 omitted network rack; device U mappings switched to derived columns and need semantic comparison. v31 revalidates critical duplicate headers.",
+  "equipment_extra_field_review": "NOT ACCEPTED: normalized critical fields match; extra site/room values require correction under v33 checks",
   "historical_equipment_core_comparison": [
     {
       "sheet": "Network Information",
@@ -129,5 +129,28 @@
         "start_u": 778
       }
     }
-  ]
+  ],
+  "normalized_equipment_core_comparison": [
+    {
+      "sheet": "Network Information",
+      "rows": 189,
+      "normalized_matches": {
+        "label": 189,
+        "model": 189,
+        "rack": 189,
+        "start_u": 189
+      }
+    },
+    {
+      "sheet": "Server Information",
+      "rows": 778,
+      "normalized_matches": {
+        "label": 778,
+        "model": 778,
+        "rack": 778,
+        "start_u": 778
+      }
+    }
+  ],
+  "normalized_equipment_core_scope": "Fixture-only comparison: Rack Unit trailing u-/dash equals numeric helper column. No product value coercion added."
 }

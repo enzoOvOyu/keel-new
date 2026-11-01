@@ -1,10 +1,10 @@
 {
   "version": 1,
   "updated_at": "2026-11-01",
-  "coverage": "API42e709d/v31 deployed. Ultra-03 running with duplicate-header critical mapping checks and restored draft correction. Five cabling sheets: 7154 rows x eight source fields matched. Equipment latest candidates still need semantic validation; earlier 967-row core match is historical, not current acceptance.",
+  "coverage": "APIfe6564d/v33 deployed. Ultra-03 running; 7154 cabling rows x eight critical fields verified and 967 device rows x four core fields match after source position normalization. Extra site/room misbindings and complex sheets remain unaccepted. No CMDB publication.",
   "schema_authority": "docs/openapi.yaml",
-  "code_revision": "42e709d",
-  "deployed_revision": "42e709d",
+  "code_revision": "fe6564d",
+  "deployed_revision": "fe6564d",
   "deployment_evidence": "docs/intelligent-deployment/deployment-agent-repair-20261101.json",
   "operations": [
     {
