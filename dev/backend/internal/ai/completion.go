@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -21,10 +22,16 @@ type ProviderError struct {
 }
 
 func (e *ProviderError) Error() string {
+	if e.Status == 0 {
+		return "PROVIDER_TIMEOUT_OR_UNAVAILABLE"
+	}
+	if e.Status == 200 {
+		return "PROVIDER_RESPONSE_FAILED: " + e.Reason
+	}
 	return fmt.Sprintf("PROVIDER_ERROR: HTTP %d %s", e.Status, e.Reason)
 }
 func (e *ProviderError) Temporary() bool {
-	return e.Status == 429 || e.Status == 502 || e.Status == 503 || e.Status == 504 || (e.Status == 402 && e.Reason == "in_flight_budget_exhausted")
+	return e.Status == 0 || (e.Status == 200 && (e.Reason == "response_timeout" || e.Reason == "response_interrupted")) || e.Status == 429 || e.Status == 502 || e.Status == 503 || e.Status == 504 || (e.Status == 402 && e.Reason == "in_flight_budget_exhausted")
 }
 
 func (p *Provider) completeJSON(ctx context.Context, prompt string, input any, format ...map[string]any) ([]byte, error) {
@@ -32,6 +39,7 @@ func (p *Provider) completeJSON(ctx context.Context, prompt string, input any, f
 }
 func (p *Provider) complete(ctx context.Context, prompt string, input any, functions []any, format ...map[string]any) ([]byte, error) {
 	p.Calls++
+	p.HTTPStatus = 0
 	encoded, _ := json.Marshal(input)
 	payload := map[string]any{"model": p.Model, "messages": []map[string]string{{"role": "system", "content": prompt}, {"role": "user", "content": string(encoded)}}, "stream": false}
 	token := "max_tokens"
@@ -117,7 +125,10 @@ func (p *Provider) complete(ctx context.Context, prompt string, input any, funct
 	}
 	res, e := client.Do(req)
 	if e != nil {
-		return nil, errors.New("PROVIDER_TIMEOUT_OR_UNAVAILABLE")
+		if ctx.Err() != nil {
+			return nil, ctx.Err()
+		}
+		return nil, &ProviderError{Reason: "request_timeout_or_unavailable"}
 	}
 	defer res.Body.Close()
 	p.HTTPStatus = res.StatusCode
@@ -152,7 +163,15 @@ func (p *Provider) complete(ctx context.Context, prompt string, input any, funct
 	}
 	raw, e := io.ReadAll(io.LimitReader(res.Body, 1<<20))
 	if e != nil {
-		return nil, errors.New("PROVIDER_RESPONSE_FAILED")
+		if ctx.Err() != nil {
+			return nil, ctx.Err()
+		}
+		reason := "response_interrupted"
+		var networkError net.Error
+		if errors.As(e, &networkError) && networkError.Timeout() {
+			reason = "response_timeout"
+		}
+		return nil, &ProviderError{Status: 200, Reason: reason}
 	}
 	var response struct {
 		Choices []struct {

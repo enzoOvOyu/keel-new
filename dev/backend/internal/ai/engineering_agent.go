@@ -126,7 +126,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 					regions = append(regions, region)
 				}
 			}
-			selected := engineeringSourceTools(functions, active, inspected[active])
+			selected := engineeringSourceTools(functions, active, inspected[active], engineeringProposalDue(sheet, history))
 			raw, err := p.engineeringCompletion(ctx, string(prompt), map[string]any{"workbook": summary, "modules": registry, "attribute_definitions": hooks.Attributes, "history": history, "active_sheet": active, "active_sheet_preview": engineeringSheetPreview(sheet, regions), "pending_sheets": pending, "completed_sheets": len(completed), "turns_remaining": budget - turn}, selected, trace)
 			if err != nil {
 				return proposal, err
@@ -473,7 +473,7 @@ func constrainEngineeringTools(functions []any, attributes []engineering.Attribu
 
 // Keep source evidence in context until that sheet is understood. This sequences
 // inspection, not engineering-domain applicability or dependency execution.
-func engineeringSourceTools(functions []any, sheet string, inspected bool) []any {
+func engineeringSourceTools(functions []any, sheet string, inspected, propose bool) []any {
 	selected := []any{}
 	for _, tool := range functions {
 		function := tool.(map[string]any)["function"].(map[string]any)
@@ -485,6 +485,9 @@ func engineeringSourceTools(functions []any, sheet string, inspected bool) []any
 				enabled = true
 			}
 		}
+		if propose {
+			enabled = name == "propose_engineering_model"
+		}
 		if !enabled {
 			continue
 		}
@@ -495,4 +498,65 @@ func engineeringSourceTools(functions []any, sheet string, inspected bool) []any
 		selected = append(selected, tool)
 	}
 	return selected
+}
+
+// Once a complete small sheet has been read, or a read is being repeated with
+// no new evidence, require a proposal/explicit uncertainty instead of looping.
+func engineeringProposalDue(sheet bom.Sheet, history []any) bool {
+	seen := map[string]bool{}
+	for _, entry := range history {
+		raw, _ := json.Marshal(entry)
+		var step struct {
+			Action engineeringAction `json:"action"`
+			Result json.RawMessage   `json:"result"`
+		}
+		if json.Unmarshal(raw, &step) != nil || step.Action.Sheet != sheet.Name {
+			continue
+		}
+		var failure map[string]json.RawMessage
+		if json.Unmarshal(step.Result, &failure) == nil && failure["error"] != nil {
+			continue
+		}
+		action := step.Action
+		switch action.Action {
+		case "inspect_sheet":
+			var result struct {
+				Samples []any `json:"sample_cells"`
+			}
+			_ = json.Unmarshal(step.Result, &result)
+			visible := 0
+			for _, cell := range sheet.Cells {
+				if !cell.Sensitive {
+					visible++
+				}
+			}
+			if visible > 0 && len(result.Samples) == visible {
+				return true
+			}
+		case "read_range", "inspect_region":
+			if action.Bounds == nil {
+				continue
+			}
+			key := engineering.Digest(struct {
+				Sheet  string
+				Bounds engineering.Bounds
+			}{sheet.Name, *action.Bounds})
+			if seen[key] {
+				return true
+			}
+			seen[key] = true
+			complete := true
+			for _, cell := range sheet.Cells {
+				b := action.Bounds
+				if !cell.Sensitive && (cell.Row < b.StartRow || cell.Row > b.EndRow || cell.Column < b.StartColumn || cell.Column > b.EndColumn) {
+					complete = false
+					break
+				}
+			}
+			if complete {
+				return true
+			}
+		}
+	}
+	return false
 }

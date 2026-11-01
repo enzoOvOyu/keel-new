@@ -30,8 +30,8 @@ func TestEngineeringNativeToolsResumeSheetCheckpoint(t *testing.T) {
 		if calls == 0 && len(toolList) != 1 {
 			t.Errorf("initial source inspection must have one focused tool, got %d", len(toolList))
 		}
-		if calls == 1 && len(toolList) != 6 {
-			t.Errorf("expected six source-analysis tools after inspection, got %d", len(toolList))
+		if calls == 1 && len(toolList) != 1 {
+			t.Errorf("a fully inspected two-cell sheet must progress to a proposal, got %d tools", len(toolList))
 		}
 		for _, tool := range toolList {
 			function := tool.(map[string]any)["function"].(map[string]any)
@@ -159,5 +159,19 @@ func TestEngineeringRestoresUnfinishedSheetToolHistory(t *testing.T) {
 	result, err := resumed.UnderstandEngineering(context.Background(), wb, trace, EngineeringToolHooks{Resume: saved, Checkpoint: hook})
 	if err != nil || len(result.Regions) != 1 || calls != 3 {
 		t.Fatalf("resume failed: %v calls=%d", err, calls)
+	}
+}
+
+func TestProviderInterruptedBodyRemainsRetryable(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Length", "100")
+		_, _ = w.Write([]byte(`{"choices":`))
+	}))
+	defer server.Close()
+	p := Provider{Endpoint: server.URL, Timeout: time.Second}
+	_, err := p.completeJSON(context.Background(), "synthetic", map[string]string{})
+	var upstream *ProviderError
+	if !errors.As(err, &upstream) || upstream.Status != 200 || upstream.Reason != "response_interrupted" || !upstream.Temporary() {
+		t.Fatalf("interrupted provider response not recoverable: %v", err)
 	}
 }
