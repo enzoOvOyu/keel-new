@@ -27,5 +27,5 @@ bomv1.xlsx
 /web/
 
 # Isolated jobs UI design preview
-docs/flows-redesign/prototype/node_modules/
+docs/flows-redesign/prototype/node_modules
 docs/flows-redesign/prototype/dist/
