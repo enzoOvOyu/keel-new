@@ -62,7 +62,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 					part.Regions = append(part.Regions, region)
 				}
 			}
-			if engineering.CheckProposal(w, part) == nil {
+			if engineering.CheckProposal(w, part) == nil && engineering.CheckSheetCoverage(w, part, sheet) == nil {
 				completed[sheet] = true
 				validRegions = append(validRegions, part.Regions...)
 			}
@@ -301,6 +301,9 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 						if r.Sheet != action.Sheet {
 							err = fmt.Errorf("PROPOSE_ONE_SHEET_AT_A_TIME")
 						}
+					}
+					if err == nil {
+						err = engineering.CheckSheetCoverage(w, *action.Proposal, action.Sheet)
 					}
 				}
 				if err == nil {
