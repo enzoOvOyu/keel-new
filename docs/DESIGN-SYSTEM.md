@@ -1,10 +1,12 @@
-# keel Design System — React + shadcn/ui
+# keel Design System — React + shadcn/ui / 作业平台 Kestra 原生 UI
+
+> 作业平台特例（用户确认，2026-11-01）：本文件§10为该模块的当前规范，优先于本文件其他章节关于“所有组件使用shadcn”“只借鉴Kestra、不复制源码”和旧Flow线框的描述。其他模块继续沿用既有设计系统。完整页面范围和LC-01～14见 [Kestra原生替换方案](flows-redesign/KESTRA-UI-REPLACEMENT.md)，实施状态见 [作业平台实施记录](flows-redesign/implementation.md)。设计规定不代表功能已实现。
 
 ## 1. 技术约束
 
 - React + TypeScript + Vite；shadcn/ui 为基础组件源，Tailwind CSS 管理样式。
 - 路由：React Router；服务端状态：TanStack Query；表单：React Hook Form + Zod；图表按项目现有方案统一；大型表格使用虚拟滚动。
-- 所有业务组件基于 shadcn/ui 组合，不另造一套基础按钮、表单、弹窗或下拉组件。组件源码纳入仓库，避免运行时依赖外部 CDN。
+- 除§10作业平台特例外，业务组件基于shadcn/ui组合，不另造基础组件体系。作业平台内容区使用固定版本Kestra原生组件，React外壳保持不变；源码纳入仓库，避免运行时依赖外部CDN。
 - 图标使用 Lucide；不使用 emoji 作为功能图标。色彩仅表达状态，不能只靠颜色传递含义。
 
 ## 2. 视觉原则
@@ -102,7 +104,7 @@ Overview（阶段时间线/汇总）、Targets（目标矩阵）、Logs（实时
 
 ## 9. 视觉验收与参考实现
 
-### 9.1 参考源（学习交互，不复制代码/品牌）
+### 9.1 参考源（作业平台按§10直接复用Kestra，其余模块学习交互）
 - Kestra UI 总览：<https://kestra.io/docs/ui>；重点学习左侧导航、Flows/Executions/Logs 分区、任务执行状态、Topology/Gantt、日志过滤与产物查看。
 - Kestra Execution：<https://kestra.io/docs/workflow-components/execution>；重点学习执行/任务状态、重试、Outputs 与运行生命周期。
 - shadcn/ui Blocks：<https://ui.shadcn.com/blocks>；优先参考 Sidebar、Dashboard、Data Table、Form、Dialog 的组件组合方式。
@@ -123,33 +125,58 @@ Overview（阶段时间线/汇总）、Targets（目标矩阵）、Logs（实时
 - 对表格密集页检查首屏信息密度、列宽、行高、固定列、筛选区和操作位置；对执行页检查状态、时间、耗时、频率、日志和失败动作是否无需猜测即可理解。
 - 提交 UI 变更时附关键页面截图或浏览器检查结果；不能只报告“样式已优化”。
 
-## 10. Flow 页面细则
+## 10. 作业平台：Kestra 原生 UI 实施硬规则
 
-Flow 是批量执行已纳管服务器或交换机脚本的工作台，不是单纯 DAG 画布。
+### 10.1 当前产品决策与权威依据
 
-```text
-Flow 列表
-  ├─ 搜索/过滤：名称、目标类型、状态、标签、创建人
-  ├─ 频率/最近执行/成功率/下一次运行
-  └─ 新建 Flow / 立即运行 / 启停 Schedule
+- 产品名称固定为 **作业平台**。Flow、Execution是资源术语，保留`/flows`及既有API命名兼容，不把整个模块重新命名为Flows。
+- 用户已明确要求**直接复用Kestra开源前端组件、页面组织和UI/UX**，不是只借鉴颜色，也不是用React/shadcn重新画一套相似页面。不得再次以旧文档“不复制源码”为由退回自制界面。
+- 固定上游为Kestra `v2.0.7`、commit `49b62a2c820d37e98a1c7b63aa35fd83f960d4ec`。只复用Apache-2.0开源内容，保留LICENSE、来源和修改说明；不将上游locked/demo企业入口冒充可用功能，不替换Keel品牌。
+- [替换方案](flows-redesign/KESTRA-UI-REPLACEMENT.md)规定逐页替换、生命周期LC-01～14和上游源组件；[原任务](flows-redesign/keel-flows-module-build-spec.md)及同目录draw.io规定Keel业务覆盖。上游原生UI是实现与交互基准，不再按旧ASCII线框另造布局。
+- 开发在独立`feat/jobs-kestra-ui`分支、`/home/ubuntu/keel-kestra-ui-dev`工作区进行，以最新dev为基线。其他业务在dev继续。用户未明确要求时，不合并dev/main、不部署、不覆盖5180/8081。
 
-Flow 编辑器
-  ├─ 基本信息与版本
-  ├─ 目标：已纳管服务器/交换机 + 项目/机柜/角色/标签选择
-  ├─ 脚本：编辑器、参数 schema、敏感值引用（不保存明文）
-  ├─ 执行策略：timeout、retry、并发、失败阈值、审批
-  └─ 触发：手动/定时，显示时区与 next run
+### 10.2 原生模块与Keel边界
 
-Execution 详情
-  ├─ Overview/Gantt：生命周期、阶段、耗时、重试
-  ├─ Topology：步骤节点和状态
-  ├─ Targets：每台设备状态矩阵与单目标重试
-  ├─ Logs：实时/历史、级别、目标、attempt、时间过滤
-  ├─ Outputs：stdout 摘要、结构化输出、文件产物
-  └─ 关联：CMDB、BOM、工单、门禁、审批
-```
+- 保留Keel唯一Sidebar、顶栏、ProjectSwitcher、React Router和身份会话；作业平台挂载独立Vue模块。不增加第二套全局导航、iframe或临时用户入口，不迁移BOM/CMDB等其他模块。
+- 表格、筛选、按钮、状态、弹层、多面板编辑器、任务属性、Gantt、日志、变量/输出等优先使用上游原生组件；Keel专属Targets、Quick Run、Agents、审批扩展也用相同原生组件组合。不得长期保留旧`.fl-*`视觉与新原生组件混搭。
+- 集中Adapter连接Keel API；浏览器不直连Kestra、不携带引擎凭据。项目、权限、目标设备、审批、CMDB稳定ID、通道及维护态约束由Keel保留，后端逐请求授权。
+- 上游样式限定在`.keel-kestra`模块作用域；浅/深色跟随Keel主题。修改导入组件标记适配内容，不让全局CSS、弹层、快捷键或布局监听影响其他模块。
+- Flow与Execution使用一份URL状态，支持刷新、深链接和前进后退；切项目/卸载时清理请求和订阅。只持久化布局偏好，不在localStorage保存会话、秘密或可变执行范围。
 
-执行详情默认订阅当前活动日志，不一次加载全部 10k 目标日志；使用游标分页/虚拟滚动。所有控制按钮必须依据后端状态和权限计算可用性。
+### 10.3 导航与页面信息架构
+
+- 侧栏沿用**作业平台、Executions、Agents**三个已确认入口，不为每项生命周期能力增加一级菜单。
+- Flow目录采用原生列表/筛选/列管理/批量动作；创建为主动作，Quick Run为次动作。搜索、排序、分页total和最近执行摘要来自授权服务端查询，不能用已加载数据的本地分页冒充完整目录。
+- Flow详情固定总览、编辑、执行、触发器；版本、依赖、日志、指标、并发放同一标签栏的“更多”。Files、模板、Docs进入编辑器面板，不堆多行Tabs。
+- Execution目录提供记录、运行概况、异常/等待保存视图及跨执行日志。只显示实际聚合，不重复全局Dashboard。
+- Execution详情固定总览、Targets、Gantt/任务、日志、变量与输出；更多包含Metrics、Dependencies、Audit/Context。每个页面保留独立URL，选择任务/设备/Attempt后联动日志和输出。
+
+### 10.4 编辑器：同一份定义的连续交互
+
+- 直接复用上游多面板编辑器、Monaco、No-code/BlockEditor及Topology；支持分栏、标签切换/关闭、拖动、最大化和布局恢复。默认Visual与Topology并排，YAML随时打开；不再设计固定三栏替代品。
+- 节点目录 → 添加/选择节点 → 属性/脚本编辑 → YAML同步 → 校验定位 → 保存Revision → 目标预检 → 执行，必须形成连续路径。只读结构摘要不能称为No-code，普通textarea不能替代Monaco。
+- Visual、YAML、Topology、Files及模板共用canonical Flow定义，不维护第二套图数据。不保留“设备步骤/完整编排”两套互相独立的编辑入口。
+- 设备任务是Keel受控适配；当前只有串行依赖时，应在真实所属任务内部表达，不画成可任意并行执行的Kestra节点。未知插件参数不能因Visual编辑而丢失。
+- 属性与Docs来自实际可用插件/任务Schema；不得用静态少量输入框宣称支持所有Kestra插件。未具备的能力明确说明限制，不使用可点击但无行为的按钮。
+- 文件内容/版本、脚本、输入及目标随Revision/Execution冻结；套用模板处理未保存修改，不能保留旧票据、回调或触发器。快捷保存遵守只读、权限和忙状态。
+
+### 10.5 执行中心与生命周期
+
+- 按LC-01～14完整纳入状态历史、TaskRun/Attempt、暂停/恢复/终止/重试、变量文件、指标、依赖、跨执行日志、并发队列、触发补跑、源码搜索及历史版本导航；未完成项保留在实施记录，不因主列表能打开就称为完成。
+- 故障路径：Execution → 失败TaskRun/目标 → 指定Attempt日志 → 原因/产物 → 失败目标定向重试 → 新Execution；保留父执行和筛选返回路径。
+- Kestra引擎状态与设备成功/失败/阻断分别展示；Worker与设备Agent分别建模。不能用引擎SUCCESS覆盖部分设备失败，不能用当前状态推算历史。
+- 暂停/继续、终止、失败目标重试、全部重跑、修改输入后新运行是不同操作，确认时冻结项目、Revision、设备集合、输入与审批。权限不等于批准，不直通引擎绕过JobService。
+- 日志使用当前Execution SSE/游标查询，支持任务、Attempt、设备、等级、时间与跟随；不加载全量目标日志或在浏览器遍历所有执行拼接跨执行检索。
+- Inputs/Outputs先脱敏，文件按授权资源下载。没有真实指标、排队原因、触发历史或依赖证据时显示缺失，不编造趋势、百分比、下次触发时间或故障关系。
+
+### 10.6 视觉与交互验收
+
+- 1440px及以上桌面优先，紧凑单行标题/动作、筛选栏和高利用率主体；编辑器与执行工作区占主要空间。去掉占据大面积的说明、重复统计卡、卡片嵌套和无意义空白。
+- 字体、间距、行高、状态、按钮、图标、表格、编辑面板与日志遵循上游原生组件及其设计token；Keel专属部分也保持同体系。不能只换颜色、加卡片或用截图冒充原生接入。
+- 同页覆盖loading、empty、error、permission、partial、unknown等适用状态；主要操作有可观察结果，无权限按既定规范禁用并说明原因。
+- 检查真实来源组件、许可证、canonical定义同步、URL/主题/项目一致性和BOM/CMDB样式隔离。截图与关键交互按实际变更定向验证，不重复全仓测试。
+- UI复用、后端能力、环境发布、真实设备验收分别记录；浏览器synthetic数据只证明对应UI行为。不得再把软件缺口写成“只等真机”。
+
 
 ## 11. Rack Diagram 机柜图工作区
 

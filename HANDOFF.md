@@ -2,6 +2,8 @@
 
 ## 最新指令：恢复作业平台UI独立开发（2026-11-01）
 
+用户再次明确直接复用Kestra原生UI；已将强制规则写入 [DESIGN-SYSTEM §10](docs/DESIGN-SYSTEM.md#10-作业平台kestra-原生-ui-实施硬规则)，并同步UI-REFERENCE和替换方案状态。旧“不复制Kestra”、强制全部shadcn和旧Flow线框不再适用于作业平台。
+
 作业平台UI从最新dev同步到 `feat/jobs-kestra-ui` 后继续，工作区 `/home/ubuntu/keel-kestra-ui-dev`；其他业务继续dev。此前“作业平台也统一dev”和暂停要求被本次指令覆盖。仅开发，不发布、不合并业务代码至dev/main。具体进度继续更新作业平台实施记录。
 
 ## 当前开发约定：dev统一入口，旧Demo归档（2026-11-01）
