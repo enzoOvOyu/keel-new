@@ -165,6 +165,18 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 				}
 			}
 		}
+		if r.Kind == "connection" || r.Kind == "cable" {
+			sources := map[string]int{}
+			for _, binding := range r.Columns {
+				sources[binding.Field] = binding.Column
+			}
+			for _, side := range []string{"a", "z"} {
+				device, port := side+"_device", side+"_port"
+				if sources[device] > 0 && sources[device] == sources[port] {
+					bindingConflicts = append(bindingConflicts, fmt.Sprintf("FIELD_SOURCE_CONFLICT: sheet=%s field=%s column=%d equals %s; copying a device/rack identifier cannot invent a port. Bind an explicit port source or omit the unknown port; route/quantity summaries are not device-port connections", r.Sheet, port, sources[port], device))
+				}
+			}
+		}
 		if len(bindingConflicts) > 0 {
 			return fmt.Errorf("%s", strings.Join(bindingConflicts, " | "))
 		}

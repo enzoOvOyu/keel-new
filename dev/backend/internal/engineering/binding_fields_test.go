@@ -70,3 +70,16 @@ func TestRejectEquipmentMetadataMasqueradingAsTypedFacts(t *testing.T) {
 		}
 	}
 }
+
+func TestConnectionCannotUseDeviceIdentifierAsPort(t *testing.T) {
+	w := bom.Workbook{Sheets: []bom.Sheet{{Name: "arbitrary", Cells: []bom.Cell{{Ref: "A1", Row: 1, Column: 1, Value: "Local device"}, {Ref: "B1", Row: 1, Column: 2, Value: "Local port"}, {Ref: "C1", Row: 1, Column: 3, Value: "Remote device"}, {Ref: "D1", Row: 1, Column: 4, Value: "Remote port"}, {Ref: "A2", Row: 2, Column: 1, Value: "TEST-A"}, {Ref: "B2", Row: 2, Column: 2, Value: "P1"}, {Ref: "C2", Row: 2, Column: 3, Value: "TEST-Z"}, {Ref: "D2", Row: 2, Column: 4, Value: "P2"}}}}}
+	p := EngineeringProposal{Summary: "endpoints", Regions: []RegionMapping{{Sheet: "arbitrary", Kind: "connection", Bounds: Bounds{StartRow: 1, EndRow: 2, StartColumn: 1, EndColumn: 4}, HeaderRows: []int{1}, Columns: []ColumnBinding{{Field: "a_device", Column: 1}, {Field: "a_port", Column: 1}, {Field: "z_device", Column: 3}, {Field: "z_port", Column: 3}}}}}
+	if err := CheckProposal(w, p); err == nil || !strings.Contains(err.Error(), "field=a_port") || !strings.Contains(err.Error(), "field=z_port") {
+		t.Fatalf("invented endpoint identities accepted: %v", err)
+	}
+	p.Regions[0].Columns[1].Column = 2
+	p.Regions[0].Columns[3].Column = 4
+	if err := CheckProposal(w, p); err != nil {
+		t.Fatal(err)
+	}
+}
