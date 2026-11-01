@@ -94,7 +94,7 @@ func materializeEngineeringCorrection(raw []byte, draft *engineering.Engineering
 		return raw, false, fmt.Errorf("INVALID_DRAFT_CORRECTION")
 	}
 	if len(patch.Columns) == 0 && len(patch.RemoveColumns) == 0 && len(patch.Constants) == 0 && len(patch.RemoveConstants) == 0 && patch.Bounds == nil {
-		return raw, false, fmt.Errorf("EMPTY_DRAFT_CORRECTION")
+		return raw, false, fmt.Errorf("EMPTY_DRAFT_CORRECTION: provide set_columns, remove_columns, set_constants, remove_constants or bounds; sheet and region_index alone make no change. Correct the outstanding draft validation error")
 	}
 	encoded, _ := json.Marshal(draft)
 	var candidate engineering.EngineeringProposal

@@ -138,7 +138,7 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 				ref, _ := excelize.CoordinatesToCellName(c.Column, headerRow)
 				header := cells[ref]
 				if sourceHeaderConflict(header.Value, c.Field) {
-					bindingConflicts = append(bindingConflicts, fmt.Sprintf("HEADER_FIELD_CONFLICT: sheet=%s column=%d proposed_field=%s; sequence/brand/asset identifiers are not quantities, dimensions or states, and U position is not U height; omit the conflicting binding, retaining its source", r.Sheet, c.Column, c.Field))
+					bindingConflicts = append(bindingConflicts, fmt.Sprintf("HEADER_FIELD_CONFLICT: sheet=%s column=%d proposed_field=%s; sequence/brand/asset identifiers are not quantities, dimensions or states, U position is not U height, and site/room/rack identities are distinct; omit the conflicting binding, retaining its source", r.Sheet, c.Column, c.Field))
 					continue columnBindings
 				}
 			}

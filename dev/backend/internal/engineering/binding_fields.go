@@ -81,6 +81,9 @@ func sourceHeaderConflict(header, field string) bool {
 		return field != "label" && field != "device"
 	}
 	for _, expected := range HeaderFields(header) {
+		if (expected == "site" || expected == "room" || expected == "rack") && (field == "site" || field == "room" || field == "rack") && expected != field {
+			return true // Distinct facility levels cannot share an unrelated source identity.
+		}
 		if (expected == "start_u" && field == "height_u") || (expected == "height_u" && field == "start_u") {
 			return true
 		}

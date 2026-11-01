@@ -780,13 +780,13 @@ func engineeringBindingErrors(proposal engineering.EngineeringProposal, attribut
 		for _, binding := range region.Columns {
 			reason := ""
 			if !allowed[binding.Field] {
-				reason = "unsupported field: omit this binding"
+				reason = "unsupported field: use remove_columns to remove this field; setting other fields leaves it unchanged"
 			} else if seen[binding.Field] {
 				reason = "duplicate field: each object has one binding per field"
 			}
 			seen[binding.Field] = true
 			if reason != "" {
-				issues = append(issues, map[string]any{"region": index, "kind": region.Kind, "field": binding.Field, "column": binding.Column, "reason": reason})
+				issues = append(issues, map[string]any{"region_index": index, "kind": region.Kind, "field": binding.Field, "column": binding.Column, "reason": reason})
 			}
 		}
 		for _, binding := range region.Constants {
@@ -800,7 +800,7 @@ func engineeringBindingErrors(proposal engineering.EngineeringProposal, attribut
 			}
 			seen[binding.Field] = true
 			if reason != "" {
-				issues = append(issues, map[string]any{"region": index, "kind": region.Kind, "field": binding.Field, "reason": reason})
+				issues = append(issues, map[string]any{"region_index": index, "kind": region.Kind, "field": binding.Field, "reason": reason})
 			}
 		}
 	}
