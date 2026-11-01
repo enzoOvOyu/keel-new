@@ -50,7 +50,7 @@ func (s *Server) publishEngineering(ctx context.Context, tx pgx.Tx, event, proje
 			return errors.New("ENGINEERING_DEPENDENCY_UNPUBLISHED")
 		}
 	}
-	if payload.Target != engineering.CablingTarget && payload.Target != engineering.PowerTarget {
+	if payload.Target != engineering.CablingTarget && payload.Target != engineering.PowerTarget && payload.Target != engineering.MaterialTarget && payload.Target != engineering.WorkloadTarget {
 		if _, e = tx.Exec(ctx, `INSERT INTO bom_revision(id,import_id,project_id,digest) VALUES($1,$2,$3,$4) ON CONFLICT DO NOTHING`, payload.PublicationID, importID, project, digest); e != nil {
 			return e
 		}

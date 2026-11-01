@@ -80,3 +80,5 @@ export type PowerEdit = Models['IDEPowerEdit'];
 export type CalculationApplication = Models['IDECalculationApplication'];
 export const editEngineeringPower=(project:string,id:string,request:PowerEdit)=>bomRequest<EngineeringWorkspace>(engineeringPath(project,id)+'/power','PUT',request);
 export const applyEngineeringCalculation=(project:string,id:string,request:CalculationApplication)=>bomRequest<EngineeringWorkspace>(engineeringPath(project,id)+'/calculation-application','POST',request);
+export type EstimateEdit = Models['IDEEstimateEdit'];
+export const editEngineeringEstimate=(project:string,id:string,request:EstimateEdit)=>bomRequest<EngineeringWorkspace>(engineeringPath(project,id)+'/estimates','PUT',request);

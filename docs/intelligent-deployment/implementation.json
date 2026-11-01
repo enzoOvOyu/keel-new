@@ -1,13 +1,13 @@
 {
-  "updated_at": "2026-11-01 04:03:54 UTC",
+  "updated_at": "2026-11-01 04:23:40 UTC",
   "branch": "audit/intelligent-deployment-p0",
-  "scope": "S1 physical, P3 calculations, S3 connectivity/cabling and S4 power/cooling implemented; remaining domains in progress",
+  "scope": "Physical, calculations, connectivity/cabling, power/cooling, material/workload implemented; network and final orchestration/reimport in progress",
   "phase_status": {
     "P0": "complete; report commit 314126d",
     "P1": "complete: architecture, models, contracts and kernel",
     "P2": "all named tool actions connected to source inspection, typed proposals, dependencies, rules/calculation and deterministic physical validation; domain expansion and acceptance pending",
     "P3": "isolated LibreOffice Provider, formula graph, unit-aware restricted rule AST, human rule approval and durable runs implemented; real Golden Fixture reference acceptance pending",
-    "P4": "equipment, facility, connectivity/cabling and power/cooling vertical slices implemented; material/workload/network in progress",
+    "P4": "first four domain batches implemented; network design in progress",
     "P5": "physical target review/revisions/Outbox/CMDB receipts implemented; later-domain releases pending",
     "P6": "physical workbench plus calculation/evidence/rule editing and review implemented; remaining domain panels pending; interaction acceptance NOT RUN"
   },
@@ -36,7 +36,10 @@
     "Connectivity editor and scoped individual-object revision endpoint; migration029/030",
     "PowerPlan typed tables and parameter workbench, distinct planned/nameplate/measured power and unknown capacities",
     "Durable intrinsic rack power balance with explicit units and missing-input issues, partial results and cooling/capacity validation",
-    "Batch calculation output application into versioned cable lengths/power fields, run/source/output checks and stale power invalidation"
+    "Batch calculation output application into versioned cable lengths/power fields, run/source/output checks and stale power invalidation",
+    "Material and workload relational estimates with separate required/purchased/spares/gap and quantity/stock/labor values",
+    "Source-driven procurement/labor or approved project rules; no universal procurement formula or invented labor rate",
+    "Persistent workload summary, batch application, stale quantity block and replacement; estimates publish only engineering revisions"
   ],
   "files": {
     "design": "docs/intelligent-deployment/P1-DESIGN.txt",
@@ -164,6 +167,21 @@
       "check": "Power Pydantic proposal and incremental frontend TypeScript",
       "result": "PASS",
       "scope": "strict synthetic power proposal and static type checking; not AI understanding or browser acceptance"
+    },
+    {
+      "check": "TestWorkloadSummaryUsesStockAndDoesNotInventLabor / TestMaterialRuleAndUnitsRemainExplicit",
+      "result": "PASS",
+      "scope": "synthetic counts and normalized stock distribution, missing stock partial, no assumed procurement gap/labor, unit checks"
+    },
+    {
+      "check": "TestEngineeringEstimatePublicationAndWorkload",
+      "result": "PASS",
+      "scope": "isolated PostgreSQL count3→4, persistent runs and result application, independent estimate review/publish, zero CMDB assets and stale/recalculation replacement"
+    },
+    {
+      "check": "Estimate incremental TypeScript",
+      "result": "PASS",
+      "scope": "static frontend types only; browser acceptance NOT RUN"
     }
   ],
   "not_run": [

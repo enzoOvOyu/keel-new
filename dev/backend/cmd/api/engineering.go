@@ -200,6 +200,18 @@ func (s *Server) engineeringRoutes(w http.ResponseWriter, r *http.Request) bool 
 		}
 		return true
 	}
+	if action == "estimates" && r.Method == "PUT" {
+		var q engineering.EstimateEdit
+		if !engineeringDecode(w, r, &q) {
+			return true
+		}
+		if err := s.editEngineeringEstimate(ctx, id, q, subjectOf(ctx).Username); err != nil {
+			engineeringFailure(w, err)
+		} else {
+			reply(id, 200)
+		}
+		return true
+	}
 	if action == "power" && r.Method == "PUT" {
 		var q engineering.PowerEdit
 		if !engineeringDecode(w, r, &q) {
@@ -540,6 +552,12 @@ func engineeringDiff(before, after engineering.PhysicalModel) []engineering.Revi
 		}
 		for _, v := range m.Connections {
 			add(v.EntityID, "connection", v)
+		}
+		for _, v := range m.Materials {
+			add(v.EntityID, "material_estimate", v)
+		}
+		for _, v := range m.Workloads {
+			add(v.EntityID, "workload_estimate", v)
 		}
 		for _, v := range m.PowerPlans {
 			add(v.EntityID, "power_plan", v)

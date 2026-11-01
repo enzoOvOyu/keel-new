@@ -6421,6 +6421,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/engineering-imports/{engineeringId}/estimates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["editEngineeringEstimate"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -15809,6 +15825,8 @@ export interface components {
             revision_id: string;
             spares?: components["schemas"]["IDEQuantity"];
             spec_ref: string;
+            source_model_label: string;
+            required_calculation_run_id?: string;
         };
         IDEModelRevision: {
             author_id: string;
@@ -15913,6 +15931,8 @@ export interface components {
             cables: components["schemas"]["IDECablePlan"][];
             optics: components["schemas"]["IDEOpticDemand"][];
             power_plans: components["schemas"]["IDEPowerPlan"][];
+            materials: components["schemas"]["IDEMaterialEstimate"][];
+            workloads: components["schemas"]["IDEWorkloadEstimate"][];
         };
         IDEPlannedConnection: {
             a_port_id: string;
@@ -16174,6 +16194,8 @@ export interface components {
             spec_ref?: string;
             standard_length?: components["schemas"]["IDEQuantity"];
             work_type: string;
+            source_model_label: string;
+            quantity_calculation_run_id?: string;
         };
         IDEColumnBinding: {
             field: string;
@@ -16189,7 +16211,7 @@ export interface components {
             sheet: string;
             bounds: components["schemas"]["IDEBounds"];
             /** @enum {string} */
-            kind: "equipment" | "assembly" | "site" | "room" | "rack" | "placement" | "other" | "port" | "connection" | "cable" | "power";
+            kind: "equipment" | "assembly" | "site" | "room" | "rack" | "placement" | "other" | "port" | "connection" | "cable" | "power" | "material" | "workload";
             semantic: string;
             header_rows: number[];
             columns: components["schemas"]["IDEColumnBinding"][];
@@ -16300,7 +16322,7 @@ export interface components {
         };
         IDETargetAction: {
             expected_revision: number;
-            targets: ("CMDB_PLANNED_EQUIPMENT" | "CMDB_PLANNED_FACILITY" | "CMDB_PLANNED_PLACEMENT" | "CMDB_PLANNED_CONNECTIVITY" | "ENGINEERING_CABLING" | "ENGINEERING_POWER")[];
+            targets: ("CMDB_PLANNED_EQUIPMENT" | "CMDB_PLANNED_FACILITY" | "CMDB_PLANNED_PLACEMENT" | "CMDB_PLANNED_CONNECTIVITY" | "ENGINEERING_CABLING" | "ENGINEERING_POWER" | "ENGINEERING_MATERIAL" | "ENGINEERING_WORKLOAD")[];
             /** @enum {string} */
             decision: "approve" | "reject" | "publish";
             reason: string;
@@ -16355,7 +16377,7 @@ export interface components {
             requested_cells: components["schemas"]["IDEFormulaCell"][];
             inputs: components["schemas"]["IDENamedValue"][];
             /** @enum {string} */
-            operation?: "power_balance";
+            operation?: "power_balance" | "workload_summary";
         };
         IDECalculationPage: {
             run: components["schemas"]["IDECalculationRun"];
@@ -16443,7 +16465,7 @@ export interface components {
         IDEResultBinding: {
             entity_id: string;
             /** @enum {string} */
-            field: "power_load" | "power_remaining" | "cable_calculated" | "cable_selected_stock";
+            field: "power_load" | "power_remaining" | "cable_calculated" | "cable_selected_stock" | "material_required" | "material_gap" | "workload_quantity" | "workload_hours";
             output_name: string;
         };
         IDECalculationApplication: {
@@ -16457,6 +16479,16 @@ export interface components {
             request_id: string;
         };
         applyEngineeringCalculationEnvelope: {
+            data: components["schemas"]["IDEWorkspace"];
+            request_id: string;
+        };
+        IDEEstimateEdit: {
+            expected_revision: number;
+            material?: components["schemas"]["IDEMaterialEstimate"];
+            workload?: components["schemas"]["IDEWorkloadEstimate"];
+            reason: string;
+        };
+        editEngineeringEstimateEnvelope: {
             data: components["schemas"]["IDEWorkspace"];
             request_id: string;
         };
@@ -35990,6 +36022,54 @@ export interface operations {
                 content?: never;
             };
             /** @description Invalid typed model or result binding */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    editEngineeringEstimate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                engineeringId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEEstimateEdit"];
+            };
+        };
+        responses: {
+            /** @description New estimate revision with validation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["editEngineeringEstimateEnvelope"];
+                };
+            };
+            /** @description Permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid typed estimate */
             422: {
                 headers: {
                     [name: string]: unknown;

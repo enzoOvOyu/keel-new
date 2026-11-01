@@ -89,6 +89,12 @@ func engineeringCalculationEvidence(x *engineering.Extraction, refs map[string]s
 	for _, v := range x.Model.Cables {
 		targets[v.EntityID] = engineering.CablingTarget
 	}
+	for _, v := range x.Model.Materials {
+		targets[v.EntityID] = engineering.MaterialTarget
+	}
+	for _, v := range x.Model.Workloads {
+		targets[v.EntityID] = engineering.WorkloadTarget
+	}
 	for _, v := range x.Model.PowerPlans {
 		targets[v.EntityID] = engineering.PowerTarget
 	}
@@ -106,6 +112,35 @@ func engineeringCalculationEvidence(x *engineering.Extraction, refs map[string]s
 			x.Issues = append(x.Issues, engineering.ValidationIssue{ID: uuid.NewString(), EntityID: e.EntityID, Code: "FORMULA_RECALCULATION_REQUIRED", Severity: "BLOCK", ModuleID: "workbook_intelligence", Field: e.Field, Message: "公式字段没有兼容的独立重算结果；缓存仅保留为来源证据", PublishTarget: targets[e.EntityID], EvidenceIDs: []string{e.ID}})
 		}
 	}
+	for i := range x.Model.Materials {
+		v := &x.Model.Materials[i]
+		for _, e := range x.Evidence {
+			if e.EntityID != v.EntityID || e.CalculationRunID == nil {
+				continue
+			}
+			if e.Field == "required_quantity" {
+				v.RequiredCalculationRunID = e.CalculationRunID
+			}
+			if e.Field == "purchase_gap" {
+				v.CalculationRunID = e.CalculationRunID
+			}
+		}
+	}
+	for i := range x.Model.Workloads {
+		v := &x.Model.Workloads[i]
+		for _, e := range x.Evidence {
+			if e.EntityID != v.EntityID || e.CalculationRunID == nil {
+				continue
+			}
+			if e.Field == "work_quantity" {
+				v.QuantityCalculationRunID = e.CalculationRunID
+			}
+			if e.Field == "labor_hours" {
+				v.CalculationRunID = e.CalculationRunID
+			}
+		}
+	}
+
 	for i := range x.Model.Cables {
 		c := &x.Model.Cables[i]
 		for _, e := range x.Evidence {
@@ -156,11 +191,15 @@ func (s *Server) queueEngineeringCalculation(ctx context.Context, source string,
 	var ruleID *string
 	var ruleVersion *int
 	if q.Operation != "" {
-		if q.Operation != "power_balance" || q.Rule != nil || len(q.Inputs) > 0 || len(q.RequestedCells) > 0 {
+		if (q.Operation != "power_balance" && q.Operation != "workload_summary") || q.Rule != nil || len(q.Inputs) > 0 || len(q.RequestedCells) > 0 {
 			return "", errors.New("CALC_OPERATION_INVALID")
 		}
 		provider = "engineering-power-balance"
 		module = "power_cooling"
+		if q.Operation == "workload_summary" {
+			provider = "engineering-workload-summary"
+			module = "material_workload"
+		}
 	} else if q.Rule != nil {
 		view, err := engineeringRule(ctx, tx, s.project, q.Rule.ID, q.Rule.Version)
 		if err != nil {
@@ -352,7 +391,13 @@ func (s *Server) runEngineeringCalculation(ctx context.Context) {
 		return
 	}
 	run := page.Run
-	if run.ProviderID == "engineering-power-balance" {
+	if run.ProviderID == "engineering-workload-summary" {
+		var model engineering.PhysicalModel
+		model, _, e = engineeringModel(c, s.db, run.RevisionID, project)
+		if e == nil {
+			run = engineering.WorkloadSummary(model, run.RevisionID)
+		}
+	} else if run.ProviderID == "engineering-power-balance" {
 		var model engineering.PhysicalModel
 		model, _, e = engineeringModel(c, s.db, run.RevisionID, project)
 		if e == nil {

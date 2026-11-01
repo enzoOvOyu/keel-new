@@ -9,7 +9,7 @@ const ConnectivityTarget = "CMDB_PLANNED_CONNECTIVITY"
 const CablingTarget = "ENGINEERING_CABLING"
 
 var PhysicalTargets = []string{EquipmentTarget, FacilityTarget, PlacementTarget}
-var PublishTargets = []string{EquipmentTarget, FacilityTarget, PlacementTarget, ConnectivityTarget, CablingTarget, PowerTarget}
+var PublishTargets = []string{EquipmentTarget, FacilityTarget, PlacementTarget, ConnectivityTarget, CablingTarget, PowerTarget, MaterialTarget, WorkloadTarget}
 
 func TargetDependencies(target string) []string {
 	switch target {
@@ -188,4 +188,14 @@ type CalculationApplication struct {
 	RunID            string          `json:"run_id"`
 	Bindings         []ResultBinding `json:"bindings"`
 	Reason           string          `json:"reason"`
+}
+
+const MaterialTarget = "ENGINEERING_MATERIAL"
+const WorkloadTarget = "ENGINEERING_WORKLOAD"
+
+type EstimateEdit struct {
+	ExpectedRevision int               `json:"expected_revision"`
+	Material         *MaterialEstimate `json:"material,omitempty"`
+	Workload         *WorkloadEstimate `json:"workload,omitempty"`
+	Reason           string            `json:"reason"`
 }

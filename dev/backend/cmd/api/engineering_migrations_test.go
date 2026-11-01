@@ -1,0 +1,29 @@
+package main
+
+import (
+	"context"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"os"
+	"testing"
+)
+
+func prepareEngineeringDB(t *testing.T, db *pgxpool.Pool) {
+	t.Helper()
+	ctx := context.Background()
+	for i, file := range []string{"027_engineering_physical.sql", "028_engineering_calculation.sql", "029_engineering_connectivity.sql", "030_engineering_patch_through.sql", "031_engineering_power.sql", "032_engineering_estimates.sql"} {
+		var exists bool
+		if e := db.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM schema_migration WHERE version=$1)`, 27+i).Scan(&exists); e != nil {
+			t.Fatal(e)
+		}
+		if exists {
+			continue
+		}
+		raw, e := os.ReadFile("../../migrations/" + file)
+		if e != nil {
+			t.Fatal(e)
+		}
+		if _, e = db.Exec(ctx, string(raw)); e != nil {
+			t.Fatalf("%s: %v", file, e)
+		}
+	}
+}

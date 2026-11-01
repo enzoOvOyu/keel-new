@@ -23,13 +23,13 @@ func Digest(v any) string {
 	return hex.EncodeToString(h[:])
 }
 func EmptyPhysical(project string) PhysicalModel {
-	return PhysicalModel{ProjectID: project, PowerPlans: []PowerPlan{}, Equipment: []EquipmentPlan{}, Assemblies: []DeviceAssembly{}, Facilities: []FacilityModel{}, Placements: []RackPlacement{}, Ports: []PlannedPort{}, Connections: []PlannedConnection{}, Cables: []CablePlan{}, Optics: []OpticDemand{}}
+	return PhysicalModel{ProjectID: project, Materials: []MaterialEstimate{}, Workloads: []WorkloadEstimate{}, PowerPlans: []PowerPlan{}, Equipment: []EquipmentPlan{}, Assemblies: []DeviceAssembly{}, Facilities: []FacilityModel{}, Placements: []RackPlacement{}, Ports: []PlannedPort{}, Connections: []PlannedConnection{}, Cables: []CablePlan{}, Optics: []OpticDemand{}}
 }
 
 var bindingFields = map[string]bool{}
 
 func init() {
-	for _, f := range strings.Fields("label equipment_type model quantity identity_kind serial parent child relation_type slot site room rack capacity_u width_mm height_mm depth_mm x_mm y_mm z_mm orientation_degrees coordinate_frame start_u height_u mount_face device port parent_port breakout_index role rate_bps medium a_device a_port z_device z_port a_parent_port z_parent_port a_optic z_optic connector_a connector_z cable_label cable_model length length_unit length_state standard_length standard_length_unit patch_device patch_port patch_exit_port power power_unit power_basis cooling_type power_capacity power_capacity_unit cooling_capacity cooling_capacity_unit route_from route_to distance distance_unit") {
+	for _, f := range strings.Fields("label equipment_type model quantity identity_kind serial parent child relation_type slot site room rack capacity_u width_mm height_mm depth_mm x_mm y_mm z_mm orientation_degrees coordinate_frame start_u height_u mount_face device port parent_port breakout_index role rate_bps medium a_device a_port z_device z_port a_parent_port z_parent_port a_optic z_optic connector_a connector_z cable_label cable_model length length_unit length_state standard_length standard_length_unit patch_device patch_port patch_exit_port power power_unit power_basis required_quantity purchased_quantity spare_quantity purchase_gap quantity_unit work_type work_quantity work_unit labor_hours labor_unit cooling_type power_capacity power_capacity_unit cooling_capacity cooling_capacity_unit route_from route_to distance distance_unit") {
 		bindingFields[f] = true
 	}
 }
@@ -62,7 +62,7 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 			return fmt.Errorf("INVALID_REGION: %s", r.Sheet)
 		}
 		switch r.Kind {
-		case "equipment", "assembly", "site", "room", "rack", "placement", "port", "connection", "cable", "power", "other":
+		case "equipment", "assembly", "site", "room", "rack", "placement", "port", "connection", "cable", "power", "material", "workload", "other":
 		default:
 			return fmt.Errorf("UNKNOWN_REGION_KIND")
 		}
@@ -89,7 +89,7 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 				}
 			}
 			switch c.Field {
-			case "equipment_type", "identity_kind", "relation_type", "mount_face", "role", "medium", "length_state", "power_basis", "cooling_type":
+			case "equipment_type", "identity_kind", "relation_type", "mount_face", "role", "medium", "length_state", "power_basis", "cooling_type", "work_type":
 				matches = true
 			}
 			if !matches {
@@ -376,6 +376,7 @@ func ExtractPhysical(w bom.Workbook, p EngineeringProposal, project, source, rev
 	}
 	extractConnectivity(project, source, revision, rows, &out, makeVersion, addIssue)
 	extractPower(project, rows, &out, makeVersion, addIssue)
+	extractEstimates(project, rows, &out, makeVersion, addIssue)
 	out.MappedCells = len(used)
 	out.Issues = append(out.Issues, ValidatePhysical(out.Model)...)
 	// Omitted regions remain represented by source retention and an explicit issue.

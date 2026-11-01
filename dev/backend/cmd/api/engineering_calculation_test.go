@@ -23,19 +23,7 @@ func TestEngineeringCalculationPersistenceAndRuleReview(t *testing.T) {
 		t.Fatal(e)
 	}
 	defer db.Close()
-	migration, e := os.ReadFile("../../migrations/028_engineering_calculation.sql")
-	if e != nil {
-		t.Fatal(e)
-	}
-	var migrated bool
-	if e = db.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM schema_migration WHERE version=28)`).Scan(&migrated); e != nil {
-		t.Fatal(e)
-	}
-	if !migrated {
-		if _, e = db.Exec(ctx, string(migration)); e != nil {
-			t.Fatal(e)
-		}
-	}
+	prepareEngineeringDB(t, db)
 	project := "engineering-calculation-synthetic-" + uuid.NewString()
 	s := &Server{db: db, project: project}
 	if _, e = db.Exec(ctx, `INSERT INTO project(id,name,code) VALUES($1,'Synthetic calculation check',$1)`, project); e != nil {

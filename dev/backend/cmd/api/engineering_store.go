@@ -71,6 +71,9 @@ func engineeringModel(ctx context.Context, q engineeringQuery, revision, project
 			return m, evidence, e
 		}
 	}
+	if e := loadEstimateRows(ctx, q, revision, &m); e != nil {
+		return m, evidence, e
+	}
 	if e := loadPowerRows(ctx, q, revision, &m); e != nil {
 		return m, evidence, e
 	}
@@ -105,6 +108,10 @@ func engineeringTargetDigest(m engineering.PhysicalModel, target string, maturit
 		values = []any{m.Equipment, m.Assemblies, m.Facilities, m.Placements}
 	case engineering.ConnectivityTarget:
 		values = []any{m.Equipment, m.Assemblies, m.Ports, m.Connections}
+	case engineering.MaterialTarget:
+		values = m.Materials
+	case engineering.WorkloadTarget:
+		values = []any{m.Workloads, m.Equipment, m.Connections, m.Cables}
 	case engineering.PowerTarget:
 		values = []any{m.PowerPlans, m.Equipment, m.Facilities, m.Placements}
 	case engineering.CablingTarget:
@@ -152,6 +159,10 @@ func targetHasContent(m engineering.PhysicalModel, t string) bool {
 		return len(m.Placements) > 0
 	case engineering.ConnectivityTarget:
 		return len(m.Ports) > 0 || len(m.Connections) > 0
+	case engineering.MaterialTarget:
+		return len(m.Materials) > 0
+	case engineering.WorkloadTarget:
+		return len(m.Workloads) > 0
 	case engineering.PowerTarget:
 		return len(m.PowerPlans) > 0
 	case engineering.CablingTarget:
@@ -196,12 +207,14 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 
 	changed := map[string]bool{}
 	previousPowerInput := ""
+	var previousModel *engineering.PhysicalModel
 	if previous != nil {
 		old, oldEvidence, err := engineeringModel(ctx, tx, *previous, s.project)
 		if err != nil {
 			return "", err
 		}
 		previousPowerInput = powerInputDigest(old)
+		previousModel = &old
 		if origin == "human" {
 			fields := map[string]map[string]bool{}
 			for _, difference := range engineeringDiff(old, x.Model) {
@@ -293,6 +306,10 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 				case engineering.ConnectivityTarget:
 					x.Model.Ports = old.Ports
 					x.Model.Connections = old.Connections
+				case engineering.MaterialTarget:
+					x.Model.Materials = old.Materials
+				case engineering.WorkloadTarget:
+					x.Model.Workloads = old.Workloads
 				case engineering.PowerTarget:
 					x.Model.PowerPlans = old.PowerPlans
 				case engineering.CablingTarget:
@@ -306,6 +323,9 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 		for _, d := range engineeringDiff(engineering.EmptyPhysical(s.project), x.Model) {
 			changed[d.EntityID] = true
 		}
+	}
+	if previousModel != nil {
+		invalidateEstimateInputs(*previousModel, &x.Model)
 	}
 	if previousPowerInput != "" && previousPowerInput != powerInputDigest(x.Model) {
 		for i := range x.Model.PowerPlans {
@@ -393,6 +413,9 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 			return "", e
 		}
 	}
+	if e = saveEstimateRows(ctx, tx, revision, &x.Model, insertVersion); e != nil {
+		return "", e
+	}
 	if e = savePowerRows(ctx, tx, revision, &x.Model, insertVersion); e != nil {
 		return "", e
 	}
@@ -415,6 +438,11 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 		}
 	}
 	issues = append(issues, engineering.ValidatePhysical(x.Model)...)
+	staleWorkload, err := staleWorkloadIssues(ctx, tx, x.Model)
+	if err != nil {
+		return "", err
+	}
+	issues = append(issues, staleWorkload...)
 	for _, item := range x.Model.Equipment {
 		if item.IdentityKind != "observed_reference" {
 			continue

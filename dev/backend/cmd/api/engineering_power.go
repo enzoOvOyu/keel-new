@@ -148,6 +148,9 @@ func (s *Server) applyEngineeringCalculation(ctx context.Context, source string,
 	for _, v := range page.Run.Outputs {
 		outputs[v.Name] = v.Value
 	}
+	if e = s.prepareWorkloadApplication(ctx, &x.Model, page.Run, q.Bindings); e != nil {
+		return e
+	}
 	seen := map[string]bool{}
 	for _, binding := range q.Bindings {
 		key := binding.EntityID + "/" + binding.Field
@@ -199,6 +202,8 @@ func (s *Server) applyEngineeringCalculation(ctx context.Context, source string,
 				}
 				c.RuleVersion = page.Run.Rule
 			}
+		case "material_required", "material_gap", "workload_quantity", "workload_hours":
+			found = applyEstimateResult(&x.Model, page.Run, binding, quantity)
 		default:
 			return errors.New("CALC_BINDING_FIELD_UNSUPPORTED")
 		}

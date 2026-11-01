@@ -1182,6 +1182,20 @@
       "handler": "dev/backend/cmd/api/engineering.go",
       "source": "dev/backend/cmd/api/engineering_power.go",
       "documentation": "docs/api/engineering.md"
+    },
+    {
+      "method": "put",
+      "path": "/projects/{projectId}/engineering-imports/{engineeringId}/estimates",
+      "operation_id": "editEngineeringEstimate",
+      "response_status": "200",
+      "response_schema": "editEngineeringEstimateEnvelope",
+      "request_schema": "IDEEstimateEdit",
+      "implementation": "implemented",
+      "deployment": "not_deployed",
+      "verification": "isolated synthetic estimate/workload calculation and publication; UI acceptance NOT RUN",
+      "handler": "dev/backend/cmd/api/engineering.go",
+      "source": "dev/backend/cmd/api/engineering_estimates.go",
+      "documentation": "docs/api/engineering.md"
     }
   ],
   "development_note": "作业平台 UI 整改：新增执行版本定义查询、列表分页、时间筛选和同步游标为分支增量；尚未部署至当前 BOM v5 集成后端。现运行版本以 HANDOFF 顶部为准。"

@@ -16336,6 +16336,41 @@ paths:
           description: Revision stale
         '422':
           description: Invalid typed model or result binding
+  /projects/{projectId}/engineering-imports/{engineeringId}/estimates:
+    put:
+      operationId: editEngineeringEstimate
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: engineeringId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDEEstimateEdit'
+      responses:
+        '200':
+          description: New estimate revision with validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/editEngineeringEstimateEnvelope'
+        '403':
+          description: Permission denied
+        '409':
+          description: Revision conflict
+        '422':
+          description: Invalid typed estimate
 components:
   securitySchemes:
     bearerAuth:
@@ -44379,6 +44414,10 @@ components:
           $ref: '#/components/schemas/IDEQuantity'
         spec_ref:
           type: string
+        source_model_label:
+          type: string
+        required_calculation_run_id:
+          type: string
       required:
       - entity_id
       - revision_id
@@ -44388,6 +44427,7 @@ components:
       - attributes
       - spec_ref
       - required
+      - source_model_label
       type: object
       x-implementation-status: model-contract-only
     IDEModelRevision:
@@ -44751,6 +44791,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/IDEPowerPlan'
+        materials:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEMaterialEstimate'
+        workloads:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEWorkloadEstimate'
       required:
       - equipment
       - assemblies
@@ -44762,6 +44810,8 @@ components:
       - cables
       - optics
       - power_plans
+      - materials
+      - workloads
       type: object
       x-implementation-status: model-contract-only
       description: 'Read aggregate assembled from typed domain tables. Not a persistence JSON payload. First vertical slice: equipment,
@@ -45613,6 +45663,10 @@ components:
           $ref: '#/components/schemas/IDEQuantity'
         work_type:
           type: string
+        source_model_label:
+          type: string
+        quantity_calculation_run_id:
+          type: string
       required:
       - entity_id
       - revision_id
@@ -45622,6 +45676,7 @@ components:
       - attributes
       - work_type
       - quantity
+      - source_model_label
       type: object
       x-implementation-status: model-contract-only
     IDEColumnBinding:
@@ -45677,6 +45732,8 @@ components:
           - connection
           - cable
           - power
+          - material
+          - workload
         semantic:
           type: string
         header_rows:
@@ -46032,6 +46089,8 @@ components:
             - CMDB_PLANNED_CONNECTIVITY
             - ENGINEERING_CABLING
             - ENGINEERING_POWER
+            - ENGINEERING_MATERIAL
+            - ENGINEERING_WORKLOAD
         decision:
           type: string
           enum:
@@ -46197,6 +46256,7 @@ components:
           type: string
           enum:
           - power_balance
+          - workload_summary
       required:
       - expected_revision
       - requested_cells
@@ -46459,6 +46519,10 @@ components:
           - power_remaining
           - cable_calculated
           - cable_selected_stock
+          - material_required
+          - material_gap
+          - workload_quantity
+          - workload_hours
         output_name:
           type: string
       required:
@@ -46499,6 +46563,34 @@ components:
       - data
       - request_id
     applyEngineeringCalculationEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    IDEEstimateEdit:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_revision:
+          type: integer
+          minimum: 1
+        material:
+          $ref: '#/components/schemas/IDEMaterialEstimate'
+        workload:
+          $ref: '#/components/schemas/IDEWorkloadEstimate'
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - expected_revision
+      - reason
+    editEngineeringEstimateEnvelope:
       type: object
       additionalProperties: false
       properties:

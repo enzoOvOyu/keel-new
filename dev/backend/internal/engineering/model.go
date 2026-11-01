@@ -271,21 +271,25 @@ type OpticDemand struct {
 }
 type MaterialEstimate struct {
 	EntityVersion
-	SpecRef          ID        `json:"spec_ref"`
-	Required         Quantity  `json:"required"`
-	Purchased        *Quantity `json:"purchased,omitempty"`
-	Spares           *Quantity `json:"spares,omitempty"`
-	PurchaseGap      *Quantity `json:"purchase_gap,omitempty"`
-	CalculationRunID *ID       `json:"calculation_run_id,omitempty"`
+	SourceModelLabel         string    `json:"source_model_label"`
+	RequiredCalculationRunID *ID       `json:"required_calculation_run_id,omitempty"`
+	SpecRef                  ID        `json:"spec_ref"`
+	Required                 Quantity  `json:"required"`
+	Purchased                *Quantity `json:"purchased,omitempty"`
+	Spares                   *Quantity `json:"spares,omitempty"`
+	PurchaseGap              *Quantity `json:"purchase_gap,omitempty"`
+	CalculationRunID         *ID       `json:"calculation_run_id,omitempty"`
 }
 type WorkloadEstimate struct {
 	EntityVersion
-	WorkType         string    `json:"work_type"`
-	SpecRef          *ID       `json:"spec_ref,omitempty"`
-	Quantity         Quantity  `json:"quantity"`
-	StandardLength   *Quantity `json:"standard_length,omitempty"`
-	LaborHours       *Quantity `json:"labor_hours,omitempty"`
-	CalculationRunID *ID       `json:"calculation_run_id,omitempty"`
+	SourceModelLabel         string    `json:"source_model_label"`
+	QuantityCalculationRunID *ID       `json:"quantity_calculation_run_id,omitempty"`
+	WorkType                 string    `json:"work_type"`
+	SpecRef                  *ID       `json:"spec_ref,omitempty"`
+	Quantity                 Quantity  `json:"quantity"`
+	StandardLength           *Quantity `json:"standard_length,omitempty"`
+	LaborHours               *Quantity `json:"labor_hours,omitempty"`
+	CalculationRunID         *ID       `json:"calculation_run_id,omitempty"`
 }
 type NetworkAllocation struct {
 	ID           ID      `json:"id"`

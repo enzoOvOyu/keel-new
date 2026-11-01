@@ -16,7 +16,7 @@ type measured struct {
 func unitScale(unit string) (string, *big.Rat) {
 	dimension, scale := unit, "1"
 	switch unit {
-	case "1", "count":
+	case "1", "count", "pcs":
 		dimension = "scalar"
 	case "%":
 		dimension = "scalar"
@@ -35,6 +35,14 @@ func unitScale(unit string) (string, *big.Rat) {
 	case "ft":
 		dimension = "length"
 		scale = "0.3048"
+	case "s":
+		dimension = "time"
+	case "min":
+		dimension = "time"
+		scale = "60"
+	case "h", "hour":
+		dimension = "time"
+		scale = "3600"
 	case "W":
 		dimension = "power"
 	case "kW":

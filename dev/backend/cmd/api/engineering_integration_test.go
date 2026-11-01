@@ -30,24 +30,7 @@ func TestEngineeringPhysicalPublication(t *testing.T) {
 	if e = (cmdb.Service{DB: db}).Initialize(ctx); e != nil {
 		t.Fatal(e)
 	}
-	for _, step := range []struct {
-		version int
-		file    string
-	}{{27, "027_engineering_physical.sql"}, {28, "028_engineering_calculation.sql"}, {29, "029_engineering_connectivity.sql"}, {30, "030_engineering_patch_through.sql"}, {31, "031_engineering_power.sql"}} {
-		migration, err := os.ReadFile("../../migrations/" + step.file)
-		if err != nil {
-			t.Fatal(err)
-		}
-		var migrated bool
-		if err = db.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM schema_migration WHERE version=$1)`, step.version).Scan(&migrated); err != nil {
-			t.Fatal(err)
-		}
-		if !migrated {
-			if _, err = db.Exec(ctx, string(migration)); err != nil {
-				t.Fatal(err)
-			}
-		}
-	}
+	prepareEngineeringDB(t, db)
 	if _, e = db.Exec(ctx, `INSERT INTO project(id,name,code) VALUES($1,'Engineering synthetic vertical slice',$1)`, svc.project); e != nil {
 		t.Fatal(e)
 	}

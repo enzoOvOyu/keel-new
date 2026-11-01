@@ -50,6 +50,27 @@ func verifyEngineeringResults(ctx context.Context, tx pgx.Tx, source, project st
 			}
 		}
 	}
+	for _, v := range x.Model.Materials {
+		if v.RequiredCalculationRunID != nil {
+			runs[*v.RequiredCalculationRunID] = true
+			values = append(values, calculated{v.EntityID, *v.RequiredCalculationRunID, v.Required})
+		}
+		if v.CalculationRunID != nil && v.PurchaseGap != nil {
+			runs[*v.CalculationRunID] = true
+			values = append(values, calculated{v.EntityID, *v.CalculationRunID, *v.PurchaseGap})
+		}
+	}
+	for _, v := range x.Model.Workloads {
+		if v.QuantityCalculationRunID != nil {
+			runs[*v.QuantityCalculationRunID] = true
+			values = append(values, calculated{v.EntityID, *v.QuantityCalculationRunID, v.Quantity})
+		}
+		if v.CalculationRunID != nil && v.LaborHours != nil {
+			runs[*v.CalculationRunID] = true
+			values = append(values, calculated{v.EntityID, *v.CalculationRunID, *v.LaborHours})
+		}
+	}
+
 	outputs := map[string][]engineering.TypedValue{}
 	for run := range runs {
 		var ok bool
