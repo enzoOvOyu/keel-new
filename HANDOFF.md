@@ -1,3 +1,9 @@
+## 已完成里程碑事件：原生工具Schema命名冲突修复
+
+- v16真实调用HTTP400；独立合成请求精确复现上游错误duplicate $defs entry CellBinding has conflicting schemas。上游把不同工具的定义合并到同一命名空间，域收敛工具与全域分类工具发生冲突。
+- 现仅为收敛后的映射工具定义及引用加独立命名空间；分类能力和本地校验不变。修改后同一上游协议检查HTTP200/tool_calls，定向Native/域约束测试和Go构建通过。
+- v17准备上线继续同一来源，原v16失败没有新增完成Sheet。模型协议检查不代替真实整本理解验收。
+
 ## 已完成里程碑事件：按Agent域判断收紧纠错工具
 
 - v15任务最终因NS表重复在connection里输出quantity而失败ENGINEERING_AGENT_NO_PROGRESS；同一检查点中EW2592、GB_OUT3456、OOB216共6264条的八个关键字段均匹配来源。EW另有cable_label指向Fiber core count的可疑额外映射，不能把八字段匹配扩称全部字段正确。

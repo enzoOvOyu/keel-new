@@ -269,7 +269,7 @@ func TestMappingToolsFollowAgentDomainWithoutRestrictingReclassification(t *test
 			continue
 		}
 		defs := f["parameters"].(map[string]any)["$defs"].(map[string]any)
-		fields := defs["Column"].(map[string]any)["properties"].(map[string]any)["field"].(map[string]any)["enum"].([]string)
+		fields := defs["mapping_Column"].(map[string]any)["properties"].(map[string]any)["field"].(map[string]any)["enum"].([]string)
 		hasEndpoint := false
 		for _, field := range fields {
 			if field == "quantity" {
@@ -285,5 +285,16 @@ func TestMappingToolsFollowAgentDomainWithoutRestrictingReclassification(t *test
 	}
 	if !foundClassification {
 		t.Error("domain interpretation cannot be revised")
+	}
+	definitions := map[string]string{}
+	for _, tool := range scoped {
+		defs := tool.(map[string]any)["function"].(map[string]any)["parameters"].(map[string]any)["$defs"].(map[string]any)
+		for key, value := range defs {
+			raw, _ := json.Marshal(value)
+			if previous, ok := definitions[key]; ok && previous != string(raw) {
+				t.Errorf("conflicting provider definition: %s", key)
+			}
+			definitions[key] = string(raw)
+		}
 	}
 }

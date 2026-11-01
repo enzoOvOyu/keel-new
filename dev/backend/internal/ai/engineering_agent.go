@@ -739,6 +739,7 @@ func scopeEngineeringProposalTools(selected, functions []any, kinds []string, at
 			defs[name].(map[string]any)["properties"].(map[string]any)["field"].(map[string]any)["enum"] = fields
 		}
 		defs["Region"].(map[string]any)["properties"].(map[string]any)["kind"].(map[string]any)["enum"] = appendUnique(append([]string{}, kinds...), "other")
+		namespaceEngineeringDefinitions(copy["function"].(map[string]any)["parameters"].(map[string]any), "mapping_")
 		out[i] = copy
 	}
 	for _, tool := range functions {
@@ -748,4 +749,32 @@ func scopeEngineeringProposalTools(selected, functions []any, kinds []string, at
 		}
 	}
 	return out
+}
+
+// Some native tool providers combine definitions across tools in one namespace.
+// Scoped mapping fields must not collide with the broader classification schema.
+func namespaceEngineeringDefinitions(parameters map[string]any, prefix string) {
+	var rewrite func(any)
+	rewrite = func(value any) {
+		switch v := value.(type) {
+		case map[string]any:
+			if ref, ok := v["$ref"].(string); ok && strings.HasPrefix(ref, "#/$defs/") {
+				v["$ref"] = "#/$defs/" + prefix + strings.TrimPrefix(ref, "#/$defs/")
+			}
+			for _, child := range v {
+				rewrite(child)
+			}
+		case []any:
+			for _, child := range v {
+				rewrite(child)
+			}
+		}
+	}
+	rewrite(parameters)
+	defs := parameters["$defs"].(map[string]any)
+	renamed := map[string]any{}
+	for key, value := range defs {
+		renamed[prefix+key] = value
+	}
+	parameters["$defs"] = renamed
 }
