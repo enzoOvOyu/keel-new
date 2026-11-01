@@ -12,6 +12,7 @@ import {EngineeringEstimatePanel} from './EngineeringEstimatePanel';
 import {EngineeringPowerPanel} from './EngineeringPowerPanel';
 import {EngineeringConnectivityPanel} from './EngineeringConnectivityPanel';
 import {EngineeringCalculationPanel} from './EngineeringCalculationPanel';
+import {EngineeringAttributesPanel} from './EngineeringAttributesPanel';
 import {EngineeringModuleOverview, EngineeringEvidenceExplorer} from './EngineeringIntelligencePanel';
 import './bom-workspace.css';
 import './engineering-workbench.css';
@@ -72,7 +73,7 @@ const running=!!w?.latest_job&&['pending','running'].includes(w.latest_job.state
    <nav className="tabs" aria-label="工程工作区">{[['understanding','资料理解'],['overview','工程总览'],['evidence','来源证据'],['issues','校验问题'],['calculations','计算与规则'],['versions','版本差异'],['release','审核与发布']].map(([key,label])=><button key={key} className={tab===key||key==='overview'&&engineeringTab?'active':''} onClick={()=>chooseTab(key)}>{label}{key==='issues'&&w.issues.length>0?' · '+w.issues.length:''}</button>)}</nav>
    {plan.error&&<p role="alert">模块计划读取失败：{plan.error.message}</p>}
    {tab==='overview'&&plan.isPending&&<p>正在读取工程模块…</p>}
-   {tab==='overview'&&plan.data&&<EngineeringModuleOverview view={plan.data} onOpen={chooseTab}/>}
+   {tab==='overview'&&plan.data&&<><EngineeringModuleOverview view={plan.data} onOpen={chooseTab}/><details className="engineering-module"><summary>项目扩展属性</summary><EngineeringAttributesPanel key={projectId+id} project={projectId} id={id} revision={w.revision} canEdit={can('bom:edit')&&!locked} canReview={can('bom:review')&&!locked}/></details></>}
    {engineeringTab&&<nav className="tabs engineering-domain-tabs" aria-label="工程领域"><button onClick={()=>chooseTab('overview')}>← 总览</button>{domainTabs.map(([key,label])=><button key={key} className={tab===key?'active':''} onClick={()=>chooseTab(key)}>{label}</button>)}</nav>}
    {tab==='evidence'&&<EngineeringEvidenceExplorer key={projectId+id} project={projectId} id={id} revision={w.revision}/>}
    {tab==='understanding'&&<div className="engineering-overview"><section><h3>工作簿理解</h3><p>{w.summary||'尚未开始分析。点击“开始智能理解”读取区域、字段和跨表依据。'}</p><h3>适用工程模块</h3>{w.modules.length?w.modules.map(m=><details className="engineering-module" key={m.module_id}><summary><strong>{({equipment:'设备与组合',facility_placement:'机房与落位',connectivity_cabling:'连接与布线',power_cooling:'电力与冷却',material_workload:'采购与施工',network_design:'逻辑网络',workbook_intelligence:'资料理解',validation_release:'校验与发布'} as Record<string,string>)[m.module_id]||m.module_id}</strong><span>{m.applicable?'检测到相关资料':'不适用建议'}</span></summary><p>{m.reason}</p><small>来源：{m.sheets.join('、')||'待补充'}</small></details>):<p className="muted">识别后显示模块及来源依据。</p>}<h3>待补充资料</h3>{w.questions.length?<ul>{w.questions.map((q,i)=><li key={i}>{q}</li>)}</ul>:<p className="muted">{w.summary?'本轮未提出额外问题；仍需结合校验结果审核。':'等待资料理解。'}</p>}<h3>计算结果</h3><p className="notice">公式、原缓存、重算值和计算错误分别保留，详情见“计算与规则”。</p></section><aside className="panel padded"><h3>分析进度</h3>{running&&<p><LoaderCircle size={14} className="bom-spin"/> 正在理解资料，已完成步骤持续保存。</p>}{w.steps.map(step=><div className="engineering-step" key={step.sequence}><strong>{step.tool}</strong><Badge value={step.state}/><p>{step.detail}</p><small>{new Date(step.at).toLocaleTimeString()}</small></div>)}{!w.steps.length&&<p>任务启动后显示工具步骤。</p>}</aside></div>}

@@ -41,6 +41,15 @@ func (s *Server) publishEngineering(ctx context.Context, tx pgx.Tx, event, proje
 	if e != nil {
 		return e
 	}
+	definitions, e := engineeringAttributeDefinitions(ctx, tx, project)
+	if e != nil {
+		return e
+	}
+	for _, issue := range engineering.AttributeIssues(model, definitions) {
+		if issue.PublishTarget == payload.Target {
+			return errors.New(issue.Code)
+		}
+	}
 	reimportIssues, e := reimportValidationIssues(ctx, tx, project, payload.SourceID, model)
 	if e != nil {
 		return e

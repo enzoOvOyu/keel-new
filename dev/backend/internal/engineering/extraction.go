@@ -91,7 +91,7 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 				return fmt.Errorf("EMPTY_RECORD_BINDING")
 			}
 			for _, b := range record.Cells {
-				if !bindingFields[b.Field] || usedConstant(r.Constants, b.Field) || bound[b.Field] {
+				if !validBindingField(b.Field) || usedConstant(r.Constants, b.Field) || bound[b.Field] {
 					return fmt.Errorf("INVALID_RECORD_FIELD")
 				}
 				bound[b.Field] = true
@@ -111,13 +111,13 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 		}
 		used := map[string]bool{}
 		for _, c := range r.Columns {
-			if !bindingFields[c.Field] || used[c.Field] || c.Column < b.StartColumn || c.Column > b.EndColumn {
+			if !validBindingField(c.Field) || used[c.Field] || c.Column < b.StartColumn || c.Column > b.EndColumn {
 				return fmt.Errorf("INVALID_FIELD_BINDING: %s", c.Field)
 			}
 			used[c.Field] = true
 		}
 		for _, c := range r.Constants {
-			if !bindingFields[c.Field] || used[c.Field] || len(c.EvidenceCells) == 0 {
+			if !validBindingField(c.Field) || used[c.Field] || len(c.EvidenceCells) == 0 {
 				return fmt.Errorf("INVALID_CONSTANT_EVIDENCE: %s", c.Field)
 			}
 			used[c.Field] = true
@@ -187,7 +187,7 @@ type Extraction struct {
 	TotalCells, MappedCells int
 }
 
-func ExtractPhysical(w bom.Workbook, p EngineeringProposal, project, source, revision string) (Extraction, error) {
+func ExtractPhysical(w bom.Workbook, p EngineeringProposal, project, source, revision string, definitions ...AttributeDefinition) (Extraction, error) {
 	out := Extraction{Model: EmptyPhysical(project), Evidence: []SourceEvidence{}, Issues: []ValidationIssue{}}
 	if e := CheckProposal(w, p); e != nil {
 		return out, e
@@ -287,7 +287,9 @@ func ExtractPhysical(w bom.Workbook, p EngineeringProposal, project, source, rev
 			rows = append(rows, r)
 		}
 	}
+	attributeRows := map[string][]rowData{}
 	makeVersion := func(id string, r rowData, fields ...string) EntityVersion {
+		attributeRows[id] = append(attributeRows[id], r)
 		v := EntityVersion{EntityID: id, RevisionID: revision, ProvenanceID: source, Maturity: Estimated, EvidenceIDs: []ID{}, Attributes: []AttributeValue{}}
 		for _, f := range fields {
 			if value := r.values[f]; value != "" {
@@ -474,6 +476,7 @@ func ExtractPhysical(w bom.Workbook, p EngineeringProposal, project, source, rev
 	extractPower(project, rows, &out, makeVersion, addIssue)
 	extractEstimates(project, rows, &out, makeVersion, addIssue)
 	extractNetwork(project, source, revision, rows, &out, makeVersion, addIssue)
+	extractAttributes(source, revision, &out, attributeRows, definitions, used)
 	out.MappedCells = len(used)
 	out.Issues = append(out.Issues, ValidatePhysical(out.Model)...)
 	// Omitted regions remain represented by source retention and an explicit issue.

@@ -47,7 +47,9 @@
     "Unified engineering overview and source evidence browser; stale form saves use frozen revision",
     "Immutable cross-file source lineage and baseline, explicit reviewed differences with origin evidence preservation",
     "Superseded planning field history and expired relations; pure planned withdrawals retired and excluded from active topology; Observed untouched",
-    "Explicit physical cable segment specs and stock lengths; workload distribution per external segment"
+    "Explicit physical cable segment specs and stock lengths; workload distribution per external segment",
+    "Project/version-scoped typed extension definitions with human approval, relational value slots and source-bound Agent mapping",
+    "Typed extension review/edit UI and planned CMDB source linkage; missing required fields block their domain"
   ],
   "files": {
     "design": "docs/intelligent-deployment/P1-DESIGN.txt",
@@ -230,6 +232,11 @@
       "check": "TestEngineeringConnectivityPublication extended for segment specs; TestCableStockDistributionNeedsEveryPhysicalSegment; TypeScript",
       "result": "PASS",
       "scope": "isolated DB 3m/5m independent plans and two topology segments; missing segment remains incomplete; static UI types"
+    },
+    {
+      "check": "TestApprovedTypedAttributeExtraction; TestEngineeringTypedAttributesApprovalAndPublication; synthetic AI protocol; TypeScript",
+      "result": "PASS",
+      "scope": "local synthetic source/schema/isolated DB/CMDB checks; no real provider/source/browser acceptance"
     }
   ],
   "not_run": [
@@ -250,8 +257,7 @@
     "live_frontend_changed": false
   },
   "next_vertical_slice": [
-    "P4 typed extensions",
-    "P6 final interaction closure"
+    "P6 final input/editor/calculation freshness closure"
   ],
   "limits": [
     "No current environment migration or deployment",
@@ -262,8 +268,8 @@
     "Golden endpoint supplies reviewed planning input only; vendor configuration generation/downloading is outside this engineering module"
   ],
   "changes": {
-    "migration_added": "027–036, isolated DB only",
-    "http_operations_added": 30,
+    "migration_added": "027–037, isolated DB only",
+    "http_operations_added": 33,
     "current_environment_changed": false,
     "original_workbooks_modified": false
   }

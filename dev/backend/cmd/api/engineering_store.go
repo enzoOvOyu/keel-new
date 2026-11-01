@@ -92,6 +92,9 @@ func engineeringModel(ctx context.Context, q engineeringQuery, revision, project
 	if e := loadCableRows(ctx, q, revision, &m); e != nil {
 		return m, evidence, e
 	}
+	if e := loadEngineeringAttributes(ctx, q, revision, &m); e != nil {
+		return m, evidence, e
+	}
 	rows, e := q.Query(ctx, `SELECT id::text,entity_id::text,sheet,cell,field,formula,calculation_run_id::text,source_id::text FROM eng_evidence WHERE revision_id=$1 ORDER BY id`, revision)
 	if e != nil {
 		return m, evidence, e
@@ -216,6 +219,10 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 	if x.Model.ProjectID != s.project {
 		return "", errors.New("PROJECT_SCOPE_MISMATCH")
 	}
+	definitions, e := engineeringAttributeDefinitions(ctx, tx, s.project)
+	if e != nil {
+		return "", e
+	}
 	revision := uuid.NewString()
 	if origin == "human" {
 		for _, issue := range engineering.ValidatePhysical(x.Model) {
@@ -270,6 +277,9 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 			}
 			aliases := map[string]string{"model": "source_model_label", "coordinate_frame": "coordinate_frame_id"}
 			fieldChanged := func(entity, field string) bool {
+				if _, _, extension := engineering.AttributeBinding(field); extension {
+					return fields[entity]["attributes"]
+				}
 				grouped := map[string][]string{"length": {"estimated", "calculated", "confirmed", "as_built"}, "length_unit": {"estimated", "calculated", "confirmed", "as_built"}, "length_state": {"estimated", "calculated", "confirmed", "as_built"}, "standard_length": {"selected_stock"}, "standard_length_unit": {"selected_stock"}, "cable_model": {"spec"}, "connector_a": {"spec"}, "connector_z": {"spec"}, "patch_device": {"patch_port_ids"}, "patch_port": {"patch_port_ids"}, "patch_exit_port": {"patch_port_ids"}, "route_from": {"route"}, "route_to": {"route"}, "distance": {"route"}, "distance_unit": {"route"}}
 				for _, key := range grouped[field] {
 					if fields[entity][key] {
@@ -402,9 +412,6 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 			return errors.New("INVALID_OR_DUPLICATE_ENTITY_ID")
 		}
 		entities[v.EntityID] = true
-		if len(v.Attributes) > 0 {
-			return errors.New("EXTENSIONS_REQUIRE_APPROVED_DEFINITION")
-		}
 		v.RevisionID = revision
 		v.ProvenanceID = revision
 		if origin == "human" && changed[v.EntityID] {
@@ -417,7 +424,10 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 			return err
 		}
 		_, err := tx.Exec(ctx, `INSERT INTO eng_entity_version(revision_id,entity_id,project_id,kind,maturity,provenance_id) VALUES($1,$2,$3,$4,$5,$6)`, revision, v.EntityID, s.project, kind, v.Maturity, revision)
-		return err
+		if err != nil {
+			return err
+		}
+		return saveEngineeringAttributes(ctx, tx, s.project, revision, kind, *v, definitions)
 	}
 	for i := range x.Model.Equipment {
 		v := &x.Model.Equipment[i]
@@ -495,6 +505,12 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 	}
 	issues = append(issues, reimportIssues...)
 	issues = append(issues, engineering.ValidatePhysical(x.Model)...)
+	issues = append(issues, engineering.AttributeIssues(x.Model, definitions)...)
+	attributeRefs, attributeErr := attributeReferenceIssues(ctx, tx, s.project, x.Model)
+	if attributeErr != nil {
+		return "", attributeErr
+	}
+	issues = append(issues, attributeRefs...)
 	networkIssues, networkErr := validateNetworkDomain(ctx, tx, s.project, x.Model)
 	if networkErr != nil {
 		return "", networkErr

@@ -34,7 +34,15 @@ func (s Service) ProjectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 		}
 		return n
 	}
+	extensionValues := map[string][]engineering.AttributeValue{}
+	for _, object := range engineering.ModelObjects(&m) {
+		extensionValues[object.Version.EntityID] = object.Version.Attributes
+	}
 	projectAsset := func(id, kind, label string, attrs map[string]any) error {
+		for _, value := range extensionValues[id] {
+			attrs["engineering.attribute."+value.DefinitionID+"@"+strconv.Itoa(value.DefinitionVersion)] = value.Value
+		}
+
 		var exists, inProject bool
 		if err := tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM cmdb_entity WHERE item_uid=$1),EXISTS(SELECT 1 FROM cmdb_asset_scope WHERE asset_id=$1 AND project_id=$2)`, id, project).Scan(&exists, &inProject); err != nil {
 			return err
@@ -48,7 +56,11 @@ func (s Service) ProjectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 		item := bom.Item{UID: id, Category: kind, Hostname: label, Fields: map[string]string{}}
 		for k, v := range attrs {
 			if v != nil {
-				item.Fields[k] = fmt.Sprint(v)
+				if _, typed := v.(engineering.TypedValue); typed {
+					item.Fields[k] = string(Encode(v))
+				} else {
+					item.Fields[k] = fmt.Sprint(v)
+				}
 			}
 		}
 		if model, ok := attrs["model"].(string); ok {

@@ -91,7 +91,10 @@ func (s *Server) runEngineeringJob(ctx context.Context) {
 		e = err
 		if e == nil {
 			hooks = s.engineeringToolHooks(run, source, expected, wb)
-			proposal, e = provider.UnderstandEngineering(run, engineeringSafeWorkbook(wb), trace, hooks)
+			hooks.Attributes, e = engineeringAttributeDefinitions(run, s.db, project)
+			if e == nil {
+				proposal, e = provider.UnderstandEngineering(run, engineeringSafeWorkbook(wb), trace, hooks)
+			}
 		}
 	}
 	if len(proposal.Regions) > 0 {
@@ -125,7 +128,7 @@ func (s *Server) runEngineeringJob(ctx context.Context) {
 			effective, refs, err := s.engineeringCalculatedWorkbook(run, source, wb)
 			var extracted engineering.Extraction
 			if err == nil {
-				extracted, err = engineering.ExtractPhysical(effective, proposal, project, source, uuid.NewString())
+				extracted, err = engineering.ExtractPhysical(effective, proposal, project, source, uuid.NewString(), hooks.Attributes...)
 				engineeringCalculationEvidence(&extracted, refs)
 			}
 			if err == nil {

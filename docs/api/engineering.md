@@ -127,3 +127,13 @@ Agent region支持可选records单元格引用，每条record按明确的sheet/c
 ## P4 分段线缆规格
 
 CablePlan新增可选segment_index（1起）。直连缺省为唯一外部段；含配线架的路径必须明确每个CablePlan属于哪一段，不能将整条路径长度当作每段长度。持久化和人工编辑支持此字段，Agent可绑定来源段序号。标准线长分布逐段统计；缺失段保持partial。迁移036。合成两段3m/5m存储、审核发布与现有拓扑查询，以及核心缺失规格校验和TS通过；真实文件未验收。
+
+## P4 版本化类型扩展
+
+项目级`/engineering-attributes`提供定义查询/不可变版本草拟，`/{attributeId}/review`由bom:review人工批准或驳回。定义限定对象类型、text/decimal/boolean/reference、明确单位、文本枚举和必填；批准前不能应用。核心身份字段不通过属性覆盖。
+
+值按定义ID/版本与对象版本逐条关系化保存，typed slots不能混用；false保留为明确值。Required缺失、引用不属于项目或定义不可用均阻断对应领域。定义变更不执行动态数据库迁移，不改写旧版确认值。对物理对象，发布后将类型化扩展值关联到CMDB planned来源；Observed仍不覆盖。
+
+Agent收到项目属性定义，只能引用批准版本，使用`attribute:<id>@<version>`绑定明确来源列/单元格；本地提取校验类型、单位和来源。未知定义/冲突不静默接受。工程总览提供定义审核及对象属性修订，采用现有模型修订接口。
+
+迁移037。TestApprovedTypedAttributeExtraction与TestEngineeringTypedAttributesApprovalAndPublication通过：真实类型/明确单位、草稿定义拒绝、false往返、项目必填阻断、批准后CMDB规划关联；合成Agent协议与TS通过。真实模型/真实资料/浏览器未验收，未部署。

@@ -28,6 +28,10 @@ func engineeringFailure(w http.ResponseWriter, e error) {
 		fail(w, 409, e.Error())
 		return
 	}
+	if strings.HasPrefix(e.Error(), "ATTRIBUTE_") {
+		fail(w, 422, e.Error())
+		return
+	}
 	if strings.HasPrefix(e.Error(), "REIMPORT_") {
 		fail(w, 422, e.Error())
 		return
@@ -53,6 +57,9 @@ func engineeringFailure(w http.ResponseWriter, e error) {
 	}
 }
 func (s *Server) engineeringRoutes(w http.ResponseWriter, r *http.Request) bool {
+	if s.engineeringAttributeRoutes(w, r) {
+		return true
+	}
 	p := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
 	if len(p) < 5 || p[0] != "api" || p[1] != "v1" || p[2] != "projects" || (p[4] != "engineering-imports" && p[4] != "engineering-physical-revisions") {
 		return false

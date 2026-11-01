@@ -25,6 +25,7 @@ type engineeringAction struct {
 }
 
 type EngineeringToolHooks struct {
+	Attributes  []engineering.AttributeDefinition
 	Names       []excelize.DefinedName
 	ProposeRule func(context.Context, engineering.CalculationRule) (engineering.RuleView, error)
 	Calculate   func(context.Context, *engineering.VersionReference, []engineering.FormulaCell, []engineering.NamedValue) (engineering.CalculationPage, error)
@@ -56,7 +57,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 		summary = append(summary, map[string]any{"sheet": s.Name, "cells": len(s.Cells), "merges": s.Merges, "formulas": formulas, "dimension": s.Dimension})
 	}
 	for turn := 0; turn < 40; turn++ {
-		raw, err := p.completeJSON(ctx, string(prompt), map[string]any{"workbook": summary, "modules": registry, "history": history, "turns_remaining": 40 - turn})
+		raw, err := p.completeJSON(ctx, string(prompt), map[string]any{"workbook": summary, "modules": registry, "attribute_definitions": hooks.Attributes, "history": history, "turns_remaining": 40 - turn})
 		if err != nil {
 			return proposal, err
 		}
@@ -172,7 +173,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 					proposal = *action.Proposal
 					result = map[string]any{"schema_valid": true, "regions": len(proposal.Regions), "formal_write": false}
 					if action.Action == "validate_model" || action.Action == "analyze_validation_issues" {
-						x, extractErr := engineering.ExtractPhysical(w, proposal, "analysis", "source", "revision")
+						x, extractErr := engineering.ExtractPhysical(w, proposal, "analysis", "source", "revision", hooks.Attributes...)
 						if extractErr != nil {
 							err = extractErr
 						} else {

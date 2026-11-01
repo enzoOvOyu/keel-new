@@ -16598,6 +16598,100 @@ paths:
           description: Revision conflict
         '422':
           description: Invalid difference decision
+  /projects/{projectId}/engineering-attributes:
+    get:
+      operationId: listEngineeringAttributes
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Typed project attribute definition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listEngineeringAttributesEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped definition not found
+        '409':
+          description: Definition version conflict
+        '422':
+          description: Invalid typed attribute
+    post:
+      operationId: saveEngineeringAttribute
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Typed project attribute definition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/saveEngineeringAttributeEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped definition not found
+        '409':
+          description: Definition version conflict
+        '422':
+          description: Invalid typed attribute
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDEAttributeDraft'
+  /projects/{projectId}/engineering-attributes/{attributeId}/review:
+    post:
+      operationId: reviewEngineeringAttribute
+      tags:
+      - IntelligentEngineering
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: attributeId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Typed project attribute definition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/reviewEngineeringAttributeEnvelope'
+        '403':
+          description: Permission denied
+        '404':
+          description: Scoped definition not found
+        '409':
+          description: Definition version conflict
+        '422':
+          description: Invalid typed attribute
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IDEAttributeReview'
 components:
   securitySchemes:
     bearerAuth:
@@ -47132,6 +47226,76 @@ components:
       properties:
         data:
           $ref: '#/components/schemas/IDEWorkspace'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    IDEAttributeDraft:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_version:
+          type: integer
+          minimum: 0
+        definition:
+          $ref: '#/components/schemas/IDEAttributeDefinition'
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - expected_version
+      - definition
+      - reason
+    IDEAttributeReview:
+      type: object
+      additionalProperties: false
+      properties:
+        version:
+          type: integer
+          minimum: 1
+        decision:
+          type: string
+          enum:
+          - approve
+          - reject
+        reason:
+          type: string
+          minLength: 1
+      required:
+      - version
+      - decision
+      - reason
+    listEngineeringAttributesEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IDEAttributeDefinition'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    saveEngineeringAttributeEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEAttributeDefinition'
+        request_id:
+          type: string
+      required:
+      - data
+      - request_id
+    reviewEngineeringAttributeEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: '#/components/schemas/IDEAttributeDefinition'
         request_id:
           type: string
       required:
