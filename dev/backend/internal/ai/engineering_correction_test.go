@@ -210,3 +210,62 @@ func TestEngineeringCorrectsDomainBeforeAddingMissingFields(t *testing.T) {
 		t.Fatalf("domain correction failed: %v calls=%d", err, calls)
 	}
 }
+
+func TestEngineeringRetainsOtherRejectedDraftsAcrossSheetSaveAndRestart(t *testing.T) {
+	calls := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var body struct {
+			Messages []struct {
+				Content string `json:"content"`
+			} `json:"messages"`
+			Tools []struct {
+				Function struct {
+					Name string `json:"name"`
+				} `json:"function"`
+			} `json:"tools"`
+		}
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		var input map[string]any
+		_ = json.Unmarshal([]byte(body.Messages[1].Content), &input)
+		calls++
+		expected := "alpha"
+		if calls == 2 {
+			expected = "beta"
+		}
+		if input["active_sheet"] != expected || input["draft_to_correct"] == nil || len(body.Tools) != 1 || body.Tools[0].Function.Name != "map_semantic_fields" {
+			t.Errorf("pending draft lost or mixed across sheets: active=%v calls=%d", input["active_sheet"], calls)
+		}
+		args, _ := json.Marshal(map[string]any{"sheet": expected, "region_index": 0, "set_columns": []any{}, "remove_columns": []string{"quantity"}})
+		_ = json.NewEncoder(w).Encode(map[string]any{"choices": []any{map[string]any{"message": map[string]any{"tool_calls": []any{map[string]any{"function": map[string]any{"name": "map_semantic_fields", "arguments": string(args)}}}}, "finish_reason": "tool_calls"}}})
+	}))
+	defer server.Close()
+	wb := bom.Workbook{}
+	prior := EngineeringCheckpoint{Version: engineeringCheckpointVersion, CompletedSheets: []string{"alpha", "beta"}, InspectedSheets: []string{"alpha", "beta"}, Proposal: engineering.EngineeringProposal{Summary: "source"}}
+	for _, sheet := range []string{"alpha", "beta"} {
+		wb.Sheets = append(wb.Sheets, bom.Sheet{Name: sheet, Cells: []bom.Cell{{Ref: "A1", Row: 1, Column: 1, Value: "No."}, {Ref: "B1", Row: 1, Column: 2, Value: "Device Name"}, {Ref: "A2", Row: 2, Column: 1, Value: "1"}, {Ref: "B2", Row: 2, Column: 2, Value: "TEST-" + sheet}}})
+		prior.Proposal.Regions = append(prior.Proposal.Regions, engineering.RegionMapping{Sheet: sheet, Kind: "equipment", Semantic: "inventory", Bounds: engineering.Bounds{StartRow: 1, EndRow: 2, StartColumn: 1, EndColumn: 2}, HeaderRows: []int{1}, Columns: []engineering.ColumnBinding{{Field: "label", Column: 2}, {Field: "quantity", Column: 1}}})
+	}
+	var saved EngineeringCheckpoint
+	p := Provider{Endpoint: server.URL, Timeout: time.Second}
+	_, err := p.UnderstandEngineering(context.Background(), wb, func(string, string, string) error { return nil }, EngineeringToolHooks{Resume: &prior, Checkpoint: func(_ context.Context, cp EngineeringCheckpoint) error {
+		if len(cp.CompletedSheets) == 1 {
+			raw, _ := json.Marshal(cp)
+			_ = json.Unmarshal(raw, &saved)
+			return context.Canceled
+		}
+		return nil
+	}})
+	if err != context.Canceled || len(saved.PendingDrafts) != 1 || len(saved.PendingDrafts["beta"].Regions) != 1 {
+		t.Fatalf("unprocessed sheet draft not durable: %v %+v", err, saved.PendingDrafts)
+	}
+	restarted := Provider{Endpoint: server.URL, Timeout: time.Second}
+	result, err := restarted.UnderstandEngineering(context.Background(), wb, func(string, string, string) error { return nil }, EngineeringToolHooks{Resume: &saved})
+	if err != nil || calls != 2 || len(result.Regions) != 2 {
+		t.Fatalf("resume regenerated already-inspected sheets: %v calls=%d", err, calls)
+	}
+	for _, region := range result.Regions {
+		if len(region.Columns) != 1 || region.Columns[0].Field != "label" || region.Columns[0].Column != 2 {
+			t.Fatal("unrelated valid identity binding changed")
+		}
+	}
+}

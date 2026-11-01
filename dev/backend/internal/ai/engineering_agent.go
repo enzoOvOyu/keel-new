@@ -31,11 +31,12 @@ type engineeringAction struct {
 const engineeringCheckpointVersion = 2
 
 type EngineeringCheckpoint struct {
-	Version         int                             `json:"version"`
-	Proposal        engineering.EngineeringProposal `json:"proposal"`
-	InspectedSheets []string                        `json:"inspected_sheets"`
-	History         []any                           `json:"history"`
-	CompletedSheets []string                        `json:"completed_sheets"`
+	Version         int                                        `json:"version"`
+	Proposal        engineering.EngineeringProposal            `json:"proposal"`
+	InspectedSheets []string                                   `json:"inspected_sheets"`
+	History         []any                                      `json:"history"`
+	CompletedSheets []string                                   `json:"completed_sheets"`
+	PendingDrafts   map[string]engineering.EngineeringProposal `json:"pending_drafts,omitempty"`
 }
 type EngineeringToolHooks struct {
 	Resume      *EngineeringCheckpoint
@@ -59,9 +60,12 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 	var graph []engineering.FormulaEvidence
 	var proposal engineering.EngineeringProposal
 	completed := map[string]bool{}
-	resumeFeedback := []any{}
+	pendingDrafts := map[string]engineering.EngineeringProposal{}
 	if hooks.Resume != nil {
 		proposal = hooks.Resume.Proposal
+		for sheet, draft := range hooks.Resume.PendingDrafts {
+			pendingDrafts[sheet] = draft
+		}
 		validRegions := []engineering.RegionMapping{}
 		for _, sheet := range hooks.Resume.CompletedSheets {
 			part := engineering.EngineeringProposal{Summary: proposal.Summary, Modules: proposal.Modules, Regions: []engineering.RegionMapping{}}
@@ -76,12 +80,20 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 			}
 			if validationErr == nil {
 				completed[sheet] = true
+				delete(pendingDrafts, sheet)
 				validRegions = append(validRegions, part.Regions...)
 			} else {
-				resumeFeedback = append(resumeFeedback, map[string]any{"action": engineeringAction{Action: "propose_engineering_model", Sheet: sheet, Proposal: &part}, "result": map[string]any{"error": validationErr.Error(), "restored_draft": true}})
+				pendingDrafts[sheet] = part
 			}
 		}
 		proposal.Regions = validRegions
+		for _, sheet := range w.Sheets {
+			if !completed[sheet.Name] {
+				if draft, _ := engineeringCorrectionDraft(hooks.Resume.History, sheet.Name); draft != nil {
+					pendingDrafts[sheet.Name] = *draft
+				}
+			}
+		}
 	}
 	prompt, e := prompts.ReadFile("prompts/engineering-source-v1.txt")
 	if e != nil {
@@ -98,7 +110,6 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 	if hooks.Resume != nil {
 		history = boundedEngineeringHistory(hooks.Resume.History)
 	}
-	history = append(history, resumeFeedback...)
 	registry := engineering.DefaultRegistry().Definitions()
 	sheetOrder := append([]bom.Sheet{}, w.Sheets...)
 	score := func(sheet bom.Sheet) int {
@@ -137,7 +148,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 		if hooks.Checkpoint == nil {
 			return nil
 		}
-		checkpoint := EngineeringCheckpoint{Version: engineeringCheckpointVersion, Proposal: proposal, CompletedSheets: []string{}, InspectedSheets: []string{}, History: boundedEngineeringHistory(history)}
+		checkpoint := EngineeringCheckpoint{Version: engineeringCheckpointVersion, Proposal: proposal, CompletedSheets: []string{}, InspectedSheets: []string{}, History: boundedEngineeringHistory(history), PendingDrafts: pendingDrafts}
 		for _, sheet := range w.Sheets {
 			if completed[sheet.Name] {
 				checkpoint.CompletedSheets = append(checkpoint.CompletedSheets, sheet.Name)
@@ -165,6 +176,16 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 		active := pending[0]
 		if len(queued) == 0 {
 			history = engineeringSheetHistory(history, active)
+			if draft, exists := pendingDrafts[active]; exists {
+				validationErr := engineering.CheckProposal(w, draft)
+				if validationErr == nil {
+					validationErr = engineering.CheckSheetCoverage(w, draft, active)
+				}
+				if validationErr != nil {
+					history = append(history, map[string]any{"action": engineeringAction{Action: "propose_engineering_model", Sheet: active, Proposal: &draft}, "result": map[string]any{"error": validationErr.Error(), "restored_draft": true}})
+				}
+				delete(pendingDrafts, active)
+			}
 			sheet, _ := ir.AnalyzeSheet(active)
 			regions := []bom.Region{}
 			for _, region := range ir.Regions {
