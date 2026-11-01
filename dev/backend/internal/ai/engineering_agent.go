@@ -90,9 +90,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 		if len(pending) == 0 {
 			return proposal, nil
 		}
-		if len(history) > 6 {
-			history = history[len(history)-6:]
-		}
+		history = boundedEngineeringHistory(history)
 		if len(queued) == 0 {
 			raw, err := p.engineeringCompletion(ctx, string(prompt), map[string]any{"workbook": summary, "modules": registry, "attribute_definitions": hooks.Attributes, "history": history, "pending_sheets": pending, "completed_sheets": len(completed), "turns_remaining": budget - turn}, functions, trace)
 			if err != nil {
@@ -390,4 +388,26 @@ func engineeringSheetPreview(s bom.Sheet, regions []bom.Region) any {
 		}
 	}
 	return map[string]any{"sheet": s.Name, "merges": s.Merges, "regions": regions, "sample_cells": samples, "sample_is_not_full_data": true}
+}
+
+func boundedEngineeringHistory(history []any) []any {
+	if len(history) > 6 {
+		history = history[len(history)-6:]
+	}
+	for len(history) > 1 {
+		raw, _ := json.Marshal(history)
+		if len(raw) <= 64<<10 {
+			break
+		}
+		history = history[1:]
+	}
+	if len(history) == 1 {
+		raw, _ := json.Marshal(history[0])
+		if len(raw) > 64<<10 {
+			if item, ok := history[0].(map[string]any); ok {
+				history = []any{map[string]any{"action": item["action"], "result": map[string]any{"error": "TOOL_RESULT_TOO_LARGE", "bytes": len(raw), "next": "Full result preserved as artifact; request a smaller source range."}}}
+			}
+		}
+	}
+	return history
 }

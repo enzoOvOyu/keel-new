@@ -30,6 +30,16 @@ func TestEngineeringNativeToolsResumeSheetCheckpoint(t *testing.T) {
 		if len(toolList) != 14 {
 			t.Errorf("native tools missing: %d", len(toolList))
 		}
+		if calls > 0 {
+			var messages []struct {
+				Role    string `json:"role"`
+				Content string `json:"content"`
+			}
+			_ = json.Unmarshal(body["messages"], &messages)
+			if len(messages) < 4 || messages[len(messages)-1].Role != "tool" {
+				t.Error("tool output not carried in native tool messages")
+			}
+		}
 		if _, ok := body["response_format"]; ok {
 			t.Error("JSON mode conflicts with native tools")
 		}

@@ -49,6 +49,54 @@ func (p *Provider) complete(ctx context.Context, prompt string, input any, funct
 		payload["response_format"] = format[0]
 	}
 	if len(functions) > 0 {
+		// Model tool outputs as actual tool messages; embedding a pseudo transcript
+		// in a user JSON payload causes models to repeatedly request the same data.
+		if values, ok := input.(map[string]any); ok {
+			contextValues := map[string]any{}
+			for k, v := range values {
+				if k != "history" {
+					contextValues[k] = v
+				}
+			}
+			contextJSON, _ := json.Marshal(contextValues)
+			messages := []map[string]any{{"role": "system", "content": prompt}, {"role": "user", "content": string(contextJSON)}}
+			history, _ := values["history"].([]any)
+			for i, entry := range history {
+				encoded, _ := json.Marshal(entry)
+				var item struct {
+					Action   json.RawMessage `json:"action"`
+					Rejected json.RawMessage `json:"rejected_action"`
+					Result   any             `json:"result"`
+					Error    string          `json:"error"`
+				}
+				if json.Unmarshal(encoded, &item) != nil {
+					continue
+				}
+				action := item.Action
+				if len(action) == 0 {
+					action = item.Rejected
+				}
+				var args map[string]json.RawMessage
+				if json.Unmarshal(action, &args) != nil {
+					continue
+				}
+				var name string
+				_ = json.Unmarshal(args["action"], &name)
+				if name == "" {
+					continue
+				}
+				delete(args, "action")
+				arguments, _ := json.Marshal(args)
+				id := fmt.Sprintf("history_%d", i)
+				result := item.Result
+				if item.Error != "" {
+					result = map[string]string{"error": item.Error}
+				}
+				resultJSON, _ := json.Marshal(result)
+				messages = append(messages, map[string]any{"role": "assistant", "tool_calls": []any{map[string]any{"id": id, "type": "function", "function": map[string]any{"name": name, "arguments": string(arguments)}}}}, map[string]any{"role": "tool", "tool_call_id": id, "content": string(resultJSON)})
+			}
+			payload["messages"] = messages
+		}
 		delete(payload, "response_format")
 		payload["tools"] = functions
 		payload["tool_choice"] = "required"
