@@ -102,7 +102,15 @@ func (p *Provider) complete(ctx context.Context, prompt string, input any, funct
 					}
 				}
 				if failure != "" {
-					toolErrors = append(toolErrors, map[string]any{"tool": name, "error": failure})
+					feedback := map[string]any{"tool": name, "error": failure}
+					if result, ok := item.Result.(map[string]any); ok {
+						for _, key := range []string{"binding_errors", "available_formula_cells", "next"} {
+							if value, exists := result[key]; exists {
+								feedback[key] = value
+							}
+						}
+					}
+					toolErrors = append(toolErrors, feedback)
 					continue // Keep rejected large proposals in artifacts, not as examples to imitate.
 				}
 				delete(args, "action")

@@ -1,3 +1,7 @@
+## 已完成里程碑事件：修复首轮理解纠错反馈
+
+用户要求继续完成，恢复使用指定Ultra真实测试。Agent现在一次返回提案中全部不支持/重复列绑定，纠错轮聚焦重新提案，不再逃逸到无关读取；公式单元格不存在时返回实际可读的公式引用。未知列仍保留来源，没有自动删除提案或降低来源门禁。完整internal/ai检查和Go API构建通过；首次检查因未设置既有KEEL_BOM_PYTHON失败，改用现有专用Python环境后通过。代码准备部署v18并继续独立测试来源，整本理解尚未通过。
+
 ## 已完成里程碑事件：用户指定Ultra直接实测并停止
 
 直接使用nvidia/nemotron-3-ultra-550b-a55b:free上传原MM文件到全新独立项目TEST-Agent-MM-Ultra-02，未继承旧模型完成结果。首次读取成功，但连续三次模型提案因connection.fabric、connection.label、cable.label等错误字段被拒绝；还观察到多列重复label。随后又三次查询不存在的公式单元格（CELL_NOT_FOUND），任务自行失败ENGINEERING_AGENT_NO_PROGRESS，停止后续重试。0/15表完成，未产生工程实体或发布记录；证据已持久保存。没有可用于量化“比DeepSeek差多少”的同条件成功基线，只能确定本轮未达到Agent可用标准。详见[Ultra实测记录](docs/intelligent-deployment/ultra-model-test-20261101.json)。

@@ -217,6 +217,12 @@ func TestEngineeringRepeatedBadProposalStopsAndDoesNotPolluteContext(t *testing.
 			if input["tool_errors"] == nil {
 				t.Error("missing correction feedback")
 			}
+			feedback := input["tool_errors"].([]any)
+			last := feedback[len(feedback)-1].(map[string]any)
+			bindings, ok := last["binding_errors"].([]any)
+			if !ok || len(bindings) != 1 || bindings[0].(map[string]any)["field"] != "cable_label" || last["next"] == nil {
+				t.Error("specific binding correction lost before model request")
+			}
 			assistantCalls := 0
 			for _, m := range body.Messages {
 				if m.Role == "assistant" {
@@ -240,6 +246,62 @@ func TestEngineeringRepeatedBadProposalStopsAndDoesNotPolluteContext(t *testing.
 	_, err := p.UnderstandEngineering(context.Background(), wb, func(string, string, string) error { return nil })
 	if err == nil || err.Error() != "ENGINEERING_AGENT_NO_PROGRESS" || calls != 4 {
 		t.Fatalf("unbounded errors: %v calls=%d", err, calls)
+	}
+}
+
+func TestEngineeringBindingErrorsIncludeAllUnsupportedAndDuplicateColumns(t *testing.T) {
+	proposal := engineering.EngineeringProposal{Regions: []engineering.RegionMapping{{Sheet: "renamed", Kind: "connection", Columns: []engineering.ColumnBinding{
+		{Field: "a_device", Column: 5}, {Field: "fabric", Column: 1}, {Field: "label", Column: 2}, {Field: "label", Column: 3}, {Field: "a_device", Column: 4},
+	}}}}
+	issues := engineeringBindingErrors(proposal, nil)
+	if len(issues) != 4 || issues[0].(map[string]any)["column"] != 1 || issues[3].(map[string]any)["column"] != 4 {
+		t.Fatalf("incomplete correction feedback: %+v", issues)
+	}
+	if len(proposal.Regions[0].Columns) != 5 {
+		t.Fatal("feedback silently repaired the proposal")
+	}
+	history := []any{map[string]any{"action": engineeringAction{Action: "propose_engineering_model", Sheet: "renamed", Proposal: &proposal}, "result": map[string]string{"error": "FIELD_NOT_SUPPORTED_FOR_REGION: fabric"}}}
+	if !engineeringProposalDue(bom.Sheet{Name: "renamed"}, history) {
+		t.Fatal("schema correction allowed a detour into unrelated source reads")
+	}
+}
+
+func TestEngineeringMissingFormulaProvidesActualReferences(t *testing.T) {
+	calls := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var body struct {
+			Messages []struct {
+				Content string `json:"content"`
+			} `json:"messages"`
+		}
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		content := `{"action":"inspect_sheet","sheet":"synthetic"}`
+		switch calls {
+		case 1:
+			content = `{"action":"inspect_formula","sheet":"synthetic","cell":"B2"}`
+		case 2:
+			var input map[string]any
+			_ = json.Unmarshal([]byte(body.Messages[1].Content), &input)
+			feedback := input["tool_errors"].([]any)[0].(map[string]any)
+			refs := feedback["available_formula_cells"].([]any)
+			if len(refs) != 1 || refs[0] != "B4" {
+				t.Errorf("formula source references missing: %+v", refs)
+			}
+			content = `{"action":"inspect_formula","sheet":"synthetic","cell":"B4"}`
+		default:
+			if calls > 2 {
+				content = `{"action":"propose_engineering_model","sheet":"synthetic","proposal":{"summary":"unmapped calculation retained","regions":[{"sheet":"synthetic","bounds":{"start_row":1,"end_row":4,"start_column":1,"end_column":2},"kind":"other","semantic":"calculation evidence, domain unknown","header_rows":[],"columns":[]}]}}`
+			}
+		}
+		calls++
+		_ = json.NewEncoder(w).Encode(map[string]any{"choices": []any{map[string]any{"message": map[string]string{"content": content}}}})
+	}))
+	defer server.Close()
+	p := Provider{Endpoint: server.URL, Timeout: time.Second}
+	wb := bom.Workbook{Sheets: []bom.Sheet{{Name: "synthetic", Cells: []bom.Cell{{Ref: "A1", Row: 1, Column: 1, Value: "Calculation"}, {Ref: "B4", Row: 4, Column: 2, Value: "2", Formula: "1+1"}}}}}
+	_, err := p.UnderstandEngineering(context.Background(), wb, func(string, string, string) error { return nil })
+	if err != nil || calls != 4 {
+		t.Fatalf("formula recovery failed: %v calls=%d", err, calls)
 	}
 }
 

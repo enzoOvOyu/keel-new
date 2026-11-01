@@ -345,7 +345,24 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 		if err != nil {
 			state = "rejected"
 			detail = err.Error()
-			result = map[string]string{"error": detail}
+			feedback := map[string]any{"error": detail}
+			if action.Proposal != nil {
+				feedback["binding_errors"] = engineeringBindingErrors(*action.Proposal, hooks.Attributes)
+				feedback["next"] = "Correct all listed bindings together. Omit unsupported columns; they remain in the source. Do not rename their fields or change the region kind just to pass validation."
+			}
+			if action.Action == "inspect_formula" {
+				refs := []string{}
+				if sheet, ok := ir.AnalyzeSheet(action.Sheet); ok {
+					for _, cell := range sheet.Cells {
+						if !cell.Sensitive && cell.Formula != "" && len(refs) < 16 {
+							refs = append(refs, cell.Ref)
+						}
+					}
+				}
+				feedback["available_formula_cells"] = refs
+				feedback["next"] = "Use an actual formula cell address from the source preview or available_formula_cells; do not guess a row beneath the header."
+			}
+			result = feedback
 		}
 		if action.Action == "propose_engineering_model" && err == nil {
 			detail = fmt.Sprintf("已持久保存 %s 的区域理解（%d/%d Sheet）；未发布正式数据", action.Sheet, len(completed), len(w.Sheets))
@@ -598,6 +615,11 @@ func engineeringProposalDue(sheet bom.Sheet, history []any) bool {
 		}
 		var failure map[string]json.RawMessage
 		if json.Unmarshal(step.Result, &failure) == nil && failure["error"] != nil {
+			var detail string
+			_ = json.Unmarshal(failure["error"], &detail)
+			if step.Action.Action == "propose_engineering_model" && (strings.HasPrefix(detail, "FIELD_NOT_SUPPORTED_FOR_REGION") || strings.HasPrefix(detail, "DUPLICATE_FIELD_BINDING")) {
+				return true
+			}
 			continue
 		}
 		action := step.Action
@@ -642,6 +664,37 @@ func engineeringProposalDue(sheet bom.Sheet, history []any) bool {
 		}
 	}
 	return false
+}
+
+// Return every invalid column in a rejected proposal, not only the first error.
+// This is correction feedback, never an automatically accepted/repaired mapping.
+func engineeringBindingErrors(proposal engineering.EngineeringProposal, attributes []engineering.AttributeDefinition) []any {
+	issues := []any{}
+	for index, region := range proposal.Regions {
+		allowed := map[string]bool{}
+		for _, field := range engineering.RegionFields(region.Kind) {
+			allowed[field] = true
+		}
+		for _, attribute := range attributes {
+			if attribute.ApprovalStatus == "approved" {
+				allowed[fmt.Sprintf("attribute:%s@%d", attribute.ID, attribute.Version)] = true
+			}
+		}
+		seen := map[string]bool{}
+		for _, binding := range region.Columns {
+			reason := ""
+			if !allowed[binding.Field] {
+				reason = "unsupported field: omit this binding"
+			} else if seen[binding.Field] {
+				reason = "duplicate field: each object has one binding per field"
+			}
+			seen[binding.Field] = true
+			if reason != "" {
+				issues = append(issues, map[string]any{"region": index, "kind": region.Kind, "field": binding.Field, "column": binding.Column, "reason": reason})
+			}
+		}
+	}
+	return issues
 }
 
 func engineeringRegionCapabilities() map[string][]string {
