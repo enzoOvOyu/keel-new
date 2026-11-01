@@ -102,7 +102,7 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 				return fmt.Errorf("EMPTY_RECORD_BINDING")
 			}
 			for _, b := range record.Cells {
-				if !validBindingField(b.Field) || usedConstant(r.Constants, b.Field) || bound[b.Field] {
+				if !validRegionField(r.Kind, b.Field) || usedConstant(r.Constants, b.Field) || bound[b.Field] {
 					return fmt.Errorf("INVALID_RECORD_FIELD")
 				}
 				bound[b.Field] = true
@@ -122,8 +122,8 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 		}
 		used := map[string]bool{}
 		for _, c := range r.Columns {
-			if !validBindingField(c.Field) {
-				return fmt.Errorf("UNKNOWN_FIELD_BINDING: %s", c.Field)
+			if !validRegionField(r.Kind, c.Field) {
+				return fmt.Errorf("FIELD_NOT_SUPPORTED_FOR_REGION: kind=%s field=%s; supported=%s", r.Kind, c.Field, strings.Join(RegionFields(r.Kind), ","))
 			}
 			if used[c.Field] {
 				return fmt.Errorf("DUPLICATE_FIELD_BINDING: sheet=%s kind=%s field=%s; split side-by-side tables into separate regions or use records; each field occurs once per object", r.Sheet, r.Kind, c.Field)
@@ -134,7 +134,7 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 			used[c.Field] = true
 		}
 		for _, c := range r.Constants {
-			if !validBindingField(c.Field) || used[c.Field] || len(c.EvidenceCells) == 0 {
+			if !validRegionField(r.Kind, c.Field) || used[c.Field] || len(c.EvidenceCells) == 0 {
 				return fmt.Errorf("INVALID_CONSTANT_EVIDENCE: %s", c.Field)
 			}
 			used[c.Field] = true

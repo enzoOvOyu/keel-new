@@ -40,6 +40,7 @@ func (p *Provider) completeJSON(ctx context.Context, prompt string, input any, f
 func (p *Provider) complete(ctx context.Context, prompt string, input any, functions []any, format ...map[string]any) ([]byte, error) {
 	p.Calls++
 	p.HTTPStatus = 0
+	p.Raw = nil
 	encoded, _ := json.Marshal(input)
 	payload := map[string]any{"model": p.Model, "messages": []map[string]string{{"role": "system", "content": prompt}, {"role": "user", "content": string(encoded)}}, "stream": false}
 	token := "max_tokens"
@@ -173,6 +174,7 @@ func (p *Provider) complete(ctx context.Context, prompt string, input any, funct
 		}
 		return nil, &ProviderError{Status: 200, Reason: reason}
 	}
+	p.Raw = append([]byte{}, raw...)
 	var response struct {
 		Choices []struct {
 			Message struct {

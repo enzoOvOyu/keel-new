@@ -10,6 +10,7 @@ import (
 	"io"
 	"keel.local/dev/internal/bom"
 	"keel.local/dev/internal/engineering"
+	"sort"
 	"strings"
 	"time"
 )
@@ -53,9 +54,20 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 	completed := map[string]bool{}
 	if hooks.Resume != nil {
 		proposal = hooks.Resume.Proposal
+		validRegions := []engineering.RegionMapping{}
 		for _, sheet := range hooks.Resume.CompletedSheets {
-			completed[sheet] = true
+			part := engineering.EngineeringProposal{Summary: proposal.Summary, Modules: proposal.Modules, Regions: []engineering.RegionMapping{}}
+			for _, region := range proposal.Regions {
+				if region.Sheet == sheet {
+					part.Regions = append(part.Regions, region)
+				}
+			}
+			if engineering.CheckProposal(w, part) == nil {
+				completed[sheet] = true
+				validRegions = append(validRegions, part.Regions...)
+			}
 		}
+		proposal.Regions = validRegions
 	}
 	prompt, e := prompts.ReadFile("prompts/engineering-v1.txt")
 	if e != nil {
@@ -73,6 +85,23 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 		history = boundedEngineeringHistory(hooks.Resume.History)
 	}
 	registry := engineering.DefaultRegistry().Definitions()
+	sheetOrder := append([]bom.Sheet{}, w.Sheets...)
+	score := func(sheet bom.Sheet) int {
+		headers := map[string]bool{}
+		for _, cell := range sheet.Cells {
+			if !cell.Sensitive {
+				for _, field := range engineering.HeaderFields(cell.Value) {
+					headers[field] = true
+				}
+			}
+		}
+		return len(headers)
+	}
+	scores := map[string]int{}
+	for _, sheet := range sheetOrder {
+		scores[sheet.Name] = score(sheet)
+	}
+	sort.SliceStable(sheetOrder, func(i, j int) bool { return scores[sheetOrder[i].Name] > scores[sheetOrder[j].Name] })
 	summary := []any{}
 	for _, s := range w.Sheets {
 		formulas := 0
@@ -108,7 +137,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 	budget := max(24, len(w.Sheets)*16)
 	for turn := 0; turn < budget; turn++ {
 		pending := []string{}
-		for _, sheet := range w.Sheets {
+		for _, sheet := range sheetOrder {
 			if len(sheet.Cells) > 0 && !completed[sheet.Name] {
 				pending = append(pending, sheet.Name)
 			}
@@ -127,7 +156,7 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 				}
 			}
 			selected := engineeringSourceTools(functions, active, inspected[active], engineeringProposalDue(sheet, history))
-			raw, err := p.engineeringCompletion(ctx, string(prompt), map[string]any{"workbook": summary, "modules": registry, "attribute_definitions": hooks.Attributes, "history": history, "active_sheet": active, "active_sheet_preview": engineeringSheetPreview(sheet, regions), "pending_sheets": pending, "completed_sheets": len(completed), "turns_remaining": budget - turn}, selected, trace)
+			raw, err := p.engineeringCompletion(ctx, string(prompt), map[string]any{"workbook": summary, "modules": registry, "attribute_definitions": hooks.Attributes, "history": history, "active_sheet": active, "active_sheet_preview": engineeringSheetPreview(sheet, regions), "region_field_capabilities": engineeringRegionCapabilities(), "pending_sheets": pending, "completed_sheets": len(completed), "turns_remaining": budget - turn}, selected, trace, hooks.Artifact)
 			if err != nil {
 				return proposal, err
 			}
@@ -313,12 +342,27 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 	return proposal, fmt.Errorf("ENGINEERING_AGENT_TURN_LIMIT")
 }
 
-// Only retry an explicit transient provider rejection, honoring its Retry-After.
-func (p *Provider) engineeringCompletion(ctx context.Context, prompt string, input any, functions []any, trace func(string, string, string) error) ([]byte, error) {
+// Retry transient transport failures and ask the model to correct invalid output.
+// Neither retry path relaxes the schema or source checks.
+func (p *Provider) engineeringCompletion(ctx context.Context, prompt string, input any, functions []any, trace func(string, string, string) error, artifacts ...func(context.Context, string, string, any) error) ([]byte, error) {
+	corrections := 0
 	for attempt := 0; ; attempt++ {
 		raw, err := p.complete(ctx, prompt, input, functions)
 		if err == nil {
 			return raw, nil
+		}
+		if (err.Error() == "INVALID_JSON" || err.Error() == "PROVIDER_OUTPUT_TRUNCATED" || err.Error() == "SCHEMA_VALIDATION_FAILED") && corrections < 2 {
+			if len(artifacts) > 0 && artifacts[0] != nil {
+				if e := artifacts[0](ctx, "provider_output", "rejected", map[string]any{"error": err.Error(), "response": string(p.Raw)}); e != nil {
+					return nil, e
+				}
+			}
+			corrections++
+			if e := trace("provider_output", "retrying", err.Error()+"；要求模型重新输出精简、合法的工具参数"); e != nil {
+				return nil, e
+			}
+			prompt += "\nYour previous output was rejected: " + err.Error() + ". Call exactly one supplied function with a complete valid JSON object as arguments. Keep it concise; bind columns instead of listing source rows. Do not output commentary or markdown."
+			continue
 		}
 		var upstream *ProviderError
 		if !errors.As(err, &upstream) || !upstream.Temporary() || attempt >= 3 {
@@ -409,12 +453,16 @@ func engineeringSheetPreview(s bom.Sheet, regions []bom.Region) any {
 		rows[regions[len(regions)-1].End] = true
 	}
 	samples := []map[string]any{}
+	hints := []map[string]any{}
 	for _, c := range s.Cells {
 		if rows[c.Row] && !c.Sensitive && len(samples) < 240 {
 			samples = append(samples, map[string]any{"cell": c.Ref, "row": c.Row, "column": c.Column, "value": c.Value, "formula": c.Formula})
+			if fields := engineering.HeaderFields(c.Value); len(fields) > 0 {
+				hints = append(hints, map[string]any{"cell": c.Ref, "header": c.Value, "candidate_fields": fields})
+			}
 		}
 	}
-	return map[string]any{"sheet": s.Name, "merges": s.Merges, "regions": regions, "sample_cells": samples, "sample_is_not_full_data": true}
+	return map[string]any{"sheet": s.Name, "merges": s.Merges, "regions": regions, "sample_cells": samples, "header_hints": hints, "sample_is_not_full_data": true}
 }
 
 func boundedEngineeringHistory(history []any) []any {
@@ -559,4 +607,12 @@ func engineeringProposalDue(sheet bom.Sheet, history []any) bool {
 		}
 	}
 	return false
+}
+
+func engineeringRegionCapabilities() map[string][]string {
+	out := map[string][]string{}
+	for _, kind := range []string{"equipment", "assembly", "site", "room", "rack", "placement", "port", "connection", "cable", "power", "material", "workload"} {
+		out[kind] = engineering.RegionFields(kind)
+	}
+	return out
 }

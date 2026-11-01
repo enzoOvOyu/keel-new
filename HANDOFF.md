@@ -1,3 +1,9 @@
+## 已完成里程碑事件：按工程域纠错与非法输出恢复
+
+- 真实Lightning任务在两个Sheet后返回INVALID_JSON；此前通过全局字段词表的部分映射也不符合领域含义，不能当成成功。现按实际提取器能力限制每个区域的字段，恢复时重新校验旧检查点并退回不合法的Sheet。
+- 复用现有通用表头词表提供候选提示，按可识别表头证据优先处理清晰表格；没有固定Sheet名、列号、设备型号或业务常量。复杂图表保留来源和疑问，不强行变成设备行。
+- 模型非法JSON/截断输出最多要求纠正两次，原响应写MinIO取证，仍执行严格Schema。完整internal/ai与internal/engineering定向包检查通过，新增跨域错误映射拒绝和非法工具参数纠错用例。真实整本理解仍待本轮在线复测。
+
 ## 当前复测切换：免费Lightning模型与模型版本记录
 
 - Ultra免费模型的响应正文超时已通过新诊断确认（response_timeout，120秒）。仅将独立测试Provider `59c504bf-a8c8-42db-9afc-b89f70a0f2d5`更新为`nvidia/nemotron-3.5-lightning:free`、版本2、名称TEST-Agent-Free-Nemotron-Lightning；原test/DeepSeek及默认选择不变。新模型原生工具检查HTTP200、费用0。

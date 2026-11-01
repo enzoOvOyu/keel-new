@@ -175,3 +175,27 @@ func TestProviderInterruptedBodyRemainsRetryable(t *testing.T) {
 		t.Fatalf("interrupted provider response not recoverable: %v", err)
 	}
 }
+
+func TestEngineeringCorrectsMalformedToolOutputWithoutAcceptingIt(t *testing.T) {
+	calls, archived := 0, 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		args := `{"sheet":`
+		if calls == 2 {
+			args = `{"sheet":"synthetic"}`
+		}
+		_ = json.NewEncoder(w).Encode(map[string]any{"choices": []any{map[string]any{"message": map[string]any{"tool_calls": []any{map[string]any{"function": map[string]any{"name": "inspect_sheet", "arguments": args}}}}, "finish_reason": "tool_calls"}}})
+	}))
+	defer server.Close()
+	p := Provider{Endpoint: server.URL, Timeout: time.Second}
+	raw, err := p.engineeringCompletion(context.Background(), "synthetic", map[string]any{}, []any{map[string]any{"type": "function", "function": map[string]any{"name": "inspect_sheet"}}}, func(string, string, string) error { return nil }, func(_ context.Context, tool, state string, v any) error {
+		archived++
+		if tool != "provider_output" || state != "rejected" || v.(map[string]any)["response"] == "" {
+			t.Error("invalid model response was not preserved")
+		}
+		return nil
+	})
+	if err != nil || calls != 2 || archived != 1 || !json.Valid(raw) {
+		t.Fatalf("correction failed: %s %v calls=%d archived=%d", raw, err, calls, archived)
+	}
+}
