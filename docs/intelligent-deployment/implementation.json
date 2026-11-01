@@ -1,7 +1,7 @@
 {
   "updated_at": "2026-11-01T05:29:49.409927+00:00",
   "branch": "dev",
-  "scope": "API31dbe52/v24 deployed. Ultra-03 task50a9ba49 continues with original working native tool settings, isolated active-sheet context, bounded reads, batch correction and source validation. Whole workbook acceptance pending.",
+  "scope": "API3e5dad5/v29 deployed. Ultra-03 taske66f9d18-c9ea-4d7e-abd6-c49ea65ebede continues with native unique field keys, active-sheet context, source semantic checks and explicit constant-object feedback. 7154 cabling and 967 equipment core rows matched; equipment extra fields and remaining domains not accepted.",
   "phase_status": {
     "P0": "complete; report commit 314126d",
     "P1": "complete: architecture, models, contracts and kernel",

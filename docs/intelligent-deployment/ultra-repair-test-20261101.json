@@ -5,32 +5,32 @@
   "project_code": "TEST-Agent-MM-Ultra-03",
   "project_id": "proj-18101842-d821-4583-9229-a708f995c1c8",
   "source_id": "71a5c797-319b-496d-a6ce-f67c1080439c",
-  "job_id": "50a9ba49-be28-4832-83a1-f593bcf27228",
-  "runtime_revision": "31dbe52",
-  "prepared_revision": "1df3a86",
+  "job_id": "e66f9d18-c9ea-4d7e-abd6-c49ea65ebede",
+  "runtime_revision": "3e5dad5",
+  "prepared_revision": "3e5dad5",
   "accepted_sheets": 5,
   "total_sheets": 15,
   "source_comparison": [
     {
       "sheet": "Network Information",
       "expected_rows": 189,
-      "regions": 0,
+      "regions": 1,
       "field_matches": {
-        "label": 0,
-        "model": 0,
-        "rack": 0,
-        "start_u": 0
+        "label": 189,
+        "model": 189,
+        "rack": 189,
+        "start_u": 189
       }
     },
     {
       "sheet": "Server Information",
       "expected_rows": 778,
-      "regions": 0,
+      "regions": 1,
       "field_matches": {
-        "label": 0,
-        "model": 0,
-        "rack": 0,
-        "start_u": 0
+        "label": 778,
+        "model": 778,
+        "rack": 778,
+        "start_u": 778
       }
     },
     {
@@ -124,5 +124,6 @@
   ],
   "storage": "Complete tool artifacts/checkpoints remain in MinIO; PostgreSQL stores metadata and typed engineering facts",
   "reasoning_trial": "Default reasoning produced invalid textual tool payloads; restored prior working request settings without changing model",
-  "test_scope": "Targeted AI/engineering checks, API build, real API documentation consistency and real workbook analysis only"
+  "test_scope": "Targeted AI/engineering checks, API build, real API documentation consistency and real workbook analysis only",
+  "equipment_extra_field_review": "NOT ACCEPTED: core fields match, but metadata misbindings in previous candidates require re-analysis under v28/v29 checks"
 }
