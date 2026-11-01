@@ -773,6 +773,20 @@ func engineeringBindingErrors(proposal engineering.EngineeringProposal, attribut
 				issues = append(issues, map[string]any{"region": index, "kind": region.Kind, "field": binding.Field, "column": binding.Column, "reason": reason})
 			}
 		}
+		for _, binding := range region.Constants {
+			reason := ""
+			if !allowed[binding.Field] {
+				reason = "unsupported constant field"
+			} else if seen[binding.Field] {
+				reason = "duplicate constant/column field: different source objects need records or separate regions, not repeated constants"
+			} else if len(binding.EvidenceCells) == 0 {
+				reason = "constant needs existing source evidence cells"
+			}
+			seen[binding.Field] = true
+			if reason != "" {
+				issues = append(issues, map[string]any{"region": index, "kind": region.Kind, "field": binding.Field, "reason": reason})
+			}
+		}
 	}
 	return issues
 }

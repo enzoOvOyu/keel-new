@@ -169,8 +169,14 @@ func CheckProposal(w bom.Workbook, p EngineeringProposal) error {
 			return fmt.Errorf("%s", strings.Join(bindingConflicts, " | "))
 		}
 		for _, c := range r.Constants {
-			if !validRegionField(r.Kind, c.Field) || used[c.Field] || len(c.EvidenceCells) == 0 {
-				return fmt.Errorf("INVALID_CONSTANT_EVIDENCE: %s", c.Field)
+			if !validRegionField(r.Kind, c.Field) {
+				return fmt.Errorf("FIELD_NOT_SUPPORTED_FOR_REGION: kind=%s field=%s", r.Kind, c.Field)
+			}
+			if used[c.Field] {
+				return fmt.Errorf("DUPLICATE_FIELD_BINDING: sheet=%s kind=%s field=%s; a constant cannot repeat a column or another constant. Different source objects need separate regions or records, not repeated constants", r.Sheet, r.Kind, c.Field)
+			}
+			if len(c.EvidenceCells) == 0 {
+				return fmt.Errorf("CONSTANT_EVIDENCE_REQUIRED: field=%s; cite existing cells in this sheet", c.Field)
 			}
 			used[c.Field] = true
 			if allowed := bindingEnum(c.Field); len(allowed) > 0 {

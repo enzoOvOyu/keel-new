@@ -279,6 +279,17 @@ func TestEngineeringBindingErrorsIncludeAllUnsupportedAndDuplicateColumns(t *tes
 	}
 }
 
+func TestEngineeringConstantConflictsReturnTogether(t *testing.T) {
+	p := engineering.EngineeringProposal{Regions: []engineering.RegionMapping{{Kind: "power", Columns: []engineering.ColumnBinding{{Field: "power_capacity", Column: 3}}, Constants: []engineering.ConstantBinding{
+		{Field: "power_capacity", EvidenceCells: []string{"B17"}},
+		{Field: "cooling_type", EvidenceCells: []string{"B17"}},
+		{Field: "cooling_type", EvidenceCells: []string{"B18"}},
+	}}}}
+	if issues := engineeringBindingErrors(p, nil); len(issues) != 2 {
+		t.Fatalf("constant conflicts hidden: %+v", issues)
+	}
+}
+
 func TestEngineeringRangePagesWithoutLosingRequestedExtent(t *testing.T) {
 	wb := bom.Workbook{Sheets: []bom.Sheet{{Name: "renamed", Cells: []bom.Cell{{Ref: "B100", Row: 100, Column: 2, Value: "sample"}, {Ref: "B200", Row: 200, Column: 2, Value: "later"}}}}}
 	bounds := engineering.Bounds{StartRow: 100, EndRow: 200, StartColumn: 2, EndColumn: 2}
