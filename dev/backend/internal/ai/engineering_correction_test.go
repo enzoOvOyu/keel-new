@@ -175,3 +175,38 @@ func TestEngineeringCorrectionCoversTitleWithoutCreatingFakeEquipment(t *testing
 		t.Fatalf("title became an asset: %+v %v", result.Model.Equipment, err)
 	}
 }
+
+func TestEngineeringCorrectsDomainBeforeAddingMissingFields(t *testing.T) {
+	calls := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var body map[string]json.RawMessage
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		calls++
+		args := map[string]any{"sheet": "synthetic", "region_index": 0}
+		if calls == 1 {
+			var declared []map[string]any
+			_ = json.Unmarshal(body["tools"], &declared)
+			props := declared[0]["function"].(map[string]any)["parameters"].(map[string]any)["properties"].(map[string]any)
+			if props["set_kind"] == nil || props["set_columns"] != nil {
+				t.Error("domain error still invites edits to correctly mapped columns")
+			}
+			args["set_kind"] = "power"
+		} else {
+			args["set_columns"] = []any{map[string]any{"field": "power", "column": 2, "unit": "kW"}, map[string]any{"field": "power_capacity", "column": 3, "unit": "kW"}}
+			args["remove_columns"] = []string{}
+		}
+		if calls > 2 {
+			t.Error("domain correction did not resolve its actual cause")
+		}
+		encoded, _ := json.Marshal(args)
+		_ = json.NewEncoder(w).Encode(map[string]any{"choices": []any{map[string]any{"message": map[string]any{"tool_calls": []any{map[string]any{"function": map[string]any{"name": "map_semantic_fields", "arguments": string(encoded)}}}}, "finish_reason": "tool_calls"}}})
+	}))
+	defer server.Close()
+	wb := bom.Workbook{Sheets: []bom.Sheet{{Name: "synthetic", Cells: []bom.Cell{{Ref: "A1", Row: 1, Column: 1, Value: "Rack"}, {Ref: "B1", Row: 1, Column: 2, Value: "Max Load(kW)"}, {Ref: "C1", Row: 1, Column: 3, Value: "Rack Power Capacity(kW)"}, {Ref: "A2", Row: 2, Column: 1, Value: "TEST-RACK"}, {Ref: "B2", Row: 2, Column: 2, Value: "12"}, {Ref: "C2", Row: 2, Column: 3, Value: "24"}}}}}
+	cp := EngineeringCheckpoint{Version: engineeringCheckpointVersion, InspectedSheets: []string{"synthetic"}, CompletedSheets: []string{"synthetic"}, Proposal: engineering.EngineeringProposal{Summary: "source", Regions: []engineering.RegionMapping{{Sheet: "synthetic", Kind: "placement", Semantic: "rack power", Bounds: engineering.Bounds{StartRow: 1, EndRow: 2, StartColumn: 1, EndColumn: 3}, HeaderRows: []int{1}, Columns: []engineering.ColumnBinding{{Field: "rack", Column: 1}}}}}}
+	p := Provider{Endpoint: server.URL, Timeout: time.Second}
+	result, err := p.UnderstandEngineering(context.Background(), wb, func(string, string, string) error { return nil }, EngineeringToolHooks{Resume: &cp})
+	if err != nil || calls != 2 || result.Regions[0].Kind != "power" || len(result.Regions[0].Columns) != 3 {
+		t.Fatalf("domain correction failed: %v calls=%d", err, calls)
+	}
+}

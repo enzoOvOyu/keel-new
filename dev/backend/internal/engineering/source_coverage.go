@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/xuri/excelize/v2"
 	"keel.local/dev/internal/bom"
+	"sort"
 )
 
 // Finishing a sheet accounts for all meaningful source areas. Unknown areas can
@@ -91,17 +92,32 @@ func checkRecognizedTableCoverage(w bom.Workbook, p EngineeringProposal, sheet s
 					continue
 				}
 				mapped := false
-				for _, r := range p.Regions {
-					if r.Sheet != sheet || !kinds[r.Kind] || row > r.Bounds.EndRow {
+				wrongRegion := -1
+				wrongKind := ""
+				for index, r := range p.Regions {
+					if r.Sheet != sheet || row > r.Bounds.EndRow {
 						continue
 					}
 					for _, c := range r.Columns {
 						for _, column := range fields[field] {
 							if c.Field == field && c.Column == column && column >= r.Bounds.StartColumn && column <= r.Bounds.EndColumn {
-								mapped = true
+								if kinds[r.Kind] {
+									mapped = true
+								} else if wrongRegion < 0 {
+									wrongRegion = index
+									wrongKind = r.Kind
+								}
 							}
 						}
 					}
+				}
+				if !mapped && wrongRegion >= 0 {
+					allowed := []string{}
+					for kind := range kinds {
+						allowed = append(allowed, kind)
+					}
+					sort.Strings(allowed)
+					return fmt.Errorf("REGION_KIND_CONFLICT: sheet=%s region_index=%d field=%s is already mapped, but kind=%s cannot represent this evidenced table; allowed_region_kinds=%v. Correct set_kind using source meaning; do not repeatedly change the already-mapped column", sheet, wrongRegion, field, wrongKind, allowed)
 				}
 				if !mapped {
 					return fmt.Errorf("SUPPORTED_HEADER_UNMAPPED: sheet=%s header_row=%d candidate_columns=%v field=%s; choose an evidenced source column across all data rows. Duplicate headers do not justify omitting a critical field; keep other valid bindings unchanged", sheet, row, fields[field], field)

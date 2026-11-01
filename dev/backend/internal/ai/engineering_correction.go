@@ -23,7 +23,7 @@ func engineeringCorrectionDraft(history []any, sheet string) (*engineering.Engin
 		if json.Unmarshal(raw, &step) != nil || step.Action.Proposal == nil || step.Action.Sheet != sheet {
 			continue
 		}
-		for _, prefix := range []string{"FIELD_NOT_SUPPORTED_FOR_REGION", "HEADER_FIELD_CONFLICT", "FIELD_VALUE_CONFLICT", "FIELD_SOURCE_CONFLICT", "SUPPORTED_HEADER_UNMAPPED", "INCOMPLETE_SHEET_COVERAGE", "INVALID_CONSTANT_VALUE", "INVALID_CONSTANT_CELL", "UNSUPPORTED_CONSTANT_VALUE"} {
+		for _, prefix := range []string{"FIELD_NOT_SUPPORTED_FOR_REGION", "HEADER_FIELD_CONFLICT", "FIELD_VALUE_CONFLICT", "FIELD_SOURCE_CONFLICT", "REGION_KIND_CONFLICT", "SUPPORTED_HEADER_UNMAPPED", "INCOMPLETE_SHEET_COVERAGE", "INVALID_CONSTANT_VALUE", "INVALID_CONSTANT_CELL", "UNSUPPORTED_CONSTANT_VALUE"} {
 			if strings.HasPrefix(step.Result.Error, prefix) {
 				return step.Action.Proposal, step.Result.Error
 			}
@@ -73,19 +73,26 @@ func engineeringCorrectionTool(draft engineering.EngineeringProposal, sheet stri
 			"header_rows": map[string]any{"type": "array", "items": map[string]any{"type": "integer", "minimum": 1}, "description": "All title, header, subtotal or footer rows to exclude from entity extraction."},
 		}},
 	}}
+	fn := tool["function"].(map[string]any)
+	focusedKeys := []string{}
 	if strings.HasPrefix(validationError, "INCOMPLETE_SHEET_COVERAGE") {
-		fn := tool["function"].(map[string]any)
 		fn["description"] = "Include the missing source area by correcting bounds of the appropriate region. Preserve field bindings. Set header_rows to exclude titles, headers and totals from entity extraction; retain existing excluded rows."
+		focusedKeys = []string{"sheet", "region_index", "bounds", "header_rows"}
+	} else if strings.HasPrefix(validationError, "REGION_KIND_CONFLICT") {
+		fn["description"] = "The source column is already correctly mapped. Correct only the region_index and set_kind identified by the validation error, choosing an evidenced allowed_region_kind. Preserve existing bindings for revalidation."
+		focusedKeys = []string{"sheet", "region_index", "set_kind"}
+	}
+	if len(focusedKeys) > 0 {
 		params := fn["parameters"].(map[string]any)
 		props := params["properties"].(map[string]any)
 		focused := map[string]any{}
-		for _, key := range []string{"sheet", "region_index", "bounds", "header_rows"} {
+		for _, key := range focusedKeys {
 			focused[key] = props[key]
 		}
 		params["properties"] = focused
-		params["required"] = []string{"sheet", "region_index", "bounds", "header_rows"}
-		delete(params, "$defs")
+		params["required"] = focusedKeys
 	}
+
 	return tool
 }
 
