@@ -1,5 +1,12 @@
 # Keel 整合交接 · 2026-10-31
 
+## 5181原型路由修复（2026-11-01，覆盖下方旧预览运行目录）
+
+用户反馈作业平台预览无法正常进入。确认带index.html本机可访问，但/jobs-preview及末尾斜杠路径被拓扑SPA兜底。补目录重定向、相对资源路径，并在原拓扑侧栏增加“作业平台样式”。
+
+5181仍用原tmux keel-topology-prototype，现运行 `/home/ubuntu/keel-kestra-ui-dev/docs/topology/prototype`，使用同套原拓扑/机柜源码加上述入口修正。生成文件位于该工作区public/jobs-preview/；只重启5181，5180/8081 PID保持不变，主工作区没有修改。路由定向检查见 [记录](docs/flows-redesign/prototype/route-validation.json)。不重复业务或后端测试。
+
+
 ## 作业平台UI：用户要求先审阅独立样式原型（2026-11-01）
 
 - 功能分支 `feat/jobs-kestra-ui`，工作区 `/home/ubuntu/keel-kestra-ui-dev`。已同步最新dev基线；业务代码未合并回dev/main，未切换5180/8081。

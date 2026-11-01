@@ -1,6 +1,6 @@
 # 作业平台交互设计预览
 
-预览入口：<http://localhost:5181/jobs-preview/index.html#flows>。
+预览入口：<http://localhost:5181/jobs-preview/index.html#flows>。`/jobs-preview`和`/jobs-preview/`也会跳转到独立HTML，不再落入拓扑SPA。原有拓扑左侧“作业平台样式”按钮可直接进入。
 
 此目录是独立设计原型，不修改正式`/flows`、不访问业务API、不写数据库或设备。所有项目、设备、执行、日志与产物均来自`data.ts`，明确标记synthetic；运行/暂停/批量动作只改变原型内存。保存视图仅使用独立的`keel-jobs-preview-view`会话偏好，不保存凭据。
 
@@ -29,7 +29,9 @@ Keel外壳仅保留一套导航、项目切换与主题；其他业务菜单在�
 NODE_OPTIONS=--max-old-space-size=2048 node dev/node_modules/vite/bin/vite.js build --config docs/flows-redesign/prototype/vite.config.ts
 ```
 
-该目录依赖仓库`dev/node_modules`（可在本目录建立`node_modules -> ../../../dev/node_modules`链接），不单独引入依赖体系。产物输出到忽略的`dist/`，再复制到现有5181原型的`docs/topology/prototype/public/jobs-preview/`。后者只存生成文件，本地Git忽略；不会覆盖已有全局拓扑、机柜等原型，不需要新服务或端口。
+该目录依赖仓库`dev/node_modules`（可在本目录建立`node_modules -> ../../../dev/node_modules`链接），不单独引入依赖体系。产物输出到忽略的`dist/`，再复制到本工作区`docs/topology/prototype/public/jobs-preview/`。后者只存生成文件，本地Git忽略；不会覆盖已有全局拓扑、机柜等原型。原型资源使用相对路径，兼容带前缀的端口转发。
+
+当前5181由独立作业平台工作区 `/home/ubuntu/keel-kestra-ui-dev/docs/topology/prototype` 提供，仍为原tmux `keel-topology-prototype`。本次只为预览路由重启了5181，未触碰5180/8081。拓扑与机柜原型源码保持原内容，仅增加作业平台入口及目录重定向；保留原工作区的fs兼容访问以支持旧页面刷新。此前主工作区的静态副本不是当前运行入口。
 
 浏览器定向检查：`node docs/flows-redesign/prototype/verify.mjs`。结果写入`validation.json`，实际截图在`screenshots/`；只验证本原型，不能作为正式API、设备、完整编辑器或生产验收证据。
 
