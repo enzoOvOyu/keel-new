@@ -209,7 +209,7 @@ func (s Service) ProjectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 				if p.ParentPortID != nil && !done[*p.ParentPortID] {
 					continue
 				}
-				attrs := map[string]any{"physical_name": p.Name, "device_id": p.EquipmentID, "parent_uid": p.EquipmentID, "media_type": p.Medium, "role": p.Role}
+				attrs := map[string]any{"physical_name": p.Name, "device_id": p.EquipmentID, "parent_uid": p.EquipmentID, "media_type": p.Medium, "role": p.Role, "connector": p.Connector}
 				if p.MAC != nil {
 					attrs["mac"] = *p.MAC
 				}

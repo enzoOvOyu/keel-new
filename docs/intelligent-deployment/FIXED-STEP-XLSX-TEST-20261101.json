@@ -1,0 +1,192 @@
+{
+  "scope": "isolated database/API/object bucket; synthetic files only",
+  "cases": [
+    {
+      "name": "five_step_catalog",
+      "status": "PASS",
+      "tables": 28
+    },
+    {
+      "name": "xlsx_preview_step_1",
+      "status": "PASS",
+      "tables": 1,
+      "confirmation_supported": true
+    },
+    {
+      "name": "xlsx_preview_step_2",
+      "status": "PASS",
+      "tables": 4,
+      "confirmation_supported": true
+    },
+    {
+      "name": "xlsx_preview_step_3",
+      "status": "PASS",
+      "tables": 7,
+      "confirmation_supported": false
+    },
+    {
+      "name": "xlsx_preview_step_4",
+      "status": "PASS",
+      "tables": 6,
+      "confirmation_supported": false
+    },
+    {
+      "name": "xlsx_preview_step_5",
+      "status": "PASS",
+      "tables": 5,
+      "confirmation_supported": false
+    },
+    {
+      "name": "xlsx_step_1_persisted_identity_mac",
+      "status": "PASS"
+    },
+    {
+      "name": "repeat_import_reuses_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "stale_revision_rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_step_2_persisted_placement_preserves_connections",
+      "status": "PASS"
+    },
+    {
+      "name": "immutable_workbook_source_indexes",
+      "status": "PASS",
+      "count": 3
+    },
+    {
+      "name": "business_step_3",
+      "status": "BLOCKED_NOT_IMPLEMENTED",
+      "format_preview": "PASS",
+      "model_write_rejected": true
+    },
+    {
+      "name": "business_step_4",
+      "status": "BLOCKED_NOT_IMPLEMENTED",
+      "format_preview": "PASS",
+      "model_write_rejected": true
+    },
+    {
+      "name": "business_step_5",
+      "status": "BLOCKED_NOT_IMPLEMENTED",
+      "format_preview": "PASS",
+      "model_write_rejected": true
+    },
+    {
+      "name": "physical_review_outbox_publication",
+      "status": "PASS"
+    },
+    {
+      "name": "planned_ports_connections_publication",
+      "status": "PASS"
+    },
+    {
+      "name": "cmdb_projection_matches_independent_truth",
+      "status": "PASS",
+      "counts": {
+        "server": 1,
+        "switch": 1,
+        "rack": 2,
+        "port": 2,
+        "cable": 1
+      },
+      "macs": [
+        "02:00:00:00:01:01",
+        "02:00:00:00:02:01"
+      ],
+      "positions": [
+        {
+          "serial": "TEST-SRV-001",
+          "u_start": "3",
+          "u_height": "2"
+        },
+        {
+          "serial": "TEST-SW-002",
+          "u_start": "10",
+          "u_height": "1"
+        }
+      ]
+    },
+    {
+      "name": "existing_visualization_api_reads_published_assets",
+      "status": "PASS",
+      "snapshot_saved": true,
+      "subgraph_saved": true
+    },
+    {
+      "name": "server_switch_matrix_matches_one_planned_connection",
+      "status": "PASS",
+      "included": 1
+    },
+    {
+      "name": "connection_chart_has_exact_endpoints",
+      "status": "PASS"
+    },
+    {
+      "name": "physical_trace_one_registered_segment",
+      "status": "PASS",
+      "integrity": "complete",
+      "verification": "unverified"
+    },
+    {
+      "name": "rack_chart_geometry_and_placement_coverage",
+      "status": "PASS",
+      "racks": 2,
+      "capacity_u": 42,
+      "devices_each": 1
+    },
+    {
+      "name": "conflicting_mac_rejected_without_revision_change",
+      "status": "PASS"
+    },
+    {
+      "name": "occupied_port_rejected_without_revision_change",
+      "status": "PASS"
+    },
+    {
+      "name": "overlapping_u_slots_block_approval",
+      "status": "PASS"
+    },
+    {
+      "name": "valid_xlsx_supplement_resolves_overlap",
+      "status": "PASS"
+    }
+  ],
+  "overall": "PARTIAL: steps 1-2 persisted/published and visualization APIs verified; steps 3-5 complete business chain and new Agent not implemented",
+  "agent": "NOT_IMPLEMENTED_NOT_TESTED",
+  "online_changed": false,
+  "project_id": "proj-680e0b56-e9c2-43c4-897c-dc63bf05b2a9",
+  "import_ids": [
+    "d18eb8e9-b127-402d-8359-0c5efa783148",
+    "66787568-780d-4706-bdc1-323afb926204",
+    "f9464725-f75c-4354-b651-461e222a56d2",
+    "a6d42a1f-3421-4f8c-8b76-787c6de33453",
+    "a7ff84b0-f32f-4f8d-8936-6f3b76037a30"
+  ],
+  "source_id": "2045385a-fedd-431d-98a7-01262ae13959",
+  "publication": "PASS: steps 1-2 plus planned connectivity",
+  "topology": "PASS: rack data, physical connection, server-switch matrix and registered trace; no UI or live connectivity claim",
+  "negative_cases": "PASS: MAC/occupied ports reject atomically, U overlap blocks approval and XLSX supplement repairs draft",
+  "code_base": "ba17450 plus fixed-step XLSX/connectivity development changes; patch-orientation correction additionally unit-tested",
+  "api_binary_sha256": "2a0d99b44a77fecbc2c822d0d20c2298490b4c3618635fbd365c3b81723e7667",
+  "database": "keel_engineering_fixed_9aef546d73",
+  "environment": "isolated 8093 API, separate database and object bucket; no online service switch",
+  "native_tests": {
+    "engineering_domain": "PASS",
+    "go_compile": "PASS",
+    "typescript": "PASS",
+    "documentation": "PASS",
+    "xlsx_format_all_five": "PASS",
+    "model_expectations_steps_1_2": "PASS",
+    "cable_routing_kernel": "PASS",
+    "forward_reverse_patch_orientation": "PASS",
+    "browser": "NOT RUN",
+    "new_agent": "NOT IMPLEMENTED / NOT RUN",
+    "complete_steps_3_5_business_chain": "BLOCKED_NOT_IMPLEMENTED"
+  },
+  "final_test_draft": "Valid step-2 workbook restored after negative test; new draft still requires review",
+  "runtime": "Isolated test API stopped after checks; test database, object bucket and private configuration retained for cleanup"
+}

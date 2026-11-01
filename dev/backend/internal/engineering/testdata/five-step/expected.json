@@ -1,0 +1,54 @@
+{
+  "acceptance": "NOT_RUN",
+  "cabling": {
+    "cable_count": 1,
+    "lead_per_end_m": "2",
+    "required_m": "17.6",
+    "route_m": "12",
+    "selected_stock_m": "20",
+    "separate_optic_count": 2,
+    "slack_factor": "1.1"
+  },
+  "classification": "SYNTHETIC_ONLY",
+  "connection_count": 1,
+  "equipment_count": 2,
+  "limits": [
+    "Generated files and expected results do not imply business or Agent acceptance",
+    "Fixture rules and policy references require explicit test-project approval",
+    "No real device configuration or external AI calls"
+  ],
+  "network": {
+    "addresses": [
+      "192.0.2.0/31",
+      "192.0.2.1/31"
+    ],
+    "asns": [
+      64512,
+      64513
+    ],
+    "bgp_sessions": 1
+  },
+  "placements": {
+    "TEST-SRV-001": {
+      "height_u": 2,
+      "rack": "R1",
+      "start_u": 3
+    },
+    "TEST-SW-002": {
+      "height_u": 1,
+      "rack": "R2",
+      "start_u": 10
+    }
+  },
+  "port_count": 2,
+  "power": {
+    "R1_load_W": "500",
+    "R1_remaining_W": "1500",
+    "R2_load_W": "300",
+    "R2_remaining_W": "1700",
+    "redundancy": "NOT_APPLICABLE: explicit single-feed fixture"
+  },
+  "rack_count": 2,
+  "room_count": 1,
+  "site_count": 1
+}

@@ -198,6 +198,25 @@ func (s *Server) engineeringRoutes(w http.ResponseWriter, r *http.Request) bool 
 		respond(w, 200, workspace)
 		return true
 	}
+	if (action == "standard-workbook" || action == "standard-workbook-preview") && r.Method == "POST" {
+		var q engineering.StandardWorkbookRequest
+		if !engineeringDecode(w, r, &q) {
+			return true
+		}
+		if action == "standard-workbook-preview" {
+			inputs, _, err := s.standardWorkbook(ctx, q)
+			if err != nil {
+				engineeringFailure(w, err)
+			} else {
+				respond(w, 200, workbookPreview(q, inputs))
+			}
+		} else if err := s.importStandardWorkbook(ctx, workspace, q, subjectOf(ctx).Username); err != nil {
+			engineeringFailure(w, err)
+		} else {
+			reply(id, 200)
+		}
+		return true
+	}
 	if action == "standard-input" && r.Method == "POST" {
 		var q engineering.StandardInputRequest
 		if !engineeringDecode(w, r, &q) {

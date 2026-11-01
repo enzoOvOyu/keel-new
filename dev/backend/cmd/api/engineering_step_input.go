@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/csv"
-	"github.com/xuri/excelize/v2"
 	"keel.local/dev/internal/engineering"
 	"net/http"
 	"strings"
@@ -61,24 +60,15 @@ func (s *Server) engineeringStepInputRoutes(w http.ResponseWriter, r *http.Reque
 				fail(w, 400, "INVALID_FORMAT")
 				return true
 			}
-			f := excelize.NewFile()
-			defer f.Close()
-			cells := make([]any, len(headers))
-			for i, v := range headers {
-				cells[i] = v
-			}
-			if e := f.SetSheetRow("Sheet1", "A1", &cells); e != nil {
-				fail(w, 500, "TEMPLATE_FAILED")
-				return true
-			}
-			body, e := f.WriteToBuffer()
+			body, e := engineering.WriteStepWorkbook(t.Step, []engineering.StandardTableData{{TableID: t.ID}})
 			if e != nil {
 				fail(w, 500, "TEMPLATE_FAILED")
 				return true
 			}
+
 			w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 			w.Header().Set("Content-Disposition", `attachment; filename="`+t.ID+`.xlsx"`)
-			w.Write(body.Bytes())
+			w.Write(body)
 			return true
 		}
 		fail(w, 404, "NOT_FOUND")

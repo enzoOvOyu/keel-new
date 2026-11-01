@@ -218,6 +218,7 @@ type PlannedPort struct {
 	EquipmentID   ID      `json:"equipment_id"`
 	Name          string  `json:"name"`
 	MAC           *string `json:"mac,omitempty"`
+	Connector     string  `json:"connector,omitempty"`
 	ParentPortID  *ID     `json:"parent_port_id,omitempty"`
 	BreakoutIndex *int    `json:"breakout_index,omitempty"`
 	Role          string  `json:"role"`

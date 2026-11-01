@@ -8,6 +8,9 @@ import (
 )
 
 func MergeStandardInput(current PhysicalModel, q InputPreviewRequest) (PhysicalModel, error) {
+	if q.TableID == "port_specs" || q.TableID == "patch_paths" {
+		return mergeConnectivityInput(current, q)
+	}
 	if q.TableID == "terminations" {
 		return MergeTerminations(current, q)
 	}

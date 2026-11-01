@@ -52,7 +52,7 @@ func StepInputCatalog() InputCatalog {
 	add := func(id string, step int, name, condition, spec string) {
 		t := InputTable{ID: id, Step: step, Name: name, Condition: condition, Fields: []InputField{}}
 		switch id {
-		case "terminations", "rooms", "racks", "equipment_specs", "placements":
+		case "terminations", "rooms", "racks", "equipment_specs", "placements", "port_specs", "patch_paths":
 			t.SupportsConfirmation = true
 		}
 		for _, s := range strings.Split(spec, "|") {
@@ -185,4 +185,18 @@ type StandardInputRequest struct {
 	InputPreviewRequest
 	ExpectedRevision int    `json:"expected_revision"`
 	Reason           string `json:"reason"`
+}
+
+type StandardWorkbookRequest struct {
+	ImportID         string `json:"import_id"`
+	Step             int    `json:"step"`
+	ExpectedRevision int    `json:"expected_revision"`
+	Reason           string `json:"reason,omitempty"`
+}
+type StandardWorkbookPreview struct {
+	ImportID             string         `json:"import_id"`
+	Step                 int            `json:"step"`
+	Tables               []InputPreview `json:"tables"`
+	Valid                bool           `json:"valid"`
+	SupportsConfirmation bool           `json:"supports_confirmation"`
 }

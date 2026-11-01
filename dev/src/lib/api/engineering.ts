@@ -105,3 +105,6 @@ export const engineeringInputTemplateURL=(project:string,table:string,format:'cs
 export const importEngineeringStandardInput=(project:string,id:string,request:Models['IDEStandardInputRequest'])=>bomRequest<EngineeringWorkspace>(engineeringPath(project,id)+'/standard-input','POST',request);
 
 export type EngineeringStandardInputRequest = Models['IDEStandardInputRequest'];
+export type EngineeringStandardWorkbookPreview = Models['IDEStandardWorkbookPreview'];
+export const previewEngineeringStandardWorkbook=async(project:string,id:string,file:File,step:number,revision:number,signal?:AbortSignal)=>{const uploaded=await uploadEngineeringWorkbook(project,file,'');if(signal?.aborted)throw new DOMException('Aborted','AbortError');return bomRequest<EngineeringStandardWorkbookPreview>(engineeringPath(project,id)+'/standard-workbook-preview','POST',{import_id:uploaded.id,step,expected_revision:revision},undefined,signal)};
+export const importEngineeringStandardWorkbook=(project:string,id:string,request:Models['IDEStandardWorkbookConfirmRequest'])=>bomRequest<EngineeringWorkspace>(engineeringPath(project,id)+'/standard-workbook','POST',request);

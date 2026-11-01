@@ -181,3 +181,11 @@ Agent原生工具参数按Pydantic Schema校验，读取脱敏IR，以逐Sheet�
 迁移039新增端口MAC、端接类型、原始B端位置声明和标准输入来源索引。MAC与类型由工程发布投影为planned事实，Observed保护沿用；声明不等于正式机柜落位。此入口不自动补造型号/高度/网络参数。当前补充来源尚未接入Evidence Explorer逐字段查看，后续四步确认导入和完整闭环仍未完成；这些不以预览成功代替验收。新增错误码STEP_*定位输入、身份、端口、类型、位置或源存储问题；并发版本或运行中分析返回409。未进行数据库、HTTP、浏览器和CMDB发布验收。
 
 标准确认导入已扩展rooms/racks/equipment_specs/placements。InputTable.supports_confirmation由服务端声明，前端据此提供确认入口。机房/机柜编码解析父子关系；设备规格按已确认SN补类型/型号/高度；落位复用设备和机柜ID，编辑保留原落位ID，空白可选规格不清除已有值。安装方式u要求起始U/占用U；non_u要求位置编码且U位字段为空，重复非U位置阻断。机柜越界、U位重叠、规格高度冲突沿用结构校验和发布门禁。迁移040持久设备高度、设施编码和非U位置，CMDB发布保留规划来源；非U位置不伪造U位。尚未进行数据库或已有机柜图的真实验收。
+
+### 标准XLSX整步预览与合并（开发实例验证，未部署到8081）
+
+`POST .../{sourceId}/standard-workbook-preview`接受IDEStandardWorkbookRequest，引用同项目已上传的bom_import_batch及步骤，不接收浏览器生成的模型。后端从MinIO读取不可变原件、核对SHA256并按版本1固定模板读取，返回每张表的行数/问题、valid及supports_confirmation。`POST .../{sourceId}/standard-workbook`接受IDEStandardWorkbookConfirmRequest，复查原件、当前修订和人工依据，同一工作簿所有表合并为一个工程修订；任一表不支持/不通过时不提交模型。原件沿用既有上传对象，不因合并失败删除；来源索引与新修订同事务保存。
+
+两接口要求bom:edit，上传原件继续要求bom:import和工程模式（不启动旧BOM Agent）。原件限制20MiB，未知非空Sheet、额外列、未验证公式及跨项目引用明确拒绝。表名使用官方目录ID；下载XLSX已统一该表名，并将所有输入列设为文本格式。前端可选择本步骤XLSX、查看分表问题并确认，仍保留CSV编辑入口。当前完整支持步骤1-2；步骤3的port_specs/patch_paths可单表确认，其他布线/网络/电力表仍只做格式预览。不能以valid=true替代supports_confirmation或工程发布门禁。
+
+新增原生读写器及五个合成XLSX；独立expectations核对SN、MAC、设备/机柜/U位。路径计算内核覆盖允许通道最短路径、显式引线/余量和标准长度上取，不代表其已接入完整导入/计算发布。迁移041保存端口连接器，端口规格显式换算速率并保留MAC/稳定ID；Breakout和配线路径有关系校验。隔离8093 API已实际验证步骤1-2整步导入、重复/版本拒绝、来源索引、人工审核/Outbox发布、CMDB字段及既有机柜数据/连接矩阵/物理路径接口；未运行浏览器、实际设备或新Agent测试。线上8081/5180及迁移038保持，详见独立测试报告。

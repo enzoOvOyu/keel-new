@@ -16804,6 +16804,73 @@ paths:
           description: Revision changed or active analysis
         "422":
           description: Input, identity, placement or port conflict
+  /projects/{projectId}/engineering-imports/{sourceId}/standard-workbook-preview:
+    post:
+      operationId: previewEngineeringStandardWorkbook
+      tags:
+        - Engineering
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema: &a1
+            type: string
+        - in: path
+          name: sourceId
+          required: true
+          schema: *a1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IDEStandardWorkbookRequest"
+      responses:
+        "200":
+          description: Workbook field validation; no model write
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IDEStandardWorkbookPreviewEnvelope"
+        "403":
+          description: No project permission
+        "409":
+          description: Revision or active job conflict
+        "422":
+          description: Workbook/input unsupported or unresolved
+  /projects/{projectId}/engineering-imports/{sourceId}/standard-workbook:
+    post:
+      operationId: importEngineeringStandardWorkbook
+      tags:
+        - Engineering
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema: *a1
+        - in: path
+          name: sourceId
+          required: true
+          schema: *a1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IDEStandardWorkbookConfirmRequest"
+      responses:
+        "200":
+          description: Atomic additive revision from the immutable uploaded workbook
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getEngineeringWorkspaceEnvelope"
+        "403":
+          description: No project permission
+        "409":
+          description: Revision or active job conflict
+        "422":
+          description: Workbook/input unsupported or unresolved
 components:
   securitySchemes:
     bearerAuth:
@@ -45326,7 +45393,7 @@ components:
           description: MAC of this endpoint port, never a standalone device identity
         attributes:
           items:
-            $ref: '#/components/schemas/IDEAttributeValue'
+            $ref: "#/components/schemas/IDEAttributeValue"
           type: array
         breakout_index:
           type: integer
@@ -45340,10 +45407,10 @@ components:
           type: array
         maturity:
           enum:
-          - Estimated
-          - Calculated
-          - Confirmed
-          - As-built
+            - Estimated
+            - Calculated
+            - Confirmed
+            - As-built
           type: string
         medium:
           type: string
@@ -45359,17 +45426,20 @@ components:
           type: string
         role:
           type: string
+        connector:
+          type: string
+          description: Explicit endpoint connector, retained from standard port specification
       required:
-      - entity_id
-      - revision_id
-      - evidence_ids
-      - provenance_id
-      - maturity
-      - attributes
-      - equipment_id
-      - name
-      - role
-      - medium
+        - entity_id
+        - revision_id
+        - evidence_ids
+        - provenance_id
+        - maturity
+        - attributes
+        - equipment_id
+        - name
+        - role
+        - medium
       type: object
       x-implementation-status: model-contract-only
     IDEPowerPlan:
@@ -47575,6 +47645,8 @@ components:
             - racks
             - equipment_specs
             - placements
+            - port_specs
+            - patch_paths
         csv:
           type: string
         expected_revision:
@@ -47583,6 +47655,66 @@ components:
         reason:
           type: string
           minLength: 1
+    IDEStandardWorkbookRequest:
+      type: object
+      additionalProperties: false
+      properties: &a1
+        import_id: &a2
+          type: string
+        step:
+          type: integer
+          minimum: 1
+          maximum: 5
+        expected_revision:
+          type: integer
+          minimum: 1
+        reason:
+          type: string
+          minLength: 1
+      required:
+        - import_id
+        - step
+        - expected_revision
+    IDEStandardWorkbookConfirmRequest:
+      type: object
+      additionalProperties: false
+      properties: *a1
+      required:
+        - import_id
+        - step
+        - expected_revision
+        - reason
+    IDEStandardWorkbookPreview:
+      type: object
+      additionalProperties: false
+      properties:
+        import_id: *a2
+        step:
+          type: integer
+        tables:
+          type: array
+          items:
+            $ref: "#/components/schemas/IDEInputPreview"
+        valid:
+          type: boolean
+        supports_confirmation:
+          type: boolean
+      required:
+        - import_id
+        - step
+        - tables
+        - valid
+        - supports_confirmation
+    IDEStandardWorkbookPreviewEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: "#/components/schemas/IDEStandardWorkbookPreview"
+        request_id: *a2
+      required:
+        - data
+        - request_id
 x-implementation-policy:
   frontend-first: true
   mock-provider-required: true

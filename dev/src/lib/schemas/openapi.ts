@@ -6645,6 +6645,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/engineering-imports/{sourceId}/standard-workbook-preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["previewEngineeringStandardWorkbook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/engineering-imports/{sourceId}/standard-workbook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["importEngineeringStandardWorkbook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -16183,6 +16215,8 @@ export interface components {
             rate_bps?: number;
             revision_id: string;
             role: string;
+            /** @description Explicit endpoint connector, retained from standard port specification */
+            connector?: string;
         };
         IDEPowerPlan: {
             attributes: components["schemas"]["IDEAttributeValue"][];
@@ -16876,10 +16910,33 @@ export interface components {
         };
         IDEStandardInputRequest: {
             /** @enum {string} */
-            table_id: "terminations" | "rooms" | "racks" | "equipment_specs" | "placements";
+            table_id: "terminations" | "rooms" | "racks" | "equipment_specs" | "placements" | "port_specs" | "patch_paths";
             csv: string;
             expected_revision: number;
             reason: string;
+        };
+        IDEStandardWorkbookRequest: {
+            import_id: string;
+            step: number;
+            expected_revision: number;
+            reason?: string;
+        };
+        IDEStandardWorkbookConfirmRequest: {
+            import_id: string;
+            step: number;
+            expected_revision: number;
+            reason: string;
+        };
+        IDEStandardWorkbookPreview: {
+            import_id: string;
+            step: number;
+            tables: components["schemas"]["IDEInputPreview"][];
+            valid: boolean;
+            supports_confirmation: boolean;
+        };
+        IDEStandardWorkbookPreviewEnvelope: {
+            data: components["schemas"]["IDEStandardWorkbookPreview"];
+            request_id: string;
         };
     };
     responses: {
@@ -37110,6 +37167,102 @@ export interface operations {
                 content?: never;
             };
             /** @description Input, identity, placement or port conflict */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    previewEngineeringStandardWorkbook: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                sourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEStandardWorkbookRequest"];
+            };
+        };
+        responses: {
+            /** @description Workbook field validation; no model write */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IDEStandardWorkbookPreviewEnvelope"];
+                };
+            };
+            /** @description No project permission */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision or active job conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Workbook/input unsupported or unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    importEngineeringStandardWorkbook: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                sourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEStandardWorkbookConfirmRequest"];
+            };
+        };
+        responses: {
+            /** @description Atomic additive revision from the immutable uploaded workbook */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getEngineeringWorkspaceEnvelope"];
+                };
+            };
+            /** @description No project permission */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision or active job conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Workbook/input unsupported or unresolved */
             422: {
                 headers: {
                     [name: string]: unknown;

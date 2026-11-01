@@ -319,13 +319,15 @@
     "completed_slices": [
       "Version 1 five-step template catalog, CSV/XLSX header templates, CSV syntax preview and UI; not model persistence or semantic acceptance",
       "Eight-field termination additive draft import, scoped CMDB identity lookup, MinIO input archive and migration 039 endpoint fields implemented; domain unit/compile/type/documentation checks passed; DB/HTTP/browser and publication NOT RUN; not deployed",
-      "Facility/rack/specification/placement standard confirmation with typed code, height and non-U fields; migration 040; domain tests and compilation/type checks passed, not deployed or DB/UI accepted"
+      "Facility/rack/specification/placement standard confirmation with typed code, height and non-U fields; migration 040; domain tests and compilation/type checks passed, not deployed or DB/UI accepted",
+      "Five synthetic XLSX fixtures with independent expected results; native readers and atomic workbook preview/import UI/API; steps 1-2 passed isolated real API/DB/MinIO/review/outbox/CMDB and visualization API assertions; step-3 port/patch input plus routing kernels implemented; full 3-5 chain and Agent still incomplete"
     ],
     "remaining_slices": [
       "Source field evidence viewer for supplemental input",
       "Step 3-5 fixed-format confirmation and full deterministic business path",
       "New triage and five scoped extraction tasks",
       "Independent real source and existing visualization acceptance"
-    ]
+    ],
+    "test_report": "docs/intelligent-deployment/FIXED-STEP-XLSX-TEST-20261101.json"
   }
 }
