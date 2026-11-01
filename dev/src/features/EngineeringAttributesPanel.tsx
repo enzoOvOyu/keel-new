@@ -96,11 +96,13 @@ export function EngineeringAttributesPanel({project, id, revision, canEdit, canR
     </Modal>}
     {edit && <Modal sheet title={object?.label || '扩展属性'} description="属性值采用已批准的类型和单位，保存后创建工程新版本。" onClose={() => setEdit(null)}>
       {!applicable.length && <p>此类对象尚无已批准定义。</p>}
-      <div className="engineering-editor">{applicable.map(d => {
-        const value = edit.values.find(v => v.definition_id === d.id)?.value;
+      <div className="engineering-editor">{applicable.map(latestDefinition => {
+        const existing = edit.values.find(v => v.definition_id === latestDefinition.id);
+        const d = definitions.data?.find(v => v.id === existing?.definition_id && v.version === existing.definition_version) || latestDefinition;
+        const value = existing?.value;
         const text = String(value?.text ?? value?.decimal ?? value?.boolean ?? value?.reference ?? '');
         const options = d.value_type === 'boolean' ? [{id:'true',label:'是'},{id:'false',label:'否'}] : d.value_type === 'reference' ? objects.map(v => ({id:v.entity.entity_id,label:v.label})) : d.enum_values.map(v => ({id:v,label:v}));
-        return <label key={d.id}>{d.key} {d.unit || ''}{d.required ? ' · 必填' : ''}{options.length ? <select value={text} onChange={e => changeValue(d,e.target.value)}><option value="">未提供</option>{options.map(v => <option key={v.id} value={v.id}>{v.label}</option>)}</select> : <input value={text} onChange={e => changeValue(d,e.target.value)} />}</label>;
+        return <label key={d.id}>{d.key} · v{d.version} {d.unit || ''}{d.required ? ' · 必填' : ''}{options.length ? <select value={text} onChange={e => changeValue(d,e.target.value)}><option value="">未提供</option>{options.map(v => <option key={v.id} value={v.id}>{v.label}</option>)}</select> : <input value={text} onChange={e => changeValue(d,e.target.value)} />}</label>;
       })}</div>
       <label className="bom-review-reason">修改依据<textarea value={reason} onChange={e => setReason(e.target.value)}/></label>
       <Button variant="primary" disabled={busy || !canEdit || !reason.trim() || !applicable.length} onClick={() => void action(saveValues)}>保存新版本</Button>

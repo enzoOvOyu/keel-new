@@ -1,15 +1,15 @@
 {
-  "updated_at": "2026-11-01T04:55:37.302212+00:00",
+  "updated_at": "2026-11-01T05:29:49.409927+00:00",
   "branch": "audit/intelligent-deployment-p0",
-  "scope": "P1 complete; P2/P3/domain main chains implemented; P5 cross-file review/removal now implemented; P4 typed extensions/segment plans and P6 interaction closure remaining",
+  "scope": "P1 completed; P2–P6 code implementation closed on this branch; deployment and real-source/AI/reference/browser acceptance NOT RUN",
   "phase_status": {
     "P0": "complete; report commit 314126d",
     "P1": "complete: architecture, models, contracts and kernel",
     "P2": "Multiround source tools, column and explicit cross-sheet record proposals, deterministic typed extraction, persisted regions/facts/provenance and dynamic module plan connected; real provider/source acceptance NOT RUN",
     "P3": "isolated LibreOffice Provider, formula graph, unit-aware restricted rule AST, human rule approval and durable runs implemented; real Golden Fixture reference acceptance pending",
-    "P4": "All five typed domain batches implemented; real Golden Fixture/AI/customer acceptance NOT RUN",
+    "P4": "All five typed domain batches, per-segment cable plans and approved typed attributes implemented; Golden receives reviewed input only; real source/customer acceptance NOT RUN",
     "P5": "Independent domain review/publication plus immutable reimport baseline, explicit difference decisions and same-lineage planning withdrawal implemented; real source acceptance NOT RUN",
-    "P6": "Unified overview and evidence explorer plus domain editors connected; final reimport/review interactions pending; browser acceptance NOT RUN"
+    "P6": "Unified understanding/overview/evidence/calculation/issues/difference/review workspace implemented; input freshness and versioned editor closure complete; browser acceptance NOT RUN"
   },
   "implemented": [
     "Three-layer design, model ownership and relational schema design for all requested common and domain models",
@@ -49,7 +49,8 @@
     "Superseded planning field history and expired relations; pure planned withdrawals retired and excluded from active topology; Observed untouched",
     "Explicit physical cable segment specs and stock lengths; workload distribution per external segment",
     "Project/version-scoped typed extension definitions with human approval, relational value slots and source-bound Agent mapping",
-    "Typed extension review/edit UI and planned CMDB source linkage; missing required fields block their domain"
+    "Typed extension review/edit UI and planned CMDB source linkage; missing required fields block their domain",
+    "Relevant cable inputs invalidate retained calculated lengths/derived stock; actual/source evidence remains separate; actionable UI errors and original attribute-version editing"
   ],
   "files": {
     "design": "docs/intelligent-deployment/P1-DESIGN.txt",
@@ -237,6 +238,16 @@
       "check": "TestApprovedTypedAttributeExtraction; TestEngineeringTypedAttributesApprovalAndPublication; synthetic AI protocol; TypeScript",
       "result": "PASS",
       "scope": "local synthetic source/schema/isolated DB/CMDB checks; no real provider/source/browser acceptance"
+    },
+    {
+      "check": "TestCableCalculationTracksRelevantInputs; incremental TypeScript",
+      "result": "PASS",
+      "scope": "Synthetic relevant/unrelated rack changes, estimated/calculated/confirmed length changes, derived stock evidence invalidation and source stock preservation; static frontend types only"
+    },
+    {
+      "check": "node dev/scripts/check-real-api-docs.mjs; git diff --check",
+      "result": "PASS",
+      "scope": "88 registered operations and local whitespace check only; no HTTP/DB/AI calls"
     }
   ],
   "not_run": [
@@ -254,11 +265,10 @@
     "database_changed": false,
     "http_operations_changed": false,
     "original_workbooks_modified": false,
-    "live_frontend_changed": false
+    "live_frontend_changed": false,
+    "scope": "Existing running environment only; branch implementation and isolated checks listed separately"
   },
-  "next_vertical_slice": [
-    "P6 final input/editor/calculation freshness closure"
-  ],
+  "next_vertical_slice": [],
   "limits": [
     "No current environment migration or deployment",
     "No true AI/source workbook/Golden Fixture/human Ground Truth acceptance",
@@ -272,5 +282,12 @@
     "http_operations_added": 33,
     "current_environment_changed": false,
     "original_workbooks_modified": false
-  }
+  },
+  "pending_acceptance": [
+    "Deploy this branch with migrations and configured providers when authorized",
+    "Real source + real AI + human Ground Truth across engineering domains",
+    "Reference recalculation of real workbook formulas",
+    "Second structurally different real customer source; variants alone do not prove generalization",
+    "Browser interaction and existing CMDB rack/topology acceptance"
+  ]
 }

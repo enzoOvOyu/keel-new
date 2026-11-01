@@ -481,7 +481,7 @@ func ExtractPhysical(w bom.Workbook, p EngineeringProposal, project, source, rev
 	out.Issues = append(out.Issues, ValidatePhysical(out.Model)...)
 	// Omitted regions remain represented by source retention and an explicit issue.
 	if out.MappedCells < out.TotalCells {
-		out.Issues = append(out.Issues, ValidationIssue{ID: StableID(project, "issue", revision+"unmapped"), ProjectID: project, RevisionID: revision, EntityID: source, Code: "SOURCE_INFORMATION_RETAINED", Severity: "WARNING", ModuleID: "workbook_intelligence", Field: "coverage", Message: fmt.Sprintf("%d个单元格保留在来源中，未映射为首批物理模型；不代表资料已全部理解", out.TotalCells-out.MappedCells), PublishTarget: "", Resolution: "open", EvidenceIDs: []ID{}})
+		out.Issues = append(out.Issues, ValidationIssue{ID: StableID(project, "issue", revision+"unmapped"), ProjectID: project, RevisionID: revision, EntityID: source, Code: "SOURCE_INFORMATION_RETAINED", Severity: "WARNING", ModuleID: "workbook_intelligence", Field: "coverage", Message: fmt.Sprintf("%d个单元格保留在来源中，未映射为工程模型；不代表资料已全部理解", out.TotalCells-out.MappedCells), PublishTarget: "", Resolution: "open", EvidenceIDs: []ID{}})
 	}
 	sort.Slice(out.Evidence, func(i, j int) bool { return out.Evidence[i].ID < out.Evidence[j].ID })
 	return out, nil

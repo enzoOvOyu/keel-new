@@ -280,7 +280,7 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 				if _, _, extension := engineering.AttributeBinding(field); extension {
 					return fields[entity]["attributes"]
 				}
-				grouped := map[string][]string{"length": {"estimated", "calculated", "confirmed", "as_built"}, "length_unit": {"estimated", "calculated", "confirmed", "as_built"}, "length_state": {"estimated", "calculated", "confirmed", "as_built"}, "standard_length": {"selected_stock"}, "standard_length_unit": {"selected_stock"}, "cable_model": {"spec"}, "connector_a": {"spec"}, "connector_z": {"spec"}, "patch_device": {"patch_port_ids"}, "patch_port": {"patch_port_ids"}, "patch_exit_port": {"patch_port_ids"}, "route_from": {"route"}, "route_to": {"route"}, "distance": {"route"}, "distance_unit": {"route"}}
+				grouped := map[string][]string{"length": {"estimated", "calculated", "confirmed", "as_built"}, "length_unit": {"estimated", "calculated", "confirmed", "as_built"}, "length_state": {"estimated", "calculated", "confirmed", "as_built"}, "standard_length": {"selected_stock"}, "standard_length_unit": {"selected_stock"}, "cable_model": {"spec"}, "connector_a": {"spec"}, "connector_z": {"spec"}, "patch_device": {"patch_port_ids"}, "patch_port": {"patch_port_ids"}, "patch_exit_port": {"patch_port_ids"}, "route_from": {"route"}, "route_to": {"route"}, "distance": {"route"}, "distance_unit": {"route"}, "power": {"equipment_profiles"}, "power_unit": {"equipment_profiles"}, "power_basis": {"equipment_profiles"}, "cooling_type": {"equipment_profiles", "racks"}, "power_capacity": {"racks"}, "power_capacity_unit": {"racks"}, "cooling_capacity": {"racks"}, "cooling_capacity_unit": {"racks"}, "required_quantity": {"required"}, "purchased_quantity": {"purchased"}, "spare_quantity": {"spares"}, "quantity_unit": {"required", "purchased", "spares", "purchase_gap"}, "work_quantity": {"quantity"}, "work_unit": {"quantity"}, "labor_unit": {"labor_hours"}, "network_role": {"device_roles"}, "network_interface": {"interface_mappings"}, "network_allocation": {"allocations"}, "network_bgp": {"bgp"}, "network_bfd": {"bfd"}, "network_qos": {"qos"}, "network_ar": {"adaptive_routing"}, "network_evpn": {"evpn_vxlan"}}
 				for _, key := range grouped[field] {
 					if fields[entity][key] {
 						return true
@@ -382,6 +382,7 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 	}
 	if previousModel != nil {
 		invalidateEstimateInputs(*previousModel, &x.Model)
+		invalidateCableInputs(*previousModel, &x)
 	}
 	if previousPowerInput != "" && previousPowerInput != powerInputDigest(x.Model) {
 		for i := range x.Model.PowerPlans {
