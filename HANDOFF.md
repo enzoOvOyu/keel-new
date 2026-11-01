@@ -54,9 +54,9 @@ API v12 / 743383f已部署；任务28d974d0-b1e0-4203-9b59-b8daa7d9dfdb使用独
 
 ## 当前在线状态（覆盖下方历史快照）
 
-API v17 / 0405d93继续运行8081；5180保持原页面加工程上传分流。最新用户指定Ultra测试项目TEST-Agent-MM-Ultra-02，来源6e1eed2e-03ea-4c02-b75a-a3de1eb98e31，任务1e3ee903-c92b-4abe-9ea4-016f4eb2b98b，已失败ENGINEERING_AGENT_NO_PROGRESS。当前TEST Provider59c504bf-a8c8-42db-9afc-b89f70a0f2d5为nvidia/nemotron-3-ultra-550b-a55b:free，版本3，非默认；原test/DeepSeek未改。
+API v18 / 645eeb6已部署8081；5180保持原页面加工程上传分流。用户要求继续完成，已恢复真实测试：全新TEST-Agent-MM-Ultra-03，项目proj-18101842-d821-4583-9229-a708f995c1c8，来源71a5c797-319b-496d-a6ce-f67c1080439c，任务c02c518e-a090-4fcd-814b-70b60acf562d正在运行。TEST Provider仍为Ultra版本3；原默认test/DeepSeek不变。
 
-本轮0/15 Sheet通过，工程实体/发布记录均0；原资料和34份MinIO分析产物保留。按照用户“输出差则停”的要求，不再排队重试；没有修改业务代码或重新部署，也不继续核查400。之前Lightning项目3张表/6264条八字段匹配是另一轮局部证据，不能算作本次Ultra成绩。当前仍未完成真实整本理解验收，详情见ultra-model-test-20261101.json。
+本轮接受数量和最终结果待实际验证。Ultra-02的0/15失败、Lightning局部6264条八字段匹配均为历史独立记录，不能代替本轮结果。分析产物继续持久写MinIO，没有发布正式数据。
 
 ## 已完成里程碑事件：按工程域纠错与非法输出恢复
 

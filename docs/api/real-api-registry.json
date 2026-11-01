@@ -1,10 +1,10 @@
 {
   "version": 1,
   "updated_at": "2026-11-01",
-  "coverage": "Agent repair0405d93 deployed8081; original frontend with engineering-only upload. Whole-workbook acceptance NOT COMPLETE: real Lightning task failed with semantic no-progress; default DeepSeek lacks account funds. MinIO recovery and native/schema/domain/source checks implemented; no CMDB or topology acceptance.",
+  "coverage": "Agent repair645eeb6/v18 deployed8081; engineering upload frontend unchanged. User-authorized fresh Ultra test in progress; full workbook understanding pending. No CMDB/topology publication acceptance.",
   "schema_authority": "docs/openapi.yaml",
-  "code_revision": "0405d93",
-  "deployed_revision": "0405d93",
+  "code_revision": "645eeb6",
+  "deployed_revision": "645eeb6",
   "deployment_evidence": "docs/intelligent-deployment/deployment-agent-repair-20261101.json",
   "operations": [
     {
