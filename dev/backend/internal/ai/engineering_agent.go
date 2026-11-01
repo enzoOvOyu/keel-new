@@ -164,7 +164,11 @@ func (p *Provider) UnderstandEngineering(ctx context.Context, w bom.Workbook, tr
 				}
 			}
 			selected := engineeringSourceTools(functions, active, inspected[active], engineeringProposalDue(sheet, history))
-			raw, err := p.engineeringCompletion(ctx, string(prompt), map[string]any{"workbook": summary, "modules": registry, "attribute_definitions": hooks.Attributes, "history": history, "active_sheet": active, "active_sheet_preview": engineeringSheetPreview(sheet, regions), "region_field_capabilities": engineeringRegionCapabilities(), "pending_sheets": pending, "completed_sheets": len(completed), "turns_remaining": budget - turn}, selected, trace, hooks.Artifact)
+			kinds := engineeringProposedKinds(history, active)
+			if len(kinds) > 0 {
+				selected = scopeEngineeringProposalTools(selected, functions, kinds, hooks.Attributes)
+			}
+			raw, err := p.engineeringCompletion(ctx, string(prompt), map[string]any{"workbook": summary, "modules": registry, "attribute_definitions": hooks.Attributes, "history": history, "active_sheet": active, "proposed_region_kinds": kinds, "active_sheet_preview": engineeringSheetPreview(sheet, regions), "region_field_capabilities": engineeringRegionCapabilities(), "pending_sheets": pending, "completed_sheets": len(completed), "turns_remaining": budget - turn}, selected, trace, hooks.Artifact)
 			if err != nil {
 				return proposal, err
 			}
@@ -682,4 +686,66 @@ func engineeringSourceSpans(chunks []bom.Region) []bom.Region {
 		spans = append(spans, r)
 	}
 	return spans
+}
+
+// Scope mapping vocabulary to the Agent's own most recent domain proposal.
+// The classification tool remains available so new evidence can change it.
+func engineeringProposedKinds(history []any, sheet string) []string {
+	for i := len(history) - 1; i >= 0; i-- {
+		raw, _ := json.Marshal(history[i])
+		var step struct {
+			Action engineeringAction `json:"action"`
+		}
+		if json.Unmarshal(raw, &step) != nil || step.Action.Proposal == nil {
+			continue
+		}
+		kinds := []string{}
+		matched := false
+		for _, r := range step.Action.Proposal.Regions {
+			if r.Sheet == sheet {
+				matched = true
+				if r.Kind != "other" {
+					kinds = appendUnique(kinds, r.Kind)
+				}
+			}
+		}
+		if matched {
+			return kinds
+		}
+	}
+	return nil
+}
+func scopeEngineeringProposalTools(selected, functions []any, kinds []string, attributes []engineering.AttributeDefinition) []any {
+	fields := []string{}
+	for _, kind := range kinds {
+		fields = appendUnique(fields, engineering.RegionFields(kind)...)
+	}
+	for _, a := range attributes {
+		if a.ApprovalStatus == "approved" {
+			fields = appendUnique(fields, fmt.Sprintf("attribute:%s@%d", a.ID, a.Version))
+		}
+	}
+	out := append([]any{}, selected...)
+	for i, tool := range out {
+		f := tool.(map[string]any)["function"].(map[string]any)
+		if f["name"] != "propose_engineering_model" {
+			continue
+		}
+		raw, _ := json.Marshal(tool)
+		var copy map[string]any
+		_ = json.Unmarshal(raw, &copy)
+		defs := copy["function"].(map[string]any)["parameters"].(map[string]any)["$defs"].(map[string]any)
+		for _, name := range []string{"Column", "Constant", "CellBinding"} {
+			defs[name].(map[string]any)["properties"].(map[string]any)["field"].(map[string]any)["enum"] = fields
+		}
+		defs["Region"].(map[string]any)["properties"].(map[string]any)["kind"].(map[string]any)["enum"] = appendUnique(append([]string{}, kinds...), "other")
+		out[i] = copy
+	}
+	for _, tool := range functions {
+		if tool.(map[string]any)["function"].(map[string]any)["name"] == "classify_information" {
+			out = append(out, tool)
+			break
+		}
+	}
+	return out
 }

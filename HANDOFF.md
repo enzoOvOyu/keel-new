@@ -1,3 +1,9 @@
+## 已完成里程碑事件：按Agent域判断收紧纠错工具
+
+- v15任务最终因NS表重复在connection里输出quantity而失败ENGINEERING_AGENT_NO_PROGRESS；同一检查点中EW2592、GB_OUT3456、OOB216共6264条的八个关键字段均匹配来源。EW另有cable_label指向Fiber core count的可疑额外映射，不能把八字段匹配扩称全部字段正确。
+- 现在从Agent最近的区域分类限定下一轮映射工具的kind/field枚举；例如连接域不再提供quantity。分类仍由Agent提出，不由Sheet名或样例模板决定；classify_information保留以允许显式改判。检查点和强制来源校验保持。
+- 完整AI包和域工具收敛用例、Go构建通过。额外真实模型表头探针：Gemma429；Super-VL原参数格式错误、展开Schema后仅4/8字段正确，未切换正式测试Provider，不冒称通过。
+
 ## 已完成里程碑事件：显式关键表头不能退为未知资料
 
 - v14中GB_OUT 3456条与OOB216条的八个端接/线缆字段逐行匹配独立源基线；EW/NS却被模型退为other，故整本仍未通过。保留这种退化的真实记录，不用区域数量代替理解质量。

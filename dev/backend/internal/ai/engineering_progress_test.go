@@ -249,3 +249,41 @@ func TestSourceSpansHidePagingBoundariesButPreserveBlankSeparators(t *testing.T)
 		t.Fatalf("incorrect source spans: %+v", spans)
 	}
 }
+
+func TestMappingToolsFollowAgentDomainWithoutRestrictingReclassification(t *testing.T) {
+	raw, _ := prompts.ReadFile("prompts/engineering-tools.json")
+	var functions []any
+	_ = json.Unmarshal(raw, &functions)
+	constrainEngineeringTools(functions, nil)
+	history := []any{map[string]any{"action": engineeringAction{Action: "propose_engineering_model", Proposal: &engineering.EngineeringProposal{Regions: []engineering.RegionMapping{{Sheet: "renamed", Kind: "connection"}}}}}}
+	kinds := engineeringProposedKinds(history, "renamed")
+	scoped := scopeEngineeringProposalTools(engineeringSourceTools(functions, "renamed", true, true), functions, kinds, nil)
+	foundClassification := false
+	for _, tool := range scoped {
+		f := tool.(map[string]any)["function"].(map[string]any)
+		if f["name"] == "classify_information" {
+			foundClassification = true
+			continue
+		}
+		if f["name"] != "propose_engineering_model" {
+			continue
+		}
+		defs := f["parameters"].(map[string]any)["$defs"].(map[string]any)
+		fields := defs["Column"].(map[string]any)["properties"].(map[string]any)["field"].(map[string]any)["enum"].([]string)
+		hasEndpoint := false
+		for _, field := range fields {
+			if field == "quantity" {
+				t.Error("quantity leaked into connection mapping")
+			}
+			if field == "a_device" {
+				hasEndpoint = true
+			}
+		}
+		if !hasEndpoint {
+			t.Error("endpoint field missing")
+		}
+	}
+	if !foundClassification {
+		t.Error("domain interpretation cannot be revised")
+	}
+}

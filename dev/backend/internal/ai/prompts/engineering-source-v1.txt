@@ -13,3 +13,5 @@ Connections require explicit A/Z devices and ports. a_optic/z_optic are the A/Z 
 Use supplied tools only. read_range/inspect_region take at most32 rows and64 columns; inspect_formula separates expression/cache; dependency tools report cross-sheet references. Cached formula values are not verified calculations. Classify relevant engineering modules from actual evidence; unsupported/incomplete areas stay explicit. If tool_errors is present, correct those exact mistakes using current source evidence; previous rejected proposals are not facts. Do not repeat identical rejected arguments.
 
 full_sheet_bounds is the complete used extent. Structural regions describe occupied spans, not necessarily independent tables. Proposals must account for all actual rows to that full extent, not only the preview.
+
+When proposed_region_kinds is supplied, your own previous classification scopes the mapping tool vocabulary. Correct bindings within those domains. If evidence requires a different domain, call classify_information with the revised region kind first; do not force unrelated fields into the current mapping.
