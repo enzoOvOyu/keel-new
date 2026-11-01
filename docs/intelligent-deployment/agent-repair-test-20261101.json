@@ -44,16 +44,16 @@
     "Cross-customer generalization"
   ],
   "private_evidence_directory": "/home/ubuntu/.local/state/keel-tests/mm-agent-repair",
-  "latest_deployed_agent_revision": "ad9e5f0",
+  "latest_deployed_agent_revision": "0405d93",
   "resume": "After Provider funding is available, POST analyze on same engineering source at current revision; verify actual source observations before accepting",
   "free_model_followup": {
-    "status": "IN_PROGRESS",
+    "status": "FAILED_NOT_ACCEPTED",
     "provider_id": "59c504bf-a8c8-42db-9afc-b89f70a0f2d5",
     "model": "nvidia/nemotron-3.5-lightning:free",
     "project_code": "TEST-Agent-MM-Free-01",
     "note": "Original default Provider unchanged; no mixed acceptance claim",
     "provider_revision": 2,
-    "job_id": "99fdc10c-af58-4e5a-9ec4-eb2a434bfb7f",
+    "job_id": "acead157-d064-47e9-b889-39a33a1fb4be",
     "prior_observations": [
       "Ultra response_timeout at 120 seconds",
       "Repeated reads without proposals",
@@ -77,6 +77,42 @@
         "eight_endpoint_spec_length_fields": "all match"
       },
       "note": "Different job checkpoints; these do not constitute one complete accepted workbook"
+    },
+    "error_code": "ENGINEERING_AGENT_NO_PROGRESS",
+    "current_checkpoint": {
+      "sheet_count": 3,
+      "total_sheets": 15,
+      "matching_connection_rows": 6264,
+      "baseline_connection_rows": 7154,
+      "matching_fields": [
+        "a_device",
+        "a_port",
+        "z_device",
+        "z_port",
+        "a_optic",
+        "z_optic",
+        "cable_model",
+        "length"
+      ],
+      "equipment_baseline_rows": 967,
+      "equipment_validated": false,
+      "extra_mapping_issue": "EW cable_label maps to Fiber core count column; eight-field comparison does not validate this extra binding",
+      "typed_model_revision": 1,
+      "no_complete_typed_model": true
+    },
+    "provider_probes": {
+      "Lightning_compact_synthetic_headers": "6/6 correct; not whole-workbook acceptance",
+      "Lightning_real_full_tool_loop": "repeated invalid fields/regions and other classification; failed",
+      "Lightning_reasoning_enabled_header_probe": "2/8 critical fields",
+      "Ultra": "response body timeout120s",
+      "Super_VL": "malformed nested JSON; inline schema probe4/8",
+      "Gemma": "HTTP429",
+      "Xingchen": "HTTP429",
+      "Inkling": "HTTP403",
+      "Flint": "HTTP400",
+      "Cohere": "malformed JSON/finish error even with inline schema"
     }
-  }
+  },
+  "latest_original_account_balance_usd": 0.003091741,
+  "continuation": "User asked asynchronously to replenish original test account or configure a capable Provider. No claim that a provider change alone guarantees acceptance; continue real tests and necessary fixes. Current independent projects retained for cleanup; no publication."
 }

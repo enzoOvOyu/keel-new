@@ -1,12 +1,12 @@
 {
-  "code_revision": "ad9e5f0",
+  "code_revision": "0405d93",
   "branch": "dev",
   "repository": "enzoOvOyu/keel-new",
   "api": {
     "port": 8081,
-    "binary": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/keel-api-v15",
-    "pid": 1099858,
-    "sha256": "aeb024ba9a9c71d0c43a891b221406490342c93c094594192a5df1b2163dd0a6",
+    "binary": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/keel-api-v17",
+    "pid": 1116119,
+    "sha256": "51a7688e3483d3954ce12b4165474f33c29c80ea92689e7516a75cef17c9889a",
     "cwd": "/home/ubuntu/keel/dev/backend",
     "session": "keel-cmdb-api"
   },
@@ -32,10 +32,11 @@
     "native_tools_checkpoint_and_provider_errors": "PASS",
     "source_upload": "PASS: engineering mode; zero legacy recognition jobs",
     "minio_artifact_write_read": "PASS: actual artifact roundtrip",
-    "full_real_workbook_understanding": "IN PROGRESS / NOT ACCEPTED: critical source coverage validation, current independent Lightning task99fdc10c-af58-4e5a-9ec4-eb2a434bfb7f. Prior runs exposed sample-only bounds, artificial chunk headers and incorrect other classification.",
+    "full_real_workbook_understanding": "FAILED / NOT ACCEPTED: latest real Lightning job acead157-d064-47e9-b889-39a33a1fb4be ended ENGINEERING_AGENT_NO_PROGRESS. 3/15 sheet checkpoints retained; 6264/7154 connection source rows match eight critical fields, not a complete model. Original default account remaining $0.003091741; awaiting funded/capable Provider for continuation.",
     "frontend_upload_module": "HTTP 200; browser not run",
     "artifact_recovery_scope_hash_cleanup": "PASS: isolated PostgreSQL and synthetic S3, including new service instance restore, wrong project/revision/claim rejection, integrity verification and index cascade",
-    "typescript_engineering_adapter": "PASS"
+    "typescript_engineering_adapter": "PASS",
+    "scoped_native_tool_protocol": "HTTP400 duplicate $defs conflict independently reproduced; isolated definitions gave HTTP200/tool_calls"
   },
   "rollback": {
     "api_launcher": "/home/ubuntu/.local/state/keel-deployments/engineering-5abb94f/api-run.py",

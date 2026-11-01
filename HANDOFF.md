@@ -44,7 +44,9 @@ API v12 / 743383f已部署；任务28d974d0-b1e0-4203-9b59-b8daa7d9dfdb使用独
 
 ## 当前在线状态（覆盖下方历史快照）
 
-API v15 / ad9e5f0已部署8081，前端5180仍为原页面加工程上传分流。真实任务99fdc10c-af58-4e5a-9ec4-eb2a434bfb7f使用独立TEST-Agent-Free-Nemotron-Lightning版本2，当前继续测试，整本理解尚未验收；原test/DeepSeek未改。检查点解释版本2，旧版本提案不恢复。部署摘要见deployment-agent-repair-20261101.json。没有CMDB发布或改动原Excel。
+API v17 / 0405d93已部署8081；5180保持原页面加工程上传分流。最新真实任务acead157-d064-47e9-b889-39a33a1fb4be使用独立Lightning Provider版本2，已失败ENGINEERING_AGENT_NO_PROGRESS，整本理解未验收；没有继续排队相同失败调用。MinIO解释版本2检查点保留3/15表，6264/7154条端接的八关键字段匹配源基线，967设备未完成验证；EW额外cable_label映射仍可疑，不能泛称全部字段正确。无完整模型/CMDB发布。
+
+原test/DeepSeek配置未改，最新账户余额$0.003091741；已再次异步请用户充值或配置可用Provider，等待答复。替代免费模型探针未获得可接受结果，详情见agent-repair-test-20261101.json。新Agent实现入口internal/ai/engineering_agent.go；旧BOM重复触发已切断。源码/部署/测试失败与局部证据必须分别记录；不可把此次工程修复宣称为用户的整本理解目标已完成。
 
 ## 已完成里程碑事件：按工程域纠错与非法输出恢复
 
