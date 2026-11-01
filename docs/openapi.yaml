@@ -43714,6 +43714,10 @@ components:
           $ref: '#/components/schemas/IDECableSpec'
         label:
           type: string
+        segment_index:
+          type: integer
+          minimum: 1
+          description: One-based external physical segment; required for paths containing patch panels.
       required:
       - entity_id
       - revision_id

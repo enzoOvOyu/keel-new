@@ -251,6 +251,7 @@ type LengthEvidence struct {
 }
 type CablePlan struct {
 	EntityVersion
+	SegmentIndex  *int              `json:"segment_index,omitempty"`
 	Label         *string           `json:"label,omitempty"`
 	ConnectionID  ID                `json:"connection_id"`
 	Spec          CableSpec         `json:"spec"`

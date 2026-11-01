@@ -13,7 +13,7 @@ func loadCableRows(ctx context.Context, q engineeringQuery, revision string, m *
 	e := q.QueryRow(ctx, `SELECT COALESCE(jsonb_agg(jsonb_strip_nulls(jsonb_build_object(
  'entity_id',c.entity_id,'revision_id',c.revision_id,'provenance_id',v.provenance_id,'maturity',v.maturity,'attributes','[]'::jsonb,
  'evidence_ids',COALESCE((SELECT jsonb_agg(id) FROM eng_evidence e WHERE e.revision_id=c.revision_id AND e.entity_id=c.entity_id),'[]'::jsonb),
- 'connection_id',c.connection_id,'label',c.label,'spec',jsonb_build_object('id',c.spec_id,'medium',c.medium,'connector_a',c.connector_a,'connector_z',c.connector_z,'source_model_label',c.source_model_label,'rate_bps',c.rate_bps),
+ 'connection_id',c.connection_id,'segment_index',c.segment_index,'label',c.label,'spec',jsonb_build_object('id',c.spec_id,'medium',c.medium,'connector_a',c.connector_a,'connector_z',c.connector_z,'source_model_label',c.source_model_label,'rate_bps',c.rate_bps),
  'rule_version',CASE WHEN c.rule_id IS NOT NULL THEN jsonb_build_object('id',c.rule_id,'version',c.rule_version) END,
  'route',COALESCE((SELECT jsonb_agg(jsonb_strip_nulls(jsonb_build_object('from_id',r.from_id,'to_id',r.to_id,'calculation_run_id',r.calculation_run_id,'distance',CASE WHEN r.distance_value IS NOT NULL THEN jsonb_build_object('value',r.distance_value::text,'unit',r.distance_unit) END)) ORDER BY r.position) FROM eng_cable_route r WHERE r.revision_id=c.revision_id AND r.entity_id=c.entity_id),'[]'::jsonb))||
  COALESCE((SELECT jsonb_object_agg(l.kind,jsonb_strip_nulls(jsonb_build_object('length',jsonb_build_object('value',l.value::text,'unit',l.unit),'evidence_ids',l.evidence_ids,'calculation_run_id',l.calculation_run_id))) FROM eng_cable_length l WHERE l.revision_id=c.revision_id AND l.entity_id=c.entity_id),'{}'::jsonb)) ORDER BY c.entity_id),'[]'::jsonb) FROM eng_cable_plan c JOIN eng_entity_version v USING(revision_id,entity_id) WHERE c.revision_id=$1`, revision).Scan(&raw)
@@ -55,7 +55,7 @@ func saveConnectivityRows(ctx context.Context, tx pgx.Tx, revision string, m *en
 			rule = &v.RuleVersion.ID
 			n = &v.RuleVersion.Version
 		}
-		if _, e := tx.Exec(ctx, `INSERT INTO eng_cable_plan VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`, revision, v.EntityID, v.ConnectionID, v.Label, v.Spec.ID, v.Spec.Medium, v.Spec.ConnectorA, v.Spec.ConnectorZ, v.Spec.RateBPS, v.Spec.SourceModelLabel, rule, n); e != nil {
+		if _, e := tx.Exec(ctx, `INSERT INTO eng_cable_plan VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`, revision, v.EntityID, v.ConnectionID, v.Label, v.Spec.ID, v.Spec.Medium, v.Spec.ConnectorA, v.Spec.ConnectorZ, v.Spec.RateBPS, v.Spec.SourceModelLabel, rule, n, v.SegmentIndex); e != nil {
 			return e
 		}
 		for j, r := range v.Route {

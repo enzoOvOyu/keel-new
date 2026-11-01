@@ -1,6 +1,9 @@
 package engineering
 
-import "github.com/google/uuid"
+import (
+	"fmt"
+	"github.com/google/uuid"
+)
 
 func ValidateConnectivity(m PhysicalModel) []ValidationIssue {
 	issues := []ValidationIssue{}
@@ -122,14 +125,28 @@ func ValidateConnectivity(m PhysicalModel) []ValidationIssue {
 		if !ok {
 			add(c.EntityVersion, "CABLE_CONNECTION_UNRESOLVED", "connection_id", "线缆规划缺少端接关系", CablingTarget)
 		}
-		if cableFor[c.ConnectionID] {
-			add(c.EntityVersion, "DUPLICATE_CABLE_PLAN", "connection_id", "同一端接有多个线缆规划", CablingTarget)
+		segment := 1
+		if c.SegmentIndex != nil {
+			segment = *c.SegmentIndex
 		}
-		cableFor[c.ConnectionID] = true
+		if segment < 1 || segment > 1+len(connection.PatchPortIDs)/2 || (len(connection.PatchPortIDs) > 0 && c.SegmentIndex == nil) {
+			add(c.EntityVersion, "CABLE_SEGMENT_REQUIRED", "segment_index", "带配线节点的连接必须明确逐物理线段序号", CablingTarget)
+		}
+		key := fmt.Sprintf("%s/%d", c.ConnectionID, segment)
+		if cableFor[key] {
+			add(c.EntityVersion, "DUPLICATE_CABLE_PLAN", "connection_id", "同一物理线段有多个线缆规划", CablingTarget)
+		}
+		cableFor[key] = true
 		if c.Spec.ID == "" || (c.Spec.Medium == "" && c.Spec.SourceModelLabel == "") {
 			add(c.EntityVersion, "CABLE_SPEC_REQUIRED", "spec", "缺少明确线缆规格或介质", CablingTarget)
 		}
-		for _, portID := range []string{connection.APortID, connection.ZPortID} {
+		path := append([]string{connection.APortID}, connection.PatchPortIDs...)
+		path = append(path, connection.ZPortID)
+		endpoints := []string{}
+		if offset := 2 * (segment - 1); offset >= 0 && offset+1 < len(path) {
+			endpoints = path[offset : offset+2]
+		}
+		for _, portID := range endpoints {
 			p := ports[portID]
 			if c.Spec.Medium != "" && p.Medium != "" && c.Spec.Medium != p.Medium {
 				add(c.EntityVersion, "CABLE_MEDIUM_MISMATCH", "spec", "线缆与端口介质不匹配", CablingTarget)

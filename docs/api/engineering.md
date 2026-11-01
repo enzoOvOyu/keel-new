@@ -123,3 +123,7 @@ Agent region支持可选records单元格引用，每条record按明确的sheet/c
 同一资料版本链、同一发布目标的旧规划证据标记superseded（不删除历史），旧关系结束有效期；撤回且没有其他有效拥有来源的纯规划资产退役。Observed/其他来源值不改写。现有机柜/拓扑查询排除退役资产。新版分域发布令祖先相同目标失效，Golden不能继续消费失效物理版本。迁移035仅隔离库。
 
 验证：TestEngineeringReimportReviewedRemoval 在隔离合成库发布旧设备/端口/线缆，再导入新版；处理保留/采用决定，保留原始来源；撤回线缆后现有VisualConnections返回0；进一步审核空连接目标并撤回两个端口；Observed payload逐字节未变、历史证据仍在、祖先发布STALE。增量TypeScript通过。没有真实XLSX/模型或浏览器验收，没有部署。
+
+## P4 分段线缆规格
+
+CablePlan新增可选segment_index（1起）。直连缺省为唯一外部段；含配线架的路径必须明确每个CablePlan属于哪一段，不能将整条路径长度当作每段长度。持久化和人工编辑支持此字段，Agent可绑定来源段序号。标准线长分布逐段统计；缺失段保持partial。迁移036。合成两段3m/5m存储、审核发布与现有拓扑查询，以及核心缺失规格校验和TS通过；真实文件未验收。

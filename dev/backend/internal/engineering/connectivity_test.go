@@ -80,3 +80,23 @@ func TestConnectivityRequiresExplicitPatchPair(t *testing.T) {
 		t.Fatal("single patch endpoint accepted as two cable ends")
 	}
 }
+
+func TestCableStockDistributionNeedsEveryPhysicalSegment(t *testing.T) {
+	m := EmptyPhysical("project")
+	m.Connections = []PlannedConnection{{EntityVersion: EntityVersion{EntityID: "connection"}, APortID: "a", ZPortID: "z", PatchPortIDs: []string{"front", "rear"}}}
+	first, second := 1, 2
+	m.Cables = []CablePlan{{ConnectionID: "connection", SegmentIndex: &first, Spec: CableSpec{ID: "s", SourceModelLabel: "Synthetic"}, SelectedStock: &LengthEvidence{Length: Quantity{"3", "m"}}}, {ConnectionID: "connection", SegmentIndex: &second, Spec: CableSpec{ID: "s", SourceModelLabel: "Synthetic"}, SelectedStock: &LengthEvidence{Length: Quantity{"500", "cm"}}}}
+	items, missing := DerivedWorkloads(m)
+	if len(missing) != 0 || len(items) != 3 {
+		t.Fatal("two external segment specs not counted independently", items, missing)
+	}
+	m.Cables[1].SelectedStock = nil
+	_, missing = DerivedWorkloads(m)
+	if len(missing) != 1 {
+		t.Fatal("missing second-segment stock silently inferred", missing)
+	}
+	m.Cables[0].SegmentIndex = nil
+	if !hasIssue(ValidateConnectivity(m), "CABLE_SEGMENT_REQUIRED") {
+		t.Fatal("whole route assigned to arbitrary physical segment")
+	}
+}

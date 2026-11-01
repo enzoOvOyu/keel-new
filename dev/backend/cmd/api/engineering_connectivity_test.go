@@ -37,8 +37,8 @@ func TestEngineeringConnectivityPublication(t *testing.T) {
 		t.Fatal(e)
 	}
 	sheet := bom.Sheet{Name: "Arbitrary structured region", Cells: []bom.Cell{}}
-	fields := []string{"a_device", "a_port", "z_device", "z_port", "patch_device", "patch_port", "patch_exit_port", "medium", "length", "a_optic", "z_optic"}
-	values := []string{"Synthetic-A", "port-1", "Synthetic-Z", "port-2", "Synthetic-Patch", "front-1", "rear-1", "fiber", "3", "Synthetic optic", "Synthetic optic"}
+	fields := []string{"a_device", "a_port", "z_device", "z_port", "patch_device", "patch_port", "patch_exit_port", "medium", "length", "a_optic", "z_optic", "segment_index", "standard_length", "standard_length_unit"}
+	values := []string{"Synthetic-A", "port-1", "Synthetic-Z", "port-2", "Synthetic-Patch", "front-1", "rear-1", "fiber", "3", "Synthetic optic", "Synthetic optic", "1", "3", "m"}
 	columns := []engineering.ColumnBinding{}
 	for i, field := range fields {
 		u := ""
@@ -47,6 +47,15 @@ func TestEngineeringConnectivityPublication(t *testing.T) {
 		}
 		columns = append(columns, engineering.ColumnBinding{Field: field, Column: i + 1, Unit: u})
 		sheet.Cells = append(sheet.Cells, bom.Cell{Sheet: sheet.Name, Ref: fmt.Sprintf("%c1", 'A'+i), Row: 1, Column: i + 1, Value: values[i]})
+	}
+	for i, value := range values {
+		if fields[i] == "segment_index" {
+			value = "2"
+		}
+		if fields[i] == "length" || fields[i] == "standard_length" {
+			value = "5"
+		}
+		sheet.Cells = append(sheet.Cells, bom.Cell{Sheet: sheet.Name, Ref: fmt.Sprintf("%c2", 'A'+i), Row: 2, Column: i + 1, Value: value})
 	}
 	wb := bom.Workbook{Sheets: []bom.Sheet{sheet}}
 	original := uuid.NewString()
@@ -57,7 +66,7 @@ func TestEngineeringConnectivityPublication(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	p := engineering.EngineeringProposal{Summary: "Synthetic planned connection with patch", Regions: []engineering.RegionMapping{{Sheet: sheet.Name, Bounds: engineering.Bounds{StartRow: 1, EndRow: 1, StartColumn: 1, EndColumn: len(fields)}, Kind: "cable", Columns: columns}}, Modules: []engineering.ModuleDetection{}, Questions: []string{}}
+	p := engineering.EngineeringProposal{Summary: "Synthetic planned connection with patch", Regions: []engineering.RegionMapping{{Sheet: sheet.Name, Bounds: engineering.Bounds{StartRow: 1, EndRow: 2, StartColumn: 1, EndColumn: len(fields)}, Kind: "cable", Columns: columns}}, Modules: []engineering.ModuleDetection{}, Questions: []string{}}
 	x, e := engineering.ExtractPhysical(wb, p, svc.project, source, uuid.NewString())
 	if e != nil {
 		t.Fatal(e)
@@ -78,9 +87,36 @@ func TestEngineeringConnectivityPublication(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if len(m.Cables) != 1 || m.Cables[0].Estimated == nil || m.Cables[0].Estimated.Length.Value != "3" || m.Cables[0].AsBuilt != nil {
-		t.Fatalf("lost/separated cable state: %+v", m.Cables)
+	if len(m.Cables) != 2 {
+		t.Fatalf("lost segment plans: %+v", m.Cables)
 	}
+	lengths := map[int]string{}
+	for _, c := range m.Cables {
+		if c.SegmentIndex == nil || c.Estimated == nil || c.AsBuilt != nil || c.SelectedStock == nil {
+			t.Fatal("segment state/provenance lost", c)
+		}
+		lengths[*c.SegmentIndex] = c.SelectedStock.Length.Value
+	}
+	if lengths[1] != "3" || lengths[2] != "5" {
+		t.Fatal("segment stock lengths conflated", lengths)
+	}
+	workloads, missing := engineering.DerivedWorkloads(m)
+	if len(missing) > 0 {
+		t.Fatal("complete segment specs treated as unknown", missing)
+	}
+	distributions := 0
+	for _, work := range workloads {
+		if work.WorkType == "cable_stock_distribution" {
+			distributions++
+			if work.Quantity.Value != "1" {
+				t.Fatal("physical segment counted more than once")
+			}
+		}
+	}
+	if distributions != 2 {
+		t.Fatal("stock distribution lost")
+	}
+
 	r := httptest.NewRequest("POST", "/", nil)
 	r = r.WithContext(context.WithValue(ctx, principalKey{}, principal{Subject: identity.Subject{Username: "synthetic-human"}}))
 	r.Header.Set("Idempotency-Key", "synthetic-connectivity")

@@ -169,17 +169,23 @@ func DerivedWorkloads(m PhysicalModel) ([]WorkloadEstimate, []CalculationError) 
 	}
 	cables := map[string]CablePlan{}
 	for _, c := range m.Cables {
-		cables[c.ConnectionID] = c
+		index := 1
+		if c.SegmentIndex != nil {
+			index = *c.SegmentIndex
+		}
+		cables[fmt.Sprintf("%s/%d", c.ConnectionID, index)] = c
 	}
 	for _, c := range m.Connections {
 		segments := int64(1 + len(c.PatchPortIDs)/2)
 		add("cable_install", "物理外部线段", nil, nil, segments)
-		plan, ok := cables[c.EntityID]
-		if !ok || plan.SelectedStock == nil || len(c.PatchPortIDs) > 0 {
-			errors = append(errors, CalculationError{Code: "WORKLOAD_STOCK_DISTRIBUTION_INCOMPLETE", Message: "连接 " + c.EntityID + " 缺少逐物理线段的明确标准规格"})
-			continue
+		for index := 1; index <= int(segments); index++ {
+			plan, ok := cables[fmt.Sprintf("%s/%d", c.EntityID, index)]
+			if !ok || plan.SelectedStock == nil || (segments > 1 && plan.SegmentIndex == nil) {
+				errors = append(errors, CalculationError{Code: "WORKLOAD_STOCK_DISTRIBUTION_INCOMPLETE", Message: fmt.Sprintf("连接 %s 第%d段缺少明确标准规格", c.EntityID, index)})
+				continue
+			}
+			add("cable_stock_distribution", plan.Spec.SourceModelLabel, &plan.Spec.ID, &plan.SelectedStock.Length, 1)
 		}
-		add("cable_stock_distribution", plan.Spec.SourceModelLabel, &plan.Spec.ID, &plan.SelectedStock.Length, 1)
 	}
 	result := []WorkloadEstimate{}
 	for _, v := range groups {

@@ -146,9 +146,22 @@ func extractConnectivity(project, source, revision string, rows []rowData, out *
 		if r.kind != "cable" {
 			continue
 		}
-		cableID := StableID(project, "cable-plan", id)
+		var segment *int
+		cableKey := id
+		if v["segment_index"] != "" {
+			n, err := strconv.Atoi(strings.TrimSpace(v["segment_index"]))
+			if err != nil || n < 1 {
+				issue(id, "CABLE_SEGMENT_INVALID", "segment_index", "物理线段序号必须是正整数", CablingTarget)
+			} else {
+				segment = &n
+				if n != 1 {
+					cableKey += "/segment/" + strconv.Itoa(n)
+				}
+			}
+		}
+		cableID := StableID(project, "cable-plan", cableKey)
 		spec := CableSpec{ID: StableID(project, "cable-spec", strings.Join([]string{v["cable_model"], v["medium"], v["connector_a"], v["connector_z"], v["rate_bps"]}, "/")), SourceModelLabel: v["cable_model"], Medium: v["medium"], ConnectorA: v["connector_a"], ConnectorZ: v["connector_z"], RateBPS: parseRate(v["rate_bps"], r.units["rate_bps"])}
-		cable := CablePlan{EntityVersion: version(cableID, r, "a_device", "a_port", "z_device", "z_port", "cable_label", "cable_model", "medium", "connector_a", "connector_z", "rate_bps", "length", "length_unit", "length_state", "standard_length", "standard_length_unit", "route_from", "route_to", "distance", "distance_unit"), ConnectionID: id, Spec: spec, Route: []RouteSegment{}}
+		cable := CablePlan{EntityVersion: version(cableID, r, "a_device", "a_port", "z_device", "z_port", "cable_label", "segment_index", "cable_model", "medium", "connector_a", "connector_z", "rate_bps", "length", "length_unit", "length_state", "standard_length", "standard_length_unit", "route_from", "route_to", "distance", "distance_unit"), ConnectionID: id, SegmentIndex: segment, Spec: spec, Route: []RouteSegment{}}
 		if v["cable_label"] != "" {
 			label := v["cable_label"]
 			cable.Label = &label

@@ -15664,6 +15664,8 @@ export interface components {
             selected_stock?: components["schemas"]["IDELengthEvidence"];
             spec: components["schemas"]["IDECableSpec"];
             label?: string;
+            /** @description One-based external physical segment; required for paths containing patch panels. */
+            segment_index?: number;
         };
         IDECableSpec: {
             connector_a: string;

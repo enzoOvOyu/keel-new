@@ -46,7 +46,8 @@
     "Explicit source-cell records for transposed/key-value/cross-sheet forms with local extraction and sensitive-cell exclusion",
     "Unified engineering overview and source evidence browser; stale form saves use frozen revision",
     "Immutable cross-file source lineage and baseline, explicit reviewed differences with origin evidence preservation",
-    "Superseded planning field history and expired relations; pure planned withdrawals retired and excluded from active topology; Observed untouched"
+    "Superseded planning field history and expired relations; pure planned withdrawals retired and excluded from active topology; Observed untouched",
+    "Explicit physical cable segment specs and stock lengths; workload distribution per external segment"
   ],
   "files": {
     "design": "docs/intelligent-deployment/P1-DESIGN.txt",
@@ -224,6 +225,11 @@
       "check": "P5 incremental TypeScript",
       "result": "PASS",
       "scope": "static types only; no browser acceptance"
+    },
+    {
+      "check": "TestEngineeringConnectivityPublication extended for segment specs; TestCableStockDistributionNeedsEveryPhysicalSegment; TypeScript",
+      "result": "PASS",
+      "scope": "isolated DB 3m/5m independent plans and two topology segments; missing segment remains incomplete; static UI types"
     }
   ],
   "not_run": [
@@ -244,8 +250,8 @@
     "live_frontend_changed": false
   },
   "next_vertical_slice": [
-    "P4 segment-specific cable specs and typed extensions",
-    "P6 final review/editor interaction closure"
+    "P4 typed extensions",
+    "P6 final interaction closure"
   ],
   "limits": [
     "No current environment migration or deployment",
@@ -256,7 +262,7 @@
     "Golden endpoint supplies reviewed planning input only; vendor configuration generation/downloading is outside this engineering module"
   ],
   "changes": {
-    "migration_added": "027–035, isolated DB only",
+    "migration_added": "027–036, isolated DB only",
     "http_operations_added": 30,
     "current_environment_changed": false,
     "original_workbooks_modified": false
