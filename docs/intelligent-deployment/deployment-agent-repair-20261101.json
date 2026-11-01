@@ -1,12 +1,12 @@
 {
-  "code_revision": "def536f",
+  "code_revision": "e545dfb",
   "branch": "dev",
   "repository": "enzoOvOyu/keel-new",
   "api": {
     "port": 8081,
-    "binary": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/keel-api-v20",
-    "pid": 1314776,
-    "sha256": "556d867432acda7fcadf0262cb324e8207bc0f05ef32e670ee0d8a0de9578c8f",
+    "binary": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/keel-api-v22",
+    "pid": 1324432,
+    "sha256": "6be199a108390706be2cfcc6bc283023211d74fa3fcee819ab7d70ad89fec12d",
     "cwd": "/home/ubuntu/keel/dev/backend",
     "session": "keel-cmdb-api"
   },
@@ -32,13 +32,14 @@
     "native_tools_checkpoint_and_provider_errors": "PASS",
     "source_upload": "PASS: engineering mode; zero legacy recognition jobs",
     "minio_artifact_write_read": "PASS: actual artifact roundtrip",
-    "full_real_workbook_understanding": "RUNNING: Ultra-03 source resumed with corrected batch feedback; no accepted complete model yet",
+    "full_real_workbook_understanding": "RUNNING: Ultra-03 source resumed; EW2592 critical rows matched, NS mapping with invalid extra fields rejected on restore; full acceptance pending",
     "frontend_upload_module": "HTTP 200; browser not run",
     "artifact_recovery_scope_hash_cleanup": "PASS: isolated PostgreSQL and synthetic S3, including new service instance restore, wrong project/revision/claim rejection, integrity verification and index cascade",
     "typescript_engineering_adapter": "PASS",
     "scoped_native_tool_protocol": "HTTP400 duplicate $defs conflict independently reproduced; isolated definitions gave HTTP200/tool_calls",
     "binding_and_formula_feedback": "PASS: internal/ai including corrective feedback and actual formula references",
-    "range_paging_and_batch_feedback": "PASS: internal/ai and Go build; oversized reads return explicit pages, first rejected call stops queued batch"
+    "range_paging_and_batch_feedback": "PASS: internal/ai and Go build; oversized reads return explicit pages, first rejected call stops queued batch",
+    "auxiliary_source_fields": "PASS: AI and engineering packages plus Go build; manufacturer/brand and invalid length state mappings rejected"
   },
   "rollback": {
     "api_launcher": "/home/ubuntu/.local/state/keel-deployments/engineering-5abb94f/api-run.py",
