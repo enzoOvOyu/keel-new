@@ -44,7 +44,7 @@
     "Cross-customer generalization"
   ],
   "private_evidence_directory": "/home/ubuntu/.local/state/keel-tests/mm-agent-repair",
-  "latest_deployed_agent_revision": "f435b23",
+  "latest_deployed_agent_revision": "ad9e5f0",
   "resume": "After Provider funding is available, POST analyze on same engineering source at current revision; verify actual source observations before accepting",
   "free_model_followup": {
     "status": "IN_PROGRESS",
@@ -53,12 +53,30 @@
     "project_code": "TEST-Agent-MM-Free-01",
     "note": "Original default Provider unchanged; no mixed acceptance claim",
     "provider_revision": 2,
-    "job_id": "9cbd085d-0aac-4af6-9200-cec24abf835b",
+    "job_id": "99fdc10c-af58-4e5a-9ec4-eb2a434bfb7f",
     "prior_observations": [
       "Ultra response_timeout at 120 seconds",
       "Repeated reads without proposals",
       "Globally valid but domain-inappropriate mappings accepted then invalidated",
-      "Lightning invalid JSON after partial progress"
-    ]
+      "Lightning invalid JSON after partial progress",
+      "Sample rows mistaken for entire table",
+      "IR paging boundary mistaken for header row, missing one real connection",
+      "Explicit cabling tables downgraded to other despite recognizable endpoint headers"
+    ],
+    "partial_source_comparisons": {
+      "v12_EW_SP_LF": {
+        "rows": 2592,
+        "eight_endpoint_spec_length_fields": "all match"
+      },
+      "v14_GB_OUT": {
+        "rows": 3456,
+        "eight_endpoint_spec_length_fields": "all match"
+      },
+      "v14_OOB": {
+        "rows": 216,
+        "eight_endpoint_spec_length_fields": "all match"
+      },
+      "note": "Different job checkpoints; these do not constitute one complete accepted workbook"
+    }
   }
 }

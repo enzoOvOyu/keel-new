@@ -1,12 +1,12 @@
 {
-  "code_revision": "f435b23",
+  "code_revision": "ad9e5f0",
   "branch": "dev",
   "repository": "enzoOvOyu/keel-new",
   "api": {
     "port": 8081,
-    "binary": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/keel-api-v10",
-    "pid": 1075375,
-    "sha256": "f31a7836b4b966907e234dc08400355e36e46300967f148c1c80dc208243add7",
+    "binary": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/keel-api-v15",
+    "pid": 1099858,
+    "sha256": "aeb024ba9a9c71d0c43a891b221406490342c93c094594192a5df1b2163dd0a6",
     "cwd": "/home/ubuntu/keel/dev/backend",
     "session": "keel-cmdb-api"
   },
@@ -32,7 +32,7 @@
     "native_tools_checkpoint_and_provider_errors": "PASS",
     "source_upload": "PASS: engineering mode; zero legacy recognition jobs",
     "minio_artifact_write_read": "PASS: actual artifact roundtrip",
-    "full_real_workbook_understanding": "IN PROGRESS, NOT ACCEPTED: independent nondefault free Lightning provider; original DeepSeek account insufficient. Invalid domain bindings and malformed JSON observed in prior runs.",
+    "full_real_workbook_understanding": "IN PROGRESS / NOT ACCEPTED: critical source coverage validation, current independent Lightning task99fdc10c-af58-4e5a-9ec4-eb2a434bfb7f. Prior runs exposed sample-only bounds, artificial chunk headers and incorrect other classification.",
     "frontend_upload_module": "HTTP 200; browser not run",
     "artifact_recovery_scope_hash_cleanup": "PASS: isolated PostgreSQL and synthetic S3, including new service instance restore, wrong project/revision/claim rejection, integrity verification and index cascade",
     "typescript_engineering_adapter": "PASS"

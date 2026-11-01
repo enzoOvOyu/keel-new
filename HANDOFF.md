@@ -32,7 +32,7 @@ API v12 / 743383f已部署；任务28d974d0-b1e0-4203-9b59-b8daa7d9dfdb使用独
 
 ## 当前在线状态（覆盖下方历史快照）
 
-API v10 / f435b23已部署8081，前端5180仍为原页面加工程上传分流。真实任务9cbd085d-0aac-4af6-9200-cec24abf835b使用独立TEST-Agent-Free-Nemotron-Lightning Provider版本2，当前继续测试，整本理解尚未验收。原test/DeepSeek未改动；实际代码、进程和二进制摘要见deployment-agent-repair-20261101.json。没有CMDB发布或改动原Excel。
+API v15 / ad9e5f0已部署8081，前端5180仍为原页面加工程上传分流。真实任务99fdc10c-af58-4e5a-9ec4-eb2a434bfb7f使用独立TEST-Agent-Free-Nemotron-Lightning版本2，当前继续测试，整本理解尚未验收；原test/DeepSeek未改。检查点解释版本2，旧版本提案不恢复。部署摘要见deployment-agent-repair-20261101.json。没有CMDB发布或改动原Excel。
 
 ## 已完成里程碑事件：按工程域纠错与非法输出恢复
 

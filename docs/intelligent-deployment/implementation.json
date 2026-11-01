@@ -1,7 +1,7 @@
 {
   "updated_at": "2026-11-01T05:29:49.409927+00:00",
   "branch": "dev",
-  "scope": "Agent repair f435b23 deployed with per-tool MinIO checkpoints, domain binding validation and bounded malformed-output correction. Real MM understanding continues on independent free Lightning provider; NOT ACCEPTED. Original DeepSeek account lacks funds. Historical P1–P6 synthetic checks do not establish real-source acceptance.",
+  "scope": "Agent repair ad9e5f0 deployed. Real MM understanding continues on independent Lightning model. Native tool/schema/domain/source coverage and MinIO persistence are implemented; source comparison has exposed remaining model issues. Whole-workbook acceptance NOT COMPLETE; no publication.",
   "phase_status": {
     "P0": "complete; report commit 314126d",
     "P1": "complete: architecture, models, contracts and kernel",
