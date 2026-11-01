@@ -1,7 +1,7 @@
 {
   "updated_at": "2026-11-01T05:29:49.409927+00:00",
   "branch": "audit/intelligent-deployment-p0",
-  "scope": "P1 completed; P2–P6 code implementation closed on this branch; deployment and real-source/AI/reference/browser acceptance NOT RUN",
+  "scope": "P1–P6 code deployed at 5abb94f on existing development environment; real-source/AI/reference/browser acceptance NOT RUN",
   "phase_status": {
     "P0": "complete; report commit 314126d",
     "P1": "complete: architecture, models, contracts and kernel",
@@ -248,6 +248,12 @@
       "check": "node dev/scripts/check-real-api-docs.mjs; git diff --check",
       "result": "PASS",
       "scope": "88 registered operations and local whitespace check only; no HTTP/DB/AI calls"
+    },
+    {
+      "check": "Deployment build, migrations and runtime readiness",
+      "result": "PASS",
+      "scope": "Go build, frontend bundle, full DB backup/archive index, migrations27–37, original core row counts, health/frontend modules, authenticated engineering GETs, Calc version and Pydantic availability",
+      "evidence": "docs/intelligent-deployment/deployment-20261101.json"
     }
   ],
   "not_run": [
@@ -258,19 +264,20 @@
     "cross-customer generalization",
     "smoke/regression suites",
     "real workbook reference recalculation (synthetic isolated reference passed)",
-    "HTTP and live environment integration (isolated service/DB/Outbox passed)"
+    "Full HTTP mutation and live business integration; authenticated read-only startup endpoints passed"
   ],
   "deployment": {
-    "deployed": false,
-    "database_changed": false,
-    "http_operations_changed": false,
+    "deployed": true,
+    "database_changed": true,
+    "http_operations_changed": true,
     "original_workbooks_modified": false,
-    "live_frontend_changed": false,
-    "scope": "Existing running environment only; branch implementation and isolated checks listed separately"
+    "live_frontend_changed": true,
+    "scope": "Existing running environment only; branch implementation and isolated checks listed separately",
+    "code_revision": "5abb94f",
+    "evidence": "docs/intelligent-deployment/deployment-20261101.json"
   },
   "next_vertical_slice": [],
   "limits": [
-    "No current environment migration or deployment",
     "No true AI/source workbook/Golden Fixture/human Ground Truth acceptance",
     "No browser interaction or cross-customer generalization acceptance",
     "Formula source/Golden Fixture compatibility and human Ground Truth NOT RUN",
@@ -278,13 +285,12 @@
     "Golden endpoint supplies reviewed planning input only; vendor configuration generation/downloading is outside this engineering module"
   ],
   "changes": {
-    "migration_added": "027–037, isolated DB only",
+    "migration_added": "027–037 applied to current development database; isolated checks previously passed",
     "http_operations_added": 33,
-    "current_environment_changed": false,
+    "current_environment_changed": true,
     "original_workbooks_modified": false
   },
   "pending_acceptance": [
-    "Deploy this branch with migrations and configured providers when authorized",
     "Real source + real AI + human Ground Truth across engineering domains",
     "Reference recalculation of real workbook formulas",
     "Second structurally different real customer source; variants alone do not prove generalization",

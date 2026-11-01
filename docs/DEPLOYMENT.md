@@ -145,3 +145,10 @@ Flows开发补齐（afe8cb9）：作用域Schedule、多步骤/输出绑定、Na
 API：tmux `keel-cmdb-api`，工作目录`/home/ubuntu/keel/dev/backend`，启动`python3 /tmp/keel-flows-run-deployed-api.py`，二进制`/tmp/keel-api-flows-combined-1031`。启动器使用原私有进程环境与忽略的`.env.deployed`引擎配置；秘密不写本文。Worker URL通过172.22.0.1:5180回调已有前端代理，API保持localhost绑定。
 
 临时5190/8096和合成Agent关闭；不停止正在使用的Kestra/PostgreSQL依赖。发布证据与回退入口见[HANDOFF](../HANDOFF.md)、[deployment-validation](flows-redesign/deployment-validation.json)。本次只读启动检查不等于真实设备验收，不重复运行闭环测试。
+
+
+## 智能开局工程当前部署（2026-11-01）
+
+用户授权后，代码5abb94f已更新原5180/8081。API由tmux `keel-cmdb-api`运行，前端由`keel-dev-5180`从`/home/ubuntu/keel-engineering-p0/dev`运行；未合并main。完整数据库备份在私有部署目录，027–037逐项迁移成功；原账号、数据与服务配置沿用，仅启用固定镜像摘要的隔离Calc。
+
+当前部署、构建/只读启动检查与回退入口见[部署证据](intelligent-deployment/deployment-20261101.json)。回退应用使用记录中的旧启动器；不自动逆向数据库迁移。没有运行真实资料/AI、完整浏览器或全平台冒烟/回归。

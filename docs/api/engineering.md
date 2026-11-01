@@ -1,6 +1,6 @@
 # 智能开局工程真实接口
 
-更新：2026-11-01。S1代码已实现；当前环境未部署。所有路径使用 `/api/v1` 前缀及现有身份Session、项目授权和CSRF。精确DTO以 `openapi.yaml` 的 `IDE*` 为准。
+更新：2026-11-01。P1–P6代码5abb94f已部署至原5180/8081，迁移027–037已应用。下方阶段检查是历史开发记录，当前部署证据见[部署记录](../intelligent-deployment/deployment-20261101.json)。所有路径使用 `/api/v1` 前缀及现有身份Session、项目授权和CSRF。精确DTO以 `openapi.yaml` 的 `IDE*` 为准。
 
 统一前缀 `/projects/{projectId}/engineering-imports`，下表 `{id}` 为工程来源ID，不是旧BOM批次ID。
 
@@ -50,7 +50,7 @@ CMDB复用bom_item和稳定ID，写入planned事实及字段证据。已有Obser
 
 表达式支持带单位的输入/常量、加减乘除、最小/最大、绝对值、取整、标准规格上取整和多个输出；不执行Python/JS。取整须显式提供步长对应的无量纲比率；标准长度/采购参数来自规则输入或经审核常量，未预设业务规格。内部使用有理数运算，输出十进制表示最多18位小数。当前不支持复合单位相乘/相除（标量及同维比值除外），明确拒绝；未知/外链/动态依赖不能标为完全兼容。
 
-## Calc运行配置（未应用到当前服务）
+## Calc运行配置（当前服务已启用）
 
 构建：`docker build -t keel-engineering-calc:local dev/deploy/calculation`。API运行用户需能调用本机Docker；显式设置`KEEL_CALC_IMAGE=keel-engineering-calc:local`。未设置时Provider报告available=false。其他引擎实现同一个SpreadsheetCalculationProvider接口，不自动替换或假装成功。
 
@@ -145,3 +145,7 @@ Agent收到项目属性定义，只能引用批准版本，使用`attribute:<id>
 扩展属性编辑展示对象值实际使用的批准定义版本，不用最新定义的单位重新解释旧值。排队计算不显示零时间；分析、差异审核、计算与属性失败显示中文处理提示。未增加接口、迁移或新的产品菜单。
 
 定向线缆输入检查及增量TypeScript通过；真实源文件、真实Provider与浏览器验收未运行，当前环境未部署。当前开发状态统一见HANDOFF与实施报告，不以历史S编号判断P1–P6完成度。
+
+## 当前环境部署
+
+运行代码5abb94f，原5180/8081与身份/AI/对象存储/Flows配置沿用；Calc以镜像摘要固定版本。四个工程列表GET和Provider选项已通过真实登录后的只读启动检查；33个操作均已随二进制发布，但没有逐个执行写入或完整业务验收。没有导入样本或运行外部AI。部署/备份/迁移/回退证据见上述部署记录。
