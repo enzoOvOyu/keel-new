@@ -17,3 +17,16 @@ func TestSheetCompletionRequiresNonSampledAreas(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestRecognizedEndpointsCannotBeDowngradedToOther(t *testing.T) {
+	wb := bom.Workbook{Sheets: []bom.Sheet{{Name: "customer arbitrary", Cells: []bom.Cell{{Ref: "A4", Row: 4, Column: 1, Value: "endpoint_b_port"}, {Ref: "B4", Row: 4, Column: 2, Value: "endpoint_a_device"}, {Ref: "C4", Row: 4, Column: 3, Value: "endpoint_b_device"}, {Ref: "D4", Row: 4, Column: 4, Value: "endpoint_a_port"}}}}}
+	p := EngineeringProposal{Regions: []RegionMapping{{Sheet: "customer arbitrary", Kind: "other", Bounds: Bounds{StartRow: 4, EndRow: 4, StartColumn: 1, EndColumn: 4}}}}
+	if CheckSheetCoverage(wb, p, "customer arbitrary") == nil {
+		t.Fatal("recognized endpoints silently retained as unknown")
+	}
+	p.Regions[0].Kind = "connection"
+	p.Regions[0].Columns = []ColumnBinding{{Field: "z_port", Column: 1}, {Field: "a_device", Column: 2}, {Field: "z_device", Column: 3}, {Field: "a_port", Column: 4}}
+	if err := CheckSheetCoverage(wb, p, "customer arbitrary"); err != nil {
+		t.Fatal(err)
+	}
+}
