@@ -15,7 +15,13 @@
     "pid": 990892,
     "cwd": "/home/ubuntu/.local/state/keel-deployments/engineering-agent-repair/frontend-source/dev",
     "base_revision": "4064a69",
-    "change": "Only uploadEngineeringWorkbook sets import_mode=engineering; unrelated native jobs UI not deployed"
+    "change": "Only uploadEngineeringWorkbook sets import_mode=engineering; unrelated native jobs UI not deployed",
+    "fixture_link": {
+      "path": "dev/fixtures/demo-full-64-b300",
+      "target": "../../fixtures/demo-full-64-b300",
+      "previous_target": "../../keel-demo/fixtures/demo-full-64-b300",
+      "state": "repaired in both dev worktree and active deployment"
+    }
   },
   "migration": {
     "previous": 37,
@@ -49,7 +55,20 @@
     "focused_correction_and_reclassification": "PASS: targeted AI correction/resume/no-progress/reclassification cases and build. Earlier full package run exposed an obsolete context assertion; affected tests updated and passed.",
     "coverage_correction_excludes_titles": "PASS: targeted AI correction/resume/no-progress tests, title retained without creating equipment, and Go build",
     "power_semantics_and_endpoint_sources": "PASS: targeted AI corrections, complete engineering package, and build; device/port cannot share an unsplit source column",
-    "domain_identity_pending_drafts": "PASS: engineering package and targeted AI correction/native/resume/no-progress tests, two-sheet serialized restart, plus Go build"
+    "domain_identity_pending_drafts": "PASS: engineering package and targeted AI correction/native/resume/no-progress tests, two-sheet serialized restart, plus Go build",
+    "frontend_fixture_recovery": {
+      "status": "PASS",
+      "module_requests": {
+        "/src/lib/api/index.tsx": 200,
+        "/src/app/main.tsx": 200
+      },
+      "browser_route": "/dashboard",
+      "visible_heading": "全局交付与运维",
+      "vite_error_overlay": false,
+      "page_errors": 0,
+      "failed_http_responses": 0,
+      "scope": "Authenticated page startup only; no business regression or Agent calls"
+    }
   },
   "rollback": {
     "api_launcher": "/home/ubuntu/.local/state/keel-deployments/engineering-5abb94f/api-run.py",

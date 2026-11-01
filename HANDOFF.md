@@ -1,3 +1,7 @@
+## 已完成里程碑事件：恢复前端失效的fixture资源链接
+
+用户报告Vite无法导入demo-seed.json。根因是dev/fixtures/demo-full-64-b300仍指向已删除的../../keel-demo/fixtures/demo-full-64-b300；仓库与当前frontend-source部署均存在同一个断链。已将二者修正为../../fixtures/demo-full-64-b300，复用仓库现有唯一数据源，没有复制种子或修改API/数据库。实际失败的/src/lib/api/index.tsx及入口/src/app/main.tsx均恢复200；无头浏览器使用已有测试会话进入/dashboard，显示“全局交付与运维”，无Vite错误层、pageerror或HTTP失败。只验证本次页面启动故障，没有重跑Agent、平台冒烟或业务回归。
+
 ## 已完成里程碑事件：整本候选完成独立的首轮理解审查，结论未通过
 
 v40任务c3788ecc-f911-465f-bb4c-bc667ca70d8d已保存15/15表、29区域和33问题，完整提案从MinIO读取。当前候选7154条端接×8来源字段及967条设备名称/型号匹配独立OOXML；这不证明最终对象关系正确。首轮理解仍未通过：数量说明不准确、适用模块漏关联来源、网格关系不完整、机柜对仍当设备连接、摘要重复。已区分理解与工程投影，不再追加字段门禁或启动新一轮分析。此前P0-P5代码实现不等于真实业务验收完成。具体证据和根因见[首轮理解审查](docs/intelligent-deployment/SOURCE-UNDERSTANDING-REVIEW-20261101.txt)。本里程碑完成的是审查，不是问题修复或产品验收。
@@ -150,7 +154,7 @@ API v12 / 743383f已部署；任务28d974d0-b1e0-4203-9b59-b8daa7d9dfdb使用独
 
 ## 当前在线状态（覆盖下方历史快照）
 
-API v40 / ceab753已部署8081，5180页面保持；本次结果审查未再改业务代码或部署。独立TEST-Agent-MM-Ultra-03，项目proj-18101842-d821-4583-9229-a708f995c1c8，来源71a5c797-319b-496d-a6ce-f67c1080439c。Provider仍为用户指定Ultra版本3；默认test/DeepSeek未变，未进行模型对照。
+API v40 / ceab753已部署8081；5180沿用原页面，已在线修正fixture资源断链并验证页面启动。独立TEST-Agent-MM-Ultra-03，项目proj-18101842-d821-4583-9229-a708f995c1c8，来源71a5c797-319b-496d-a6ce-f67c1080439c。Provider仍为用户指定Ultra版本3；默认test/DeepSeek未变，未进行模型对照。
 
 当前任务c3788ecc-f911-465f-bb4c-bc667ca70d8d恢复revision2检查点后技术成功，已完成15张表候选、保存完整MinIO提案和工程草稿revision3。首轮资料理解结论PARTIAL / NOT ACCEPTED，见SOURCE-UNDERSTANDING-REVIEW-20261101.txt；任务技术状态由ultra-repair-test-20261101.json登记，技术成功不等于语义通过。上一版v35草稿revision2的3118条问题是历史记录，不能当本轮问题数，也不能当纯AI错误数。
 
