@@ -1,16 +1,22 @@
 ## 唯一接续入口 · 2026-11-02 干净开发基线
 
-- **后续开发：`/home/ubuntu/keel-dev`，Git `dev`，应用目录 `dev/`。** `main`同步保留同一整合基线。
-- 已完整合入最新开局ab1bd85与新版作业平台12f8b80/ce1f199，组合代码与当前部署9441a89的整个`dev/`目录完全一致；其后的提交仅整合/清理记录，不是未部署功能。
+- **后续开发：`/home/ubuntu/keel-dev`，Git `dev`，应用目录 `dev/`。** `main`保留稳定整合基线，本轮kickoff新增功能在dev，未合并main。
+- 稳定基线9441a89已整合原开局与新版作业平台。本轮新kickoff继续在dev实现；当前5180/8081运行9a3e03b固定导出，原型5195及其他工作区保留。
 - GitHub `enzoOvOyu/keel-new`及本地仅保留main/dev。14个旧功能/修复/部署分支均已纳入后删除，10个无依赖旧工作区已移除；没有强制推送或删历史。
 - 原`keel-flows-dev`、`keel-kestra-ui-dev`、`keel-visualization-dev`只保留在线原型/依赖包/私有证书配置所需文件，已解除分支关联，**禁止在其中继续开发**。本次不迁移运行服务或删除其依赖。
-- 当前5180/8081已部署新kickoff固定发布de08d2c，原型仍在5195。迁移048–051已应用；发布前备份及旧9441a89回退保留。详见docs/kickoff/DEPLOYMENT.json。
+- 当前5180/8081已部署新kickoff固定发布9a3e03b，原型仍在5195。迁移048–051已应用；发布前备份及旧9441a89回退保留。详见docs/kickoff/DEPLOYMENT.json。
 - 接续先读本节，再按`docs/REAL-API-CONTRACTS.md`、模块文档和`docs/flows-redesign/implementation.md`定位。不要再参考下方“独立作业分支/旧部署目录继续开发”的历史说明。
 - 清理清单与原分支SHA：`docs/git-baseline-20261102.json`；整合说明：`docs/integration-20261102.md`。既有未验收/真机限制维持原记录。
 
-## 当前验收：MM大批量发布已通过，位置增量正在处理
+## 已完成里程碑事件：新kickoff部署及MM历史CMDB闭环验收
 
-MM历史候选已复用：971设备、14308端口、7154连接、85机柜，967条已知机柜与起始U位关系保留；没有新AI任务。入库Outbox重试的根因是每关系端点持有独立事务advisory lock耗尽PostgreSQL共享锁表，整批事务回滚。现改为按稳定顺序锁定已存在资产行，继续串行化基数约束检查；不拆散事务、不调高数据库限制。真实MM首笔发布已得到published回执：971设备、14308端口、7154连接，来源及稳定ID保持，新增AI任务0。已实现缺高度/容量的机柜/start-U关联独立入库，不把部分位置当成完整占位；051冻结facility/location闭包，旧回执不会获得后来新增的范围。定向隔离集成通过，de08d2c已部署，正在确认59个有设备引用机柜的967条位置关联增量；全85个机柜候选中其余26个仍在建模输入。在线主应用总览、连接核对、版本、布线页通过，零页面异常/HTTP失败，截图仅留私有部署目录。
+新工作台9a3e03b已部署5180/8081，迁移048–051已应用；固定发布和旧环境回退、发布前备份均保留。新9内容页/23表与原型指标对照、隔离Go/PostgreSQL/MinIO集成、在线主应用总览/连接核对/版本/布线页检查通过，截图仅保留私有目录。
+
+复用mm测试既有类型化候选和MinIO原件，无重新全量AI解析；971设备、14308端口、7154双端连接、85机柜候选及15来源区域保留，资产ID不变。首笔及位置增量均published；CMDB逐类回读通过，7154连接各有两个端点，967设备的机柜与起始U位对应59个有设备引用机柜；增量重试0。其余26机柜仍留建模输入，不冒称已发布。
+
+解决真实验收阻断：关系端点使用稳定顺序资产行锁，消除万级事务advisory锁耗尽；已知机柜/start-U先以planned入库，缺高度/容量保持needs_input，不冒称完整占位；冻结facility/location对象闭包，后续补参不改变历史回执。当前精确落位0，布线needs_input，功率partial均真实展示。
+
+本阶段截至非Agent闭环。新Agent仍未开发，分析接口明确503；历史候选组件0、4台通用device待补类型，不以本次历史复用宣称新Agent覆盖完整。没有执行设备/网络/装机动作。实施与证据：docs/kickoff/IMPLEMENTATION.txt、DEPLOYMENT.json、MM-HISTORY-CHECK.json、LIVE-UI-CHECK.json；真实接口台账补齐11项Kickoff操作，合计133项。完成后仅同步dev，不擅自合并main。
 
 ## 已完成里程碑事件：新kickoff非Agent基础闭环与原型对照完成
 
@@ -18,7 +24,7 @@ MM历史候选已复用：971设备、14308端口、7154连接、85机柜，967�
 
 Go定向用例、隔离库与临时MinIO桶集成、受影响的原工程发布链路通过；覆盖10m参考线长、缺值非零、子集入库、幂等回执、历史复用、项目清理顺序及审计保留。主应用9页、23编辑器、Drawer、异步保存、项目隔离、只读权限和原项目路由通过协议回放检查；相对5195原型的字体、统计条、按钮、表格密度已做实际指标对照。全量TypeScript/Vite构建通过，原有OpenAPI路由和非Kickoff schemas保持不变。
 
-Agent按用户要求暂未开发，/analyze明确503，不伪造新资料解析成功。用户已要求自查后部署，再复用mm测试项目的历史资料/候选验收，不重新全量AI解析。部署见docs/kickoff/DEPLOYMENT.json，MM首笔入库已通过，位置增量结果仍待更新docs/kickoff/MM-HISTORY-CHECK.json。历史候选复用不等于新Agent识别验收。详见docs/kickoff/IMPLEMENTATION.txt、UI-CHECK.json、STYLE-CHECK.json。
+Agent按用户要求暂未开发，/analyze明确503，不伪造新资料解析成功。用户已要求自查后部署，再复用mm测试项目的历史资料/候选验收，不重新全量AI解析。部署及MM位置增量均已通过，见docs/kickoff/DEPLOYMENT.json、MM-HISTORY-CHECK.json。历史候选复用不等于新Agent识别验收。详见docs/kickoff/IMPLEMENTATION.txt、UI-CHECK.json、STYLE-CHECK.json。
 
 ## 已完成里程碑事件：新kickoff内容移植与来源/建模API切片
 

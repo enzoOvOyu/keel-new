@@ -1,6 +1,6 @@
 {
-  "release_commit": "de08d2ce394aced0dc6bcfb5af373289d2eed558",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-de08d2c",
+  "release_commit": "9a3e03b9095afa7c91214cd40c00292d288578ba",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-9a3e03b",
   "url": "http://localhost:5180/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/kickoff/overview",
   "api": "127.0.0.1:8081",
   "project_count_before_after": [
@@ -14,20 +14,23 @@
     51
   ],
   "agent_implemented": false,
-  "binary_sha256": "f38ebf6ddc653361b41a5fab0fb79e5a41e5b7eaf49afd8e0d1c1fb3517c6a06",
+  "binary_sha256": "8e0cea8f9b99795ff80567f071818157a2315860fc9f84ad9835fe1848820527",
   "rollback_release": "/home/ubuntu/.local/state/keel-deployments/jobs-ui-20261102",
   "status": "deployed",
-  "code_revision": "de08d2ce394aced0dc6bcfb5af373289d2eed558",
+  "code_revision": "9a3e03b9095afa7c91214cd40c00292d288578ba",
+  "binary_matches": true,
+  "startup_http": {
+    "http://localhost:8081/healthz": 200,
+    "http://localhost:5180/": 200
+  },
   "self_check": {
     "backend": "PASS",
     "ui": "PASS",
     "prototype_metrics": "PASS",
     "agent_implemented": false
   },
-  "startup_http": {
-    "http://localhost:8081/healthz": 200,
-    "http://localhost:5180/": 200
-  },
-  "mm_first_publication": "published",
-  "mm_location_increment": "pending"
+  "mm_publication_revision": 2,
+  "mm_cmdb_receipt": "published",
+  "mm_location_increment_retry_count": 0,
+  "authenticated_workspace_read_seconds": 16.2
 }
