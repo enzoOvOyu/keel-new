@@ -1,0 +1,39 @@
+智能开局前端基座与服务接入契约
+
+路由
+/p/:projectId/kickoff/overview
+/p/:projectId/kickoff/sources?source=:sourceId
+/p/:projectId/kickoff/review?category=devices|components|ports|connections|placements&filter=issues
+/p/:projectId/kickoff/publish?targets=:commaSeparatedDeviceIds
+/p/:projectId/kickoff/models/:domain?table=:tableId&rack=:rackId
+
+来源、对象和工程表选择从URL恢复；项目上下文唯一。
+当前LocalProvider仅含一个合成项目，不将该数据投影为其他项目。不把前端路由限制当成生产授权。
+
+类型与Provider
+src/lib/api/types.ts：Device/Port/Connection/Component/Rack/Source/Issue/ModelInput/Calculation/Publication。
+src/lib/api/catalog.ts：23张标准工程建模表与字段语义。表格schema用于输入暂存，不替代正式领域表。
+src/lib/api/provider.ts：本地实现、集中就绪判断、问题确认、提交对象闭包、版本持久化。
+src/lib/api/calculations.ts：已知通道最短路径、双端引线、余量、标准长度；规划功率/容量。
+src/lib/api/workbook.ts：CSV及标准单表XLSX读取、未知列反馈、XLSX导出；不解释任意公式。
+页面仅通过统一Provider/Context读取数据，不直接访问fixture或真实HTTP。
+
+正式接入映射（必须先同步OpenAPI及生成类型）
+资料：复用BOM工程上传、WorkbookSource、MinIO、摘要和分析Job；大文件/分析产物不能存在浏览器存储。
+识别：复用kickoff Agent检查点与候选暂存；任务按类别编排，参数修正不全量模型重跑。
+建模：复用engineering modeling-inputs、preview、adopt。页面合并重复动作，后端保留版本和来源。
+计算：复用CalculationRule/Run及批准规则、FormulaProvider；本地计算不是生产规则批准。
+审核入库：将有效对象与依赖冻结为本次确认范围；旧全域门槛改成该范围条件。复用Review/Publish/Outbox，必须读取投影回执才能显示真实入库。
+版本：基于既有ModelRevision和差异审核，不重新生成实体ID，不覆盖Observed/人工确认。
+下游：CMDB提供统一身份/关系与可消费规划版本引用。Fabric/装机分别读取实际CMDB与批准计划，不读取浏览器对象。
+
+必须同步调整的门槛
+engineering_handoff.go：非本次范围的草稿、网络/布线/电力缺口不能阻断已有设备入库及消费。
+Fabric snapshot adopt：可先接入设备/物理关系；所选目标生成配置时才要求相应NetworkPlan/能力。
+装机：清单和计划可以先建立；实际启动仍要求真实目标纳管、启动身份、介质、权限及网络证据。
+按对象的错误继续保留；局部发布是明确冻结独立批次，不是静默忽略原批次BLOCK。
+
+验证边界
+本次前端检查使用合成数据与独立浏览器上下文。不调用真实AI、不写在线CMDB、不执行真实设备。
+读取新XLSX、编辑/局部确认、版本/失效、计算和页面展示分别检查。
+未来验收需补真实MM识别、来源覆盖、真实事务/Outbox读回以及下游实际消费，不能用原型检查代替。

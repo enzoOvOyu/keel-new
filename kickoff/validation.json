@@ -1,0 +1,61 @@
+{
+  "scope": "isolated frontend prototype",
+  "realAI": false,
+  "realCMDB": false,
+  "realDeviceExecution": false,
+  "checks": [
+    {
+      "name": "初始总览：最小开局与完整工程域同时可见",
+      "result": "PASS"
+    },
+    {
+      "name": "九个独立路由可直接打开",
+      "result": "PASS"
+    },
+    {
+      "name": "核对分类、搜索和分页",
+      "result": "PASS"
+    },
+    {
+      "name": "局部入库19台：身份冲突隔离，位置/坐标/布线/功率缺口不全局阻断，刷新保留",
+      "result": "PASS"
+    },
+    {
+      "name": "例外确认后增补20台，身份稳定，差异版本可读",
+      "result": "PASS"
+    },
+    {
+      "name": "标准XLSX真实导出/重新导入和字段编辑",
+      "result": "PASS"
+    },
+    {
+      "name": "确定性布线：6m路径+双端1m+2m余量=10m；其他范围缺口明确",
+      "result": "PASS"
+    },
+    {
+      "name": "输入变更使旧计算标记过期",
+      "result": "PASS"
+    },
+    {
+      "name": "电力缺失不当零，不影响既有入库",
+      "result": "PASS"
+    },
+    {
+      "name": "新资料不套用旧结果冒充AI分析",
+      "result": "PASS"
+    },
+    {
+      "name": "390px窄屏保持导航与内容可访问",
+      "result": "PASS"
+    },
+    {
+      "name": "项目路由不串用数据",
+      "result": "PASS"
+    },
+    {
+      "name": "页面运行无JS异常和模块HTTP错误",
+      "result": "PASS"
+    }
+  ],
+  "errors": []
+}
