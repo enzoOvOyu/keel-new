@@ -1,0 +1,289 @@
+{
+  "scope": "Exactly one fresh real Agent run after committing first-step input cleanup",
+  "state": "COMPLETED",
+  "source_sha256": "1cd77c4d0ff8a42deb2055f7b1e39fadbb48fbff734eb95af0323ceaa92b5004",
+  "provider": {
+    "id": "8b8a86f6-2351-43f4-9816-b6019aef7ec2",
+    "name": "sol",
+    "model": "gpt-6.1-sol",
+    "protocol": "openai-responses",
+    "revision": 8,
+    "timeout_seconds": 120,
+    "token_budget": 8192,
+    "token_parameter": "max_tokens",
+    "json_mode": true
+  },
+  "runtime_release": "step1-cleanup-31111a4",
+  "agent_code_commit": "31111a4",
+  "expected": {
+    "terminations": 7154,
+    "port_identities": 14308,
+    "inventory_rows": 967,
+    "by_sheet": {
+      "Cabling_EW_SP-LF": 2592,
+      "Cabling_NS": 484,
+      "Cabling_GB_OUT": 3456,
+      "Cabling_OOB": 216,
+      "Cabling_HDD_SSD_CPU": 406
+    }
+  },
+  "runs": [
+    {
+      "index": 1,
+      "project_id": "proj-6c17d5ae-148d-4bb8-856d-abc4ea03d44c",
+      "project_name": "TEST-MM-STEP1-CLEANUP-01-2b415",
+      "state": "IDENTITY_PASS_WORKFLOW_BLOCKED",
+      "manual_edits": 0,
+      "checkpoint_replay": false,
+      "import_id": "0060ba13-55b9-4945-abcb-bf4f5d37ef4c",
+      "source_id": "5c59d6c1-d2f1-4e21-92d0-2d0e8917676d",
+      "initial_revision": 1,
+      "job_id": "c947005c-ef81-4144-b4d3-78dd5ecc3d06",
+      "last_job_state": "succeeded",
+      "last_sequence": 92,
+      "elapsed_seconds": 349.1,
+      "job_state": "succeeded",
+      "error_code": null,
+      "tables": [
+        {
+          "table_id": "cable_specs",
+          "rows": 483,
+          "issues_by_field": {
+            "medium": 483,
+            "connector_a": 483,
+            "connector_b": 483,
+            "rate": 51,
+            "rate_unit": 51,
+            "optic_mode": 483,
+            "length": 432,
+            "unit": 432
+          },
+          "version": 1
+        },
+        {
+          "table_id": "equipment_specs",
+          "rows": 988,
+          "issues_by_field": {
+            "serial": 21,
+            "equipment_type": 11
+          },
+          "version": 1
+        },
+        {
+          "table_id": "network_roles",
+          "rows": 189,
+          "issues_by_field": {
+            "fabric": 189,
+            "plane": 189
+          },
+          "version": 1
+        },
+        {
+          "table_id": "optic_specs",
+          "rows": 7,
+          "issues_by_field": {
+            "port_type": 7,
+            "medium": 7,
+            "rate": 7,
+            "rate_unit": 7,
+            "distance": 7,
+            "unit": 7
+          },
+          "version": 1
+        },
+        {
+          "table_id": "placements",
+          "rows": 967,
+          "issues_by_field": {
+            "room_code": 967,
+            "mount_type": 967,
+            "face": 967
+          },
+          "version": 1
+        },
+        {
+          "table_id": "port_specs",
+          "rows": 14308,
+          "issues_by_field": {
+            "medium": 14308,
+            "connector": 14308,
+            "rate": 14308,
+            "rate_unit": 14308
+          },
+          "version": 1
+        },
+        {
+          "table_id": "power_profiles",
+          "rows": 9,
+          "issues_by_field": {
+            "basis": 9,
+            "source": 9
+          },
+          "version": 1
+        },
+        {
+          "table_id": "rack_capacity",
+          "rows": 56,
+          "issues_by_field": {
+            "basis": 56
+          },
+          "version": 1
+        },
+        {
+          "table_id": "racks",
+          "rows": 56,
+          "issues_by_field": {
+            "room_code": 56,
+            "name": 56
+          },
+          "version": 1
+        },
+        {
+          "table_id": "route_nodes",
+          "rows": 60,
+          "issues_by_field": {
+            "room_code": 60
+          },
+          "version": 1
+        },
+        {
+          "table_id": "terminations",
+          "rows": 7154,
+          "issues_by_field": {
+            "b_rack_position": 7154
+          },
+          "version": 1
+        }
+      ],
+      "metrics": {
+        "termination_rows": 7154,
+        "six_field_correct_rows": 7154,
+        "six_field_missing_or_wrong_rows": 0,
+        "six_field_extra_or_wrong_rows": 0,
+        "four_field_correct_rows": 7154,
+        "missing_sn_cells": 0,
+        "missing_mac_cells": 0,
+        "inventory_serials_found": 967,
+        "unexpected_inventory_serials": 0,
+        "source_models_mismatched": 0,
+        "placement_rows": 967,
+        "placement_unknown_serials": 0,
+        "placement_rack_not_in_source_choices": 0,
+        "port_identities_missing_from_specs": 0,
+        "port_identities_extra_in_specs": 0,
+        "central_missing_inputs": 73
+      },
+      "adoption": {
+        "http_status": 422,
+        "error": {
+          "code": "STEP_INPUT_INVALID",
+          "message": "STEP_INPUT_INVALID",
+          "retryable": false
+        }
+      },
+      "formal_model": {
+        "equipment": 0,
+        "ports": 0,
+        "connections": 0,
+        "cables": 0,
+        "published_targets": 0,
+        "revision": 1
+      },
+      "duration_seconds": 354.5,
+      "identity_sn_mac_ports_pass": true,
+      "end_to_end_pass": false,
+      "end_to_end_state": "NOT_RUN_PENDING_REQUIRED_MODELING_REVIEW_AND_PUBLISH",
+      "job_created_at": "2026-11-02T09:27:22.203398Z",
+      "job_updated_at": "2026-11-02T09:33:00.049835Z"
+    }
+  ],
+  "known_source_decisions": [
+    "工程机房身份与空间参数须明确确认",
+    "允许通道与批准布线规则须补充或核对",
+    "逻辑网络地址/ASN/邻居不能从物理连接生成"
+  ],
+  "code_or_provider_modified_during_benchmark": false,
+  "duration_seconds": 354.7,
+  "summary": {
+    "completed_runs": 1,
+    "agent_jobs_succeeded": 1,
+    "six_field_pass_runs": 1,
+    "adoption_pass_runs": 0,
+    "independent_runs": 1,
+    "checkpoint_replays": 0,
+    "end_to_end_pass_runs": 0
+  },
+  "acceptance": {
+    "field_removal": "PASS",
+    "six_identity_fields": "PASS",
+    "first_step_adoption": "BLOCKED_B_RACK_POSITION",
+    "downstream_cmdb_and_topology": "NOT_RUN"
+  },
+  "runtime_contract_check": {
+    "catalog_version": "3",
+    "fields": [
+      "a_serial",
+      "a_mac",
+      "a_port",
+      "b_serial",
+      "b_rack_position",
+      "b_mac",
+      "b_port"
+    ],
+    "old_draft_projected_rows": 7154,
+    "removed_field_issues": 0
+  },
+  "removed_field_check": {
+    "column_count": 7,
+    "rows": 7154,
+    "retired_field_issues": 0,
+    "retired_field_question_mentions": 0
+  },
+  "telemetry": [
+    {
+      "checkpoints": 8,
+      "cost": "NOT_PROVIDED",
+      "failed_response_events": 0,
+      "index": 1,
+      "new_source_no_checkpoint_replay": true,
+      "reported_input_tokens": 542837,
+      "reported_output_tokens": 15262,
+      "resolved_models": [
+        "gpt-6.1-sol"
+      ],
+      "route_regions": 33,
+      "route_sheets": 15,
+      "successful_json_responses": 21,
+      "token_totals_may_exclude_unreported_failed_requests": true,
+      "transport_retry_events": 0
+    }
+  ],
+  "notes": [
+    "Candidate input has 7 columns; removed field is absent from columns, required-field errors and central questions.",
+    "Existing persisted prior-format draft reads as 7154 rows with current columns. Immutable source objects and historical connection attributes remain.",
+    "7154 candidate B rack positions are still blank. Earlier independent source inspection found rack/U evidence for 7150; combination format and supported cross-table composition remain unresolved.",
+    "967 inventory SN/model pairs match. Equipment specifications also contain 21 incomplete candidates without serials; total 988 specification candidates is not 988 confirmed assets.",
+    "Port identity coverage does not certify medium, connector or rate completeness.",
+    "No model rerun after this one verification; no manual input or formal asset publication."
+  ],
+  "checks": {
+    "targeted_go_tests": "PASS",
+    "frontend_typescript": "PASS",
+    "generated_api_types": "PASS",
+    "real_api_documentation_consistency": "PASS",
+    "go_api_build": "PASS",
+    "frontend_module": "HTTP 200",
+    "api_health": "HTTP 200",
+    "browser_visual_acceptance": "NOT_RUN"
+  },
+  "release": {
+    "code_commit": "31111a4",
+    "api_port": 8081,
+    "frontend_port": 5180,
+    "catalog_version": "3",
+    "binary_sha256": "42999e355fe55e025bc0dad0fce03fccf304e6f2f33de09c8c48008fec09ec6d",
+    "runtime_directory": "/home/ubuntu/.local/state/keel-deployments/step1-cleanup-31111a4",
+    "keel-cmdb-api_process_matches": true,
+    "keel-dev-5180_process_matches": true
+  }
+}
