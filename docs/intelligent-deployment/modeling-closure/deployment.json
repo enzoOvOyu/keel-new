@@ -1,0 +1,44 @@
+{
+  "code_revision": "4432065",
+  "api_port": 8081,
+  "api_pid": 2633638,
+  "frontend_port": 5180,
+  "frontend_pid": 2633938,
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/modeling-4432065",
+  "migration": 45,
+  "api_health": 200,
+  "frontend_checks": [
+    {
+      "path": "/",
+      "status": 200
+    },
+    {
+      "path": "/src/features/EngineeringStepInputs.tsx",
+      "status": 200
+    },
+    {
+      "path": "/src/features/EngineeringHandoff.tsx",
+      "status": 200
+    },
+    {
+      "path": "/src/features/EngineeringStudio.tsx",
+      "status": 200
+    },
+    {
+      "path": "/src/features/engineering-workbench.css",
+      "status": 200
+    }
+  ],
+  "database_backup": "private backup outside frontend source and Git",
+  "prototype_ports_retained": [
+    5081,
+    5181
+  ],
+  "provider_calls": 0,
+  "verification_scope": "Deployment startup checks only; isolated domain and UI verification are separate. New scoped Agent waits for user Provider configuration.",
+  "login_page": "PASS: visible login form, no browser page errors",
+  "schema_versions_checked": [
+    43,
+    45
+  ]
+}

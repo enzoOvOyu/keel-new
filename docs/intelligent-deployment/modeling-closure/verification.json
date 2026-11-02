@@ -8,10 +8,11 @@
     "isolated_database_and_minio": "PASS: TestModelingDraftAdoptionAndHandoff; real isolated PostgreSQL and MinIO; draft reload, independent input CAS, malformed-row rejection, ordered standard-domain adoption, prefilled package basis, actual review/publication/CMDB, handoff receipt, downstream NOT_STARTED, stale receipt",
     "browser": "PASS: synthetic API responses only; ten model groups, draft save/reopen, validation/adoption, rule parameter UI, handoff gate, desktop/narrow screenshots; see ui-validation.json",
     "typescript": "PASS: tsc --noEmit",
-    "build": "PENDING",
+    "build": "PASS: Go API build and Vite production build; existing chunk-size warning retained",
     "real_ai_or_customer_file_acceptance": "NOT_RUN",
     "five_step_business_chain": "Existing e5faead isolated acceptance retained; not rerun this milestone",
-    "navigation": "PASS: step-scoped cards; existing power/network edit actions open the same prototype modeling center"
+    "navigation": "PASS: step-scoped cards; existing power/network edit actions open the same prototype modeling center",
+    "deployment": "PASS: 4432065 on 8081/5180, schema045, source consistency, health and login page; no repeated business/AI test"
   },
   "limitations": [
     "No promise that arbitrary material can be recognized; new source routing and five scoped extraction tasks wait for Provider configuration.",
