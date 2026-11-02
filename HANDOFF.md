@@ -1,3 +1,11 @@
+## 已完成里程碑事件：AI Provider 增加 Responses 协议
+
+`802f9ef` 已部署前端5180和API8081，运行目录 `/home/ubuntu/.local/state/keel-deployments/responses-802f9ef`，迁移046已应用。设置页新增openai-responses选择与JSON选项，地址支持Base URL或完整/responses，并支持切换已有Chat地址。运行时支持max_output_tokens、JSON格式、工具定义/历史与调用响应、输出截断检测、用量统计；继续使用既有秘密引用和授权。OpenAPI和生成类型已同步。
+
+专项Go测试（Responses请求/输出、工具历史、地址补全及原Chat兼容用例）、TypeScript和合成HTTP页面保存检查通过；在线模块和健康检查200。没有调用外部模型，没有保存真实用户密钥。较早的宽泛Provider筛选额外命中了既有TestFullResumeAppliesPreviouslyPartialSheetWithoutProvider并失败，本轮未修改或宣称通过该BOM恢复流程。
+
+协议依据：[OpenAI官方迁移说明](https://developers.openai.com/api/docs/guides/migrate-to-responses)。真实Provider兼容性待用户配置后测试。
+
 ## 已完成里程碑事件：确定性布线计算恢复为第三步固定可见模块
 
 前端 `2ffd2fc` 已部署至5180，运行目录 `/home/ubuntu/.local/state/keel-deployments/cabling-2ffd2fc`。计算模块移至第三步顶部，不再依赖工程任务存在才渲染；缺少任务、端接、落位或必要布线表时列出补充入口并禁用计算。展示路径长度、两端引入合计、余量规则、计算长度、标准线长、线缆/光模块数量及实际安装状态；按线缆绑定的计算运行和规则版本读取证据，任意自定义规则不强行显示为固定百分比公式。详情直接定位对应计算记录。
