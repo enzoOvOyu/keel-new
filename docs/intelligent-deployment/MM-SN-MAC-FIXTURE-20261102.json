@@ -1,0 +1,19 @@
+{
+  "fixture": "/home/ubuntu/.local/state/keel-tests/mm-sn/MM_Layout_GB300-18_HDD&SSD&CPU-112_V1.1_TEST_SN_MAC.xlsx",
+  "fixture_sha256": "1cd77c4d0ff8a42deb2055f7b1e39fadbb48fbff734eb95af0323ceaa92b5004",
+  "source_sn_fixture_unchanged": true,
+  "synthetic_mac_only": true,
+  "identity_key": "test SN + physical port name",
+  "unique_macs": 14308,
+  "mac_cells_written": 14308,
+  "by_sheet": {
+    "Cabling_EW_SP-LF": 5184,
+    "Cabling_NS": 968,
+    "Cabling_GB_OUT": 6912,
+    "Cabling_OOB": 432,
+    "Cabling_HDD_SSD_CPU": 812
+  },
+  "formula_cells_preserved": 85570,
+  "original_workbook_unchanged": true,
+  "uploaded_to_existing_task": false
+}
