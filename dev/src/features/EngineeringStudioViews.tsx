@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom';
 import * as Dialog from '@radix-ui/react-dialog';
 import {ArrowDownToLine,ArrowRight,Cable,Check,CheckCircle2,ChevronRight,Database,ListChecks,RefreshCw,ShieldCheck,Sparkles,X} from 'lucide-react';
 import {Button} from '../components/ui';
-import {adoptEngineeringModelingInputs,engineeringInputCatalog,engineeringModelingInputs,publishEngineering,reviewEngineering,type EngineeringWorkspace,type EngineeringModelView,type EngineeringTargetAction,engineeringProviders} from '../lib/api/engineering';
+import {adoptEngineeringModelingInputs,engineeringInputCatalog,engineeringModelingInputs,engineeringCalculation,engineeringRules,publishEngineering,reviewEngineering,type EngineeringWorkspace,type EngineeringModelView,type EngineeringTargetAction,engineeringProviders} from '../lib/api/engineering';
 import {readInputCSV} from './engineeringInputCSV';
 import {EngineeringStepInputs} from './EngineeringStepInputs';
 import {EngineeringHandoff} from './EngineeringHandoff';
@@ -27,15 +27,60 @@ export function StudioPlacement({workspace,model,onEdit,onEvidence}:{workspace:E
  return <section className="panel padded"><div className="es-section-title"><h3>规划落位</h3><div><Button onClick={onEdit}>修改落位</Button><Link className="btn" to="/racks">查看 CMDB 机柜图</Link></div></div><div className="table-wrap"><table><thead><tr><th>设备身份</th><th>目标机柜</th><th>U 位 / 安装位置</th><th>安装面</th><th>数据状态</th><th>依据</th></tr></thead><tbody>{m?.placements.map(p=><tr key={p.entity_id}><td>{label(p.equipment_id)}</td><td>{workspace.targets.some(t=>t.target==='CMDB_PLANNED_FACILITY'&&t.state==='PUBLISHED')?<Link to={'/racks/'+p.rack_id}>{label(p.rack_id)}</Link>:label(p.rack_id)}</td><td>{p.installation_type==='non_u'?p.position_code||'待补充':`U${p.start_u??'?'} · ${p.height_u??'?'}U`}</td><td>{{front:'前',rear:'后',both:'双面',unknown:'待补充'}[p.mount_face]||p.mount_face}</td><td>Planning</td><td><Button onClick={()=>onEvidence(p.entity_id)}>查看来源</Button></td></tr>)}</tbody></table>{!m?.placements.length&&<p className="empty">采用机房、机柜和设备落位输入后，在这里核对规划。</p>}</div>
  <details className="es-spaced"><summary>机房、机柜与设备组合</summary><div className="table-wrap"><table><thead><tr><th>对象</th><th>类型</th><th>上级</th><th>机柜容量</th><th>来源</th></tr></thead><tbody>{m?.facilities.map(f=><tr key={f.entity_id}><td>{f.label}</td><td>{{site:'站点',room:'机房',rack:'机柜'}[f.kind]}</td><td>{f.parent_id?label(f.parent_id):'—'}</td><td>{f.capacity_u?f.capacity_u+'U':'—'}</td><td><Button onClick={()=>onEvidence(f.entity_id)}>查看来源</Button></td></tr>)}</tbody></table></div>{m?.assemblies.map(a=><p key={a.entity_id}>{label(a.parent_id)} → {label(a.child_id)} · {a.relation_type} · {a.quantity}</p>)}</details></section>;
 }
-export function StudioCabling({project,workspace,model,canEdit,onSaved,onInputs,onCalculations}:{project:string;workspace:EngineeringWorkspace;model?:EngineeringModelView;canEdit:boolean;onSaved:()=>Promise<void>;onInputs:()=>void;onCalculations:()=>void}){
+type CableQuantity={value:string;unit:string};
+const cableMetres=(value?:CableQuantity)=>{
+ const factor:Record<string,number>={mm:.001,cm:.01,m:1,km:1000};
+ return value&&factor[value.unit]!==undefined&&Number.isFinite(Number(value.value))?Number(value.value)*factor[value.unit]:null;
+};
+const cableNumber=(value:number|null)=>value===null?'待提供':Number(value.toFixed(6)).toString();
+export function StudioCabling({project,workspace,model,loading=false,canEdit,onSaved,onInputs,onCalculations}:{project:string;workspace?:EngineeringWorkspace;model?:EngineeringModelView;loading?:boolean;canEdit:boolean;onSaved:()=>Promise<void>;onInputs:(step:number,model:string)=>void;onCalculations:(run?:string)=>void}){
  const [busy,setBusy]=useState(false),[error,setError]=useState(''),[selected,setSelected]=useState('');
+ const inputs=useQuery({queryKey:['engineering-modeling-inputs',project,workspace?.id,workspace?.revision],queryFn:({signal})=>engineeringModelingInputs(project,workspace!.id,'',signal),enabled:!!workspace});
+ const catalog=useQuery({queryKey:['engineering-input-catalog',project],queryFn:({signal})=>engineeringInputCatalog(project,signal),enabled:!!workspace});
  const m=model?.model,cables=m?.cables||[],current=cables.find(c=>c.entity_id===selected)||cables[0];
+ const runID=current?.calculated?.calculation_run_id;
+ const calculation=useQuery({queryKey:['engineering-cable-calculation',project,workspace?.id,runID],queryFn:({signal})=>engineeringCalculation(project,workspace!.id,runID!,0,signal),enabled:!!workspace&&!!runID});
+ const rules=useQuery({queryKey:['engineering-rules',project],queryFn:({signal})=>engineeringRules(project,signal),enabled:!!runID});
+ const required=[['route_nodes','通道节点','route_nodes'],['route_edges','允许布线路径','route_edges'],['rack_access','机柜接入','route_nodes'],['cable_specs','线缆规格','cable_specs'],['cabling_rules','布线计算规则','cabling_rules']];
+ const gaps:{label:string;step:number;model:string}[]=[];
+ if(!workspace)gaps.push({label:'尚未建立工程任务，请先提供开局资料。',step:0,model:''});
+ else{
+  if(!m?.equipment.length||!m.ports.length||!m.connections.length)gaps.push({label:'设备身份、端口与两端端接尚未核对。',step:1,model:'terminations'});
+  if(!m?.facilities.some(f=>f.kind==='room')||!m.facilities.some(f=>f.kind==='rack')||!m.placements.length)gaps.push({label:'机房、机柜或设备落位待补充。',step:2,model:'placements'});
+  for(const [id,name,model] of required){const input=inputs.data?.items.find(i=>i.table_id===id);if(!input?.rows||input.issues.length)gaps.push({label:input?.issues.length?name+'：'+input.issues[0].message:name+'尚未提供。',step:3,model})}
+ }
+ const pending=loading||!!workspace&&(inputs.isPending||catalog.isPending);
+ const blocked=pending||gaps.length>0||!!inputs.error||!!catalog.error;
  const port=(id:string)=>{const p=m?.ports.find(p=>p.entity_id===id);return p?(m?.equipment.find(e=>e.entity_id===p.equipment_id)?.label||p.equipment_id)+' / '+p.name:id};
  const link=current&&m?.connections.find(c=>c.entity_id===current.connection_id);
- const quantity=(v?:{value:string;unit:string})=>v?v.value+' '+v.unit:'待计算';
- async function calculate(){setBusy(true);setError('');try{const [inputs,catalog]=await Promise.all([engineeringModelingInputs(project,workspace.id),engineeringInputCatalog(project)]);const values=inputs.items.filter(i=>catalog.tables.some(t=>t.id===i.table_id&&t.step===3));if(!values.length)throw Error('请先补充路径、规格和布线规则。');await adoptEngineeringModelingInputs(project,workspace.id,{expected_revision:workspace.revision,step:3,inputs:values.map(i=>({table_id:i.table_id,version:i.version})),reason:'核对当前路径与规则，执行确定性布线计算'});await onSaved()}catch(e){setError((e as Error).message)}finally{setBusy(false)}}
- return <section className="panel padded es-calculation"><div className="es-section-title"><h3>确定性布线计算</h3><Button variant="primary" disabled={!canEdit||busy} onClick={()=>void calculate()}><RefreshCw size={15}/>{busy?'正在计算…':cables.length?'重新计算':'执行布线计算'}</Button></div><p className="muted">使用已核对的允许路径、两端引入、余量与规格规则；计算结果保留版本和来源。</p>{error&&<p role="alert" className="notice error">{error}</p>}
- {current?<><label className="es-cable-select">查看链路<select aria-label="查看计算链路" value={current.entity_id} onChange={e=>setSelected(e.target.value)}>{cables.map(c=>{const l=m?.connections.find(l=>l.entity_id===c.connection_id);return <option key={c.entity_id} value={c.entity_id}>{c.label||(l?port(l.a_port_id)+' → '+port(l.z_port_id):c.entity_id)}</option>})}</select></label><p>{link?port(link.a_port_id)+' → '+port(link.z_port_id):current.label}</p><div className="es-formula"><span>允许路径<b>{current.route.length} 段</b></span><ArrowRight size={17}/><span>规则版本<b>{current.rule_version?'v'+current.rule_version.version:'未提供'}</b></span><ArrowRight size={17}/><span>计算长度<b>{quantity(current.calculated?.length)}</b></span><ArrowRight size={17}/><span>标准线长<b>{quantity(current.selected_stock?.length)}</b></span></div><div className="es-calc-results"><div><small>线缆需求</small><b>{cables.length} 条</b></div><div><small>物理端口光模块</small><b>{m?.optics.reduce((n,o)=>n+o.quantity,0)||0} 只</b></div><div><small>结果性质</small><b>{current.maturity}</b></div><div><small>实际安装长度</small><b>{current.as_built?quantity(current.as_built.length):'未提供'}</b></div></div><details><summary>查看采用的路径与规格</summary><div className="table-wrap"><table><thead><tr><th>路径起点</th><th>路径终点</th><th>距离</th></tr></thead><tbody>{current.route.map((r,i)=><tr key={i}><td>{r.from_id}</td><td>{r.to_id}</td><td>{quantity(r.distance)}</td></tr>)}</tbody></table></div><p>{current.spec.source_model_label} · {current.spec.medium} · {current.spec.connector_a} → {current.spec.connector_z}</p><p>估算：{current.estimated?quantity(current.estimated.length):'未提供'} · 已确认：{current.confirmed?quantity(current.confirmed.length):'未提供'}</p></details><Button onClick={onCalculations}>查看计算过程与独立算例</Button></>:<div className="empty"><Cable size={24}/><h4>等待输入核对</h4><p>确认身份，采用机房、落位、通道、规格与规则；不依赖网络或电力完成。</p><Button onClick={onInputs}>补充布线输入</Button></div>}</section>;
+ const quantity=(v?:CableQuantity)=>v?v.value+' '+v.unit:'待计算';
+ const distances=current?.route.map(r=>cableMetres(r.distance));
+ const routeMetres=distances&&distances.every(v=>v!==null)&&(distances.length>0||runID)?distances.reduce<number>((n,v)=>n+v!,0):null;
+ const baseValue=calculation.data?.run.inputs.find(i=>i.name==='length')?.value;
+ const baseMetres=baseValue?.decimal!==undefined?cableMetres({value:baseValue.decimal,unit:baseValue.unit||''}):null;
+ const leads=routeMetres!==null&&baseMetres!==null&&baseMetres>=routeMetres?baseMetres-routeMetres:null;
+ const ruleRef=calculation.data?.run.rule;
+ const rule=rules.data?.find(r=>r.rule.id===ruleRef?.id&&r.rule.version===ruleRef.version)?.rule;
+ const expr=rule?.expression,add=expr?.arguments[1];
+ const percent=expr?.operator==='multiply'&&expr.arguments[0]?.operator==='input'&&expr.arguments[0].input==='length'&&add?.operator==='add'&&add.arguments[0]?.operator==='literal'&&add.arguments[0].literal?.value==='1'&&add.arguments[0].literal.unit==='1'&&add.arguments[1]?.operator==='literal'&&add.arguments[1].literal?.unit==='%'?add.arguments[1].literal.value:null;
+ const stale=!!current&&(workspace?.targets.some(t=>t.target==='ENGINEERING_CABLING'&&t.state==='STALE')||inputs.data?.items.some(i=>['rooms','racks','placements','equipment_specs',...required.map(r=>r[0]),'port_specs','optic_specs','patch_paths'].includes(i.table_id)&&i.state!=='adopted'));
+ async function calculate(){
+  if(!workspace||blocked)return;
+  setBusy(true);setError('');
+  try{const values=inputs.data!.items.filter(i=>catalog.data!.tables.some(t=>t.id===i.table_id&&t.step===3));await adoptEngineeringModelingInputs(project,workspace.id,{expected_revision:workspace.revision,step:3,inputs:values.map(i=>({table_id:i.table_id,version:i.version})),reason:'核对当前路径与规则，执行确定性布线计算'});await onSaved();await inputs.refetch()}
+  catch(e){const message=(e as Error).message;setError(message==='CABLE_APPROVED_RULE_REQUIRED'?'引入长度、余量或标准长度规则尚未批准，请在布线计算规则中核对。':message)}finally{setBusy(false)}
+ }
+ return <section className="panel padded es-calculation" aria-label="确定性布线计算"><div className="es-section-title"><h3>确定性布线计算</h3><Button variant="primary" disabled={!canEdit||busy||blocked} onClick={()=>void calculate()}><RefreshCw size={15}/>{busy?'正在计算…':cables.length?'重新计算':'执行布线计算'}</Button></div><p className="muted">按允许通道求路径，使用项目已批准的引入、余量与标准线长规则。网络和电力未完成不影响本步。</p>
+ {pending?<p aria-busy="true">正在核对计算输入…</p>:gaps.length>0&&<div className="es-cabling-gaps"><b>计算前需补齐 {gaps.length} 项</b>{gaps.map(g=><div key={g.model+g.label}><span>{g.label}</span><Button onClick={()=>onInputs(g.step,g.model)}>去补充<ChevronRight size={13}/></Button></div>)}</div>}
+ {[error,inputs.error?.message,catalog.error?.message,calculation.error?.message,rules.error?.message].filter(Boolean).map((message,i)=><p key={i} role="alert" className="notice error">{message}</p>)}
+ {!canEdit&&workspace&&<p className="muted">当前没有工程编辑权限，可查看已有计算结果。</p>}
+ {stale&&<p className="notice">输入已变化，下方保留上次计算结果；核对输入后重新计算。</p>}
+ {current&&<><label className="es-cable-select">查看链路<select aria-label="查看计算链路" value={current.entity_id} onChange={e=>setSelected(e.target.value)}>{cables.map(c=>{const l=m?.connections.find(l=>l.entity_id===c.connection_id);return <option key={c.entity_id} value={c.entity_id}>{c.label||(l?port(l.a_port_id)+' → '+port(l.z_port_id):c.entity_id)}</option>})}</select></label><p>{link?port(link.a_port_id)+' → '+port(link.z_port_id):current.label}</p></>}
+ <div className="es-formula es-cabling-formula"><span>路径长度<b>{routeMetres===null?'待计算':cableNumber(routeMetres)+' m'}</b></span><em>+</em><span>两端引入（合计）<b>{leads===null?'待提供':cableNumber(leads)+' m'}</b></span><ArrowRight size={17}/><span>余量规则<b>{percent!==null?percent+'%':ruleRef?'项目规则 v'+ruleRef.version:'待提供'}</b></span><ArrowRight size={17}/><span>计算长度<b>{quantity(current?.calculated?.length)}</b></span><ArrowRight size={17}/><span>标准线长<b>{quantity(current?.selected_stock?.length)}</b></span></div>
+ <p className="muted">{percent!==null?'计算式：（路径长度 + 两端引入）×（1 + 余量率）。参数来自本链路的计算记录和规则版本。':'路径 → 两端引入 → 已批准的余量规则 → 标准规格匹配；规则参数随项目版本确定。'}{runID?' 两端引入合计由该运行的输入长度减去路径长度得到。':''}</p>
+ <div className="es-calc-results"><div><small>线缆需求</small><b>{current?cables.length+' 条':'待计算'}</b></div><div><small>物理端口光模块</small><b>{current?(m?.optics.reduce((n,o)=>n+o.quantity,0)||0)+' 只':'待计算'}</b></div><div><small>结果性质</small><b>{current?.maturity||'未计算'}</b></div><div><small>实际安装长度</small><b>{current?.as_built?quantity(current.as_built.length):'未提供'}</b></div></div>
+ {current&&<><details><summary>查看采用的路径与规格</summary><div className="table-wrap"><table><thead><tr><th>路径起点</th><th>路径终点</th><th>距离</th></tr></thead><tbody>{current.route.map((r,i)=><tr key={i}><td>{r.from_id}</td><td>{r.to_id}</td><td>{quantity(r.distance)}</td></tr>)}</tbody></table></div><p>{current.spec.source_model_label} · {current.spec.medium} · {current.spec.connector_a} → {current.spec.connector_z}</p><p>估算：{current.estimated?quantity(current.estimated.length):'未提供'} · 已确认：{current.confirmed?quantity(current.confirmed.length):'未提供'}</p></details><Button onClick={()=>onCalculations(runID)}>查看计算过程与独立算例</Button></>}
+ </section>;
 }
 
 const targetNames:Record<string,string>={CMDB_PLANNED_EQUIPMENT:'设备与组合',CMDB_PLANNED_FACILITY:'机房与机柜',CMDB_PLANNED_PLACEMENT:'规划落位',CMDB_PLANNED_CONNECTIVITY:'物理端口与端接',ENGINEERING_CABLING:'线缆与光模块需求',ENGINEERING_POWER:'电力与冷却',ENGINEERING_MATERIAL:'物料需求',ENGINEERING_WORKLOAD:'施工工程量',NETWORK_REVISION:'网络规划版本'};
