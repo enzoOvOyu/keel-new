@@ -1,21 +1,17 @@
-<template><ElConfigProvider namespace="kel"><div class="native-workbench"><MultiPanelGenericEditorView :editorElements="elements" :defaultActiveTabs="['code','outline']" :saveKey="scopeKey?`keel-native-editor:${scopeKey}`:undefined"/><KsDialog v-model="isKeyShortcutsDialogShown" :teleported="false" :appendToBody="false" title="编辑器快捷键"><dl><dt>Ctrl / ⌘ + S</dt><dd>保存草稿</dd><dt>Ctrl / ⌘ + F</dt><dd>查找内容</dd><dt>Ctrl / ⌘ + H</dt><dd>查找替换</dd></dl></KsDialog></div></ElConfigProvider></template>
+<template><ElConfigProvider namespace="kel"><div class="native-workbench"><MultiPanelGenericEditorView ref="view" :editorElements="elements" :defaultActiveTabs="['visual','topology']" :saveKey="scopeKey?`keel-native-workbench-v2:${scopeKey}`:undefined"><template #actions><KsButton size="small" :disabled="readOnly" @click="open('files');emit('files','')">新增 / 导入脚本</KsButton><KsButton size="small" :disabled="busy" @click="emit('validate')">校验</KsButton><KsButton size="small" :disabled="readOnly||busy" @click="emit('save')">保存草稿</KsButton><KsButton size="small" type="primary" :disabled="readOnly||busy" @click="emit('publish')">发布</KsButton></template></MultiPanelGenericEditorView><KsDialog v-model="isKeyShortcutsDialogShown" :teleported="false" :appendToBody="false" title="编辑器快捷键"><dl><dt>Ctrl / ⌘ + S</dt><dd>保存草稿</dd><dt>Ctrl / ⌘ + F</dt><dd>查找内容</dd><dt>Ctrl / ⌘ + H</dt><dd>查找替换</dd></dl></KsDialog></div></ElConfigProvider></template>
 <script setup lang="ts">
-import {computed,defineComponent,h,markRaw} from 'vue';
-import YAML from 'yaml';
-import {ElConfigProvider} from 'element-plus';
-import MultiPanelGenericEditorView from '../../vendor/kestra/editor/components/MultiPanelGenericEditorView.vue';
-import {useKeyShortcuts} from '../../vendor/kestra/editor/utils/useKeyShortcuts';
-import NativeCodeEditor from './NativeCodeEditor.vue';
-import KsDialog from '../../vendor/kestra/design-system/components/Feedback/KsDialog.vue';
-import CodeTags from 'vue-material-design-icons/CodeTags.vue';
-import FileTree from 'vue-material-design-icons/FileTree.vue';
-import {taskList} from '../flows/definition';
-const props=defineProps<{source:string;readOnly:boolean;path:string;theme:'dark'|'light';scopeKey?:string}>();
-const emit=defineEmits(['change','save']);
-const {isKeyShortcutsDialogShown}=useKeyShortcuts();
-const structure=computed(()=>{try{const d=YAML.parse(props.source);return {id:d?.id,namespace:d?.namespace,tasks:taskList(d||{})}}catch{return null}});
-const code=markRaw(defineComponent({setup:()=>()=>h(NativeCodeEditor,{...props,onChange:(s:string)=>emit('change',s),onSave:()=>emit('save')})}));
-const outline=markRaw(defineComponent({setup:()=>()=>h('section',{class:'native-outline'},[h('h3','Flow 结构'),structure.value?h('div',[h('p',String(structure.value.id||'未命名')),h('small',String(structure.value.namespace||'')),...structure.value.tasks.map((t:any)=>h('div',{class:'outline-task',key:t.id},[h('strong',t.id),h('small',t.type)]))]):h('p','YAML 语法无效，修正后显示结构')])}));
-const elements=[{uid:'code',button:{label:'YAML',icon:markRaw(CodeTags)},component:code},{uid:'outline',button:{label:'Flow 结构',icon:markRaw(FileTree)},component:outline}].map(e=>({...e,deserialize:(id:string)=>id===e.uid?e:undefined}));
+import {defineComponent,h,markRaw,ref} from 'vue';import {ElConfigProvider} from 'element-plus';
+import MultiPanelGenericEditorView from '../../vendor/kestra/editor/components/MultiPanelGenericEditorView.vue';import {useKeyShortcuts} from '../../vendor/kestra/editor/utils/useKeyShortcuts';
+import NativeCodeEditor from './NativeCodeEditor.vue';import NativeVisual from './NativeVisual.vue';import NativePanelSlot from './NativePanelSlot.vue';
+import KsDialog from '../../vendor/kestra/design-system/components/Feedback/KsDialog.vue';import KsButton from '../../vendor/kestra/design-system/components/Basic/KsButton/KsButton.vue';
+import CodeTags from 'vue-material-design-icons/CodeTags.vue';import ViewSequential from 'vue-material-design-icons/ViewSequential.vue';import VectorPolyline from 'vue-material-design-icons/VectorPolyline.vue';import FolderOutline from 'vue-material-design-icons/FolderOutline.vue';import BookOpenOutline from 'vue-material-design-icons/BookOpenOutline.vue';import ViewGridOutline from 'vue-material-design-icons/ViewGridOutline.vue';
+const props=defineProps<{source:string;readOnly:boolean;busy?:boolean;path:string;theme:'dark'|'light';scopeKey?:string;selected:string;attach:(name:string,element:HTMLElement|null)=>void}>();
+const emit=defineEmits(['change','save','publish','validate','files','select']);
+const view=ref<InstanceType<typeof MultiPanelGenericEditorView>|null>(null),{isKeyShortcutsDialogShown}=useKeyShortcuts();
+function open(name:string){const instance=view.value;if(!instance)return;if(instance.openTabs.includes(name))instance.focusTab(name);else{const tab=elements.find(e=>e.uid===name)!;const panel=instance.panels.at(-1);if(panel){panel.tabs.push(tab);panel.activeTab=tab}else instance.setTabValue(name)}}
+const code=markRaw(defineComponent({setup:()=>()=>h(NativeCodeEditor,{source:props.source,path:props.path,readOnly:props.readOnly,theme:props.theme,onChange:(s:string)=>emit('change',s),onSave:()=>{if(!props.readOnly&&!props.busy)emit('save')}})}));
+const visual=markRaw(defineComponent({setup:()=>()=>h(NativeVisual,{source:props.source,readOnly:props.readOnly||!!props.busy,theme:props.theme,selected:props.selected,onSelect:(id:string)=>emit('select',id),onChange:(s:string)=>emit('change',s),onSave:()=>emit('save'),onFiles:(id:string)=>{emit('files',id);open('files')}})}));
+const slot=(name:string)=>markRaw(defineComponent({setup:()=>()=>h(NativePanelSlot,{name,attach:props.attach})}));
+const elements=[{uid:'visual',button:{label:'Visual',icon:markRaw(ViewSequential)},component:visual},{uid:'topology',button:{label:'Topology',icon:markRaw(VectorPolyline)},component:slot('topology')},{uid:'code',button:{label:'YAML',icon:markRaw(CodeTags)},component:code},{uid:'files',button:{label:'Files / 脚本',icon:markRaw(FolderOutline)},component:slot('files')},{uid:'templates',button:{label:'模板',icon:markRaw(ViewGridOutline)},component:slot('templates')},{uid:'docs',button:{label:'Docs',icon:markRaw(BookOpenOutline)},component:slot('docs')}].map(e=>({...e,deserialize:(id:string)=>id===e.uid?e:undefined}));
 </script>
-<style>.native-workbench{height:600px;min-height:400px;background:var(--ks-bg-surface);color:var(--ks-text-primary)}.native-workbench .native-code-editor{height:100%}.native-outline{padding:16px;overflow:auto;height:100%;font-size:12px}.native-outline h3{font-size:14px;margin:0 0 12px}.native-outline small{display:block;color:var(--ks-text-secondary);overflow-wrap:anywhere}.outline-task{padding:12px 0;border-bottom:1px solid var(--ks-border-default)}</style>
+<style>.native-workbench{height:calc(100vh - 270px);min-height:540px;background:var(--ks-bg-surface);color:var(--ks-text-primary)}.native-workbench .native-code-editor{height:100%}.native-workbench .native-react-panel>.fl-overview-dag{height:100%;min-height:440px}.native-workbench .fl-files-workspace{padding:12px}.native-workbench .native-visual .native-inspector .native-code-editor{height:280px}.native-workbench .native-react-panel .fl-files-grid{grid-template-columns:180px minmax(0,1fr)}</style>

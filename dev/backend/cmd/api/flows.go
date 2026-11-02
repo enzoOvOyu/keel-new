@@ -131,6 +131,18 @@ func (s *Server) flowsRoutes(w http.ResponseWriter, r *http.Request) bool {
 	var e error
 	code := 200
 	switch {
+	case path == "/catalog" && r.Method == "GET":
+		out, e = service.Catalog(ctx, scope, r.URL.Query())
+	case path == "/execution-summary" && r.Method == "GET":
+		out, e = service.ExecutionSummary(ctx, scope, r.URL.Query())
+	case path == "/log-search" && r.Method == "GET":
+		out, e = service.LogSearch(ctx, scope, r.URL.Query())
+	case path == "/task-documentation" && r.Method == "GET":
+		out, e = service.TaskDocumentation(ctx, scope, r.URL.Query().Get("type"))
+	case len(parts) == 3 && parts[0] == "executions" && parts[2] == "variables" && r.Method == "GET":
+		out, e = service.ExecutionVariables(ctx, scope, parts[1])
+	case len(parts) == 3 && parts[0] == "executions" && parts[2] == "insights" && r.Method == "GET":
+		out, e = service.ExecutionInsights(ctx, scope, parts[1], r.URL.Query())
 	case path == "/capabilities" && r.Method == "GET":
 		out = map[string]any{"namespace": flows.Namespace(r.URL.Query().Get("project_id")), "engine": "Kestra", "version": "2.0.7", "configured": service.Engine.Base != "", "agent_versions": []string{"0.2.0"}, "execution_definition": true, "bootstrap_ready": flows.BootstrapConfigured(), "agent_public_gateway": os.Getenv("KEEL_AGENT_PUBLIC_GATEWAY"), "enrollment_url": os.Getenv("KEEL_PUBLIC_HTTPS_URL"), "agent_gateway": service.Gateway != nil, "scheduling": "Kestra triggers", "native_plugins": "validated by configured Kestra"}
 	case path == "/templates" && r.Method == "GET":

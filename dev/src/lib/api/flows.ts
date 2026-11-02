@@ -30,6 +30,12 @@ async function collection<T extends {id:string;project_id:string}>(path:string,p
  }
 }
 export const flowsApi = {
+ variables:(p:string|null,id:string)=>request<S['FlowsExecutionVariables']>('/executions/'+id+'/variables',p),
+ catalog:(p:string|null,filters:Record<string,string>,signal?:AbortSignal)=>request<S['FlowsCatalogPage']>('/catalog?'+new URLSearchParams(filters),p,'GET',undefined,undefined,signal),
+ executionSummary:(p:string|null,filters:Record<string,string>={})=>request<S['FlowsExecutionSummary']>('/execution-summary?'+new URLSearchParams(filters),p),
+ logSearch:(p:string|null,filters:Record<string,string>,signal?:AbortSignal)=>request<S['FlowsLogSearchPage']>('/log-search?'+new URLSearchParams(filters),p,'GET',undefined,undefined,signal),
+ insights:(p:string|null,id:string,filters:Record<string,string>={})=>request<S['FlowsExecutionInsights']>('/executions/'+id+'/insights?'+new URLSearchParams(filters),p),
+ taskDocumentation:(p:string|null,type:string)=>request<S['FlowsTaskDocumentation']>('/task-documentation?'+new URLSearchParams({type}),p),
  executionDefinition:(p:string|null,id:string)=>request<S['FlowsExecutionDefinition']>('/executions/'+id+'/definition',p),
  schedule:(p:string,id:string)=>request<BatchSchedule>('/'+id+'/schedule',p),saveSchedule:(p:string,id:string,value:BatchSchedule)=>request<BatchSchedule>('/'+id+'/schedule',p,'PUT',value),
  fileVersions:(p:string,id:string)=>request<FileRevision[]>('/'+id+'/namespace-artifacts',p),uploadFile:(p:string,id:string,value:{path:string;data_base64:string;expected_revision:number})=>request<FileRevision>('/'+id+'/namespace-artifacts',p,'POST',value),

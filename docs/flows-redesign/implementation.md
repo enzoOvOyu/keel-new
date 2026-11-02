@@ -1,5 +1,12 @@
 # 作业平台重构实施记录（技术域 Flows）
 
+## 2026-11-02 原生核心工作台接通（持续开发中）
+
+原生多面板替换旧三栏Builder；Visual、受控设备步骤、YAML、Topology、Files/模板/Docs共享同一Flow定义，节点拖动限定同分支、未知字段保留。Flow头部和常用/更多标签、执行详情、三步QuickRun及Agents目录/抽屉已转原生组件；Keel外壳、项目上下文与审批保持原样。新增6个查询资源，详见docs/api/flows.md。没有发布或合并。
+
+验证：正式路由8组synthetic浏览器交互通过，截图及结果在native-validation/；修复Monaco定位缺失导致遮挡下一步。隔离PostgreSQL+synthetic Kestra查询集成通过，含跨项目拒绝、SECRET变量、日志与相邻执行。上述不是真机或生产验收。后续持久化批量安装/恢复、证书轮换与调度补跑尚在开发；不据核心页面运行宣称全部完成。
+
+
 ## 2026-11-02 正式开发恢复：脚本文件工作台第一批
 
 分支仍为 `feat/jobs-kestra-ui`，工作区 `/home/ubuntu/keel-kestra-ui-dev`。用户已要求按原型继续正式开发；本批未发布、未合并，不改变5180/8081/5181。

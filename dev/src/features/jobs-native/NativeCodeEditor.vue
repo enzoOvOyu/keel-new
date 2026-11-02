@@ -5,4 +5,4 @@ import KsEditor from '../../vendor/kestra/design-system/components/Form/KsEditor
 defineProps<{source:string;readOnly:boolean;path:string;theme:'dark'|'light';language?:'shell'|'python'|'plaintext'}>();
 const emit=defineEmits(['change','save']);
 </script>
-<style scoped>.native-code-editor{height:540px;min-height:360px;background:var(--ks-bg-surface)}.native-code-editor :deep(.ks-editor){height:100%}</style>
+<style scoped>.native-code-editor{height:540px;min-height:360px;background:var(--ks-bg-surface)}.native-code-editor :deep(.ks-editor){height:100%}.native-code-editor{position:relative;overflow:hidden}.native-code-editor :deep(.editor-container){position:relative;min-height:0;flex:1}.native-code-editor :deep(.editor-wrapper){position:relative;height:100%;min-height:0}.native-code-editor :deep(.ks-monaco-editor){inset:0;width:100%;height:100%}</style>

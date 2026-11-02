@@ -5,9 +5,10 @@ import {ElConfigProvider} from 'element-plus';
 import SidebarList from '../../vendor/kestra/outputs/SidebarList.vue';
 import KsButton from '../../vendor/kestra/design-system/components/Basic/KsButton/KsButton.vue';
 import KsNoData from '../../vendor/kestra/design-system/components/Data/KsNoData.vue';
-const props=defineProps<{outputs:Record<string,unknown>}>(),expression=ref(''),error=ref('');
-const items=computed(()=>Object.entries(props.outputs||{}).map(([label,value])=>({label,value,expression:'outputs['+JSON.stringify(label)+']',type:value===null?'null':Array.isArray(value)?'array':typeof value,preview:JSON.stringify(value)?.slice(0,100)||String(value)})));
-const sections=computed(()=>[{key:'outputs',label:'任务输出',items:items.value}]);
+const props=defineProps<{outputs:Record<string,unknown>;inputs?:Record<string,unknown>}>(),expression=ref(''),error=ref('');
+const entries=(root:string,values:Record<string,unknown>)=>Object.entries(values).map(([label,value])=>({label,value,expression:root+'['+JSON.stringify(label)+']',type:value===null?'null':Array.isArray(value)?'array':typeof value,preview:JSON.stringify(value)?.slice(0,100)||String(value)}));
+const inputItems=computed(()=>entries('inputs',props.inputs||{})),items=computed(()=>[...inputItems.value,...entries('outputs',props.outputs||{})]);
+const sections=computed(()=>[{key:'inputs',label:'执行输入（已脱敏）',items:inputItems.value},{key:'outputs',label:'任务输出',items:items.value.filter(i=>i.expression.startsWith('outputs'))}]);
 const selected=computed(()=>items.value.find(i=>i.expression===expression.value)||items.value[0]);
 const serialized=computed(()=>selected.value?JSON.stringify(selected.value.value,null,2)||String(selected.value.value):'');
 async function copy(){try{await navigator.clipboard.writeText(serialized.value);error.value=''}catch{error.value='浏览器未允许剪贴板写入，可下载完整 JSON'}}

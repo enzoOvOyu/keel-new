@@ -1,0 +1,3 @@
+import {useEffect,useRef} from 'react';import {createApp,h,reactive} from 'vue';import NativeFlowHeader from './NativeFlowHeader.vue';import './native-theme.scss';import type {Flow} from '@/lib/api/flows';
+type Props={name:string;flow?:Flow;project:string;tab:string;canEdit:boolean;canExecute:boolean;dirty:boolean;onBack:()=>void;onTab:(tab:string)=>void;onRun:()=>void};
+export function NativeFlowHeaderHost(props:Props){const element=useRef<HTMLDivElement>(null),state=useRef(reactive({...props}));useEffect(()=>{const app=createApp({setup:()=>()=>h(NativeFlowHeader,state.current)});app.mount(element.current!);return()=>app.unmount()},[]);useEffect(()=>{Object.assign(state.current,props)},[props]);return <div className="keel-kestra" ref={element}/>}

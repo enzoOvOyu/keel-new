@@ -127,3 +127,25 @@ Bootstrap需运维预置root可信helper、包摘要及HTTPS分发，未对生�
 - 保存后刷新文件版本、上下文和分发历史。内存草稿按identity/permission_revision/project/flow隔离；不持久化浏览器秘密。权限判断由后端复核。
 - 脚本内联只修改待保存Flow，实际保存/发布仍走Flow Revision校验。引擎脚本与Keel设备通道不同；设备脚本继续使用受控steps。Namespace引用及Execution冻结文件版本的完整集成不在本批完成范围。
 - 未新增HTTP操作或修改Schema；OpenAPI/生成类型和真实接口注册表保持原契约。此处的浏览器验证使用synthetic拦截响应，不表示Go/数据库/设备闭环已验证。历史文件版本列表仍有既有500条上限，需要后续分页契约，不能当成无限完整文件目录。
+
+
+### 2026-11-02 原生工作台查询契约（代码实现，未发布）
+
+OpenAPI为唯一字段定义。本节对应6个新增已登记查询：
+
+| 方法/路径 | 响应资源 | 作用域及语义 |
+|---|---|---|
+| GET `/flows/catalog` | FlowsCatalogPage | 授权binding交集；q/namespace/target_type/state/sort/direction/limit/offset。total为服务端匹配总数，recent_execution按时间+ID选取最后执行；enabled/draft来自Kestra，不另建状态权威表。source_search=true时q至少2字符，使用引擎源码索引，精确namespace与已授权binding再次相交，不返回其他namespace或未登记Flow。 |
+| GET `/flows/execution-summary` | FlowsExecutionSummary | 按flow_id/source/since/until聚合现有投影；引擎状态和设备结果分别计数，标注state_source。 |
+| GET `/flows/log-search` | FlowsLogSearchPage | 已脱敏flow_event日志，按Flow/Execution/Task/等级/文本/时间筛选，游标绑定用户+授权项目+查询；时间范围是采集事件时间。coverage明确不含尚未捕获的历史日志。 |
+| GET `/flows/executions/{executionId}/insights` | FlowsExecutionInsights | 稳定时间/ID相邻执行，真实parent_id谱系；按需查询引擎指标（metrics=false跳过），不将单位缺失解释为默认单位。引擎指标不可用返回metrics_error。 |
+| GET `/flows/executions/{executionId}/variables` | FlowsExecutionVariables | 输入按执行原Revision的SECRET定义脱敏，定义不可得时遮蔽所有输入；结构化敏感键和文本再次脱敏。产物仍经现有授权下载接口。 |
+| GET `/flows/task-documentation` | FlowsTaskDocumentation | 仅既有执行策略允许的类型，从固定Kestra插件文档API读取；不是安装插件或扩展执行权限入口。 |
+
+所有操作逐请求使用flows:read与后端项目范围，400拒绝非法分页/时间/游标，404隐藏未授权执行，未连接引擎不伪造结果。所有响应包含request_id。相邻执行与谱系逐项授权；来源筛选不代表业务消费者已经接通。
+
+现有`ValidatePolicy`禁止直接执行Worker Shell/Python插件，因此正式脚本工作台将已保存内容加入受控设备steps，进入Flow版本快照；不放宽策略来适配原型。原型Namespace/Worker脚本引用不计为已获准的正式执行能力。未保存草稿不会载入设备任务。此规则覆盖上节“普通引擎Flow新增Script”的初次实现描述。
+
+加载：目录按URL分页/筛选按需读取，Execution及日志仍沿用SSE；详情Tab、插件Docs、变量、指标按需读取；聚合缓存60s。Catalog当前对授权namespace元数据服务端筛选后分页，尚未建立独立索引投影；大目录成本需在实际规模验收，不能宣称无限规模或没有N+1开销。
+
+前端验证见`docs/flows-redesign/native-validation/result.json`；8组正式路由使用拦截synthetic API，无后端写入。后端`TestWorkspaceQueryIntegration`使用隔离keel_flows_dev数据库与本地synthetic Kestra，验证实际SQL/授权/脱敏，未连接设备。普通Go领域测试通过；cmd/api全包存在无关BOM测试失败，未删除或放宽用例。

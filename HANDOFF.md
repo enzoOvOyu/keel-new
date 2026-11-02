@@ -1,3 +1,13 @@
+## 2026-11-02 持续开发中（未发布；覆盖下方首批暂停点）
+
+用户要求直接开发到完成，当前仍在feat/jobs-kestra-ui。已新增原生Visual/Topology/YAML/Files/模板/Docs同一编辑器、原生Flow Header、Execution详情（Gantt/Attempt/目标矩阵/日志/变量/指标/谱系）、三步QuickRun和Agents；React Portal只承接现有领域组件，保留同一React会话与QueryContext。前端代码在jobs-native/Native*.vue及Host，旧Builder已改为原生容器，FlowGraph独立复用。
+
+后端workspace.go新增6个查询（catalog、execution-summary、log-search、execution insights、variables、task-documentation），OpenAPI/类型已补。Catalog由服务端授权后筛选分页/total/最近执行，state从Kestra读取；源码搜索使用引擎索引并再次交叉核对授权binding。跨执行日志只检索已持久化的脱敏flow_event，明确coverage不是全部历史。Variables按原Revision SECRET输入定义脱敏，schema缺失时遮蔽全部输入。未发布。
+
+重要纠偏：既有ValidatePolicy拒绝Worker Shell/Python插件；不放宽限制。新保存脚本改为加入受控设备steps，仍经JobService/通道/预检/审批。上个首批“可新增引擎脚本任务”被本轮纠正；原型里的Namespace/Worker引用不作为已获准的正式执行能力。
+
+正在统一收尾/验证核心前端；构建曾通过，后续修改仍需最终受影响检查。Go flows测试通过；cmd/api全包测试有无关BOM用例TestFullResumeAppliesPreviouslyPartialSheetWithoutProvider失败，未改弱/删除用例，最终需区分报告。尚待：必要浏览器/契约联调、调度补跑、Agent持久批量安装/恢复与证书轮换、API登记/正式实施报告。禁止切换现有5180/8081/5181或合并dev/main。不要因某次构建通过宣称完整交付。
+
 ## 2026-11-02 正式开发恢复：脚本文件工作台第一批
 
 分支仍为 `feat/jobs-kestra-ui`，工作区 `/home/ubuntu/keel-kestra-ui-dev`。用户已要求按原型继续正式开发；本批未发布、未合并，不改变5180/8081/5181。
