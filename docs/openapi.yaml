@@ -14167,6 +14167,11 @@ paths:
       - FlowsReal
       parameters:
       - in: query
+        name: attention
+        description: Filter executions requiring attention by captured engine states or failed, blocked or reconciling target results; does not rewrite engine state.
+        schema:
+          type: boolean
+      - in: query
         name: project_id
         schema:
           type: string
@@ -18717,6 +18722,10 @@ components:
       type: object
       additionalProperties: false
       properties:
+        name:
+          type: string
+          nullable: true
+          description: User-visible execution title from the frozen request; null for historical requests without a title.
         parent_id:
           type: string
           nullable: true
@@ -18843,6 +18852,10 @@ components:
       type: object
       additionalProperties: false
       properties:
+        name:
+          type: string
+          maxLength: 160
+          description: Optional user-visible execution title; persisted with the immutable run request.
         project_id:
           type: string
         flow_id:

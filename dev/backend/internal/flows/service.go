@@ -512,7 +512,7 @@ var highRisk = regexp.MustCompile(`(?i)\b(reboot|shutdown|poweroff|mkfs|flashrom
 
 func (s *Service) Execution(ctx context.Context, p Scope, id string) (Execution, error) {
 	var out Execution
-	e := s.DB.QueryRow(ctx, `SELECT id::text,project_id,flow_id::text,kestra_id,engine_flow_id,flow_revision,source_module,mode,requester_id::text,b.created_at,b.error_code,b.parent_id::text,(SELECT name FROM flow_binding f WHERE f.id=b.flow_id AND f.project_id=b.project_id) FROM flow_execution_binding b WHERE b.id::text=$1 AND b.project_id=ANY($2)`, id, p.Projects).Scan(&out.ID, &out.Project, &out.FlowID, &out.KestraID, &out.Flow, &out.Revision, &out.Source, &out.Mode, &out.Requester, &out.Created, &out.Error, &out.ParentID, &out.FlowName)
+	e := s.DB.QueryRow(ctx, `SELECT id::text,project_id,flow_id::text,kestra_id,engine_flow_id,flow_revision,source_module,mode,requester_id::text,b.created_at,b.error_code,b.parent_id::text,(SELECT name FROM flow_binding f WHERE f.id=b.flow_id AND f.project_id=b.project_id),NULLIF(b.request->>'name','') FROM flow_execution_binding b WHERE b.id::text=$1 AND b.project_id=ANY($2)`, id, p.Projects).Scan(&out.ID, &out.Project, &out.FlowID, &out.KestraID, &out.Flow, &out.Revision, &out.Source, &out.Mode, &out.Requester, &out.Created, &out.Error, &out.ParentID, &out.FlowName, &out.Name)
 	if e != nil {
 		return out, problem(404, "EXECUTION_NOT_FOUND")
 	}

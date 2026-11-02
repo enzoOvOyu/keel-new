@@ -196,3 +196,19 @@ Catalog新增state_counts（授权搜索/Namespace/目标筛选后、选择状�
 - 文件保存冲突保留编辑内容；已保存的 Shell/Python 文件经确认后复制为受控设备步骤的内容快照，或替换选中的设备步骤。单 command 定义首次扩展为多步骤时保留原命令。Namespace 动态执行引用继续禁用，不放宽 Worker Shell/Python 策略；当前 JobStep 没有独立文件来源绑定字段，不宣称支持文件版本自动跟随。
 - Visual、YAML、Topology、Docs 共用当前 Flow 定义；`keel.device.bash/python/command` 仅为 Docs/节点展示类型，提交给引擎的仍是原受控适配定义。Docs 按需使用既有 task-documentation 端点，不创建假插件。
 - Quick Run 的草稿字段先按 JobStep 结构限制给予即时反馈，后端仍独立校验授权、执行能力、维护态、目标版本与审批。目标/脚本/通道变更清除预检与审批；异步预检仅回填匹配当前请求的结果。创建执行固定所选目标 ID 与预检返回的目标版本。审批记录不是前端可自证的授权，启动时仍由后端核验。
+
+
+### 2026-11-02 原型复核修复：版本、上下文与目录
+
+本节仅对应feat/jobs-kestra-ui开发代码，**未部署**；不改变已有部署证据。
+
+- `FlowsRun.name`：可选、最多160字符、禁止换行；作为既有不可变request JSON的一部分持久化，不新增表/迁移。`FlowsExecution.name`读取该请求，历史缺失返回null；前端按执行名→业务Flow名→引擎ID显示。名称参与既有幂等/审批摘要，改名后重新确认，不能继续沿用旧批准。执行列表q同时支持执行名称与同项目业务Flow名称。
+- `GET /flows/executions?attention=true`：按捕获的FAILED/WARNING/PAUSED/QUEUED/KILLED引擎状态，或FAILED/BLOCKED/RECONCILING目标结果筛选。非法布尔值400；状态与设备结果不合并改写。游标仍绑定用户、授权项目及全部查询条件。“全部/运行中/需要关注”是同一目录的视图。紧凑汇总使用既有execution-summary；不支持同口径的关键词/通道/模式/发起人组合时不显示汇总，不以当前加载页冒充完整总数。
+- Execution源版本使用既有`GET /flows/executions/{executionId}/definition`，在当前页只读显示冻结定义及版本。缺失/错误不回落最新Flow。dirty Flow禁止直接运行，元数据修改也计入dirty。
+- 定义节点与TaskRun实例分开：Topology点击后仅在明确唯一时直接选择；多迭代要求选择实例。设备关联仅接受稳定asset_id、TaskRun.value中的明确ID/asset_id，不按Hostname猜测。缺少关联时只展示已有设备stdout/stderr及缺口说明，不混入其他TaskRun日志。
+- task_run、attempt、target、task_id、日志事件时间窗及指标/目标分页写入同一URL。连续Vue事件使用当前地址更新，避免后一次切Tab覆盖先一次任务筛选。目录return_to仅接受本地/flows路径，筛选/页码/列配置写URL；滚动仅存用户/权限版本/项目隔离的Query内存。
+- Files显式选择新增或替换兼容设备脚本，默认跟随当前选中的脚本任务；不能转换Log为设备脚本。引用仍是已保存版本的内容快照。辅助面板优先复用右区；不删除原生分栏/最大化能力。当前JobStep仍无独立文件来源绑定、每步description/timeout字段，不把确认弹窗里的路径/版本冒充已持久绑定。
+- Quick Run复用既有`GET /projects/{project_id}/approvals`（IdentityApproval，approval:read），显示同项目、申请人、动作、资源、目标范围匹配且未过期的approved候选。提交审批申请只获得待审记录，不自动当作批准；启动仍由Job Service复核摘要、版本、职责分离及有效签名。列表无权或记录未列出时保留显式ID入口，由后端核验。
+- 变量输出按当前对象逐层浏览，不一次递归渲染所有输出；通过已授权artifact接口预览<=1MiB UTF-8文本，HTML等不直接嵌入。产出任务只按实际Task ID定位。Execution Metrics支持服务端task_id筛选；时间控件明确只筛选**当前页已有时间戳样本**，并非全量时序查询。状态历史点击按实际事件时间窗打开日志，不生成虚假历史。
+
+证据：`docs/flows-redesign/parity-correction/result.json`（7组）、`enhancements.json`（3组）与截图；所有UI请求拦截为synthetic，没有后端/设备写入。隔离PostgreSQL的TestWorkspaceQueryIntegration覆盖attention/名称持久读取与搜索，TestExecutionTitleValidation覆盖名称约束；最终构建见HANDOFF。ZTP匹配按用户安排在Fabric联调，不计本轮缺口。

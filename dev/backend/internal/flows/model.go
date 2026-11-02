@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 type Error struct {
@@ -64,6 +65,7 @@ type Target struct {
 	SSH          string         `json:"ssh_profile_id"`
 }
 type RunRequest struct {
+	Name              string            `json:"name,omitempty"`
 	internalOperation bool              `json:"-"`
 	Steps             []JobStep         `json:"steps,omitempty"`
 	ApprovalID        string            `json:"approval_id,omitempty"`
@@ -107,6 +109,7 @@ type TargetRun struct {
 	Ended    *time.Time `json:"ended_at"`
 }
 type Execution struct {
+	Name      *string        `json:"name"`
 	FlowName  *string        `json:"flow_name"`
 	ParentID  *string        `json:"parent_id"`
 	ID        string         `json:"id"`
@@ -180,6 +183,9 @@ func Route(t Target, policy, capability string) Decision {
 	return d
 }
 func runValid(r RunRequest) error {
+	if utf8.RuneCountInString(r.Name) > 160 || strings.ContainsAny(r.Name, "\r\n") {
+		return problem(422, "EXECUTION_NAME_INVALID")
+	}
 	if _, e := PlanSteps(r.Steps); e != nil {
 		return e
 	}

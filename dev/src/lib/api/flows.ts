@@ -30,6 +30,9 @@ async function collection<T extends {id:string;project_id:string}>(path:string,p
  }
 }
 export const flowsApi = {
+ artifactURL:(project:string|null,execution:string,uri:string)=>'/api/v1/flows/executions/'+encodeURIComponent(execution)+'/artifacts?'+new URLSearchParams({path:uri,...(project?{project_id:project}:{})}),
+ artifactPreview:async(project:string|null,execution:string,uri:string)=>{const response=await fetch(flowsApi.artifactURL(project,execution,uri),{credentials:'same-origin'});if(!response.ok)throw Error('文件预览失败（'+response.status+'）');const blob=await response.blob();if(blob.size>1048576)throw Error('文件超过 1 MiB，请下载查看');return new TextDecoder('utf-8',{fatal:true}).decode(await blob.arrayBuffer())},
+ approvals:async(project:string):Promise<S['IdentityApproval'][]>=>{const response=await fetch('/api/v1/projects/'+encodeURIComponent(project)+'/approvals',{credentials:'same-origin'});const result=await response.json();if(!response.ok){if(response.status===401)window.dispatchEvent(new Event('keel-session-expired'));throw Error(result.error?.code||'APPROVALS_UNAVAILABLE')}return result.data},
  scheduleStatus:(p:string,id:string)=>request<S['FlowsScheduleStatus']>('/'+id+'/schedule/status',p),
  replayRequest:(p:string|null,id:string,mode:'all'|'failed',nonce:string)=>request<Run>('/executions/'+id+'/replay-request?'+new URLSearchParams({mode,nonce}),p),
  replay:(p:string,id:string,mode:'all'|'failed',run:Run,key:string)=>request<Execution>('/executions/'+id+'/replay',p,'POST',{mode,run},key),

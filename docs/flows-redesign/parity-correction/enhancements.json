@@ -1,0 +1,14 @@
+{
+  "at": "2026-11-02T08:47:22.749Z",
+  "scope": "focused enhancements, synthetic intercepted API; no backend/device writes",
+  "checks": [
+    "QuickRun执行名称、已批准记录选择、冻结目标版本一起提交",
+    "输出逐层浏览、授权文本预览、产出任务日志定位",
+    "指标任务筛选/日志定位及状态历史时间窗下钻"
+  ],
+  "errors": [],
+  "interceptedWrites": [
+    "/api/v1/flows/preflight",
+    "/api/v1/flows/quick-run"
+  ]
+}

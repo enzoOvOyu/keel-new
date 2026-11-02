@@ -84,3 +84,14 @@ func TestSwitchChangesCannotBypassFabricApproval(t *testing.T) {
 		}
 	}
 }
+
+func TestExecutionTitleValidation(t *testing.T) {
+	r := RunRequest{Name: "GPU inventory collection", Targets: []string{"synthetic"}, Kind: "bash", Command: "printf synthetic", Policy: "agent_only", Timeout: 60, Concurrency: 1}
+	if err := runValid(r); err != nil {
+		t.Fatal(err)
+	}
+	r.Name = "bad\nname"
+	if err := runValid(r); err == nil {
+		t.Fatal("multiline title accepted")
+	}
+}

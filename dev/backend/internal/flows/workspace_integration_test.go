@@ -145,4 +145,20 @@ func TestWorkspaceQueryIntegration(t *testing.T) {
 	if e != nil || len(logs.Items) != 0 {
 		t.Fatal("cross-project logs leaked")
 	}
+	// Name stays in the immutable existing request; attention is a server filter, not a browser count.
+	if _, err := db.Exec(ctx, `UPDATE flow_execution_binding SET engine_state='SUCCESS',request=jsonb_build_object('name','synthetic titled run') WHERE id=$1`, first); err != nil {
+		t.Fatal(err)
+	}
+	attention, err := s.ExecutionPage(ctx, scope, url.Values{"flow_id": {fid}, "attention": {"true"}})
+	if err != nil || len(attention.Items) != 1 || attention.Items[0].ID != second {
+		t.Fatalf("attention scope wrong: %+v %v", attention, err)
+	}
+	named, err := s.ExecutionPage(ctx, scope, url.Values{"flow_id": {fid}, "q": {"synthetic titled run"}})
+	if err != nil || len(named.Items) != 1 || named.Items[0].Name == nil || *named.Items[0].Name != "synthetic titled run" {
+		t.Fatalf("persisted name unavailable: %+v %v", named, err)
+	}
+	if _, err = s.ExecutionPage(ctx, scope, url.Values{"attention": {"maybe"}}); err == nil {
+		t.Fatal("invalid attention filter accepted")
+	}
+
 }

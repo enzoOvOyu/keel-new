@@ -1,0 +1,17 @@
+{
+  "at": "2026-11-02T08:40:51.330Z",
+  "scope": "focused current fixes, synthetic API intercepted; zero backend/device writes",
+  "checks": [
+    "dirty定义禁止直接运行",
+    "列表→详情→返回恢复URL筛选",
+    "源版本按Execution读取冻结定义，保留当前页面上下文",
+    "执行Topology与TaskRun/日志统一选择",
+    "无设备TaskRun关联不展示其他任务日志",
+    "60条Agent按25条切片，第二页实际切换",
+    "Files显式替换所选beta，alpha及步骤数量保持原样"
+  ],
+  "errors": [],
+  "interceptedWrites": [
+    "/api/v1/flows/00000001-1111-4111-8111-111111111111"
+  ]
+}

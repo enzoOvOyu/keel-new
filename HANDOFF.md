@@ -1,3 +1,17 @@
+## 2026-11-02 原型复核修复已实现并通过定向检查（独立分支，未部署）
+
+工作树 `/home/ubuntu/keel-kestra-ui-dev`，分支 `feat/jobs-kestra-ui`。本节与本批修复提交同批，审计基线698361a。用户要求继续开发后的实际修复覆盖下方“只审计”记录；完整状态见[原型复核修复](docs/flows-redesign/implementation.md#prototype-parity-fixes-20261102)。没有合并dev/main，没有发布或改5180/8081/5181。本任务专用5193已停止。
+
+**完成**：dirty（含名称/说明/目标类型）禁止直接运行；Execution冻结源定义只读Dialog；Topology/TaskRun/Attempt/设备日志统一URL上下文，多实例明确选择，缺失稳定ID关联不冒充设备日志；Agent/目标表/历史分页；Files新增/替换兼容任务显式选择；return_to/筛选/页码/列偏好及内存滚动；辅助面板复用右区、依赖约束下拖动、Log多行输入、START/END视觉端点；输出逐层浏览/产出任务/冻结版本/授权小文本预览；QuickRun真实执行名称、批准候选、待审提示、目标revision、输入Diff；指标任务/当前页采样时间与状态历史日志下钻。修复Router连续事件覆盖、表格切片导致选择循环、冻结编辑器Worker缺初始化、全局main样式使输出区居中缩窄。
+
+**契约与后端**：FlowsRun.name可选/FlowsExecution.name历史null，复用request JSON；执行目录attention服务端筛选并支持业务名/执行名搜索，无migration。复用既有Identity审批列表，启动仍由Job Service核验摘要/签名/权限。OpenAPI、生成类型、Provider、模块说明和108项台账已同步；旧部署证据不改变。
+
+**实际检查**：7组核心修复+3组增强浏览器交互通过，零pageerror；API拦截synthetic，零后端/设备写入。证据 `docs/flows-redesign/parity-correction/{result,enhancements}.json` 与截图。输出布局定向测量宽1032px/顶偏移0，已查看修正后截图。隔离PostgreSQL TestWorkspaceQueryIntegration及TestExecutionTitleValidation通过（attention/名称读写搜索/非法名称）；稳定ID/返回路径检查通过；台账检查108项通过；最终 `npm run build`（TypeScript+Vite）通过，Vite1m34s，保留既有chunk体积提示。没有重复全仓或真机/规模验收。
+
+**明确限制**：JobStep没有独立文件来源绑定、每步description/timeout字段；Namespace动态引用仍禁用，只用已保存内容快照。指标时间筛选仅当前页已返回时间戳样本，不是全量时序查询。真实循环/设备兼容/规模与像素级100%未验收。**ZTP事件匹配由Fabric模块开发时联调，不计本轮缺口**。
+
+**接续定位**：`flows/{FlowsWorkspace,TaskRuns,NamespaceFiles,QuickRun,FlowGraph,execution-context,useJobsSearchParams}`、`jobs-native/Native{Execution,Agents,Catalog,Files,Outputs,QuickRun,Visual,Workbench}`及Host；Go `internal/flows/{model,service,page}.go`；权威契约 `docs/openapi.yaml`，解释 `docs/api/flows.md`。后续从修复状态表继续，不重新遍历仓库，也不能把历史审计表当作仍全部未修复。
+
 ## 2026-11-02 最新：用户要求原型一致性自查，仍有未修复偏差
 
 审计基线`dff0a8a`，功能实现保持原样。本次只核查并记录，不擅自继续改造或部署。完整清单及最小整改顺序见[原型复核](docs/flows-redesign/implementation.md#prototype-parity-audit-20261102)，其中4项已浏览器复现：dirty仍可运行、源版本未定位冻结定义、Execution拓扑与TaskRun上下文分裂、Agent分页未绑定（60条全部渲染而pageSize25）。证据`docs/flows-redesign/parity-audit/result.json`及截图，零后端/设备写入、零pageerror；其他9组是定向源码确认。先前“整改完成”不可解释为整个批准原型一致性已验收。

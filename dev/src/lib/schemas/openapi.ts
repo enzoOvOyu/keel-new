@@ -6656,7 +6656,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Authorized Keel job workspace query; source and missing evidence are explicit. */
+        /** @description Read installed policy-allowed Kestra plugin documentation or built-in keel.device.bash/python/command JobStep documentation. Device identifiers are presentation types, not executable Kestra plugins. */
         get: operations["getFlowsTaskDocumentation"];
         put?: never;
         post?: never;
@@ -7309,6 +7309,8 @@ export interface components {
             online: boolean;
         };
         FlowsExecution: {
+            /** @description User-visible execution title from the frozen request; null for historical requests without a title. */
+            name?: string | null;
             parent_id: string | null;
             id: string;
             project_id: string;
@@ -7349,6 +7351,8 @@ export interface components {
             target: components["schemas"]["FlowsTarget"];
         };
         FlowsRun: {
+            /** @description Optional user-visible execution title; persisted with the immutable run request. */
+            name?: string;
             project_id: string;
             flow_id?: string;
             expected_revision?: number;
@@ -33718,6 +33722,8 @@ export interface operations {
     listRealExecutions: {
         parameters: {
             query?: {
+                /** @description Filter executions requiring attention by captured engine states or failed, blocked or reconciling target results; does not rewrite engine state. */
+                attention?: boolean;
                 project_id?: string;
                 cursor?: string;
                 q?: string;

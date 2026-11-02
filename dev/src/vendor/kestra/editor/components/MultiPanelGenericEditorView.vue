@@ -1,4 +1,4 @@
-<!-- Keel adaptation: native component imports, no external analytics; upstream49b62a2 / Apache-2.0. -->
+<!-- Keel adaptation: optional reuseLastPanelFor keeps auxiliary panels from squeezing the editor; native component imports, no external analytics; upstream49b62a2 / Apache-2.0. -->
 <template>
     <div class="main-editor">
         <MultiPanelEditorTabs :tabs="editorElements" @update:tabs="setTabValue" :openTabs="openTabs">
@@ -47,12 +47,14 @@
         editorElements: EditorElement[];
         defaultActiveTabs: string[];
         saveKey?: string;
+        reuseLastPanelFor?: string[];
         bottomVisible?: boolean;
         preSerializePanels?: (panels: Panel[]) => any;
     }>(), {
         bottomVisible: false,
         preSerializePanels: undefined,
         saveKey: undefined,
+        reuseLastPanelFor: () => [],
     })
 
     const slots = useSlots()
@@ -108,6 +110,11 @@
             return
         }
 
+        if(props.reuseLastPanelFor.includes(tabValue)&&panels.value.length>1){
+            const tab=props.editorElements.find(e=>e.uid===tabValue);
+            const last=panels.value.at(-1);
+            if(tab&&last){last.tabs.push(tab);last.activeTab=tab;return}
+        }
         const panel = getPanelFromValue(tabValue)
         if(panel){
             if(panel.prepend){
