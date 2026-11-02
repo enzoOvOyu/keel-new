@@ -30,7 +30,8 @@ func validateKickoffMappings(w bom.Workbook, regions []KickoffRegion, step int, 
 		if region == nil || !kickoffBounds(w, region.Sheet, m.Bounds) || m.Bounds.StartRow < region.Bounds.StartRow || m.Bounds.EndRow > region.Bounds.EndRow || m.Bounds.StartColumn < region.Bounds.StartColumn || m.Bounds.EndColumn > region.Bounds.EndColumn {
 			return fmt.Errorf("MAPPING_OUTSIDE_REGION: %s", m.Region)
 		}
-		key := fmt.Sprintf("%s/%s/%v", m.Region, m.Table, m.Bounds)
+		// Endpoint A and B may share a source range but bind different columns.
+		key := engineering.Digest(m)
 		if seen[key] {
 			return fmt.Errorf("DUPLICATE_MAPPING: %s", key)
 		}
@@ -227,6 +228,43 @@ func kickoffAddress(cell string) (col, row int) {
 		}
 	}
 	return
+}
+
+// Endpoint references are source-backed identities, not inferred specifications.
+// Leave all unknown specifications blank so the existing review gate applies.
+func completeKickoffPortIdentities(tables map[string][][]string) []any {
+	terms, _ := kickoffTable("terminations")
+	specs, _ := kickoffTable("port_specs")
+	index := func(t engineering.InputTable, field string) int {
+		for i, f := range t.Fields {
+			if f.Code == field {
+				return i
+			}
+		}
+		panic("unknown kickoff contract field: " + field)
+	}
+	si, pi := index(specs, "serial"), index(specs, "port")
+	seen := map[[2]string]bool{}
+	for _, r := range tables["port_specs"] {
+		seen[[2]string{strings.TrimSpace(r[si]), strings.TrimSpace(r[pi])}] = true
+	}
+	evidence := []any{}
+	for i, row := range tables["terminations"] {
+		for _, side := range []string{"a", "b"} {
+			sn := strings.TrimSpace(row[index(terms, side+"_serial")])
+			port := strings.TrimSpace(row[index(terms, side+"_port")])
+			key := [2]string{sn, port}
+			if sn == "" || port == "" || seen[key] {
+				continue
+			}
+			seen[key] = true
+			r := make([]string, len(specs.Fields))
+			r[si], r[pi] = sn, port
+			tables["port_specs"] = append(tables["port_specs"], r)
+			evidence = append(evidence, map[string]any{"target_table": "port_specs", "target_row": len(tables["port_specs"]) + 1, "source_table": "terminations", "source_row": i + 2, "side": side, "state": "identity_only_specs_need_input"})
+		}
+	}
+	return evidence
 }
 func kickoffUnit(value string) string {
 	v := strings.TrimSpace(value)

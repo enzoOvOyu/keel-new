@@ -62,6 +62,7 @@ type KickoffVerifiedCell struct {
 	RunID string `json:"run_id"`
 }
 type KickoffCheckpoint struct {
+	Missing     []string                       `json:"missing_inputs,omitempty"`
 	Verified    map[string]KickoffVerifiedCell `json:"verified_cells,omitempty"`
 	Fingerprint string                         `json:"fingerprint"`
 	Regions     []KickoffRegion                `json:"regions"`
@@ -150,13 +151,13 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 	ask := func(task string, input map[string]any, decode func([]byte) error) error {
 		history := []any{}
 		correction := false
-		for turn := 0; turn < 8; turn++ {
+		for turn := 0; turn < 9; turn++ {
 			input["history"] = boundedEngineeringHistory(history)
-			input["remaining_tool_calls"] = 7 - turn
-			input["must_finish"] = turn == 7
+			input["remaining_tool_calls"] = max(0, 6-turn)
+			input["must_finish"] = turn >= 6
 			prompt, _ := prompts.ReadFile("prompts/kickoff-v1.txt")
 			callPrompt := string(prompt) + "\nTask: " + task
-			if turn == 7 {
+			if turn >= 6 {
 				callPrompt += "\nNo read/tool calls remain. Return the final route or extraction plan now, with explicit missing_inputs for unresolved facts. Do not request another tool."
 			}
 			raw, err := p.engineeringCompletion(ctx, callPrompt, input, nil, trace, hooks.Artifact)
@@ -189,6 +190,10 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 				Inputs  []engineering.NamedValue      `json:"inputs,omitempty"`
 			}
 			_ = json.Unmarshal(raw, &action)
+			if turn >= 6 && action.Action != "" {
+				history = append(history, map[string]any{"error": "FINAL_PLAN_REQUIRED", "instruction": "Return the final plan, not another tool request."})
+				continue
+			}
 			if action.Action == "trace_formula_dependencies" {
 				if graph == nil {
 					graph = engineering.FormulaGraph(safe, nil)
@@ -283,6 +288,9 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 			if err = decode(raw); err == nil {
 				return nil
 			}
+			if traceErr := trace("kickoff_plan_validation", "failed", task+" · "+strings.SplitN(err.Error(), ":", 2)[0]); traceErr != nil {
+				return traceErr
+			}
 			if correction {
 				return err
 			}
@@ -300,6 +308,7 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 		err := ask("route", map[string]any{"sheets": sheets, "steps": engineering.StepInputCatalog()}, func(raw []byte) error {
 			var plan struct {
 				Regions []KickoffRegion `json:"regions"`
+				Missing []string        `json:"missing_inputs,omitempty"`
 			}
 			if err := kickoffDecode(raw, &plan); err != nil {
 				return err
@@ -324,6 +333,7 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 				}
 			}
 			cp.Regions = plan.Regions
+			cp.Missing = plan.Missing
 			return nil
 		})
 		if err != nil {
@@ -362,7 +372,7 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 					tables = append(tables, t)
 				}
 			}
-			err := ask(fmt.Sprintf("extract_step_%d", step), map[string]any{"regions": regions, "region_samples": kickoffSamples(safe, regions), "tables": tables, "prior_tasks": kickoffTaskIndex(cp.Tasks)}, func(raw []byte) error {
+			err := ask(fmt.Sprintf("extract_step_%d", step), map[string]any{"regions": regions, "source_regions": cp.Regions, "region_samples": kickoffSamples(safe, regions), "tables": tables, "prior_tasks": kickoffTaskIndex(cp.Tasks)}, func(raw []byte) error {
 				var proposed KickoffTaskResult
 				if err := kickoffDecode(raw, &proposed); err != nil {
 					return err
@@ -421,6 +431,7 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 		}
 	}
 	rowsByTable := map[string][][]string{}
+	result.Missing = append(result.Missing, cp.Missing...)
 	for step := 1; step <= 5; step++ {
 		task := cp.Tasks[step]
 		result.Missing = append(result.Missing, task.Missing...)
@@ -460,6 +471,15 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 		}
 		if len(r.Steps) == 0 {
 			result.Coverage = append(result.Coverage, KickoffCoverage{Region: r.ID, State: "not_applicable", Reason: r.Reason})
+		}
+	}
+	// Reuse the verified endpoint identities instead of asking the model to
+	// rediscover them for step 3. This does not supply missing port specs.
+	projected := completeKickoffPortIdentities(rowsByTable)
+	if len(projected) > 0 {
+		result.Missing = append(result.Missing, fmt.Sprintf("端口规格：从端接候选补齐%d个端口身份，介质、连接器和速率仍须来源证据或人工补充。", len(projected)))
+		if err := artifact("kickoff_port_identity_projection", projected); err != nil {
+			return result, err
 		}
 	}
 	ids := []string{}
