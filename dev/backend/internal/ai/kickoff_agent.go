@@ -152,8 +152,14 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 		correction := false
 		for turn := 0; turn < 8; turn++ {
 			input["history"] = boundedEngineeringHistory(history)
+			input["remaining_tool_calls"] = 7 - turn
+			input["must_finish"] = turn == 7
 			prompt, _ := prompts.ReadFile("prompts/kickoff-v1.txt")
-			raw, err := p.engineeringCompletion(ctx, string(prompt)+"\nTask: "+task, input, nil, trace, hooks.Artifact)
+			callPrompt := string(prompt) + "\nTask: " + task
+			if turn == 7 {
+				callPrompt += "\nNo read/tool calls remain. Return the final route or extraction plan now, with explicit missing_inputs for unresolved facts. Do not request another tool."
+			}
+			raw, err := p.engineeringCompletion(ctx, callPrompt, input, nil, trace, hooks.Artifact)
 			if err != nil {
 				if (err.Error() == "INVALID_JSON" || err.Error() == "SCHEMA_VALIDATION_FAILED" || err.Error() == "PROVIDER_OUTPUT_TRUNCATED") && !correction {
 					correction = true
