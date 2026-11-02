@@ -190,6 +190,45 @@ func ValidateNetwork(p NetworkPlan, physical PhysicalModel) []ValidationIssue {
 			}
 		}
 	}
+	for _, plane := range p.Planes {
+		if plane.Profile == "" || plane.Profile == "ethernet" {
+			continue
+		}
+		if plane.Profile != "ipv4-bgp" && plane.Profile != "ipv6-bgp" {
+			add("NETWORK_PROFILE_UNSUPPORTED", plane.ID, "配置集尚无明确校验规则")
+			continue
+		}
+		count := 0
+		for _, iface := range p.InterfaceMappings {
+			if iface.PlaneID != plane.ID {
+				continue
+			}
+			count++
+			hasIP, hasNeighbor := false, false
+			for _, allocation := range p.Allocations {
+				if allocation.Kind == "ip" && allocation.InterfaceID != nil && *allocation.InterfaceID == iface.ID && allocation.Address != nil {
+					address, e := netip.ParseAddr(*allocation.Address)
+					if e == nil && ((plane.Profile == "ipv4-bgp" && address.Is4()) || (plane.Profile == "ipv6-bgp" && address.Is6())) {
+						hasIP = true
+					}
+				}
+			}
+			for _, session := range p.BGP {
+				if (session.AInterfaceID == iface.ID || session.ZInterfaceID == iface.ID) && session.SAFI == "unicast" && ((plane.Profile == "ipv4-bgp" && session.AFI == "ipv4") || (plane.Profile == "ipv6-bgp" && session.AFI == "ipv6")) {
+					hasNeighbor = true
+				}
+			}
+			if !hasIP {
+				add("NETWORK_PROFILE_ADDRESS_REQUIRED", iface.ID, "所选BGP配置集需要对应地址族的接口地址")
+			}
+			if !hasNeighbor {
+				add("NETWORK_PROFILE_NEIGHBOR_REQUIRED", iface.ID, "所选BGP配置集需要明确邻居")
+			}
+		}
+		if count == 0 {
+			add("NETWORK_PROFILE_INTERFACES_REQUIRED", plane.ID, "所选BGP配置集需要接口映射")
+		}
+	}
 	return issues
 }
 

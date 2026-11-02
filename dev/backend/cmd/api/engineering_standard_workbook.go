@@ -98,6 +98,9 @@ func (s *Server) importStandardWorkbook(ctx context.Context, w engineering.Works
 			return e
 		}
 	}
+	if e = s.bindStandardNetworkContext(ctx, w.ID, &m); e != nil {
+		return e
+	}
 	var raw []byte
 	var proposal engineering.EngineeringProposal
 	if e = s.db.QueryRow(ctx, `SELECT proposal FROM eng_revision WHERE id=$1`, *w.HeadRevisionID).Scan(&raw); e != nil {

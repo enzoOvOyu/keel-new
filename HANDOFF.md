@@ -1,3 +1,7 @@
+## 已完成里程碑事件：核心网络标准导入、审核发布与Golden读取
+
+network_planes/roles/interfaces/addresses/asns/bgp六类表已接入固定输入通路，关联既有设备/端口、保留明确IP/ASN/邻居。平面profile通过042存储，ethernet/ipv4-bgp/ipv6-bgp有明确门禁，缺地址/邻居不放行；新计划冻结本任务已发布物理连接版本，未发布时保留阻断草稿。隔离8093 API和测试库实际完成04-network.xlsx持久化核对、NETWORK_REVISION审核/Outbox发布与Golden读取，见[网络测试](docs/intelligent-deployment/NETWORK-STANDARD-TEST-20261102.json)。现网未部署，042仅应用隔离库。VLAN/VRF接口及BFD/QoS/AR/EVPN固定子表仍未接入；完整布线、电力、分步Agent和整体验收仍未完成，不以本切片代替整体交付。
+
 ## 已完成里程碑事件：五步合成XLSX与前两步隔离业务闭环验证
 
 用户最新要求完成全部业务和Agent后自行生成各步XLSX测试。已生成五份纯合成XLSX及独立预期（internal/engineering/testdata/five-step），新增原生读写器、标准XLSX预览/整步原子合并API与工作台入口。所有列保持文本、未知表/额外列/未验证公式不静默忽略；下载模板表名已与读取契约统一。端口规格/Breakout/配线路径增量输入及连接器字段持久化（041）已实现；允许通道最短路径、显式余量、标准长度选择内核有独立算例，尚未接入完整布线链。

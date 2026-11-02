@@ -40,6 +40,9 @@ func (s *Server) importStandardInput(ctx context.Context, w engineering.Workspac
 	if e != nil {
 		return e
 	}
+	if e = s.bindStandardNetworkContext(ctx, w.ID, &next); e != nil {
+		return e
+	}
 	var raw []byte
 	var proposal engineering.EngineeringProposal
 	if e = s.db.QueryRow(ctx, `SELECT proposal FROM eng_revision WHERE id=$1`, *w.HeadRevisionID).Scan(&raw); e != nil {
@@ -163,4 +166,32 @@ func (s *Server) resolveStandardInputIdentities(ctx context.Context, m engineeri
 		m.Ports = append(m.Ports, engineering.PlannedPort{EntityVersion: engineering.EntityVersion{EntityID: id, Maturity: engineering.Estimated, EvidenceIDs: []string{}, Attributes: []engineering.AttributeValue{}}, EquipmentID: device, Name: name, MAC: mac})
 	}
 	return m, rows.Err()
+}
+
+// Bind an explicit immutable published physical snapshot; never substitute a
+// different task or infer network parameters from physical connectivity.
+func (s *Server) bindStandardNetworkContext(ctx context.Context, source string, m *engineering.PhysicalModel) error {
+	for i := range m.NetworkPlans {
+		p := &m.NetworkPlans[i]
+		if !engineering.NetworkHasContent(*p) {
+			continue
+		}
+		if len(p.SourceIDs) == 0 {
+			p.SourceIDs = []string{source}
+		}
+		if p.PhysicalRevisionID != "" {
+			continue
+		}
+		options, e := s.engineeringPhysicalRevisions(ctx)
+		if e != nil {
+			return e
+		}
+		for _, option := range options {
+			if option.SourceID == source && option.Target == engineering.ConnectivityTarget {
+				p.PhysicalRevisionID = option.RevisionID
+				break
+			}
+		}
+	}
+	return nil
 }

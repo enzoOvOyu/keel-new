@@ -1,4 +1,14 @@
 export const engineeringMessages: Record<string, string> = {
+ STEP_NETWORK_REFERENCE_AMBIGUOUS: '网络引用匹配多个对象，请使用明确的设备、平面或接口引用。',
+ STEP_NETWORK_PLANE_REQUIRED: '请先补充网络域/平面，并核对所属Fabric。',
+ STEP_NETWORK_INTERFACE_REQUIRED: '请先补充接口映射，并使用明确的设备/接口引用。',
+ STEP_NETWORK_ASN_REQUIRED: '邻居引用的ASN与分配表不一致，请先核对分配。',
+ STEP_NETWORK_ASN_INVALID: 'ASN须在1至4294967295范围内。',
+ STEP_NETWORK_ADDRESS_INVALID: '请填写有效的接口地址和前缀，例如192.0.2.0/31。',
+ STEP_NETWORK_ADDRESS_FAMILY_REQUIRED: '地址族请使用AFI-SAFI格式，例如ipv4-unicast。',
+ STEP_NETWORK_PROFILE_UNSUPPORTED: '标准入口当前支持ethernet、ipv4-bgp和ipv6-bgp配置集。',
+ STEP_NETWORK_VLAN_VRF_REQUIRES_MODEL: '此标准入口尚未接入VLAN/VRF接口引用，请先完成对应模型关联。',
+
  STEP_XLSX_INVALID: '无法读取XLSX，请检查文件格式或重新保存。',
  STEP_UNKNOWN_SHEET: '工作表名称不符合本步骤模板，请使用对应模板。',
  STEP_EXTRA_COLUMNS: '资料存在模板之外的列，请先核对，系统不会丢弃额外信息。',

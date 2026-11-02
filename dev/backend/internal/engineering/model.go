@@ -322,6 +322,7 @@ type NetworkPlane struct {
 	FabricID    ID     `json:"fabric_id"`
 	Name        string `json:"name"`
 	EvidenceIDs []ID   `json:"evidence_ids"`
+	Profile     string `json:"profile,omitempty"`
 }
 type DeviceRole struct {
 	EquipmentID ID     `json:"equipment_id"`

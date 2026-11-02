@@ -45255,11 +45255,15 @@ components:
           type: string
         name:
           type: string
+        profile:
+          type: string
+          description: Explicit standard input configuration profile; empty for legacy
+            manual plans
       required:
-      - id
-      - fabric_id
-      - name
-      - evidence_ids
+        - id
+        - fabric_id
+        - name
+        - evidence_ids
       type: object
       x-implementation-status: model-contract-only
     IDEPhysicalModel:
@@ -47647,6 +47651,12 @@ components:
             - placements
             - port_specs
             - patch_paths
+            - network_planes
+            - network_roles
+            - network_interfaces
+            - network_addresses
+            - network_asns
+            - network_bgp
         csv:
           type: string
         expected_revision:

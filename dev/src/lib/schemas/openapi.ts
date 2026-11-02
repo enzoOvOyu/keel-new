@@ -16164,6 +16164,8 @@ export interface components {
             fabric_id: string;
             id: string;
             name: string;
+            /** @description Explicit standard input configuration profile; empty for legacy manual plans */
+            profile?: string;
         };
         /** @description Read aggregate assembled from typed domain tables. Not a persistence JSON payload. First vertical slice: equipment, assemblies, facilities and placements. */
         IDEPhysicalModel: {
@@ -16910,7 +16912,7 @@ export interface components {
         };
         IDEStandardInputRequest: {
             /** @enum {string} */
-            table_id: "terminations" | "rooms" | "racks" | "equipment_specs" | "placements" | "port_specs" | "patch_paths";
+            table_id: "terminations" | "rooms" | "racks" | "equipment_specs" | "placements" | "port_specs" | "patch_paths" | "network_planes" | "network_roles" | "network_interfaces" | "network_addresses" | "network_asns" | "network_bgp";
             csv: string;
             expected_revision: number;
             reason: string;

@@ -52,7 +52,7 @@ func StepInputCatalog() InputCatalog {
 	add := func(id string, step int, name, condition, spec string) {
 		t := InputTable{ID: id, Step: step, Name: name, Condition: condition, Fields: []InputField{}}
 		switch id {
-		case "terminations", "rooms", "racks", "equipment_specs", "placements", "port_specs", "patch_paths":
+		case "terminations", "rooms", "racks", "equipment_specs", "placements", "port_specs", "patch_paths", "network_planes", "network_roles", "network_interfaces", "network_addresses", "network_asns", "network_bgp":
 			t.SupportsConfirmation = true
 		}
 		for _, s := range strings.Split(spec, "|") {
@@ -81,7 +81,7 @@ func StepInputCatalog() InputCatalog {
 	add("cable_specs", 3, "线缆规格", "可采购长度按同一规格逐行填写。", "code:规格编码|medium:介质|connector_a:本端连接器|connector_b:对端连接器|rate:支持速率:positive|rate_unit:速率单位|length:可采购长度:positive|unit:长度单位|optic_mode:模块需求方式")
 	add("optic_specs", 3, "光模块规格", "根据端口和产品规则匹配，不固定每端一个模块。", "model:型号|port_type:端口类型|medium:介质|rate:速率:positive|rate_unit:速率单位|distance:适用距离:positive|unit:长度单位")
 	add("cabling_rules", 3, "布线规则", "参数和公式需独立校验审批；不能直接执行任意代码。", "code:规则编码|version:版本:positive_integer|strategy:路径策略|lead_rule:引线参数规则|slack_rule:余量参数规则|length_rule:标准长度选择规则|source:来源")
-	add("network_planes", 4, "网络域与平面", "仅声明客户实际选用的网络配置集。", "fabric:Fabric编码|type:类型|plane:Plane编码|profile:配置集")
+	add("network_planes", 4, "网络域与平面", "配置集填ethernet、ipv4-bgp或ipv6-bgp；BGP配置集必须提供地址、ASN和邻居。", "fabric:Fabric编码|type:类型|plane:Plane编码|profile:配置集")
 	add("network_roles", 4, "设备角色", "引用已经确认的设备。", "serial:设备SN|fabric:Fabric编码|plane:Plane编码|role:角色")
 	add("network_interfaces", 4, "接口映射", "VLAN/VRF仅在使用时填写，不从物理线缆推断。", "serial:设备SN|port:物理端口|interface:逻辑接口|domain:网络域|vlan?:VLAN|vrf?:VRF")
 	add("network_addresses", 4, "地址分配", "必须来自明确规划或已批准地址池。", "serial:设备SN|interface:接口|address:地址及前缀|purpose:用途|source:分配依据")
