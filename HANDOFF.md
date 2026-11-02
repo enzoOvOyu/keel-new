@@ -1,3 +1,11 @@
+## 已完成里程碑事件：智能开局工作台界面与建模交互对齐原型
+
+仅调整智能开局业务前端：五个工作区入口、五步输入/产物导航、由真实契约生成的集中建模卡片、CSV逐行编辑、三类发布域概览及未运行的gptsol6.1基准说明。保留现有来源、模型、计算、权限、版本和分域审核/发布接口。改动位于EngineeringWorkbench、EngineeringStudio、EngineeringStepInputs、engineeringInputCSV、EngineeringCalculationPanel及对应样式。
+
+TypeScript检查通过。隔离浏览器以合成响应验证29类输入卡片、建模表编辑、后端问题反馈、五步导航、审核及基准入口，页面异常为0；CSV引号/换行/零值/未闭合引号定向检查通过。截图及范围见[界面对齐记录](docs/intelligent-deployment/workbench-alignment/validation.json)。此检查不代表真实资料、模型、入库或发布验收；5180/8081未部署本次修改。
+
+仍有差距：新分步Agent、预填补充XLSX生成、友好的项目规则参数模板、跨资料批量合并以及真实交付主链接入。本次没有把这些原型设计能力伪装成已实现；后续按KICKOFF-STUDIO-IMPLEMENTATION.txt继续纵向业务切片。
+
 ## 已完成里程碑事件：开局工程独立交互原型与实施方案
 
 用户本轮只要求设计原型和可交给 Codex 的实施方案，已再次明确不开发真实 Agent/后端。本轮交付独立目录 `dev/prototypes/kickoff-studio/`，主路由 `/kickoff-studio`，本地5081（tmux `keel-kickoff-prototype-5081`）。现有应用入口、OpenAPI/生成SDK与Go业务代码无变更，5180/8081现网未切换。

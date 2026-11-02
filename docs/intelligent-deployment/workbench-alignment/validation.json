@@ -1,0 +1,27 @@
+{
+  "scope": "Smart kickoff workbench UI alignment; isolated browser responses",
+  "implemented": [
+    "five workspace navigation areas",
+    "five step input/output navigation",
+    "centralized modeling cards from real input catalog",
+    "editable CSV rows before server validation",
+    "real source/revision/review/publish API reuse",
+    "three publication domain summaries",
+    "gptsol6.1 baseline visibly not run"
+  ],
+  "checks": {
+    "typescript": "PASS: tsc --noEmit -p dev/tsconfig.json",
+    "browser_navigation_and_modeling": "PASS",
+    "csv_quoted_fields_newlines_zero_invalid_quote": "PASS",
+    "page_errors": 0,
+    "production_writes": 0
+  },
+  "limitations": [
+    "Existing single-source upload and per-step workbook merging retained; new triage and scoped extraction Agents not implemented",
+    "Rule creation still uses existing expression editor; project parameter-template packaging not implemented",
+    "No consolidated supplemental XLSX generation API",
+    "Real delivery-chain consumption not implemented",
+    "No real provider or end-to-end import test in this task",
+    "Not deployed to 5180/8081"
+  ]
+}
