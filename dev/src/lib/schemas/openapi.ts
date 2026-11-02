@@ -4,6 +4,22 @@
  */
 
 export interface paths {
+    "/projects/{projectId}/kickoff/publications/{publicationId}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getKickoffPublicationStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/projects/{projectId}/kickoff/history": {
         parameters: {
             query?: never;
@@ -18232,6 +18248,50 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    getKickoffPublicationStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                publicationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Lightweight publication receipt */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: string;
+                            /** @enum {string} */
+                            state: "pending" | "published" | "failed";
+                            errorCode: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Insufficient permission */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Publication not found in project */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     replayKickoffHistoricalSource: {
         parameters: {
             query?: never;
