@@ -288,15 +288,11 @@ func (s Service) PutRelation(ctx context.Context, tx pgx.Tx, schema Schema, in R
 	if !matches(sourceKind, d.SourceTypes) || !matches(targetKind, d.TargetTypes) {
 		return "", Reject("RELATIONSHIP_ENDPOINT_TYPE", 422)
 	}
-	// Shared transaction lock serializes cardinality checks for either endpoint.
-	locks := []string{in.SourceID, in.TargetID}
-	if locks[0] > locks[1] {
-		locks[0], locks[1] = locks[1], locks[0]
-	}
-	for _, id := range locks {
-		if _, e = tx.Exec(ctx, "SELECT pg_advisory_xact_lock(hashtextextended($1,14))", id); e != nil {
-			return "", e
-		}
+	// Serialize endpoint cardinality checks using existing asset rows. Row locks
+	// do not consume one shared advisory-lock entry per imported port/connection.
+	// The stable order also applies when two writers provide reversed endpoints.
+	if _, e = tx.Exec(ctx, "SELECT item_uid FROM cmdb_entity WHERE item_uid=ANY($1) ORDER BY item_uid FOR UPDATE", []string{in.SourceID, in.TargetID}); e != nil {
+		return "", e
 	}
 	if d.Name == "contains" || d.Name == "parent" {
 		var cycle, limited bool

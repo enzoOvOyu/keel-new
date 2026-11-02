@@ -1,0 +1,26 @@
+{
+  "release_commit": "70232c90a35152f338d17cf054251d9c0bfe20fd",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-70232c9",
+  "url": "http://localhost:5180/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/kickoff/overview",
+  "api": "127.0.0.1:8081",
+  "project_count_before_after": [
+    4,
+    4
+  ],
+  "migrations": [
+    48,
+    49,
+    50
+  ],
+  "agent_implemented": false,
+  "binary_sha256": "f45144e0ab3e0a804eb5cd0c9a236a13d21401b31f0b789762619fce4da82976",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/jobs-ui-20261102",
+  "status": "deployed",
+  "self_check": {
+    "backend": "PASS",
+    "ui": "PASS",
+    "prototype_metrics": "PASS",
+    "agent_implemented": false
+  },
+  "binary_matches": true
+}
