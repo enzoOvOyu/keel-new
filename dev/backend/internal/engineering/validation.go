@@ -192,7 +192,7 @@ func ValidatePhysical(m PhysicalModel) []ValidationIssue {
 	}
 	for _, f := range m.Facilities {
 		checkVersion(f.EntityVersion, facTarget, "facility_placement")
-		if f.Label == "" {
+		if f.Label == "" && f.Code == "" {
 			issue("FACILITY_LABEL_REQUIRED", facTarget, "facility_placement", "label", "位置名称缺失", f.EntityVersion)
 		}
 		want := ""
@@ -244,7 +244,7 @@ func ValidatePhysical(m PhysicalModel) []ValidationIssue {
 			issue("MULTIPLE_PLACEMENTS", locTarget, "facility_placement", "equipment_id", "同一设备存在多个规划位置", p.EntityVersion)
 		}
 		placed[p.EquipmentID] = true
-		if p.InstallationType == "non_u" {
+		if p.UsesNonUPosition() {
 			if p.PositionCode == "" || p.StartU != nil || p.HeightU != nil {
 				issue("NON_U_POSITION_REQUIRED", locTarget, "facility_placement", "position_code", "非U安装须提供位置编码，不能混用U位", p.EntityVersion)
 			}
@@ -261,7 +261,7 @@ func ValidatePhysical(m PhysicalModel) []ValidationIssue {
 			issue("PLACEMENT_HEIGHT_CONFLICT", locTarget, "facility_placement", "height_u", "设备规格高度与落位占用不一致", p.EntityVersion)
 		}
 		switch p.MountFace {
-		case "front", "rear", "both", "unknown":
+		case "", "front", "rear", "both", "unknown":
 		default:
 			issue("MOUNT_FACE_INVALID", locTarget, "facility_placement", "mount_face", "安装面类型无效", p.EntityVersion)
 		}
@@ -271,7 +271,7 @@ func ValidatePhysical(m PhysicalModel) []ValidationIssue {
 	}
 	positionCodes := map[string]bool{}
 	for _, p := range m.Placements {
-		if p.InstallationType == "non_u" && p.PositionCode != "" {
+		if p.UsesNonUPosition() && p.PositionCode != "" {
 			key := p.RackID + "/" + p.PositionCode
 			if positionCodes[key] {
 				issue("NON_U_POSITION_OCCUPIED", locTarget, "facility_placement", "position_code", "非U安装位置重复占用", p.EntityVersion)

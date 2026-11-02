@@ -192,6 +192,11 @@ type RackPlacement struct {
 	PositionCode     string  `json:"position_code,omitempty"`
 	DepthMM          *string `json:"depth_mm,omitempty"`
 }
+
+func (p RackPlacement) UsesNonUPosition() bool {
+	return p.InstallationType == "non_u" || p.InstallationType == "" && p.PositionCode != "" && p.StartU == nil && p.HeightU == nil
+}
+
 type EquipmentPowerProfile struct {
 	EquipmentID ID       `json:"equipment_id"`
 	Basis       string   `json:"basis"`

@@ -63,10 +63,19 @@ func (s *Server) modelingInputs(ctx context.Context, w engineering.Workspace, wi
 		if err = json.Unmarshal(issues, &v.Issues); err != nil {
 			break
 		}
-		if v.TableID == "terminations" {
+		{
+			required := map[string]bool{}
+			for _, table := range engineering.StepInputCatalog().Tables {
+				if table.ID == v.TableID {
+					for _, f := range table.Fields {
+						required[f.Code] = f.Required
+					}
+					break
+				}
+			}
 			current := v.Issues[:0]
 			for _, issue := range v.Issues {
-				if issue.Field != "termination_type" && !(issue.Field == "b_rack_position" && issue.Code == "REQUIRED") {
+				if !(v.TableID == "terminations" && issue.Field == "termination_type") && !(issue.Code == "REQUIRED" && !required[issue.Field]) {
 					current = append(current, issue)
 				}
 			}

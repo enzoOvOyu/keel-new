@@ -9,6 +9,9 @@ import (
 )
 
 func MergeStandardInput(current PhysicalModel, q InputPreviewRequest) (PhysicalModel, error) {
+	if preview := PreviewStepInput(q); preview.Valid && len(preview.Rows) == 0 {
+		return current, nil
+	}
 	if strings.HasPrefix(q.TableID, "power_") || q.TableID == "rack_capacity" {
 		return mergePowerInput(current, q)
 	}
@@ -43,6 +46,9 @@ func MergeStandardInput(current PhysicalModel, q InputPreviewRequest) (PhysicalM
 	}
 	// Codes are resolved within their parent, never by an unqualified rack name.
 	find := func(kind, code, parent string) (int, error) {
+		if code == "" {
+			return -1, nil
+		}
 		found := -1
 		for i, v := range next.Facilities {
 			p := ""
@@ -57,6 +63,67 @@ func MergeStandardInput(current PhysicalModel, q InputPreviewRequest) (PhysicalM
 			}
 		}
 		return found, nil
+	}
+	only := func(kind, parent string) int {
+		found := -1
+		for i, f := range next.Facilities {
+			if f.Kind != kind || parent != "" && (f.ParentID == nil || *f.ParentID != parent) {
+				continue
+			}
+			if found >= 0 {
+				return -1
+			}
+			found = i
+		}
+		return found
+	}
+	roomFor := func(code string) (int, error) {
+		if code == "" {
+			return only("room", ""), nil
+		}
+		room, err := find("room", code, "")
+		if err == nil && room < 0 {
+			err = fmt.Errorf("STEP_ROOM_REQUIRED")
+		}
+		return room, err
+	}
+	rackFor := func(room int, code, label string) (int, error) {
+		parent := ""
+		if room >= 0 {
+			parent = next.Facilities[room].EntityID
+		}
+		key := code
+		if key == "" {
+			key = label
+		}
+		if key == "" {
+			return only("rack", parent), nil
+		}
+		rack, err := find("rack", key, parent)
+		if err == nil && rack < 0 && label != "" && label != key {
+			rack, err = find("rack", label, parent)
+		}
+		if err != nil {
+			return -1, err
+		}
+		if rack < 0 && parent != "" {
+			for i, f := range next.Facilities {
+				if f.Kind == "rack" && f.ParentID == nil && (f.Code == key || f.Code == "" && (f.Label == key || label != "" && f.Label == label)) {
+					if rack >= 0 {
+						return -1, fmt.Errorf("STEP_FACILITY_AMBIGUOUS")
+					}
+					rack = i
+				}
+			}
+		}
+		if rack < 0 {
+			rack = len(next.Facilities)
+			next.Facilities = append(next.Facilities, FacilityModel{EntityVersion: version("rack_code", parent+"/"+key), Kind: "rack", Code: code, Label: label})
+		}
+		if parent != "" {
+			next.Facilities[rack].ParentID = &parent
+		}
+		return rack, nil
 	}
 	integer := func(s string) (*int, error) {
 		if s == "" {
@@ -81,37 +148,79 @@ func MergeStandardInput(current PhysicalModel, q InputPreviewRequest) (PhysicalM
 		}
 		switch q.TableID {
 		case "rooms":
-			site, e := find("site", v[0], "")
+			siteKey := v[0]
+			if siteKey == "" {
+				siteKey = v[1]
+			}
+			site, e := find("site", siteKey, "")
+			if e == nil && site < 0 && v[1] != "" && v[1] != siteKey {
+				site, e = find("site", v[1], "")
+			}
 			if e != nil {
 				return current, e
 			}
-			if site < 0 {
+			if siteKey == "" {
+				site = only("site", "")
+			}
+			if site < 0 && siteKey != "" {
 				site = len(next.Facilities)
-				next.Facilities = append(next.Facilities, FacilityModel{EntityVersion: version("site_code", v[0]), Kind: "site", Code: v[0], Label: v[1]})
-			} else {
-				next.Facilities[site].Code = v[0]
-				next.Facilities[site].Label = v[1]
+				next.Facilities = append(next.Facilities, FacilityModel{EntityVersion: version("site_code", siteKey), Kind: "site", Code: v[0], Label: v[1]})
 			}
-			parent := next.Facilities[site].EntityID
-			for _, existing := range next.Facilities {
-				if existing.Kind == "room" && existing.Code == v[2] && (existing.ParentID == nil || *existing.ParentID != parent) {
-					return current, fmt.Errorf("STEP_FACILITY_AMBIGUOUS")
+			parent := ""
+			if site >= 0 {
+				f := &next.Facilities[site]
+				if v[0] != "" {
+					f.Code = v[0]
 				}
+				if v[1] != "" {
+					f.Label = v[1]
+				}
+				parent = f.EntityID
 			}
-			room, e := find("room", v[2], parent)
+			roomKey := v[2]
+			if roomKey == "" {
+				roomKey = v[3]
+			}
+			room, e := find("room", roomKey, parent)
+			if e == nil && room < 0 && v[3] != "" && v[3] != roomKey {
+				room, e = find("room", v[3], parent)
+			}
 			if e != nil {
 				return current, e
+			}
+			if roomKey == "" {
+				room = only("room", parent)
+			}
+			if room < 0 && roomKey == "" {
+				continue
+			}
+			if room < 0 && parent != "" {
+				for i, f := range next.Facilities {
+					if f.Kind == "room" && f.ParentID == nil && (f.Code == roomKey || f.Code == "" && (f.Label == roomKey || v[3] != "" && f.Label == v[3])) {
+						if room >= 0 {
+							return current, fmt.Errorf("STEP_FACILITY_AMBIGUOUS")
+						}
+						room = i
+					}
+				}
 			}
 			if room < 0 {
 				room = len(next.Facilities)
-				next.Facilities = append(next.Facilities, FacilityModel{EntityVersion: version("room_code", parent+"/"+v[2]), Kind: "room", Code: v[2], Label: v[3], ParentID: &parent})
-			} else {
-				next.Facilities[room].Code = v[2]
-				next.Facilities[room].Label = v[3]
+				next.Facilities = append(next.Facilities, FacilityModel{EntityVersion: version("room_code", parent+"/"+roomKey), Kind: "room", Code: v[2], Label: v[3]})
+			}
+			f := &next.Facilities[room]
+			if v[2] != "" {
+				f.Code = v[2]
+			}
+			if v[3] != "" {
+				f.Label = v[3]
+			}
+			if parent != "" {
+				f.ParentID = &parent
 			}
 			if v[4] != "" {
 				frame := StableID(current.ProjectID, "coordinate-frame", v[4])
-				next.Facilities[room].CoordinateFrameID = &frame
+				f.CoordinateFrameID = &frame
 			}
 			if v[5] != "" {
 				dimension, _ := unitScale(v[5])
@@ -119,26 +228,29 @@ func MergeStandardInput(current PhysicalModel, q InputPreviewRequest) (PhysicalM
 					return current, fmt.Errorf("STEP_COORDINATE_UNIT_INVALID")
 				}
 			}
+
 		case "racks":
-			room, e := find("room", v[0], "")
+			room, e := roomFor(v[0])
 			if e != nil {
 				return current, e
 			}
-			if room < 0 {
-				return current, fmt.Errorf("STEP_ROOM_REQUIRED")
-			}
-			parent := next.Facilities[room].EntityID
-			rack, e := find("rack", v[1], parent)
+			rack, e := rackFor(room, v[1], v[2])
 			if e != nil {
 				return current, e
 			}
+			// A row without a unique physical reference remains in its immutable
+			// standard input. Do not manufacture a rack code or an empty identity.
 			if rack < 0 {
-				rack = len(next.Facilities)
-				next.Facilities = append(next.Facilities, FacilityModel{EntityVersion: version("rack_code", parent+"/"+v[1]), Kind: "rack", Code: v[1], ParentID: &parent})
+				continue
 			}
 			r := &next.Facilities[rack]
-			r.Label = v[2]
-			r.Code = v[1]
+			if v[2] != "" {
+				r.Label = v[2]
+			}
+			if v[1] != "" {
+				r.Code = v[1]
+			}
+
 			if v[3] != "" {
 				r.CapacityU, e = integer(v[3])
 				if e != nil {
@@ -158,7 +270,7 @@ func MergeStandardInput(current PhysicalModel, q InputPreviewRequest) (PhysicalM
 			if v[7] != "" {
 				frame := StableID(current.ProjectID, "coordinate-frame", v[7])
 				r.CoordinateFrameID = &frame
-			} else if r.CoordinateFrameID == nil {
+			} else if r.CoordinateFrameID == nil && room >= 0 {
 				r.CoordinateFrameID = next.Facilities[room].CoordinateFrameID
 			}
 			for index := 0; index < 3; index++ {
@@ -229,26 +341,38 @@ func MergeStandardInput(current PhysicalModel, q InputPreviewRequest) (PhysicalM
 				return current, fmt.Errorf("STEP_EQUIPMENT_REQUIRED")
 			}
 			equipment := next.Equipment[found].EntityID
-			room, e := find("room", v[1], "")
+			room, e := roomFor(v[1])
 			if e != nil {
 				return current, e
 			}
-			if room < 0 {
-				return current, fmt.Errorf("STEP_ROOM_REQUIRED")
-			}
-			rack, e := find("rack", v[2], next.Facilities[room].EntityID)
-			if e != nil {
-				return current, e
+			rack := -1
+			if v[2] == "" {
+				for _, old := range next.Placements {
+					if old.EquipmentID == equipment {
+						for i, f := range next.Facilities {
+							if f.EntityID == old.RackID {
+								rack = i
+							}
+						}
+					}
+				}
 			}
 			if rack < 0 {
-				return current, fmt.Errorf("STEP_RACK_REQUIRED")
+				rack, e = rackFor(room, v[2], "")
+				if e != nil {
+					return current, e
+				}
 			}
-			if v[3] != "u" && v[3] != "non_u" {
+			if rack < 0 {
+				continue
+			}
+			if v[3] != "" && v[3] != "u" && v[3] != "non_u" {
 				return current, fmt.Errorf("STEP_INSTALLATION_TYPE_REQUIRED")
 			}
-			if v[6] != "front" && v[6] != "rear" && v[6] != "both" && v[6] != "unknown" {
+			if v[6] != "" && v[6] != "front" && v[6] != "rear" && v[6] != "both" && v[6] != "unknown" {
 				return current, fmt.Errorf("STEP_MOUNT_FACE_INVALID")
 			}
+
 			start, e := integer(v[4])
 			if e != nil {
 				return current, e
@@ -280,6 +404,12 @@ func MergeStandardInput(current PhysicalModel, q InputPreviewRequest) (PhysicalM
 				next.Placements = append(next.Placements, p)
 			} else {
 				p.EntityVersion = next.Placements[existing].EntityVersion
+				if p.InstallationType == "" {
+					p.InstallationType = next.Placements[existing].InstallationType
+				}
+				if p.MountFace == "" {
+					p.MountFace = next.Placements[existing].MountFace
+				}
 				next.Placements[existing] = p
 			}
 		}

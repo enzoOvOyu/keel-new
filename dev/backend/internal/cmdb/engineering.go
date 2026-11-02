@@ -187,7 +187,11 @@ func (s Service) ProjectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 			if v.CoordinateFrameID != nil {
 				attrs["coordinate_frame_id"] = *v.CoordinateFrameID
 			}
-			if e = projectAsset(v.EntityID, kind, v.Label, attrs); e != nil {
+			name := v.Label
+			if name == "" {
+				name = v.Code
+			}
+			if e = projectAsset(v.EntityID, kind, name, attrs); e != nil {
 				return e
 			}
 		}
@@ -271,7 +275,7 @@ func (s Service) ProjectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 		}
 		for _, v := range m.Placements {
 			eq, ok := equipment[v.EquipmentID]
-			if !ok || (v.InstallationType != "non_u" && (v.StartU == nil || v.HeightU == nil)) || (v.InstallationType == "non_u" && v.PositionCode == "") {
+			if !ok || (!v.UsesNonUPosition() && (v.StartU == nil || v.HeightU == nil)) || (v.UsesNonUPosition() && v.PositionCode == "") {
 				return Reject("PLACEMENT_INCOMPLETE", 422)
 			}
 			var kind string
@@ -279,7 +283,7 @@ func (s Service) ProjectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 				return e
 			}
 			attrs := map[string]any{"rack_uid": v.RackID, "rack_id": v.RackID, "mounting_face": v.MountFace, "depth_mm": number(v.DepthMM), "installation_type": v.InstallationType, "position_code": v.PositionCode}
-			if v.InstallationType != "non_u" {
+			if !v.UsesNonUPosition() {
 				attrs["u_start"] = float64(*v.StartU)
 				attrs["u_height"] = float64(*v.HeightU)
 			}

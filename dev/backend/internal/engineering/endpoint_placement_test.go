@@ -38,8 +38,16 @@ func TestEndpointIdentityAdoptionDoesNotRequirePlacement(t *testing.T) {
 	if err != nil || len(m.Connections) != 1 || len(m.Equipment) != 2 || len(m.Placements) != 0 {
 		t.Fatalf("identity is still gated by placement: %v", err)
 	}
-	if _, err = MergeStandardInput(m, standardRequest("placements", []string{"S1", "", "Rack-A", "u", "12", "1", "front", ""})); err == nil {
-		t.Fatal("formal placement bypassed room prerequisite")
+	partial, err := MergeStandardInput(m, standardRequest("placements", []string{"S1", "", "Rack-A", "u", "12", "1", "front", ""}))
+	if err != nil {
+		t.Fatal("missing room configuration blocked planning input", err)
+	}
+	missingParent := false
+	for _, issue := range ValidatePhysical(partial) {
+		missingParent = missingParent || issue.Code == "FACILITY_PARENT_REQUIRED"
+	}
+	if !missingParent {
+		t.Fatal("incomplete facility relationship was marked release-ready")
 	}
 	if _, err = MergeCablingWorkbook(m, nil, nil, nil); err == nil || !strings.HasPrefix(err.Error(), "CABLE_INPUT_REQUIRED") {
 		t.Fatal("cabling prerequisites bypassed", err)

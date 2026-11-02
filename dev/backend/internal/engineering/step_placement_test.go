@@ -74,3 +74,72 @@ func TestStandardPlacementBlocksMissingDependencies(t *testing.T) {
 		}
 	}
 }
+
+func TestOptionalPlacementConfiguration(t *testing.T) {
+	m, err := MergeTerminations(EmptyPhysical("optional"), InputPreviewRequest{"terminations", terminationHeader + terminationRow})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, q := range []InputPreviewRequest{
+		standardRequest("rooms", []string{"", "Site", "", "Room", "", ""}),
+		standardRequest("racks", []string{"", "", "Rack", "42"}),
+		standardRequest("placements", []string{"00001", "", "", "", "3", "2", "", ""}),
+	} {
+		if !PreviewStepInput(q).Valid {
+			t.Fatal("optional configuration rejected", q.TableID)
+		}
+		m, err = MergeStandardInput(m, q)
+		if err != nil {
+			t.Fatal(q.TableID, err)
+		}
+	}
+	if len(m.Facilities) != 3 || len(m.Placements) != 1 || m.Placements[0].InstallationType != "" || m.Placements[0].MountFace != "" {
+		t.Fatal("inferred configuration values or lost relationship")
+	}
+	for _, f := range m.Facilities {
+		if f.Code != "" {
+			t.Fatal("fabricated facility code")
+		}
+	}
+	for _, issue := range ValidatePhysical(m) {
+		if issue.Code == "MOUNT_FACE_INVALID" || issue.Code == "INSTALLATION_TYPE_INVALID" || issue.Code == "FACILITY_PARENT_REQUIRED" {
+			t.Fatal(issue.Code)
+		}
+	}
+	q := standardRequest("placements", []string{"00002", "", "", "", "", "", "", "side-slot"})
+	m, err = MergeStandardInput(m, q)
+	if err != nil || !m.Placements[1].UsesNonUPosition() {
+		t.Fatal("explicit position requires redundant installation configuration", err)
+	}
+	for _, issue := range ValidatePhysical(m) {
+		if issue.EntityID == m.Placements[1].EntityID && issue.Code == "PLACEMENT_U_REQUIRED" {
+			t.Fatal("non-U source forced into U placement")
+		}
+	}
+	for _, id := range []string{"rooms", "racks"} {
+		for _, table := range StepInputCatalog().Tables {
+			if table.ID == id {
+				for _, field := range table.Fields {
+					if field.Required {
+						t.Fatal("configuration remains required", id, field.Code)
+					}
+				}
+			}
+		}
+	}
+	ids := []ID{m.Facilities[0].EntityID, m.Facilities[1].EntityID, m.Facilities[2].EntityID}
+	for _, q := range []InputPreviewRequest{standardRequest("rooms", []string{"SITE", "Site", "ROOM", "Room"}), standardRequest("racks", []string{"ROOM", "RACK", "Rack"})} {
+		m, err = MergeStandardInput(m, q)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	if len(m.Facilities) != 3 {
+		t.Fatal("late configuration duplicated identities")
+	}
+	for i, id := range ids {
+		if m.Facilities[i].EntityID != id {
+			t.Fatal("late code replaced stable identity")
+		}
+	}
+}

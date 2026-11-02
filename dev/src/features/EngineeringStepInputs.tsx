@@ -28,8 +28,8 @@ export function EngineeringStepInputs({project,canEdit,sourceID,revision,onSaved
  const staged=references.flatMap(q=>q.data?.items||[]).flatMap(item=>{const t=catalog.data?.tables.find(t=>t.id===item.table_id);return (readInputCSV(item.csv||'')?.slice(1)||[]).map(row=>({table:item.table_id,values:Object.fromEntries(t?.fields.map((f,i)=>[f.code,row[i]])||[])}))});
  const model=physical.data?.model;
  function choices(code:string,row:Record<string,string>):string[]{
-  if(code==='room_code'&&initialTable!=='rooms')return [...new Set([...(model?.facilities.filter(f=>f.kind==='room').map(f=>f.code||'')||[]),...staged.filter(s=>s.table==='rooms').map(s=>s.values.room_code)].filter(Boolean))];
-  if(code==='rack_code'&&initialTable!=='racks')return [...new Set([...(model?.facilities.filter(f=>f.kind==='rack'&&(!row.room_code||model.facilities.find(p=>p.entity_id===f.parent_id)?.code===row.room_code)).map(f=>f.code||'')||[]),...staged.filter(s=>s.table==='racks'&&(!row.room_code||s.values.room_code===row.room_code)).map(s=>s.values.rack_code)].filter(Boolean))];
+  if(code==='room_code'&&initialTable!=='rooms')return [...new Set([...(model?.facilities.filter(f=>f.kind==='room').map(f=>f.code||f.label||'')||[]),...staged.filter(s=>s.table==='rooms').map(s=>s.values.room_code||s.values.room_name)].filter(Boolean))];
+  if(code==='rack_code'&&initialTable!=='racks')return [...new Set([...(model?.facilities.filter(f=>f.kind==='rack'&&(!row.room_code||model.facilities.find(p=>p.entity_id===f.parent_id)?.code===row.room_code)).map(f=>f.code||f.label||'')||[]),...staged.filter(s=>s.table==='racks'&&(!row.room_code||s.values.room_code===row.room_code)).map(s=>s.values.rack_code||s.values.name)].filter(Boolean))];
   if(code==='serial'||code==='device')return [...new Set([...(model?.equipment.map(e=>e.serial||e.label)||[]),...staged.filter(s=>s.table==='equipment_specs').map(s=>s.values.serial)].filter(Boolean))];
   if(initialTable==='route_edges'&&['from','to'].includes(code)||initialTable==='rack_access'&&code==='node')return staged.filter(s=>s.table==='route_nodes').map(s=>s.values.code);
   if(['lead_rule','slack_rule','length_rule'].includes(code)||initialTable==='rack_access'&&code==='rule')return rules.data?.filter(v=>v.rule.approval_status==='approved').map(v=>v.rule.id+'@'+v.rule.version)||[];
@@ -41,7 +41,7 @@ export function EngineeringStepInputs({project,canEdit,sourceID,revision,onSaved
  }
  const issues:{row:number;field:string;message:string}[]=[];
  if(!editable)issues.push({row:1,field:'',message:'表头、列数或引号格式不符合模板；未知列保留在原文中，请修正。'});
- if(!rows.length)issues.push({row:0,field:'',message:'尚无输入，请导入资料或添加一行。'});
+ if(!rows.length&&table?.step===1)issues.push({row:0,field:'',message:'尚无输入，请导入资料或添加一行。'});
  const seen=new Set<string>();
  rows.forEach((row,i)=>{
   const values=Object.fromEntries(table?.fields.map((f,j)=>[f.code,row[j]?.trim()||''])||[]);
@@ -50,9 +50,9 @@ export function EngineeringStepInputs({project,canEdit,sourceID,revision,onSaved
    if(['number','positive','nonnegative','positive_integer'].includes(f.kind)&&(!Number.isFinite(Number(v))||f.kind==='positive'&&Number(v)<=0||f.kind==='nonnegative'&&Number(v)<0||f.kind==='positive_integer'&&(!Number.isInteger(Number(v))||Number(v)<=0)))add(f.code,label(f.label)+'数值不符合要求');
    if(f.kind==='mac'&&!/^(?:[0-9a-f]{2}[:-]){5}[0-9a-f]{2}$/i.test(v)&&!/^[0-9a-f]{12}$/i.test(v))add(f.code,label(f.label)+'需填写有效 MAC 地址');
    const reference=initialTable==='racks'&&f.code==='room_code'||initialTable==='placements'&&['serial','room_code','rack_code'].includes(f.code)||initialTable==='route_nodes'&&['room_code','rack_code'].includes(f.code)||initialTable==='route_edges'&&['from','to'].includes(f.code)||initialTable==='rack_access'&&['rack_code','node'].includes(f.code);
-   if(reference&&references.every(q=>q.isSuccess)&&(!physical.isEnabled||physical.isSuccess)&&!choices(f.code,values).includes(v))add(f.code,label(f.label)+'未找到关联对象，请先补充对应模型');
+   if(reference&&f.required&&references.every(q=>q.isSuccess)&&(!physical.isEnabled||physical.isSuccess)&&!choices(f.code,values).includes(v))add(f.code,label(f.label)+'未找到关联对象，请先补充对应模型');
   });
-  if(keyFields[initialTable]){const key=keyFields[initialTable].map(k=>values[k]).join('\0');if(seen.has(key))add(keyFields[initialTable][0],'对象编码重复');seen.add(key)}
+  if(keyFields[initialTable]){const keys=keyFields[initialTable].map(k=>values[k]||((initialTable==='rooms'&&k==='room_code')?values.room_name:(initialTable==='racks'&&k==='rack_code')?values.name:''));if(keys.some(Boolean)){const key=keys.join('\0');if(seen.has(key))add(keyFields[initialTable][0],'对象引用重复');seen.add(key)}}
   if(values.orientation_deg&&(Number(values.orientation_deg)<0||Number(values.orientation_deg)>=360))add('orientation_deg','朝向应在 0（含）至 360（不含）度之间');
   if(initialTable==='route_edges'&&values.from&&values.from===values.to)add('to','路径起点和终点不能相同');
   if(initialTable==='placements'&&values.mount_type==='u'){

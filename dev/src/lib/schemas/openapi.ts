@@ -16977,7 +16977,7 @@ export interface components {
             fields: components["schemas"]["IDEInputField"][];
             supports_confirmation: boolean;
         };
-        /** @description Current five-step input catalog, version 4. Step 1 requires endpoint SN, MAC and port on both sides. The optional b_rack_position preserves a source declaration; structured rack/U references reuse step 2 placement inputs and models by exact SN. */
+        /** @description Current five-step input catalog, version 5. All configuration fields after step 1 are optional at intake, including empty configuration tables. Provided values retain format validation; calculations and release still require actual supporting facts. Known identities or names resolve relationships; unresolved rows stay in source candidates without fabricated entities. Step 1 requires endpoint SN, MAC and port on both sides. The optional b_rack_position preserves a source declaration; structured rack/U references reuse step 2 placement inputs and models by exact SN. */
         IDEInputCatalog: {
             version: string;
             tables: components["schemas"]["IDEInputTable"][];

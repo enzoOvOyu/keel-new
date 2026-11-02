@@ -53,6 +53,33 @@ func TestStepInputCatalog(t *testing.T) {
 		t.Fatal("nonstandard header accepted")
 	}
 }
+
+func TestPostIdentityConfigurationIsOptional(t *testing.T) {
+	for _, table := range StepInputCatalog().Tables {
+		if table.Step == 1 {
+			continue
+		}
+		var b strings.Builder
+		w := csv.NewWriter(&b)
+		headers := []string{}
+		for _, field := range table.Fields {
+			if field.Required {
+				t.Fatal("post-identity field is required", table.ID, field.Code)
+			}
+			headers = append(headers, field.Label)
+		}
+		w.Write(headers)
+		w.Flush()
+		if !PreviewStepInput(InputPreviewRequest{TableID: table.ID, CSV: b.String()}).Valid {
+			t.Fatal("empty optional configuration rejected", table.ID)
+		}
+		before := EmptyPhysical("optional")
+		after, err := MergeStandardInput(before, InputPreviewRequest{TableID: table.ID, CSV: b.String()})
+		if err != nil || Digest(before) != Digest(after) {
+			t.Fatal("empty configuration created facts", table.ID, err)
+		}
+	}
+}
 func TestStepInputInvalidNumbers(t *testing.T) {
 	for _, value := range []string{"0", "-1", "NaN", "+Inf", "1.2", "1e3"} {
 		got := PreviewStepInput(InputPreviewRequest{"network_asns", "设备或域引用,ASN,来源依据\nS1," + value + ",客户规划\n"})
