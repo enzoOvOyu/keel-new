@@ -692,6 +692,17 @@ func (s *Server) engineeringWorkspace(ctx context.Context, id string) (engineeri
 			return v, e
 		}
 		v.Steps = append(v.Steps, step)
+		if step.Tool == "emit_missing_input" {
+			found := false
+			for _, question := range v.Questions {
+				if question == step.Detail {
+					found = true
+				}
+			}
+			if !found {
+				v.Questions = append(v.Questions, step.Detail)
+			}
+		}
 	}
 	sort.Slice(v.Steps, func(i, j int) bool { return v.Steps[i].Sequence < v.Steps[j].Sequence })
 	return v, rows.Err()

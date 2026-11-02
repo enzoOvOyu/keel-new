@@ -1,3 +1,13 @@
+## 已完成里程碑事件：开局Agent执行链替换为分流与五步固定输入提取（等待用户安排测试）
+
+按用户授权删除生产工程Agent的旧逐Sheet循环、摘要拼接和自动生成工程草稿路径。新入口为 `internal/ai/kickoff_agent.go:ExtractKickoff`，作业只产生现有建模暂存候选，复用Parser/IR、Provider/Responses、对象存储、任务、规则注册表和领域采用服务。旧工具中仍有价值的读取/预览/传输部分保留在workbook_tools.go；旧Agent纠错/列绑定辅助仅保留于历史测试支持文件，不编入生产程序。
+
+实现资料区域分流、五个有界提取上下文、严格DTO、行表/网格/合并引用、唯一键跨表lookup、来源坐标与证据、完整行展开、未消费单元格coverage、集中缺口、公式依赖/已有计算服务和未批准规则候选。模型不输出实物行，不允许生成SN/IP/MAC、任意代码或直接发布。独立重算得到的兼容数值可回填；其余公式保留缺口。每任务最多8轮及一次语义纠正，复用有界传输重试；来源/Provider/Prompt指纹隔离checkpoint，结果/证据/用量持久化至既有MinIO。
+
+后端只写eng_modeling_input候选；已有输入保留，更新使用现有版本约束。前端资料入口已接通“AI分步识别”，任务结束刷新候选，缺口进入已有补充清单。没有改CMDB、机柜图、发布与计算内核。
+
+用户明确要求开发完成后等待其安排测试：未执行Go测试、浏览器测试、MM导入、模型调用、业务链或部署。仅进行格式整理及Go/TypeScript编译检查，已通过；这不代表MM识别验收完成。旧Agent行为回归断言仍按旧工具协议描述，保留供后续测试迁移，不能用它们宣称新Agent通过。MM实际覆盖、准确率、人工补充量和真实Provider能力均为NOT RUN。其他Agent新增的fabric-studio等未跟踪文件保持不动。
+
 ## 已完成里程碑事件：AI Provider 增加 Responses 协议
 
 `802f9ef` 已部署前端5180和API8081，运行目录 `/home/ubuntu/.local/state/keel-deployments/responses-802f9ef`，迁移046已应用。设置页新增openai-responses选择与JSON选项，地址支持Base URL或完整/responses，并支持切换已有Chat地址。运行时支持max_output_tokens、JSON格式、工具定义/历史与调用响应、输出截断检测、用量统计；继续使用既有秘密引用和授权。OpenAPI和生成类型已同步。
