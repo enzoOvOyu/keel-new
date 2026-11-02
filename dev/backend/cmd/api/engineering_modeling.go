@@ -21,6 +21,7 @@ import (
 type modelingStored struct {
 	engineering.ModelingInput
 	Key, Digest string
+	Actor       string
 }
 
 func (s *Server) modelingObject(ctx context.Context, key, digest string) ([]byte, error) {
@@ -47,7 +48,7 @@ func (s *Server) modelingObject(ctx context.Context, key, digest string) ([]byte
 }
 
 func (s *Server) modelingInputs(ctx context.Context, w engineering.Workspace, withCSV bool) ([]modelingStored, error) {
-	rows, err := s.db.Query(ctx, `SELECT table_id,version,base_revision,adopted_revision,object_key,content_sha256,row_count,issues,reason FROM eng_modeling_input WHERE source_id=$1 ORDER BY table_id`, w.ID)
+	rows, err := s.db.Query(ctx, `SELECT table_id,version,base_revision,adopted_revision,object_key,content_sha256,row_count,issues,reason,actor FROM eng_modeling_input WHERE source_id=$1 ORDER BY table_id`, w.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +57,7 @@ func (s *Server) modelingInputs(ctx context.Context, w engineering.Workspace, wi
 		var v modelingStored
 		var adopted *int
 		var issues []byte
-		if err = rows.Scan(&v.TableID, &v.Version, &v.BaseRevision, &adopted, &v.Key, &v.Digest, &v.Rows, &issues, &v.Reason); err != nil {
+		if err = rows.Scan(&v.TableID, &v.Version, &v.BaseRevision, &adopted, &v.Key, &v.Digest, &v.Rows, &issues, &v.Reason, &v.Actor); err != nil {
 			break
 		}
 		if err = json.Unmarshal(issues, &v.Issues); err != nil {

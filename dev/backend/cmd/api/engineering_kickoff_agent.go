@@ -25,9 +25,14 @@ func (s *Server) saveKickoffCandidates(ctx context.Context, source string, expec
 	edits := []engineering.ModelingInputEdit{}
 	for _, draft := range result.Drafts {
 		exists := false
+		inputVersion := 0
 		for _, input := range current {
 			if input.TableID == draft.TableID {
-				exists = true
+				if input.Actor == "kickoff-agent" && input.State == "draft" {
+					inputVersion = input.Version
+				} else {
+					exists = true
+				}
 				break
 			}
 		}
@@ -35,7 +40,7 @@ func (s *Server) saveKickoffCandidates(ctx context.Context, source string, expec
 			result.Missing = append(result.Missing, "已有输入保持不变，新候选供差异核对："+draft.TableID)
 			continue
 		}
-		edits = append(edits, engineering.ModelingInputEdit{ExpectedRevision: expected, InputVersion: 0, InputPreviewRequest: engineering.InputPreviewRequest{TableID: draft.TableID, CSV: draft.CSV}, Reason: "Agent固定格式候选 · " + job})
+		edits = append(edits, engineering.ModelingInputEdit{ExpectedRevision: expected, InputVersion: inputVersion, InputPreviewRequest: engineering.InputPreviewRequest{TableID: draft.TableID, CSV: draft.CSV}, Reason: "Agent固定格式候选 · " + job})
 	}
 	if len(edits) > 0 {
 		if err = s.saveModelingInputs(ctx, w, edits, "kickoff-agent"); err != nil {

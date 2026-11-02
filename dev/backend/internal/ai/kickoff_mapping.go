@@ -164,18 +164,25 @@ func expandKickoffRegion(w bom.Workbook, region KickoffRegion, m KickoffMapping)
 					missing = append(missing, b.Field+":公式缓存需独立核对")
 				}
 				if strings.HasSuffix(b.Field, "serial") || b.Field == "serial" {
-					header := read(m.Bounds.StartRow-1, cc)
+					source, sourceColumn, headerStart, dataStart := sheet, cc, region.Bounds.StartRow, m.Bounds.StartRow
 					if b.Lookup != nil {
-						if source, ok := kickoffSheet(w, b.Lookup.Sheet); ok {
-							for _, c := range source.Cells {
-								if c.Row == b.Lookup.StartRow-1 && c.Column == b.Lookup.ValueColumn {
-									header = c
-								}
-							}
+						source, _ = kickoffSheet(w, b.Lookup.Sheet)
+						sourceColumn = b.Lookup.ValueColumn
+						headerStart = 1
+						dataStart = b.Lookup.StartRow
+					}
+					serialHeader := false
+					for _, header := range source.Cells {
+						if header.Column != sourceColumn || header.Row < headerStart || header.Row >= dataStart {
+							continue
+						}
+						h := strings.ToLower(strings.TrimSpace(header.Value))
+						if bom.Field(header.Value) == "serial" || strings.Contains(h, "序列号") || strings.HasSuffix(h, "sn") {
+							serialHeader = true
+							break
 						}
 					}
-					h := strings.ToLower(strings.TrimSpace(header.Value))
-					if bom.Field(header.Value) != "serial" && !strings.Contains(h, "序列号") && !strings.HasSuffix(h, "sn") {
+					if !serialHeader {
 						value = ""
 						missing = append(missing, b.Field+":缺少明确SN来源，规划标签不能替代物理身份")
 					}

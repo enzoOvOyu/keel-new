@@ -692,20 +692,35 @@ func (s *Server) engineeringWorkspace(ctx context.Context, id string) (engineeri
 			return v, e
 		}
 		v.Steps = append(v.Steps, step)
-		if step.Tool == "emit_missing_input" {
-			found := false
-			for _, question := range v.Questions {
-				if question == step.Detail {
-					found = true
-				}
-			}
-			if !found {
-				v.Questions = append(v.Questions, step.Detail)
-			}
-		}
+
 	}
 	sort.Slice(v.Steps, func(i, j int) bool { return v.Steps[i].Sequence < v.Steps[j].Sequence })
-	return v, rows.Err()
+	if err := rows.Err(); err != nil {
+		return v, err
+	}
+	rows.Close()
+	questions, err := s.db.Query(ctx, `SELECT DISTINCT detail FROM eng_step WHERE job_id=$1 AND tool='emit_missing_input' ORDER BY detail`, j.ID)
+	if err != nil {
+		return v, err
+	}
+	defer questions.Close()
+	for questions.Next() {
+		var message string
+		if err = questions.Scan(&message); err != nil {
+			return v, err
+		}
+		found := false
+		for _, old := range v.Questions {
+			if old == message {
+				found = true
+				break
+			}
+		}
+		if !found {
+			v.Questions = append(v.Questions, message)
+		}
+	}
+	return v, questions.Err()
 }
 
 func suggestionDigest(m engineering.PhysicalModel, target string) string {
