@@ -296,3 +296,7 @@ Flows定向实施沿用现有token/shadcn；紧凑目录、三栏Builder、Execu
 详见 [Flows 实施记录](flows-redesign/implementation.md)、[真实 API 契约](api/flows.md)。字段/Schema仅定义于OpenAPI。
 
 Flows开发补齐（afe8cb9）：作用域Schedule、多步骤/输出绑定、Namespace二进制版本/分发、持久事件游标、审批单次绑定与任务取消已实现；规则和真实证据统一见[实施记录](flows-redesign/implementation.md)及[契约](api/flows.md)，不在本文件重定义。生产设备验收仍单列。
+
+## Fabric Astra原型工程化约束 · 2026-11-02
+
+本模块直接保留确认React原型的页面内容、密度、表格、拓扑、Drawer、Dialog与交互，不用旧组件重做。正式Shell和项目/身份由现有应用承接；CSS与Portal作用域限定.fabric-workspace。用户指定FABRIC-DESIGN-CONTRACT.md尚未定位，验收不能用这段文字替代；详见fabric-provisioning/INTEGRATION.md。

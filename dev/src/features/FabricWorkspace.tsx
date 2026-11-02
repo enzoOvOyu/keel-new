@@ -1,3 +1,1 @@
-export function FabricWorkspace(_props: {view?: string}) {
-  return null;
-}
+export {FabricWorkspace} from './fabric/Workspace';

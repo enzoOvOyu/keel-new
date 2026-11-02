@@ -7120,6 +7120,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/fabric/inputs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read confirmed Kickoff publication scope and authorized CMDB receipts
+         * @description Read-only. Does not create a workspace, run AI, import assets, execute jobs, or accept unpublished candidates. Returns WAITING_FOR_KICKOFF if the upstream publication migration has not been deployed. Cursor pages contain at most20 publications. Asset fields are current authorized CMDB projections; assetVersions and digest identify the read vector, not a global CMDB revision.
+         */
+        get: operations["getFabricPublishedInputs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -18052,6 +18072,36 @@ export interface components {
             enabled: boolean;
             /** @enum {string} */
             source: "scoped_schedule" | "flow_definition";
+        };
+        FabricPublishedInput: {
+            id: string;
+            projectId: string;
+            revision: number;
+            /** Format: date-time */
+            publishedAt: string;
+            modelRevisionId: string;
+            inputVersions: {
+                [key: string]: number;
+            };
+            assets: components["schemas"]["InfrastructureAsset"][];
+            assetVersions: {
+                [key: string]: number;
+            };
+            networkPlans: components["schemas"]["IDENetworkPlan"][];
+            digest: string;
+            missingAssetIds: string[];
+        };
+        FabricInputPage: {
+            projectId: string;
+            /** @enum {string} */
+            status: "WAITING_FOR_KICKOFF" | "EMPTY" | "AVAILABLE";
+            message: string;
+            inputs: components["schemas"]["FabricPublishedInput"][];
+            nextCursor: string | null;
+        };
+        FabricInputPageEnvelope: {
+            data: components["schemas"]["FabricInputPage"];
+            request_id: string;
         };
     };
     responses: {
@@ -39762,6 +39812,44 @@ export interface operations {
             };
             /** @description Flow not accessible */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getFabricPublishedInputs: {
+        parameters: {
+            query?: {
+                before?: string;
+            };
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Published input candidates or explicit dependency state */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FabricInputPageEnvelope"];
+                };
+            };
+            /** @description Project fabric:read and cmdb:read permissions required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Published input or receipt query failed */
+            500: {
                 headers: {
                     [name: string]: unknown;
                 };

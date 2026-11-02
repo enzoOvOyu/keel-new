@@ -1,3 +1,15 @@
+## 当前任务 · Fabric Astra原型工程化第一切片（2026-11-02）
+
+独立分支feat/fabric-rebuild，工作区/home/ubuntu/keel-fabric-dev，基线d9e2b77。原“空白页”仅为本轮之前历史，现已迁入全部8页原型内容、Topology、Dialog/Drawer/Table和状态交互；复用主应用Shell与ProjectContext/Session，不嵌套新Router/入口，不用旧Fabric组件替代。
+
+正式路由/p/:projectId/deploy/fabric/{overview,blueprint,onboarding,configuration,validation,deployments,assurance,settings}。隔离主应用预览5197（显式Mock），原5194原型和5180/8081保持原样。默认Real Provider仅读新Kickoff已发布范围及当前授权CMDB回执，不执行模拟写入。新getFabricPublishedInputs接口、生成类型/123项台账/模块契约已同步；无新DB实体/迁移。
+
+关键依赖：另一个窗口新Kickoff的publication及迁移049尚未同步/部署；其未提交代码没有复制。本轮不将既有旧工程输入替代新Kickoff。用户所述5191未监听，现有Kickoff原型5195、集成5196；正式依赖API，不靠端口抓页面数据。
+
+关键验收缺口：本机未找到FABRIC-DESIGN-CONTRACT.md，已询问用户路径。当前按5194可读React源保留设计，但不声称通过该文件或像素级100%验收。source-manifest保留源码摘要。后续先取得验收契约，再做输入采用/Blueprint持久化切片，随后编译、校验审批、受控执行、回采，不能把Mock全流程当真实落地。
+
+已运行：8页加载、单Shell、来源Dialog/Mock采用、Sidebar/Blueprint Commit及配置Dialog检查通过，零pageerror，API全部synthetic拦截、无后端设备写入。Go摘要/项目拒绝检查与API构建通过；TS/Vite构建通过（Vite1m23s，既有体积/依赖注释告警）。未做真实Kickoff/CMDB联合验收。详细位置docs/fabric-provisioning/INTEGRATION.md、docs/api/fabric.md、integration/result.json。下文为历史记录。
+
 ## 当前任务 · 2026-11-02 Fabric重构空白起点
 
 用户明确要求本次新建独立Fabric分支。工作区 `/home/ubuntu/keel-fabric-dev`，分支 `feat/fabric-rebuild`，基线为dev已提交d9e2b77；另一个窗口dev未提交的kickoff改动未复制、未暂存或提交。

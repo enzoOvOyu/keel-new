@@ -1,0 +1,4 @@
+/* Integration geometry only. The approved content CSS remains scoped separately. */
+.main-shell > main:has(> .fabric-workspace){padding:0;margin:0;max-width:none;width:100%}
+.main-shell > main:has(> .fabric-workspace) > footer{display:none}
+.fabric-workspace{min-width:0;min-height:calc(100vh - 62px)}

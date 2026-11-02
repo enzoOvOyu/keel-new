@@ -18,6 +18,10 @@
 
 本台账不新建一套契约，也不更改现有 API。发现文档、OpenAPI 和运行行为冲突时，登记差异并定向核对，不能拿任何一份旧文档静默覆盖另一份。
 
+## Fabric当前切片
+
+[Fabric契约](api/fabric.md)：getFabricPublishedInputs为本分支新增只读消费接口，未部署，依赖新Kickoff发布；Mock八页接入和真实发布联合验收严格区分。
+
 ## 当前登记范围
 
 本次已逐项核对 **5 个可视化操作**：4 个新查询接口与1个兼容读取接口。运行代码版本为 `4541850`，部署事实来自 [deployment-validation.json](topology/deployment-validation.json)，不是根据分支 HEAD 推断。

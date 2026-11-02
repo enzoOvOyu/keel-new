@@ -1,5 +1,13 @@
 # AGENTS.md — Codex 执行约束
 
+## Fabric 原型接入（2026-11-02，本分支当前任务）
+
+- 用户明确要求在feat/fabric-rebuild、/home/ubuntu/keel-fabric-dev接入Astra确认原型；复用当前Shell、ProjectContext和RBAC，保留页面布局/信息层级/密度/Drawer/交互，不用旧页面替换，不自行设计。
+- FABRIC-DESIGN-CONTRACT.md为用户指定验收标准；文件未提供时记录缺失并询问路径，不编造同名标准或声称100%通过。当前可读原型为dev/prototypes/fabric-studio（5194）。
+- 另一窗口的新Kickoff为资产和规划发布上游，仅消费published范围与CMDB回执；不复制未提交代码、不重复导入或建设CMDB。按纵向切片落地，不一次性重写后端；真实接口未接通不可回退为模拟成功。
+- 分支预览可显式VITE_FABRIC_PROVIDER=mock，但不等同真实后端/设备验收；不擅自部署5180/8081。
+
+
 ## 开发分支与 Demo 隔离（2026-11-01，优先于旧分支说明）
 
 - 后续业务开发统一在 Git `dev` 分支进行，应用源代码目录为 `dev/`；默认工作区 `/home/ubuntu/keel-dev`。开始前确认分支及工作区状态，不在 `main`、归档Tag或旧功能/部署工作区继续开发。

@@ -1,0 +1,33 @@
+{
+  "visual_source": "dev/prototypes/fabric-studio (5194)",
+  "design_contract": "FABRIC-DESIGN-CONTRACT.md NOT FOUND; requested path, acceptance pending",
+  "source_files": {
+    "App.tsx": "63355e578f82bc8dc4cd58f006b04d849e07d3c16a6e89be70f566e9908db1af",
+    "Pages.tsx": "600d3bda1ddff97b0911ffa9963523779ceb08e15d1ea58ca8b7f38ba3b1af19",
+    "Dialogs.tsx": "f75f3e88af5216026181ee38a92edd00b771d75708b231a0dc6077f774686911",
+    "Topology.tsx": "e2a86561fa156fa18fcec2990626d20a7a85a27dcbfc472a717109fcbe271244",
+    "ui.tsx": "31b375a86a419b30521da5a15852da7c3702aa7d1f448d0493d200314b1875c9",
+    "style.css": "e7c346ffecc37234861e9d1e727648f84a309b40fccc13c14fc09dc579bdddb4",
+    "contracts.ts": "e692f9a4f8666c9f119ada12d962492d04b6ad2f6943c6e9859e54fec1abb63a",
+    "provider.ts": "d73433c2389d0c7ce19e0fce583b944cbe89bd32efd43d8d30bcbcf145bf9f61"
+  },
+  "scope": "Original page DOM/layout/table density/topology/dialogs retained; only Shell/project/identity/provider/CSS integration adaptations.",
+  "pages": [
+    "overview",
+    "blueprint",
+    "onboarding",
+    "configuration",
+    "validation",
+    "deployments",
+    "assurance",
+    "settings"
+  ],
+  "real_backend_slice": "getFabricPublishedInputs: published Kickoff + authorized current CMDB receipt read only; no writes/new database tables",
+  "not_claimed": [
+    "pixel-identical acceptance against missing contract",
+    "real input adoption/Blueprint mutation",
+    "configuration compiler/device writes/rollback",
+    "Kickoff publication deployment or real-data joint acceptance"
+  ],
+  "dependency": "Other-window Kickoff publication and migration049 are not copied or deployed by this branch."
+}

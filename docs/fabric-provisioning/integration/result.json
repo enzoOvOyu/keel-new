@@ -1,0 +1,22 @@
+{
+  "checks": [
+    "all8 approved pages mounted within one Keel Shell",
+    "source drawer and input adoption update shared state",
+    "Sidebar routes and Blueprint commit retained",
+    "configuration compile dialog retained"
+  ],
+  "errors": [],
+  "scope": "synthetic intercepted APIs; no backend/device writes; not pixel parity approval",
+  "builds": {
+    "typescript": "passed; final noEmit after read-model mapping changes",
+    "vite": "passed 1m23s; current read-model labels present in built asset",
+    "go_api": "passed",
+    "go_focused_tests": "TestFabricInputDigestTracksAssetVersions + TestFabricInputsRequireProjectAuthorization passed",
+    "api_registry": "123 passed"
+  },
+  "preview": {
+    "url": "http://localhost:5197/p/proj-b300-demo/deploy/fabric/overview",
+    "mode": "SIMULATION_ONLY, main app with Mock provider",
+    "session": "keel-fabric-integrated"
+  }
+}

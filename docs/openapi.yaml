@@ -18272,6 +18272,33 @@ paths:
           description: Project scope denied
         "404":
           description: Flow not accessible
+  /projects/{projectId}/fabric/inputs:
+    get:
+      operationId: getFabricPublishedInputs
+      tags:
+        - Fabric
+      summary: Read confirmed Kickoff publication scope and authorized CMDB receipts
+      description: Read-only. Does not create a workspace, run AI, import assets, execute jobs, or accept unpublished candidates. Returns WAITING_FOR_KICKOFF if the upstream publication migration has not been deployed. Cursor pages contain at most20 publications. Asset fields are current authorized CMDB projections; assetVersions and digest identify the read vector, not a global CMDB revision.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema: &a2
+            type: string
+        - in: query
+          name: before
+          schema: *a2
+      responses:
+        "200":
+          description: Published input candidates or explicit dependency state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FabricInputPageEnvelope"
+        "403":
+          description: Project fabric:read and cmdb:read permissions required
+        "500":
+          description: Published input or receipt query failed
 components:
   securitySchemes:
     bearerAuth:
@@ -51595,6 +51622,90 @@ components:
           enum:
             - scoped_schedule
             - flow_definition
+    FabricPublishedInput:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - projectId
+        - revision
+        - publishedAt
+        - modelRevisionId
+        - inputVersions
+        - assets
+        - assetVersions
+        - networkPlans
+        - digest
+        - missingAssetIds
+      properties:
+        id: &a2
+          type: string
+        projectId: *a2
+        revision:
+          type: integer
+        publishedAt:
+          type: string
+          format: date-time
+        modelRevisionId: *a2
+        inputVersions:
+          type: object
+          additionalProperties:
+            type: integer
+        assets:
+          type: array
+          items:
+            $ref: "#/components/schemas/InfrastructureAsset"
+        assetVersions:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
+        networkPlans:
+          type: array
+          items:
+            $ref: "#/components/schemas/IDENetworkPlan"
+        digest: *a2
+        missingAssetIds:
+          type: array
+          items: *a2
+    FabricInputPage:
+      type: object
+      additionalProperties: false
+      required:
+        - projectId
+        - status
+        - message
+        - inputs
+        - nextCursor
+      properties:
+        projectId: &a2
+          type: string
+        status:
+          type: string
+          enum:
+            - WAITING_FOR_KICKOFF
+            - EMPTY
+            - AVAILABLE
+        message: *a2
+        inputs:
+          type: array
+          items:
+            $ref: "#/components/schemas/FabricPublishedInput"
+        nextCursor:
+          type:
+            - string
+            - "null"
+    FabricInputPageEnvelope:
+      type: object
+      additionalProperties: false
+      required:
+        - data
+        - request_id
+      properties:
+        data:
+          $ref: "#/components/schemas/FabricInputPage"
+        request_id:
+          type: string
 x-implementation-policy:
   frontend-first: true
   mock-provider-required: true

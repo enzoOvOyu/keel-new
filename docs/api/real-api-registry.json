@@ -2009,6 +2009,20 @@
       "permission": "approval:read",
       "loading": "on-demand for an explicitly selected high-risk action",
       "side_effects": "read-only; final approval digest and signer checks remain in Job Service"
+    },
+    {
+      "method": "get",
+      "path": "/projects/{projectId}/fabric/inputs",
+      "operation_id": "getFabricPublishedInputs",
+      "response_status": "200",
+      "response_media_type": "application/json",
+      "response_schema": "FabricInputPageEnvelope",
+      "implementation": "implemented",
+      "deployment": "not_deployed",
+      "verification": "focused_unit_checks_and_build_only; upstream Kickoff dependency not deployed",
+      "handler": "dev/backend/cmd/api/fabric.go",
+      "source": "dev/backend/cmd/api/fabric.go",
+      "documentation": "docs/api/fabric.md"
     }
   ],
   "development_note": "当前运行ceab753/v40，迁移038；真实MM/Ultra分析提案已完整保存，资料理解验收未通过。当前结论见docs/intelligent-deployment/SOURCE-UNDERSTANDING-REVIEW-20261101.txt；未正式发布、未进行模型对照或跨客户验收。"
