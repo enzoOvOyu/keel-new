@@ -444,7 +444,7 @@ func ApplyInputs(m *engineering.PhysicalModel, inputs []ModelInput) error {
 	return nil
 }
 
-// A room can be planned before a site is supplied. Provided relationships still
+// A room or rack can be planned before its parent is supplied. Provided relationships still
 // require correct types; no missing site is invented to satisfy a legacy gate.
 func ValidationIssues(m engineering.PhysicalModel) []engineering.ValidationIssue {
 	out := []engineering.ValidationIssue{}
@@ -452,7 +452,7 @@ func ValidationIssues(m engineering.PhysicalModel) []engineering.ValidationIssue
 		optionalParent := false
 		if issue.Code == "FACILITY_PARENT_REQUIRED" {
 			for _, f := range m.Facilities {
-				if f.EntityID == issue.EntityID && f.Kind == "room" && f.ParentID == nil {
+				if f.EntityID == issue.EntityID && (f.Kind == "room" || f.Kind == "rack") && f.ParentID == nil {
 					optionalParent = true
 				}
 			}
