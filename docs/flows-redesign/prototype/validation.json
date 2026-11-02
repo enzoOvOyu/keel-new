@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "checks": [
+    "Flow search filters independent fixture",
+    "Native multi-panel and Monaco mount; selected task properties editable",
+    "Gantt selection updates task detail",
+    "Target matrix selects failed device",
+    "Logs filter by severity",
+    "Native variable sidebar with selected JSON",
+    "Quick Run wizard creates isolated execution; pause updates visible lifecycle",
+    "Agent row opens scoped detail drawer",
+    "Light/dark theme switch"
+  ],
+  "errors": [],
+  "apiRequests": [],
+  "scope": "Synthetic design prototype only; no real API, database, device execution or production UI verification",
+  "visual_review": [
+    "1600x1000 Flow catalog, native panel editor, execution and target screenshots reviewed",
+    "1440x900 Flow and light theme inspected after table layout settled",
+    "Fixed multi-card focus highlight; only selected node remains highlighted"
+  ],
+  "build": "Standalone Vite production build passed; chunk-size and upstream PURE annotation warnings retained"
+}

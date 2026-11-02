@@ -1,0 +1,14 @@
+{
+  "at": "2026-11-02T07:25:59.563Z",
+  "scope": "same approved prototype synthetic fixture; 1600x1000; formal API intercepted, no backend writes/devices",
+  "checks": [
+    "目录状态页签、服务端计数、真实历史条及作用域保存视图",
+    "Builder同源任务/属性/拓扑，移除额外名称表单和重复保存动作",
+    "总览任务结构定位编辑器并写入URL",
+    "版本侧栏/Monaco真实差异，恢复仅改变草稿不写后端",
+    "执行任务、Attempt与内联日志同屏，展开日志保留所选实例与Attempt"
+  ],
+  "errors": [],
+  "writes": [],
+  "known_shell_difference": "Keel production global Sidebar/ProjectContext retained as approved; prototype isolated shell not copied"
+}

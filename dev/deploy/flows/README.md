@@ -81,3 +81,13 @@ npm run build
 当前Agent0.2.0新增`job.pipeline`能力；旧Agent可继续单任务，不能冒充支持多步骤。迁移023包含Schedule消费、步骤结果、持久事件、文件版本；024绑定审批单次执行。两者已应用到本隔离库，不可重复执行；未应用原业务库。
 
 Cron由Kestra执行，Go不是另一个调度器；当前合成验证计划已停用。新增二进制资源上限1MiB、每目标32步、步骤结果/输入绑定32KiB。Bootstrap上线需要发布0.2.0包并预置对应可信摘要，不使用旧0.1.0包假称支持pipeline。
+
+## 2026-11-02 独立UI分支增量（尚未部署，不执行上述历史重启命令）
+
+当前开发为feat/jobs-kestra-ui，工作区/home/ubuntu/keel-kestra-ui-dev；不切换现有5180/8081/5181。新版本上线前须按顺序应用迁移044_flows_operations.sql，再启动同版本API。这里只记录依赖，用户未授权本轮发布。
+
+迁移新增持久flow_operation_job/item及公开Agent证书轮换记录；API内OperationWorker负责已获准的Bootstrap/历史补跑业务队列，Kestra仍负责未来Cron和实际Flow调度。进程故障的未知副作用转UNKNOWN并对账，不自动重新SSH或创建重复执行。项目有业务批次历史时保留既有退役前置约束。
+
+Agent续期需新binary，显式配置`--enroll-url https://受控地址`、`--renew-before 168h`（示例，实际按运维策略决定）及可选`--renew-check-interval`；默认renew-before=0未启用。服务端使用已有KEEL_AGENT_CA_CERT/KEY签署，专用TLS监听接收客户端证书；浏览器API、Session不能替代mTLS。Agent私钥仅本机0600文件，激活后credentials-current原子切换。不能将本地测试CA当生产PKI，不能为maintained设备恢复Agent。
+
+隔离验证只使用keel_flows_dev，迁移044已在该库应用，不重复迁移、不复制此环境业务数据。后续生产包发布、反向代理证书透传、安全策略、真实设备安装/续期/规模验收仍需专门部署联调。

@@ -1,0 +1,15 @@
+{
+  "at": "2026-11-02T03:37:59.861Z",
+  "scope": "formal routes; synthetic intercepted API; no backend/database/device calls",
+  "checks": [
+    "正式目录使用catalog接口及URL搜索",
+    "原生多面板默认Visual/Topology，受控步骤与Monaco属性可选",
+    "Files在原生编辑器内部打开，无额外全局入口",
+    "TaskRun选择写URL并联动Attempt上下文和真实日志字段",
+    "目标矩阵与设备详情联动",
+    "变量使用独立脱敏接口，保留原生SidebarList",
+    "三步QuickRun可选目标、Monaco输入和预检；未创建执行",
+    "原生Agents目录、详情深链接与证书页"
+  ],
+  "errors": []
+}

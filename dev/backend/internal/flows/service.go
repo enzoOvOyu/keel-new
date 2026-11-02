@@ -106,6 +106,9 @@ func (s *Service) Save(ctx context.Context, p Scope, id string, input SaveFlow) 
 	if !identifier.MatchString(fid) || fmt.Sprint(doc["namespace"]) != ns {
 		return empty, problem(422, "FLOW_NAMESPACE_SCOPE_INVALID")
 	}
+	if e := s.validateFlowScriptSources(ctx, input.Project, ns, doc); e != nil {
+		return empty, e
+	}
 	if e := ValidatePolicy(input.Source, ns); e != nil {
 		return empty, e
 	}
@@ -262,6 +265,22 @@ func (s *Service) Preflight(ctx context.Context, p Scope, r RunRequest) ([]Decis
 				}
 			}
 		}
+
+		for i, d := range merged {
+			needsTimeout := false
+			for _, step := range plan {
+				needsTimeout = needsTimeout || step.Timeout > 0
+			}
+			if d.Ready && d.Transport == "AGENT" && needsTimeout && !contains(d.Target.Capabilities, "job.step-timeout") {
+				if r.Policy == "agent_preferred" && sshOnlyPossible && d.Target.SSH != "" {
+					merged[i].Transport = "SSH"
+				} else {
+					merged[i].Ready = false
+					merged[i].Transport = "BLOCKED"
+					merged[i].Reason = "AGENT_STEP_TIMEOUT_CAPABILITY_REQUIRED"
+				}
+			}
+		}
 		return merged, nil
 	}
 	targets, e := s.Targets(ctx, Scope{Projects: []string{r.Project}}, "")
@@ -343,6 +362,10 @@ func (s *Service) Preflight(ctx context.Context, p Scope, r RunRequest) ([]Decis
 	return out, nil
 }
 func (s *Service) Start(ctx context.Context, p Scope, r RunRequest, key string) (Execution, error) {
+	if r.ApprovalContext != "" && !r.internalOperation {
+		return Execution{}, problem(422, "RESERVED_APPROVAL_CONTEXT_USE_OPERATION_ENDPOINT")
+	}
+
 	if r.Flow != "" && len(r.Targets) == 0 {
 		return s.StartNative(ctx, p, r, key)
 	}
@@ -508,7 +531,7 @@ var highRisk = regexp.MustCompile(`(?i)\b(reboot|shutdown|poweroff|mkfs|flashrom
 
 func (s *Service) Execution(ctx context.Context, p Scope, id string) (Execution, error) {
 	var out Execution
-	e := s.DB.QueryRow(ctx, `SELECT id::text,project_id,flow_id::text,kestra_id,engine_flow_id,flow_revision,source_module,mode,requester_id::text,created_at,error_code,parent_id::text FROM flow_execution_binding WHERE id::text=$1 AND project_id=ANY($2)`, id, p.Projects).Scan(&out.ID, &out.Project, &out.FlowID, &out.KestraID, &out.Flow, &out.Revision, &out.Source, &out.Mode, &out.Requester, &out.Created, &out.Error, &out.ParentID)
+	e := s.DB.QueryRow(ctx, `SELECT id::text,project_id,flow_id::text,kestra_id,engine_flow_id,flow_revision,source_module,mode,requester_id::text,b.created_at,b.error_code,b.parent_id::text,(SELECT name FROM flow_binding f WHERE f.id=b.flow_id AND f.project_id=b.project_id),NULLIF(b.request->>'name','') FROM flow_execution_binding b WHERE b.id::text=$1 AND b.project_id=ANY($2)`, id, p.Projects).Scan(&out.ID, &out.Project, &out.FlowID, &out.KestraID, &out.Flow, &out.Revision, &out.Source, &out.Mode, &out.Requester, &out.Created, &out.Error, &out.ParentID, &out.FlowName, &out.Name)
 	if e != nil {
 		return out, problem(404, "EXECUTION_NOT_FOUND")
 	}
@@ -590,6 +613,9 @@ func (s *Service) Retry(ctx context.Context, p Scope, id, key string) (Execution
 		return ex, problem(409, "NO_FAILED_TARGETS")
 	}
 	r.Parent = id
+	r.ApprovalID = ""
+	r.ApprovalContext = "retry:" + id + ":" + key
+	r.internalOperation = true
 	r.Source = "retry"
 	return s.Start(ctx, p, r, key)
 }
@@ -646,6 +672,9 @@ func (s *Service) Restart(ctx context.Context, p Scope, id, key string) (Executi
 		return ex, e
 	}
 	r.Parent = id
+	r.ApprovalID = ""
+	r.ApprovalContext = "restart:" + id + ":" + key
+	r.internalOperation = true
 	r.Source = "restart"
 	return s.Start(ctx, p, r, key)
 }

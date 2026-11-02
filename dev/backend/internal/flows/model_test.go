@@ -84,3 +84,33 @@ func TestSwitchChangesCannotBypassFabricApproval(t *testing.T) {
 		}
 	}
 }
+
+func TestExecutionTitleValidation(t *testing.T) {
+	r := RunRequest{Name: "GPU inventory collection", Targets: []string{"synthetic"}, Kind: "bash", Command: "printf synthetic", Policy: "agent_only", Timeout: 60, Concurrency: 1}
+	if err := runValid(r); err != nil {
+		t.Fatal(err)
+	}
+	r.Name = "bad\nname"
+	if err := runValid(r); err == nil {
+		t.Fatal("multiline title accepted")
+	}
+}
+
+func TestStepOptionsUseExistingDeadline(t *testing.T) {
+	step := JobStep{ID: "check", Kind: "bash", Command: "printf synthetic", Description: "read-only inventory", Timeout: 30}
+	if _, err := PlanSteps([]JobStep{step}); err != nil {
+		t.Fatal(err)
+	}
+	child := StepTask(Task{ID: "job", Timeout: 600}, step, nil)
+	if child.Timeout != 30 {
+		t.Fatalf("step deadline not applied: %d", child.Timeout)
+	}
+	step.Timeout = 0
+	if StepTask(Task{ID: "job", Timeout: 600}, step, nil).Timeout != 600 {
+		t.Fatal("inherited deadline changed")
+	}
+	step.Timeout = -1
+	if _, err := PlanSteps([]JobStep{step}); err == nil {
+		t.Fatal("invalid step timeout accepted")
+	}
+}

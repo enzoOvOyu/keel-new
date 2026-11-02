@@ -1,11 +1,13 @@
 # UI-REFERENCE.md — keel 前端参考与页面线框
 
+> 作业平台当前要求：按 [DESIGN-SYSTEM §10](DESIGN-SYSTEM.md#10-作业平台kestra-原生-ui-实施硬规则) 和 [Kestra原生替换方案](flows-redesign/KESTRA-UI-REPLACEMENT.md) 直接复用原生组件与交互。下文旧Flow线框仅保留历史业务参考，不能作为另做自制UI的依据。
+
 ## 1. 参考项目与具体借鉴点
 
 | 参考 | 地址 | 借鉴范围 | 不做什么 |
 |---|---|---|---|
-| Kestra UI | https://kestra.io/docs/ui | Flows/Executions/Logs 导航、执行详情分 Tab、Topology/Gantt、任务日志和产物 | 不复制 Kestra 源码/品牌，不把首期做成复杂通用 DAG 编辑器 |
-| Kestra Execution | https://kestra.io/docs/workflow-components/execution | 执行/任务状态、重试 attempt、Outputs、手动运行和调度语义 | 不照搬 Kestra 状态名；以 keel API 状态契约为准 |
+| Kestra UI | https://kestra.io/docs/ui | Flows/Executions/Logs 导航、执行详情分 Tab、Topology/Gantt、任务日志和产物 | 作业平台按固定开源版本直接复用原生UI，保留许可证与Keel品牌；不复制企业locked/demo入口 |
+| Kestra Execution | https://kestra.io/docs/workflow-components/execution | 执行/任务状态、重试 attempt、Outputs、手动运行和调度语义 | 保留Kestra真实引擎状态，单独展示Keel设备结果，不相互覆盖 |
 | shadcn/ui Blocks | https://ui.shadcn.com/blocks | Sidebar、Dashboard、Data Table、表单、Dialog 组合 | 不直接把 dashboard 模板复制到每个页面 |
 | shadcn/ui Data Table | https://ui.shadcn.com/docs/components/data-table | 服务端分页/排序/筛选、列显示、行选择 | 不用无分页的大表加载数万条数据 |
 | shadcn/ui Sidebar | https://ui.shadcn.com/docs/components/sidebar | Sidebar provider、折叠、导航分组和响应式行为 | 不自制第二套导航组件 |
@@ -54,7 +56,7 @@
 └───────────────────────────────────────────────────────────────────────────┘
 ```
 
-## 5. Flow 与 Execution 线框（Kestra-inspired）
+## 5. Flow 与 Execution 历史业务线框（视觉已由DESIGN-SYSTEM §10替代）
 
 ```text
 Flows

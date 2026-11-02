@@ -1,0 +1,9 @@
+{
+  "at": "2026-11-02T04:48:28.591Z",
+  "scope": "formal routes; synthetic intercepted API; no backend/database/device calls",
+  "checks": [
+    "批量执行处置冻结选择，仅运行态执行请求暂停，终态逐项跳过",
+    "聚合时间窗/Flow版本使用统一summary API过滤"
+  ],
+  "errors": []
+}

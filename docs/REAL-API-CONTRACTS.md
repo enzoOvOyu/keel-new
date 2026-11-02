@@ -77,3 +77,12 @@ Flows当前登记49个操作（开发补齐afe8cb9），加原5个可视化共54
 ## 智能开局工程
 
 [P1设计](intelligent-deployment/P1-DESIGN.txt)保留三层模型和分域边界。P1–P6已实现并部署，新增33个工程HTTP操作；契约见[工程接口](api/engineering.md)，检查及缺口见[实施记录](intelligent-deployment/implementation.json)。本次四个工程只读GET启动检查通过；真实AI、真实XLSX及跨客户泛化验收未完成。
+
+## 2026-11-02 作业平台独立分支增量
+
+`feat/jobs-kestra-ui`新增目录/日志/变量/诊断查询、持久Bootstrap/历史补跑批次、受控Replay、Trigger运行态及两阶段Agent证书续期，见[作业平台契约](api/flows.md)和[实施记录](flows-redesign/implementation.md)。107项当前登记、442项设计操作的引用检查通过；新增项均标记not_deployed，部署revision/evidence不变。迁移044只在隔离keel_flows_dev验证；synthetic查询/PKI/审批反例与前端拦截检查不等同生产设备验收。
+
+
+### 2026-11-02 作业平台原型复核修复增量（独立分支，未部署）
+
+当前真实接口台账登记108项（增加现有Identity审批列表的消费登记，不代表本轮新增后端）。Run/Execution可选执行名称、执行列表attention及业务名称搜索已同步OpenAPI/Go/生成类型/Provider，复用request JSON，无migration。冻结定义、审批列表、输出文件和日志仍走已有接口；分支验证及限制见[原型修复记录](flows-redesign/implementation.md#prototype-parity-fixes-20261102)与[Flows契约](api/flows.md)。不继承旧部署revision为本次运行证据，不改变5180/8081。

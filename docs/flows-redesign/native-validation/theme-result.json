@@ -1,0 +1,8 @@
+{
+  "at": "2026-11-02T04:38:15.747Z",
+  "scope": "formal routes; synthetic intercepted API; no backend/database/device calls",
+  "checks": [
+    "Keel ia-dark主题与原生Kestra令牌同步，保留React外壳"
+  ],
+  "errors": []
+}

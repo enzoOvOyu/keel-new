@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"github.com/google/uuid"
 	"mime/multipart"
 	"net/url"
@@ -121,4 +122,67 @@ func (s *Service) DistributeFile(ctx context.Context, p Scope, flowID, revisionI
 	r.Steps = nil
 	r.Command = string(raw(map[string]string{"path": "uploads/" + path.Base(meta.Path), "data_base64": base64.StdEncoding.EncodeToString(b), "sha256": meta.SHA256}))
 	return s.Start(ctx, p, r, key)
+}
+
+// File lineage is stored in the existing versioned Flow document. Namespace
+// references are pinned; their embedded execution content must match that version.
+func (s *Service) validateFlowScriptSources(ctx context.Context, project, namespace string, doc map[string]any) error {
+	variables, _ := doc["variables"].(map[string]any)
+	value, exists := variables["keel_script_sources"]
+	if !exists {
+		return nil
+	}
+	type sourceRef struct {
+		Mode     string `json:"mode"`
+		Path     string `json:"path"`
+		ID       string `json:"file_revision_id"`
+		Revision int64  `json:"revision"`
+		SHA      string `json:"sha256"`
+	}
+	var sources map[string]sourceRef
+	if json.Unmarshal(raw(value), &sources) != nil {
+		return problem(422, "SCRIPT_SOURCES_INVALID")
+	}
+	defaults := map[string]any{}
+	inputs, _ := doc["inputs"].([]any)
+	for _, input := range inputs {
+		row, _ := input.(map[string]any)
+		key, _ := row["id"].(string)
+		defaults[key] = row["defaults"]
+	}
+	steps := []JobStep{}
+	if defaults["steps"] != nil {
+		if json.Unmarshal(raw(defaults["steps"]), &steps) != nil {
+			return problem(422, "SCRIPT_SOURCES_INVALID")
+		}
+	}
+	if len(steps) == 0 {
+		command, _ := defaults["command"].(string)
+		steps = []JobStep{{ID: "command", Command: command}}
+	}
+	for id, ref := range sources {
+		var step *JobStep
+		for i := range steps {
+			if steps[i].ID == id {
+				if step != nil {
+					return problem(422, "SCRIPT_SOURCE_TASK_AMBIGUOUS")
+				}
+				step = &steps[i]
+			}
+		}
+		if step == nil || !contains([]string{"namespace", "inline"}, ref.Mode) {
+			return problem(422, "SCRIPT_SOURCE_TASK_INVALID")
+		}
+		var path, sha string
+		var revision int64
+		var content []byte
+		err := s.DB.QueryRow(ctx, `SELECT path,revision,sha256,content FROM flow_file_revision WHERE id::text=$1 AND project_id=$2 AND namespace=$3`, ref.ID, project, namespace).Scan(&path, &revision, &sha, &content)
+		if err != nil || path != ref.Path || revision != ref.Revision || sha != ref.SHA {
+			return problem(422, "SCRIPT_SOURCE_VERSION_INVALID")
+		}
+		if ref.Mode == "namespace" && step.Command != string(content) {
+			return problem(422, "SCRIPT_SOURCE_CONTENT_MISMATCH")
+		}
+	}
+	return nil
 }

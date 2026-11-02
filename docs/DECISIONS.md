@@ -130,3 +130,15 @@ P1待审核细化：规划工程身份到既有bom_item/CMDB身份的映射，pl
 用户要求结合前沿研究给出“任何资料、100%”的实施方案。已完成[研究与实施设计](intelligent-deployment/RESEARCH-BACKED-IMPLEMENTATION-20261101.txt)，但缺失、损坏或有歧义的信息无法保证全自动正确恢复；公开基准与有限测试也不能证明无限范围零错误。此处记录技术限制，不代表用户已经接受缩小范围。
 
 建议明确支持的文件格式/规模和业务范围，以独立人工标注验收字段、关系、自动化程度及五步完成情况；未知、失败、人工补齐单列。不能把内容留存、任务结束或人工完成定义成AI识别成功。该未决范围影响最终能力承诺，不阻止已经明确的五步固定输入方案；本轮未修改业务代码或在线环境。
+
+
+## 2026-11-02 作业平台独立分支兼容记录
+
+- 已确认origin/dev已存在038_engineering_analysis_artifacts至043_engineering_power_supply，本分支业务操作/证书迁移改名044_flows_operations，不覆盖其他开发的迁移。隔离keel_flows_dev曾以临时038验证相同表结构，已在核实该库没有eng_analysis_artifact后仅将本任务版本记录改为044；未更改任何已部署数据库或资产数据。正式合并前仍须核对届时dev编号，不擅自合并/部署。
+- Kestra v2.0.7标准Schedule和本期历史预览适配范围分别说明；Sunday=7等当前未适配变体返回unsupported，不自行解释成0。未来调度由Kestra负责，历史补跑不建立另一个调度权威源。
+- Worker Shell/Python及Namespace动态执行引用不能绕过既有ValidatePolicy。当前保存脚本以设备steps冻结内容并受Keel预检/审批；若后续需要Worker执行，须独立确定Worker信任与授权范围，不能因为原型能点就放宽生产权限。
+
+
+## 2026-11-02 · 作业脚本引用还原采用现有版本存储
+
+原型文件引用不扩展为未授权 Worker 执行。使用现有 flow_file_revision 及 canonical Flow.variables.keel_script_sources 固定来源，受控 steps.command 冻结内容；namespace 固定版本 / inline 独立快照两种交互均可保存。动态跟随最新版不是本轮能力。不新增资产、迁移、执行引擎。步骤 description/timeout 复用现有 JobStep 与 Task 时限。独立分支开发，不自动部署。

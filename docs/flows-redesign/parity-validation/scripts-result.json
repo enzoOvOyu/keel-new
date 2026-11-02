@@ -1,0 +1,38 @@
+{
+  "at": "2026-11-02T07:50:30.511Z",
+  "scope": "synthetic API intercepted; zero backend/device writes",
+  "checks": [
+    "新建 Flow 可创建/编辑本地文件，未绑定时不伪造版本或发文件API",
+    "真实绑定创建后文件草稿/选择转移至新Flow作用域，导入内容未丢失",
+    "文件保存冲突保留草稿，重试产生版本，明确使用已保存内容快照",
+    "添加Shell/Python任务与同源YAML/拓扑，选中脚本Docs读取统一文档API",
+    "QuickRun目标/脚本/预检/冻结版本提交完整联动，修改脚本废弃旧预检，维护态不可选择"
+  ],
+  "errors": [],
+  "interceptedWrites": [
+    {
+      "path": "/api/v1/flows",
+      "method": "POST"
+    },
+    {
+      "path": "/api/v1/flows/11111111-1111-4111-8111-111111111111/namespace-artifacts",
+      "method": "POST"
+    },
+    {
+      "path": "/api/v1/flows/11111111-1111-4111-8111-111111111111/namespace-artifacts",
+      "method": "POST"
+    },
+    {
+      "path": "/api/v1/flows/preflight",
+      "method": "POST"
+    },
+    {
+      "path": "/api/v1/flows/preflight",
+      "method": "POST"
+    },
+    {
+      "path": "/api/v1/flows/quick-run",
+      "method": "POST"
+    }
+  ]
+}

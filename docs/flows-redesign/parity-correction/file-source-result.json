@@ -1,0 +1,11 @@
+{
+  "at": "2026-11-02T10:12:31.129Z",
+  "scope": "synthetic API interception only; zero backend/device writes",
+  "checks": [
+    "导入预览改名，确认前不创建草稿",
+    "所选步骤与来源同YAML保存，保留描述和时限",
+    "重开源文件固定rev1，不跟随后来rev2",
+    "明确转内联编辑，保留来源版本"
+  ],
+  "errors": []
+}

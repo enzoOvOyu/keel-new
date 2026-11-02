@@ -1,0 +1,44 @@
+{
+  "results": [
+    {
+      "path": "/jobs-preview/index.html#flows",
+      "url": "http://127.0.0.1:5181/jobs-preview/index.html#flows",
+      "jobs": 1,
+      "topology": 0,
+      "errors": []
+    },
+    {
+      "path": "/jobs-preview/",
+      "url": "http://127.0.0.1:5181/jobs-preview/index.html",
+      "jobs": 1,
+      "topology": 0,
+      "errors": []
+    },
+    {
+      "path": "/jobs-preview",
+      "url": "http://127.0.0.1:5181/jobs-preview/index.html",
+      "jobs": 1,
+      "topology": 0,
+      "errors": []
+    },
+    {
+      "path": "/global-topology",
+      "url": "http://127.0.0.1:5181/global-topology",
+      "jobs": 0,
+      "topology": 1,
+      "errors": []
+    },
+    {
+      "path": "/rack-detail",
+      "url": "http://127.0.0.1:5181/rack-detail",
+      "jobs": 0,
+      "topology": 1,
+      "errors": []
+    },
+    {
+      "sidebarEntry": "PASS",
+      "url": "http://127.0.0.1:5181/jobs-preview/index.html#flows"
+    }
+  ],
+  "scope": "5181 preview routing only; 5180/8081 untouched"
+}

@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 type Error struct {
@@ -64,23 +65,26 @@ type Target struct {
 	SSH          string         `json:"ssh_profile_id"`
 }
 type RunRequest struct {
-	Steps           []JobStep         `json:"steps,omitempty"`
-	ApprovalID      string            `json:"approval_id,omitempty"`
-	ApprovalAction  string            `json:"approval_action,omitempty"`
-	Inputs          map[string]string `json:"inputs,omitempty"`
-	TargetRevisions map[string]int64  `json:"target_revisions,omitempty"`
-	Project         string            `json:"project_id"`
-	Flow            string            `json:"flow_id"`
-	Revision        int               `json:"expected_revision"`
-	Targets         []string          `json:"target_ids"`
-	Kind            string            `json:"kind"`
-	Command         string            `json:"command"`
-	Policy          string            `json:"transport_policy"`
-	Timeout         int               `json:"timeout_seconds"`
-	Concurrency     int               `json:"target_concurrency"`
-	Retries         int               `json:"max_retries"`
-	Source          string            `json:"source_module"`
-	Parent          string            `json:"-"`
+	Name              string            `json:"name,omitempty"`
+	internalOperation bool              `json:"-"`
+	Steps             []JobStep         `json:"steps,omitempty"`
+	ApprovalID        string            `json:"approval_id,omitempty"`
+	ApprovalContext   string            `json:"approval_context,omitempty"`
+	ApprovalAction    string            `json:"approval_action,omitempty"`
+	Inputs            map[string]string `json:"inputs,omitempty"`
+	TargetRevisions   map[string]int64  `json:"target_revisions,omitempty"`
+	Project           string            `json:"project_id"`
+	Flow              string            `json:"flow_id"`
+	Revision          int               `json:"expected_revision"`
+	Targets           []string          `json:"target_ids"`
+	Kind              string            `json:"kind"`
+	Command           string            `json:"command"`
+	Policy            string            `json:"transport_policy"`
+	Timeout           int               `json:"timeout_seconds"`
+	Concurrency       int               `json:"target_concurrency"`
+	Retries           int               `json:"max_retries"`
+	Source            string            `json:"source_module"`
+	Parent            string            `json:"-"`
 }
 type Decision struct {
 	Asset     string `json:"asset_id"`
@@ -105,6 +109,8 @@ type TargetRun struct {
 	Ended    *time.Time `json:"ended_at"`
 }
 type Execution struct {
+	Name      *string        `json:"name"`
+	FlowName  *string        `json:"flow_name"`
 	ParentID  *string        `json:"parent_id"`
 	ID        string         `json:"id"`
 	Project   string         `json:"project_id"`
@@ -177,6 +183,14 @@ func Route(t Target, policy, capability string) Decision {
 	return d
 }
 func runValid(r RunRequest) error {
+	if utf8.RuneCountInString(r.Name) > 160 || strings.ContainsAny(r.Name, "\r\n") {
+		return problem(422, "EXECUTION_NAME_INVALID")
+	}
+	for _, step := range r.Steps {
+		if step.Timeout > r.Timeout {
+			return problem(422, "STEP_TIMEOUT_EXCEEDS_JOB_TIMEOUT")
+		}
+	}
 	if _, e := PlanSteps(r.Steps); e != nil {
 		return e
 	}

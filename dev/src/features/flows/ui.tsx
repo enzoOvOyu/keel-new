@@ -1,8 +1,9 @@
-import { useState, type ReactNode } from 'react';
+import { lazy,Suspense,useState,type ReactNode } from 'react';
 import { useReactTable, getCoreRowModel, getSortedRowModel, getPaginationRowModel, flexRender, type ColumnDef } from '@tanstack/react-table';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/shadcn/dialog';
 import { Button } from '@/components/shadcn/button';
 export { Button };
+const NativeDialogHost=lazy(()=>import('../jobs-native/NativeDialogHost').then(m=>({default:m.NativeDialogHost})));
 export function State({ value }: {
     value: unknown;
 }) { const text = String(value ?? 'unknown'); return <span className={'fl-state fl-state-' + text.toLowerCase()}>{text}</span>; }
@@ -21,10 +22,7 @@ export function Panel({ title, description, open, onClose, children }: {
     onClose: () => void;
     children: ReactNode;
 }) {
-    return <Dialog open={open} onOpenChange={v => {
-            if (!v)
-                onClose();
-        }}><DialogContent className="fl-dialog"><DialogTitle>{title}</DialogTitle><DialogDescription>{description}</DialogDescription>{children}</DialogContent></Dialog>;
+    return open?<Suspense fallback={null}><NativeDialogHost open title={title} description={description} onClose={onClose}>{children}</NativeDialogHost></Suspense>:null;
 }
 export function Table<T extends {
     id: string;

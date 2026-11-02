@@ -1,0 +1,22 @@
+{
+  "at": "2026-11-02T04:39:58.870768+00:00",
+  "scope": "isolated keel_flows_dev; synthetic assets and local fake Kestra; no deployed environment/device",
+  "confirmed_checks": [
+    "TestBackfillNeverReusesScheduleApproval passed: old approval cleared; two independent occurrence digests; missing approvals block both; zero engine writes",
+    "ScheduleStatus integration passed: actual engine runtime date/disabled; unauthorized project denied",
+    "TestWorkspaceQueryIntegration passed: scoped queries, variables and replay request secret redaction",
+    "Go cmd/api build passed",
+    "Production Vite build passed in 1m15s after stopping only this task temporary 5193 server; prior failures were memory pressure / heap limit",
+    "Final TypeScript noEmit passed after definition draft and theme changes",
+    "107 registered operations / 442 OpenAPI operations reference check passed",
+    "Isolated operation migration history renumbered 038 -> 044 to avoid known origin/dev 038-043 collisions; no application data changed",
+    "ExecutionPage and summary exact revision exclusion passed in isolated DB",
+    "Duration statistics: captured 8-second terminal sample retained, missing sample not zero-filled, insufficient percentile null; empirical rank unit check passed",
+    "Latest full TypeScript/Vite build passed in 1m13s; built-output metrics/filter browser checks passed; final SVG bar-width-only edit SFC compilation passed"
+  ],
+  "limitations": [
+    "No production SSH installation, firmware/NOS compatibility or 8-device mixed batch acceptance",
+    "Replay approval-signature-to-device complete end-to-end not run",
+    "Earlier full cmd/api package has unrelated BOM TestFullResumeAppliesPreviouslyPartialSheetWithoutProvider failure; not weakened or rerun"
+  ]
+}

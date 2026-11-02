@@ -6765,6 +6765,297 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/flows/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Authorized Keel job workspace query; source and missing evidence are explicit. */
+        get: operations["getFlowsCatalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/execution-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Authorized Keel job workspace query; source and missing evidence are explicit. */
+        get: operations["getFlowsExecutionSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/log-search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Authorized Keel job workspace query; source and missing evidence are explicit. */
+        get: operations["searchFlowsLogs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/executions/{executionId}/insights": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Authorized Keel job workspace query; source and missing evidence are explicit. */
+        get: operations["getFlowExecutionInsights"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/task-documentation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Read installed policy-allowed Kestra plugin documentation or built-in keel.device.bash/python/command JobStep documentation. Device identifiers are presentation types, not executable Kestra plugins. */
+        get: operations["getFlowsTaskDocumentation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/executions/{executionId}/variables": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Authorized Keel job workspace query; source and missing evidence are explicit. */
+        get: operations["getFlowExecutionVariables"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/agents/bootstrap-jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Persistent scoped business-operation progress; unknown side effects are never blindly retried. */
+        get: operations["listFlowsBootstrapJobs"];
+        put?: never;
+        /** @description Persistent scoped business-operation progress; unknown side effects are never blindly retried. */
+        post: operations["createFlowsBootstrapJob"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/operation-jobs/{jobId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Persistent scoped business-operation progress; unknown side effects are never blindly retried. */
+        get: operations["getFlowsOperationJob"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/operation-jobs/{jobId}/actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Persistent scoped business-operation progress; unknown side effects are never blindly retried. */
+        post: operations["actFlowsOperationJob"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/agents/certificates/renew": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Dedicated enrollment TLS listener; verified agent client certificate required, no browser credentials. */
+        post: operations["renewFlowsAgentCertificate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/agents/certificates/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Dedicated enrollment TLS listener; verified agent client certificate required, no browser credentials. */
+        post: operations["activateFlowsAgentCertificate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/{flowId}/backfill/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Scoped historical batch replay; every occurrence revalidates permissions, target versions and approvals. No future scheduling. */
+        post: operations["previewFlowsBackfill"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/{flowId}/backfill": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Scoped historical batch replay; every occurrence revalidates permissions, target versions and approvals. No future scheduling. */
+        get: operations["listFlowsBackfills"];
+        put?: never;
+        /** @description Scoped historical batch replay; every occurrence revalidates permissions, target versions and approvals. No future scheduling. */
+        post: operations["createFlowsBackfill"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/operation-jobs/{jobId}/items/{ordinal}/request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Scoped historical batch replay; every occurrence revalidates permissions, target versions and approvals. No future scheduling. */
+        get: operations["getFlowsOperationItemRequest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/executions/{executionId}/replay-request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description New execution from historical inputs; new per-request approval context, freshly authorized targets and no copied approval. */
+        get: operations["getFlowsReplayRequest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/executions/{executionId}/replay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description New execution from historical inputs; new per-request approval context, freshly authorized targets and no copied approval. */
+        post: operations["createFlowsReplay"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/flows/{flowId}/schedule/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Actual Kestra trigger runtime and latest 50 persisted scoped consumption records; engine unavailable remains explicit, next evaluation is never synthesized. */
+        get: operations["getFlowsScheduleStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -6856,6 +7147,9 @@ export interface components {
             last_error: string | null;
         };
         FlowsJobStep: {
+            description?: string;
+            /** @description Zero inherits the total job deadline; a positive value is a per-step deadline bounded by the total job timeout. Agent transport requires job.step-timeout capability. */
+            timeout_seconds?: number;
             id: string;
             /** @enum {string} */
             kind: "command" | "bash" | "python";
@@ -7202,6 +7496,8 @@ export interface components {
             online: boolean;
         };
         FlowsExecution: {
+            /** @description User-visible execution title from the frozen request; null for historical requests without a title. */
+            name?: string | null;
             parent_id: string | null;
             id: string;
             project_id: string;
@@ -7216,6 +7512,8 @@ export interface components {
             error_code: string | null;
             engine: components["schemas"]["FlowsEngine"];
             targets: components["schemas"]["FlowsTargetRun"][];
+            /** @description Name from the same-project Flow binding. Null for Quick Run or missing binding; engine_flow_id remains the frozen engine identity. */
+            flow_name?: string | null;
         };
         FlowsTargetRun: {
             id: string;
@@ -7240,6 +7538,8 @@ export interface components {
             target: components["schemas"]["FlowsTarget"];
         };
         FlowsRun: {
+            /** @description Optional user-visible execution title; persisted with the immutable run request. */
+            name?: string;
             project_id: string;
             flow_id?: string;
             expected_revision?: number;
@@ -7262,6 +7562,8 @@ export interface components {
             steps?: components["schemas"]["FlowsJobStep"][];
             approval_id?: string;
             approval_action?: string;
+            /** @description Server-frozen per-occurrence approval context; never copied from a previous execution. */
+            approval_context?: string;
         };
         FlowsTarget: {
             id: string;
@@ -17139,6 +17441,333 @@ export interface components {
         IDEKickoffHandoffRequest: {
             expected_revision: number;
             reason: string;
+        };
+        /** @description Source record in canonical Flow YAML variables.keel_script_sources keyed by device step ID. Namespace mode pins a version and validates matching embedded script content; inline mode preserves origin while allowing independent edits. */
+        FlowsScriptSource: {
+            /** @enum {string} */
+            mode: "namespace" | "inline";
+            path: string;
+            file_revision_id: string;
+            revision: number;
+            sha256: string;
+        };
+        FlowsRecentExecution: {
+            id: string;
+            state: string;
+            created_at: string;
+            success: number;
+            failed: number;
+            total: number;
+        };
+        FlowsCatalogItem: {
+            draft: boolean;
+            id: string;
+            project_id: string;
+            namespace: string;
+            flow_id: string;
+            name: string;
+            description: string;
+            target_type: string;
+            revision: number;
+            source: string;
+            disabled: boolean;
+            engine: components["schemas"]["FlowsEngine"];
+            recent_execution: components["schemas"]["FlowsRecentExecution"] | null;
+            /** @description Most recent authorized persisted executions, newest first. No synthesized history slots. */
+            recent_executions: components["schemas"]["FlowsRecentExecution"][];
+            triggers: components["schemas"]["FlowsCatalogTrigger"][];
+            /**
+             * Format: date-time
+             * @description Latest persisted flow.save audit timestamp; null if unavailable.
+             */
+            updated_at: string | null;
+            /** @description Actor of latest authorized flow.save audit event. */
+            updated_by: string | null;
+        };
+        FlowsCatalogPage: {
+            items: components["schemas"]["FlowsCatalogItem"][];
+            total: number;
+            limit: number;
+            offset: number;
+            namespaces: string[];
+            state_source: string;
+            /** @description Server-authorized counts after search/namespace/target filters, before state selection. Includes ALL. */
+            state_counts: {
+                [key: string]: number;
+            };
+        };
+        FlowsExecutionSummary: {
+            total: number;
+            states: {
+                [key: string]: number;
+            };
+            targets: {
+                [key: string]: number;
+            };
+            since: string | null;
+            until: string | null;
+            state_source: string;
+            duration: components["schemas"]["FlowsDurationSummary"];
+            daily: components["schemas"]["FlowsDailySummary"][];
+        };
+        FlowsLogSearchItem: {
+            id: string;
+            execution_id: string;
+            project_id: string;
+            flow_id: string;
+            task_id: string;
+            task_run_id: string;
+            level: string;
+            timestamp: string;
+            message: string;
+        };
+        FlowsLogSearchPage: {
+            items: components["schemas"]["FlowsLogSearchItem"][];
+            next_cursor: string | null;
+            coverage: string;
+        };
+        FlowsExecutionReference: {
+            id: string;
+            relation: string;
+            state: string;
+            created_at: string;
+        };
+        FlowsExecutionInsights: {
+            previous_id: string | null;
+            next_id: string | null;
+            relations: components["schemas"]["FlowsExecutionReference"][];
+            metrics: components["schemas"]["FlowsEngine"][];
+            metrics_total: number;
+            metrics_error: string | null;
+        };
+        FlowsTaskDocumentation: {
+            type: string;
+            documentation: components["schemas"]["FlowsEngine"];
+            policy: string;
+        };
+        getFlowsCatalogEnvelope: {
+            data: components["schemas"]["FlowsCatalogPage"];
+            /** Format: uuid */
+            request_id: string;
+        };
+        getFlowsExecutionSummaryEnvelope: {
+            data: components["schemas"]["FlowsExecutionSummary"];
+            /** Format: uuid */
+            request_id: string;
+        };
+        searchFlowsLogsEnvelope: {
+            data: components["schemas"]["FlowsLogSearchPage"];
+            /** Format: uuid */
+            request_id: string;
+        };
+        getFlowExecutionInsightsEnvelope: {
+            data: components["schemas"]["FlowsExecutionInsights"];
+            /** Format: uuid */
+            request_id: string;
+        };
+        getFlowsTaskDocumentationEnvelope: {
+            data: components["schemas"]["FlowsTaskDocumentation"];
+            /** Format: uuid */
+            request_id: string;
+        };
+        FlowsExecutionVariables: {
+            inputs: components["schemas"]["FlowsEngine"];
+            outputs: components["schemas"]["FlowsEngine"];
+        };
+        getFlowExecutionVariablesEnvelope: {
+            data: components["schemas"]["FlowsExecutionVariables"];
+            /** Format: uuid */
+            request_id: string;
+        };
+        FlowsBootstrapBatch: {
+            project_id: string;
+            asset_ids: string[];
+            version: string;
+        };
+        FlowsOperationAction: {
+            /** @enum {string} */
+            action: "pause" | "resume" | "cancel" | "retry-blocked" | "reconcile" | "authorize-item";
+            expected_revision: number;
+            ordinal?: number;
+            approval_id?: string;
+        };
+        FlowsOperationItem: {
+            ordinal: number;
+            asset_id: string | null;
+            scheduled_at: string | null;
+            /** @enum {string} */
+            state: "PENDING" | "RUNNING" | "SUCCEEDED" | "BLOCKED" | "UNKNOWN" | "CANCELLED";
+            execution_id: string | null;
+            result: components["schemas"]["FlowsEngine"];
+            error_code: string | null;
+            started_at: string | null;
+            ended_at: string | null;
+        };
+        FlowsOperationJob: {
+            id: string;
+            project_id: string;
+            owner_id: string;
+            /** @enum {string} */
+            kind: "bootstrap" | "backfill";
+            /** @enum {string} */
+            state: "PENDING" | "RUNNING" | "PAUSED" | "COMPLETED" | "PARTIAL_FAILURE" | "CANCELLED";
+            revision: number;
+            created_at: string;
+            updated_at: string;
+            items: components["schemas"]["FlowsOperationItem"][];
+        };
+        FlowsCertificateRenewal: {
+            csr: string;
+        };
+        FlowsCertificateRotation: {
+            id: string;
+            agent_id: string;
+            certificate: string;
+            ca: string;
+            expires_at: string;
+            /** @enum {string} */
+            state: "pending" | "active";
+        };
+        listFlowsBootstrapJobsEnvelope: {
+            data: components["schemas"]["FlowsOperationJob"][];
+            /** Format: uuid */
+            request_id: string;
+        };
+        createFlowsBootstrapJobEnvelope: {
+            data: components["schemas"]["FlowsOperationJob"];
+            /** Format: uuid */
+            request_id: string;
+        };
+        getFlowsOperationJobEnvelope: {
+            data: components["schemas"]["FlowsOperationJob"];
+            /** Format: uuid */
+            request_id: string;
+        };
+        actFlowsOperationJobEnvelope: {
+            data: components["schemas"]["FlowsOperationJob"];
+            /** Format: uuid */
+            request_id: string;
+        };
+        renewFlowsAgentCertificateEnvelope: {
+            data: components["schemas"]["FlowsCertificateRotation"];
+            /** Format: uuid */
+            request_id: string;
+        };
+        activateFlowsAgentCertificateEnvelope: {
+            data: components["schemas"]["FlowsCertificateRotation"];
+            /** Format: uuid */
+            request_id: string;
+        };
+        FlowsBackfillRequest: {
+            start: string;
+            end: string;
+            expected_schedule_revision: number;
+            expected_flow_revision: number;
+            preview_hash: string;
+        };
+        FlowsBackfillPreview: {
+            project_id: string;
+            flow_id: string;
+            cron: string;
+            timezone: string;
+            occurrences: string[];
+            count: number;
+            truncated: boolean;
+            requires_approval: boolean;
+            preview_hash: string;
+            run: components["schemas"]["FlowsRun"];
+        };
+        previewFlowsBackfillEnvelope: {
+            data: components["schemas"]["FlowsBackfillPreview"];
+            /** Format: uuid */
+            request_id: string;
+        };
+        createFlowsBackfillEnvelope: {
+            data: components["schemas"]["FlowsOperationJob"];
+            /** Format: uuid */
+            request_id: string;
+        };
+        listFlowsBackfillsEnvelope: {
+            data: components["schemas"]["FlowsOperationJob"][];
+            /** Format: uuid */
+            request_id: string;
+        };
+        getFlowsOperationItemRequestEnvelope: {
+            data: components["schemas"]["FlowsRun"];
+            /** Format: uuid */
+            request_id: string;
+        };
+        FlowsReplayInput: {
+            /** @enum {string} */
+            mode: "all" | "failed";
+            run: components["schemas"]["FlowsRun"];
+        };
+        getFlowsReplayRequestEnvelope: {
+            data: components["schemas"]["FlowsRun"];
+            /** Format: uuid */
+            request_id: string;
+        };
+        createFlowsReplayEnvelope: {
+            data: components["schemas"]["FlowsExecution"];
+            /** Format: uuid */
+            request_id: string;
+        };
+        FlowsTriggerRuntime: {
+            triggerId: string;
+            /** Format: date-time */
+            updatedAt: string | null;
+            /** Format: date-time */
+            evaluatedAt: string | null;
+            /** Format: date-time */
+            nextEvaluationDate: string | null;
+            /** Format: date-time */
+            lastTriggeredDate: string | null;
+            disabled: boolean;
+            sourceDisabled: boolean;
+            locked: boolean;
+        };
+        FlowsScheduleFire: {
+            engine_execution_id: string;
+            execution_id: string | null;
+            state: string;
+            error_code: string | null;
+            /** Format: date-time */
+            created_at: string;
+        };
+        FlowsScheduleStatus: {
+            configured: boolean;
+            runtime: components["schemas"]["FlowsTriggerRuntime"][];
+            runtime_error: string | null;
+            history: components["schemas"]["FlowsScheduleFire"][];
+            source: string;
+        };
+        getFlowsScheduleStatusEnvelope: {
+            /** Format: uuid */
+            request_id: string;
+            data: components["schemas"]["FlowsScheduleStatus"];
+        };
+        FlowsDurationSummary: {
+            sample_count: number;
+            missing_count: number;
+            mean_seconds: number | null;
+            p50_seconds: number | null;
+            p95_seconds: number | null;
+            coverage: string;
+        };
+        FlowsDailySummary: {
+            /** Format: date */
+            date: string;
+            total: number;
+            failed: number;
+        };
+        FlowsCatalogTrigger: {
+            id: string;
+            type: string;
+            cron: string | null;
+            timezone: string | null;
+            enabled: boolean;
+            /** @enum {string} */
+            source: "scoped_schedule" | "flow_definition";
         };
     };
     responses: {
@@ -33490,6 +34119,8 @@ export interface operations {
     listRealExecutions: {
         parameters: {
             query?: {
+                /** @description Filter executions requiring attention by captured engine states or failed, blocked or reconciling target results; does not rewrite engine state. */
+                attention?: boolean;
                 project_id?: string;
                 cursor?: string;
                 q?: string;
@@ -33502,6 +34133,8 @@ export interface operations {
                 until?: string;
                 mode?: string;
                 limit?: number;
+                /** @description Exact frozen Flow revision; included in cursor scope. */
+                revision?: number;
             };
             header?: never;
             path?: never;
@@ -37795,6 +38428,947 @@ export interface operations {
             };
             /** @description Input, dependencies or publication not ready */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getFlowsCatalog: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                q?: string;
+                namespace?: string;
+                target_type?: string;
+                state?: string;
+                sort?: string;
+                direction?: string;
+                limit?: number;
+                offset?: number;
+                /** @description Search the scoped engine source index instead of metadata; q needs at least two characters. */
+                source_search?: "true" | "false";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped domain result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getFlowsCatalogEnvelope"];
+                };
+            };
+            /** @description Invalid filter or cursor */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource unavailable */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Engine not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getFlowsExecutionSummary: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                flow_id?: string;
+                source?: string;
+                since?: string;
+                until?: string;
+                /** @description Filter exact frozen Flow revision; omit for all revisions. */
+                revision?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped domain result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getFlowsExecutionSummaryEnvelope"];
+                };
+            };
+            /** @description Invalid filter or cursor */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource unavailable */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Engine not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    searchFlowsLogs: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                flow_id?: string;
+                execution_id?: string;
+                task_id?: string;
+                level?: string;
+                q?: string;
+                since?: string;
+                until?: string;
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped domain result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["searchFlowsLogsEnvelope"];
+                };
+            };
+            /** @description Invalid filter or cursor */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource unavailable */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Engine not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getFlowExecutionInsights: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                page?: number;
+                limit?: number;
+                task_id?: string;
+                metrics?: "true" | "false";
+            };
+            header?: never;
+            path: {
+                executionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped domain result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getFlowExecutionInsightsEnvelope"];
+                };
+            };
+            /** @description Invalid filter or cursor */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource unavailable */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Engine not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getFlowsTaskDocumentation: {
+        parameters: {
+            query?: {
+                project_id?: string;
+                type?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped domain result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getFlowsTaskDocumentationEnvelope"];
+                };
+            };
+            /** @description Invalid filter or cursor */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource unavailable */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Engine not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getFlowExecutionVariables: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                executionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped domain result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getFlowExecutionVariablesEnvelope"];
+                };
+            };
+            /** @description Invalid filter or cursor */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource unavailable */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Engine not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listFlowsBootstrapJobs: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Domain result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listFlowsBootstrapJobsEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Permission, project or client certificate denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, idempotency or operation state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createFlowsBootstrapJob: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header: {
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowsBootstrapBatch"];
+            };
+        };
+        responses: {
+            /** @description Domain result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["createFlowsBootstrapJobEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Permission, project or client certificate denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, idempotency or operation state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getFlowsOperationJob: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                jobId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Domain result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getFlowsOperationJobEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Permission, project or client certificate denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, idempotency or operation state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    actFlowsOperationJob: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header: {
+                "Idempotency-Key": string;
+            };
+            path: {
+                jobId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowsOperationAction"];
+            };
+        };
+        responses: {
+            /** @description Domain result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["actFlowsOperationJobEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Permission, project or client certificate denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, idempotency or operation state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    renewFlowsAgentCertificate: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowsCertificateRenewal"];
+            };
+        };
+        responses: {
+            /** @description Domain result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["renewFlowsAgentCertificateEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Permission, project or client certificate denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, idempotency or operation state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    activateFlowsAgentCertificate: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Domain result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["activateFlowsAgentCertificateEnvelope"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Permission, project or client certificate denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, idempotency or operation state conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    previewFlowsBackfill: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header: {
+                "Idempotency-Key": string;
+            };
+            path: {
+                flowId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowsBackfillRequest"];
+            };
+        };
+        responses: {
+            /** @description Domain result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["previewFlowsBackfillEnvelope"];
+                };
+            };
+            /** @description Scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision, frozen preview or approval changed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unsupported cron, invalid historical window or unavailable evidence */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listFlowsBackfills: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                flowId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Domain result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["listFlowsBackfillsEnvelope"];
+                };
+            };
+            /** @description Scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision, frozen preview or approval changed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unsupported cron, invalid historical window or unavailable evidence */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createFlowsBackfill: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header: {
+                "Idempotency-Key": string;
+            };
+            path: {
+                flowId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowsBackfillRequest"];
+            };
+        };
+        responses: {
+            /** @description Domain result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["createFlowsBackfillEnvelope"];
+                };
+            };
+            /** @description Scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision, frozen preview or approval changed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unsupported cron, invalid historical window or unavailable evidence */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getFlowsOperationItemRequest: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                ordinal: number;
+                jobId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Domain result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getFlowsOperationItemRequestEnvelope"];
+                };
+            };
+            /** @description Scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision, frozen preview or approval changed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unsupported cron, invalid historical window or unavailable evidence */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getFlowsReplayRequest: {
+        parameters: {
+            query: {
+                project_id?: string;
+                mode: "all" | "failed";
+                nonce: string;
+            };
+            header?: never;
+            path: {
+                executionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getFlowsReplayRequestEnvelope"];
+                };
+            };
+            /** @description Scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, state or target changed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description New approval or preflight required */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createFlowsReplay: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header: {
+                "Idempotency-Key": string;
+            };
+            path: {
+                executionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowsReplayInput"];
+            };
+        };
+        responses: {
+            /** @description Scoped result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["createFlowsReplayEnvelope"];
+                };
+            };
+            /** @description Scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Version, state or target changed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description New approval or preflight required */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getFlowsScheduleStatus: {
+        parameters: {
+            query?: {
+                project_id?: string;
+            };
+            header?: never;
+            path: {
+                flowId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Schedule runtime and scoped history */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["getFlowsScheduleStatusEnvelope"];
+                };
+            };
+            /** @description Project scope denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Flow not accessible */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
