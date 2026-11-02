@@ -6,10 +6,10 @@ import KickoffStudio from './KickoffStudio';
 
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/kickoff-studio">
       <Routes>
-        <Route path="/kickoff-studio" element={<KickoffStudio />} />
-        <Route path="*" element={<Navigate to="/kickoff-studio" replace />} />
+        <Route path="/" element={<KickoffStudio />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,

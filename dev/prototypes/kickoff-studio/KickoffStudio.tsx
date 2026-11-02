@@ -129,7 +129,7 @@ export default function KickoffStudio() {
       <a className="ks-brand" href="/kickoff-studio"><span>k</span>keel<small>ENGINEERING</small></a>
       <div className="ks-workspace-label">项目工作台</div>
       <div className="ks-project"><div className="ks-project-symbol"><Box size={20} /></div><div><strong>智能开局工程</strong><small>B300 · 合成规划沙箱</small></div></div>
-      <nav aria-label="开局工程主导航">{nav.map(item => <button key={item.id} className={view === item.id ? 'active' : ''} onClick={() => navigate(item.id)}><item.icon size={18} />{item.label}{item.id === 'models' && <span>{data.models.length - adopted}</span>}</button>)}</nav>
+      <nav aria-label="开局工程主导航"><button onClick={() => window.location.assign("/global-topology")}><Network size={18} />数据中心拓扑</button><button onClick={() => window.location.assign("/jobs-preview/index.html#flows")}><Activity size={18} />作业平台样式</button>{nav.map(item => <button key={item.id} className={view === item.id ? 'active' : ''} onClick={() => navigate(item.id)}><item.icon size={18} />{item.label}{item.id === 'models' && <span>{data.models.length - adopted}</span>}</button>)}</nav>
       <div className="ks-sidebar-guide"><Layers3 size={20} /><b>资料转为工程依据</b><p>AI 提取候选，规则计算结果，用户确认后发布。</p><button onClick={downloadPlan}>查看实施方案<ArrowDownToLine size={14} /></button></div>
       <div className="ks-sidebar-bottom"><span className="ks-avatar">K</span><div>交互评审环境<small>独立原型 · 5081</small></div></div>
     </aside>
