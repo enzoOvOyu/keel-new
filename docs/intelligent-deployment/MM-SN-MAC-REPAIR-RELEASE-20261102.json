@@ -1,0 +1,12 @@
+{
+  "backend_code_commit": "5d7276b",
+  "backend_runtime_directory": "/home/ubuntu/.local/state/keel-deployments/agent-benchmark-fix-5d7276b",
+  "frontend_runtime_directory": "/home/ubuntu/.local/state/keel-deployments/agent-release-7b2ec19",
+  "api_port": 8081,
+  "frontend_port": 5180,
+  "binary_sha256": "43b9207481af7ac3226eda416429be83ef851e0fd51df79b6792db2186328d20",
+  "provider_changed": false,
+  "post_final_repair_model_runs": 0,
+  "api_process_release_matches": true,
+  "api_health": "HTTP 200"
+}
