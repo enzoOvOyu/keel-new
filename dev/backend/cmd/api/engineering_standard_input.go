@@ -26,6 +26,9 @@ func (s *Server) importStandardInput(ctx context.Context, w engineering.Workspac
 	if q.ExpectedRevision != w.Revision {
 		return errors.New("REVISION_CONFLICT")
 	}
+	if e := s.prepareStandardPowerRules(ctx, []engineering.InputPreviewRequest{q.InputPreviewRequest}, actor); e != nil {
+		return e
+	}
 	current, evidence, e := engineeringModel(ctx, s.db, *w.HeadRevisionID, s.project)
 	if e != nil {
 		return e

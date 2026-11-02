@@ -82,6 +82,9 @@ func (s *Server) importStandardWorkbook(ctx context.Context, w engineering.Works
 	if !preview.SupportsConfirmation {
 		return errors.New("STEP_TABLE_NOT_SUPPORTED")
 	}
+	if e = s.prepareStandardPowerRules(ctx, inputs, actor); e != nil {
+		return e
+	}
 	m, evidence, e := engineeringModel(ctx, s.db, *w.HeadRevisionID, s.project)
 	if e != nil {
 		return e

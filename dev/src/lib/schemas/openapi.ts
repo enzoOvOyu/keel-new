@@ -16230,6 +16230,9 @@ export interface components {
             provenance_id: string;
             racks: components["schemas"]["IDERackPowerPlan"][];
             revision_id: string;
+            scope?: components["schemas"]["IDEPowerScope"];
+            circuits?: components["schemas"]["IDEPowerCircuit"][];
+            supplies?: components["schemas"]["IDEEquipmentSupply"][];
         };
         IDEProvenance: {
             actor_id?: string;
@@ -16309,6 +16312,7 @@ export interface components {
             remaining?: components["schemas"]["IDEQuantity"];
             cooling_capacity?: components["schemas"]["IDEQuantity"];
             cooling_type: string;
+            capacity_basis?: string;
         };
         IDEReviewDecision: {
             actor_id: string;
@@ -16728,8 +16732,11 @@ export interface components {
         };
         IDEResultBinding: {
             entity_id: string;
-            /** @enum {string} */
-            field: "power_load" | "power_remaining" | "cable_calculated" | "cable_selected_stock" | "material_required" | "material_gap" | "workload_quantity" | "workload_hours";
+            /**
+             * @description Supported fields: power_load, power_remaining, circuit_load, circuit_remaining, supply_load, cable_calculated, cable_selected_stock, material_required, material_gap, workload_quantity, workload_hours.
+             * @enum {string}
+             */
+            field: "power_load" | "power_remaining" | "cable_calculated" | "cable_selected_stock" | "material_required" | "material_gap" | "workload_quantity" | "workload_hours" | "circuit_load" | "circuit_remaining" | "supply_load";
             output_name: string;
         };
         IDECalculationApplication: {
@@ -16871,7 +16878,7 @@ export interface components {
             code: string;
             label: string;
             /** @enum {string} */
-            kind: "text" | "mac" | "number" | "positive" | "positive_integer";
+            kind: "text" | "mac" | "number" | "positive" | "positive_integer" | "nonnegative";
             required: boolean;
         };
         IDEInputTable: {
@@ -16912,7 +16919,7 @@ export interface components {
         };
         IDEStandardInputRequest: {
             /** @enum {string} */
-            table_id: "terminations" | "rooms" | "racks" | "equipment_specs" | "placements" | "port_specs" | "patch_paths" | "network_planes" | "network_roles" | "network_interfaces" | "network_addresses" | "network_asns" | "network_bgp";
+            table_id: "terminations" | "rooms" | "racks" | "equipment_specs" | "placements" | "port_specs" | "patch_paths" | "network_planes" | "network_roles" | "network_interfaces" | "network_addresses" | "network_asns" | "network_bgp" | "power_scope" | "power_profiles" | "rack_capacity" | "power_circuits" | "power_connections" | "power_rules";
             csv: string;
             expected_revision: number;
             reason: string;
@@ -16939,6 +16946,36 @@ export interface components {
         IDEStandardWorkbookPreviewEnvelope: {
             data: components["schemas"]["IDEStandardWorkbookPreview"];
             request_id: string;
+        };
+        IDEPowerScope: {
+            scenario: string;
+            /** @enum {string} */
+            basis: "planned" | "nameplate" | "measured";
+            demand_rule: components["schemas"]["IDEVersionReference"];
+            /** @enum {string} */
+            redundancy_mode: "none" | "dual_independent";
+        };
+        IDEPowerCircuit: {
+            id: string;
+            code: string;
+            object_code: string;
+            location_id: string;
+            upstream_code: string;
+            capacity: components["schemas"]["IDEQuantity"];
+            load?: components["schemas"]["IDEQuantity"];
+            remaining?: components["schemas"]["IDEQuantity"];
+            calculation_run_id?: string;
+        };
+        IDEEquipmentSupply: {
+            id: string;
+            equipment_id: string;
+            psu: string;
+            circuit_code: string;
+            /** @enum {string} */
+            feed_group: "A" | "B";
+            allocation_rule: components["schemas"]["IDEVersionReference"];
+            load?: components["schemas"]["IDEQuantity"];
+            calculation_run_id?: string;
         };
     };
     responses: {

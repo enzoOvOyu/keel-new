@@ -117,6 +117,7 @@ func ValidatePower(m PhysicalModel) []ValidationIssue {
 		fac[f.EntityID] = f.Kind == "rack"
 	}
 	for _, p := range m.PowerPlans {
+		issues = append(issues, ValidatePowerSupply(m, p, true)...)
 		seen := map[string]bool{}
 		for _, v := range p.EquipmentProfiles {
 			key := v.EquipmentID + "/" + v.Basis

@@ -45451,13 +45451,13 @@ components:
       properties:
         attributes:
           items:
-            $ref: '#/components/schemas/IDEAttributeValue'
+            $ref: "#/components/schemas/IDEAttributeValue"
           type: array
         entity_id:
           type: string
         equipment_profiles:
           items:
-            $ref: '#/components/schemas/IDEEquipmentPowerProfile'
+            $ref: "#/components/schemas/IDEEquipmentPowerProfile"
           type: array
         evidence_ids:
           items:
@@ -45465,28 +45465,38 @@ components:
           type: array
         maturity:
           enum:
-          - Estimated
-          - Calculated
-          - Confirmed
-          - As-built
+            - Estimated
+            - Calculated
+            - Confirmed
+            - As-built
           type: string
         provenance_id:
           type: string
         racks:
           items:
-            $ref: '#/components/schemas/IDERackPowerPlan'
+            $ref: "#/components/schemas/IDERackPowerPlan"
           type: array
         revision_id:
           type: string
+        scope:
+          $ref: "#/components/schemas/IDEPowerScope"
+        circuits:
+          type: array
+          items:
+            $ref: "#/components/schemas/IDEPowerCircuit"
+        supplies:
+          type: array
+          items:
+            $ref: "#/components/schemas/IDEEquipmentSupply"
       required:
-      - entity_id
-      - revision_id
-      - evidence_ids
-      - provenance_id
-      - maturity
-      - attributes
-      - equipment_profiles
-      - racks
+        - entity_id
+        - revision_id
+        - evidence_ids
+        - provenance_id
+        - maturity
+        - attributes
+        - equipment_profiles
+        - racks
       type: object
       x-implementation-status: model-contract-only
     IDEProvenance:
@@ -45710,20 +45720,22 @@ components:
         calculation_run_id:
           type: string
         capacity:
-          $ref: '#/components/schemas/IDEQuantity'
+          $ref: "#/components/schemas/IDEQuantity"
         planned_load:
-          $ref: '#/components/schemas/IDEQuantity'
+          $ref: "#/components/schemas/IDEQuantity"
         rack_id:
           type: string
         remaining:
-          $ref: '#/components/schemas/IDEQuantity'
+          $ref: "#/components/schemas/IDEQuantity"
         cooling_capacity:
-          $ref: '#/components/schemas/IDEQuantity'
+          $ref: "#/components/schemas/IDEQuantity"
         cooling_type:
           type: string
+        capacity_basis:
+          type: string
       required:
-      - rack_id
-      - cooling_type
+        - rack_id
+        - cooling_type
       type: object
       x-implementation-status: model-contract-only
     IDEReviewDecision:
@@ -47076,20 +47088,26 @@ components:
         field:
           type: string
           enum:
-          - power_load
-          - power_remaining
-          - cable_calculated
-          - cable_selected_stock
-          - material_required
-          - material_gap
-          - workload_quantity
-          - workload_hours
+            - power_load
+            - power_remaining
+            - cable_calculated
+            - cable_selected_stock
+            - material_required
+            - material_gap
+            - workload_quantity
+            - workload_hours
+            - circuit_load
+            - circuit_remaining
+            - supply_load
+          description: "Supported fields: power_load, power_remaining, circuit_load,
+            circuit_remaining, supply_load, cable_calculated, cable_selected_stock,
+            material_required, material_gap, workload_quantity, workload_hours."
         output_name:
           type: string
       required:
-      - entity_id
-      - field
-      - output_name
+        - entity_id
+        - field
+        - output_name
     IDECalculationApplication:
       type: object
       additionalProperties: false
@@ -47524,6 +47542,7 @@ components:
             - number
             - positive
             - positive_integer
+            - nonnegative
         required:
           type: boolean
       required:
@@ -47657,6 +47676,12 @@ components:
             - network_addresses
             - network_asns
             - network_bgp
+            - power_scope
+            - power_profiles
+            - rack_capacity
+            - power_circuits
+            - power_connections
+            - power_rules
         csv:
           type: string
         expected_revision:
@@ -47725,6 +47750,78 @@ components:
       required:
         - data
         - request_id
+    IDEPowerScope:
+      type: object
+      additionalProperties: false
+      properties:
+        scenario: &a1
+          type: string
+        basis:
+          type: string
+          enum:
+            - planned
+            - nameplate
+            - measured
+        demand_rule:
+          $ref: "#/components/schemas/IDEVersionReference"
+        redundancy_mode:
+          type: string
+          enum:
+            - none
+            - dual_independent
+      required:
+        - scenario
+        - basis
+        - demand_rule
+        - redundancy_mode
+    IDEPowerCircuit:
+      type: object
+      additionalProperties: false
+      properties:
+        id: *a1
+        code: *a1
+        object_code: *a1
+        location_id: *a1
+        upstream_code: *a1
+        capacity:
+          $ref: "#/components/schemas/IDEQuantity"
+        load:
+          $ref: "#/components/schemas/IDEQuantity"
+        remaining:
+          $ref: "#/components/schemas/IDEQuantity"
+        calculation_run_id: *a1
+      required:
+        - id
+        - code
+        - object_code
+        - location_id
+        - upstream_code
+        - capacity
+    IDEEquipmentSupply:
+      type: object
+      additionalProperties: false
+      properties:
+        id: *a1
+        equipment_id: *a1
+        psu: *a1
+        circuit_code: *a1
+        feed_group:
+          type: string
+          enum:
+            - A
+            - B
+        allocation_rule:
+          $ref: "#/components/schemas/IDEVersionReference"
+        load:
+          $ref: "#/components/schemas/IDEQuantity"
+        calculation_run_id: *a1
+      required:
+        - id
+        - equipment_id
+        - psu
+        - circuit_code
+        - feed_group
+        - allocation_rule
 x-implementation-policy:
   frontend-first: true
   mock-provider-required: true

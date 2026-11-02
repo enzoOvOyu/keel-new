@@ -392,6 +392,17 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 				r.Remaining = nil
 				r.CalculationRunID = nil
 			}
+			for j := range x.Model.PowerPlans[i].Circuits {
+				c := &x.Model.PowerPlans[i].Circuits[j]
+				c.Load = nil
+				c.Remaining = nil
+				c.CalculationRunID = nil
+			}
+			for j := range x.Model.PowerPlans[i].Supplies {
+				c := &x.Model.PowerPlans[i].Supplies[j]
+				c.Load = nil
+				c.CalculationRunID = nil
+			}
 		}
 		kept := []engineering.SourceEvidence{}
 		for _, ev := range x.Evidence {
@@ -522,6 +533,11 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 		return "", networkErr
 	}
 	issues = append(issues, networkIssues...)
+	_, powerIssues, powerErr := powerPolicyRules(ctx, tx, s.project, x.Model)
+	if powerErr != nil {
+		return "", powerErr
+	}
+	issues = append(issues, powerIssues...)
 	staleWorkload, err := staleWorkloadIssues(ctx, tx, x.Model)
 	if err != nil {
 		return "", err

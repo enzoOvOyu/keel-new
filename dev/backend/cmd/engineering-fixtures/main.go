@@ -44,10 +44,11 @@ func main() {
 			{TableID: "network_bgp", Rows: [][]string{{"TEST-SRV-001", "ens1", "TEST-SW-002/Ethernet1", "64512", "64513", "ipv4-unicast", "fixture-network-policy-v1"}}},
 		},
 		5: {
+			{TableID: "power_scope", Rows: [][]string{{"normal-single-feed", "planned", "fixture-power@1", "none"}}},
 			{TableID: "power_profiles", Rows: [][]string{{"TEST-SRV-001", "500", "W", "planned", "SYNTHETIC_ONLY engineering input"}, {"TEST-SW-002", "300", "W", "planned", "SYNTHETIC_ONLY engineering input"}}},
 			{TableID: "rack_capacity", Rows: [][]string{{"R1", "2", "kW", "SYNTHETIC_ONLY capacity", "air", ""}, {"R2", "2", "kW", "SYNTHETIC_ONLY capacity", "air", ""}}},
 			{TableID: "power_circuits", Rows: [][]string{{"PDU-R1-A", "R1", "", "CIRCUIT-R1-A", "2", "kW"}, {"PDU-R2-A", "R2", "", "CIRCUIT-R2-A", "2", "kW"}}},
-			{TableID: "power_connections", Rows: [][]string{{"TEST-SRV-001", "PSU1", "CIRCUIT-R1-A", "A", "fixture-full-load-v1"}, {"TEST-SW-002", "PSU1", "CIRCUIT-R2-A", "A", "fixture-full-load-v1"}}},
+			{TableID: "power_connections", Rows: [][]string{{"TEST-SRV-001", "PSU1", "CIRCUIT-R1-A", "A", "fixture-power@1"}, {"TEST-SW-002", "PSU1", "CIRCUIT-R2-A", "A", "fixture-power@1"}}},
 			{TableID: "power_rules", Rows: [][]string{{"fixture-power", "1", "normal-single-feed", "planned", "1", "SYNTHETIC_ONLY; not a redundant power design"}}},
 		},
 	}

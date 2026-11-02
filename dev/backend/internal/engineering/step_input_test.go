@@ -64,3 +64,10 @@ func TestStepInputInvalidNumbers(t *testing.T) {
 		t.Fatal("unknown table")
 	}
 }
+
+func TestStepInputSensitiveValuesNotEchoed(t *testing.T) {
+	result := PreviewStepInput(standardRequest("power_scope", []string{"password=synthetic-not-real", "planned", "example@1", "none"}))
+	if result.Valid || len(result.Rows) != 1 || result.Rows[0][0] != "[REDACTED]" {
+		t.Fatal("sensitive value accepted or echoed")
+	}
+}

@@ -3,6 +3,8 @@ package engineering
 import (
 	"encoding/csv"
 	"io"
+	"keel.local/dev/internal/bom"
+	"math/big"
 	"net"
 	"strconv"
 	"strings"
@@ -52,7 +54,7 @@ func StepInputCatalog() InputCatalog {
 	add := func(id string, step int, name, condition, spec string) {
 		t := InputTable{ID: id, Step: step, Name: name, Condition: condition, Fields: []InputField{}}
 		switch id {
-		case "terminations", "rooms", "racks", "equipment_specs", "placements", "port_specs", "patch_paths", "network_planes", "network_roles", "network_interfaces", "network_addresses", "network_asns", "network_bgp":
+		case "terminations", "rooms", "racks", "equipment_specs", "placements", "port_specs", "patch_paths", "network_planes", "network_roles", "network_interfaces", "network_addresses", "network_asns", "network_bgp", "power_scope", "power_profiles", "rack_capacity", "power_circuits", "power_connections", "power_rules":
 			t.SupportsConfirmation = true
 		}
 		for _, s := range strings.Split(spec, "|") {
@@ -91,11 +93,12 @@ func StepInputCatalog() InputCatalog {
 	add("network_qos", 4, "RoCE与QoS", "使用相应配置集时必填，值由网络规划决定。", "serial:设备SN|interface:接口|profile:配置集|traffic_class:流量类别|pfc:无损优先级|ecn:ECN策略|source:来源")
 	add("network_ar", 4, "Adaptive Routing", "使用Adaptive Routing时必填。", "serial:设备SN|scope:作用范围|profile:策略引用|source:来源")
 	add("network_evpn", 4, "EVPN与VXLAN", "使用该配置集时必填。", "serial:设备SN|vrf:VRF|vni:VNI:positive_integer|rd:RD|import_rt:导入RT|export_rt:导出RT|source:来源")
-	add("power_profiles", 5, "设备功率", "规划、铭牌、实测分别记录，不能混用。", "reference:设备SN或型号引用|power:功率:positive|unit:功率单位|basis:功率依据|source:来源")
+	add("power_scope", 5, "电力计算范围", "明确场景、功率依据和已批准规则；冗余模式填none或dual_independent，规则引用填编码@版本或UUID@版本。", "scenario:场景|basis:功率依据|demand_rule:需求规则引用|redundancy_mode:冗余要求")
+	add("power_profiles", 5, "设备功率", "规划、铭牌、实测分别记录，不能混用。", "reference:设备SN或型号引用|power:功率:nonnegative|unit:功率单位|basis:功率依据|source:来源")
 	add("rack_capacity", 5, "机柜容量", "容量未知不得按0或通过处理。", "rack_code:机柜编码|capacity:可用容量:positive|unit:功率单位|basis:容量依据|cooling_type?:冷却方式|cooling_capacity?:冷却容量:positive")
 	add("power_circuits", 5, "供电对象与回路", "声称回路或冗余校验时必填；上游根节点可空。", "code:对象编码|location:机房或机柜编码|upstream?:上游引用|circuit:回路编码|capacity:可用容量:positive|unit:功率单位")
 	add("power_connections", 5, "设备供电关系", "声称供电关系或冗余校验时必填。", "serial:设备SN|psu:电源口或PSU|circuit:供电对象或回路|group:A或B分组|rule:负载分配规则引用")
-	add("power_rules", 5, "电力规则", "规则参数需明确来源和审批，不能猜测A/B分摊。", "code:规则编码|version:版本:positive_integer|scenario:运行或冗余场景|basis:负载容量口径|factor:需用系数:positive|source:来源")
+	add("power_rules", 5, "电力规则", "规则参数需明确来源和审批，不能猜测A/B分摊。", "code:规则编码|version:版本:positive_integer|scenario:运行或冗余场景|basis:负载容量口径|factor:需用系数:nonnegative|source:来源")
 	return c
 }
 
@@ -150,6 +153,11 @@ func PreviewStepInput(q InputPreviewRequest) InputPreview {
 		out.Rows = append(out.Rows, values)
 		for i, f := range table.Fields {
 			value := strings.TrimSpace(values[i])
+			if bom.Sensitive(value) && !(f.Code == "source" && strings.HasPrefix(value, "vault:")) {
+				values[i] = "[REDACTED]"
+				problem(row, f.Code, "SENSITIVE_VALUE", "敏感信息不能进入标准模型，请改用受控引用或移除秘密值")
+				continue
+			}
 			if value == "" {
 				if f.Required {
 					problem(row, f.Code, "REQUIRED", "请补充"+f.Label)
@@ -162,8 +170,8 @@ func PreviewStepInput(q InputPreviewRequest) InputPreview {
 				if e != nil || len(m) != 6 {
 					problem(row, f.Code, "INVALID_MAC", "MAC应为48位地址")
 				}
-			case "number", "positive", "positive_integer":
-				if !decimal(value) || f.Kind != "number" && !positive(value) {
+			case "number", "nonnegative", "positive", "positive_integer":
+				if !decimal(value) || ((f.Kind == "positive" || f.Kind == "positive_integer") && !positive(value)) || (f.Kind == "nonnegative" && !inputNonnegative(value)) {
 					problem(row, f.Code, "INVALID_NUMBER", "数值或范围无效")
 				} else if f.Kind == "positive_integer" {
 					if _, e := strconv.ParseUint(value, 10, 64); e != nil {
@@ -199,4 +207,9 @@ type StandardWorkbookPreview struct {
 	Tables               []InputPreview `json:"tables"`
 	Valid                bool           `json:"valid"`
 	SupportsConfirmation bool           `json:"supports_confirmation"`
+}
+
+func inputNonnegative(value string) bool {
+	n, ok := new(big.Rat).SetString(value)
+	return ok && n.Sign() >= 0
 }

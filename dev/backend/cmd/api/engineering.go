@@ -600,6 +600,19 @@ func (s *Server) engineeringAction(r *http.Request, source string, q engineering
 		if action == "publish" && publication != nil {
 			return errors.New("ENGINEERING_PUBLICATION_PENDING")
 		}
+		if target == engineering.PowerTarget {
+			model, _, err := engineeringModel(ctx, tx, revision, s.project)
+			if err != nil {
+				return err
+			}
+			_, pending, err := powerPolicyRules(ctx, tx, s.project, model)
+			if err != nil {
+				return err
+			}
+			if len(pending) > 0 {
+				return errors.New("ENGINEERING_TARGET_BLOCKED")
+			}
+		}
 		if action == "review" {
 			if q.Decision == "approve" {
 				var blocked bool

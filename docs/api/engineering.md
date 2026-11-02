@@ -197,3 +197,13 @@ Agent原生工具参数按Pydantic Schema校验，读取脱敏IR，以逐Sheet�
 新规划绑定本任务当前已发布的物理连接修订（存在时），保留其版本；未有物理发布时仍可保存待补充草稿，继续由现有发布门禁阻断。来源指向本工程资料任务，补充XLSX原件另有不可变索引。审核及NETWORK_REVISION发布沿用现有事务/Outbox，Golden只读取已发布规划。当前标准入口不接收非空VLAN/VRF接口字段；BFD/QoS/AR/EVPN标准子表仍未接入，不宣称全网络协议完成，现有类型化编辑能力保持。
 
 隔离数据库和8093 API实际通过04-network.xlsx的两接口、两地址、两ASN及一BGP会话持久化核对，以及审核、发布和Golden读取；未下发设备配置。现网8081/5180未切换。
+
+### 标准供电建模与计算发布
+
+新增power_scope固定表明确scenario、basis、demand_rule、redundancy_mode；规则引用为编码@版本或UUID@版本，编码仅解析本项目导入的规则标识。power_profiles/rack_capacity/power_circuits/power_connections/power_rules整步可确认。机柜容量依据、回路位置/上游/容量、设备PSU/供电组/分配规则经043关系表持久化，不复制第二套资产身份。
+
+power_rules的显式系数提议现有注册表中的版本化规则草案，不自动批准；既有规则定义不一致拒绝覆盖。用户须在“计算与规则”审核，再运行power_balance。带scope的计算消费已批准项目规则，分别计算需求、PSU分配、回路及上游负载/余量；校验分配守恒、循环、未解析引用和双路至已声明根节点的独立性。未声明供电scope的历史基本机柜汇总保持原能力，不宣称冗余验证。未知容量不按0处理，显式零功率与非负系数可输入。
+
+calculation-application新增circuit_load/circuit_remaining/supply_load，前端只应用对应对象的负载/余量，不把诊断输出写入资产。带scope结果核对计算时模型快照与当前电力输入、provider版本及精确输出名称；任务去重input_digest不等于电力输入指纹。输入变化使相关结果失效；规则退役/未批准在审核和发布时重新核查。过载、缺计算、错误规则或供电图关系阻断ENGINEERING_POWER。Power面板新增场景、回路和设备供电表，仍由既有审核/Outbox发布，不覆盖Observed功率。
+
+隔离库043与8093 API已实际通过新版05-power.xlsx：规则草案门禁→显式规则审核→500W/300W需求和1500W/1700W机柜/回路余量→十项机柜/回路/PSU结果应用→ENGINEERING_POWER审核发布；错对象绑定拒绝且修订不变。另有循环、单路冒充双路、分配不守恒的定向单元用例。尚未接入完整布线链或新Agent，未执行真实供电操作。

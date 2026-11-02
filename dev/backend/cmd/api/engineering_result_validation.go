@@ -50,6 +50,26 @@ func verifyEngineeringResults(ctx context.Context, tx pgx.Tx, source, project st
 			}
 		}
 	}
+	for _, p := range x.Model.PowerPlans {
+		for _, c := range p.Circuits {
+			if c.CalculationRunID != nil {
+				runs[*c.CalculationRunID] = true
+				for _, q := range []*engineering.Quantity{c.Load, c.Remaining} {
+					if q != nil {
+						values = append(values, calculated{p.EntityID, *c.CalculationRunID, *q})
+					}
+				}
+			}
+		}
+		for _, s := range p.Supplies {
+			if s.CalculationRunID != nil {
+				runs[*s.CalculationRunID] = true
+				if s.Load != nil {
+					values = append(values, calculated{p.EntityID, *s.CalculationRunID, *s.Load})
+				}
+			}
+		}
+	}
 	for _, v := range x.Model.Materials {
 		if v.RequiredCalculationRunID != nil {
 			runs[*v.RequiredCalculationRunID] = true
@@ -102,6 +122,9 @@ func verifyEngineeringResults(ctx context.Context, tx pgx.Tx, source, project st
 		if e != nil {
 			return e
 		}
+	}
+	if e := verifyScopedPowerOutputs(ctx, tx, x.Model); e != nil {
+		return e
 	}
 	for _, value := range values {
 		found := false

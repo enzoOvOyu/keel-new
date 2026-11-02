@@ -68,6 +68,15 @@ func (s *Server) publishEngineering(ctx context.Context, tx pgx.Tx, event, proje
 			return errors.New("ENGINEERING_DEPENDENCY_UNPUBLISHED")
 		}
 	}
+	if payload.Target == engineering.PowerTarget {
+		_, pending, err := powerPolicyRules(ctx, tx, project, model)
+		if err != nil {
+			return err
+		}
+		if len(pending) > 0 {
+			return errors.New("POWER_RULE_APPROVAL_REQUIRED")
+		}
+	}
 	if payload.Target == engineering.NetworkTarget {
 		for _, p := range model.NetworkPlans {
 			if !networkPublicationReady(ctx, tx, project, p) {

@@ -12,10 +12,10 @@ import (
 
 func loadPowerRows(ctx context.Context, q engineeringQuery, revision string, m *engineering.PhysicalModel) error {
 	var raw []byte
-	e := q.QueryRow(ctx, `SELECT COALESCE(jsonb_agg(jsonb_build_object('entity_id',p.entity_id,'revision_id',p.revision_id,'provenance_id',v.provenance_id,'maturity',v.maturity,'attributes','[]'::jsonb,
+	e := q.QueryRow(ctx, `SELECT COALESCE(jsonb_agg(jsonb_build_object('scope',CASE WHEN p.scenario IS NOT NULL THEN jsonb_build_object('scenario',p.scenario,'basis',p.basis,'demand_rule',jsonb_build_object('id',p.demand_rule_id,'version',p.demand_rule_version),'redundancy_mode',p.redundancy_mode) END,'entity_id',p.entity_id,'revision_id',p.revision_id,'provenance_id',v.provenance_id,'maturity',v.maturity,'attributes','[]'::jsonb,
  'evidence_ids',COALESCE((SELECT jsonb_agg(id) FROM eng_evidence e WHERE e.revision_id=p.revision_id AND e.entity_id=p.entity_id),'[]'::jsonb),
  'equipment_profiles',COALESCE((SELECT jsonb_agg(jsonb_build_object('equipment_id',e.equipment_id,'basis',e.basis,'power',jsonb_build_object('value',e.power_value::text,'unit',e.power_unit),'cooling_type',e.cooling_type,'evidence_ids',e.evidence_ids) ORDER BY e.equipment_id,e.basis) FROM eng_equipment_power e WHERE e.revision_id=p.revision_id AND e.entity_id=p.entity_id),'[]'::jsonb),
- 'racks',COALESCE((SELECT jsonb_agg(jsonb_strip_nulls(jsonb_build_object('rack_id',r.rack_id,'cooling_type',r.cooling_type,
+ 'racks',COALESCE((SELECT jsonb_agg(jsonb_strip_nulls(jsonb_build_object('rack_id',r.rack_id,'cooling_type',r.cooling_type,'capacity_basis',r.capacity_basis,
  'capacity',CASE WHEN r.capacity_value IS NOT NULL THEN jsonb_build_object('value',r.capacity_value::text,'unit',r.capacity_unit) END,
  'cooling_capacity',CASE WHEN r.cooling_value IS NOT NULL THEN jsonb_build_object('value',r.cooling_value::text,'unit',r.cooling_unit) END,
  'planned_load',CASE WHEN r.load_value IS NOT NULL THEN jsonb_build_object('value',r.load_value::text,'unit',r.load_unit) END,
@@ -23,7 +23,16 @@ func loadPowerRows(ctx context.Context, q engineeringQuery, revision string, m *
 	if e != nil {
 		return e
 	}
-	return json.Unmarshal(raw, &m.PowerPlans)
+	if e = json.Unmarshal(raw, &m.PowerPlans); e != nil {
+		return e
+	}
+	for i := range m.PowerPlans {
+		p := &m.PowerPlans[i]
+		if e = loadPowerSupplyRows(ctx, q, revision, p); e != nil {
+			return e
+		}
+	}
+	return nil
 }
 func quantityColumns(q *engineering.Quantity) (*string, *string) {
 	if q == nil {
@@ -37,7 +46,16 @@ func savePowerRows(ctx context.Context, tx pgx.Tx, revision string, m *engineeri
 		if e := version(&p.EntityVersion, "power_plan"); e != nil {
 			return e
 		}
-		if _, e := tx.Exec(ctx, `INSERT INTO eng_power_plan VALUES($1,$2)`, revision, p.EntityID); e != nil {
+		var scenario, basis, rule, mode *string
+		var versionNumber *int
+		if p.Scope != nil {
+			scenario = &p.Scope.Scenario
+			basis = &p.Scope.Basis
+			rule = &p.Scope.DemandRule.ID
+			versionNumber = &p.Scope.DemandRule.Version
+			mode = &p.Scope.RedundancyMode
+		}
+		if _, e := tx.Exec(ctx, `INSERT INTO eng_power_plan(revision_id,entity_id,scenario,basis,demand_rule_id,demand_rule_version,redundancy_mode) VALUES($1,$2,$3,$4,$5,$6,$7)`, revision, p.EntityID, scenario, basis, rule, versionNumber, mode); e != nil {
 			return e
 		}
 		for _, v := range p.EquipmentProfiles {
@@ -65,9 +83,12 @@ func savePowerRows(ctx context.Context, tx pgx.Tx, revision string, m *engineeri
 			tv, tu := quantityColumns(v.CoolingCapacity)
 			lv, lu := quantityColumns(v.PlannedLoad)
 			rv, ru := quantityColumns(v.Remaining)
-			if _, e := tx.Exec(ctx, `INSERT INTO eng_rack_power VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`, revision, p.EntityID, v.RackID, cv, cu, tv, tu, v.CoolingType, lv, lu, rv, ru, v.CalculationRunID); e != nil {
+			if _, e := tx.Exec(ctx, `INSERT INTO eng_rack_power(revision_id,entity_id,rack_id,capacity_value,capacity_unit,cooling_value,cooling_unit,cooling_type,load_value,load_unit,remaining_value,remaining_unit,calculation_run_id,capacity_basis) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`, revision, p.EntityID, v.RackID, cv, cu, tv, tu, v.CoolingType, lv, lu, rv, ru, v.CalculationRunID, v.CapacityBasis); e != nil {
 				return e
 			}
+		}
+		if e := savePowerSupplyRows(ctx, tx, revision, *p); e != nil {
+			return e
 		}
 	}
 	return nil
@@ -186,6 +207,43 @@ func (s *Server) applyEngineeringCalculation(ctx context.Context, source string,
 					r.CalculationRunID = &q.RunID
 				}
 			}
+		case "circuit_load", "circuit_remaining", "supply_load":
+			for i := range x.Model.PowerPlans {
+				p := &x.Model.PowerPlans[i]
+				if binding.Field == "supply_load" {
+					for j := range p.Supplies {
+						s := &p.Supplies[j]
+						if s.ID != binding.EntityID {
+							continue
+						}
+						if page.Run.ProviderID != "engineering-power-balance" || binding.OutputName != s.ID+"/load" {
+							return errors.New("CALC_OUTPUT_BINDING_MISMATCH")
+						}
+						s.Load = &quantity
+						s.CalculationRunID = &q.RunID
+						found = true
+						entity = p.EntityID
+					}
+				}
+				for j := range p.Circuits {
+					c := &p.Circuits[j]
+					if c.ID != binding.EntityID || binding.Field == "supply_load" {
+						continue
+					}
+					suffix := map[string]string{"circuit_load": "/load", "circuit_remaining": "/remaining"}[binding.Field]
+					if page.Run.ProviderID != "engineering-power-balance" || binding.OutputName != c.ID+suffix {
+						return errors.New("CALC_OUTPUT_BINDING_MISMATCH")
+					}
+					if binding.Field == "circuit_load" {
+						c.Load = &quantity
+					} else {
+						c.Remaining = &quantity
+					}
+					c.CalculationRunID = &q.RunID
+					found = true
+					entity = p.EntityID
+				}
+			}
 		case "cable_calculated", "cable_selected_stock":
 			for i := range x.Model.Cables {
 				c := &x.Model.Cables[i]
@@ -223,8 +281,20 @@ func powerInputDigest(m engineering.PhysicalModel) string {
 		for _, e := range p.EquipmentProfiles {
 			values = append(values, []any{e.EquipmentID, e.Basis, e.Power})
 		}
+		if p.Scope != nil {
+			values = append(values, p.Scope)
+		}
+		for _, c := range p.Circuits {
+			values = append(values, []any{c.ID, c.Code, c.ObjectCode, c.LocationID, c.UpstreamCode, c.Capacity})
+		}
+		for _, s := range p.Supplies {
+			values = append(values, []any{s.ID, s.EquipmentID, s.PSU, s.CircuitCode, s.FeedGroup, s.AllocationRule})
+		}
 		for _, r := range p.Racks {
 			values = append(values, []any{r.RackID, r.Capacity, r.CoolingCapacity})
+			if r.CapacityBasis != "" {
+				values = append(values, []string{r.RackID, "capacity_basis", r.CapacityBasis})
+			}
 		}
 	}
 	for _, e := range m.Equipment {

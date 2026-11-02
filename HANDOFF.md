@@ -1,3 +1,9 @@
+## 已完成里程碑事件：供电图、已批准规则计算与电力发布闭环
+
+新增power_scope及供电回路/设备PSU关系，沿用注册表创建系数规则草案，必须单独审核。043规范化保存场景、容量依据、回路、PSU分配；计算验证规则批准、功率守恒、循环和已声明双路独立性，结果按机柜/回路/PSU精确应用并校验模型快照输入。修复真实隔离测试发现的摘要误比：任务去重摘要不等于电力输入指纹。05-power.xlsx在8093/隔离库实际完成导入→规则审核→需求/负载/余量计算→十项结果应用→ENGINEERING_POWER审核/Outbox发布；错误对象绑定原子拒绝，详见[电力测试](docs/intelligent-deployment/POWER-STANDARD-TEST-20261102.json)。UI新增场景、回路和PSU表，未执行浏览器或真实供电操作。
+
+现有生产8081/5180与迁移038未切换。当前业务已实测设备/落位、核心IPv4 BGP网络、场景化供电；完整布线导入/计算/发布和新Agent仍未完成，不能宣称五步整体交付。隔离测试API仍在8093，私有配置沿用/tmp/keel-fixed-step-test-d56d5fb3，库已增量到043；仅用于合成项目。
+
 ## 已完成里程碑事件：核心网络标准导入、审核发布与Golden读取
 
 network_planes/roles/interfaces/addresses/asns/bgp六类表已接入固定输入通路，关联既有设备/端口、保留明确IP/ASN/邻居。平面profile通过042存储，ethernet/ipv4-bgp/ipv6-bgp有明确门禁，缺地址/邻居不放行；新计划冻结本任务已发布物理连接版本，未发布时保留阻断草稿。隔离8093 API和测试库实际完成04-network.xlsx持久化核对、NETWORK_REVISION审核/Outbox发布与Golden读取，见[网络测试](docs/intelligent-deployment/NETWORK-STANDARD-TEST-20261102.json)。现网未部署，042仅应用隔离库。VLAN/VRF接口及BFD/QoS/AR/EVPN固定子表仍未接入；完整布线、电力、分步Agent和整体验收仍未完成，不以本切片代替整体交付。

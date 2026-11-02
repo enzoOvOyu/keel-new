@@ -200,6 +200,7 @@ type EquipmentPowerProfile struct {
 	EvidenceIDs []ID     `json:"evidence_ids"`
 }
 type RackPowerPlan struct {
+	CapacityBasis    string    `json:"capacity_basis,omitempty"`
 	RackID           ID        `json:"rack_id"`
 	Capacity         *Quantity `json:"capacity,omitempty"`
 	CoolingCapacity  *Quantity `json:"cooling_capacity,omitempty"`
@@ -210,6 +211,9 @@ type RackPowerPlan struct {
 }
 type PowerPlan struct {
 	EntityVersion
+	Scope             *PowerScope             `json:"scope,omitempty"`
+	Circuits          []PowerCircuit          `json:"circuits,omitempty"`
+	Supplies          []EquipmentSupply       `json:"supplies,omitempty"`
 	EquipmentProfiles []EquipmentPowerProfile `json:"equipment_profiles"`
 	Racks             []RackPowerPlan         `json:"racks"`
 }

@@ -404,7 +404,7 @@ func (s *Server) runEngineeringCalculation(ctx context.Context) {
 		var model engineering.PhysicalModel
 		model, _, e = engineeringModel(c, s.db, run.RevisionID, project)
 		if e == nil {
-			run = engineering.PowerBalance(model, run.RevisionID)
+			run, e = s.scopedPowerBalance(c, model, run.RevisionID)
 		}
 	} else if run.Rule != nil {
 		view, err := engineeringRule(c, s.db, project, run.Rule.ID, run.Rule.Version)

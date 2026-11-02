@@ -1,4 +1,17 @@
 export const engineeringMessages: Record<string, string> = {
+ STEP_POWER_PLAN_AMBIGUOUS: '当前标准入口需要一个明确的电力规划版本。',
+ STEP_POWER_SCOPE_AMBIGUOUS: '每份电力资料只声明一个当前计算场景。',
+ STEP_POWER_SOURCE_CONFLICT: '同一电力对象在本次资料中存在冲突值，请先核对。',
+ STEP_POWER_QUANTITY_INVALID: '功率和容量必须是明确的非负W/kW数值。',
+ STEP_POWER_BASIS_INVALID: '功率依据请填写planned、nameplate或measured。',
+ STEP_POWER_REDUNDANCY_INVALID: '冗余要求请填写none或dual_independent。',
+ STEP_POWER_FEED_INVALID: '供电分组请填写A或B。',
+ STEP_POWER_RULE_REFERENCE_INVALID: '规则引用请使用编码@版本或UUID@版本。',
+ STEP_POWER_RULE_INVALID: '电力规则版本和非负系数不完整。',
+ STEP_POWER_RULE_DEFINITION_CONFLICT: '此规则版本已有不同定义，请创建新版本再引用。',
+ CALC_POWER_OUTPUT_UNAVAILABLE: '计算结果不存在或不属于当前项目。',
+ CALC_POWER_INPUT_STALE: '电力输入已变化，或结果不来自当前场景的计算，请重新计算。',
+
  STEP_NETWORK_REFERENCE_AMBIGUOUS: '网络引用匹配多个对象，请使用明确的设备、平面或接口引用。',
  STEP_NETWORK_PLANE_REQUIRED: '请先补充网络域/平面，并核对所属Fabric。',
  STEP_NETWORK_INTERFACE_REQUIRED: '请先补充接口映射，并使用明确的设备/接口引用。',

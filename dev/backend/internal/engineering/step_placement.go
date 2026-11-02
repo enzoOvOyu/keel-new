@@ -8,6 +8,9 @@ import (
 )
 
 func MergeStandardInput(current PhysicalModel, q InputPreviewRequest) (PhysicalModel, error) {
+	if strings.HasPrefix(q.TableID, "power_") || q.TableID == "rack_capacity" {
+		return mergePowerInput(current, q)
+	}
 	if strings.HasPrefix(q.TableID, "network_") {
 		return mergeNetworkInput(current, q)
 	}
