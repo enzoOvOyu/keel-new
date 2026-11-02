@@ -1,3 +1,9 @@
+## 已完成里程碑事件：新开局Agent正式发布到现有环境
+
+按用户“Agent功能上线然后发布”指令，前端5180与API8081已统一部署到 `/home/ubuntu/.local/state/keel-deployments/agent-release-7b2ec19`。发布源版本7b2ec19，后端功能代码与93a6a1e一致，复用已构建且同源的二进制；新分步识别入口、Responses Provider、多行SN表头修复和候选保护均已在线。运行进程、源文件一致性、健康页和前端模块HTTP200已核对。没有重跑模型、导入或业务回归；其他原型端口保持。
+
+功能发布不改变现有真实测试结论：MM完整开局仍有输入及提取缺口；新SN+MAC副本已生成，尚未重新导入识别或发布业务资产。真实Provider保留gpt-6.1-sol及用户已有凭据引用。发布清单见 [Agent发布记录](docs/intelligent-deployment/AGENT-RELEASE-20261102.json)。
+
 ## 已完成里程碑事件：MM测试副本补充合成MAC
 
 用户明确授权生成MAC并填入表格。私有新副本 `/home/ubuntu/.local/state/keel-tests/mm-sn/MM_Layout_GB300-18_HDD&SSD&CPU-112_V1.1_TEST_SN_MAC.xlsx` 已在五张端接表新增本端MAC/对端MAC两列，共14308个地址，按测试SN+端口稳定关联，均为02前缀本地管理单播地址。逐项回读验证唯一性与格式；原文件、已有SN副本及原公式缓存不变。没有覆盖已上传任务的不可变原件；已有Agent测试结论仍针对SN版，后续导入须使用新SN_MAC副本，不能将此次文件校验宣称为新版Agent识别验收。原文件、MAC映射与实际行仅留在受控私有目录。

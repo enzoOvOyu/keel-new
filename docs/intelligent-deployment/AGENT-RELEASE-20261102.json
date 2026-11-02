@@ -1,0 +1,18 @@
+{
+  "commit": "7b2ec19",
+  "backend_code_commit": "93a6a1e",
+  "runtime_directory": "/home/ubuntu/.local/state/keel-deployments/agent-release-7b2ec19",
+  "frontend_port": 5180,
+  "api_port": 8081,
+  "binary_sha256": "1e0fc3f02b76b72c7d8574b1ea64aba2a4cda9b59ae060da9d0d3ae1a00bd767",
+  "new_model_calls": 0,
+  "new_business_tests": false,
+  "checks": {
+    "api_health": "HTTP 200",
+    "frontend_entry": "HTTP 200",
+    "agent_action_module": "HTTP 200",
+    "committed_source_matches_runtime": true,
+    "api_process_release_matches": true,
+    "frontend_process_release_matches": true
+  }
+}
