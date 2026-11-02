@@ -330,3 +330,7 @@ Kestra2.0.7兼容修正包括Loop替代不存在的ForEach、`fromJson(item.valu
 仍不宣称像素级100%或真实设备验收；Metrics时间筛选为已返回样本，不是全量时序查询。固定版本是本轮已实现语义，动态跟随最新版不在范围。ZTP由Fabric后续联调。未保存草稿仍为当前会话内存。
 
 本批最终 `npm run build`（TypeScript + Vite）通过，Vite1m22s；API台账108项及diff空白检查通过。保留既有chunk体积和第三方注释提示。仅本任务临时5193已关闭，未改部署服务。
+
+## 2026-11-02 授权部署
+
+组合发布9441a89保留dev ab1bd85并接入jobs12f8b80，独立deploy/jobs-ui-20261102推送；未合并dev/main，未修改其他工作区。5180/flows和8081已上线，增量044迁移/私有备份完成。组合构建、5项认证GET及3个真实页面启动检查通过；不含设备/业务写测试。证据及回退见deployment-20261102.json。
