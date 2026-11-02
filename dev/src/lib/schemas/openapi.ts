@@ -7256,7 +7256,7 @@ export interface components {
             name: string;
             serial: string;
             /** @enum {string} */
-            type: "server" | "switch";
+            type: "server" | "switch" | "device";
             model: string;
             rackId: string;
             startU: number | null;

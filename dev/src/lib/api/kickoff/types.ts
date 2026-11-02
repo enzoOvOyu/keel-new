@@ -3,7 +3,7 @@ export type ReviewState = 'ready' | 'blocked' | 'published';
 export type Readiness = 'ready' | 'partial' | 'needs_input';
 export interface Evidence { sourceId: string; sheet: string; cell: string; method: 'source' | 'mapping' | 'manual' | 'calculation'; note?: string }
 export interface Device {
-  id: string; name: string; serial: string; type: 'server' | 'switch'; model: string;
+  id: string; name: string; serial: string; type: 'server' | 'switch' | 'device'; model: string;
   rackId: string; startU: number | null; heightU: number | null; role: string;
   managementAddress: string; evidence: Evidence;
 }

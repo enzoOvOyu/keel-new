@@ -18726,6 +18726,7 @@ components:
           enum:
             - server
             - switch
+            - device
         model:
           type: string
         rackId:

@@ -106,7 +106,7 @@ func stringValue(v *string) string {
 	return *v
 }
 func IsDevice(e engineering.EquipmentPlan) bool {
-	return e.EquipmentType == "server" || e.EquipmentType == "switch"
+	return e.EquipmentType == "server" || e.EquipmentType == "switch" || e.EquipmentType == "device"
 }
 func Project(m engineering.PhysicalModel, ev []engineering.SourceEvidence, source string, inputs []ModelInput) View {
 	v := View{Devices: []Device{}, Ports: []Port{}, Connections: []Connection{}, Components: []Component{}, Racks: []Rack{}, Issues: []Issue{}}
