@@ -1,3 +1,11 @@
+## 当前任务 · 2026-11-02 Fabric重构空白起点
+
+用户明确要求本次新建独立Fabric分支。工作区 `/home/ubuntu/keel-fabric-dev`，分支 `feat/fabric-rebuild`，基线为dev已提交d9e2b77；另一个窗口dev未提交的kickoff改动未复制、未暂存或提交。
+
+FabricWorkspace现在返回null，移除旧网络设备/ZTP/Golden/Doublecheck/PushJob/无损/DDM/日志/规则治理子菜单及专属旧FabricTopology页面。保留“网络底座”一级入口、项目路由、现有页面权限和全局Shell，内容区为空，不加入占位说明或按钮；旧子路由也不再呈现旧功能。
+
+本次不删除CMDB/设备/端口/线缆数据或后端契约，不改共享设备抽屉、运维拓扑、网络证据组件，不影响其他模块。仅分支准备，未部署或合并dev/main。后续在本分支按新Fabric需求实施。
+
 ## 唯一接续入口 · 2026-11-02 干净开发基线
 
 - **后续开发：`/home/ubuntu/keel-dev`，Git `dev`，应用目录 `dev/`。** `main`同步保留同一整合基线。
