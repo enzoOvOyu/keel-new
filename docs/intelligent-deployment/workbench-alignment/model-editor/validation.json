@@ -1,0 +1,26 @@
+{
+  "scope": "Model input detail dialog only; approved prototype ModelEditor alignment",
+  "changes": [
+    "1160px responsive dialog with fixed heading and footer",
+    "Single model; remove duplicate step and type navigation inside dialog",
+    "Import toolbar, quoted CSV paste and editable table",
+    "Source/version explanation and server validation feedback",
+    "Keep whole-step XLSX in explicit secondary section",
+    "Backend preview required before adoption; actual revision and permissions retained"
+  ],
+  "checks": {
+    "typescript": "PASS",
+    "isolated_browser": "PASS",
+    "dialog_width_desktop": "1160px",
+    "narrow_viewport": "390px; horizontal table scrolling",
+    "no_duplicate_step_navigation": true,
+    "invalid_preview_blocks_adoption": true,
+    "page_errors": 0,
+    "production_writes": 0
+  },
+  "limits": [
+    "Original prototype save-draft operation is not mapped to a fake local save; actual backend requires preview followed by confirmed merge",
+    "No new Agent, API, schema or database changes",
+    "Synthetic browser responses only; no real import or model acceptance"
+  ]
+}

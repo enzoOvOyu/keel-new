@@ -1,3 +1,9 @@
+## 已完成里程碑事件：建模导入编辑详情按原型修正
+
+针对上一轮直接嵌入旧五步表单的偏差，改为与批准ModelEditor原型一致的宽弹窗、顶部导入工具栏、逐格编辑表格、来源/版本依据、校验反馈及底部固定操作。弹窗内去掉重复步骤导航和资料类型选择；整步XLSX明确作为次级入口保留，避免被误解为仅当前表操作。继续使用真实后端预览与确认合并，不伪造本地“保存草稿”成功。仅修改EngineeringStudio、EngineeringStepInputs及作用域样式。
+
+TypeScript和隔离浏览器检查通过，覆盖1160px桌面、390px窄屏、表格编辑/粘贴、后端问题反馈、无效预览不能确认采用及无页面异常；截图与范围见[详情页验证](docs/intelligent-deployment/workbench-alignment/model-editor/validation.json)。未执行真实资料导入或Agent验收，未改API/数据库；后续发布记录单独登记。
+
 ## 已完成里程碑事件：智能开局工作台前端部署至5180
 
 前端1706cbc已部署 `/home/ubuntu/.local/state/keel-deployments/workbench-1706cbc/dev`，5180由 `keel-dev-5180` 会话提供。前端构建通过，入口及新增工作台/建模编辑模块HTTP200；在线登录页无页面异常，发布源文件与提交一致。API保持e5faead和原进程2424213，健康检查200；没有数据库迁移或真实项目写入。旧前端启动器保留用于回退。详见[部署证据](docs/intelligent-deployment/workbench-alignment/deployment.json)。

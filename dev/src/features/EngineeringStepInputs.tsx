@@ -1,3 +1,4 @@
+import {ArrowDownToLine,Check,FileSpreadsheet,Plus,Trash2,Upload} from 'lucide-react';
 import {readInputCSV,writeInputCSV} from './engineeringInputCSV';
 import {useEffect,useRef,useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
@@ -5,8 +6,9 @@ import {Button} from '../components/ui';
 import {importEngineeringStandardWorkbook,previewEngineeringStandardWorkbook,type EngineeringStandardWorkbookPreview,importEngineeringStandardInput,engineeringInputCatalog,engineeringInputTemplateURL,previewEngineeringInput,type EngineeringInputPreview,type EngineeringStandardInputRequest} from '../lib/api/engineering';
 
 const steps=['设备关联','机房与落位','连线与布线','逻辑网络','电力相关'];
-export function EngineeringStepInputs({project,canEdit,sourceID,revision,onSaved,canUpload=false,initialStep=1,initialTable=''}:{project:string;canEdit:boolean;sourceID?:string;revision?:number;onSaved?:()=>Promise<void>;canUpload?:boolean;initialStep?:number;initialTable?:string}) {
+export function EngineeringStepInputs({project,canEdit,sourceID,revision,onSaved,canUpload=false,initialStep=1,initialTable='',dialog=false}:{project:string;canEdit:boolean;sourceID?:string;revision?:number;onSaved?:()=>Promise<void>;canUpload?:boolean;initialStep?:number;initialTable?:string;dialog?:boolean}) {
  const [step,setStep]=useState(initialStep),[tableID,setTableID]=useState(initialTable),[csv,setCSV]=useState(''),[result,setResult]=useState<EngineeringInputPreview|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false);
+ const csvFile=useRef<HTMLInputElement>(null),workbookFile=useRef<HTMLInputElement>(null);const [showPaste,setShowPaste]=useState(false);
  const [reason,setReason]=useState('');const [workbook,setWorkbook]=useState<EngineeringStandardWorkbookPreview|null>(null);const [filename,setFilename]=useState('');
  const scope=useRef(project);scope.current=project+'\0'+step+'\0'+tableID;const pending=useRef<AbortController|null>(null);
  const catalog=useQuery({queryKey:['engineering-input-catalog',project],queryFn:({signal})=>engineeringInputCatalog(project,signal)});
@@ -15,11 +17,40 @@ export function EngineeringStepInputs({project,canEdit,sourceID,revision,onSaved
  const parsed=readInputCSV(csv);const headers=table?.fields.map(f=>f.label)||[];
  const editable=!!parsed&&(!parsed.length||JSON.stringify(parsed[0])===JSON.stringify(headers))&&parsed.every(row=>row.length===headers.length);
  const inputRows=parsed?.slice(1)||[];
- function updateRows(rows:string[][]){setCSV(writeInputCSV([headers,...rows]));setResult(null)}
- async function preview(){if(!table)return;pending.current?.abort();const controller=new AbortController();pending.current=controller;const frozen=scope.current;setBusy(true);setError('');setResult(null);try{const value=await previewEngineeringInput(project,{table_id:table.id,csv},controller.signal);if(scope.current===frozen&&!controller.signal.aborted)setResult(value)}catch(e){if(!controller.signal.aborted&&scope.current===frozen)setError((e as Error).message)}finally{if(!controller.signal.aborted&&scope.current===frozen)setBusy(false)}}
+ function updateRows(rows:string[][]){setCSV(writeInputCSV([headers,...rows]));setResult(null);setWorkbook(null)}
+ async function preview(){if(!table)return;pending.current?.abort();const controller=new AbortController();pending.current=controller;const frozen=scope.current;setBusy(true);setError('');setResult(null);setWorkbook(null);try{const value=await previewEngineeringInput(project,{table_id:table.id,csv},controller.signal);if(scope.current===frozen&&!controller.signal.aborted)setResult(value)}catch(e){if(!controller.signal.aborted&&scope.current===frozen)setError((e as Error).message)}finally{if(!controller.signal.aborted&&scope.current===frozen)setBusy(false)}}
  async function confirm(){if(!sourceID||!revision||!result?.valid||!table?.supports_confirmation)return;const frozen=scope.current;setBusy(true);setError('');try{await importEngineeringStandardInput(project,sourceID,{table_id:table.id as EngineeringStandardInputRequest['table_id'],csv,expected_revision:revision,reason});await onSaved?.();if(scope.current===frozen){setResult(null);setCSV('');setReason('')}}catch(e){if(scope.current===frozen)setError((e as Error).message)}finally{if(scope.current===frozen)setBusy(false)}}
  async function readWorkbook(file:File){if(!sourceID||!revision)return;pending.current?.abort();const controller=new AbortController();pending.current=controller;const frozen=scope.current;setBusy(true);setError('');setWorkbook(null);setResult(null);try{const value=await previewEngineeringStandardWorkbook(project,sourceID,file,step,revision,controller.signal);if(scope.current===frozen&&!controller.signal.aborted){setWorkbook(value);setFilename(file.name)}}catch(e){if(scope.current===frozen&&!controller.signal.aborted)setError((e as Error).message)}finally{if(scope.current===frozen&&!controller.signal.aborted)setBusy(false)}}
  async function confirmWorkbook(){if(!sourceID||!revision||!workbook?.valid||!workbook.supports_confirmation)return;const frozen=scope.current;setBusy(true);setError('');try{await importEngineeringStandardWorkbook(project,sourceID,{import_id:workbook.import_id,step:workbook.step,expected_revision:revision,reason});await onSaved?.();if(scope.current===frozen){setWorkbook(null);setFilename('');setReason('')}}catch(e){if(scope.current===frozen)setError((e as Error).message)}finally{if(scope.current===frozen)setBusy(false)}}
+ if(dialog)return <section className="es-model-editor">
+  <div className="es-model-editor-body">
+   {catalog.isPending&&<p aria-busy="true">正在读取输入要求…</p>}
+   {catalog.error&&<p role="alert">{catalog.error.message}<Button onClick={()=>void catalog.refetch()}>重试</Button></p>}
+   {table&&<>
+    <div className="es-editor-note"><FileSpreadsheet size={17}/><span>{table.condition}</span></div>
+    <div className="es-editor-toolbar">
+     <a className="btn" href={engineeringInputTemplateURL(project,table.id,'csv')}><ArrowDownToLine size={15}/>下载 CSV 模板</a>
+     <Button disabled={!canEdit||busy} onClick={()=>csvFile.current?.click()}><Upload size={15}/>导入 CSV</Button>
+     <Button disabled={!canEdit||busy} onClick={()=>setShowPaste(v=>!v)}>粘贴表格</Button>
+     <span>{inputRows.length} 行 · {table.fields.length} 列</span>
+    </div>
+    <input ref={csvFile} hidden aria-label={'导入'+table.name+' CSV'} type="file" accept=".csv,text/csv" onChange={e=>{const file=e.target.files?.[0];e.target.value='';if(!file)return;const frozen=scope.current;void file.text().then(value=>{if(scope.current===frozen){setCSV(value);setResult(null);setWorkbook(null);setReason('用户导入 · '+file.name)}})}}/>
+    {(showPaste||!editable)&&<div className="es-editor-paste"><label>CSV 原文与批量粘贴<textarea aria-label="标准数据 CSV" rows={5} disabled={!canEdit||busy} value={csv} onChange={e=>{setCSV(e.target.value);setResult(null);setWorkbook(null)}} placeholder={headers.join(',')}/></label>{!editable&&<p role="alert">表头、列数或引号不匹配，请保留模板中的全部列。</p>}<Button onClick={()=>setShowPaste(false)} disabled={!editable}>返回表格</Button></div>}
+    {editable&&<><div className="es-editor-table"><table><thead><tr><th>#</th>{table.fields.map(f=><th key={f.code}>{f.label.replace(/^a端/,'本端').replace(/^b端/,'对端')}{f.required?' *':''}<small>{f.code}</small></th>)}<th/></tr></thead><tbody>{inputRows.map((row,i)=><tr key={i}><td>{i+1}</td>{table.fields.map((f,j)=><td key={f.code}><input aria-label={f.label+' 第'+(i+1)+'行'} disabled={!canEdit||busy} value={row[j]||''} onChange={e=>updateRows(inputRows.map((r,k)=>k===i?r.map((v,l)=>l===j?e.target.value:v):r))}/></td>)}<td><button className="es-editor-icon" aria-label={'删除第'+(i+1)+'行'} disabled={!canEdit||busy} onClick={()=>updateRows(inputRows.filter((_,k)=>k!==i))}><Trash2 size={15}/></button></td></tr>)}</tbody></table>{!inputRows.length&&<p className="es-editor-empty">导入资料，或添加一行开始填写。未知字段保持空白，由校验定位缺口。</p>}</div><Button disabled={!canEdit||busy} onClick={()=>updateRows([...inputRows,headers.map(()=>'')])}><Plus size={15}/>添加一行</Button></>}
+    <label className="es-editor-reason">输入依据 / 版本说明<input aria-label="输入依据 / 版本说明" value={reason} disabled={!canEdit||busy} onChange={e=>setReason(e.target.value)} placeholder="填写来源文件、设计版本或人工核对依据"/></label>
+    {error&&<p className="notice error" role="alert">{error}</p>}
+    {result&&<div className={'es-editor-validation '+(result.valid?'valid':'invalid')} role={result.valid?'status':'alert'}><strong>{result.valid?'格式校验通过':'需要处理 '+result.issues.length+' 项问题'}</strong>{result.issues.map((issue,i)=><p key={i}>第 {issue.row||'—'} 行 · {table.fields.find(f=>f.code===issue.field)?.label||issue.field}：{issue.message}</p>)}{result.valid&&<p>身份、引用和工程约束将在确认合并时由后端检查，正式发布仍需审核。</p>}</div>}
+    {!sourceID&&<p className="es-editor-help">先上传资料建立工程任务，才能确认采用建模输入。</p>}
+    {!canEdit&&<p className="es-editor-help">当前账号没有编辑权限。</p>}
+    <details className="es-editor-workbook"><summary>整步 XLSX 导入与字段要求</summary><p>此入口会合并本步骤工作簿中的多张表，而非只替换当前模型。</p><a className="btn" href={engineeringInputTemplateURL(project,table.id,'xlsx')}>下载 XLSX 模板</a> <Button disabled={!sourceID||!canUpload||!canEdit||busy} onClick={()=>workbookFile.current?.click()}>导入本步骤 XLSX</Button><input hidden ref={workbookFile} aria-label="导入本步骤 XLSX" type="file" accept=".xlsx" onChange={e=>{const file=e.target.files?.[0];e.target.value='';if(file)void readWorkbook(file)}}/>
+     <dl>{table.fields.map(f=><div key={f.code}><dt>{f.label}</dt><dd>{f.required?'必填':'按适用条件补充'} · {f.kind}</dd></div>)}</dl>
+    </details>
+    {workbook&&<div className="es-editor-validation" role="status"><strong>{filename} · {workbook.valid?'格式校验通过':'需要修正'}</strong>{workbook.tables.map(t=><div key={t.table_id}><p>{catalog.data?.tables.find(v=>v.id===t.table_id)?.name||t.table_id} · {t.rows.length} 行</p>{t.issues.map((issue,i)=><p key={i}>第 {issue.row} 行 · {issue.field}：{issue.message}</p>)}</div>)}{!workbook.supports_confirmation&&<p>部分资料不支持整步确认，不能合并。</p>}</div>}
+    <p className="es-editor-help">采用输入将产生新版本并重新校验；已有发布记录保留，受影响的工程结果需重新审核。</p>
+   </>}
+  </div>
+  <div className="es-model-editor-footer"><span>{busy?'正在处理…':workbook?'整步工作簿预览':'先校验，再确认采用'}</span><Button disabled={!canEdit||busy||!csv.trim()||!editable} onClick={()=>void preview()}>校验输入</Button><Button variant="primary" disabled={!sourceID||!revision||!canEdit||busy||!reason.trim()||(workbook?!workbook.valid||!workbook.supports_confirmation:!result?.valid||!table?.supports_confirmation)} onClick={()=>void(workbook?confirmWorkbook():confirm())}><Check size={15}/>{workbook?'确认采用工作簿':'确认采用'}</Button></div>
+ </section>;
  return <section className="panel padded engineering-step-inputs">
   <div className="work-heading"><div><h3>五步标准输入</h3><p>下载模板，填写或导入资料，先定位缺项与格式问题。</p></div><span>契约版本 {catalog.data?.version||'—'}</span></div>
   <nav className="tabs" aria-label="开局五步">{steps.map((name,i)=><button key={name} aria-current={step===i+1?'step':undefined} className={step===i+1?'active':''} onClick={()=>{setStep(i+1);setTableID('')}}>{i+1}. {name}</button>)}</nav>
