@@ -1,0 +1,37 @@
+{
+  "at": "2026-11-02T08:02:15.733Z",
+  "scope": "targeted parity audit; synthetic API intercepted, zero backend writes; actual current defects, not production-device verification",
+  "findings": [
+    {
+      "id": "P-01",
+      "issue": "未保存修改时仍允许运行",
+      "reproduced": true,
+      "impact": "当前编辑草稿与实际持久化执行版本不一致；原型禁用dirty时运行"
+    },
+    {
+      "id": "P-02",
+      "issue": "源版本未定位执行冻结定义",
+      "reproduced": true,
+      "url": "http://127.0.0.1:5193/flows/definitions/11111111-1111-4111-8111-111111111111?tab=Revisions",
+      "expectedRevision": 12
+    },
+    {
+      "id": "P-03",
+      "issue": "执行Topology选中未联动Task Run/Attempt/日志",
+      "reproduced": true,
+      "before": "run-validate_topology",
+      "after": "run-validate_topology",
+      "inspector": "validate_topology",
+      "clicked": "resolve_targets"
+    },
+    {
+      "id": "P-04",
+      "issue": "Agent分页未绑定切片和页码状态",
+      "reproduced": true,
+      "renderedRows": 60,
+      "pageSize": 25
+    }
+  ],
+  "errors": [],
+  "writes": []
+}

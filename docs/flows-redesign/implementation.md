@@ -1,3 +1,31 @@
+<a id="prototype-parity-audit-20261102"></a>
+
+## 2026-11-02 原型一致性复核：仍有偏差，尚未修复
+
+**审计基线**：`dff0a8a` / `feat/jobs-kestra-ui`。本次只核对原型、现有代码和当前页面，不改业务实现、不部署、不合并。用户已明确ZTP事件匹配在Fabric模块开发时联调，不列为作业平台本轮未完成项。先前“整改已完成”仅能表述为该批基础交互接通，不能代表整体原型一致性已验收。
+
+依据：本目录prototype/{Prototype,EditorPreview,ScriptFilesPreview}.vue、KESTRA-UI-REPLACEMENT.md的页面及LC矩阵。四个当前问题已通过隔离浏览器复现，证据`parity-audit/result.json`及截图；API全拦截synthetic，零后端/设备写入、零pageerror。不把没有页面崩溃当成交互正确。其余项目是定向源码确认，未冒充浏览器逐项验收。
+
+| ID / 优先级 | 与批准设计的偏差 | 核对结果及位置 | 最小整改方向 |
+|---|---|---|---|
+| JUI-01 / P1 | dirty定义仍可运行；原型dirty时禁用运行 | **浏览器复现**：NativeFlowHeader运行按钮未判断dirty；FlowsWorkspace的onRun传入已保存flow | 禁止混淆草稿与执行版本：保存/发布后运行，或显式选择运行已发布版本并清楚说明；不静默执行旧定义 |
+| JUI-02 / P1 | Execution“源版本”跳到Flow的普通Revisions列表 | **浏览器复现**：NativeExecution只带tab=Revisions，不带冻结revision，也不打开现有executionDefinition接口 | 使用该Execution实际冻结定义，展示Flow Revision/引擎版本；缺失时明确不可用；不回落到最新版本 |
+| JUI-03 / P1 | Execution Topology与Task Run/Attempt/日志有两套选择状态 | **浏览器复现**：TaskRuns.tsx本地selected未接外部URL context；点resolve_targets后右栏仍validate_topology | 统一选中定义节点与具体TaskRun实例的映射；循环多实例需明确选择，不随便取第一个 |
+| JUI-04 / P1 | Agent分页控件没有实际页码/切片绑定 | **浏览器复现**：NativeAgents配置pageSize=25，但60条fixture全部渲染；history列表也使用固定pageSize未绑定状态 | 按现有完整列表在UI切片并绑定分页/筛选重置；若后端分页则明确同一契约，不重复分页 |
+| JUI-05 / P1 | 目标设备→日志并未准确定位到设备TaskRun | **源码确认**：NativeExecution的filteredLogs仅过滤task_run/attempt，不过滤或解析context.target；“查看设备日志”只改Tab，旧任务上下文仍在 | 复用稳定asset_id与真实TaskRun/JobStep关联，缺失映射时明确无法定向定位；不按名称推测 |
+| JUI-06 / P1 | Files缺少“新增/替换所选任务”的明确选择及返回编辑来源 | **源码确认**：NativeFiles只有快照确认；FlowsWorkspace.scriptTarget只有“从Files载入”动作设置，不跟随当前Visual选择；未保存路径/版本的任务级来源绑定 | 补目标任务选择和适用性校验；先保留快照语义，再用现有版本引用扩展明确来源。不要承诺文件修改自动同步任务 |
+| JUI-07 / P1 | 列表→详情→返回不能恢复筛选、分页与视图 | **源码确认**：FlowsWorkspace的onOpen和NativeFlowHeader/NativeExecution返回动作使用裸路由；列配置是Vue临时ref，保存视图仅存URL过滤 | 保存授权作用域内的return context，并恢复URL/页码/列选择/滚动；不把目标范围写入全局可变存储 |
+| JUI-08 / P2 | Executions页并非原型“全部/运行中/需要关注+紧凑汇总” | **源码确认**：NativeCatalog使用记录/运行概况/跨执行日志/失败/排队/暂停；记录固定active；业务Flow名称已在API但列表仍主要显示engine_flow_id | 保留已有查询能力，按原型重组页签、当前态和汇总；展示业务名及引擎ID，不另造总数 |
+| JUI-09 / P2 | 受控Shell/Python任务缺少原型拖动排序；脚本属性较原型退化 | **源码确认**：NativeVisual受控卡片draggable=false且无移动动作；Log message通用单行input，而原型为多行textarea；JobStep当前没有独立description/timeout字段 | 补符合依赖语义的排序交互及多行编辑；对JobStep属性先核对/补契约，不能只增加无效字段或重排后破坏DAG |
+| JUI-10 / P2 | 变量/输出尚为顶层列表+JSON，文件预览与产出任务定位不完整 | **源码确认**：NativeOutputs仅Object.entries展开一层；ArtifactLinks只有下载，未实现LC-04的递归/文件安全预览/源任务关联 | 保留脱敏和授权下载，按真实结构增加递归浏览、定位和安全预览；不能把任意HTML直接内嵌 |
+| JUI-11 / P2 | QuickRun少任务名称、确认信息与审批交互不够产品化 | **源码确认**：原型配置runName；正式只有可选“保存Flow名称”；最终逐台决策不显示冻结revision，审批要求手输记录ID，输入差异未呈现 | 明确一次执行标题的真实契约；最终展示冻结范围/版本/差异；复用已有审批记录选择，不把ID输入当完整审批体验 |
+| JUI-12 / P2 | 视觉语言和多面板空间利用仍未完全还原 | **截图+源码**：正式节点/START-END/子任务组织与原型不同；toolbar顺序多出模板，部分面板仍使用旧React Panel/表单；Visual+Topology+Files三开时Files过窄 | 保留原生多面板能力，统一标题/属性/节点/留白/状态样式，Files优先复用右侧面板或明确最大化；不为一致外观伪造依赖 |
+| JUI-13 / P2 | LC扩展仍有交互缺口，不能全标完成 | **源码确认**：Execution Metrics只有分页表、无任务/时间过滤及日志定位；状态历史仅展示、未接事件定位；重跑已有预检但缺前后输入Diff | 使用已有指标/审计/重跑契约补定向交互；缺字段时扩展同一API，禁止仅加空按钮 |
+
+**允许且必须保留的差异**：正式应用保留Keel全局Sidebar/ProjectContext/RBAC，不复制原型的隔离侧栏；真实预检、独立审批与维护态限制不能换成原型模拟成功。原型展示的Namespace动态引用/Worker脚本没有获准的正式执行契约，当前禁用并使用设备脚本快照是边界，不列为可通过改UI直接消除的缺陷。库与语言差异本身不是问题，具体页面质量和行为才是验收对象。ZTP属于Fabric后续联调。
+
+**整改依赖**：先JUI-01/02/03/05（执行版本及上下文正确性）→ JUI-04/06/07（目录/文件/返回闭环）→ JUI-08/09/12（原型视觉与布局）→ JUI-10/11/13（需核对接口字段的增强）。前两组多数可复用现有API，不需要真机；TaskRun与资产/文件来源、执行标题等缺少完整字段的部分需先收紧契约。没有证据前不估计“原型还原百分比”。
+
 <a id="prototype-parity-correction-20261102"></a>
 
 ## 2026-11-02 原型一致性整改与后续交互补齐
@@ -26,7 +54,7 @@
 
 ## ZTP / 设备事件后续事项（2026-11-02，暂缓）
 
-用户明确：先记录，不急于开发。本事项不阻塞当前作业平台UI交付，也不表示相关能力已完成；本轮不新增消费者、事件接口或部署。
+用户最新明确：ZTP事件匹配在Fabric模块开发时联调；作业平台这里只保留接续点，不计为本轮缺口。本事项不阻塞当前作业平台UI交付，也不表示相关能力已完成；本轮不新增消费者、事件接口或部署。
 
 - **现状**：受控设备作业已有手动、Cron及历史补跑入口；ZTP业务消费者、设备Webhook/事件到Job Service的受控Adapter尚未接通。`source_module=ztp`和列表来源筛选仅为关联信息，不是事件接入证据；界面继续明确未启用。
 - **接续前提**：先核对届时ZTP真实后端、事件生产方、事件类型与载荷、稳定事件ID、项目/设备归属、服务身份及重试约定，再冻结OpenAPI/领域事件契约。未确定的内容不自行补造。
