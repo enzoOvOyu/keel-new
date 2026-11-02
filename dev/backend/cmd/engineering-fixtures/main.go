@@ -30,10 +30,10 @@ func main() {
 			{TableID: "port_specs", Rows: [][]string{{"TEST-SRV-001", "eth1", "fiber", "LC", "100", "Gbps", "", ""}, {"TEST-SW-002", "Ethernet1", "fiber", "LC", "100", "Gbps", "", ""}}},
 			{TableID: "route_nodes", Rows: [][]string{{"NODE-1", "ROOM-A", "R1", "ROOM-A-mm", "0", "0", "2200", "mm"}, {"NODE-2", "ROOM-A", "R2", "ROOM-A-mm", "12000", "0", "2200", "mm"}}},
 			{TableID: "route_edges", Rows: [][]string{{"EDGE-1", "NODE-1", "NODE-2", "12", "m", "fiber"}}},
-			{TableID: "rack_access", Rows: [][]string{{"R1", "NODE-1", "fixture-lead-2m-v1"}, {"R2", "NODE-2", "fixture-lead-2m-v1"}}},
+			{TableID: "rack_access", Rows: [][]string{{"R1", "NODE-1", "fixture-lead-2m@1"}, {"R2", "NODE-2", "fixture-lead-2m@1"}}},
 			{TableID: "cable_specs", Rows: [][]string{{"FIBER-LC-100G", "fiber", "LC", "LC", "100", "Gbps", "20", "m", "separate-optics"}, {"FIBER-LC-100G", "fiber", "LC", "LC", "100", "Gbps", "30", "m", "separate-optics"}}},
 			{TableID: "optic_specs", Rows: [][]string{{"SYNTHETIC-100G-LC", "LC", "fiber", "100", "Gbps", "100", "m"}}},
-			{TableID: "cabling_rules", Rows: [][]string{{"fixture-cabling", "1", "shortest_path", "fixture-lead-2m-v1", "fixture-slack-10pct-v1", "fixture-stock-ceiling-v1", "SYNTHETIC_ONLY: rules must be explicitly created and approved in the test project"}}},
+			{TableID: "cabling_rules", Rows: [][]string{{"fixture-cabling", "1", "shortest_path", "fixture-lead-2m@1", "fixture-slack-10pct@1", "fixture-stock-ceiling@1", "SYNTHETIC_ONLY: rules must be explicitly created and approved in the test project"}}},
 		},
 		4: {
 			{TableID: "network_planes", Rows: [][]string{{"FABRIC-A", "ethernet", "PLANE-A", "ipv4-bgp"}}},

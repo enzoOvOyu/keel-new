@@ -1,3 +1,5 @@
+> 最新开发验收：五步固定输入链在隔离API通过，见[连贯验收](../intelligent-deployment/FIVE-STEP-CHAIN-ACCEPTANCE-20261102.json)。完整布线导入已补齐；新分步Agent仍未实现。以下旧阶段描述保留历史，现网仍2215177。
+
 > 当前发布：代码2215177已部署8081/5180、迁移043，证据见[部署记录](../intelligent-deployment/DEPLOYMENT-FIXED-STEPS-20261102.json)。下文“未部署”属于相应开发阶段历史；当前完整布线和新Agent仍未完成，发布检查不等于整体验收。
 
 # 智能开局工程真实接口
@@ -209,3 +211,13 @@ power_rules的显式系数提议现有注册表中的版本化规则草案，不
 calculation-application新增circuit_load/circuit_remaining/supply_load，前端只应用对应对象的负载/余量，不把诊断输出写入资产。带scope结果核对计算时模型快照与当前电力输入、provider版本及精确输出名称；任务去重input_digest不等于电力输入指纹。输入变化使相关结果失效；规则退役/未批准在审核和发布时重新核查。过载、缺计算、错误规则或供电图关系阻断ENGINEERING_POWER。Power面板新增场景、回路和设备供电表，仍由既有审核/Outbox发布，不覆盖Observed功率。
 
 隔离库043与8093 API已实际通过新版05-power.xlsx：规则草案门禁→显式规则审核→500W/300W需求和1500W/1700W机柜/回路余量→十项机柜/回路/PSU结果应用→ENGINEERING_POWER审核发布；错对象绑定拒绝且修订不变。另有循环、单路冒充双路、分配不守恒的定向单元用例。尚未接入完整布线链或新Agent，未执行真实供电操作。
+
+### 完整第三步布线工作簿
+
+复用standard-workbook-preview/standard-workbook，不增加接口或迁移。整步XLSX支持route_nodes、route_edges、rack_access、cable_specs、cabling_rules及按需port_specs/patch_paths/optic_specs。路径、接入、规格和规则表必须齐备；单独port_specs/patch_paths的原有确认仍可用。其他布线表只支持整步XLSX合并，目录supports_confirmation继续表示CSV单表能力；工作簿返回的supports_confirmation独立判断整步处理能力，格式valid不等于语义可发布。
+
+当前路径策略shortest_path，沿明确允许的双向通道按介质求最短路径，不根据坐标猜通道；rack_access必须关联同机房已建模机柜。各规则引用编码@版本或UUID@版本，在本项目connectivity_cabling注册表创建并独立审批。编码使用StableID(project,"cabling-rule-code",code)；可直接使用规则界面已有UUID。引线规则不接收参数并输出单一length长度；余量及标准长度规则接收length并输出length。工作簿不执行任意公式或代码。相同节点路径距离为明确0，引线仍按批准规则计算。样本2m、1.1、20/30m仅存在合成Fixture和测试规则中。
+
+每个物理端接段生成独立CablePlan，保留Confirmed/AsBuilt、记录Calculated/SelectedStock对应计算运行并匹配当前可采购规格；计算记录绑定来源摘要、工程修订和批准规则版本。媒体、连接器、速率及光模块适用距离必须匹配；多候选不任意选择。separate-optics按父物理端口去重；no-optics/DAC/AOC不生成独立模块需求。采购需求和施工标准线长分布为规划数量，保留采购/备件字段，不投影成真实资产。重算方案移除旧的自动生成需求，不丢弃已有采购记录。缺来源、路径、规格或批准规则按CABLE_* HTTP422拒绝合并；原文件仍保存，不修改已发布模型。失败前完成的计算保留为尝试记录，不意味着模型已发布。
+
+本次单项目五步验收、独立预期及真实限制见上述验收记录。仅验证核心IPv4 BGP规划，无实际网络下发、供电或运行观测确认。

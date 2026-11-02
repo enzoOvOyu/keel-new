@@ -1,0 +1,131 @@
+{
+  "scope": "single fresh isolated project; five synthetic XLSX; API/PostgreSQL/MinIO/Outbox/CMDB charts",
+  "cases": [
+    {
+      "name": "step_1_identity_endpoint_mac",
+      "status": "PASS"
+    },
+    {
+      "name": "step_2_room_rack_u_preserves_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "step_3_cable_route_rules_stock_optic_material_workload",
+      "status": "PASS"
+    },
+    {
+      "name": "step_3_physical_and_engineering_independent_publication",
+      "status": "PASS"
+    },
+    {
+      "name": "step_4_network_from_published_physical_to_golden",
+      "status": "PASS"
+    },
+    {
+      "name": "step_5_power_scope_supply_and_rule_gate",
+      "status": "PASS"
+    },
+    {
+      "name": "step_5_power_deterministic_calculation_application_publication",
+      "status": "PASS",
+      "bindings": 10
+    },
+    {
+      "name": "five_steps_preserve_prior_domain_models_and_published_network",
+      "status": "PASS"
+    },
+    {
+      "name": "final_cmdb_rack_matrix_connections_trace_api_data",
+      "status": "PASS",
+      "racks": 2,
+      "matrix_links": 1,
+      "trace_verification": "unverified"
+    },
+    {
+      "name": "five_immutable_workbook_sources_in_same_task",
+      "status": "PASS"
+    },
+    {
+      "name": "missing_cable_rule_rejects_without_model_mutation",
+      "status": "PASS"
+    },
+    {
+      "name": "failed_reimport_preserves_all_published_targets_and_golden",
+      "status": "PASS"
+    }
+  ],
+  "overall": "PASS: five fixed-input steps in one task, real persistence/calculations/review/Outbox/CMDB/chart data",
+  "agent": "NOT_IMPLEMENTED_NOT_TESTED",
+  "online_changed": false,
+  "project_id": "proj-3c4d8f3f-de7d-4736-b5b2-7e02bb828a19",
+  "import_ids": [
+    "3ddbd05f-5953-46dc-88eb-73f93ce791fd",
+    "a00f9297-db02-4d64-9057-2c0c90ad431c",
+    "425169e9-7fd6-4d2e-900d-4388741ce5c4",
+    "140dac91-bb95-4126-81eb-72cbb4ce0b7b",
+    "69a46808-23c5-442f-9f1a-245afc98f862"
+  ],
+  "source_id": "a1bd190f-ee5a-4d65-86dc-8e33cf6bcf13",
+  "limits": [
+    "Synthetic isolated project, no live device or power action",
+    "New unstructured-material scoped Agent not implemented; fixed-input chain only",
+    "Core IPv4 BGP fixture, not all logical network protocols",
+    "API chart data verified, no visual interaction acceptance"
+  ],
+  "acceptance": "PASS_FIXED_INPUT_FIVE_STEP_CHAIN",
+  "resolved_findings": [
+    {
+      "finding": "CMDB unique attribute rejection when repeating the same synthetic assets in another project",
+      "resolution": "Independent synthetic namespace; uniqueness guard retained, no production constraint weakened"
+    },
+    {
+      "finding": "Missing approved cable rule surfaced as generic storage HTTP 500",
+      "resolution": "Actionable CABLE_* HTTP 422; model/revision/approved publications/Golden preserved, isolated real API assertion passed"
+    }
+  ],
+  "fixtures": [
+    {
+      "filename": "01-equipment.xlsx",
+      "sha256": "1ec6d2ade14ce56609490341f12bb1701ab5ee3eff134ca4a2a2c541d6082a6c"
+    },
+    {
+      "filename": "02-placement.xlsx",
+      "sha256": "73d14bbd663d2425d7df4436fa073bb717f1d48c8e5d37fb5f0486a782529055"
+    },
+    {
+      "filename": "03-cabling.xlsx",
+      "sha256": "4ce8b6f8cffdcb1a9f989d168909215277193d8884181209beacacbfe7b7370e"
+    },
+    {
+      "filename": "04-network.xlsx",
+      "sha256": "93f4810e767c8836fbdac43907c65181e763d6e682487398321d671b699229ff"
+    },
+    {
+      "filename": "05-power.xlsx",
+      "sha256": "1ebf224334e0f7a40042ae5b7dec7c4a46f371d42d78b28bc243a48a0e33d0c4"
+    }
+  ],
+  "expected": {
+    "cable_route_m": "12",
+    "calculated_length_m": "17.6",
+    "selected_stock_m": "20",
+    "optics": 2,
+    "cable_count": 1,
+    "rack_loads_W": [
+      "300",
+      "500"
+    ],
+    "rack_remaining_W": [
+      "1500",
+      "1700"
+    ]
+  },
+  "checks": [
+    "go test ./internal/engineering (passed)",
+    "go test ./cmd/api -run ^$ (compilation passed; no DB unit suites claimed)",
+    "go test ./internal/engineering ./cmd/api -run Test(CablingWorkbookGroundTruth|CablingInputFailureIsActionable)$ (passed)",
+    "Isolated API8093/PostgreSQL043/MinIO/Outbox single-project five-step fixture and final CMDB chart assertions (passed)",
+    "Missing approved rule HTTP422 with unchanged draft, publications and Golden (passed)"
+  ],
+  "deployment": "Existing live 8081/5180 remains2215177; this change tested on isolated8093 only; no live device operations"
+}

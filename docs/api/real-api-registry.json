@@ -1467,11 +1467,11 @@
       "response_schema": "IDEStandardWorkbookPreviewEnvelope",
       "implementation": "implemented",
       "deployment": "deployed",
-      "verification": "Isolated real API/DB/MinIO steps 1-2 and publication/topology data verified; 3-5 import blocked as incomplete; browser/Agent NOT RUN",
+      "verification": "Single-project five-step synthetic fixed-input chain passed isolated real API/DB/MinIO/calculation/review/Outbox/CMDB/chart assertions; missing-rule failure preserves published data. New scoped Agent NOT IMPLEMENTED; live deployed2215177 lacks new full-cabling support.",
       "handler": "dev/backend/cmd/api/engineering.go",
       "source": "dev/backend/cmd/api/engineering_standard_workbook.go",
       "documentation": "docs/api/engineering.md",
-      "verification_evidence": "docs/intelligent-deployment/FIXED-STEP-XLSX-TEST-20261101.json",
+      "verification_evidence": "docs/intelligent-deployment/FIVE-STEP-CHAIN-ACCEPTANCE-20261102.json",
       "deployment_evidence": "docs/intelligent-deployment/DEPLOYMENT-FIXED-STEPS-20261102.json"
     },
     {
@@ -1482,11 +1482,11 @@
       "response_schema": "getEngineeringWorkspaceEnvelope",
       "implementation": "implemented",
       "deployment": "deployed",
-      "verification": "Isolated real API/DB/MinIO steps 1-2 and publication/topology data verified; 3-5 import blocked as incomplete; browser/Agent NOT RUN",
+      "verification": "Single-project five-step synthetic fixed-input chain passed isolated real API/DB/MinIO/calculation/review/Outbox/CMDB/chart assertions; missing-rule failure preserves published data. New scoped Agent NOT IMPLEMENTED; live deployed2215177 lacks new full-cabling support.",
       "handler": "dev/backend/cmd/api/engineering.go",
       "source": "dev/backend/cmd/api/engineering_standard_workbook.go",
       "documentation": "docs/api/engineering.md",
-      "verification_evidence": "docs/intelligent-deployment/FIXED-STEP-XLSX-TEST-20261101.json",
+      "verification_evidence": "docs/intelligent-deployment/FIVE-STEP-CHAIN-ACCEPTANCE-20261102.json",
       "deployment_evidence": "docs/intelligent-deployment/DEPLOYMENT-FIXED-STEPS-20261102.json"
     }
   ],

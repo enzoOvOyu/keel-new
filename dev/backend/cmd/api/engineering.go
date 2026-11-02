@@ -24,7 +24,7 @@ func engineeringDecode(w http.ResponseWriter, r *http.Request, dst any) bool {
 	return true
 }
 func engineeringFailure(w http.ResponseWriter, e error) {
-	if strings.HasPrefix(e.Error(), "STEP_") {
+	if strings.HasPrefix(e.Error(), "STEP_") || strings.HasPrefix(e.Error(), "CABLE_") {
 		fail(w, 422, strings.Split(e.Error(), ":")[0])
 		return
 	}

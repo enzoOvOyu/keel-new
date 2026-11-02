@@ -16930,6 +16930,7 @@ export interface components {
             expected_revision: number;
             reason?: string;
         };
+        /** @description Atomic step workbook merge. Full cabling requires explicit route, access, specification tables and approved versioned project rules; calculations are recorded before the draft revision. Single port or patch tables remain supported. */
         IDEStandardWorkbookConfirmRequest: {
             import_id: string;
             step: number;

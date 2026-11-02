@@ -57,7 +57,7 @@ func workbookPreview(q engineering.StandardWorkbookRequest, inputs []engineering
 		v := engineering.PreviewStepInput(input)
 		out.Tables = append(out.Tables, v)
 		out.Valid = out.Valid && v.Valid
-		out.SupportsConfirmation = out.SupportsConfirmation && catalog[input.TableID].SupportsConfirmation
+		out.SupportsConfirmation = out.SupportsConfirmation && (catalog[input.TableID].SupportsConfirmation || q.Step == 3)
 	}
 	return out
 }
@@ -90,6 +90,9 @@ func (s *Server) importStandardWorkbook(ctx context.Context, w engineering.Works
 		return e
 	}
 	for _, input := range inputs {
+		if q.Step == 3 && hasCablingInputs(inputs) {
+			continue
+		}
 		if input.TableID == "terminations" {
 			m, e = s.resolveStandardInputIdentities(ctx, m, input)
 			if e != nil {
@@ -97,6 +100,16 @@ func (s *Server) importStandardWorkbook(ctx context.Context, w engineering.Works
 			}
 		}
 		m, e = engineering.MergeStandardInput(m, input)
+		if e != nil {
+			return e
+		}
+	}
+	if q.Step == 3 && hasCablingInputs(inputs) {
+		ids := []engineering.ID{}
+		for _, v := range evidence {
+			ids = append(ids, v.ID)
+		}
+		m, e = engineering.MergeCablingWorkbook(m, inputs, ids, s.standardCableRuleRunner(ctx, w, attachment, actor))
 		if e != nil {
 			return e
 		}
@@ -116,4 +129,13 @@ func (s *Server) importStandardWorkbook(ctx context.Context, w engineering.Works
 	// failure must never delete this original workbook.
 	_, e = s.saveEngineeringDraft(ctx, w.ID, q.ExpectedRevision, "human", actor, q.Reason, engineering.Extraction{Model: m, Evidence: evidence, TotalCells: w.TotalCells, MappedCells: w.MappedCells}, proposal, attachment)
 	return e
+}
+
+func hasCablingInputs(inputs []engineering.InputPreviewRequest) bool {
+	for _, input := range inputs {
+		if input.TableID != "port_specs" && input.TableID != "patch_paths" {
+			return true
+		}
+	}
+	return false
 }

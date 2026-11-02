@@ -309,7 +309,7 @@
       "逻辑网络",
       "电力相关"
     ],
-    "implementation_gate": "User authorized implementation. Complete deterministic five-step persistence, relations and scoped acceptance before Agent integration; template/preview slice implemented, not deployed.",
+    "implementation_gate": "Deterministic fixed-input five-step chain accepted in one isolated synthetic project; new triage/scoped Agents not implemented or accepted.",
     "agent_scope": "New source triage plus five step-scoped extraction tasks sharing existing runtime; standard inputs remain usable without AI.",
     "confirmed_mac_meaning": "A=本端MAC; B=对端MAC; associate with the corresponding endpoint, not a sole device identity key.",
     "pending_semantics": [
@@ -322,11 +322,12 @@
       "Facility/rack/specification/placement standard confirmation with typed code, height and non-U fields; migration 040; domain tests and compilation/type checks passed, not deployed or DB/UI accepted",
       "Five synthetic XLSX fixtures with independent expected results; native readers and atomic workbook preview/import UI/API; steps 1-2 passed isolated real API/DB/MinIO/review/outbox/CMDB and visualization API assertions; step-3 port/patch input plus routing kernels implemented; full 3-5 chain and Agent still incomplete",
       "Six core network standard tables and frozen published physical reference; IPv4 BGP fixture passed isolated API/DB/review/publication/Golden read; no live push; other protocol fixed imports remain unsupported",
-      "Scoped supply power standard import, normalized circuits/PSU graph and rule registry drafts; isolated API/DB explicit rule review, deterministic rack/circuit/PSU outputs, exact result application and power publication passed; no physical power operation"
+      "Scoped supply power standard import, normalized circuits/PSU graph and rule registry drafts; isolated API/DB explicit rule review, deterministic rack/circuit/PSU outputs, exact result application and power publication passed; no physical power operation",
+      "Full cabling workbook import with approved rule runs, route/stock/optics/material/workload persistence and release; single-project five-step chain, CMDB rack/matrix/connections/trace API assertions passed, live version unchanged"
     ],
     "remaining_slices": [
       "Source field evidence viewer for supplemental input",
-      "Full cabling standard import/calculation/publication and further network protocol fixed inputs; generated core BGP and scoped power have passed isolated checks",
+      "Further network protocol fixed inputs beyond the tested core IPv4 BGP profile",
       "New triage and five scoped extraction tasks",
       "Independent real source and existing visualization acceptance"
     ],
@@ -336,6 +337,12 @@
       "database_migration": 43,
       "evidence": "docs/intelligent-deployment/DEPLOYMENT-FIXED-STEPS-20261102.json",
       "full_business_acceptance": "NOT COMPLETE"
+    },
+    "fixed_input_chain_acceptance": {
+      "status": "PASS_SYNTHETIC_ISOLATED",
+      "evidence": "docs/intelligent-deployment/FIVE-STEP-CHAIN-ACCEPTANCE-20261102.json",
+      "agent_acceptance": "NOT_IMPLEMENTED_NOT_TESTED",
+      "live_change_deployed": false
     }
   }
 }
