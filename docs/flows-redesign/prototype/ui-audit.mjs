@@ -36,7 +36,7 @@ try{
  await page.screenshot({path:path.join(dir,'screenshots/ui-fix-flows.png')});
  await route('editor/gpu-preflight');await page.locator('.jp-editor .leaf-block-card').first().waitFor();await audit('editor');
  await page.getByText('YAML',{exact:true}).first().click();await page.locator('.monaco-editor').first().waitFor({timeout:45000});await audit('Monaco panel');
- for(const panel of ['Files','Docs']){await page.getByText(panel,{exact:true}).first().click();await audit(panel+' panel')}
+ for(const panel of ['Files / 脚本','Docs']){await page.getByText(panel,{exact:true}).first().click();await audit(panel+' panel')}
  await page.getByRole('button',{name:'Revisions',exact:true}).click();await page.locator('.jp-revisions').waitFor();await audit('revisions');
  await page.getByRole('button',{name:'Triggers',exact:true}).click();await page.getByRole('button',{name:'添加 Schedule',exact:true}).click();await page.locator('.kel-dialog:visible').waitFor();await audit('schedule dialog');await page.locator('.kel-dialog:visible .kel-dialog__headerbtn').click();
  checks.push('Editor, Monaco, Files, Docs, Revisions and Schedule dialog checked');

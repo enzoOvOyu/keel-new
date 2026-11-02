@@ -1,5 +1,10 @@
 # Keel 整合交接 · 2026-10-31
 
+## 2026-11-02 脚本工作台补齐（独立样式原型）
+
+用户指出原型缺少脚本导入/新增/在线编辑，确认是此前仅预置文本文件导致的缺口，Kestra本身具备此能力。原型新增Files / 脚本工作台：本地文本导入、新建Shell/Python、Monaco编辑、保存/下载、未保存状态、面板切换保留、Namespace引用或内联快照关联任务。代码在ScriptFilesPreview.vue、ScriptCodeEditor.vue、script-files.ts及EditorPreview适配；按项目/Namespace保留原型内存文件，不操作正式Namespace/设备。检查见原型scripts-validation.json，既有源代码包1cb5edb仍是此前快照，不含本轮增量。正式作业平台完成率不因原型增加而提高。
+
+
 ## 2026-11-02 作业平台演示UI整改
 
 独立分支feat/jobs-kestra-ui，仅修改5181的jobs-preview。侧栏删除无关业务，只保留Flows/Executions/Agents。用户提供的巨大SVG复现为分页选择框150×150；发现加载圆环同样缺样式，曾达1182×1182。补齐原型内kel基础样式与主题变量，修复图标/弹层/选择框/加载状态，并补Flow/目标/Agent分页双向绑定；数据行滚动、分页栏保留。检查与最新截图见 [UI遍历记录](docs/flows-redesign/prototype/ui-audit.json)、原型README。没有更改正式页面/API，未切换5180/8081，不提高正式UI完成率。

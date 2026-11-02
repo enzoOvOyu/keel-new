@@ -42,3 +42,11 @@ NODE_OPTIONS=--max-old-space-size=2048 node dev/node_modules/vite/bin/vite.js bu
 独立原型补齐Element Plus基础样式：icon、checkbox、select/option、scrollbar、popper、loading及overlay。组件命名空间保持kel；基础样式和主题变量限定在jp-preview-document，兼容挂载到body的下拉菜单，不影响拓扑原型或正式页面。下拉箭头原先150×150，加载圆环还会扩大到容器宽度；采用官方尺寸规则，加载圆环在紧凑原型中为24px。
 
 Flow、目标列表和Agent列表的页码/每页数量均与切片数据绑定；过滤后重置页码。目标列表只滚动数据行，分页栏保持可见。定向遍历记录见 [ui-audit.json](ui-audit.json)，复现脚本ui-audit.mjs；截图以screenshots/ui-fix-开头。未运行业务、后端或设备测试。
+
+## 脚本导入、新增与在线编辑补齐
+
+编辑器顶部“新增脚本”“导入脚本”，或“Files / 脚本”面板进入。支持Shell/Python新增、多文本文件导入、Monaco编辑、未保存状态、Ctrl/⌘+S保存、下载、搜索及原型内修订编号。文件状态由外层原型按项目/Namespace保存，切换上下文Tab不丢失，不写浏览器持久存储；刷新页面仍重置。
+
+保存后“在Flow中使用”可选择Namespace文件引用或内联脚本快照；可新增任务或替换明确选中的兼容脚本任务，不覆盖Log等节点。生成的脚本任务为Kestra语义示例，不能当作Keel真实服务器/交换机任务已接通。当前不实现真实文件上传、Namespace持久化、实际执行或完整版本历史。
+
+官方功能依据：[Namespace Files](https://kestra.io/docs/concepts/namespace-files)、[Shell Script/Commands](https://kestra.io/docs/how-to-guides/shell)。固定上游已核对`FileExplorer.vue`和`FlowFileEditorTab.vue`；原型复用KsEditor及原生组件，通过本地数据适配，不声称已移植全部上游文件管理。定向检查入口`verify-scripts.mjs`，结果`scripts-validation.json`，截图`screenshots/scripts-files.png`。

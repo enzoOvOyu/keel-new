@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "checks": [
+    "New Python script, real Monaco keyboard edit, save, and inline task binding",
+    "Saved files survive Flow context-tab unmount/remount",
+    "Multi-file import retains both files; saved Shell file binds via namespaceFiles/commands",
+    "No oversized icons, page errors, business API or device calls"
+  ],
+  "errors": [],
+  "apiRequests": [],
+  "scope": "Synthetic standalone script workflow only; files in memory, no real Namespace persistence or execution"
+}
