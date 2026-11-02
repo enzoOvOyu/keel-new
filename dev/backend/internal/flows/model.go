@@ -107,6 +107,7 @@ type TargetRun struct {
 	Ended    *time.Time `json:"ended_at"`
 }
 type Execution struct {
+	FlowName  *string        `json:"flow_name"`
 	ParentID  *string        `json:"parent_id"`
 	ID        string         `json:"id"`
 	Project   string         `json:"project_id"`

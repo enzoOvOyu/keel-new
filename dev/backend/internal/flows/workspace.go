@@ -25,15 +25,28 @@ type RecentExecution struct {
 }
 type CatalogItem struct {
 	Flow
-	Recent *RecentExecution `json:"recent_execution"`
+	Recent           *RecentExecution  `json:"recent_execution"`
+	RecentExecutions []RecentExecution `json:"recent_executions"`
+	Triggers         []CatalogTrigger  `json:"triggers"`
+	UpdatedAt        *time.Time        `json:"updated_at"`
+	UpdatedBy        *string           `json:"updated_by"`
+}
+type CatalogTrigger struct {
+	ID       string  `json:"id"`
+	Type     string  `json:"type"`
+	Cron     *string `json:"cron"`
+	Timezone *string `json:"timezone"`
+	Enabled  bool    `json:"enabled"`
+	Source   string  `json:"source"`
 }
 type CatalogPage struct {
-	Items       []CatalogItem `json:"items"`
-	Total       int           `json:"total"`
-	Limit       int           `json:"limit"`
-	Offset      int           `json:"offset"`
-	Namespaces  []string      `json:"namespaces"`
-	StateSource string        `json:"state_source"`
+	Items       []CatalogItem  `json:"items"`
+	Total       int            `json:"total"`
+	Limit       int            `json:"limit"`
+	Offset      int            `json:"offset"`
+	Namespaces  []string       `json:"namespaces"`
+	StateSource string         `json:"state_source"`
+	StateCounts map[string]int `json:"state_counts"`
 }
 
 func queryInt(q url.Values, key string, fallback, max int) (int, error) {
@@ -85,7 +98,7 @@ func catalogFilter(all []Flow, q url.Values) ([]Flow, []string) {
 	return out, ns
 }
 func (s *Service) Catalog(ctx context.Context, p Scope, q url.Values) (CatalogPage, error) {
-	out := CatalogPage{Items: []CatalogItem{}, Namespaces: []string{}, StateSource: "Flow state: Kestra live; recent execution: persisted Kestra projection"}
+	out := CatalogPage{Items: []CatalogItem{}, Namespaces: []string{}, StateCounts: map[string]int{"ALL": 0, "ENABLED": 0, "DRAFT": 0, "DISABLED": 0, "unknown": 0}, StateSource: "Flow state: Kestra live; recent execution: persisted Kestra projection"}
 	var e error
 	out.Limit, e = queryInt(q, "limit", 25, 100)
 	if e != nil || out.Limit < 1 {
@@ -103,6 +116,18 @@ func (s *Service) Catalog(ctx context.Context, p Scope, q url.Values) (CatalogPa
 	all, e := s.Flows(ctx, p)
 	if e != nil {
 		return out, e
+	}
+	recordCounts := func(values []Flow, filters url.Values) {
+		withoutState := url.Values{}
+		for k, v := range filters {
+			withoutState[k] = v
+		}
+		withoutState.Del("state")
+		rows, _ := catalogFilter(values, withoutState)
+		out.StateCounts["ALL"] = len(rows)
+		for _, f := range rows {
+			out.StateCounts[flowStatus(f)]++
+		}
 	}
 	if q.Get("source_search") == "true" {
 		if len(strings.TrimSpace(q.Get("q"))) < 2 {
@@ -147,8 +172,10 @@ func (s *Service) Catalog(ctx context.Context, p Scope, q url.Values) (CatalogPa
 			filtered[key] = values
 		}
 		filtered.Del("q")
+		recordCounts(matched, filtered)
 		all, out.Namespaces = catalogFilter(matched, filtered)
 	} else {
+		recordCounts(all, q)
 		all, out.Namespaces = catalogFilter(all, q)
 	}
 	out.Total = len(all)
@@ -181,9 +208,9 @@ func (s *Service) Catalog(ctx context.Context, p Scope, q url.Values) (CatalogPa
 	ids := []string{}
 	for _, f := range all[out.Offset:end] {
 		ids = append(ids, f.ID)
-		out.Items = append(out.Items, CatalogItem{Flow: f})
+		out.Items = append(out.Items, CatalogItem{Flow: f, RecentExecutions: []RecentExecution{}, Triggers: []CatalogTrigger{}})
 	}
-	rows, e := s.DB.Query(ctx, `SELECT DISTINCT ON(b.flow_id) b.flow_id::text,b.id::text,COALESCE(b.error_code,b.engine_state),b.created_at,(SELECT count(*) FROM flow_execution_target t WHERE t.execution_id=b.id AND t.state='SUCCESS'),(SELECT count(*) FROM flow_execution_target t WHERE t.execution_id=b.id AND t.state='FAILED'),(SELECT count(*) FROM flow_execution_target t WHERE t.execution_id=b.id) FROM flow_execution_binding b WHERE b.flow_id::text=ANY($1) AND b.project_id=ANY($2) ORDER BY b.flow_id,b.created_at DESC,b.id DESC`, ids, p.Projects)
+	rows, e := s.DB.Query(ctx, `WITH ranked AS (SELECT b.*,row_number() OVER(PARTITION BY flow_id ORDER BY created_at DESC,id DESC) position FROM flow_execution_binding b WHERE b.flow_id::text=ANY($1) AND b.project_id=ANY($2)) SELECT b.flow_id::text,b.id::text,COALESCE(b.error_code,b.engine_state),b.created_at,t.success,t.failed,t.total FROM ranked b LEFT JOIN LATERAL (SELECT count(*) FILTER(WHERE state='SUCCESS') success,count(*) FILTER(WHERE state='FAILED') failed,count(*) total FROM flow_execution_target WHERE execution_id=b.id) t ON true WHERE b.position<=10 ORDER BY b.flow_id,b.created_at DESC,b.id DESC`, ids, p.Projects)
 	if e != nil {
 		return out, e
 	}
@@ -196,11 +223,61 @@ func (s *Service) Catalog(ctx context.Context, p Scope, q url.Values) (CatalogPa
 		}
 		for i := range out.Items {
 			if out.Items[i].ID == flowID {
-				out.Items[i].Recent = v
+				if out.Items[i].Recent == nil {
+					out.Items[i].Recent = v
+				}
+				out.Items[i].RecentExecutions = append(out.Items[i].RecentExecutions, *v)
 			}
 		}
 	}
-	return out, rows.Err()
+	if e = rows.Err(); e != nil {
+		return out, e
+	}
+	rows.Close()
+	meta, e := s.DB.Query(ctx, `SELECT f.id::text,a.created_at,a.actor,s.cron,s.timezone,s.enabled FROM flow_binding f LEFT JOIN LATERAL (SELECT created_at,actor FROM flow_audit WHERE project_id=f.project_id AND resource_id=f.id::text AND action='flow.save' ORDER BY created_at DESC,id DESC LIMIT 1) a ON true LEFT JOIN flow_schedule s ON s.flow_id=f.id WHERE f.id::text=ANY($1) AND f.project_id=ANY($2)`, ids, p.Projects)
+	if e != nil {
+		return out, e
+	}
+	defer meta.Close()
+	for meta.Next() {
+		var id string
+		var at *time.Time
+		var actor, cron, zone *string
+		var enabled *bool
+		if e = meta.Scan(&id, &at, &actor, &cron, &zone, &enabled); e != nil {
+			return out, e
+		}
+		for i := range out.Items {
+			item := &out.Items[i]
+			if item.ID != id {
+				continue
+			}
+			item.UpdatedAt = at
+			item.UpdatedBy = actor
+			if cron != nil && enabled != nil {
+				item.Triggers = append(item.Triggers, CatalogTrigger{ID: "cron", Type: "Schedule", Cron: cron, Timezone: zone, Enabled: *enabled && !item.Disabled, Source: "scoped_schedule"})
+			}
+			triggers, _ := item.Engine["triggers"].([]any)
+			for _, raw := range triggers {
+				t, ok := raw.(map[string]any)
+				if !ok {
+					continue
+				}
+				kind, _ := t["type"].(string)
+				tid, _ := t["id"].(string)
+				disabled, _ := t["disabled"].(bool)
+				get := func(k string) *string {
+					v, ok := t[k].(string)
+					if !ok || v == "" {
+						return nil
+					}
+					return &v
+				}
+				item.Triggers = append(item.Triggers, CatalogTrigger{ID: tid, Type: kind, Cron: get("cron"), Timezone: get("timezone"), Enabled: !disabled && !item.Disabled, Source: "flow_definition"})
+			}
+		}
+	}
+	return out, meta.Err()
 }
 
 type ExecutionSummary struct {

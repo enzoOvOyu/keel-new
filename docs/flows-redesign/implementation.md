@@ -1,3 +1,25 @@
+<a id="prototype-parity-correction-20261102"></a>
+
+## 2026-11-02 原型一致性整改与后续交互补齐（进行中）
+
+用户要求：先完成当前原型一致性整改，再完成下列新增交互整改；直接连续执行，不逐项等待确认。ZTP/设备事件仍按已记录安排暂缓，不扩大到该业务域。
+
+**当前呈现整改已接通，后续专项交互继续：**
+- Flow目录恢复原型状态页签、保存视图、近期执行历史条、触发方式及更新时间；真实数据从统一Provider/API取得，不造历史或时间。
+- Builder移除重复表单/动作，隐藏底层wrapper实现细节，保留同一canonical定义、多面板、领域节点和授权执行。
+- Overview/Revisions/Triggers等替换残留旧呈现；执行详情恢复任务、Attempt、内联日志同屏组织。保留既有生命周期和业务能力。
+- 同视口、同一份synthetic数据对照原型验证，分别记录视觉还原与业务联动，不沿用工作量估算充当原型还原率。
+
+呈现整改证据：parity-validation/result.json使用批准原型同一份data.ts、1600×1000视口，5组交互通过、零后端写入；已查看目录/Builder/Execution/Revisions截图。保留正式Keel全局壳层，不复制原型隔离侧栏。子任务默认收起和目录行密度随后做了定向呈现修正，最终截图随交互补齐一并更新；不宣称像素级100%一致。Go查询集成通过，TypeScript通过首轮检查。
+
+**完成以上后继续（用户补充，尚未完成，不得提前勾选）：**
+1. 新建交付任务五模块：按批准原型Visual / YAML / Topology / Files / Docs逐项核对完整性、切换保留、同源联动及保存/运行路径。
+2. Files输入交互：新增/导入、路径与语言、在线编辑、校验、保存版本、未保存处理、使用脚本、来源版本和错误反馈。已有部分能力，不等于完整闭环已验收。
+3. 添加任务显式提供Shell Script、Python Script，实际接入受控设备任务与脚本编辑；当前仅步骤类型选择不算完成，不开放未授权Worker执行或伪造插件。
+4. Quick Run：目标→脚本/通道→预检确认，覆盖前后返回、修改后预检失效、输入校验、审批、冻结目标/版本、提交结果与失败反馈。已有三步基础，仍需按原型专项整改。
+
+所有条目分别记录实现、验证、限制；在feat/jobs-kestra-ui继续，不合并/发布到当前测试环境。代码索引：flows/{FlowsWorkspace,Builder,NamespaceFiles,QuickRun}.tsx，jobs-native/Native{Catalog,Visual,Workbench,Execution,QuickRun}.vue；API契约仍以docs/openapi.yaml为准。
+
 <a id="ztp-event-follow-up"></a>
 
 ## ZTP / 设备事件后续事项（2026-11-02，暂缓）

@@ -18751,6 +18751,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FlowsTargetRun'
+        flow_name:
+          type:
+            - string
+            - "null"
+          description: Name from the same-project Flow binding. Null for Quick Run or missing binding; engine_flow_id remains the frozen engine identity.
       required:
       - parent_id
       - id
@@ -48090,6 +48095,27 @@ components:
           anyOf:
             - $ref: "#/components/schemas/FlowsRecentExecution"
             - type: "null"
+        recent_executions:
+          type: array
+          maxItems: 10
+          description: Most recent authorized persisted executions, newest first. No synthesized history slots.
+          items:
+            $ref: "#/components/schemas/FlowsRecentExecution"
+        triggers:
+          type: array
+          items:
+            $ref: "#/components/schemas/FlowsCatalogTrigger"
+        updated_at:
+          type:
+            - string
+            - "null"
+          format: date-time
+          description: Latest persisted flow.save audit timestamp; null if unavailable.
+        updated_by:
+          type:
+            - string
+            - "null"
+          description: Actor of latest authorized flow.save audit event.
       required:
         - draft
         - id
@@ -48104,6 +48130,10 @@ components:
         - disabled
         - engine
         - recent_execution
+        - recent_executions
+        - triggers
+        - updated_at
+        - updated_by
     FlowsCatalogPage:
       type: object
       additionalProperties: false
@@ -48124,6 +48154,12 @@ components:
             type: string
         state_source:
           type: string
+        state_counts:
+          type: object
+          additionalProperties:
+            type: integer
+            minimum: 0
+          description: Server-authorized counts after search/namespace/target filters, before state selection. Includes ALL.
       required:
         - items
         - total
@@ -48131,6 +48167,7 @@ components:
         - offset
         - namespaces
         - state_source
+        - state_counts
     FlowsExecutionSummary:
       type: object
       additionalProperties: false
@@ -48863,6 +48900,36 @@ components:
         - total
         - failed
       additionalProperties: false
+    FlowsCatalogTrigger:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - type
+        - cron
+        - timezone
+        - enabled
+        - source
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        cron:
+          type:
+            - string
+            - "null"
+        timezone:
+          type:
+            - string
+            - "null"
+        enabled:
+          type: boolean
+        source:
+          type: string
+          enum:
+            - scoped_schedule
+            - flow_definition
 x-implementation-policy:
   frontend-first: true
   mock-provider-required: true

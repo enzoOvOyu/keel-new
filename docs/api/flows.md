@@ -182,3 +182,9 @@ Agent新参数`--renew-before`默认0（未启用），启用时要求HTTPS；`-
 - `GET /flows/execution-summary`及`GET /flows/executions`新增revision精确筛选（1…1000000）；游标绑定包含版本的完整查询。图表下钻保留时间窗、Flow和版本，不跳回不相干的全历史。
 - summary增加duration与daily：daily按执行创建日期UTC聚合；duration仅使用各执行最新已采集终态的startDate/endDate，明确sample_count/missing_count。零样本平均及百分位为null；只有一个样本时不显示P50/P95。多样本使用经验nearest-rank，不推导SLO或统计可靠性。计数与样本在同一只读Repeatable Read快照读取；未采集/非法/尚未结束时间不补零。趋势显示最近90个有记录UTC日，缺日不插值。
 - 定向证据见native-validation/batch-result.json（synthetic拦截API）；隔离Go查询验证版本排除、无采集证据不补时长、真实样本统计及项目隔离。不是生产设备或全量性能认证。
+
+### 2026-11-02 原型呈现所需契约补齐（未部署）
+
+Catalog新增state_counts（授权搜索/Namespace/目标筛选后、选择状态前的服务端计数），recent_executions（同项目最近最多10次，最新在前，保留recent_execution兼容），triggers（现有作用域Schedule与Flow定义，来源独立），updated_at/updated_by（flow.save审计，不用创建时间冒充修改时间；缺失为null）。不新增资产或迁移。执行详情新增可空flow_name，取同项目绑定名称，不改变冻结engine_flow_id。独立Go查询集成已核对历史顺序、状态页签计数、审计来源、停用计划与项目隔离；前端使用同一批准原型synthetic数据对照，非生产HTTP验收。
+
+保存视图仅为当前用户/权限版本/项目隔离的内存Query偏好，保存搜索和筛选，不保存执行目标或秘密。版本差异使用实际Revision source与当前草稿的Monaco Diff；源定义缺失时不生成假Diff。

@@ -147,9 +147,9 @@ Overview（阶段时间线/汇总）、Targets（目标矩阵）、Logs（实时
 
 - 侧栏沿用**作业平台、Executions、Agents**三个已确认入口，不为每项生命周期能力增加一级菜单。
 - Flow目录采用原生列表/筛选/列管理/批量动作；创建为主动作，Quick Run为次动作。搜索、排序、分页total和最近执行摘要来自授权服务端查询，不能用已加载数据的本地分页冒充完整目录。
-- Flow详情固定总览、编辑、执行、触发器；版本、依赖、日志、指标、并发放同一标签栏的“更多”。Files、模板、Docs进入编辑器面板，不堆多行Tabs。
+- Flow详情按批准原型固定Overview、Builder、Executions、Revisions、Triggers；依赖、日志、指标、并发放同一标签栏的“更多”。Files、模板、Docs进入编辑器面板，不堆多行Tabs。
 - Execution目录提供记录、运行概况、异常/等待保存视图及跨执行日志。只显示实际聚合，不重复全局Dashboard。
-- Execution详情固定总览、Targets、Gantt/任务、日志、变量与输出；更多包含Metrics、Dependencies、Audit/Context。每个页面保留独立URL，选择任务/设备/Attempt后联动日志和输出。
+- Execution详情按批准原型固定Overview、Targets、Gantt/Tasks、Logs、Variables & Outputs、Audit/Context；更多包含Metrics、Dependencies。每个页面保留独立URL，选择任务/设备/Attempt后联动日志和输出。
 
 ### 10.4 编辑器：同一份定义的连续交互
 

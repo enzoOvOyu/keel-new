@@ -7323,6 +7323,8 @@ export interface components {
             error_code: string | null;
             engine: components["schemas"]["FlowsEngine"];
             targets: components["schemas"]["FlowsTargetRun"][];
+            /** @description Name from the same-project Flow binding. Null for Quick Run or missing binding; engine_flow_id remains the frozen engine identity. */
+            flow_name?: string | null;
         };
         FlowsTargetRun: {
             id: string;
@@ -17070,6 +17072,16 @@ export interface components {
             disabled: boolean;
             engine: components["schemas"]["FlowsEngine"];
             recent_execution: components["schemas"]["FlowsRecentExecution"] | null;
+            /** @description Most recent authorized persisted executions, newest first. No synthesized history slots. */
+            recent_executions: components["schemas"]["FlowsRecentExecution"][];
+            triggers: components["schemas"]["FlowsCatalogTrigger"][];
+            /**
+             * Format: date-time
+             * @description Latest persisted flow.save audit timestamp; null if unavailable.
+             */
+            updated_at: string | null;
+            /** @description Actor of latest authorized flow.save audit event. */
+            updated_by: string | null;
         };
         FlowsCatalogPage: {
             items: components["schemas"]["FlowsCatalogItem"][];
@@ -17078,6 +17090,10 @@ export interface components {
             offset: number;
             namespaces: string[];
             state_source: string;
+            /** @description Server-authorized counts after search/namespace/target filters, before state selection. Includes ALL. */
+            state_counts: {
+                [key: string]: number;
+            };
         };
         FlowsExecutionSummary: {
             total: number;
@@ -17342,6 +17358,15 @@ export interface components {
             date: string;
             total: number;
             failed: number;
+        };
+        FlowsCatalogTrigger: {
+            id: string;
+            type: string;
+            cron: string | null;
+            timezone: string | null;
+            enabled: boolean;
+            /** @enum {string} */
+            source: "scoped_schedule" | "flow_definition";
         };
     };
     responses: {

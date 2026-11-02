@@ -74,12 +74,28 @@ func TestWorkspaceQueryIntegration(t *testing.T) {
 	if e = s.RecordEvent(ctx, second, "log", map[string]any{"taskId": "log", "level": "ERROR", "timestamp": time.Now().Format(time.RFC3339), "message": "synthetic problem"}); e != nil {
 		t.Fatal(e)
 	}
+	if _, e = db.Exec(ctx, `INSERT INTO flow_audit(id,project_id,actor,action,resource_id,details) VALUES(gen_random_uuid(),$1,'synthetic-ui','flow.save',$2,'{}')`, project, fid); e != nil {
+		t.Fatal(e)
+	}
+	defer db.Exec(context.Background(), `DELETE FROM flow_audit WHERE resource_id=$1`, fid)
+	if _, e = db.Exec(ctx, `INSERT INTO flow_schedule(flow_id,owner_id,engine_flow_id,cron,timezone,enabled,request,revision) VALUES($1,$2,$3,'*/30 * * * *','UTC',false,'{}',1)`, fid, user, "synthetic-schedule-"+fid); e != nil {
+		t.Fatal(e)
+	}
+	defer db.Exec(context.Background(), `DELETE FROM flow_schedule WHERE flow_id=$1`, fid)
 	catalog, e := s.Catalog(ctx, scope, url.Values{"q": {name}, "limit": {"1"}})
 	if e != nil || catalog.Total != 1 || len(catalog.Items) != 1 || catalog.Items[0].Recent == nil || catalog.Items[0].Recent.ID != second {
 		t.Fatalf("catalog %+v %v", catalog, e)
 	}
 	if e = s.RecordEvent(ctx, first, "execution", map[string]any{"state": map[string]any{"current": "FAILED", "startDate": "2026-01-01T00:00:00Z", "endDate": "2026-01-01T00:00:08Z"}}); e != nil {
 		t.Fatal(e)
+	}
+	item := catalog.Items[0]
+	if len(item.RecentExecutions) != 2 || item.RecentExecutions[0].ID != second || item.UpdatedAt == nil || item.UpdatedBy == nil || *item.UpdatedBy != "synthetic-ui" || len(item.Triggers) != 1 || item.Triggers[0].Source != "scoped_schedule" || item.Triggers[0].Enabled {
+		t.Fatalf("catalog prototype metadata incomplete: %+v", item)
+	}
+	counted, e := s.Catalog(ctx, scope, url.Values{"q": {name}, "state": {"DRAFT"}})
+	if e != nil || counted.Total != 0 || counted.StateCounts["ALL"] != 1 || counted.StateCounts["ENABLED"] != 1 {
+		t.Fatalf("tab counts depend on selected state: %+v %v", counted, e)
 	}
 	summary, e := s.ExecutionSummary(ctx, scope, url.Values{"flow_id": {fid}})
 	if e != nil || summary.Total != 2 || summary.States["FAILED"] != 2 {

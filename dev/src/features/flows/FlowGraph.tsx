@@ -14,7 +14,7 @@ const library = [
 ] as const;
 function TaskNode({data}: any) {
   const Icon = data.type?.endsWith('.If') ? GitBranch : data.type?.endsWith('.Loop') ? Repeat2 : data.type?.endsWith('.Parallel') ? Layers : Terminal;
-  return <><Handle type="target" position={Position.Top}/><div className="fl-node-title"><Icon size={16}/><strong>{data.label}</strong>{data.state&&<State value={data.state}/>}</div><small>{data.subtitle}</small>{data.lane&&<span className="fl-node-lane">{data.lane}</span>}<Handle type="source" position={Position.Bottom}/></>;
+  return <><Handle type="target" position={Position.Top}/><div className="native-flow-node-title"><Icon size={16}/><strong>{data.label}</strong>{data.state&&<State value={data.state}/>}</div><small>{data.subtitle}</small>{data.lane&&<span className="native-flow-node-lane">{data.lane}</span>}<Handle type="source" position={Position.Bottom}/></>;
 }
 const nodeTypes = { task: TaskNode };
 export function FlowGraph({ document, onSelect, readonly = true, onConnect, selected, states = {} }: {
@@ -24,11 +24,11 @@ export function FlowGraph({ document, onSelect, readonly = true, onConnect, sele
   const [offsets,setOffsets]=useState<Record<string,{x:number;y:number}>>({});
   const graph=useMemo(()=>definitionGraph(document || {}),[document]);
   const nodes:Node[]=graph.nodes.map(n=>({id:n.id,type:'task',position:offsets[n.id]||{x:n.x,y:n.y},selected:selected===n.id,
-    data:{label:n.id.startsWith('step:')?n.id.slice(5):n.id,type:n.task.type,subtitle:n.task.type?.split('.').at(-1),lane:n.lane,state:states[n.id]},draggable:!readonly}));
+    data:{label:n.id.startsWith('step:')?n.id.slice(5):n.id,type:n.task.type,subtitle:n.task.type?.split('.').at(-1),lane:n.lane,state:states[n.id]},className:n.lane==='Parallel'||n.lane==='Iteration'?'native-flow-compact':undefined,draggable:!readonly}));
   const edges:Edge[]=graph.edges.map((e,i)=>({id:`${e.source}-${e.target}-${i}`,source:e.source,target:e.target,label:e.label,type:'smoothstep',markerEnd:{type:MarkerType.ArrowClosed}}));
-  return <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes} fitView fitViewOptions={{maxZoom:1,padding:.25}}
+  return <div className="native-flow-graph"><ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes} fitView fitViewOptions={{maxZoom:1,padding:.25}}
     onNodeClick={(_,n)=>onSelect?.(n.id)} onPaneClick={()=>onSelect?.('')} onNodeDragStop={(_,n)=>setOffsets(v=>({...v,[n.id]:n.position}))}
     onConnect={e=>e.source&&e.target&&onConnect?.(e.source,e.target)} nodesConnectable={!readonly&&!!onConnect} nodesDraggable={!readonly} minZoom={.2} maxZoom={1.5}>
-    <Background gap={20} size={1}/><Controls showInteractive={false}/>
-  </ReactFlow>;
+    <Controls showInteractive={false}/>
+  </ReactFlow></div>;
 }

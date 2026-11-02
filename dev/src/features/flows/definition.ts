@@ -130,3 +130,6 @@ export function nativeTemplate(current: Definition, kind: string): Definition {
   :{id:'parallel',type:core+'flow.Parallel',tasks:[child]};
  return {id:current.id,namespace:current.namespace,tasks:[task],...(kind==='Loop'?{inputs:[{id:'items',type:'JSON',defaults:[]}]}:{})};
 }
+
+// One canonical device execution, projected for editing without exposing the transport wrapper.
+export function deliverySteps(doc:Definition):any[]{const steps=inputDefault(doc,'steps',[]);return steps.length?steps:[{id:'command',kind:inputDefault(doc,'kind','bash'),command:inputDefault(doc,'command',''),depends_on:[],inputs:{},implicit:true}]}

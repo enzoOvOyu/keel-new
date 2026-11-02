@@ -1,3 +1,13 @@
+## 2026-11-02 原型整改第一批已接通，继续专项交互
+
+当前feat/jobs-kestra-ui未发布。目录状态页签/作用域保存视图/近期历史条/审计更新时间、Builder去重复表单/隐藏wrapper、原生Overview与Revision侧栏+Monaco Diff、Execution任务/Attempt/内联日志已接通。新增catalog展示字段与执行flow_name契约，未新增迁移。证据及当前限制见[整改记录](docs/flows-redesign/implementation.md#prototype-parity-correction-20261102)与parity-validation/result.json；同数据5组synthetic交互通过，零后端写入，Go隔离查询通过。不要把这些检查当像素级还原或真机验收。
+
+接着完成用户追加四项：五模块完整性、Files输入交互、明确Shell Script/Python Script添加入口、Quick Run闭环。优先继续NamespaceFiles.tsx与NativeFiles呈现适配、NativeVisual任务目录、QuickRun.tsx/NativeQuickRun；保留受控执行/预检/审批。ZTP事件暂缓。最后集中构建/必要交互并更新截图，避免重复整包测试。
+
+## 2026-11-02 最新整改顺序（进行中）
+
+先完成作业平台原型一致性整改，再完成用户补充的五模块完整性、Files输入交互、Shell Script/Python Script添加入口及Quick Run闭环。完整清单与尚未完成状态见[整改记录](docs/flows-redesign/implementation.md#prototype-parity-correction-20261102)。不要把先前95%工作量估算当原型还原率，也不把已有基础算作这些条目已验收。ZTP事件暂缓不变；独立分支不部署。
+
 ## 2026-11-02 用户最新安排：ZTP / 设备事件暂缓
 
 先记录、不急于开发。后续接入范围、前提、复用位置和必要验收统一见[ZTP / 设备事件后续事项](docs/flows-redesign/implementation.md#ztp-event-follow-up)。当前仍未接通，不计入已完成功能，不以来源字段或筛选入口冒充集成；本轮不扩展ZTP后端或部署。
