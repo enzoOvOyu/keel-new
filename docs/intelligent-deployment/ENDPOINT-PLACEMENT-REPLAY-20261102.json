@@ -1,0 +1,91 @@
+{
+  "state": "COMPLETED",
+  "reused_project_id": "proj-6c17d5ae-148d-4bb8-856d-abc4ea03d44c",
+  "reused_source_id": "5c59d6c1-d2f1-4e21-92d0-2d0e8917676d",
+  "original_agent_job_id": "c947005c-ef81-4144-b4d3-78dd5ecc3d06",
+  "source_sha256": "1cd77c4d0ff8a42deb2055f7b1e39fadbb48fbff734eb95af0323ceaa92b5004",
+  "new_uploads": 0,
+  "new_agent_runs": 0,
+  "new_provider_requests": 0,
+  "manual_source_changes": 0,
+  "metrics": {
+    "connections": 7154,
+    "exact_identity_matches": 7154,
+    "unique_endpoint_serials": 809,
+    "candidate_locations": 805,
+    "missing_locations": 4,
+    "conflicting_locations": 0,
+    "source_rack_or_u_mismatches": 0,
+    "a_matched_connection_rows": 7154,
+    "a_unresolved_connection_rows": 0,
+    "b_matched_connection_rows": 7150,
+    "b_unresolved_connection_rows": 4
+  },
+  "terminations_input_version": 1,
+  "revision_before": 1,
+  "adoption_http_status": 200,
+  "formal_model": {
+    "equipment": 809,
+    "ports": 14308,
+    "connections": 7154,
+    "placements": 0,
+    "cables": 0
+  },
+  "agent_job_unchanged": true,
+  "revision_after": 2,
+  "references_bound_to_existing_equipment_ids": 809,
+  "incomplete_placement_adoption_http_status": 422,
+  "result": "STEP1_AND_EXACT_SN_LOCATION_REFERENCES_PASS; STEP2_STILL_REQUIRES_MODELING",
+  "final_projection_check": {
+    "http_status": 200,
+    "duration_seconds": 0.442,
+    "reference_count": 809,
+    "candidate_locations": 805,
+    "missing_locations": 4,
+    "schema_validation": "PASS"
+  },
+  "continuation_did_not_repeat_adoption": true,
+  "backend_commit": "8b2d4e9",
+  "frontend_commit": "3d216df",
+  "adoption_verification_note": "Initial POST returned 200 and committed revision 2. Read verification continued after a full model GET connection interruption; continuation skipped the already adopted input.",
+  "browser_check": {
+    "login": "PASS",
+    "engineering_workbench_rendered": true,
+    "separate_rack_and_u_columns": true,
+    "unresolved_connection_rows": 4,
+    "second_step_navigation": true,
+    "vite_overlay": 0,
+    "page_errors": [],
+    "failed_modules": []
+  },
+  "release": {
+    "backend_commit": "8b2d4e9",
+    "frontend_commit": "3d216df",
+    "frontend_runtime_directory": "/home/ubuntu/.local/state/keel-deployments/endpoint-placement-3d216df",
+    "api_port": 8081,
+    "frontend_port": 5180,
+    "binary_sha256": "6d6cfa02205af3fb18c22b1448db2a20079ff4c3d8e46ce400dea3ab6bf7e3a0",
+    "new_agent_runs": 0,
+    "backend_runtime_directory": "/home/ubuntu/.local/state/keel-deployments/endpoint-placement-read-8b2d4e9",
+    "keel-cmdb-api_process_matches": true,
+    "keel-dev-5180_process_matches": true
+  },
+  "checks": {
+    "targeted_go_tests": "PASS",
+    "typescript": "PASS",
+    "generated_types": "PASS",
+    "api_documentation_consistency": "PASS",
+    "api_build": "PASS",
+    "actual_response_openapi_schema": "PASS",
+    "exact_SN_source_rack_U_comparison": "PASS",
+    "browser_render_filter_and_step2_navigation": "PASS"
+  },
+  "limits": [
+    "Locations remain unapproved candidates until complete step-two modeling and review. No RackPlacement was fabricated.",
+    "4 counterpart connection rows still lack matching inventory evidence and are visible through the pending-location filter.",
+    "805 connected inventory devices plus 4 unmatched devices form 809 endpoint identities. The other 162 inventory devices are not expanded into assets by endpoint adoption.",
+    "Step two still needs room, installation and other required modeling inputs; incomplete placement adoption returned 422 without changing revision 2.",
+    "No CMDB release, cabling calculations or real device operations were executed. This is not five-step closure acceptance.",
+    "A full-model read disconnected after the initial successful adoption; subsequent reads succeeded. Location projection now loads only identity/facility/placement tables, with measured 0.442-second response."
+  ]
+}

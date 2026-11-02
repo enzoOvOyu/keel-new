@@ -1,3 +1,5 @@
+> 已上线并复用历史MM验证：后端8b2d4e9/前端3d216df，第一步采用HTTP200（规划809设备/14308端口/7154连接）；7150条对端连接按SN关联原表机柜/U位，4条保留缺口。位置查询仅加载设备、机柜、落位三表；实际响应Schema及浏览器分列/筛选/跳转通过。无新增上传或模型请求，后续正式落位/布线仍待补充建模。见[定向重放报告](../intelligent-deployment/ENDPOINT-PLACEMENT-REPLAY-20261102.json)。
+
 > 当前目录版本4：第一步仅要求双端SN/MAC/端口，b_rack_position为可空来源声明，不影响设备/端口关联采用。GET modeling-inputs?table_id=terminations新增只读placement_references：按本任务精确SN复用placements候选与现有RackPlacement，返回分离的机柜/U位、candidate/model/missing/conflict、已有设备/落位ID及placements版本/行号。候选不是正式落位；冲突不覆盖人工模型，第二步审核与第三步计算条件保持。历史MM候选可直接复用，不需要再做全量AI分析。
 
 > 当前第一步输入已调整为本端SN/MAC/端口、对端SN/机架位/MAC/端口（目录版本4）。页面、模板、Agent候选和采用校验均不再包含已移除字段。已有旧格式草稿按当前列投影读取，原始对象及历史连接属性不删除；仍保留身份、MAC、端口占用和位置校验。此项不是完整开局已验收的声明。
