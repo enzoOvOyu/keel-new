@@ -168,7 +168,7 @@ export const kickoffStudioApi = {
         analyzed: false, identity_confirmed: false, review_revision: null, published_revision: null, last_published_revision: null,
         models: structuredClone(fixture.models), sources: structuredClone(fixture.sources), benchmark: structuredClone(fixture.benchmark),
         assets: inventory.filter(asset => fixture.asset_refs.includes(String(asset.id))).map(asset => ({ id: String(asset.id), label: String(asset.hostname), serial: String(asset.serial || asset.sn || ''), model: String(asset.model), rack: String(asset.rack_id), position: `U${asset.rack_u} · ${asset.u_height}U`, source: `demo-seed.json / ${String(asset.id).startsWith('srv') ? 'servers' : 'switches'} / ${asset.id}` })),
-        termination: { a_sn: String(inventory.find(a => a.id === 'srv-0001')?.serial || ''), a_mac: String(seed.collections.ports.find((p: Record<string, string>) => p.id === 'srv-0001-nic-01-p1').mac), a_port: 'NIC1/P1', b_sn: String(inventory.find(a => a.id === 'sw-leaf-0001')?.serial || ''), b_rack_position: 'rack-0002 / U2', b_mac: fixture.supplemental_b_mac, b_port: 'swp1', termination_type: 'fiber' },
+        termination: { a_sn: String(inventory.find(a => a.id === 'srv-0001')?.serial || ''), a_mac: String(seed.collections.ports.find((p: Record<string, string>) => p.id === 'srv-0001-nic-01-p1').mac), a_port: 'NIC1/P1', b_sn: String(inventory.find(a => a.id === 'sw-leaf-0001')?.serial || ''), b_rack_position: 'rack-0002 / U2', b_mac: fixture.supplemental_b_mac, b_port: 'swp1' },
         steps: [], issues: [], calculation: null, events: ['建立独立交互草稿；所有资产引用统一合成 fixture，未写入 CMDB。'],
       };
       const saved = localStorage.getItem(storageKey);

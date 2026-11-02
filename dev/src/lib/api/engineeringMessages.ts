@@ -57,7 +57,6 @@ export const engineeringMessages: Record<string, string> = {
  STEP_CONNECTION_AMBIGUOUS: '已有连接重复，请先核查。',
  STEP_SELF_CONNECTION: '连接两端不能是同一个端口。',
  STEP_PORT_OCCUPIED: '端口已连接其他端点，请核查线路。',
- STEP_TERMINATION_CONFLICT: '端接类型与已有记录不一致，请核查。',
  STEP_POSITION_CONFLICT: '对端机架位声明与已有记录不一致。',
  STEP_SOURCE_STORAGE_UNAVAILABLE: '原始输入暂时无法保存，请稍后重试。',
 

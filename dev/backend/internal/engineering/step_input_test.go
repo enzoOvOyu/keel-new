@@ -34,7 +34,7 @@ func TestStepInputCatalog(t *testing.T) {
 		headers = append(headers, f.Label)
 	}
 	w.Write(headers)
-	w.Write([]string{"00001234567890123456", "00:11:22:33:44:55", "Ethernet1", "00002", "R1-U10", "00:11:22:33:44:66", "Ethernet2", "客户定义端接"})
+	w.Write([]string{"00001234567890123456", "00:11:22:33:44:55", "Ethernet1", "00002", "R1-U10", "00:11:22:33:44:66", "Ethernet2"})
 	w.Flush()
 	got := PreviewStepInput(InputPreviewRequest{"terminations", b.String()})
 	if !got.Valid || got.Rows[0][0] != "00001234567890123456" {

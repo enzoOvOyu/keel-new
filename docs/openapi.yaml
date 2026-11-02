@@ -47874,6 +47874,7 @@ components:
         - supports_confirmation
     IDEInputCatalog:
       type: object
+      description: Current five-step input catalog, version 3. Step 1 uses a_serial, a_mac, a_port, b_serial, b_rack_position, b_mac and b_port.
       additionalProperties: false
       properties:
         version: *a1

@@ -63,6 +63,15 @@ func (s *Server) modelingInputs(ctx context.Context, w engineering.Workspace, wi
 		if err = json.Unmarshal(issues, &v.Issues); err != nil {
 			break
 		}
+		if v.TableID == "terminations" {
+			current := v.Issues[:0]
+			for _, issue := range v.Issues {
+				if issue.Field != "termination_type" {
+					current = append(current, issue)
+				}
+			}
+			v.Issues = current
+		}
 		v.State = "draft"
 		if adopted != nil {
 			v.State = "adopted"
@@ -126,6 +135,7 @@ func (s *Server) modelingInputs(ctx context.Context, w engineering.Workspace, wi
 				continue
 			}
 			known[part.TableID] = true
+			part.CSV = currentModelingCSV(part.TableID, part.CSV)
 			preview := engineering.PreviewStepInput(part)
 			v := modelingStored{ModelingInput: engineering.ModelingInput{TableID: part.TableID, BaseRevision: src.revision, State: "adopted", Rows: len(preview.Rows), Issues: preview.Issues, Reason: src.reason}}
 			if withCSV {
@@ -143,10 +153,35 @@ func (s *Server) modelingInputs(ctx context.Context, w engineering.Workspace, wi
 			if e != nil {
 				return nil, e
 			}
-			out[i].CSV = string(raw)
+			out[i].CSV = currentModelingCSV(out[i].TableID, string(raw))
+			preview := engineering.PreviewStepInput(engineering.InputPreviewRequest{TableID: out[i].TableID, CSV: out[i].CSV})
+			out[i].Issues = preview.Issues
 		}
 	}
 	return out, nil
+}
+
+// Project the retired column out of previously stored inputs. New uploads
+// still have to match the current catalog. Immutable source objects stay intact.
+func currentModelingCSV(table, raw string) string {
+	if table != "terminations" {
+		return raw
+	}
+	reader := csv.NewReader(strings.NewReader(raw))
+	rows, err := reader.ReadAll()
+	if err != nil || len(rows) == 0 || len(rows[0]) != 8 || rows[0][7] != "端接类型" {
+		return raw
+	}
+	fields := engineering.StepInputCatalog().Tables[0].Fields
+	for i, field := range fields {
+		if rows[0][i] != field.Label {
+			return raw
+		}
+	}
+	for i := range rows {
+		rows[i] = rows[i][:len(fields)]
+	}
+	return canonicalModelingCSV(table, rows[1:])
 }
 
 func canonicalModelingCSV(table string, rows [][]string) string {

@@ -1,3 +1,5 @@
+> 当前第一步输入已调整为本端SN/MAC/端口、对端SN/机架位/MAC/端口（目录版本3）。页面、模板、Agent候选和采用校验均不再包含已移除字段。已有旧格式草稿按当前列投影读取，原始对象及历史连接属性不删除；仍保留身份、MAC、端口占用和位置校验。此项不是完整开局已验收的声明。
+
 > 当前在线：代码e5faead已部署8081/5180，数据库043无变更；健康、登录、目录/任务、模板、CMDB子图和前端模块检查通过。见[部署记录](../intelligent-deployment/DEPLOYMENT-FIVE-STEP-CHAIN-20261102.json)。下方2215177/未部署说明为历史；新分步Agent仍未完成。
 
 > 最新开发验收：五步固定输入链在隔离API通过，见[连贯验收](../intelligent-deployment/FIVE-STEP-CHAIN-ACCEPTANCE-20261102.json)。完整布线导入已补齐；新分步Agent仍未实现。以下旧阶段描述保留历史，现网仍2215177。
@@ -176,15 +178,15 @@ Agent原生工具参数按Pydantic Schema校验，读取脱敏IR，以逐Sheet�
 
 ## 五步标准输入契约（开发中，未部署）
 
-`GET /projects/{projectId}/engineering-inputs` 返回版本1的五步模板目录、列名、类型、必填及条件说明。`GET .../engineering-inputs/{tableId}?format=csv|xlsx` 下载仅表头模板；XLSX使用文本表头，不包含真实资料。八列端接模板固定为a端SN/a端MAC/a端端口/b端SN/b端机架位/b端MAC/b端端口/端接类型。
+`GET /projects/{projectId}/engineering-inputs` 返回版本3的五步模板目录、列名、类型、必填及条件说明。`GET .../engineering-inputs/{tableId}?format=csv|xlsx` 下载仅表头模板；XLSX使用文本表头，不包含真实资料。设备关联模板为a端SN/a端MAC/a端端口/b端SN/b端机架位/b端MAC/b端端口。
 
 `POST .../engineering-inputs/preview` 接受IDEInputPreviewRequest，返回逐行原值和字段问题。SN等身份字符串不转数字；MAC校验48位格式，数值按类型检查。表头、列序不符明确报错。该接口只做格式预览，不持久化、不认定工程模块就绪、不发布资产，不执行模型调用或规则计算。条件必填及跨表关系尚需后置建模校验。
 
 作用域为项目，读取/下载要求bom:read，预览要求bom:edit并沿用Session/CSRF。查询可按项目缓存目录；预览无缓存。请求沿用8MiB限制。前端提供五步选择、字段说明、XLSX/CSV下载、CSV读取与手动修改、问题表和前20行预览；当前仅标准格式预览已实现，补充入库、XLSX读取及新Agent仍在开发。错误包含403/未知模板404/非法格式400/Schema400；预览中的业务输入错误以200响应issues返回。未运行HTTP或浏览器验收。
 
-`POST /projects/{projectId}/engineering-imports/{sourceId}/standard-input`（开发中未部署）接收IDEStandardInputRequest，当前仅支持terminations八列表。权限bom:edit，沿用Session/CSRF；绑定expected_revision及确认依据。先验证完整CSV，再在项目CMDB范围按SN、设备/端口名解析已有身份；歧义、MAC冲突、端口占用、类型或同向位置冲突阻断。没有现成身份时创建规划草稿；其他工程域增量保留。原始CSV存MinIO，索引与新修订在同事务保存（迁移039）；失败不提交模型。反向重复保持原连接方向，反向位置声明保留在原始补充资料。前端确认后刷新任务版本，仍需现有审核/发布。
+`POST /projects/{projectId}/engineering-imports/{sourceId}/standard-input`（开发中未部署）接收IDEStandardInputRequest，当前仅支持terminations设备关联表。权限bom:edit，沿用Session/CSRF；绑定expected_revision及确认依据。先验证完整CSV，再在项目CMDB范围按SN、设备/端口名解析已有身份；歧义、MAC冲突、端口占用或同向位置冲突阻断。没有现成身份时创建规划草稿；其他工程域增量保留。原始CSV存MinIO，索引与新修订在同事务保存（迁移039）；失败不提交模型。反向重复保持原连接方向，反向位置声明保留在原始补充资料。前端确认后刷新任务版本，仍需现有审核/发布。
 
-迁移039新增端口MAC、端接类型、原始B端位置声明和标准输入来源索引。MAC与类型由工程发布投影为planned事实，Observed保护沿用；声明不等于正式机柜落位。此入口不自动补造型号/高度/网络参数。当前补充来源尚未接入Evidence Explorer逐字段查看，后续四步确认导入和完整闭环仍未完成；这些不以预览成功代替验收。新增错误码STEP_*定位输入、身份、端口、类型、位置或源存储问题；并发版本或运行中分析返回409。未进行数据库、HTTP、浏览器和CMDB发布验收。
+迁移039新增端口MAC、历史连接属性、原始B端位置声明和标准输入来源索引。MAC及历史属性由工程发布投影为planned事实，Observed保护沿用；声明不等于正式机柜落位。此入口不自动补造型号/高度/网络参数。当前补充来源尚未接入Evidence Explorer逐字段查看，后续四步确认导入和完整闭环仍未完成；这些不以预览成功代替验收。新增错误码STEP_*定位输入、身份、端口、位置或源存储问题；并发版本或运行中分析返回409。未进行数据库、HTTP、浏览器和CMDB发布验收。
 
 标准确认导入已扩展rooms/racks/equipment_specs/placements。InputTable.supports_confirmation由服务端声明，前端据此提供确认入口。机房/机柜编码解析父子关系；设备规格按已确认SN补类型/型号/高度；落位复用设备和机柜ID，编辑保留原落位ID，空白可选规格不清除已有值。安装方式u要求起始U/占用U；non_u要求位置编码且U位字段为空，重复非U位置阻断。机柜越界、U位重叠、规格高度冲突沿用结构校验和发布门禁。迁移040持久设备高度、设施编码和非U位置，CMDB发布保留规划来源；非U位置不伪造U位。尚未进行数据库或已有机柜图的真实验收。
 

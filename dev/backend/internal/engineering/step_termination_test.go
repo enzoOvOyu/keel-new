@@ -5,8 +5,8 @@ import (
 	"testing"
 )
 
-const terminationHeader = "a端SN,a端MAC,a端端口,b端SN,b端机架位,b端MAC,b端端口,端接类型\n"
-const terminationRow = "00001,00:11:22:33:44:55,eth1,00002,R1-U10,00:11:22:33:44:66,eth2,客户端接\n"
+const terminationHeader = "a端SN,a端MAC,a端端口,b端SN,b端机架位,b端MAC,b端端口\n"
+const terminationRow = "00001,00:11:22:33:44:55,eth1,00002,R1-U10,00:11:22:33:44:66,eth2\n"
 
 func TestMergeTerminationsAdditive(t *testing.T) {
 	original := EmptyPhysical("project")
@@ -22,6 +22,7 @@ func TestMergeTerminationsAdditive(t *testing.T) {
 	if *next.Equipment[0].Serial != "00001" || *next.Ports[0].MAC != "00:11:22:33:44:55" || next.Connections[0].BRackPosition != "R1-U10" {
 		t.Fatal("lost endpoint identity")
 	}
+	next.Connections[0].TerminationType = "historical-value"
 	again, e := MergeTerminations(next, q)
 	if e != nil {
 		t.Fatal(e)
@@ -29,7 +30,10 @@ func TestMergeTerminationsAdditive(t *testing.T) {
 	if len(again.Equipment) != 2 || len(again.Ports) != 2 || len(again.Connections) != 1 || again.Connections[0].EntityID != next.Connections[0].EntityID {
 		t.Fatal("not idempotent")
 	}
-	reverse := InputPreviewRequest{"terminations", terminationHeader + "00002,00:11:22:33:44:66,eth2,00001,R2-U20,00:11:22:33:44:55,eth1,客户端接\n"}
+	if again.Connections[0].TerminationType != "historical-value" {
+		t.Fatal("unrelated historical value changed")
+	}
+	reverse := InputPreviewRequest{"terminations", terminationHeader + "00002,00:11:22:33:44:66,eth2,00001,R2-U20,00:11:22:33:44:55,eth1\n"}
 	reversed, err := MergeTerminations(next, reverse)
 	if err != nil || len(reversed.Connections) != 1 || reversed.Connections[0].BRackPosition != "R1-U10" {
 		t.Fatal("reverse duplicate changed orientation", err)
@@ -50,7 +54,6 @@ func TestMergeTerminationsRejectsConflictsWithoutMutation(t *testing.T) {
 	}
 	for _, body := range []string{
 		strings.Replace(terminationRow, "00:11:22:33:44:55", "00:11:22:33:44:99", 1),
-		strings.Replace(terminationRow, "客户端接", "其他类型", 1),
 		strings.Replace(terminationRow, "R1-U10", "R2-U20", 1),
 		strings.Replace(terminationRow, "00002", "00003", 1),
 	} {

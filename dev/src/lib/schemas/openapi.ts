@@ -16977,6 +16977,7 @@ export interface components {
             fields: components["schemas"]["IDEInputField"][];
             supports_confirmation: boolean;
         };
+        /** @description Current five-step input catalog, version 3. Step 1 uses a_serial, a_mac, a_port, b_serial, b_rack_position, b_mac and b_port. */
         IDEInputCatalog: {
             version: string;
             tables: components["schemas"]["IDEInputTable"][];

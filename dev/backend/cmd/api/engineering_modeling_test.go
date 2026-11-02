@@ -19,6 +19,24 @@ import (
 	"keel.local/dev/internal/identity"
 )
 
+func TestCurrentModelingCSVProjectsRetiredStoredColumn(t *testing.T) {
+	current := "a端SN,a端MAC,a端端口,b端SN,b端机架位,b端MAC,b端端口\nA,02:00:00:00:00:01,eth1,B,R1-U10,02:00:00:00:00:02,eth2\n"
+	old := strings.Replace(current, "b端端口\n", "b端端口,端接类型\n", 1)
+	old = strings.Replace(old, "eth2\n", "eth2,historical\n", 1)
+	if got := currentModelingCSV("terminations", old); got != current {
+		t.Fatalf("stored input not projected: %q", got)
+	}
+	if currentModelingCSV("terminations", current) != current || currentModelingCSV("port_specs", old) != old {
+		t.Fatal("unrelated input changed")
+	}
+	if engineering.PreviewStepInput(engineering.InputPreviewRequest{TableID: "terminations", CSV: old}).Valid {
+		t.Fatal("new upload accepted a removed column")
+	}
+	if !engineering.PreviewStepInput(engineering.InputPreviewRequest{TableID: "terminations", CSV: current}).Valid {
+		t.Fatal("current input rejected")
+	}
+}
+
 func TestModelingDraftAdoptionAndHandoff(t *testing.T) {
 	dsn := os.Getenv("KEEL_ENGINEERING_TEST_DATABASE_URL")
 	if !strings.Contains(dsn, "/keel_engineering_") || os.Getenv("S3_BUCKET") == "" {
@@ -100,7 +118,7 @@ func TestModelingDraftAdoptionAndHandoff(t *testing.T) {
 		w.Flush()
 		return engineering.InputPreviewRequest{TableID: table, CSV: b.String()}
 	}
-	partial := csvInput("terminations", []string{"00001", "02:00:00:00:00:01", "eth1", "00002", "R1-U10", "", "eth2", "客户确认端接"})
+	partial := csvInput("terminations", []string{"00001", "02:00:00:00:00:01", "eth1", "00002", "R1-U10", "", "eth2"})
 	edit := engineering.ModelingInputEdit{ExpectedRevision: 1, InputVersion: 0, InputPreviewRequest: partial, Reason: "Independent synthetic reference"}
 	if err = s.saveModelingInputs(ctx, get(), []engineering.ModelingInputEdit{edit}, "author"); err != nil {
 		t.Fatal(err)

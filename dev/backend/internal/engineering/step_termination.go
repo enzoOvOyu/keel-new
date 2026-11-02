@@ -105,19 +105,14 @@ func MergeTerminations(current PhysicalModel, q InputPreviewRequest) (PhysicalMo
 		key := connectionKey(endpoints[0], endpoints[1])
 		if i, ok := connections[key]; ok {
 			c := &next.Connections[i]
-			if c.TerminationType != "" && c.TerminationType != v[7] {
-				return current, fmt.Errorf("STEP_TERMINATION_CONFLICT: row %d", row+2)
-			}
 			if c.APortID != endpoints[0] {
 				// The reversed row's B position describes our A endpoint. Keep the
 				// original orientation; the archived input retains that new declaration.
-				c.TerminationType = v[7]
 				continue
 			}
 			if c.BRackPosition != "" && c.BRackPosition != v[4] {
 				return current, fmt.Errorf("STEP_POSITION_CONFLICT: row %d", row+2)
 			}
-			c.TerminationType = v[7]
 			c.BRackPosition = v[4]
 			continue
 		}
@@ -128,7 +123,7 @@ func MergeTerminations(current PhysicalModel, q InputPreviewRequest) (PhysicalMo
 		used[endpoints[1]] = true
 
 		connections[key] = len(next.Connections)
-		next.Connections = append(next.Connections, PlannedConnection{EntityVersion: version("connection", key), APortID: endpoints[0], ZPortID: endpoints[1], PatchPortIDs: []string{}, TerminationType: v[7], BRackPosition: v[4]})
+		next.Connections = append(next.Connections, PlannedConnection{EntityVersion: version("connection", key), APortID: endpoints[0], ZPortID: endpoints[1], PatchPortIDs: []string{}, BRackPosition: v[4]})
 	}
 	return next, nil
 }

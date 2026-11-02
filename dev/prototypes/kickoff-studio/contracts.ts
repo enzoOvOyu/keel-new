@@ -141,5 +141,4 @@ export type StudioTermination = {
             b_rack_position: string;
             b_mac: string;
             b_port: string;
-            termination_type: string;
         };

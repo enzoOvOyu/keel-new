@@ -29,7 +29,7 @@ func TestKickoffAllowsBothEndpointsInSameRange(t *testing.T) {
 
 func TestKickoffProjectsKnownPortsWithoutInventingSpecs(t *testing.T) {
 	tables := map[string][][]string{
-		"terminations": {{"SN-A", "", "eth1", "SN-B", "", "", "eth2", ""}, {"SN-A", "", "eth1", "", "", "", "eth3", ""}},
+		"terminations": {{"SN-A", "", "eth1", "SN-B", "", "", "eth2"}, {"SN-A", "", "eth1", "", "", "", "eth3"}},
 		"port_specs":   {{"SN-A", "eth1", "fiber", "LC", "100", "Gbps", "", ""}},
 	}
 	if got := len(completeKickoffPortIdentities(tables)); got != 1 {
