@@ -1,11 +1,11 @@
 {
   "version": 1,
   "updated_at": "2026-11-01",
-  "coverage": "API ceab753/v40 deployed. Real Ultra-03 final proposal covers 15 sheets; independent source-understanding review PARTIAL / NOT ACCEPTED. Technical completion and correct source fields do not establish semantic or publication acceptance.",
+  "coverage": "Release 2215177 on existing 8081/5180 with migration043; authenticated catalog/template/workspace reads and browser startup passed. Full cabling/new scoped Agent remain incomplete; prior isolated business evidence is separate.",
   "schema_authority": "docs/openapi.yaml",
-  "code_revision": "ceab753",
-  "deployed_revision": "ceab753",
-  "deployment_evidence": "docs/intelligent-deployment/deployment-agent-repair-20261101.json",
+  "code_revision": "2215177",
+  "deployed_revision": "2215177",
+  "deployment_evidence": "docs/intelligent-deployment/DEPLOYMENT-FIXED-STEPS-20261102.json",
   "operations": [
     {
       "method": "get",
@@ -1408,38 +1408,41 @@
       "path": "/projects/{projectId}/engineering-inputs",
       "operation_id": "getEngineeringInputCatalog",
       "implementation": "implemented",
-      "deployment": "not_deployed",
+      "deployment": "deployed",
       "verification": "Isolated real API/DB/MinIO steps 1-2 and publication/topology data verified; 3-5 import blocked as incomplete; browser/Agent NOT RUN",
       "handler": "dev/backend/cmd/api/engineering_step_input.go",
       "source": "dev/backend/internal/engineering/step_input.go",
       "documentation": "docs/api/engineering.md",
       "response_schema": "IDEInputCatalogResponse",
-      "verification_evidence": "docs/intelligent-deployment/FIXED-STEP-XLSX-TEST-20261101.json"
+      "verification_evidence": "docs/intelligent-deployment/FIXED-STEP-XLSX-TEST-20261101.json",
+      "deployment_evidence": "docs/intelligent-deployment/DEPLOYMENT-FIXED-STEPS-20261102.json"
     },
     {
       "method": "post",
       "path": "/projects/{projectId}/engineering-inputs/preview",
       "operation_id": "previewEngineeringInput",
       "implementation": "implemented",
-      "deployment": "not_deployed",
+      "deployment": "deployed",
       "verification": "Go step input unit tests and API package compile passed; TypeScript and documentation checks passed; HTTP/browser NOT RUN",
       "handler": "dev/backend/cmd/api/engineering_step_input.go",
       "source": "dev/backend/internal/engineering/step_input.go",
       "documentation": "docs/api/engineering.md",
       "response_schema": "IDEInputPreviewResponse",
-      "request_schema": "IDEInputPreviewRequest"
+      "request_schema": "IDEInputPreviewRequest",
+      "deployment_evidence": "docs/intelligent-deployment/DEPLOYMENT-FIXED-STEPS-20261102.json"
     },
     {
       "method": "get",
       "path": "/projects/{projectId}/engineering-inputs/{tableId}",
       "operation_id": "downloadEngineeringInputTemplate",
       "implementation": "implemented",
-      "deployment": "not_deployed",
+      "deployment": "deployed",
       "verification": "Go step input unit tests and API package compile passed; TypeScript and documentation checks passed; HTTP/browser NOT RUN",
       "handler": "dev/backend/cmd/api/engineering_step_input.go",
       "source": "dev/backend/internal/engineering/step_input.go",
       "documentation": "docs/api/engineering.md",
-      "response_media_type": "text/csv"
+      "response_media_type": "text/csv",
+      "deployment_evidence": "docs/intelligent-deployment/DEPLOYMENT-FIXED-STEPS-20261102.json"
     },
     {
       "method": "post",
@@ -1448,12 +1451,13 @@
       "request_schema": "IDEStandardInputRequest",
       "response_schema": "getEngineeringWorkspaceEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
+      "deployment": "deployed",
       "verification": "Isolated real API/DB/MinIO steps 1-2 and publication/topology data verified; 3-5 import blocked as incomplete; browser/Agent NOT RUN",
       "handler": "dev/backend/cmd/api/engineering.go",
       "source": "dev/backend/cmd/api/engineering_standard_input.go",
       "documentation": "docs/api/engineering.md",
-      "verification_evidence": "docs/intelligent-deployment/FIXED-STEP-XLSX-TEST-20261101.json"
+      "verification_evidence": "docs/intelligent-deployment/FIXED-STEP-XLSX-TEST-20261101.json",
+      "deployment_evidence": "docs/intelligent-deployment/DEPLOYMENT-FIXED-STEPS-20261102.json"
     },
     {
       "method": "post",
@@ -1462,12 +1466,13 @@
       "request_schema": "IDEStandardWorkbookRequest",
       "response_schema": "IDEStandardWorkbookPreviewEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
+      "deployment": "deployed",
       "verification": "Isolated real API/DB/MinIO steps 1-2 and publication/topology data verified; 3-5 import blocked as incomplete; browser/Agent NOT RUN",
       "handler": "dev/backend/cmd/api/engineering.go",
       "source": "dev/backend/cmd/api/engineering_standard_workbook.go",
       "documentation": "docs/api/engineering.md",
-      "verification_evidence": "docs/intelligent-deployment/FIXED-STEP-XLSX-TEST-20261101.json"
+      "verification_evidence": "docs/intelligent-deployment/FIXED-STEP-XLSX-TEST-20261101.json",
+      "deployment_evidence": "docs/intelligent-deployment/DEPLOYMENT-FIXED-STEPS-20261102.json"
     },
     {
       "method": "post",
@@ -1476,12 +1481,13 @@
       "request_schema": "IDEStandardWorkbookConfirmRequest",
       "response_schema": "getEngineeringWorkspaceEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
+      "deployment": "deployed",
       "verification": "Isolated real API/DB/MinIO steps 1-2 and publication/topology data verified; 3-5 import blocked as incomplete; browser/Agent NOT RUN",
       "handler": "dev/backend/cmd/api/engineering.go",
       "source": "dev/backend/cmd/api/engineering_standard_workbook.go",
       "documentation": "docs/api/engineering.md",
-      "verification_evidence": "docs/intelligent-deployment/FIXED-STEP-XLSX-TEST-20261101.json"
+      "verification_evidence": "docs/intelligent-deployment/FIXED-STEP-XLSX-TEST-20261101.json",
+      "deployment_evidence": "docs/intelligent-deployment/DEPLOYMENT-FIXED-STEPS-20261102.json"
     }
   ],
   "development_note": "当前运行ceab753/v40，迁移038；真实MM/Ultra分析提案已完整保存，资料理解验收未通过。当前结论见docs/intelligent-deployment/SOURCE-UNDERSTANDING-REVIEW-20261101.txt；未正式发布、未进行模型对照或跨客户验收。"

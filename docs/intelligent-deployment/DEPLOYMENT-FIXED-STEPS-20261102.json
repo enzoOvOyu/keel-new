@@ -1,0 +1,85 @@
+{
+  "code_revision": "2215177",
+  "branch": "dev",
+  "repository": "enzoOvOyu/keel-new",
+  "api": {
+    "port": 8081,
+    "pid": 2371641,
+    "binary": "/home/ubuntu/.local/state/keel-deployments/fixed-step-2215177/keel-api",
+    "sha256": "0bc4a8f454a9a38528242ad10ec1909f72e041ff1c6c484e548917328d466320",
+    "cwd": "/home/ubuntu/keel/dev/backend",
+    "session": "keel-cmdb-api"
+  },
+  "frontend": {
+    "port": 5180,
+    "pid": 2371898,
+    "cwd": "/home/ubuntu/.local/state/keel-deployments/fixed-step-2215177/dev",
+    "session": "keel-dev-5180",
+    "fixture_link": "../../fixtures/demo-full-64-b300"
+  },
+  "migration": {
+    "previous": 38,
+    "current": 43,
+    "applied": [
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "atomic_transaction": true
+  },
+  "backup": {
+    "path": "/home/ubuntu/.local/state/keel-deployments/fixed-step-2215177/before-039.dump",
+    "bytes": 92182979,
+    "format_check": "pg_restore --list succeeded; full restore not exercised"
+  },
+  "configuration": "Existing private API/frontend environment, credentials and MinIO preserved; no deployment into other development worktrees",
+  "checks": {
+    "go_build": "PASS",
+    "frontend_production_build": "PASS",
+    "authenticated_read_checks": {
+      "login": 200,
+      "projects": 200,
+      "project_id": "proj-b300-demo",
+      "projects/proj-b300-demo/engineering-inputs": 200,
+      "input_tables": 29,
+      "projects/proj-b300-demo/engineering-imports": 200,
+      "cmdb/visualization/subgraph?project_id=proj-b300-demo": 200,
+      "template_csv": 200,
+      "template_xlsx": 200,
+      "frontend/": 200,
+      "frontend/src/app/main.tsx": 200,
+      "frontend/src/lib/api/index.tsx": 200,
+      "frontend/src/features/EngineeringStepInputs.tsx": 200,
+      "frontend/src/features/EngineeringPowerPanel.tsx": 200
+    },
+    "browser": {
+      "route": "/p/proj-b300-demo/deploy/bom",
+      "five_step_workbench": true,
+      "power_scope_option": true,
+      "vite_error_overlay": false,
+      "page_errors": [],
+      "failed_http": []
+    }
+  },
+  "api_startup_checks": {
+    "checks": [
+      {
+        "endpoint": "/healthz",
+        "status": 200
+      }
+    ]
+  },
+  "rollback": {
+    "previous_api_launcher": "/home/ubuntu/.local/state/keel-deployments/fixed-step-2215177/previous-api-run.py",
+    "previous_frontend_launcher": "/home/ubuntu/.local/state/keel-deployments/fixed-step-2215177/previous-frontend-run.py",
+    "database": "Additive migrations retained; old v40 positional inserts are not compatible with added columns. No automatic binary-only or destructive schema rollback; backup retained for an evaluated restore if required."
+  },
+  "limits": [
+    "Full cabling workflow and new scoped Agent are incomplete",
+    "Additional network protocol fixed imports remain incomplete",
+    "No full business retest or real device/power operation performed during this deployment",
+    "Browser checked workbench startup, five-step navigation and power-scope option only"
+  ]
+}

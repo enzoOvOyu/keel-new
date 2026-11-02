@@ -1,3 +1,5 @@
+> 当前发布：代码2215177已部署8081/5180、迁移043，证据见[部署记录](../intelligent-deployment/DEPLOYMENT-FIXED-STEPS-20261102.json)。下文“未部署”属于相应开发阶段历史；当前完整布线和新Agent仍未完成，发布检查不等于整体验收。
+
 # 智能开局工程真实接口
 
 更新：2026-11-01。工程Agent修复已在原5180/8081上线，迁移038已应用；前端保留原版本页面，只改变工程上传分流。下方阶段检查是历史开发记录，当前部署证据见[部署记录](../intelligent-deployment/deployment-agent-repair-20261101.json)。所有路径使用 `/api/v1` 前缀及现有身份Session、项目授权和CSRF。精确DTO以 `openapi.yaml` 的 `IDE*` 为准。
