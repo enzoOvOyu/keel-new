@@ -121,6 +121,10 @@ func projectDeletionStatements() []string {
 		`DELETE FROM cmdb_entity e WHERE item_uid IN (SELECT asset_id FROM deletion_assets) AND NOT EXISTS(SELECT 1 FROM cmdb_relationship WHERE from_uid=e.item_uid OR to_uid=e.item_uid)`,
 		`DELETE FROM cmdb_ingest_event WHERE event_id IN (SELECT id::text FROM outbox_event WHERE project_id=$1)`,
 		`DELETE FROM outbox_event WHERE project_id=$1`,
+		// Evidence may reference another source in this project's reimport chain.
+		// Remove the owned revision evidence before cascading source deletion.
+		`DELETE FROM eng_evidence WHERE revision_id IN (SELECT r.id FROM eng_revision r JOIN eng_source s ON s.id=r.source_id WHERE s.project_id=$1)`,
+		`DELETE FROM eng_entity_version WHERE project_id=$1`,
 		`DELETE FROM eng_source WHERE project_id=$1`,
 		`DELETE FROM eng_entity WHERE project_id=$1`,
 		`DELETE FROM bom_submission WHERE project_id=$1`,
