@@ -1,0 +1,78 @@
+{
+  "code_commit": "1aa2e3e",
+  "catalog_version": "5",
+  "optional_config_tables": 28,
+  "post_identity_required_fields": 0,
+  "empty_configuration_previews": [
+    {
+      "step": 2,
+      "empty_preview": "PASS"
+    },
+    {
+      "step": 3,
+      "empty_preview": "PASS"
+    },
+    {
+      "step": 4,
+      "empty_preview": "PASS"
+    },
+    {
+      "step": 5,
+      "empty_preview": "PASS"
+    }
+  ],
+  "source_revision_unchanged": true,
+  "agent_job_unchanged": true,
+  "new_ai_requests": 0,
+  "browser": {
+    "login": "PASS",
+    "engineering_workbench_rendered": true,
+    "configuration_editors_without_required_markers": [
+      "rooms",
+      "racks",
+      "placements"
+    ],
+    "vite_overlay": 0,
+    "page_errors": [],
+    "failed_modules": []
+  },
+  "release": {
+    "code_commit": "1aa2e3e",
+    "catalog_version": "5",
+    "api_port": 8081,
+    "frontend_port": 5180,
+    "binary_sha256": "a1c21558dc74a4b52abfecf191bc563543373bb78a56d41ee7be0218a70133f9",
+    "source_archive_paths": [
+      "dev/src",
+      "dev/prototypes",
+      "dev/public",
+      "dev/fixtures",
+      "dev/index.html",
+      "dev/package.json",
+      "dev/vite.config.ts",
+      "dev/tsconfig.json",
+      "dev/components.json",
+      "fixtures",
+      "docs/intelligent-deployment/KICKOFF-STUDIO-IMPLEMENTATION.txt"
+    ],
+    "new_agent_runs": 0,
+    "runtime_directory": "/home/ubuntu/.local/state/keel-deployments/optional-config-1aa2e3e",
+    "keel-cmdb-api_matches": true,
+    "keel-dev-5180_matches": true
+  },
+  "verification": {
+    "targeted_go_tests": "PASS",
+    "typescript": "PASS",
+    "generated_types": "PASS",
+    "go_api_build": "PASS",
+    "all_post_identity_fields_optional": "PASS",
+    "empty_configuration_does_not_create_entities": "PASS_UNIT",
+    "late_code_preserves_existing_identity": "PASS_UNIT",
+    "provided_invalid_numbers_rejected": "PASS_UNIT",
+    "browser_editors": "PASS",
+    "full_business_chain": "NOT_RUN",
+    "real_device_actions": "NOT_RUN",
+    "ai_calls": 0
+  },
+  "scope": "Project kickoff configuration intake, steps 2-5; existing calculation, publication and approval semantics are not fabricated."
+}
