@@ -9,10 +9,10 @@
 | JUI-01/02 | 已修复并定向检查 | dirty含元数据修改，禁止直接运行；源版本读取Execution冻结定义，失败不回落最新 |
 | JUI-03/05 | 已修复并定向检查 | Topology、TaskRun与日志共享URL上下文；缺失设备关联显示不可定位，绝不拿其他任务日志代替；循环多实例选择器已实现，未做全量循环场景验收 |
 | JUI-04 | 已修复并定向检查 | 60条Agent以25条切片，第二页实际变化；历史/目标列表分页同样绑定；修复切片数组触发表格选择事件的循环 |
-| JUI-06 | 新增/替换交互已修复 | 当前任务为默认替换候选，保存验证不改变其他任务；独立文件来源绑定/动态Namespace仍未实现，只有明确的内容快照 |
+| JUI-06 | 新增/替换交互已修复 | 当前任务默认替换候选，保留其他任务；固定版本来源已持久化至Flow变量，可重开原文件；动态跟随最新版仍不支持 |
 | JUI-07 | 已实现，关键返回检查通过 | 筛选、分页、列设置与return_to，内存滚动；非原型像素级或全场景滚动验收 |
 | JUI-08 | 已实现 | 全部/运行中/需要关注+真实聚合；关注由服务端过滤，Go隔离SQL检查通过；不把加载数量当总量 |
-| JUI-09 | 已实现适用交互 | 受控步骤可在不违反依赖时拖动；Log用多行输入；JobStep没有独立description/timeout，不添加无效表单 |
+| JUI-09 | 已实现适用交互 | 受控步骤按依赖拖动；Log多行；JobStep描述/时限已按同一契约接通，复用Task时限与能力选择 |
 | JUI-10 | 已实现并定向检查 | 输出逐层、源任务、冻结定义、授权文本预览；仅小文本，非任意二进制/HTML预览 |
 | JUI-11 | 已实现并定向检查 | 执行名称实际持久化；批准候选、待审提示、目标revision、重跑输入Diff；后端仍重新判定批准 |
 | JUI-12 | 已修复已确认的布局问题 | 五核心面板顺序、右区复用、START/END视觉终点、原生主题、输出main填满；已查看截图，不宣称全页面像素100% |
@@ -312,3 +312,21 @@ Kestra2.0.7兼容修正包括Loop替代不存在的ForEach、`fromJson(item.valu
 暂停前Outputs增量：复用上游SidebarList/explorerSearch和原生搜索/折叠/标签组件，接入当前Execution实际outputs；支持搜索、选择、值预览、复制和完整返回值JSON下载。不是完整Inputs/Variables表达式调试器，现有Artifact授权下载链接继续保留。
 
 `npm run build`通过；浏览器仅注入明确synthetic执行，挂载、搜索选择、下载三项通过，无页面错误，未写业务库/操作设备。证据：[outputs-validation.json](native-ui/outputs-validation.json)、[截图](native-ui/outputs.png)。不是实际引擎产物闭环。
+
+
+<a id="prototype-file-source-restoration-20261102"></a>
+## 2026-11-02 · Files 与任务属性原型还原
+
+范围仅作业平台原型，沿用既有React/Vue壳层、canonical YAML、文件版本接口和JobStep；不扩展ZTP、不新建执行引擎、不发布服务。
+
+- 导入脚本增加候选文件/大小预览、目标目录、改名、显式确认/取消；确认前不创建草稿。
+- 文件使用支持 Namespace固定版本引用 / 内联快照，显式新增或替换兼容设备步骤。路径、版本、摘要保存至同一Flow.variables；固定引用内容随Flow冻结，不跟随“最新”。
+- 从任务打开脚本定位原版本；历史只读；明确转为内联后允许独立编辑并保留来源。后端Save使用现有文件表核对项目、Namespace、版本与内容。
+- Visual/QuickRun补齐步骤说明和超时；复用已有Task时限与Agent能力声明，不新增调度器。保存保持当前任务/返回路径等URL上下文。
+- OpenAPI增加FlowsScriptSource和可选JobStep属性，生成类型、模块API说明与台账同步；没有新增DB表或API操作。
+
+定向浏览器覆盖导入预览改名、替换选中任务并保留描述/时限、保存来源、重开固定历史版本和转内联，使用拦截synthetic API，零设备/后端写入、零pageerror。证据 `parity-correction/file-source-result.json` 与 `file-source-restoration.png`。隔离PostgreSQL `TestWorkspaceQueryIntegration`（来源/内容/跨项目）与 `TestStepOptionsUseExistingDeadline` 通过。
+
+仍不宣称像素级100%或真实设备验收；Metrics时间筛选为已返回样本，不是全量时序查询。固定版本是本轮已实现语义，动态跟随最新版不在范围。ZTP由Fabric后续联调。未保存草稿仍为当前会话内存。
+
+本批最终 `npm run build`（TypeScript + Vite）通过，Vite1m22s；API台账108项及diff空白检查通过。保留既有chunk体积和第三方注释提示。仅本任务临时5193已关闭，未改部署服务。

@@ -186,6 +186,11 @@ func runValid(r RunRequest) error {
 	if utf8.RuneCountInString(r.Name) > 160 || strings.ContainsAny(r.Name, "\r\n") {
 		return problem(422, "EXECUTION_NAME_INVALID")
 	}
+	for _, step := range r.Steps {
+		if step.Timeout > r.Timeout {
+			return problem(422, "STEP_TIMEOUT_EXCEEDS_JOB_TIMEOUT")
+		}
+	}
 	if _, e := PlanSteps(r.Steps); e != nil {
 		return e
 	}

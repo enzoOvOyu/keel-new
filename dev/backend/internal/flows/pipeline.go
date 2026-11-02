@@ -4,14 +4,17 @@ import (
 	"context"
 	"regexp"
 	"strings"
+	"unicode/utf8"
 )
 
 type JobStep struct {
-	ID        string            `json:"id"`
-	Kind      string            `json:"kind"`
-	Command   string            `json:"command"`
-	DependsOn []string          `json:"depends_on"`
-	Inputs    map[string]string `json:"inputs"` // environment variable -> predecessor step ID
+	Description string            `json:"description,omitempty"`
+	Timeout     int               `json:"timeout_seconds,omitempty"`
+	ID          string            `json:"id"`
+	Kind        string            `json:"kind"`
+	Command     string            `json:"command"`
+	DependsOn   []string          `json:"depends_on"`
+	Inputs      map[string]string `json:"inputs"` // environment variable -> predecessor step ID
 }
 type StepResult struct {
 	ID     string `json:"id"`
@@ -31,6 +34,9 @@ func PlanSteps(steps []JobStep) ([]JobStep, error) {
 	ordered := []JobStep{}
 	done := map[string]bool{}
 	for _, step := range steps {
+		if step.Timeout < 0 || step.Timeout > 3600 || utf8.RuneCountInString(step.Description) > 2000 {
+			return nil, problem(422, "JOB_STEP_OPTIONS_INVALID")
+		}
 		if !identifier.MatchString(step.ID) || remaining[step.ID].ID != "" || step.Command == "" || len(step.Command) > 131072 || !contains([]string{"command", "bash", "python"}, step.Kind) || strings.Contains(step.Command, "PRIVATE KEY-----") {
 			return nil, problem(422, "JOB_STEP_INVALID")
 		}
@@ -75,6 +81,9 @@ func StepTask(root Task, step JobStep, values map[string]StepResult) Task {
 		env[key] = values[source].Stdout
 	}
 	task := Task{ID: root.ID + ":" + step.ID, Kind: step.Kind, Command: step.Command, Timeout: root.Timeout, Env: env}
+	if step.Timeout > 0 && step.Timeout < task.Timeout {
+		task.Timeout = step.Timeout
+	}
 	task.SHA256 = TaskDigest(task)
 	return task
 }

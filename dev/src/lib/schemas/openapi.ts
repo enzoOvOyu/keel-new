@@ -6962,7 +6962,19 @@ export interface components {
             revision: number;
             last_error: string | null;
         };
+        /** @description Source record in canonical Flow YAML variables.keel_script_sources keyed by device step ID. Namespace mode pins a version and validates matching embedded script content; inline mode preserves origin while allowing independent edits. */
+        FlowsScriptSource: {
+            /** @enum {string} */
+            mode: "namespace" | "inline";
+            path: string;
+            file_revision_id: string;
+            revision: number;
+            sha256: string;
+        };
         FlowsJobStep: {
+            description?: string;
+            /** @description Zero inherits the total job deadline; a positive value is a per-step deadline bounded by the total job timeout. Agent transport requires job.step-timeout capability. */
+            timeout_seconds?: number;
             id: string;
             /** @enum {string} */
             kind: "command" | "bash" | "python";

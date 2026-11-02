@@ -32,7 +32,7 @@ import (
 
 const version = "0.2.0"
 
-var caps = []string{"job.pipeline", "exec.command", "script.bash", "script.python", "task.cancel", "task.stream", "inventory.collect", "file.upload", "file.download", "process.control"}
+var caps = []string{"job.pipeline", "job.step-timeout", "exec.command", "script.bash", "script.python", "task.cancel", "task.stream", "inventory.collect", "file.upload", "file.download", "process.control"}
 var taskRegistry = struct {
 	sync.Mutex
 	active map[string]context.CancelFunc

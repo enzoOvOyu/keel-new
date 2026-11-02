@@ -125,7 +125,7 @@ Bootstrap需运维预置root可信helper、包摘要及HTTPS分发，未对生�
 - 新增/导入文本先为内存草稿，保存调用既有 `POST /flows/{flowId}/namespace-artifacts`（FlowsFileUpload），使用UTF-8的base64和读取版本的expected_revision；409保持草稿，不自动覆盖，用户可确认重新加载。项目ID、CSRF与权限沿用现有Adapter/后端。
 - 内容读取优先使用 `GET /flows/{flowId}/namespace-artifacts/{revisionId}` 的原始字节响应；统一Adapter严格解码UTF-8，二进制只提供下载。未纳入Keel版本管理的历史引擎文本保留namespace-file只读兼容入口，其既有128KiB限制未改变。
 - 保存后刷新文件版本、上下文和分发历史。内存草稿按identity/permission_revision/project/flow隔离；不持久化浏览器秘密。权限判断由后端复核。
-- 脚本内联只修改待保存Flow，实际保存/发布仍走Flow Revision校验。引擎脚本与Keel设备通道不同；设备脚本继续使用受控steps。Namespace引用及Execution冻结文件版本的完整集成不在本批完成范围。
+- 脚本内联只修改待保存Flow，实际保存/发布仍走Flow Revision校验。引擎脚本与Keel设备通道不同；设备脚本继续使用受控steps。该历史批次未覆盖Namespace来源；当前固定版本来源见2026-11-02原型还原节，动态跟随仍不支持。
 - 未新增HTTP操作或修改Schema；OpenAPI/生成类型和真实接口注册表保持原契约。此处的浏览器验证使用synthetic拦截响应，不表示Go/数据库/设备闭环已验证。历史文件版本列表仍有既有500条上限，需要后续分页契约，不能当成无限完整文件目录。
 
 
@@ -193,7 +193,7 @@ Catalog新增state_counts（授权搜索/Namespace/目标筛选后、选择状�
 ### 2026-11-02 脚本工作台与 Quick Run 衔接
 
 - 新建 Flow 的 Files 允许新增、导入及在线编辑，文件仅为用户/权限版本/项目隔离的 Query 内存草稿，不对 `new` 伪 ID 发文件 API。创建真实 Flow binding 后，草稿及当前文件选择转移至实际 Flow ID；再调用已有 namespace-artifacts 接口保存带 expected_revision 的文件版本。刷新未保存内容会丢失并提示，不声称已持久化。
-- 文件保存冲突保留编辑内容；已保存的 Shell/Python 文件经确认后复制为受控设备步骤的内容快照，或替换选中的设备步骤。单 command 定义首次扩展为多步骤时保留原命令。Namespace 动态执行引用继续禁用，不放宽 Worker Shell/Python 策略；当前 JobStep 没有独立文件来源绑定字段，不宣称支持文件版本自动跟随。
+- 文件保存冲突保留编辑内容；已保存的 Shell/Python 文件经确认后复制为受控设备步骤的内容快照，或替换选中的设备步骤。单 command 定义首次扩展为多步骤时保留原命令。Namespace 动态执行引用继续禁用，不放宽 Worker Shell/Python 策略；文件来源绑定已按下节固定版本语义补齐，不支持自动跟随最新版。
 - Visual、YAML、Topology、Docs 共用当前 Flow 定义；`keel.device.bash/python/command` 仅为 Docs/节点展示类型，提交给引擎的仍是原受控适配定义。Docs 按需使用既有 task-documentation 端点，不创建假插件。
 - Quick Run 的草稿字段先按 JobStep 结构限制给予即时反馈，后端仍独立校验授权、执行能力、维护态、目标版本与审批。目标/脚本/通道变更清除预检与审批；异步预检仅回填匹配当前请求的结果。创建执行固定所选目标 ID 与预检返回的目标版本。审批记录不是前端可自证的授权，启动时仍由后端核验。
 
@@ -207,8 +207,19 @@ Catalog新增state_counts（授权搜索/Namespace/目标筛选后、选择状�
 - Execution源版本使用既有`GET /flows/executions/{executionId}/definition`，在当前页只读显示冻结定义及版本。缺失/错误不回落最新Flow。dirty Flow禁止直接运行，元数据修改也计入dirty。
 - 定义节点与TaskRun实例分开：Topology点击后仅在明确唯一时直接选择；多迭代要求选择实例。设备关联仅接受稳定asset_id、TaskRun.value中的明确ID/asset_id，不按Hostname猜测。缺少关联时只展示已有设备stdout/stderr及缺口说明，不混入其他TaskRun日志。
 - task_run、attempt、target、task_id、日志事件时间窗及指标/目标分页写入同一URL。连续Vue事件使用当前地址更新，避免后一次切Tab覆盖先一次任务筛选。目录return_to仅接受本地/flows路径，筛选/页码/列配置写URL；滚动仅存用户/权限版本/项目隔离的Query内存。
-- Files显式选择新增或替换兼容设备脚本，默认跟随当前选中的脚本任务；不能转换Log为设备脚本。引用仍是已保存版本的内容快照。辅助面板优先复用右区；不删除原生分栏/最大化能力。当前JobStep仍无独立文件来源绑定、每步description/timeout字段，不把确认弹窗里的路径/版本冒充已持久绑定。
+- Files显式选择新增或替换兼容设备脚本，默认跟随当前选中的脚本任务；不能转换Log为设备脚本。引用仍是已保存版本的内容快照。辅助面板优先复用右区；不删除原生分栏/最大化能力。文件来源与步骤描述/时限现按下节补齐；旧审计结论不再作为当前缺口。
 - Quick Run复用既有`GET /projects/{project_id}/approvals`（IdentityApproval，approval:read），显示同项目、申请人、动作、资源、目标范围匹配且未过期的approved候选。提交审批申请只获得待审记录，不自动当作批准；启动仍由Job Service复核摘要、版本、职责分离及有效签名。列表无权或记录未列出时保留显式ID入口，由后端核验。
 - 变量输出按当前对象逐层浏览，不一次递归渲染所有输出；通过已授权artifact接口预览<=1MiB UTF-8文本，HTML等不直接嵌入。产出任务只按实际Task ID定位。Execution Metrics支持服务端task_id筛选；时间控件明确只筛选**当前页已有时间戳样本**，并非全量时序查询。状态历史点击按实际事件时间窗打开日志，不生成虚假历史。
 
 证据：`docs/flows-redesign/parity-correction/result.json`（7组）、`enhancements.json`（3组）与截图；所有UI请求拦截为synthetic，没有后端/设备写入。隔离PostgreSQL的TestWorkspaceQueryIntegration覆盖attention/名称持久读取与搜索，TestExecutionTitleValidation覆盖名称约束；最终构建见HANDOFF。ZTP匹配按用户安排在Fabric联调，不计本轮缺口。
+
+
+## 2026-11-02 · 原型 Files 与步骤属性还原
+
+不新增文件存储、执行器或端点。Files 导入先预览文件名/大小并允许改名，确认后创建本地草稿；保存仍使用 namespace-artifacts 的 expected_revision。已保存版本可新增或替换当前设备步骤。
+
+文件来源采用 OpenAPI `FlowsScriptSource`，保存在同一 canonical Flow YAML 的 `variables.keel_script_sources[step_id]`：mode、path、file_revision_id、revision、sha256。`namespace` 是固定版本引用，执行内容仍冻结在 steps.command；文件后续更新不自动影响已保存 Flow。`inline` 是可独立编辑的快照，保留原始版本来源。选择任务的“在脚本编辑器中打开”读取绑定版本；历史版本只读。Namespace → inline 必须明确转换，不隐式修改已绑定文件。
+
+创建/保存 Flow 时 Go 校验来源属于同项目/Namespace、步骤存在、路径/版本/摘要一致；namespace 模式还须内容一致。422：SCRIPT_SOURCES_INVALID、SCRIPT_SOURCE_TASK_AMBIGUOUS、SCRIPT_SOURCE_TASK_INVALID、SCRIPT_SOURCE_VERSION_INVALID、SCRIPT_SOURCE_CONTENT_MISMATCH。沿用现有编辑权限、Flow修订和审计；不允许 Worker Shell/Python，也不改变设备预检和审批。
+
+`FlowsJobStep` 增加可选 description（最多2000字符）、timeout_seconds（0/省略继承，正值最多3600且不超过作业总时限）。StepTask 复用现有 Task.Timeout，不新建调度模型。Agent 显式逐步时限需要已有能力目录中的 `job.step-timeout`；旧Agent由现有通道选择逻辑按能力阻断或使用已授权SSH，不能静默忽略时限。前端 Visual/QuickRun 使用相同字段。

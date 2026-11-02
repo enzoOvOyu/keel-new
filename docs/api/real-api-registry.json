@@ -108,7 +108,8 @@
       "response_schema": "createRealFlowEnvelope",
       "request_schema": "FlowsSave",
       "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json",
+      "branch_implementation_note": "feat/jobs-kestra-ui: pinned script-source metadata and optional JobStep description/timeout; branch-only, not deployed; docs/api/flows.md"
     },
     {
       "method": "get",
@@ -240,7 +241,8 @@
       "response_schema": "preflightFlowsTargetsEnvelope",
       "request_schema": "FlowsRun",
       "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json",
+      "branch_implementation_note": "feat/jobs-kestra-ui: optional JobStep description/timeout reuse existing Task budget/capabilities; branch-only, not deployed; docs/api/flows.md"
     },
     {
       "method": "post",
@@ -259,7 +261,8 @@
       "deployed_revision": "9f16065",
       "deployment_evidence": "docs/flows-redesign/deployment-validation.json",
       "development_changes": "feat/jobs-kestra-ui only, not deployed: optional run/execution name persisted in existing request; list attention filter and business-name search; historical missing names remain null.",
-      "development_verification": "dev/backend/internal/flows/workspace_integration_test.go; docs/flows-redesign/parity-correction/result.json"
+      "development_verification": "dev/backend/internal/flows/workspace_integration_test.go; docs/flows-redesign/parity-correction/result.json",
+      "branch_implementation_note": "feat/jobs-kestra-ui: optional JobStep description/timeout reuse existing Task budget/capabilities; branch-only, not deployed; docs/api/flows.md"
     },
     {
       "method": "get",
@@ -292,7 +295,8 @@
       "response_schema": "updateRealFlowEnvelope",
       "request_schema": "FlowsSave",
       "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-validation.json",
+      "branch_implementation_note": "feat/jobs-kestra-ui: pinned script-source metadata and optional JobStep description/timeout; branch-only, not deployed; docs/api/flows.md"
     },
     {
       "method": "post",
@@ -328,7 +332,8 @@
       "deployed_revision": "9f16065",
       "deployment_evidence": "docs/flows-redesign/deployment-validation.json",
       "development_changes": "feat/jobs-kestra-ui only, not deployed: optional run/execution name persisted in existing request; list attention filter and business-name search; historical missing names remain null.",
-      "development_verification": "dev/backend/internal/flows/workspace_integration_test.go; docs/flows-redesign/parity-correction/result.json"
+      "development_verification": "dev/backend/internal/flows/workspace_integration_test.go; docs/flows-redesign/parity-correction/result.json",
+      "branch_implementation_note": "feat/jobs-kestra-ui: optional JobStep description/timeout reuse existing Task budget/capabilities; branch-only, not deployed; docs/api/flows.md"
     },
     {
       "method": "get",

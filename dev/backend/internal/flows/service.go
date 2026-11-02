@@ -106,6 +106,9 @@ func (s *Service) Save(ctx context.Context, p Scope, id string, input SaveFlow) 
 	if !identifier.MatchString(fid) || fmt.Sprint(doc["namespace"]) != ns {
 		return empty, problem(422, "FLOW_NAMESPACE_SCOPE_INVALID")
 	}
+	if e := s.validateFlowScriptSources(ctx, input.Project, ns, doc); e != nil {
+		return empty, e
+	}
 	if e := ValidatePolicy(input.Source, ns); e != nil {
 		return empty, e
 	}
@@ -259,6 +262,22 @@ func (s *Service) Preflight(ctx context.Context, p Scope, r RunRequest) ([]Decis
 					merged[i].Ready = false
 					merged[i].Transport = "BLOCKED"
 					merged[i].Reason = "AGENT_PIPELINE_CAPABILITY_REQUIRED"
+				}
+			}
+		}
+
+		for i, d := range merged {
+			needsTimeout := false
+			for _, step := range plan {
+				needsTimeout = needsTimeout || step.Timeout > 0
+			}
+			if d.Ready && d.Transport == "AGENT" && needsTimeout && !contains(d.Target.Capabilities, "job.step-timeout") {
+				if r.Policy == "agent_preferred" && sshOnlyPossible && d.Target.SSH != "" {
+					merged[i].Transport = "SSH"
+				} else {
+					merged[i].Ready = false
+					merged[i].Transport = "BLOCKED"
+					merged[i].Reason = "AGENT_STEP_TIMEOUT_CAPABILITY_REQUIRED"
 				}
 			}
 		}

@@ -161,4 +161,30 @@ func TestWorkspaceQueryIntegration(t *testing.T) {
 		t.Fatal("invalid attention filter accepted")
 	}
 
+	// Existing immutable file revisions back both pinned references and editable origin snapshots.
+	fileID := uuid.NewString()
+	filePath := "/scripts/source-" + fid + ".py"
+	fileBody := []byte("print('synthetic')\n")
+	if _, err := db.Exec(ctx, `INSERT INTO flow_file_revision(id,project_id,namespace,path,revision,sha256,size,content,actor_id) VALUES($1,$2,$3,$4,1,$5,$6,$7,$8)`, fileID, project, ns, filePath, hash(string(fileBody)), len(fileBody), fileBody, user); err != nil {
+		t.Fatal(err)
+	}
+	defer db.Exec(context.Background(), `DELETE FROM flow_file_revision WHERE id=$1`, fileID)
+	ref := map[string]any{"mode": "namespace", "path": filePath, "file_revision_id": fileID, "revision": 1, "sha256": hash(string(fileBody))}
+	step := map[string]any{"id": "script", "kind": "python", "command": string(fileBody), "depends_on": []string{}, "inputs": map[string]string{}}
+	sourceDoc := map[string]any{"variables": map[string]any{"keel_script_sources": map[string]any{"script": ref}}, "inputs": []any{map[string]any{"id": "steps", "defaults": []any{step}}}}
+	if err := s.validateFlowScriptSources(ctx, project, ns, sourceDoc); err != nil {
+		t.Fatal(err)
+	}
+	step["command"] = "print('edited')"
+	if err := s.validateFlowScriptSources(ctx, project, ns, sourceDoc); err == nil {
+		t.Fatal("changed pinned content accepted")
+	}
+	ref["mode"] = "inline"
+	if err := s.validateFlowScriptSources(ctx, project, ns, sourceDoc); err != nil {
+		t.Fatal("inline origin edits rejected", err)
+	}
+	if err := s.validateFlowScriptSources(ctx, "unauthorized-synthetic", ns, sourceDoc); err == nil {
+		t.Fatal("cross-project source accepted")
+	}
+
 }

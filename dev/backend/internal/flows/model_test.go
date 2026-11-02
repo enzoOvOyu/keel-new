@@ -95,3 +95,22 @@ func TestExecutionTitleValidation(t *testing.T) {
 		t.Fatal("multiline title accepted")
 	}
 }
+
+func TestStepOptionsUseExistingDeadline(t *testing.T) {
+	step := JobStep{ID: "check", Kind: "bash", Command: "printf synthetic", Description: "read-only inventory", Timeout: 30}
+	if _, err := PlanSteps([]JobStep{step}); err != nil {
+		t.Fatal(err)
+	}
+	child := StepTask(Task{ID: "job", Timeout: 600}, step, nil)
+	if child.Timeout != 30 {
+		t.Fatalf("step deadline not applied: %d", child.Timeout)
+	}
+	step.Timeout = 0
+	if StepTask(Task{ID: "job", Timeout: 600}, step, nil).Timeout != 600 {
+		t.Fatal("inherited deadline changed")
+	}
+	step.Timeout = -1
+	if _, err := PlanSteps([]JobStep{step}); err == nil {
+		t.Fatal("invalid step timeout accepted")
+	}
+}

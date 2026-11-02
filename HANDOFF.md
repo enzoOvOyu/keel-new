@@ -1,5 +1,18 @@
 ## 2026-11-02 原型复核修复已实现并通过定向检查（独立分支，未部署）
 
+## 当前快照 · 2026-11-02 作业平台原型还原补齐
+
+工作区 `/home/ubuntu/keel-kestra-ui-dev`，独立分支 `feat/jobs-kestra-ui`；未合并dev/main、未部署5180/8081/5181。上一批HEAD fedf4e2，本节随本批提交。严格聚焦原型，不扩展ZTP/执行引擎/其他模块。
+
+**本批完成**：Files导入候选预览/改名/确认取消；Namespace固定版本与inline快照两种使用方式；现有Flow YAML保存文件来源（variables.keel_script_sources），从任务打开绑定版本、历史只读、显式转内联；Go复用文件版本表核对来源。Visual/QuickRun说明与每步时限复用JobStep/Task.Timeout，旧Agent缺少job.step-timeout时按既有能力选择规则处理。保存保持任务/返回URL上下文。无新表、无新执行器、无新增端点。
+
+**定位**：`flows/{NamespaceFiles,FlowsWorkspace,script-sources,definition}`，`jobs-native/Native{Files,Visual,QuickRun}`；Go `internal/flows/{artifacts,pipeline,service,model}`、`cmd/agent/main.go`。API唯一机器定义 `docs/openapi.yaml`，解释 `docs/api/flows.md`，实施详情 [Files原型还原](docs/flows-redesign/implementation.md#prototype-file-source-restoration-20261102)。
+
+**已验证**：专项浏览器四组交互，synthetic API拦截、无后端/设备写入、零pageerror；隔离DB来源/内容/项目隔离与步骤时限检查通过。证据 `docs/flows-redesign/parity-correction/file-source-result.json`。最终 npm run build（TypeScript + Vite）通过，Vite 1m22s；API台账108项通过，git diff --check通过。保留既有大chunk/依赖注释告警，不扩展打包重构。
+
+**真实限制**：Namespace为固定版本，非自动追随最新版；Metrics筛选只覆盖返回样本；未保存文件草稿仅内存。ZTP后续Fabric联调；真机/规模/像素级100%未验收。不把下方历史“无来源字段/无步骤说明时限”当成当前缺口，不重复全仓审计。
+
+
 工作树 `/home/ubuntu/keel-kestra-ui-dev`，分支 `feat/jobs-kestra-ui`。本节与本批修复提交同批，审计基线698361a。用户要求继续开发后的实际修复覆盖下方“只审计”记录；完整状态见[原型复核修复](docs/flows-redesign/implementation.md#prototype-parity-fixes-20261102)。没有合并dev/main，没有发布或改5180/8081/5181。本任务专用5193已停止。
 
 **完成**：dirty（含名称/说明/目标类型）禁止直接运行；Execution冻结源定义只读Dialog；Topology/TaskRun/Attempt/设备日志统一URL上下文，多实例明确选择，缺失稳定ID关联不冒充设备日志；Agent/目标表/历史分页；Files新增/替换兼容任务显式选择；return_to/筛选/页码/列偏好及内存滚动；辅助面板复用右区、依赖约束下拖动、Log多行输入、START/END视觉端点；输出逐层浏览/产出任务/冻结版本/授权小文本预览；QuickRun真实执行名称、批准候选、待审提示、目标revision、输入Diff；指标任务/当前页采样时间与状态历史日志下钻。修复Router连续事件覆盖、表格切片导致选择循环、冻结编辑器Worker缺初始化、全局main样式使输出区居中缩窄。

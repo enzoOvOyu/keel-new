@@ -17754,10 +17754,36 @@ components:
       - run
       - revision
       - last_error
+    FlowsScriptSource:
+      type: object
+      additionalProperties: false
+      description: Source record in canonical Flow YAML variables.keel_script_sources keyed by device step ID. Namespace mode pins a version and validates matching embedded script content; inline mode preserves origin while allowing independent edits.
+      properties:
+        mode:
+          type: string
+          enum: [namespace, inline]
+        path:
+          type: string
+        file_revision_id:
+          type: string
+        revision:
+          type: integer
+          minimum: 1
+        sha256:
+          type: string
+      required: [mode, path, file_revision_id, revision, sha256]
     FlowsJobStep:
       type: object
       additionalProperties: false
       properties:
+        description:
+          type: string
+          maxLength: 2000
+        timeout_seconds:
+          type: integer
+          minimum: 0
+          maximum: 3600
+          description: Zero inherits the total job deadline; a positive value is a per-step deadline bounded by the total job timeout. Agent transport requires job.step-timeout capability.
         id:
           type: string
         kind:
