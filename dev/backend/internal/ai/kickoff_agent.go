@@ -16,13 +16,14 @@ import (
 
 // Plans describe source coordinates, never generated inventory rows.
 type KickoffBinding struct {
-	Field        string         `json:"field"`
-	Normalize    string         `json:"normalize,omitempty"`
-	Column       int            `json:"column,omitempty"`
-	Row          int            `json:"row,omitempty"`
-	OffsetRow    int            `json:"offset_row,omitempty"`
-	OffsetColumn int            `json:"offset_column,omitempty"`
-	Lookup       *KickoffLookup `json:"lookup,omitempty"`
+	Field          string         `json:"field"`
+	Classification string         `json:"classification,omitempty"`
+	Normalize      string         `json:"normalize,omitempty"`
+	Column         int            `json:"column,omitempty"`
+	Row            int            `json:"row,omitempty"`
+	OffsetRow      int            `json:"offset_row,omitempty"`
+	OffsetColumn   int            `json:"offset_column,omitempty"`
+	Lookup         *KickoffLookup `json:"lookup,omitempty"`
 }
 type KickoffLookup struct {
 	Sheet       string `json:"sheet"`

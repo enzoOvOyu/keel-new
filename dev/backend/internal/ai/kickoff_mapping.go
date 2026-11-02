@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"keel.local/dev/internal/bom"
 	"keel.local/dev/internal/engineering"
+	"regexp"
 	"strings"
 )
 
@@ -51,11 +52,20 @@ func validateKickoffMappings(w bom.Workbook, regions []KickoffRegion, step int, 
 				return fmt.Errorf("INVALID_BINDING: %s", b.Field)
 			}
 			fields[b.Field] = true
+			if b.Classification != "" {
+				allowed := map[string]bool{"server": true, "switch": true, "gpu": true, "nic": true}
+				if m.Table != "equipment_specs" || b.Field != "equipment_type" || !allowed[b.Classification] || b.Normalize != "" {
+					return fmt.Errorf("INVALID_EQUIPMENT_CLASSIFICATION: %s", b.Field)
+				}
+			}
 			if b.Column < 0 || b.Row < 0 || b.Row > 20000 || b.Column > 256 || b.OffsetColumn < -256 || b.OffsetColumn > 256 || b.OffsetRow < -20000 || b.OffsetRow > 20000 {
 				return fmt.Errorf("INVALID_COORDINATE: %s", b.Field)
 			}
-			if b.Normalize != "" && b.Normalize != "trim" && b.Normalize != "unit" && b.Normalize != "mount_type" && b.Normalize != "face" && b.Normalize != "equipment_type" {
+			if b.Normalize != "" && b.Normalize != "trim" && b.Normalize != "unit" && b.Normalize != "mount_type" && b.Normalize != "face" && b.Normalize != "equipment_type" && b.Normalize != "rate_value" && b.Normalize != "rate_unit" {
 				return fmt.Errorf("UNSUPPORTED_NORMALIZATION: %s", b.Normalize)
+			}
+			if (b.Normalize == "rate_value" && b.Field != "rate") || (b.Normalize == "rate_unit" && b.Field != "rate_unit") {
+				return fmt.Errorf("INVALID_RATE_NORMALIZATION: %s", b.Field)
 			}
 			if m.Layout == "rows" && b.Column == 0 {
 				return fmt.Errorf("SOURCE_COLUMN_REQUIRED: %s", b.Field)
@@ -155,7 +165,7 @@ func expandKickoffRegion(w bom.Workbook, region KickoffRegion, m KickoffMapping)
 						value = strings.TrimSpace(cell.Value)
 					}
 				}
-				refs[b.Field] = map[string]any{"sheet": cell.Sheet, "cell": cell.Ref, "formula": cell.Formula, "cached_value": cell.Value, "normalization": b.Normalize}
+				refs[b.Field] = map[string]any{"sheet": cell.Sheet, "cell": cell.Ref, "formula": cell.Formula, "cached_value": cell.Value, "normalization": b.Normalize, "classification": b.Classification}
 				if cell.Sensitive {
 					value = ""
 					missing = append(missing, b.Field+":敏感字段未导入")
@@ -163,6 +173,10 @@ func expandKickoffRegion(w bom.Workbook, region KickoffRegion, m KickoffMapping)
 				if cell.Formula != "" {
 					value = ""
 					missing = append(missing, b.Field+":公式缓存需独立核对")
+				}
+				if b.Classification != "" && value != "" {
+					value = b.Classification
+					refs[b.Field].(map[string]any)["state"] = "ai_classification_needs_review"
 				}
 				if strings.HasSuffix(b.Field, "serial") || b.Field == "serial" {
 					source, sourceColumn, headerStart, dataStart := sheet, cc, region.Bounds.StartRow, m.Bounds.StartRow
@@ -207,17 +221,48 @@ func expandKickoffRegion(w bom.Workbook, region KickoffRegion, m KickoffMapping)
 				if b.Normalize == "unit" {
 					value = kickoffUnit(value)
 				}
+				if b.Normalize == "rate_value" || b.Normalize == "rate_unit" {
+					number, unit := kickoffRate(value)
+					value = number
+					if b.Normalize == "rate_unit" {
+						value = unit
+					}
+				}
 				for i, f := range table.Fields {
 					if f.Code == b.Field {
 						row[i] = value
 					}
 				}
 			}
+			hasValue := false
+			for _, value := range row {
+				hasValue = hasValue || strings.TrimSpace(value) != ""
+			}
+			if !hasValue {
+				evidence = append(evidence, map[string]any{"table_id": m.Table, "row": nil, "state": "source_only_no_target_values", "source_region": region.ID, "source_sheet": region.Sheet, "source_row": r, "source_column": col, "source_key": key.Value, "fields": refs, "missing_inputs": missing})
+				continue
+			}
 			rows = append(rows, row)
 			evidence = append(evidence, map[string]any{"table_id": m.Table, "row": len(rows) + 1, "source_region": region.ID, "source_sheet": region.Sheet, "source_row": r, "source_column": col, "source_key": key.Value, "fields": refs, "missing_inputs": missing})
 		}
 	}
 	return rows, evidence, nil
+}
+
+var kickoffRatePattern = regexp.MustCompile(`^([0-9]+(?:\.[0-9]+)?)\s*(bps|[kMGT](?:bps|bit/s)?)$`)
+
+// Only an explicit bandwidth with a recognized unit is split. Product names,
+// bare numbers, lane expressions and ranges need separate source evidence.
+func kickoffRate(value string) (string, string) {
+	parts := kickoffRatePattern.FindStringSubmatch(strings.TrimSpace(value))
+	if parts == nil {
+		return "", ""
+	}
+	unit := "bps"
+	if strings.ToLower(parts[2]) != "bps" {
+		unit = map[byte]string{'k': "kbps", 'm': "Mbps", 'g': "Gbps", 't': "Tbps"}[strings.ToLower(parts[2])[0]]
+	}
+	return parts[1], unit
 }
 func kickoffAddress(cell string) (col, row int) {
 	for _, c := range strings.ReplaceAll(cell, "$", "") {

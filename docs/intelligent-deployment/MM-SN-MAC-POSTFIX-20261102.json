@@ -1,0 +1,264 @@
+{
+  "scope": "One fresh independent post-fix MM SN+MAC run, followed by direct repairs without another model run",
+  "state": "COMPLETED",
+  "source_sha256": "1cd77c4d0ff8a42deb2055f7b1e39fadbb48fbff734eb95af0323ceaa92b5004",
+  "provider": {
+    "id": "8b8a86f6-2351-43f4-9816-b6019aef7ec2",
+    "name": "sol",
+    "model": "gpt-6.1-sol",
+    "protocol": "openai-responses",
+    "revision": 8,
+    "timeout_seconds": 120,
+    "token_budget": 8192,
+    "token_parameter": "max_tokens",
+    "json_mode": true
+  },
+  "runtime_release": "agent-benchmark-fix-d2c3ac4",
+  "agent_code_commit": "d2c3ac4",
+  "expected": {
+    "terminations": 7154,
+    "port_identities": 14308,
+    "inventory_rows": 967,
+    "by_sheet": {
+      "Cabling_EW_SP-LF": 2592,
+      "Cabling_NS": 484,
+      "Cabling_GB_OUT": 3456,
+      "Cabling_OOB": 216,
+      "Cabling_HDD_SSD_CPU": 406
+    }
+  },
+  "runs": [
+    {
+      "index": 1,
+      "project_id": "proj-00e96839-c0dd-4614-95a4-4ea8603b90eb",
+      "project_name": "TEST-MM-SN-MAC-POSTFIX-01-70d05",
+      "state": "IDENTITY_PASS_WORKFLOW_BLOCKED",
+      "manual_edits": 0,
+      "checkpoint_replay": false,
+      "import_id": "7ccf6f08-fbc5-401d-ab88-bdb6fe671bca",
+      "source_id": "d008cc8a-5454-4cc7-83da-166f7cd7f6a0",
+      "initial_revision": 1,
+      "job_id": "e4778bf3-36fb-4bdb-b7cb-c1178586ba66",
+      "last_job_state": "succeeded",
+      "last_sequence": 91,
+      "elapsed_seconds": 359.1,
+      "job_state": "succeeded",
+      "error_code": null,
+      "tables": [
+        {
+          "table_id": "cable_specs",
+          "rows": 483,
+          "issues_by_field": {
+            "medium": 483,
+            "connector_a": 483,
+            "connector_b": 483,
+            "rate": 483,
+            "rate_unit": 483,
+            "optic_mode": 483,
+            "length": 432,
+            "unit": 432
+          },
+          "version": 1
+        },
+        {
+          "table_id": "equipment_specs",
+          "rows": 967,
+          "issues_by_field": {
+            "equipment_type": 778
+          },
+          "version": 1
+        },
+        {
+          "table_id": "optic_specs",
+          "rows": 871,
+          "issues_by_field": {
+            "port_type": 871,
+            "medium": 871,
+            "rate": 871,
+            "rate_unit": 871,
+            "distance": 871,
+            "unit": 871,
+            "model": 430
+          },
+          "version": 1
+        },
+        {
+          "table_id": "placements",
+          "rows": 967,
+          "issues_by_field": {
+            "room_code": 967,
+            "mount_type": 967,
+            "face": 967
+          },
+          "version": 1
+        },
+        {
+          "table_id": "port_specs",
+          "rows": 14308,
+          "issues_by_field": {
+            "medium": 14308,
+            "connector": 14308,
+            "rate": 14308,
+            "rate_unit": 14308
+          },
+          "version": 1
+        },
+        {
+          "table_id": "power_profiles",
+          "rows": 9,
+          "issues_by_field": {
+            "basis": 9,
+            "source": 9
+          },
+          "version": 1
+        },
+        {
+          "table_id": "rack_capacity",
+          "rows": 56,
+          "issues_by_field": {
+            "basis": 56
+          },
+          "version": 1
+        },
+        {
+          "table_id": "racks",
+          "rows": 91,
+          "issues_by_field": {
+            "room_code": 91,
+            "name": 91
+          },
+          "version": 1
+        },
+        {
+          "table_id": "route_nodes",
+          "rows": 60,
+          "issues_by_field": {
+            "room_code": 60
+          },
+          "version": 1
+        },
+        {
+          "table_id": "terminations",
+          "rows": 7154,
+          "issues_by_field": {
+            "b_rack_position": 7154,
+            "termination_type": 7154
+          },
+          "version": 1
+        }
+      ],
+      "metrics": {
+        "termination_rows": 7154,
+        "six_field_correct_rows": 7154,
+        "six_field_missing_or_wrong_rows": 0,
+        "six_field_extra_or_wrong_rows": 0,
+        "four_field_correct_rows": 7154,
+        "missing_sn_cells": 0,
+        "missing_mac_cells": 0,
+        "inventory_serials_found": 967,
+        "unexpected_inventory_serials": 0,
+        "source_models_mismatched": 0,
+        "placement_rows": 967,
+        "placement_unknown_serials": 0,
+        "placement_rack_not_in_source_choices": 0,
+        "port_identities_missing_from_specs": 0,
+        "port_identities_extra_in_specs": 0,
+        "central_missing_inputs": 70
+      },
+      "adoption": {
+        "http_status": 422,
+        "error": {
+          "code": "STEP_INPUT_INVALID",
+          "message": "STEP_INPUT_INVALID",
+          "retryable": false
+        }
+      },
+      "formal_model": {
+        "equipment": 0,
+        "ports": 0,
+        "connections": 0,
+        "cables": 0,
+        "published_targets": 0,
+        "revision": 1
+      },
+      "duration_seconds": 362.4,
+      "identity_sn_mac_ports_pass": true,
+      "end_to_end_pass": false,
+      "end_to_end_state": "NOT_RUN_PENDING_REQUIRED_MODELING_REVIEW_AND_PUBLISH",
+      "job_created_at": "2026-11-02T09:02:32.594399Z",
+      "job_updated_at": "2026-11-02T09:08:19.914018Z"
+    }
+  ],
+  "known_source_decisions": [
+    "工程机房身份与空间参数须明确确认",
+    "允许通道与批准布线规则须补充或核对",
+    "逻辑网络地址/ASN/邻居不能从物理连接生成"
+  ],
+  "code_or_provider_modified_during_benchmark": false,
+  "duration_seconds": 362.7,
+  "summary": {
+    "completed_runs": 1,
+    "agent_jobs_succeeded": 1,
+    "six_field_pass_runs": 1,
+    "adoption_pass_runs": 0,
+    "independent_runs": 1,
+    "checkpoint_replays": 0,
+    "end_to_end_pass_runs": 0,
+    "downstream_state": "NOT_RUN_BLOCKED_AT_STEP_1"
+  },
+  "acceptance": "IDENTITY_PASS_WORKFLOW_BLOCKED",
+  "telemetry": [
+    {
+      "checkpoints": 8,
+      "cost": "NOT_PROVIDED",
+      "failed_response_events": 0,
+      "index": 1,
+      "new_source_no_checkpoint_replay": true,
+      "reported_input_tokens": 614888,
+      "reported_output_tokens": 15248,
+      "resolved_models": [
+        "gpt-6.1-sol"
+      ],
+      "route_regions": 38,
+      "route_sheets": 15,
+      "successful_json_responses": 22,
+      "token_totals_may_exclude_unreported_failed_requests": true,
+      "transport_retry_events": 0
+    }
+  ],
+  "remaining_blockers": [
+    {
+      "field": "b_rack_position",
+      "source_evidence": "7150/7154 counterpart references have explicit inventory rack and U values; 4 are outside inventory",
+      "reason": "Single lookup binding cannot express inventory selection and combined position; canonical combination format remains unconfirmed in the existing implementation plan. Source positions are available, not absent."
+    },
+    {
+      "field": "termination_type",
+      "reason": "No explicit endpoint type field found; type dictionary is unconfirmed. Cable model and network role cannot be substituted."
+    },
+    {
+      "scope": "engineering_modeling",
+      "reason": "Room identity, spatial/allowed route information, approved rule references, network design and power bases remain incomplete or unconfirmed. Port identity coverage is not complete port specification."
+    }
+  ],
+  "direct_repairs_after_this_run": [
+    {
+      "change": "Explicit bandwidth value/unit normalization",
+      "status": "IMPLEMENTED_TARGETED_TESTED_NOT_MODEL_RETESTED"
+    },
+    {
+      "change": "All-empty specification rows retained as source evidence rather than target records",
+      "status": "IMPLEMENTED_TARGETED_TESTED_NOT_MODEL_RETESTED"
+    },
+    {
+      "change": "Source-backed server/switch/gpu/nic classification proposal for equipment_type only, kept unconfirmed in evidence",
+      "status": "IMPLEMENTED_TARGETED_TESTED_NOT_MODEL_RETESTED"
+    }
+  ],
+  "limitations": [
+    "No additional real model run after direct repairs, as requested.",
+    "Only one workbook; no cross-customer generalization claim.",
+    "No formal assets, observed state, or production device configuration changed.",
+    "Source data and synthetic identity maps stay outside Git."
+  ]
+}
