@@ -3,6 +3,7 @@ package engineering
 import (
 	"encoding/json"
 	"fmt"
+	"math/big"
 	"strconv"
 	"strings"
 )
@@ -102,10 +103,21 @@ func MergeStandardInput(current PhysicalModel, q InputPreviewRequest) (PhysicalM
 				return current, e
 			}
 			if room < 0 {
+				room = len(next.Facilities)
 				next.Facilities = append(next.Facilities, FacilityModel{EntityVersion: version("room_code", parent+"/"+v[2]), Kind: "room", Code: v[2], Label: v[3], ParentID: &parent})
 			} else {
 				next.Facilities[room].Code = v[2]
 				next.Facilities[room].Label = v[3]
+			}
+			if v[4] != "" {
+				frame := StableID(current.ProjectID, "coordinate-frame", v[4])
+				next.Facilities[room].CoordinateFrameID = &frame
+			}
+			if v[5] != "" {
+				dimension, _ := unitScale(v[5])
+				if dimension != "length" {
+					return current, fmt.Errorf("STEP_COORDINATE_UNIT_INVALID")
+				}
 			}
 		case "racks":
 			room, e := find("room", v[0], "")
@@ -141,6 +153,45 @@ func MergeStandardInput(current PhysicalModel, q InputPreviewRequest) (PhysicalM
 			}
 			if v[6] != "" {
 				r.HeightMM = text(v[6])
+			}
+
+			if v[7] != "" {
+				frame := StableID(current.ProjectID, "coordinate-frame", v[7])
+				r.CoordinateFrameID = &frame
+			} else if r.CoordinateFrameID == nil {
+				r.CoordinateFrameID = next.Facilities[room].CoordinateFrameID
+			}
+			for index := 0; index < 3; index++ {
+				if v[8+index] == "" {
+					continue
+				}
+				if r.CoordinateFrameID == nil {
+					return current, fmt.Errorf("STEP_COORDINATE_FRAME_REQUIRED")
+				}
+				dimension, scale := unitScale(v[11])
+				if dimension != "length" {
+					return current, fmt.Errorf("STEP_COORDINATE_UNIT_INVALID")
+				}
+				value, ok := new(big.Rat).SetString(v[8+index])
+				if !ok {
+					return current, fmt.Errorf("STEP_INPUT_INVALID")
+				}
+				value.Mul(value, scale).Mul(value, big.NewRat(1000, 1))
+				mm := strings.TrimRight(strings.TrimRight(value.FloatString(12), "0"), ".")
+				if mm == "" || mm == "-0" {
+					mm = "0"
+				}
+				switch index {
+				case 0:
+					r.XMM = &mm
+				case 1:
+					r.YMM = &mm
+				case 2:
+					r.ZMM = &mm
+				}
+			}
+			if v[12] != "" {
+				r.OrientationDegrees = text(v[12])
 			}
 		case "equipment_specs":
 			found := -1

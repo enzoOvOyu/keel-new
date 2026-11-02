@@ -14,7 +14,10 @@ import (
 	"keel.local/dev/internal/engineering"
 )
 
-type standardInputAttachment struct{ ID, TableID, ObjectKey, SHA256 string }
+type standardInputAttachment struct {
+	ID, TableID, ObjectKey, SHA256 string
+	InputVersion                   int
+}
 
 func (s *Server) importStandardInput(ctx context.Context, w engineering.Workspace, q engineering.StandardInputRequest, actor string) error {
 	if strings.TrimSpace(q.Reason) == "" || w.HeadRevisionID == nil {

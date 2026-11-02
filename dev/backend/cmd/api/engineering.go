@@ -61,6 +61,9 @@ func engineeringFailure(w http.ResponseWriter, e error) {
 	}
 }
 func (s *Server) engineeringRoutes(w http.ResponseWriter, r *http.Request) bool {
+	if s.projectKickoffRoute(w, r) {
+		return true
+	}
 	if s.engineeringStepInputRoutes(w, r) {
 		return true
 	}
@@ -89,6 +92,9 @@ func (s *Server) engineeringRoutes(w http.ResponseWriter, r *http.Request) bool 
 			permission = "bom:import"
 		}
 		if action == "publish" {
+			permission = "bom:execute"
+		}
+		if action == "kickoff-handoff" {
 			permission = "bom:execute"
 		}
 	}
@@ -196,6 +202,9 @@ func (s *Server) engineeringRoutes(w http.ResponseWriter, r *http.Request) bool 
 	}
 	if len(p) == 6 && r.Method == "GET" {
 		respond(w, 200, workspace)
+		return true
+	}
+	if s.modelingRoutes(w, r, workspace, action) {
 		return true
 	}
 	if (action == "standard-workbook" || action == "standard-workbook-preview") && r.Method == "POST" {

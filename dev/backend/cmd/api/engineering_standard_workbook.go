@@ -75,6 +75,11 @@ func (s *Server) importStandardWorkbook(ctx context.Context, w engineering.Works
 	if e != nil {
 		return e
 	}
+	return s.mergeStandardInputs(ctx, w, q, inputs, []standardInputAttachment{attachment}, actor)
+}
+
+// One merge path for a standard workbook and the prototype's edited input package.
+func (s *Server) mergeStandardInputs(ctx context.Context, w engineering.Workspace, q engineering.StandardWorkbookRequest, inputs []engineering.InputPreviewRequest, attachments []standardInputAttachment, actor string) error {
 	preview := workbookPreview(q, inputs)
 	if !preview.Valid {
 		return errors.New("STEP_INPUT_INVALID")
@@ -82,7 +87,7 @@ func (s *Server) importStandardWorkbook(ctx context.Context, w engineering.Works
 	if !preview.SupportsConfirmation {
 		return errors.New("STEP_TABLE_NOT_SUPPORTED")
 	}
-	if e = s.prepareStandardPowerRules(ctx, inputs, actor); e != nil {
+	if e := s.prepareStandardPowerRules(ctx, inputs, actor); e != nil {
 		return e
 	}
 	m, evidence, e := engineeringModel(ctx, s.db, *w.HeadRevisionID, s.project)
@@ -109,7 +114,7 @@ func (s *Server) importStandardWorkbook(ctx context.Context, w engineering.Works
 		for _, v := range evidence {
 			ids = append(ids, v.ID)
 		}
-		m, e = engineering.MergeCablingWorkbook(m, inputs, ids, s.standardCableRuleRunner(ctx, w, attachment, actor))
+		m, e = engineering.MergeCablingWorkbook(m, inputs, ids, s.standardCableRuleRunner(ctx, w, attachments[0], actor))
 		if e != nil {
 			return e
 		}
@@ -127,7 +132,7 @@ func (s *Server) importStandardWorkbook(ctx context.Context, w engineering.Works
 	}
 	// Reuse the already immutable upload. Unlike temporary CSV input objects,
 	// failure must never delete this original workbook.
-	_, e = s.saveEngineeringDraft(ctx, w.ID, q.ExpectedRevision, "human", actor, q.Reason, engineering.Extraction{Model: m, Evidence: evidence, TotalCells: w.TotalCells, MappedCells: w.MappedCells}, proposal, attachment)
+	_, e = s.saveEngineeringDraft(ctx, w.ID, q.ExpectedRevision, "human", actor, q.Reason, engineering.Extraction{Model: m, Evidence: evidence, TotalCells: w.TotalCells, MappedCells: w.MappedCells}, proposal, attachments...)
 	return e
 }
 

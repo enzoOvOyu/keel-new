@@ -108,3 +108,13 @@ export type EngineeringStandardInputRequest = Models['IDEStandardInputRequest'];
 export type EngineeringStandardWorkbookPreview = Models['IDEStandardWorkbookPreview'];
 export const previewEngineeringStandardWorkbook=async(project:string,id:string,file:File,step:number,revision:number,signal?:AbortSignal)=>{const uploaded=await uploadEngineeringWorkbook(project,file,'');if(signal?.aborted)throw new DOMException('Aborted','AbortError');return bomRequest<EngineeringStandardWorkbookPreview>(engineeringPath(project,id)+'/standard-workbook-preview','POST',{import_id:uploaded.id,step,expected_revision:revision},undefined,signal)};
 export const importEngineeringStandardWorkbook=(project:string,id:string,request:Models['IDEStandardWorkbookConfirmRequest'])=>bomRequest<EngineeringWorkspace>(engineeringPath(project,id)+'/standard-workbook','POST',request);
+
+export type ModelingInput = Models['IDEModelingInput'];
+export const engineeringModelingInputs=(project:string,id:string,table='',signal?:AbortSignal)=>bomRequest<Models['IDEModelingInputs']>(engineeringPath(project,id)+'/modeling-inputs'+(table?'?table_id='+encodeURIComponent(table):''),'GET',undefined,undefined,signal);
+export const saveEngineeringModelingInput=(project:string,id:string,request:Models['IDEModelingInputEdit'])=>bomRequest<ModelingInput>(engineeringPath(project,id)+'/modeling-inputs','PUT',request);
+export const adoptEngineeringModelingInputs=(project:string,id:string,request:Models['IDEModelingAdoption'])=>bomRequest<EngineeringWorkspace>(engineeringPath(project,id)+'/modeling-adopt','POST',request);
+export const engineeringModelingPackageURL=(project:string,id:string,step:number)=>'/api/v1/'+engineeringPath(project,id)+'/modeling-package?step='+step;
+export const importEngineeringModelingPackage=async(project:string,id:string,file:File,step:number,revision:number)=>{const uploaded=await uploadEngineeringWorkbook(project,file,'');return bomRequest<Models['IDEModelingInputs']>(engineeringPath(project,id)+'/modeling-package','POST',{import_id:uploaded.id,step,expected_revision:revision,reason:'用户导入 · '+file.name})};
+export const engineeringKickoffHandoff=(project:string,id:string,signal?:AbortSignal)=>bomRequest<Models['IDEKickoffHandoff']>(engineeringPath(project,id)+'/kickoff-handoff','GET',undefined,undefined,signal);
+export const createEngineeringKickoffHandoff=(project:string,id:string,request:Models['IDEKickoffHandoffRequest'])=>bomRequest<Models['IDEKickoffHandoff']>(engineeringPath(project,id)+'/kickoff-handoff','POST',request);
+export const projectEngineeringKickoff=(project:string,signal?:AbortSignal)=>bomRequest<Models['IDEKickoffHandoff']>('projects/'+encodeURIComponent(project)+'/engineering-kickoff','GET',undefined,undefined,signal);

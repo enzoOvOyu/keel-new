@@ -55,6 +55,9 @@ func WriteStepWorkbook(step int, tables []StandardTableData) ([]byte, error) {
 			}
 		}
 		for row, values := range data.Rows {
+			for len(values) < len(t.Fields) && !t.Fields[len(values)].Required {
+				values = append(values, "")
+			}
 			if len(values) != len(t.Fields) {
 				return nil, fmt.Errorf("STEP_COLUMN_COUNT: %s", t.ID)
 			}
@@ -121,6 +124,13 @@ func readStepWorkbook(input io.Reader, step int, strict bool) ([]InputPreviewReq
 		for row, values := range rows {
 			normalized := make([]string, len(t.Fields))
 			copy(normalized, values)
+			if row == 0 {
+				for col := len(values); col < len(t.Fields); col++ {
+					if !t.Fields[col].Required {
+						normalized[col] = t.Fields[col].Label
+					}
+				}
+			}
 			if len(values) > len(normalized) {
 				return nil, fmt.Errorf("STEP_EXTRA_COLUMNS: %s", sheet)
 			}

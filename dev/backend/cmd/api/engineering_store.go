@@ -416,7 +416,16 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 		return "", e
 	}
 	for _, input := range inputs {
-		if _, e = tx.Exec(ctx, `INSERT INTO eng_standard_input_source(id,revision_id,table_id,contract_version,object_key,content_sha256) VALUES($1,$2,$3,'1',$4,$5)`, input.ID, revision, input.TableID, input.ObjectKey, input.SHA256); e != nil {
+		if input.InputVersion > 0 {
+			tag, err := tx.Exec(ctx, `UPDATE eng_modeling_input SET adopted_revision=$4 WHERE source_id=$1 AND table_id=$2 AND version=$3`, source, input.TableID, input.InputVersion, version+1)
+			if err != nil {
+				return "", err
+			}
+			if tag.RowsAffected() != 1 {
+				return "", errors.New("REVISION_CONFLICT")
+			}
+		}
+		if _, e = tx.Exec(ctx, `INSERT INTO eng_standard_input_source(id,revision_id,table_id,contract_version,object_key,content_sha256) VALUES($1,$2,$3,$6,$4,$5)`, input.ID, revision, input.TableID, input.ObjectKey, input.SHA256, engineering.StepInputCatalog().Version); e != nil {
 			return "", e
 		}
 	}

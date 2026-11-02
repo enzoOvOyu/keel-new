@@ -223,3 +223,30 @@ calculation-application新增circuit_load/circuit_remaining/supply_load，前端
 每个物理端接段生成独立CablePlan，保留Confirmed/AsBuilt、记录Calculated/SelectedStock对应计算运行并匹配当前可采购规格；计算记录绑定来源摘要、工程修订和批准规则版本。媒体、连接器、速率及光模块适用距离必须匹配；多候选不任意选择。separate-optics按父物理端口去重；no-optics/DAC/AOC不生成独立模块需求。采购需求和施工标准线长分布为规划数量，保留采购/备件字段，不投影成真实资产。重算方案移除旧的自动生成需求，不丢弃已有采购记录。缺来源、路径、规格或批准规则按CABLE_* HTTP422拒绝合并；原文件仍保存，不修改已发布模型。失败前完成的计算保留为尝试记录，不意味着模型已发布。
 
 本次单项目五步验收、独立预期及真实限制见上述验收记录。仅验证核心IPv4 BGP规划，无实际网络下发、供电或运行观测确认。
+
+## 原型建模闭环（Agent 开发前）
+
+本轮按 `KICKOFF-STUDIO-IMPLEMENTATION.txt` 和 kickoff-studio 原型统一入口。普通用户从十类建模卡片编辑固定输入；原有域编辑/表达式编辑入口在智能开局工作台跳转到同一建模中心。分步 Agent 尚未开发，旧整本分析按钮停用，等待用户配置 Provider。既有后台分析实现保留，但新入口不会调用它。
+
+在 `/projects/{project_id}/engineering-imports/{source_id}` 下新增：
+
+| 路径 | 方法 | 用途 |
+|---|---|---|
+| `/modeling-inputs` | GET | 当前输入摘要；`table_id` 获取可编辑 CSV 与独立输入版本 |
+| `/modeling-inputs` | PUT | 保存完整或缺字段草稿；同时检查工程修订和输入版本 |
+| `/modeling-package?step=1..5` | GET | 预填本步骤 XLSX，包含隐藏的来源/修订/各输入版本依据 |
+| `/modeling-package` | POST | 从已有不可变上传读取 XLSX；拒绝过期补充包；保存本步骤输入草稿 |
+| `/modeling-adopt` | POST | 按固定目录依赖顺序合并选定输入，同一事务记录采用版本和工程修订 |
+| `/kickoff-handoff` | GET / POST | 查看或确认交接有效发布凭据；不创建后续执行成功记录 |
+
+项目消费端 `GET /projects/{project_id}/engineering-kickoff` 被项目交付总览实际读取，不再以演示设备计数/Mock 阶段通过状态替代开局交接。交接最小必需域为设备、机房/机柜、落位、连接；其他有内容的工程域也必须发布，无数据的域不虚构为完成。各域仍独立发布。改动产物引用或存在未采用的输入时，旧交接显示 STALE 并保留历史凭据。
+
+GET 使用 `bom:read`，输入写入使用 `bom:edit`，交接写入使用 `bom:execute`；上传仍沿用原 `bom:import`。所有请求继承项目授权、Session/CSRF。新 OpenAPI DTO 为 IDEModelingInput/Edit/Inputs/Adoption、IDEKickoffHandoff/Request；TS 从 OpenAPI 生成。
+
+输入 CSV 原文持久保存于现有 MinIO 项目隔离前缀；PostgreSQL 保存版本、对象摘要、行数、问题及采用关联。格式损坏或敏感数据拒绝保存，缺失字段保留。原标准工作簿和标准 CSV 采用结果可重新打开，经同一目录归一化；不复制资产身份。原型新增的机柜坐标/朝向复用 FacilityModel，显式单位转换成毫米，坐标参考系沿用或明确提供，不猜测。
+
+目录版本更新为 2：机房追加可选坐标系/单位，机柜追加可选坐标系、X/Y/Z、单位、朝向，允许路段追加距离依据。既有固定输入可省略尾部可选列；未知列不丢弃。布线参数表单映射到原 CalculationRule（引入长度、余量百分比、标准长度向上匹配），独立预期算例经原规则校验、人工审核后才可引用，不新增执行引擎。
+
+迁移为 **045_engineering_modeling_inputs.sql**；044 已被并行 Flows 分支占用，本分支不修改该分支或其迁移。新增表仅存建模输入索引及交接/发布引用；领域实体、审批、Outbox、CMDB 和机柜图继续复用。
+
+验证范围见 [建模闭环记录](../intelligent-deployment/modeling-closure/verification.json)。本轮不运行真实 Provider，不声明自动识别、五次模型基准或跨客户泛化通过；高级网络协议不在该原型的本轮闭环内。

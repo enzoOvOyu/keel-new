@@ -4,14 +4,14 @@ import {useQuery,useQueryClient} from '@tanstack/react-query';
 import {Button,Modal} from '../components/ui';
 import {engineeringModel,editEngineeringPower,runEngineeringCalculation,engineeringCalculations,applyEngineeringCalculation,type PowerPlan,type CalculationApplication} from '../lib/api/engineering';
 
-export function EngineeringPowerPanel({project,id,revision,canEdit}:{project:string;id:string;revision:number;canEdit:boolean}){
+export function EngineeringPowerPanel({project,id,revision,canEdit,onModelInputs}:{project:string;id:string;revision:number;canEdit:boolean;onModelInputs?:()=>void}){
  const [editRevision,setEditRevision]=useState(revision);
  const cache=useQueryClient(),[editing,setEditing]=useState<PowerPlan|null>(null),[reason,setReason]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false);
  const query=useQuery({queryKey:['engineering-model',project,id,revision],queryFn:({signal})=>engineeringModel(project,id,signal)});
  const runs=useQuery({queryKey:['engineering-calculations',project,id,revision],queryFn:({signal})=>engineeringCalculations(project,id,signal),refetchInterval:q=>q.state.data?.some(v=>['pending','running'].includes(v.run.status))?1500:false});
  const m=query.data?.model,plan=m?.power_plans[0],names=new Map([...(m?.equipment.map(v=>[v.entity_id,v.label] as const)||[]),...(m?.facilities.map(v=>[v.entity_id,v.label] as const)||[])]);
  async function action(f:()=>Promise<unknown>){setBusy(true);setError('');try{await f();await Promise.all([cache.invalidateQueries({queryKey:['engineering-workspace',project,id]}),cache.invalidateQueries({queryKey:['engineering-model',project,id]}),cache.invalidateQueries({queryKey:['engineering-calculations',project,id]})])}catch(e){setError((e as Error).message)}finally{setBusy(false)}}
- function edit(){setEditRevision(revision);setReason('');setEditing(structuredClone(plan||{entity_id:crypto.randomUUID(),revision_id:'',provenance_id:id,evidence_ids:[],attributes:[],maturity:'Estimated',equipment_profiles:[],racks:[]}))}
+ function edit(){if(onModelInputs){onModelInputs();return}setEditRevision(revision);setReason('');setEditing(structuredClone(plan||{entity_id:crypto.randomUUID(),revision_id:'',provenance_id:id,evidence_ids:[],attributes:[],maturity:'Estimated',equipment_profiles:[],racks:[]}))}
  const quantity=(q:{value:string;unit:string}|undefined)=>q?`${q.value} ${q.unit}`:'未知';
  function resultBindings(outputs:{name:string}[]):CalculationApplication['bindings']{
  const bindings:CalculationApplication['bindings']=[];const racks=new Set(plan?.racks.map(v=>v.rack_id)||[]),circuits=new Set(plan?.circuits?.map(v=>v.id)||[]),supplies=new Set(plan?.supplies?.map(v=>v.id)||[]);

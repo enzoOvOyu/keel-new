@@ -1,3 +1,13 @@
+## 已完成里程碑事件：原型建模与交接闭环，停在新 Agent 开发前
+
+用户最新限定：以批准原型为最终目标，先完成 Agent 开发前闭环，随后等待其配置 Provider。本轮未新增/调用 Agent，也未切换模型；工作台旧整本分析按钮停用，旧域编辑与规则编辑入口统一跳转到原型建模中心，不让新旧入口并行写入。
+
+已实现十类建模卡片、宽表格编辑、真实草稿保存/重开、集中字段缺口、带来源及输入版本的预填 XLSX、过期输入拒绝、整步采用；机房参考系与机柜坐标/单位/方向复用既有 FacilityModel。布线规则改用参数表单，继续使用原规则注册表/独立算例/审核；标准导入、计算、领域 Revision、发布、Outbox、CMDB 及机柜图均复用。新增交接只引用实际已发布版本，项目交付总览实际消费，后续阶段保持 NOT_STARTED。
+
+必要检查已完成：相关 Go 用例、隔离 PostgreSQL/MinIO 的草稿→跨表采用→实际审核/发布/CMDB→交接与 stale 检查、TypeScript、合成响应浏览器交互及桌面/窄屏截图。没有重跑既有五步业务链、全平台冒烟或真实 Provider。详情见[验证记录](docs/intelligent-deployment/modeling-closure/verification.json)、[API契约](docs/api/engineering.md)。迁移045避免占用另一工作树的044 Flows迁移。
+
+下一步只待发布收尾；新资料分流和五个有界提取 Agent、gptsol6.1 能力探测、真实资料/五次基准仍未实施，等用户配置 Provider 后再开始。不可把本次人工固定输入闭环宣称为自动识别验收通过。
+
 ## 已完成里程碑事件：建模详情页修正部署至5180
 
 前端b5a1e86已切换至 `/home/ubuntu/.local/state/keel-deployments/model-editor-b5a1e86/dev`，替代1706cbc前端。宽表格详情页、导入工具栏、依据/校验反馈和固定底部操作已在线；构建通过，相关模块HTTP200，登录页无页面异常。API仍e5faead/原进程2424213，健康检查200，无数据库变更。旧1706cbc前端启动器保留。详见[发布记录](docs/intelligent-deployment/workbench-alignment/model-editor/deployment.json)。严格区分详情UI对齐、现有真实接口复用和仍未完成的新Agent/业务验收，不以本次部署宣称整个实施方案完成。

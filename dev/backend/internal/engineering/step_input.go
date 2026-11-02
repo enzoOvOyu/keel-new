@@ -50,7 +50,7 @@ type InputPreview struct {
 // A trailing ? declares a conditionally required field. The condition is shown
 // with the table; preview validates syntax, never declares a domain complete.
 func StepInputCatalog() InputCatalog {
-	c := InputCatalog{Version: "1", Tables: []InputTable{}}
+	c := InputCatalog{Version: "2", Tables: []InputTable{}}
 	add := func(id string, step int, name, condition, spec string) {
 		t := InputTable{ID: id, Step: step, Name: name, Condition: condition, Fields: []InputField{}}
 		switch id {
@@ -71,14 +71,14 @@ func StepInputCatalog() InputCatalog {
 		c.Tables = append(c.Tables, t)
 	}
 	add("terminations", 1, "设备关联", "八列必须保留；MAC不适用须有已确认端接类型依据；预览通过不代表身份或端接已确认。", "a_serial:a端SN|a_mac:a端MAC:mac|a_port:a端端口|b_serial:b端SN|b_rack_position:b端机架位|b_mac:b端MAC:mac|b_port:b端端口|termination_type:端接类型")
-	add("rooms", 2, "机房", "场地和机房编码在项目内唯一。", "site_code:场地编码|site_name:场地名称|room_code:机房编码|room_name:机房名称")
-	add("racks", 2, "机柜", "U位检查需要容量U；空间计算需要毫米尺寸。", "room_code:机房编码|rack_code:机柜编码|name:机柜名称|capacity_u?:容量U:positive_integer|width_mm?:宽mm:positive|depth_mm?:深mm:positive|height_mm?:高mm:positive")
+	add("rooms", 2, "机房", "场地和机房编码在项目内唯一。", "site_code:场地编码|site_name:场地名称|room_code:机房编码|room_name:机房名称|coordinate_frame?:坐标系编码|coordinate_unit?:坐标单位")
+	add("racks", 2, "机柜", "U位检查需要容量U；空间计算需要毫米尺寸。", "room_code:机房编码|rack_code:机柜编码|name:机柜名称|capacity_u?:容量U:positive_integer|width_mm?:宽mm:positive|depth_mm?:深mm:positive|height_mm?:高mm:positive|coordinate_frame?:坐标系编码|x?:X:number|y?:Y:number|z?:Z:number|coordinate_unit?:坐标单位|orientation_deg?:朝向度:number")
 	add("equipment_specs", 2, "设备规格", "U位安装必须提供高度U；规格引用必须经确认。", "serial:设备SN|equipment_type:设备类型|model:型号或规格引用|height_u?:高度U:positive_integer")
 	add("placements", 2, "设备落位", "安装方式填u或non_u；安装面填front/rear/both/unknown。u要求起始U和占用U；non_u要求位置编码。", "serial:设备SN|room_code:机房编码|rack_code:机柜编码|mount_type:安装方式|start_u?:起始U:positive_integer|height_u?:占用U:positive_integer|face:安装面|position_code?:非U位置编码")
 	add("port_specs", 3, "端口规格", "Breakout要求父端口和子口序号；其他字段依端接类型。", "serial:设备SN|port:端口|medium:介质|connector:连接器|rate:速率:positive|rate_unit:速率单位|parent_port?:父端口|breakout_index?:Breakout子口序号:positive_integer")
 	add("patch_paths", 3, "配线路径", "有中间配线节点时必填；直连无需此表。", "connection:连接引用|sequence:段序号:positive_integer|device:配线设备引用|in_port:入口端口|out_port:出口端口")
 	add("route_nodes", 3, "路径节点", "坐标计算时必须提供坐标系和X/Y/Z；实测路段可以不填坐标。", "code:节点编码|room_code:机房编码|rack_code?:关联机柜编码|frame?:坐标系|x?:X:number|y?:Y:number|z?:Z:number|unit?:长度单位")
-	add("route_edges", 3, "可走线路段", "只能在明确允许的通道上计算路径。", "code:路段编码|from:起点节点|to:终点节点|distance:距离:positive|unit:长度单位|category:允许线路类别")
+	add("route_edges", 3, "可走线路段", "只能在明确允许的通道上计算路径。", "code:路段编码|from:起点节点|to:终点节点|distance:距离:positive|unit:长度单位|category:允许线路类别|basis?:距离依据")
 	add("rack_access", 3, "机柜接入", "接入节点必须存在；引线规则填编码@版本或UUID@版本，输出length（长度），必须审核通过。", "rack_code:机柜编码|node:接入节点|rule:引线规则引用")
 	add("cable_specs", 3, "线缆规格", "可采购长度按同一规格逐行填写；模块需求方式填separate-optics、no-optics、DAC或AOC。", "code:规格编码|medium:介质|connector_a:本端连接器|connector_b:对端连接器|rate:支持速率:positive|rate_unit:速率单位|length:可采购长度:positive|unit:长度单位|optic_mode:模块需求方式")
 	add("optic_specs", 3, "光模块规格", "根据端口和产品规则匹配，不固定每端一个模块。", "model:型号|port_type:端口类型|medium:介质|rate:速率:positive|rate_unit:速率单位|distance:适用距离:positive|unit:长度单位")
@@ -126,10 +126,13 @@ func PreviewStepInput(q InputPreviewRequest) InputPreview {
 		problem(1, "", "INVALID_HEADER", "无法读取表头")
 		return out
 	}
-	if len(headers) != len(table.Fields) {
+	if len(headers) > len(table.Fields) {
 		problem(1, "", "HEADER_MISMATCH", "列数与模板不一致")
 	}
 	for i, f := range table.Fields {
+		if i >= len(headers) && !f.Required {
+			continue
+		}
 		if i >= len(headers) || headers[i] != f.Label {
 			problem(1, f.Code, "HEADER_MISMATCH", "请保留模板列名和顺序："+f.Label)
 		}
@@ -146,10 +149,17 @@ func PreviewStepInput(q InputPreviewRequest) InputPreview {
 			problem(row, "", "INVALID_CSV", e.Error())
 			break
 		}
-		if len(values) != len(table.Fields) {
+		missingRequired := false
+		for i := len(values); i < len(table.Fields); i++ {
+			if table.Fields[i].Required {
+				missingRequired = true
+			}
+		}
+		if len(values) > len(headers) || missingRequired {
 			problem(row, "", "COLUMN_COUNT", "数据列数与模板不一致")
 			continue
 		}
+		values = append(values, make([]string, len(table.Fields)-len(values))...)
 		out.Rows = append(out.Rows, values)
 		for i, f := range table.Fields {
 			value := strings.TrimSpace(values[i])

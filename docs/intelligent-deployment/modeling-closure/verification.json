@@ -1,0 +1,21 @@
+{
+  "scope": "Approved kickoff prototype closure before new Agent development",
+  "agent_status": "WAITING_FOR_USER_PROVIDER_CONFIGURATION; new scoped Agent not developed or tested",
+  "provider_calls": 0,
+  "database_migration": "045_engineering_modeling_inputs.sql",
+  "checks": {
+    "targeted_domain_tests": "PASS: partial XLSX identity and revision round trip; explicit coordinate unit conversion and missing-unit rejection; existing affected standard placement/workbook and actionable cabling error checks",
+    "isolated_database_and_minio": "PASS: TestModelingDraftAdoptionAndHandoff; real isolated PostgreSQL and MinIO; draft reload, independent input CAS, malformed-row rejection, ordered standard-domain adoption, prefilled package basis, actual review/publication/CMDB, handoff receipt, downstream NOT_STARTED, stale receipt",
+    "browser": "PASS: synthetic API responses only; ten model groups, draft save/reopen, validation/adoption, rule parameter UI, handoff gate, desktop/narrow screenshots; see ui-validation.json",
+    "typescript": "PASS: tsc --noEmit",
+    "build": "PENDING",
+    "real_ai_or_customer_file_acceptance": "NOT_RUN",
+    "five_step_business_chain": "Existing e5faead isolated acceptance retained; not rerun this milestone",
+    "navigation": "PASS: step-scoped cards; existing power/network edit actions open the same prototype modeling center"
+  },
+  "limitations": [
+    "No promise that arbitrary material can be recognized; new source routing and five scoped extraction tasks wait for Provider configuration.",
+    "Handoff references planning publications. Network execution, provisioning, validation and NCCL remain NOT_STARTED.",
+    "Saving a draft is not domain adoption or publication. Removing a draft row does not retire a published CMDB asset."
+  ]
+}

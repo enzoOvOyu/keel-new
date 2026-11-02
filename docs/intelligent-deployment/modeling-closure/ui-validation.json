@@ -1,0 +1,15 @@
+{
+  "mode": "synthetic intercepted API responses; no Provider calls or real project writes",
+  "passed": [
+    "ten prototype modeling groups",
+    "single modeling editor",
+    "draft save and reopen",
+    "declared coordinate fields",
+    "validation then adoption",
+    "parameter rule editor",
+    "handoff gate",
+    "desktop and narrow layout",
+    "old analysis entry disabled"
+  ],
+  "page_errors": []
+}

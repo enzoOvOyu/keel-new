@@ -6677,6 +6677,94 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{project_id}/engineering-imports/{source_id}/modeling-inputs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** getEngineeringModelingInputs */
+        get: operations["getEngineeringModelingInputs"];
+        /** saveEngineeringModelingInput */
+        put: operations["saveEngineeringModelingInput"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/engineering-imports/{source_id}/modeling-package": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** downloadEngineeringModelingPackage */
+        get: operations["downloadEngineeringModelingPackage"];
+        put?: never;
+        /** importEngineeringModelingPackage */
+        post: operations["importEngineeringModelingPackage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/engineering-imports/{source_id}/modeling-adopt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** adoptEngineeringModelingInputs */
+        post: operations["adoptEngineeringModelingInputs"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/engineering-imports/{source_id}/kickoff-handoff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** getEngineeringKickoffHandoff */
+        get: operations["getEngineeringKickoffHandoff"];
+        put?: never;
+        /** createEngineeringKickoffHandoff */
+        post: operations["createEngineeringKickoffHandoff"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_id}/engineering-kickoff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** getProjectEngineeringKickoff */
+        get: operations["getProjectEngineeringKickoff"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -16977,6 +17065,64 @@ export interface components {
             allocation_rule: components["schemas"]["IDEVersionReference"];
             load?: components["schemas"]["IDEQuantity"];
             calculation_run_id?: string;
+        };
+        IDEModelingInput: {
+            table_id: string;
+            version: number;
+            base_revision: number;
+            /** @enum {string} */
+            state: "draft" | "adopted" | "stale";
+            rows: number;
+            issues: components["schemas"]["IDEInputProblem"][];
+            csv?: string;
+            reason: string;
+        };
+        IDEModelingInputs: {
+            revision: number;
+            items: components["schemas"]["IDEModelingInput"][];
+        };
+        IDEModelingInputEdit: {
+            expected_revision: number;
+            input_version: number;
+            table_id: string;
+            csv: string;
+            reason: string;
+        };
+        IDEModelingInputVersion: {
+            table_id: string;
+            version: number;
+        };
+        IDEModelingAdoption: {
+            expected_revision: number;
+            step: number;
+            inputs: components["schemas"]["IDEModelingInputVersion"][];
+            reason: string;
+        };
+        IDEKickoffPublication: {
+            target: string;
+            publication_id: string;
+            revision_id: string;
+        };
+        IDEKickoffHandoff: {
+            id: string;
+            project_id: string;
+            source_id: string;
+            revision: number;
+            /** @enum {string} */
+            state: "NEEDS_INPUT" | "READY" | "HANDED_OFF" | "STALE";
+            blockers: string[];
+            publications: components["schemas"]["IDEKickoffPublication"][];
+            equipment_ids: string[];
+            port_ids: string[];
+            network_plan_ids: string[];
+            /** @enum {string} */
+            next_stage: "NETWORK_READINESS";
+            /** @enum {string} */
+            next_stage_state: "NOT_STARTED";
+        };
+        IDEKickoffHandoffRequest: {
+            expected_revision: number;
+            reason: string;
         };
     };
     responses: {
@@ -37303,6 +37449,335 @@ export interface operations {
                 content?: never;
             };
             /** @description Workbook/input unsupported or unresolved */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getEngineeringModelingInputs: {
+        parameters: {
+            query?: {
+                table_id?: string;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+                source_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["IDEModelingInputs"];
+                    };
+                };
+            };
+            /** @description Revision or input version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, dependencies or publication not ready */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    saveEngineeringModelingInput: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                source_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEModelingInputEdit"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["IDEModelingInput"];
+                    };
+                };
+            };
+            /** @description Revision or input version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, dependencies or publication not ready */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    downloadEngineeringModelingPackage: {
+        parameters: {
+            query: {
+                step: number;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+                source_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+            /** @description Revision or input version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, dependencies or publication not ready */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    importEngineeringModelingPackage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                source_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEStandardWorkbookConfirmRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["IDEModelingInputs"];
+                    };
+                };
+            };
+            /** @description Revision or input version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, dependencies or publication not ready */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    adoptEngineeringModelingInputs: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                source_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEModelingAdoption"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["IDEWorkspace"];
+                    };
+                };
+            };
+            /** @description Revision or input version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, dependencies or publication not ready */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getEngineeringKickoffHandoff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                source_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["IDEKickoffHandoff"];
+                    };
+                };
+            };
+            /** @description Revision or input version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, dependencies or publication not ready */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createEngineeringKickoffHandoff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                source_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IDEKickoffHandoffRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["IDEKickoffHandoff"];
+                    };
+                };
+            };
+            /** @description Revision or input version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, dependencies or publication not ready */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getProjectEngineeringKickoff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["IDEKickoffHandoff"];
+                    };
+                };
+            };
+            /** @description Revision or input version conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Input, dependencies or publication not ready */
             422: {
                 headers: {
                     [name: string]: unknown;

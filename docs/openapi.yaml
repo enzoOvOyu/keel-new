@@ -16871,6 +16871,300 @@ paths:
           description: Revision or active job conflict
         "422":
           description: Workbook/input unsupported or unresolved
+  /projects/{project_id}/engineering-imports/{source_id}/modeling-inputs:
+    get:
+      operationId: getEngineeringModelingInputs
+      tags:
+        - Engineering
+      summary: getEngineeringModelingInputs
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: source_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: table_id
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: "#/components/schemas/IDEModelingInputs"
+        "409":
+          description: Revision or input version conflict
+        "422":
+          description: Input, dependencies or publication not ready
+    put:
+      operationId: saveEngineeringModelingInput
+      tags:
+        - Engineering
+      summary: saveEngineeringModelingInput
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: source_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: "#/components/schemas/IDEModelingInput"
+        "409":
+          description: Revision or input version conflict
+        "422":
+          description: Input, dependencies or publication not ready
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IDEModelingInputEdit"
+  /projects/{project_id}/engineering-imports/{source_id}/modeling-package:
+    get:
+      operationId: downloadEngineeringModelingPackage
+      tags:
+        - Engineering
+      summary: downloadEngineeringModelingPackage
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: source_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: step
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 5
+      responses:
+        "200":
+          description: OK
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        "409":
+          description: Revision or input version conflict
+        "422":
+          description: Input, dependencies or publication not ready
+    post:
+      operationId: importEngineeringModelingPackage
+      tags:
+        - Engineering
+      summary: importEngineeringModelingPackage
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: source_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: "#/components/schemas/IDEModelingInputs"
+        "409":
+          description: Revision or input version conflict
+        "422":
+          description: Input, dependencies or publication not ready
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IDEStandardWorkbookConfirmRequest"
+  /projects/{project_id}/engineering-imports/{source_id}/modeling-adopt:
+    post:
+      operationId: adoptEngineeringModelingInputs
+      tags:
+        - Engineering
+      summary: adoptEngineeringModelingInputs
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: source_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: "#/components/schemas/IDEWorkspace"
+        "409":
+          description: Revision or input version conflict
+        "422":
+          description: Input, dependencies or publication not ready
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IDEModelingAdoption"
+  /projects/{project_id}/engineering-imports/{source_id}/kickoff-handoff:
+    get:
+      operationId: getEngineeringKickoffHandoff
+      tags:
+        - Engineering
+      summary: getEngineeringKickoffHandoff
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: source_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: "#/components/schemas/IDEKickoffHandoff"
+        "409":
+          description: Revision or input version conflict
+        "422":
+          description: Input, dependencies or publication not ready
+    post:
+      operationId: createEngineeringKickoffHandoff
+      tags:
+        - Engineering
+      summary: createEngineeringKickoffHandoff
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: source_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: "#/components/schemas/IDEKickoffHandoff"
+        "409":
+          description: Revision or input version conflict
+        "422":
+          description: Input, dependencies or publication not ready
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IDEKickoffHandoffRequest"
+  /projects/{project_id}/engineering-kickoff:
+    get:
+      operationId: getProjectEngineeringKickoff
+      tags:
+        - Engineering
+      summary: getProjectEngineeringKickoff
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: "#/components/schemas/IDEKickoffHandoff"
+        "409":
+          description: Revision or input version conflict
+        "422":
+          description: Input, dependencies or publication not ready
 components:
   securitySchemes:
     bearerAuth:
@@ -47823,6 +48117,190 @@ components:
         - circuit_code
         - feed_group
         - allocation_rule
+    IDEModelingInput:
+      type: object
+      additionalProperties: false
+      required:
+        - table_id
+        - version
+        - base_revision
+        - state
+        - rows
+        - issues
+        - reason
+      properties:
+        table_id:
+          type: string
+        version:
+          type: integer
+        base_revision:
+          type: integer
+        state:
+          type: string
+          enum:
+            - draft
+            - adopted
+            - stale
+        rows:
+          type: integer
+        issues:
+          type: array
+          items:
+            $ref: "#/components/schemas/IDEInputProblem"
+        csv:
+          type: string
+        reason:
+          type: string
+    IDEModelingInputs:
+      type: object
+      additionalProperties: false
+      required:
+        - revision
+        - items
+      properties:
+        revision:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/IDEModelingInput"
+    IDEModelingInputEdit:
+      type: object
+      additionalProperties: false
+      required:
+        - expected_revision
+        - input_version
+        - table_id
+        - csv
+        - reason
+      properties:
+        expected_revision:
+          type: integer
+        input_version:
+          type: integer
+        table_id:
+          type: string
+        csv:
+          type: string
+        reason:
+          type: string
+    IDEModelingInputVersion:
+      type: object
+      additionalProperties: false
+      required:
+        - table_id
+        - version
+      properties:
+        table_id:
+          type: string
+        version:
+          type: integer
+    IDEModelingAdoption:
+      type: object
+      additionalProperties: false
+      required:
+        - expected_revision
+        - step
+        - inputs
+        - reason
+      properties:
+        expected_revision:
+          type: integer
+        step:
+          type: integer
+          minimum: 1
+          maximum: 5
+        inputs:
+          type: array
+          items:
+            $ref: "#/components/schemas/IDEModelingInputVersion"
+        reason:
+          type: string
+    IDEKickoffPublication:
+      type: object
+      additionalProperties: false
+      required:
+        - target
+        - publication_id
+        - revision_id
+      properties:
+        target:
+          type: string
+        publication_id:
+          type: string
+        revision_id:
+          type: string
+    IDEKickoffHandoff:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - project_id
+        - source_id
+        - revision
+        - state
+        - blockers
+        - publications
+        - equipment_ids
+        - port_ids
+        - network_plan_ids
+        - next_stage
+        - next_stage_state
+      properties:
+        id:
+          type: string
+        project_id:
+          type: string
+        source_id:
+          type: string
+        revision:
+          type: integer
+        state:
+          type: string
+          enum:
+            - NEEDS_INPUT
+            - READY
+            - HANDED_OFF
+            - STALE
+        blockers:
+          type: array
+          items:
+            type: string
+        publications:
+          type: array
+          items:
+            $ref: "#/components/schemas/IDEKickoffPublication"
+        equipment_ids:
+          type: array
+          items:
+            type: string
+        port_ids:
+          type: array
+          items:
+            type: string
+        network_plan_ids:
+          type: array
+          items:
+            type: string
+        next_stage:
+          type: string
+          enum:
+            - NETWORK_READINESS
+        next_stage_state:
+          type: string
+          enum:
+            - NOT_STARTED
+    IDEKickoffHandoffRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - expected_revision
+        - reason
+      properties:
+        expected_revision:
+          type: integer
+        reason:
+          type: string
 x-implementation-policy:
   frontend-first: true
   mock-provider-required: true
