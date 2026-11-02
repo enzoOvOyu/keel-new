@@ -184,6 +184,30 @@ func currentModelingCSV(table, raw string) string {
 	return canonicalModelingCSV(table, rows[1:])
 }
 
+// Endpoint location references need only identities and placements, not all
+// ports, connections, calculations and evidence in the full model.
+func (s *Server) endpointPlacementModel(ctx context.Context, revision string) (engineering.PhysicalModel, error) {
+	m := engineering.EmptyPhysical(s.project)
+	for _, entry := range []struct {
+		table, fields string
+		dest          any
+	}{
+		{"eng_equipment", "'entity_id',t.entity_id,'serial',t.serial", &m.Equipment},
+		{"eng_facility", "'entity_id',t.entity_id,'kind',t.kind,'code',t.code,'label',t.label,'parent_id',t.parent_id", &m.Facilities},
+		{"eng_placement", "'entity_id',t.entity_id,'equipment_id',t.equipment_id,'rack_id',t.rack_id,'start_u',t.start_u,'position_code',t.position_code", &m.Placements},
+	} {
+		var raw []byte
+		query := `SELECT COALESCE(jsonb_agg(jsonb_strip_nulls(jsonb_build_object(` + entry.fields + `)) ORDER BY t.entity_id),'[]'::jsonb) FROM ` + entry.table + ` t JOIN eng_revision r ON r.id=t.revision_id JOIN eng_source src ON src.id=r.source_id WHERE t.revision_id=$1 AND src.project_id=$2`
+		if err := s.db.QueryRow(ctx, query, revision, s.project).Scan(&raw); err != nil {
+			return m, err
+		}
+		if err := json.Unmarshal(raw, entry.dest); err != nil {
+			return m, err
+		}
+	}
+	return m, nil
+}
+
 func canonicalModelingCSV(table string, rows [][]string) string {
 	var b strings.Builder
 	writer := csv.NewWriter(&b)
@@ -348,7 +372,7 @@ func (s *Server) modelingRoutes(out http.ResponseWriter, r *http.Request, w engi
 		values, err := s.modelingInputs(ctx, w, table != "")
 		response := modelingResponse(w, values, table)
 		if err == nil && table == "terminations" && w.HeadRevisionID != nil {
-			model, _, e := engineeringModel(ctx, s.db, *w.HeadRevisionID, s.project)
+			model, e := s.endpointPlacementModel(ctx, *w.HeadRevisionID)
 			if e != nil {
 				reply(nil, e)
 				return true
