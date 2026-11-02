@@ -1,0 +1,37 @@
+{
+  "at": "2026-11-02T07:59:32.661641+00:00",
+  "scope": "Prototype only. No full-platform smoke or production device/API calls.",
+  "first_run": {
+    "script": "dev/prototypes/fabric-studio/tests/browser-check.mjs",
+    "completed": [
+      "A input adoption, Blueprint Commit, contextual Inspector",
+      "C per-device compilation and raw artifact drawer",
+      "D validation, change submission, separate approver",
+      "E canary waves and manual wave continuation",
+      "F independent assurance and scoped Network Ready"
+    ],
+    "interruption": "Harness locator for 设备自动纳管 used exact accessible name; menu includes pending-count badge. Selector corrected. Completed flow was not rerun.",
+    "evidence": [
+      "screenshots/blueprint.png",
+      "screenshots/configuration-artifact.png",
+      "screenshots/validation.png",
+      "screenshots/deployments.png",
+      "screenshots/assurance.png",
+      "screenshots/check-failure.png"
+    ]
+  },
+  "remaining_run": "browser-remaining-validation.json",
+  "domain_checks": "domain-validation.json",
+  "typecheck": "PASS: tsc --noEmit -p prototypes/fabric-studio/tsconfig.json",
+  "not_run": [
+    "full-platform smoke",
+    "production APIs and hardware",
+    "full production rollout/rollback",
+    "physical Spectrum-X/DMS/NVUE acceptance"
+  ],
+  "limitations": [
+    "DMS native execution / production local override / actual rollback UNSUPPORTED",
+    "Telemetry NOT_RUN; configuration output illustrative",
+    "Overview screenshot predates correction of ZTP count to switches only; current page counts switch enrollments separately."
+  ]
+}

@@ -1,0 +1,48 @@
+Fabric Studio 原型数据契约与集成边界
+2026-11-02 · 原型DTO见 dev/prototypes/fabric-studio/contracts.ts
+
+范围
+独立前端原型位于dev/prototypes/fabric-studio；本轮未修改生产Go、OpenAPI或生成SDK。
+原型Provider不是生产授权边界。模拟角色与审批保存在本地，真实接入必须以后端统一授权/审批/审计为准。
+
+数据来源
+统一fixture扩展：fixtures/demo-full-64-b300/fabric-studio.json。
+generate-fixture.py只读demo-seed.json与kickoff-studio.json，保留源摘要，将20个既有资产及关联端口/Cable投影为轻量只读数据。
+资产来源：8 Leaf + 4 Spine + 8 Host；没有创建新的CMDB身份。接口和线缆ID来自原数据。
+三个逻辑Plane、端口Plane映射、NetworkPlan参数、任务目录、能力与发布版本是explicit DEMO场景。它们不是从线缆推导的生产设计，不证明硬件Plane隔离。
+kickoff-studio现有模型为draft；发布快照是明确合成场景，不伪装已真实发布。
+
+DTO
+FabricInputSnapshotDTO：发布记录/CMDB/连接/网络版本、设备集合摘要、源摘要、ready四值、缺失/变化设备、字段参数来源。
+FabricBlueprintDTO：Fabric、Input、Revision、架构、Plane/Tier、设备组和Profile版本；DRAFT/COMMITTED/STALE。
+Device/InterfaceNode/PhysicalLink/LogicalLink/Plane：稳定ID、独立关系、角色、端口、来源；物理与逻辑不互推。
+DeviceCapabilityDTO：型号、NOS/NVUE/固件版本、支持/不支持项、Breakout、能力revision与来源。
+ZtpEnrollmentDTO：精确身份、Profile/script版本、任务ID、独立Attempt、timeline、累积证据；失败后的未到达步骤NOT_RUN。
+IntentProfileDTO：SWITCH/HOST/MULTIPLANE独立域、角色、能力约束、Schema和发布版本。
+ConfigBuildDTO/ConfigArtifactDTO：逐目标产物、输入/Blueprint/Profile/编译器/能力版本、内容摘要、语义变更、缺失/不支持、来源。
+ValidationRunDTO/ValidationFinding：七层检查，required适用性，预期/实际/来源/证据；必需UNSUPPORTED或BLOCKED不能审批。
+ChangeSetDTO/RolloutPlanDTO：冻结Build、Input、Validation、目标、任务、策略、Wave/依赖、并发、窗口、独立审批与唯一Execution绑定。
+AutomationTaskCatalogDTO/JobExecutionRefDTO：Provider/namespace/Flow/revision、输入输出Schema、目标类型、重试/并发/回滚/暂停/取消能力；保留rawState与业务状态。
+AssuranceSnapshotDTO/DriftEventDTO/NetworkReadyRecord：四态对照、精确Build/Execution/Artifact引用、独立回采时间/证据、漂移与限定范围交付。
+
+接口适配
+KickoffProvider：只读发布候选（listPublished），正式接入复用engineering来源、revisions/review/publish记录，不重新导入BOM。
+CMDBProvider：只读身份、接口、连接和能力；正式接入复用cmdb授权与visualization查询。
+DeviceAdapter.compile：本轮只生成示意产物；SWITCH为JSON/YAML1.2兼容语义对象，Host独立对象，DMS计划示意。
+未承诺Native NVUE语法或设备版本可执行。真正Renderer必须按官方版本/设备能力验证后接入。
+AutomationProvider.catalog/invoke/advance/control：独立Mock目录与事件模拟；没有Worker、SSH连接、任务编辑器或生产调度服务。
+正式Flow ID、Schema、revision、执行能力必须从docs/api/flows.md对应服务读取，未匹配任务返回阻断。
+ObservabilityProvider.collect：以精确Build成功任务与独立模拟观测形成结果。无成功应用/不可达保持UNKNOWN，时序面板NOT_RUN。
+
+交互与失效
+localStorage键keel-fabric-studio-v1，仅保存此原型按项目状态和合成记录，不保存秘密。
+上游新版需显式采用；在途执行阻止切换。采用后旧Build/Validation/ChangeSet标STALE，历史内容和交付记录保留。
+每个批准只能绑定一次执行。失败目标使用新ChangeSet审批，已成功目标不自动重跑。
+漂移只记录并阻断当前交付，修复先编译/预检/重新审批。新的漂移证据不改写此前观测快照。
+NetworkReady限定当前Build的目标范围；不能将两台样本验证当整个20设备Fabric通过。
+
+当前能力限制
+DMS完整裸机适配、Override正式审批、真正配置回滚、真实LLDP/QoS/Telemetry、实际设备批量执行均未实现，原型显示UNSUPPORTED/NOT_RUN。
+模拟能力可演示ZTP/NVUE/Host流程，不能证明真实SN5610/B300/NOS兼容性。
+关键交换机并行变更采用保守阻断；生产需引入已批准冗余关系和配置依赖规划服务，不宣称原型已实现最优调度。
+监控只展示来源契约，无真实吞吐、计数器等数值。NetworkTest、IB Perftest和NCCL保留在后续测试域。

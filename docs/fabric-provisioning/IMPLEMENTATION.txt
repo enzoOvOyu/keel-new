@@ -1,0 +1,28 @@
+Fabric Studio 本地原型实施记录 · 2026-11-02
+
+交付入口：http://localhost:5194/p/proj-b300-demo/fabric/overview
+源码：/home/ubuntu/keel-dev/dev/prototypes/fabric-studio；分支dev。
+服务：tmux keel-fabric-prototype；Vite5194；日志/tmp/keel-fabric-prototype.log。
+本次仅新增本地原型服务，原5180/8081/5181/5081未替换，无数据库写入或真实任务执行。
+
+已完成
+完整产品/IA/生命周期分析、12项官方来源研究与集成契约。
+八工作区：Overview、Blueprint、Onboarding、Configuration、Validation、Deployments、Assurance、Settings。
+共享Drawer/Dialog/Table/状态组件、三种拓扑表达、显式三Plane投影、精确端点与来源、Command-K。
+A–G状态链：采用发布快照、精确身份和ZTP证据、逐设备产物、七层预检、独立审批、冻结批次、Mock作业回执、四态回采、漂移和新版失效。
+20既有设备/720端口/112Cable来自统一fixture投影；上游发布和任务目录为明确模拟。
+
+实际验证
+TypeScript定向检查通过。20项领域约束检查通过。
+浏览器A/C/D/E/F首轮已完成；B导航定位脚本匹配失败后只补未执行B/G/Settings及1280/390视口检查，剩余6项通过。
+截图位于screenshots/，已目视检查Overview、Blueprint、ZTP失败Drawer和Assurance。
+未运行全平台冒烟、生产构建或真实设备测试。详细过程和脚本限制见validation.json。
+
+未实现/真实限制
+原型不是生产配置编译器：原文产物是语义示意，未核验厂商版本命令。
+DMS Install/Reboot、真实遥测、完整生产Override审批和实际回滚均显示未支持或未执行。
+真任务ID/Schema/能力须正式接入既有作业平台。浏览器身份切换不是生产鉴权。
+NetworkReady只证明选中Build范围的模拟闭环，不代表整个Fabric或NetworkTest/NCCL已通过。
+
+设计入口：DESIGN.txt、REFERENCES.txt、CONTRACTS.txt、lifecycle.mmd。
+开发已收口；后续按用户评审修改，不继续扩大开发或重复回归。

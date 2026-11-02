@@ -1,0 +1,21 @@
+flowchart LR
+  K[智能开局正式发布] --> S[不可变 Fabric Input Snapshot]
+  C[CMDB 身份 / 端口 / Cable] --> S
+  S --> B[Blueprint Revision / Intent]
+  B --> O[Day-0 Onboarding]
+  B --> P[Profiles + 能力快照]
+  P --> G[逐设备 ConfigBuild]
+  O --> V[七层 Preflight]
+  G --> V
+  V --> X[冻结 ChangeSet / Rollout / Flow Revision]
+  X --> A[独立审批]
+  A --> J[既有自动作业平台]
+  J --> AP[Applied 回执]
+  AP --> OB[独立 Observability 回采]
+  G --> Q[Desired / Rendered / Applied / Operational]
+  OB --> Q
+  Q --> N[限定范围 Network Ready]
+  N --> T[既有 NetworkTest / NCCL]
+  Q --> D[Drift]
+  D --> X
+  S -.新版本显式采用 / 下游STALE.-> B

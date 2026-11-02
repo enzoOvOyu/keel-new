@@ -1,0 +1,43 @@
+Fabric 架构与交互研究 · 2026-11-02
+以下官方页面在本次研究中实际读取；Keel采用是设计推导，不表示已实现厂商能力。
+
+1 Apstra 6.2 Blueprint：Reference Design与模板建立Blueprint；预览物理/逻辑结构与策略。
+https://networkingdocs.hpe.com/documentation/us/en/software/apstra6.2/apstra-user-guide/topics/topic-map/blueprint-create.html
+Keel：输入快照→Blueprint Revision→可审核意图，不要求重新绘制已有物理连接。
+2 Apstra Commit / Revert：未提交工作区支持渲染/差异/提交/撤销，Commit产生Revision。
+https://networkingdocs.hpe.com/documentation/us/en/software/apstra6.2/apstra-user-guide/topics/task/blueprint-commit-revert.html
+Keel：撤销草稿与回滚已执行配置分开，执行须走ChangeSet与作业平台。
+3 Arista Advanced Change Control：任务、串行/并行阶段、前后快照、审批与监控。
+https://labguides.testdrive.arista.com/2026.2/cloudvision_portal/cvp_adv_cc/
+Keel：证据→受控Wave→执行后证据，冗余约束参与审核，不新增调度器。
+4 NetBox Devices & Cabling：设备、型号、接口、MAC、线缆端接独立关联。
+https://netbox.readthedocs.io/en/stable/features/devices-cabling/
+Keel：沿用稳定ID与字段来源，物理关系不证明逻辑网络状态。
+5 Nautobot Golden Config：Backup/Intended/SoT/Compliance/Remediation/Deployment分离。
+https://docs.nautobot.com/projects/golden-config/en/stable/
+Keel：Golden为版本化意图；漂移生成新变更，不自动写设备。
+6 OpenConfig gNMI：Capabilities声明版本化模型、编码和协议；Get/Set/Subscribe不同。
+https://github.com/openconfig/reference/blob/master/rpc/gnmi/gnmi-specification.md
+Keel：能力快照绑定模型/版本；不能以支持gNMI推导支持所有NVIDIA专有字段。
+7 OpenGitOps：声明式、版本化不可变、自动拉取、持续协调。
+https://opengitops.dev/
+Keel：保留不可变期望与版本差异，用户明确要求的审批约束仍优先，漂移不自动修复。
+8 NVIDIA NVUE Config：Pending/Applied/Startup与Revision分开；Patch/Diff/Apply/confirm。
+https://docs.nvidia.com/networking-ethernet-software/nvue-reference/Config-Commands/
+≤5.8 Apply默认不保存，≥5.9 auto-save默认开启。--confirm具有超时未确认回滚，不能推导所有任务支持回滚。
+Keel：Apply、持久化、Operational与回滚能力分列。本原型raw内容为示意，不作可执行命令包。
+9 Cumulus 5.18 ZTP：DHCP Option239指定引导脚本URL，HTTP/HTTPS与脚本标记/返回码有版本要求。
+https://docs.nvidia.com/networking-ethernet-software/cumulus-linux/Installation-Management/Zero-Touch-Provisioning-ZTP/
+Keel：Profile按NOS版本，发现/下载/执行/身份/验证逐阶段展示，ZTP不等于Fabric Ready。
+10 NVIDIA Network Operator doSPCX configuration：prepare/configure独立，plan只编译，target-map与数据digest参与失效。
+https://mellanox.github.io/network-operator-docs/nic-conf-operator/configuration-details.html
+限制：未取得可核对完整裸机DMS Install/Reboot CLI的官方页面；原型不伪造可执行命令，DMS执行保持UNSUPPORTED。
+11 Spectrum-X NIC Configuration 26.7：版本化Profile ConfigMap，mlxConfig/RoCE/AR/CC/IPG与CC版本有关。
+https://docs.nvidia.com/networking/display/kubernetes2670/spectrum-x/spectrum-x-configuration.html
+Keel：SPCX-CC与依赖的软件/固件/Profile能力绑定，不能勾选一个布尔值就当实现。
+12 Spectrum-X Architecture and Components 26.7：NIC/eSwitch/OVS-DOCA/xPlane/VF独立依赖。
+https://docs.nvidia.com/networking/display/kubernetes2670/spectrum-x/components.html
+Keel：Host与交换机配置域分离，没有xPlane运行证据不能宣称所有Plane健康。
+
+契约修正：任务书6.1 DTO遗漏NEEDS_INPUT，以第7节四值状态机补齐原型类型。
+这些研究支持产品语义，不能证明真实设备兼容性、性能或生产交付通过。

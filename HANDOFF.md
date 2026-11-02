@@ -1,5 +1,15 @@
 ## 已完成里程碑事件：开局Agent执行链替换为分流与五步固定输入提取（等待用户安排测试）
 
+## 2026-11-02 · Fabric Provisioning 本地交互原型
+
+- 本轮用户授权完整Fabric产品/IA/交互原型及本地部署，实际只做前端Mock；源码在`dev`分支的`dev/prototypes/fabric-studio`。
+- 新原型入口 **http://localhost:5194/p/proj-b300-demo/fabric/overview**，tmux `keel-fabric-prototype`；没有替换5180/8081/5181/5081、修改数据库或启动真机作业。
+- 已完成八工作区、结构化DTO与独立Mock作业/观测Adapter、A–G状态联动、审批职责分离和版本失效；统一fixture扩展只投影既有20设备/720端口/112线缆，三逻辑Plane及发布记录明确合成。
+- 产品架构/研究/契约/实现与检查见 [Fabric实施入口](docs/fabric-provisioning/IMPLEMENTATION.txt)。原型不修改Go OpenAPI或SDK，不把原生厂商示意配置当可执行产物。
+- 实际：定向TypeScript及20项状态约束通过；浏览器A/C/D/E/F已完成，导航测试定位问题后仅补B/G及剩余设置/窄屏检查。未运行全平台冒烟或生产设备测试。DMS执行、真实遥测、生产Override/实际回滚未实现，保持UNSUPPORTED/NOT_RUN。
+- 用户要求不要反复冒烟或扩大无意义开发。本原型已收口，等待评审；下方正式工程状态不被这一本地Mock入口替代。
+
+
 按用户授权删除生产工程Agent的旧逐Sheet循环、摘要拼接和自动生成工程草稿路径。新入口为 `internal/ai/kickoff_agent.go:ExtractKickoff`，作业只产生现有建模暂存候选，复用Parser/IR、Provider/Responses、对象存储、任务、规则注册表和领域采用服务。旧工具中仍有价值的读取/预览/传输部分保留在workbook_tools.go；旧Agent纠错/列绑定辅助仅保留于历史测试支持文件，不编入生产程序。
 
 实现资料区域分流、五个有界提取上下文、严格DTO、行表/网格/合并引用、唯一键跨表lookup、来源坐标与证据、完整行展开、未消费单元格coverage、集中缺口、公式依赖/已有计算服务和未批准规则候选。模型不输出实物行，不允许生成SN/IP/MAC、任意代码或直接发布。独立重算得到的兼容数值可回填；其余公式保留缺口。每任务最多8轮及一次语义纠正，复用有界传输重试；来源/Provider/Prompt指纹隔离checkpoint，结果/证据/用量持久化至既有MinIO。

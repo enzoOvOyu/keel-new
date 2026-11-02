@@ -1,0 +1,86 @@
+{
+  "at": "2026-11-02T07:52:55.808Z",
+  "scope": "Targeted mock-domain invariants; no real API/device or full-platform smoke",
+  "checks": [
+    {
+      "name": "A incomplete source rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "A blueprint references actual input and dynamic plane count",
+      "status": "PASS"
+    },
+    {
+      "name": "read-only role blocked at provider boundary",
+      "status": "PASS"
+    },
+    {
+      "name": "B unmatched identity cannot start ZTP",
+      "status": "PASS"
+    },
+    {
+      "name": "B DHCP failure leaves later steps NOT_RUN",
+      "status": "PASS"
+    },
+    {
+      "name": "B retry preserves evidence history",
+      "status": "PASS"
+    },
+    {
+      "name": "C per-device config and provenance",
+      "status": "PASS"
+    },
+    {
+      "name": "D blocking findings prohibit changes",
+      "status": "PASS"
+    },
+    {
+      "name": "D unsafe parallel redundancy rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "D creator cannot self approve",
+      "status": "PASS"
+    },
+    {
+      "name": "E partial success preserves successful target and fails second wave",
+      "status": "PASS"
+    },
+    {
+      "name": "E same approval cannot launch second execution",
+      "status": "PASS"
+    },
+    {
+      "name": "F apply partial does not yield network readiness",
+      "status": "PASS"
+    },
+    {
+      "name": "F incomplete observation prevents ready record",
+      "status": "PASS"
+    },
+    {
+      "name": "F independent observations and scoped ready evidence",
+      "status": "PASS"
+    },
+    {
+      "name": "F drift creates new evidence and preserves old snapshot",
+      "status": "PASS"
+    },
+    {
+      "name": "F drift blocks delivery",
+      "status": "PASS"
+    },
+    {
+      "name": "G upstream revision invalidates dependent builds/validations/changes",
+      "status": "PASS"
+    },
+    {
+      "name": "DMS unsupported capability never becomes PASS",
+      "status": "PASS"
+    },
+    {
+      "name": "Plane count comes from design, not fixed constants",
+      "status": "PASS"
+    }
+  ]
+}

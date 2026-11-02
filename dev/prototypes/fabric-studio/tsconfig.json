@@ -1,0 +1,24 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "../..",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    },
+    "lib": [
+      "ES2023",
+      "DOM",
+      "DOM.Iterable"
+    ]
+  },
+  "include": [
+    "*.ts",
+    "*.tsx",
+    "../../src/vite-env.d.ts"
+  ],
+  "exclude": [
+    "tests"
+  ]
+}

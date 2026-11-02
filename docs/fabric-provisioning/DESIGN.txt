@@ -1,0 +1,50 @@
+Keel Fabric Provisioning · 产品架构与交互分析 v1
+2026-11-02 · 本地高保真前端原型，SIMULATION_ONLY
+依据：用户 Fabric Provisioning & Configuration Orchestration Design Brief v1.0。
+
+一、产品与IA
+一个以Fabric为工作对象的工程控制台，左侧以“规划与接入 / 配置与交付 / 运行一致性”组织八工作区。
+路径 /p/:projectId/fabric/{overview,blueprint,onboarding,configuration,validation,deployments,assurance,settings}。
+顶部固定项目/Fabric/输入版本/身份；页面头部只有下一步主要动作。Overview呈现任务与结构，不用同一成功率掩盖各阶段。
+Blueprint为资源树—拓扑—Inspector—Findings；Configuration为域/Profile—设备产物—语义差异；Validation为分层结果—影响图—审批；Deployment为批次依赖—逐目标执行；Assurance为四态对照。
+
+二、生命周期与版本依赖
+Published Kickoff + ConnectivityPlan + CMDB + NetworkPlan → InputSnapshot → Blueprint Revision
+→ Onboarding（独立Day-0）→ ConfigBuild/Artifacts → ValidationRun → ChangeSet/Review
+→ Automation Invocation → Applied Snapshot → Observed Snapshot → NetworkReady。
+七段是网络就绪内部生命周期，不替换全平台六阶段主链。NetworkTest/NCCL只接收交付证据。
+批准冻结输入、Blueprint、Profile、能力、Build、Validation、目标、Wave和任务版本。
+上游有新版本时提示差异；采用新版本显式创建快照，旧版本保持历史，依赖产物标STALE。
+审批后的目标/策略/产物变化必须创建新变更，不能覆盖已批准版本。拒绝无预检/过期/自审批/未纳管/维护态执行。
+
+三、事实与模型
+设备/端口/Cable沿用统一demo-seed的稳定ID。kickoff-studio现有模型还是draft，不能伪装真实发布。
+fabric-studio.json增加明确的合成已发布场景及参数/Plane/版本，只引用既有资产；界面持续显示MOCK。
+Physical Cable、NetworkPlan logical link、LLDP evidence独立。Plane来自显式场景规划，算法读取Plane数组，不固定2/4 Plane。
+Host/NVUE/DMS独立配置域。DMS Prepare和Configure分阶段、必要重启需确认，未知能力不能通过。
+字段级Provenance包含来源、版本、路径。配置按设备的已声明参数生成；缺失阻断，专有能力依设备能力快照。
+
+四、Provider边界
+KickoffProvider只读发布候选/来源；CMDBProvider只读身份/端口/线缆；DeviceAdapter只编译演示产物。
+AutomationProvider提供独立mock目录、Invocation、状态、日志、输出和操作能力；不假称当前Kestra存在这些任务。
+生产任务目录若无匹配须阻断。原型事件由独立mock适配器推进，Fabric只消费，不实现Worker或生产调度器。
+ObservabilityProvider提供明确模拟的回采、漂移与四态证据；不新建监控存储。真实API未来复用docs/api/{engineering,flows,visualization}.md；本轮不修改Go/OpenAPI/SDK。
+
+五、交互闭环
+A 输入选择→来源/完整性→采用→Blueprint；B 按身份匹配→任务/Profile→ZTP时间线→失败恢复。
+C 域/Profile/目标→逐设备编译→语义/原始/来源；D 七层预检→证据/影响→冻结变更→不同用户批准/拒绝。
+E 版本化任务绑定→拓扑安全Wave→确认→逐设备执行→部分失败→新审批重试/能力受控回滚。
+F 独立回采→四态对比→漂移→修复变更→NetworkReady；G 采用新版本→影响清单→旧产物失效→增量重新编译。
+只读用户能查看；network_engineer设计/申请，delivery_lead独立批准，delivery_engineer执行，developer_sre维护适配能力。浏览器身份切换仅用于演示，不是生产授权。
+失败注入放在相关模拟操作确认框内，不恢复全局场景切换器。无任务、无源、未匹配、失败、超时、不可达、权限不足均给出范围和下一步。
+
+六、视觉与组件
+现有React/shadcn依赖；紧凑浅色工程控制台、深蓝文字、灰色网格、青绿/橙色状态；白色内容画布。
+复用Button/Radix Dialog，统一Evidence Drawer与确认Dialog；SVG有分组、节点/链路命中、缩放、过滤和可访问名称。
+数据表搜索/排序/分页；URL保留workspace/Plane/模式/查询，浏览器返回可恢复；本地状态按项目保存。
+
+七、真实限制
+这是前端模拟，不运行DHCP/SSH/NVUE/DMS/Kestra，不写正式CMDB，不导入原始Excel，不自动修复真实设备。
+厂商原始配置仅展示适配器示意，不作为可直接执行命令包。未知型号/NOS能力显示UNSUPPORTED。
+当前仅一个授权合成项目；无其他项目资产。maintained保持IPMI-only，不允许主机配置/Agent/SSH绕过。
+实际检查与来源研究分别写入 validation.json 与 REFERENCES.txt；未运行的检查不宣称通过。

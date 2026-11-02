@@ -1,0 +1,31 @@
+{
+  "at": "2026-11-02T07:57:28.782Z",
+  "scope": "Only B/G/settings/viewports remaining after A/C/D/E/F completed. Initial state seeded by Mock Provider, no production writes.",
+  "checks": [
+    {
+      "name": "B exact identity, ZTP failure and evidence timeline",
+      "status": "PASS"
+    },
+    {
+      "name": "G version adoption invalidates existing dependencies",
+      "status": "PASS"
+    },
+    {
+      "name": "DMS unsupported remains explicit in task catalog",
+      "status": "PASS"
+    },
+    {
+      "name": "1280px layout",
+      "status": "PASS"
+    },
+    {
+      "name": "390px basic layout",
+      "status": "PASS"
+    },
+    {
+      "name": "No page errors during remaining checks",
+      "status": "PASS"
+    }
+  ],
+  "errors": []
+}
