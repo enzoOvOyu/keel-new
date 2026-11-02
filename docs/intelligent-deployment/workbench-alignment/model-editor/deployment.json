@@ -1,0 +1,20 @@
+{
+  "frontend_revision": "b5a1e86",
+  "api_revision": "e5faead",
+  "frontend_directory": "/home/ubuntu/.local/state/keel-deployments/model-editor-b5a1e86/dev",
+  "checks": {
+    "/": 200,
+    "/src/features/EngineeringStudio.tsx": 200,
+    "/src/features/EngineeringStepInputs.tsx": 200,
+    "/src/features/engineering-workbench.css": 200,
+    "api_healthz": 200,
+    "frontend_pid": 2575290,
+    "frontend_directory": "/home/ubuntu/.local/state/keel-deployments/model-editor-b5a1e86/dev",
+    "api_pid_unchanged": true
+  },
+  "vite_build": "PASS",
+  "live_login_browser": "PASS; no page errors",
+  "database_changes": false,
+  "rollback_launcher": "/home/ubuntu/.local/state/keel-deployments/workbench-1706cbc/frontend-run.py",
+  "limits": "Dialog interactions verified with isolated synthetic API responses; no real model/import/publish acceptance in this change."
+}

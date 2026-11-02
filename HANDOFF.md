@@ -1,3 +1,7 @@
+## 已完成里程碑事件：建模详情页修正部署至5180
+
+前端b5a1e86已切换至 `/home/ubuntu/.local/state/keel-deployments/model-editor-b5a1e86/dev`，替代1706cbc前端。宽表格详情页、导入工具栏、依据/校验反馈和固定底部操作已在线；构建通过，相关模块HTTP200，登录页无页面异常。API仍e5faead/原进程2424213，健康检查200，无数据库变更。旧1706cbc前端启动器保留。详见[发布记录](docs/intelligent-deployment/workbench-alignment/model-editor/deployment.json)。严格区分详情UI对齐、现有真实接口复用和仍未完成的新Agent/业务验收，不以本次部署宣称整个实施方案完成。
+
 ## 已完成里程碑事件：建模导入编辑详情按原型修正
 
 针对上一轮直接嵌入旧五步表单的偏差，改为与批准ModelEditor原型一致的宽弹窗、顶部导入工具栏、逐格编辑表格、来源/版本依据、校验反馈及底部固定操作。弹窗内去掉重复步骤导航和资料类型选择；整步XLSX明确作为次级入口保留，避免被误解为仅当前表操作。继续使用真实后端预览与确认合并，不伪造本地“保存草稿”成功。仅修改EngineeringStudio、EngineeringStepInputs及作用域样式。
