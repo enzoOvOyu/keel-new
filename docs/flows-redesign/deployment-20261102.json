@@ -1,0 +1,75 @@
+{
+  "at": "2026-11-02T11:07:48.753836+00:00",
+  "release_commit": "9441a89",
+  "release_branch": "deploy/jobs-ui-20261102",
+  "jobs_commit": "12f8b80",
+  "preserved_development_commit": "ab1bd85",
+  "url": "http://localhost:5180/flows",
+  "api": "127.0.0.1:8081",
+  "main_and_dev_merged": false,
+  "other_worktrees_modified": false,
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/jobs-ui-20261102",
+  "binary_sha256": "adc717eb5a70dedf49e867f4f2fe4aa27270be1bfb8a39fed01b82a940a4730d",
+  "migration_applied": "044_flows_operations.sql (additive only)",
+  "backup": "private before-044.dump in release directory",
+  "project_count_before_after": [
+    4,
+    4
+  ],
+  "existing_kestra": "keel-flows-kestra-1 v2.0.7 restarted, no new engine",
+  "builds": {
+    "go_api": "passed",
+    "typescript_vite": "passed; Vite 1m35s",
+    "api_registry": "122 passed"
+  },
+  "authenticated_reads": [
+    {
+      "path": "/flows/capabilities",
+      "status": 200,
+      "data_present": true
+    },
+    {
+      "path": "/flows/catalog",
+      "status": 200,
+      "data_present": true
+    },
+    {
+      "path": "/flows/execution-summary",
+      "status": 200,
+      "data_present": true
+    },
+    {
+      "path": "/flows/agents",
+      "status": 200,
+      "data_present": true
+    },
+    {
+      "path": "/projects/{projectId}/engineering-inputs",
+      "status": 200,
+      "data_present": true
+    }
+  ],
+  "browser": {
+    "checks": [
+      "deployed jobs catalog rendered",
+      "deployed new definition editor and new script dialog rendered without writes",
+      "preserved current engineering five-step page rendered"
+    ],
+    "errors": [],
+    "failures": [],
+    "scope": "authenticated deployed reads and dialog open only; no Flow/device/BOM writes"
+  },
+  "data_changes": "no Flow/BOM/device write tests, no fixture import; login session/audit and additive migration only",
+  "preserved_code": "All non-job dev application files unchanged versus ab1bd85. Shared API main only adds enrollment renewal routes/TLS and OperationWorker; project_delete only adds operation-job existence protection. New engineering timeout and deletion/reference fixes preserved. Both contract sets retained.",
+  "rollback": {
+    "api": "python3 /home/ubuntu/.local/state/keel-deployments/mm-inventory-ab1bd85/api-run.py",
+    "frontend": "python3 /home/ubuntu/.local/state/keel-deployments/optional-config-1aa2e3e/frontend-run.py",
+    "note": "Stop current tmux services first. Additive tables can remain; do not auto-drop or restore entire DB."
+  },
+  "limitations": [
+    "No real-device lifecycle or full business acceptance executed.",
+    "No automatic Agent package update. Per-step deadline requires advertised capability.",
+    "Runtime is immutable exported combined commit, not the other branch working directory."
+  ],
+  "code_revision": "9441a89"
+}

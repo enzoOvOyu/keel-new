@@ -1,11 +1,11 @@
 {
   "version": 1,
   "updated_at": "2026-11-02",
-  "coverage": "Current branch deployed on existing 5180/8081. All 33 engineering operations included; four authenticated engineering GETs checked. Historical visualization/Flows evidence retained separately; no claim of full endpoint, real AI/workbook or browser acceptance.",
+  "coverage": "Jobs12f8b80 deployed within isolated combined release9441a89 preserving dev ab1bd85; startup/read checks only, no full business/device acceptance.",
   "schema_authority": "docs/openapi.yaml",
-  "code_revision": "5abb94f",
-  "deployed_revision": "5abb94f",
-  "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json",
+  "code_revision": "12f8b80",
+  "deployed_revision": "9441a89",
+  "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
   "operations": [
     {
       "method": "get",
@@ -85,13 +85,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "listRealFlowsEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -101,15 +101,15 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "createRealFlowEnvelope",
       "request_schema": "FlowsSave",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json",
-      "branch_implementation_note": "feat/jobs-kestra-ui: pinned script-source metadata and optional JobStep description/timeout; branch-only, not deployed; docs/api/flows.md"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "branch_implementation_note": "feat/jobs-kestra-ui: pinned script-source metadata and optional JobStep description/timeout; deployed within combined9441a89; startup subset checked; docs/api/flows.md"
     },
     {
       "method": "get",
@@ -119,13 +119,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "getFlowRevisionsEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -135,13 +135,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "getFlowsCapabilitiesEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -151,13 +151,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "listFlowsTargetsEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -167,13 +167,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "listRealExecutionsEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
       "development_changes": "feat/jobs-kestra-ui only, not deployed: optional run/execution name persisted in existing request; list attention filter and business-name search; historical missing names remain null.",
       "development_verification": "dev/backend/internal/flows/workspace_integration_test.go; docs/flows-redesign/parity-correction/result.json"
     },
@@ -185,13 +185,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "listRealAgentsEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -201,13 +201,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "listFlowsSSHTrustEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -217,14 +217,14 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "saveFlowsSSHTrustEnvelope",
       "request_schema": "FlowsSSHTrustInput",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -234,15 +234,15 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "preflightFlowsTargetsEnvelope",
       "request_schema": "FlowsRun",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json",
-      "branch_implementation_note": "feat/jobs-kestra-ui: optional JobStep description/timeout reuse existing Task budget/capabilities; branch-only, not deployed; docs/api/flows.md"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "branch_implementation_note": "feat/jobs-kestra-ui: optional JobStep description/timeout reuse existing Task budget/capabilities; deployed within combined9441a89; startup subset checked; docs/api/flows.md"
     },
     {
       "method": "post",
@@ -252,17 +252,17 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "createQuickRunEnvelope",
       "request_schema": "FlowsRun",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
       "development_changes": "feat/jobs-kestra-ui only, not deployed: optional run/execution name persisted in existing request; list attention filter and business-name search; historical missing names remain null.",
       "development_verification": "dev/backend/internal/flows/workspace_integration_test.go; docs/flows-redesign/parity-correction/result.json",
-      "branch_implementation_note": "feat/jobs-kestra-ui: optional JobStep description/timeout reuse existing Task budget/capabilities; branch-only, not deployed; docs/api/flows.md"
+      "branch_implementation_note": "feat/jobs-kestra-ui: optional JobStep description/timeout reuse existing Task budget/capabilities; deployed within combined9441a89; startup subset checked; docs/api/flows.md"
     },
     {
       "method": "get",
@@ -272,13 +272,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "getRealFlowEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "put",
@@ -288,15 +288,15 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "updateRealFlowEnvelope",
       "request_schema": "FlowsSave",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json",
-      "branch_implementation_note": "feat/jobs-kestra-ui: pinned script-source metadata and optional JobStep description/timeout; branch-only, not deployed; docs/api/flows.md"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "branch_implementation_note": "feat/jobs-kestra-ui: pinned script-source metadata and optional JobStep description/timeout; deployed within combined9441a89; startup subset checked; docs/api/flows.md"
     },
     {
       "method": "post",
@@ -306,14 +306,14 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "validateRealFlowEnvelope",
       "request_schema": "FlowsValidationRequest",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -323,17 +323,17 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "executeRealFlowEnvelope",
       "request_schema": "FlowsRun",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
       "development_changes": "feat/jobs-kestra-ui only, not deployed: optional run/execution name persisted in existing request; list attention filter and business-name search; historical missing names remain null.",
       "development_verification": "dev/backend/internal/flows/workspace_integration_test.go; docs/flows-redesign/parity-correction/result.json",
-      "branch_implementation_note": "feat/jobs-kestra-ui: optional JobStep description/timeout reuse existing Task budget/capabilities; branch-only, not deployed; docs/api/flows.md"
+      "branch_implementation_note": "feat/jobs-kestra-ui: optional JobStep description/timeout reuse existing Task budget/capabilities; deployed within combined9441a89; startup subset checked; docs/api/flows.md"
     },
     {
       "method": "get",
@@ -343,13 +343,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "getFlowDependenciesEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -359,13 +359,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "getFlowFilesEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -375,13 +375,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "getRealExecutionEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
       "development_changes": "feat/jobs-kestra-ui only, not deployed: optional run/execution name persisted in existing request; list attention filter and business-name search; historical missing names remain null.",
       "development_verification": "dev/backend/internal/flows/workspace_integration_test.go; docs/flows-redesign/parity-correction/result.json"
     },
@@ -393,13 +393,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "getExecutionTargetsEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -409,13 +409,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "getExecutionLogsEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -425,13 +425,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "getExecutionOutputsEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -441,13 +441,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "getExecutionAuditEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -457,13 +457,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "actionExecutionPauseEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -473,13 +473,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "actionExecutionResumeEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -489,13 +489,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "actionExecutionKillEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -505,13 +505,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "actionExecutionRetryfailedtargetsEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -521,13 +521,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "getRealAgentEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -537,14 +537,14 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "issueAgentEnrollmentEnvelope",
       "request_schema": "FlowsTokenRequest",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -554,14 +554,14 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "agentApproveEnvelope",
       "request_schema": "FlowsReason",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -571,14 +571,14 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "agentQuarantineEnvelope",
       "request_schema": "FlowsReason",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -588,14 +588,14 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "agentRevokeEnvelope",
       "request_schema": "FlowsReason",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -605,13 +605,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "agentTasksEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -621,13 +621,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "agentAuditEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -637,13 +637,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "FlowsEventPageEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -653,13 +653,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "getFlowsTemplateEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -669,13 +669,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "getNamespaceFileEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "put",
@@ -685,14 +685,14 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "saveNamespaceFileEnvelope",
       "request_schema": "FlowsNamespaceFile",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -702,14 +702,14 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "bootstrapFlowsAgentEnvelope",
       "request_schema": "FlowsBootstrap",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -719,13 +719,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "actionExecutionRestartEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -735,12 +735,12 @@
       "response_media_type": "application/octet-stream",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -750,14 +750,14 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "registerFlowsAgentEnvelope",
       "request_schema": "FlowsEnrollmentInput",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -767,13 +767,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows_completion.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "getTargetScheduleEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "put",
@@ -783,14 +783,14 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows_completion.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "saveTargetScheduleEnvelope",
       "request_schema": "FlowsSchedule",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -800,13 +800,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows_completion.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "listNamespaceFileVersionsEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -816,14 +816,14 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows_completion.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "uploadNamespaceBinaryEnvelope",
       "request_schema": "FlowsFileUpload",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -833,14 +833,14 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows_completion.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "distributeNamespaceRevisionEnvelope",
       "request_schema": "FlowsRun",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -850,12 +850,12 @@
       "response_media_type": "application/octet-stream",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows_completion.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -865,14 +865,14 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows_completion.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "requestFlowsApprovalEnvelope",
       "request_schema": "FlowsApprovalRequest",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -882,13 +882,13 @@
       "response_media_type": "application/json",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "deployment_subset_only_see_evidence",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows_completion.go",
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "response_schema": "getDeviceStepsEnvelope",
-      "deployed_revision": "9f16065",
-      "deployment_evidence": "docs/flows-redesign/deployment-validation.json"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -897,12 +897,13 @@
       "response_schema": "getExecutionDefinitionEnvelope",
       "implementation": "implemented",
       "deployment": "deployed_existing_development",
-      "verification": "go_build_only",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows/context.go",
       "service": "ExecutionDefinition",
       "documentation": "docs/api/flows.md",
-      "deployed_revision": "5abb94f"
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -1422,8 +1423,8 @@
       "operation_id": "getFlowsCatalog",
       "response_schema": "getFlowsCatalogEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "isolated PostgreSQL + synthetic Kestra query integration; documentation endpoint compile/source compatibility only",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows/workspace.go",
       "service": "Catalog",
@@ -1432,7 +1433,9 @@
       "scope": "authorized projects from flows:read; optional project_id",
       "permission": "flows:read",
       "loading": "on-demand; summary cache 60s",
-      "side_effects": "refreshes existing execution projection where used; no device execution"
+      "side_effects": "refreshes existing execution projection where used; no device execution",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -1440,8 +1443,8 @@
       "operation_id": "getFlowsExecutionSummary",
       "response_schema": "getFlowsExecutionSummaryEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "isolated PostgreSQL + synthetic Kestra query integration; documentation endpoint compile/source compatibility only",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows/workspace.go",
       "service": "ExecutionSummary",
@@ -1450,7 +1453,9 @@
       "scope": "authorized projects from flows:read; optional project_id",
       "permission": "flows:read",
       "loading": "on-demand; summary cache 60s",
-      "side_effects": "refreshes existing execution projection where used; no device execution"
+      "side_effects": "refreshes existing execution projection where used; no device execution",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -1458,8 +1463,8 @@
       "operation_id": "searchFlowsLogs",
       "response_schema": "searchFlowsLogsEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "isolated PostgreSQL + synthetic Kestra query integration; documentation endpoint compile/source compatibility only",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows/workspace.go",
       "service": "LogSearch",
@@ -1468,7 +1473,9 @@
       "scope": "authorized projects from flows:read; optional project_id",
       "permission": "flows:read",
       "loading": "on-demand; summary cache 60s",
-      "side_effects": "refreshes existing execution projection where used; no device execution"
+      "side_effects": "refreshes existing execution projection where used; no device execution",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -1476,8 +1483,8 @@
       "operation_id": "getFlowExecutionInsights",
       "response_schema": "getFlowExecutionInsightsEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "isolated PostgreSQL + synthetic Kestra query integration; documentation endpoint compile/source compatibility only",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows/workspace.go",
       "service": "ExecutionInsights",
@@ -1486,7 +1493,9 @@
       "scope": "authorized projects from flows:read; optional project_id",
       "permission": "flows:read",
       "loading": "on-demand; summary cache 60s",
-      "side_effects": "refreshes existing execution projection where used; no device execution"
+      "side_effects": "refreshes existing execution projection where used; no device execution",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -1494,8 +1503,8 @@
       "operation_id": "getFlowExecutionVariables",
       "response_schema": "getFlowExecutionVariablesEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "isolated PostgreSQL + synthetic Kestra query integration; documentation endpoint compile/source compatibility only",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows/workspace.go",
       "service": "ExecutionVariables",
@@ -1504,7 +1513,9 @@
       "scope": "authorized projects from flows:read; optional project_id",
       "permission": "flows:read",
       "loading": "on-demand; summary cache 60s",
-      "side_effects": "refreshes existing execution projection where used; no device execution"
+      "side_effects": "refreshes existing execution projection where used; no device execution",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -1512,8 +1523,8 @@
       "operation_id": "getFlowsTaskDocumentation",
       "response_schema": "getFlowsTaskDocumentationEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "isolated PostgreSQL + synthetic Kestra query integration; documentation endpoint compile/source compatibility only",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows/workspace.go",
       "service": "TaskDocumentation",
@@ -1522,7 +1533,9 @@
       "scope": "authorized projects from flows:read; optional project_id",
       "permission": "flows:read",
       "loading": "on-demand; summary cache 60s",
-      "side_effects": "refreshes existing execution projection where used; no device execution"
+      "side_effects": "refreshes existing execution projection where used; no device execution",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -1530,8 +1543,8 @@
       "operation_id": "listFlowsBootstrapJobs",
       "response_schema": "listFlowsBootstrapJobsEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "isolated synthetic domain integration; no production device or deployed HTTP acceptance",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows/operation_jobs.go",
       "service": "OperationJobs",
@@ -1540,7 +1553,9 @@
       "scope": "stable CMDB project scope; certificate APIs bind enrolled agent identity",
       "permission": "flows:read",
       "loading": "on-demand; active operation progress poll 5s",
-      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof"
+      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -1548,8 +1563,8 @@
       "operation_id": "createFlowsBootstrapJob",
       "response_schema": "createFlowsBootstrapJobEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "isolated synthetic domain integration; no production device or deployed HTTP acceptance",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows/operation_jobs.go",
       "service": "CreateBootstrapBatch",
@@ -1558,7 +1573,9 @@
       "scope": "stable CMDB project scope; certificate APIs bind enrolled agent identity",
       "permission": "flows:edit",
       "loading": "on-demand; active operation progress poll 5s",
-      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof"
+      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -1566,8 +1583,8 @@
       "operation_id": "getFlowsOperationJob",
       "response_schema": "getFlowsOperationJobEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "isolated synthetic domain integration; no production device or deployed HTTP acceptance",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows/operation_jobs.go",
       "service": "OperationJob",
@@ -1576,7 +1593,9 @@
       "scope": "stable CMDB project scope; certificate APIs bind enrolled agent identity",
       "permission": "flows:read",
       "loading": "on-demand; active operation progress poll 5s",
-      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof"
+      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -1584,8 +1603,8 @@
       "operation_id": "actFlowsOperationJob",
       "response_schema": "actFlowsOperationJobEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "isolated synthetic domain integration; no production device or deployed HTTP acceptance",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows/operation_jobs.go",
       "service": "OperationAction",
@@ -1594,7 +1613,9 @@
       "scope": "stable CMDB project scope; certificate APIs bind enrolled agent identity",
       "permission": "bootstrap flows:edit; backfill flows:execute",
       "loading": "on-demand; active operation progress poll 5s",
-      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof"
+      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -1602,8 +1623,8 @@
       "operation_id": "renewFlowsAgentCertificate",
       "response_schema": "renewFlowsAgentCertificateEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "isolated synthetic domain integration; no production device or deployed HTTP acceptance",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows/certificate_rotation.go",
       "service": "PrepareCertificateRenewal",
@@ -1612,7 +1633,9 @@
       "scope": "stable CMDB project scope; certificate APIs bind enrolled agent identity",
       "permission": "agent current mTLS certificate; enrolled active asset",
       "loading": "on-demand; active operation progress poll 5s",
-      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof"
+      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -1620,8 +1643,8 @@
       "operation_id": "activateFlowsAgentCertificate",
       "response_schema": "activateFlowsAgentCertificateEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "isolated synthetic domain integration; no production device or deployed HTTP acceptance",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows/certificate_rotation.go",
       "service": "ActivateCertificateRenewal",
@@ -1630,7 +1653,9 @@
       "scope": "stable CMDB project scope; certificate APIs bind enrolled agent identity",
       "permission": "agent pending new mTLS certificate; enrolled active asset",
       "loading": "on-demand; active operation progress poll 5s",
-      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof"
+      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -1638,8 +1663,8 @@
       "operation_id": "previewFlowsBackfill",
       "response_schema": "previewFlowsBackfillEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "isolated synthetic domain integration; no production device or deployed HTTP acceptance",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows/backfill.go",
       "service": "BackfillPreview",
@@ -1648,7 +1673,9 @@
       "scope": "stable CMDB project scope; certificate APIs bind enrolled agent identity",
       "permission": "flows:execute",
       "loading": "on-demand; active operation progress poll 5s",
-      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof"
+      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -1656,8 +1683,8 @@
       "operation_id": "createFlowsBackfill",
       "response_schema": "createFlowsBackfillEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "isolated synthetic domain integration; no production device or deployed HTTP acceptance",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows/backfill.go",
       "service": "CreateBackfill",
@@ -1666,7 +1693,9 @@
       "scope": "stable CMDB project scope; certificate APIs bind enrolled agent identity",
       "permission": "flows:execute",
       "loading": "on-demand; active operation progress poll 5s",
-      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof"
+      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -1674,8 +1703,8 @@
       "operation_id": "listFlowsBackfills",
       "response_schema": "listFlowsBackfillsEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "isolated synthetic domain integration; no production device or deployed HTTP acceptance",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows/operation_jobs.go",
       "service": "OperationJobs",
@@ -1684,7 +1713,9 @@
       "scope": "stable CMDB project scope; certificate APIs bind enrolled agent identity",
       "permission": "flows:read",
       "loading": "on-demand; active operation progress poll 5s",
-      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof"
+      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -1692,8 +1723,8 @@
       "operation_id": "getFlowsOperationItemRequest",
       "response_schema": "getFlowsOperationItemRequestEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "isolated synthetic domain integration; no production device or deployed HTTP acceptance",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows/backfill.go",
       "service": "OperationItemRequest",
@@ -1702,7 +1733,9 @@
       "scope": "stable CMDB project scope; certificate APIs bind enrolled agent identity",
       "permission": "flows:execute",
       "loading": "on-demand; active operation progress poll 5s",
-      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof"
+      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -1710,8 +1743,8 @@
       "operation_id": "getFlowsReplayRequest",
       "response_schema": "getFlowsReplayRequestEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "isolated synthetic domain integration; no production device or deployed HTTP acceptance",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows/replay.go",
       "service": "ReplayRequest",
@@ -1720,7 +1753,9 @@
       "scope": "stable CMDB project scope; certificate APIs bind enrolled agent identity",
       "permission": "flows:execute",
       "loading": "on-demand; active operation progress poll 5s",
-      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof"
+      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "post",
@@ -1728,8 +1763,8 @@
       "operation_id": "createFlowsReplay",
       "response_schema": "createFlowsReplayEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "compile and approval-context unit checks; replay HTTP end-to-end not run",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows/replay.go",
       "service": "Replay",
@@ -1738,7 +1773,9 @@
       "scope": "stable CMDB project scope; certificate APIs bind enrolled agent identity",
       "permission": "flows:execute",
       "loading": "on-demand; active operation progress poll 5s",
-      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof"
+      "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
@@ -1746,8 +1783,8 @@
       "operation_id": "getFlowsScheduleStatus",
       "response_schema": "getFlowsScheduleStatusEnvelope",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "isolated synthetic Kestra runtime and project denial; no deployed HTTP acceptance",
+      "deployment": "deployed_existing_development",
+      "verification": "deployment_startup_subset_only_see_evidence",
       "handler": "dev/backend/cmd/api/flows.go",
       "source": "dev/backend/internal/flows/schedule_status.go",
       "service": "ScheduleStatus",
@@ -1756,7 +1793,9 @@
       "scope": "stable CMDB project scope; certificate APIs bind enrolled agent identity",
       "permission": "flows:read",
       "loading": "on-demand; 60s cache",
-      "side_effects": "authorized read only; no future time calculation or trigger mutation"
+      "side_effects": "authorized read only; no future time calculation or trigger mutation",
+      "deployed_revision": "9441a89",
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
     },
     {
       "method": "get",
