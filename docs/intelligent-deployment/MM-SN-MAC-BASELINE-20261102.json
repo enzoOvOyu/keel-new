@@ -1,0 +1,359 @@
+{
+  "scope": "Three fresh independent pre-fix Agent runs; frozen MM SN+MAC and Provider",
+  "state": "COMPLETED",
+  "source_sha256": "1cd77c4d0ff8a42deb2055f7b1e39fadbb48fbff734eb95af0323ceaa92b5004",
+  "provider": {
+    "id": "8b8a86f6-2351-43f4-9816-b6019aef7ec2",
+    "name": "sol",
+    "model": "gpt-6.1-sol",
+    "protocol": "openai-responses",
+    "revision": 8,
+    "timeout_seconds": 120,
+    "token_budget": 8192,
+    "token_parameter": "max_tokens",
+    "json_mode": true
+  },
+  "runtime_release": "agent-release-7b2ec19",
+  "agent_code_commit": "93a6a1e",
+  "expected": {
+    "terminations": 7154,
+    "port_identities": 14308,
+    "inventory_rows": 967,
+    "by_sheet": {
+      "Cabling_EW_SP-LF": 2592,
+      "Cabling_NS": 484,
+      "Cabling_GB_OUT": 3456,
+      "Cabling_OOB": 216,
+      "Cabling_HDD_SSD_CPU": 406
+    }
+  },
+  "runs": [
+    {
+      "index": 1,
+      "project_id": "proj-00f1281d-35bc-4526-9430-1545bf4e14ce",
+      "project_name": "TEST-MM-SN-MAC-BENCH-01-52dc4",
+      "state": "IDENTITY_PASS_WORKFLOW_BLOCKED",
+      "manual_edits": 0,
+      "checkpoint_replay": false,
+      "import_id": "f5a4ef69-0591-4cae-9f68-2619c64bb8db",
+      "source_id": "f7630c66-a1ab-4893-8058-3ec180c26bed",
+      "initial_revision": 1,
+      "job_id": "363556d1-25d2-45ab-8f6f-56c754ba84e6",
+      "last_job_state": "succeeded",
+      "last_sequence": 58,
+      "elapsed_seconds": 532.0,
+      "job_state": "succeeded",
+      "error_code": null,
+      "tables": [
+        {
+          "table_id": "equipment_specs",
+          "rows": 967,
+          "issues_by_field": {
+            "equipment_type": 778
+          },
+          "version": 1
+        },
+        {
+          "table_id": "network_roles",
+          "rows": 189,
+          "issues_by_field": {
+            "fabric": 189,
+            "plane": 189
+          },
+          "version": 1
+        },
+        {
+          "table_id": "placements",
+          "rows": 967,
+          "issues_by_field": {
+            "room_code": 967,
+            "mount_type": 967,
+            "face": 967,
+            "rack_code": 154
+          },
+          "version": 1
+        },
+        {
+          "table_id": "port_specs",
+          "rows": 5184,
+          "issues_by_field": {
+            "medium": 5184,
+            "connector": 5184,
+            "rate": 5184,
+            "rate_unit": 5184
+          },
+          "version": 1
+        },
+        {
+          "table_id": "power_profiles",
+          "rows": 9,
+          "issues_by_field": {
+            "source": 9
+          },
+          "version": 1
+        },
+        {
+          "table_id": "rack_capacity",
+          "rows": 56,
+          "issues_by_field": {
+            "basis": 56
+          },
+          "version": 1
+        },
+        {
+          "table_id": "racks",
+          "rows": 56,
+          "issues_by_field": {
+            "room_code": 56
+          },
+          "version": 1
+        },
+        {
+          "table_id": "terminations",
+          "rows": 7154,
+          "issues_by_field": {
+            "b_rack_position": 7154,
+            "termination_type": 7154
+          },
+          "version": 1
+        }
+      ],
+      "metrics": {
+        "termination_rows": 7154,
+        "six_field_correct_rows": 7154,
+        "six_field_missing_or_wrong_rows": 0,
+        "six_field_extra_or_wrong_rows": 0,
+        "four_field_correct_rows": 7154,
+        "missing_sn_cells": 0,
+        "missing_mac_cells": 0,
+        "inventory_serials_found": 967,
+        "unexpected_inventory_serials": 0,
+        "source_models_mismatched": 0,
+        "placement_rows": 967,
+        "placement_unknown_serials": 0,
+        "placement_rack_not_in_source_choices": 1,
+        "port_identities_missing_from_specs": 9124,
+        "port_identities_extra_in_specs": 0,
+        "central_missing_inputs": 36
+      },
+      "adoption": {
+        "http_status": 422,
+        "error": {
+          "code": "STEP_INPUT_INVALID",
+          "message": "STEP_INPUT_INVALID",
+          "retryable": false
+        }
+      },
+      "formal_model": {
+        "equipment": 0,
+        "ports": 0,
+        "connections": 0,
+        "cables": 0,
+        "published_targets": 0,
+        "revision": 1
+      },
+      "duration_seconds": 533.5,
+      "identity_sn_mac_ports_pass": true,
+      "end_to_end_pass": false,
+      "end_to_end_state": "NOT_RUN_PENDING_REQUIRED_MODELING_REVIEW_AND_PUBLISH"
+    },
+    {
+      "index": 2,
+      "project_id": "proj-ad93b205-571e-4585-a1a4-04ae4ed41a82",
+      "project_name": "TEST-MM-SN-MAC-BENCH-02-92847",
+      "state": "AGENT_FAILED",
+      "manual_edits": 0,
+      "checkpoint_replay": false,
+      "import_id": "edbb9a24-ea5f-4fa9-b9d0-be4ddd15cecd",
+      "source_id": "d72f000e-3c27-47cb-a1f3-b2098764535d",
+      "initial_revision": 1,
+      "job_id": "9f97b3c2-92ce-48dd-bd95-a077c3598a75",
+      "last_job_state": "failed",
+      "last_sequence": 8,
+      "elapsed_seconds": 129.9,
+      "job_state": "failed",
+      "error_code": "ENGINEERING_ANALYSIS_FAILED",
+      "tables": [],
+      "metrics": {
+        "termination_rows": 0,
+        "six_field_correct_rows": 0,
+        "six_field_missing_or_wrong_rows": 7154,
+        "six_field_extra_or_wrong_rows": 0,
+        "four_field_correct_rows": 0,
+        "missing_sn_cells": 0,
+        "missing_mac_cells": 0,
+        "inventory_serials_found": 0,
+        "unexpected_inventory_serials": 0,
+        "source_models_mismatched": 0,
+        "placement_rows": 0,
+        "placement_unknown_serials": 0,
+        "placement_rack_not_in_source_choices": 0,
+        "port_identities_missing_from_specs": 14308,
+        "port_identities_extra_in_specs": 0,
+        "central_missing_inputs": 0
+      },
+      "adoption": {
+        "state": "NO_TERMINATIONS"
+      },
+      "formal_model": {
+        "equipment": 0,
+        "ports": 0,
+        "connections": 0,
+        "cables": 0,
+        "published_targets": 0,
+        "revision": 1
+      },
+      "duration_seconds": 130.0,
+      "identity_sn_mac_ports_pass": false,
+      "end_to_end_pass": false,
+      "end_to_end_state": "NOT_RUN_PENDING_REQUIRED_MODELING_REVIEW_AND_PUBLISH"
+    },
+    {
+      "index": 3,
+      "project_id": "proj-4a840fb6-5b00-4491-896c-cbf992c55cbc",
+      "project_name": "TEST-MM-SN-MAC-BENCH-03-dfddb",
+      "state": "IDENTITY_PASS_WORKFLOW_BLOCKED",
+      "manual_edits": 0,
+      "checkpoint_replay": false,
+      "import_id": "63c33daf-794c-4a77-80ca-92e12e08873e",
+      "source_id": "e5191054-bff2-4746-8d08-f9ea69eb256e",
+      "initial_revision": 1,
+      "job_id": "7413a493-7215-449f-bd49-0694cf3a6664",
+      "last_job_state": "succeeded",
+      "last_sequence": 55,
+      "elapsed_seconds": 323.1,
+      "job_state": "succeeded",
+      "error_code": null,
+      "tables": [
+        {
+          "table_id": "equipment_specs",
+          "rows": 967,
+          "issues_by_field": {
+            "equipment_type": 778
+          },
+          "version": 1
+        },
+        {
+          "table_id": "network_roles",
+          "rows": 189,
+          "issues_by_field": {
+            "fabric": 189,
+            "plane": 189
+          },
+          "version": 1
+        },
+        {
+          "table_id": "placements",
+          "rows": 967,
+          "issues_by_field": {
+            "room_code": 967,
+            "mount_type": 967,
+            "face": 967
+          },
+          "version": 1
+        },
+        {
+          "table_id": "port_specs",
+          "rows": 5184,
+          "issues_by_field": {
+            "medium": 5184,
+            "connector": 5184,
+            "rate": 5184,
+            "rate_unit": 5184
+          },
+          "version": 1
+        },
+        {
+          "table_id": "power_profiles",
+          "rows": 9,
+          "issues_by_field": {
+            "source": 9
+          },
+          "version": 1
+        },
+        {
+          "table_id": "rack_capacity",
+          "rows": 56,
+          "issues_by_field": {
+            "basis": 56
+          },
+          "version": 1
+        },
+        {
+          "table_id": "racks",
+          "rows": 56,
+          "issues_by_field": {
+            "room_code": 56,
+            "name": 56
+          },
+          "version": 1
+        },
+        {
+          "table_id": "terminations",
+          "rows": 7154,
+          "issues_by_field": {
+            "termination_type": 7154,
+            "b_rack_position": 4
+          },
+          "version": 1
+        }
+      ],
+      "metrics": {
+        "termination_rows": 7154,
+        "six_field_correct_rows": 7154,
+        "six_field_missing_or_wrong_rows": 0,
+        "six_field_extra_or_wrong_rows": 0,
+        "four_field_correct_rows": 7154,
+        "missing_sn_cells": 0,
+        "missing_mac_cells": 0,
+        "inventory_serials_found": 967,
+        "unexpected_inventory_serials": 0,
+        "source_models_mismatched": 0,
+        "placement_rows": 967,
+        "placement_unknown_serials": 0,
+        "placement_rack_not_in_source_choices": 0,
+        "port_identities_missing_from_specs": 9124,
+        "port_identities_extra_in_specs": 0,
+        "central_missing_inputs": 39
+      },
+      "adoption": {
+        "http_status": 422,
+        "error": {
+          "code": "STEP_INPUT_INVALID",
+          "message": "STEP_INPUT_INVALID",
+          "retryable": false
+        }
+      },
+      "formal_model": {
+        "equipment": 0,
+        "ports": 0,
+        "connections": 0,
+        "cables": 0,
+        "published_targets": 0,
+        "revision": 1
+      },
+      "duration_seconds": 324.5,
+      "identity_sn_mac_ports_pass": true,
+      "end_to_end_pass": false,
+      "end_to_end_state": "NOT_RUN_PENDING_REQUIRED_MODELING_REVIEW_AND_PUBLISH"
+    }
+  ],
+  "known_source_decisions": [
+    "工程机房身份与空间参数须明确确认",
+    "允许通道与批准布线规则须补充或核对",
+    "逻辑网络地址/ASN/邻居不能从物理连接生成"
+  ],
+  "code_or_provider_modified_during_benchmark": false,
+  "duration_seconds": 988.6,
+  "summary": {
+    "completed_runs": 3,
+    "agent_jobs_succeeded": 2,
+    "six_field_pass_runs": 2,
+    "adoption_pass_runs": 0,
+    "independent_runs": 3,
+    "checkpoint_replays": 0,
+    "end_to_end_pass_runs": 0,
+    "end_to_end_state": "BLOCKED_AT_STEP_1_DOWNSTREAM_NOT_RUN"
+  },
+  "acceptance": "FAILED: identity extraction 2/3, step1 adoption 0/3; downstream release NOT RUN"
+}
