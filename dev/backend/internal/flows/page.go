@@ -65,7 +65,11 @@ func (s *Service) ExecutionPage(ctx context.Context, p Scope, q url.Values) (Exe
 	if since != nil && until != nil && since.After(*until) {
 		return out, problem(400, "EXECUTION_TIME_FILTER_INVALID")
 	}
-	rows, e := s.DB.Query(ctx, `SELECT b.id::text,b.created_at FROM flow_execution_binding b WHERE b.project_id=ANY($1) AND (b.created_at,b.id)<($2,$3::uuid) AND ($4='' OR b.id::text ILIKE '%'||$4||'%' OR b.engine_flow_id ILIKE '%'||$4||'%' OR EXISTS(SELECT 1 FROM flow_execution_target t WHERE t.execution_id=b.id AND (t.asset_id ILIKE '%'||$4||'%' OR t.snapshot->>'name' ILIKE '%'||$4||'%'))) AND ($5='' OR b.engine_state=$5) AND ($6='' OR b.source_module=$6) AND ($7='' OR b.flow_id::text=$7) AND ($8='' OR b.requester_id::text=$8) AND ($9='' OR EXISTS(SELECT 1 FROM flow_execution_target t WHERE t.execution_id=b.id AND t.actual_transport=$9)) AND ($11::timestamptz IS NULL OR b.created_at >= $11) AND ($12::timestamptz IS NULL OR b.created_at <= $12) AND ($13='' OR b.mode=$13) ORDER BY b.created_at DESC,b.id DESC LIMIT $10`, p.Projects, cursor.At, cursor.ID, q.Get("q"), q.Get("state"), q.Get("source"), q.Get("flow_id"), q.Get("started_by"), q.Get("transport"), out.Page.Limit+1, since, until, q.Get("mode"))
+	revision, e := queryInt(q, "revision", 0, 1000000)
+	if e != nil || q.Get("revision") != "" && revision < 1 {
+		return out, problem(400, "FLOWS_REVISION_FILTER_INVALID")
+	}
+	rows, e := s.DB.Query(ctx, `SELECT b.id::text,b.created_at FROM flow_execution_binding b WHERE b.project_id=ANY($1) AND (b.created_at,b.id)<($2,$3::uuid) AND ($4='' OR b.id::text ILIKE '%'||$4||'%' OR b.engine_flow_id ILIKE '%'||$4||'%' OR EXISTS(SELECT 1 FROM flow_execution_target t WHERE t.execution_id=b.id AND (t.asset_id ILIKE '%'||$4||'%' OR t.snapshot->>'name' ILIKE '%'||$4||'%'))) AND ($5='' OR b.engine_state=$5) AND ($6='' OR b.source_module=$6) AND ($7='' OR b.flow_id::text=$7) AND ($8='' OR b.requester_id::text=$8) AND ($9='' OR EXISTS(SELECT 1 FROM flow_execution_target t WHERE t.execution_id=b.id AND t.actual_transport=$9)) AND ($11::timestamptz IS NULL OR b.created_at >= $11) AND ($12::timestamptz IS NULL OR b.created_at <= $12) AND ($13='' OR b.mode=$13) AND ($14=0 OR b.flow_revision=$14) ORDER BY b.created_at DESC,b.id DESC LIMIT $10`, p.Projects, cursor.At, cursor.ID, q.Get("q"), q.Get("state"), q.Get("source"), q.Get("flow_id"), q.Get("started_by"), q.Get("transport"), out.Page.Limit+1, since, until, q.Get("mode"), revision)
 	if e != nil {
 		return out, e
 	}

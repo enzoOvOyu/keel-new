@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jackc/pgx/v5"
+	"math"
 	"net/url"
 	"sort"
 	"strconv"
@@ -203,12 +204,48 @@ func (s *Service) Catalog(ctx context.Context, p Scope, q url.Values) (CatalogPa
 }
 
 type ExecutionSummary struct {
-	Total       int            `json:"total"`
-	States      map[string]int `json:"states"`
-	Targets     map[string]int `json:"targets"`
-	Since       *time.Time     `json:"since"`
-	Until       *time.Time     `json:"until"`
-	StateSource string         `json:"state_source"`
+	Total       int             `json:"total"`
+	States      map[string]int  `json:"states"`
+	Targets     map[string]int  `json:"targets"`
+	Since       *time.Time      `json:"since"`
+	Until       *time.Time      `json:"until"`
+	StateSource string          `json:"state_source"`
+	Duration    DurationSummary `json:"duration"`
+	Daily       []DailySummary  `json:"daily"`
+}
+type DurationSummary struct {
+	SampleCount  int      `json:"sample_count"`
+	MissingCount int      `json:"missing_count"`
+	Mean         *float64 `json:"mean_seconds"`
+	P50          *float64 `json:"p50_seconds"`
+	P95          *float64 `json:"p95_seconds"`
+	Coverage     string   `json:"coverage"`
+}
+type DailySummary struct {
+	Date   string `json:"date"`
+	Total  int    `json:"total"`
+	Failed int    `json:"failed"`
+}
+
+func durationSummary(values []float64, total int) DurationSummary {
+	out := DurationSummary{SampleCount: len(values), MissingCount: total - len(values), Coverage: "Captured terminal engine state startDate/endDate only; uncaptured or incomplete executions excluded, not zero-filled. Empirical nearest-rank percentiles, no SLO inference."}
+	if len(values) == 0 {
+		return out
+	}
+	sort.Float64s(values)
+	sum := 0.0
+	for _, v := range values {
+		sum += v
+	}
+	mean := sum / float64(len(values))
+	out.Mean = &mean
+	if len(values) > 1 {
+		p50 := values[int(math.Ceil(float64(len(values))*0.5))-1]
+		p95 := values[int(math.Ceil(float64(len(values))*0.95))-1]
+		out.P50 = &p50
+		out.P95 = &p95
+	}
+	return out
 }
 
 func queryTimes(q url.Values) (*time.Time, *time.Time, error) {
@@ -228,13 +265,24 @@ func queryTimes(q url.Values) (*time.Time, *time.Time, error) {
 	return a, b, nil
 }
 func (s *Service) ExecutionSummary(ctx context.Context, p Scope, q url.Values) (ExecutionSummary, error) {
-	out := ExecutionSummary{States: map[string]int{}, Targets: map[string]int{}, StateSource: "Persisted Kestra/target projection; not inferred from a loaded page"}
+	out := ExecutionSummary{States: map[string]int{}, Targets: map[string]int{}, Daily: []DailySummary{}, Duration: durationSummary(nil, 0), StateSource: "Persisted Kestra/target projection; not inferred from a loaded page"}
 	var e error
 	out.Since, out.Until, e = queryTimes(q)
 	if e != nil {
 		return out, e
 	}
-	rows, e := s.DB.Query(ctx, `WITH selected AS (SELECT id,COALESCE(error_code,engine_state) state FROM flow_execution_binding WHERE project_id=ANY($1) AND ($2='' OR flow_id::text=$2) AND ($3='' OR source_module=$3) AND ($4::timestamptz IS NULL OR created_at >= $4) AND ($5::timestamptz IS NULL OR created_at <= $5)) SELECT 'execution',state,count(*) FROM selected GROUP BY state UNION ALL SELECT 'target',t.state,count(*) FROM flow_execution_target t JOIN selected b ON t.execution_id=b.id GROUP BY t.state`, p.Projects, q.Get("flow_id"), q.Get("source"), out.Since, out.Until)
+	revision, e := queryInt(q, "revision", 0, 1000000)
+	if e != nil || q.Get("revision") != "" && revision < 1 {
+		return out, problem(400, "FLOWS_REVISION_FILTER_INVALID")
+	}
+	selectedSQL := `SELECT id,created_at,COALESCE(error_code,engine_state) state FROM flow_execution_binding WHERE project_id=ANY($1) AND ($2='' OR flow_id::text=$2) AND ($3='' OR source_module=$3) AND ($4::timestamptz IS NULL OR created_at >= $4) AND ($5::timestamptz IS NULL OR created_at <= $5) AND ($6=0 OR flow_revision=$6)`
+	args := []any{p.Projects, q.Get("flow_id"), q.Get("source"), out.Since, out.Until, revision}
+	tx, e := s.DB.BeginTx(ctx, pgx.TxOptions{IsoLevel: pgx.RepeatableRead, AccessMode: pgx.ReadOnly})
+	if e != nil {
+		return out, e
+	}
+	defer tx.Rollback(ctx)
+	rows, e := tx.Query(ctx, `WITH selected AS (`+selectedSQL+`) SELECT 'execution',state,count(*) FROM selected GROUP BY state UNION ALL SELECT 'target',t.state,count(*) FROM flow_execution_target t JOIN selected b ON t.execution_id=b.id GROUP BY t.state`, args...)
 	if e != nil {
 		return out, e
 	}
@@ -252,7 +300,63 @@ func (s *Service) ExecutionSummary(ctx context.Context, p Scope, q url.Values) (
 			out.Targets[state] = count
 		}
 	}
-	return out, rows.Err()
+	if e = rows.Err(); e != nil {
+		return out, e
+	}
+	rows.Close()
+	snapshots, e := tx.Query(ctx, `WITH selected AS (`+selectedSQL+`) SELECT b.created_at,b.state,e.payload->'state' FROM selected b LEFT JOIN LATERAL (SELECT payload FROM flow_event WHERE execution_id=b.id AND event_type='execution' ORDER BY id DESC LIMIT 1) e ON true`, args...)
+	if e != nil {
+		return out, e
+	}
+	defer snapshots.Close()
+	durations := []float64{}
+	days := map[string]*DailySummary{}
+	for snapshots.Next() {
+		var created time.Time
+		var state string
+		var rawState []byte
+		if e = snapshots.Scan(&created, &state, &rawState); e != nil {
+			return out, e
+		}
+		key := created.UTC().Format("2006-01-02")
+		if days[key] == nil {
+			days[key] = &DailySummary{Date: key}
+		}
+		days[key].Total++
+		if state == "FAILED" {
+			days[key].Failed++
+		}
+		var observed struct {
+			Current string `json:"current"`
+			Start   string `json:"startDate"`
+			End     string `json:"endDate"`
+		}
+		if json.Unmarshal(rawState, &observed) != nil || !contains([]string{"SUCCESS", "FAILED", "WARNING", "KILLED", "CANCELLED"}, observed.Current) {
+			continue
+		}
+		a, ea := time.Parse(time.RFC3339Nano, observed.Start)
+		b, eb := time.Parse(time.RFC3339Nano, observed.End)
+		if ea == nil && eb == nil && !b.Before(a) {
+			durations = append(durations, b.Sub(a).Seconds())
+		}
+	}
+	if e = snapshots.Err(); e != nil {
+		return out, e
+	}
+	out.Duration = durationSummary(durations, out.Total)
+	keys := []string{}
+	for k := range days {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		out.Daily = append(out.Daily, *days[k])
+	}
+	snapshots.Close()
+	if e = tx.Commit(ctx); e != nil {
+		return out, e
+	}
+	return out, nil
 }
 
 type LogSearchItem struct {

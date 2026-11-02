@@ -17090,6 +17090,8 @@ export interface components {
             since: string | null;
             until: string | null;
             state_source: string;
+            duration: components["schemas"]["FlowsDurationSummary"];
+            daily: components["schemas"]["FlowsDailySummary"][];
         };
         FlowsLogSearchItem: {
             id: string;
@@ -17326,6 +17328,20 @@ export interface components {
             /** Format: uuid */
             request_id: string;
             data: components["schemas"]["FlowsScheduleStatus"];
+        };
+        FlowsDurationSummary: {
+            sample_count: number;
+            missing_count: number;
+            mean_seconds: number | null;
+            p50_seconds: number | null;
+            p95_seconds: number | null;
+            coverage: string;
+        };
+        FlowsDailySummary: {
+            /** Format: date */
+            date: string;
+            total: number;
+            failed: number;
         };
     };
     responses: {
@@ -33689,6 +33705,8 @@ export interface operations {
                 until?: string;
                 mode?: string;
                 limit?: number;
+                /** @description Exact frozen Flow revision; included in cursor scope. */
+                revision?: number;
             };
             header?: never;
             path?: never;
@@ -37482,6 +37500,8 @@ export interface operations {
                 source?: string;
                 since?: string;
                 until?: string;
+                /** @description Filter exact frozen Flow revision; omit for all revisions. */
+                revision?: number;
             };
             header?: never;
             path?: never;

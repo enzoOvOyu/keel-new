@@ -1,3 +1,11 @@
+## 2026-11-02 作业平台最后一批接续点
+
+分支feat/jobs-kestra-ui，工作区/home/ubuntu/keel-kestra-ui-dev。核心及持久批次09de2b7已推送；同工作树其他窗口另提交86a7f74（拓扑原型路由），保持原样，没有纳入本任务改动或回退。现在补完ExecutionBatchPanel、原生目录来源/通道/时间筛选与列配置；统计summary及执行列表按revision精确过滤，图表下钻保持范围；summary新增真实终态样本耗时与UTC日趋势，缺测不补零。
+
+最近检查：batch-result.json两组正式路由synthetic交互通过；Go TestWorkspaceQueryIntegration与TestDurationSummaryUsesActualSamplesAndDoesNotFillMissing通过，覆盖冻结版本排除、未采集样本和经验百分位。最新完整TypeScript/Vite构建通过（1m13s）；构建产物在临时5193预览，metrics-result.json两组检查通过，含实际耗时/不足样本和来源/通道/时间过滤/清除，无pageerror。截图已查看；单日趋势柱宽最后限制为28，定向SFC编译通过，不为该样式变更重跑整包。107项API台账检查通过。5180/8081/5181没改；临时预览随后停止。当前仅待本批Git同步，不扩展其他业务模块。
+
+软件边界：受控设备Webhook/事件及ZTP业务消费者未接通，界面明确未启用，不属于只等真机；原生无设备安全Flow的Kestra触发器不等同设备事件。Worker Shell/Python/Namespace动态执行引用不获既有策略授权，当前用设备steps快照完成脚本闭环。真实服务器安装/续期/8设备混批/兼容性/规模验收未运行，不能标记完成。当前任务主线是原生UI替换和现有契约内的软件闭环，禁止重建其他域来掩盖边界。
+
 ## 2026-11-02 作业平台持续开发快照（独立分支，未发布）
 
 **位置**：`feat/jobs-kestra-ui` / `/home/ubuntu/keel-kestra-ui-dev`；已推送核心工作台521013b，后续业务批次/补跑/重跑/证书增量正在形成下一提交。不得合并dev/main、切换5180/8081/5181或复用共享生产数据库。本节覆盖下方约20%的旧暂停估算。用户要求继续到完成；最近进度80–85%是工作量估算，不是验收比例。

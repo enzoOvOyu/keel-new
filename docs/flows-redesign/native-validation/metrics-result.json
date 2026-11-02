@@ -1,0 +1,9 @@
+{
+  "at": "2026-11-02T04:57:50.739Z",
+  "scope": "formal routes; synthetic intercepted API; no backend/database/device calls",
+  "checks": [
+    "实际完成样本耗时、缺测覆盖与UTC日执行/失败趋势独立展示；不足样本不补百分位",
+    "原生执行目录来源/通道/时间过滤与完整清除使用同一API和URL"
+  ],
+  "errors": []
+}

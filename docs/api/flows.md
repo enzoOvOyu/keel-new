@@ -175,3 +175,10 @@ Agent新参数`--renew-before`默认0（未启用），启用时要求HTTPS；`-
 实际证据：operation_jobs_test验证幂等、暂停/恢复、版本冲突、UNKNOWN对账；certificate_rotation_test及cmd/agent/certificates_test验证新旧密钥证明、续期失败保留、原子切换、维护态拒绝；backfill_integration_test验证旧审批被清除、两个历史项独立摘要、无批准时引擎零写入。Replay请求的范围和秘密脱敏由workspace_integration_test覆盖；完整审批签署后生产执行/设备兼容性及规模仍由后续环境联调验收。
 
 `GET /flows/{flowId}/schedule/status`（flows:read）补齐实际TriggerRuntime和最近50条flow_schedule_fire消费历史；从已授权binding对应的已保存辅助Schedule读取Kestra `/triggers/{namespace}/{flowId}`，只取cron。nextEvaluationDate是引擎下一次检查时间，不冒充承诺执行时间；runtime_error与null表示未知，不按本地Cron猜算补值。历史execution_id指向已有Keel Execution；原引擎标记执行不会被当成设备作业成功。实现依据固定v2.0.7 ApiTriggerState，隔离集成检查实际时间/disabled状态和跨项目拒绝。
+
+### 2026-11-02 列表处置与统计补齐
+
+- Execution目录的来源、实际通道、创建时间、列选择和清除筛选已接回原生列表。批量暂停/继续/终止复用已有逐执行动作API；确认面板冻结项目/执行集合，逐项重读状态并在后端重新授权，状态改变或不适用项明确跳过。独立幂等键防止同一确认重复提交；“受理”不冒充设备已停止。失败目标重试仍走单执行的新预检/审批向导，不批量复制批准。
+- `GET /flows/execution-summary`及`GET /flows/executions`新增revision精确筛选（1…1000000）；游标绑定包含版本的完整查询。图表下钻保留时间窗、Flow和版本，不跳回不相干的全历史。
+- summary增加duration与daily：daily按执行创建日期UTC聚合；duration仅使用各执行最新已采集终态的startDate/endDate，明确sample_count/missing_count。零样本平均及百分位为null；只有一个样本时不显示P50/P95。多样本使用经验nearest-rank，不推导SLO或统计可靠性。计数与样本在同一只读Repeatable Read快照读取；未采集/非法/尚未结束时间不补零。趋势显示最近90个有记录UTC日，缺日不插值。
+- 定向证据见native-validation/batch-result.json（synthetic拦截API）；隔离Go查询验证版本排除、无采集证据不补时长、真实样本统计及项目隔离。不是生产设备或全量性能认证。

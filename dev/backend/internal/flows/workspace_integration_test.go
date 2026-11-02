@@ -78,10 +78,29 @@ func TestWorkspaceQueryIntegration(t *testing.T) {
 	if e != nil || catalog.Total != 1 || len(catalog.Items) != 1 || catalog.Items[0].Recent == nil || catalog.Items[0].Recent.ID != second {
 		t.Fatalf("catalog %+v %v", catalog, e)
 	}
+	if e = s.RecordEvent(ctx, first, "execution", map[string]any{"state": map[string]any{"current": "FAILED", "startDate": "2026-01-01T00:00:00Z", "endDate": "2026-01-01T00:00:08Z"}}); e != nil {
+		t.Fatal(e)
+	}
 	summary, e := s.ExecutionSummary(ctx, scope, url.Values{"flow_id": {fid}})
 	if e != nil || summary.Total != 2 || summary.States["FAILED"] != 2 {
 		t.Fatalf("summary %+v %v", summary, e)
 	}
+	if summary.Duration.SampleCount != 1 || summary.Duration.MissingCount != 1 || summary.Duration.Mean == nil || *summary.Duration.Mean != 8 || summary.Duration.P95 != nil || len(summary.Daily) == 0 {
+		t.Fatalf("duration evidence/coverage wrong: %+v", summary)
+	}
+
+	page, e := s.ExecutionPage(ctx, scope, url.Values{"flow_id": {fid}, "revision": {"999"}})
+	if e != nil || len(page.Items) != 0 {
+		t.Fatalf("execution page revision filter ignored: %+v %v", page, e)
+	}
+	filtered, e := s.ExecutionSummary(ctx, scope, url.Values{"flow_id": {fid}, "revision": {"999"}})
+	if e != nil || filtered.Total != 0 {
+		t.Fatalf("revision filter ignored: %+v %v", filtered, e)
+	}
+	if _, e = s.ExecutionSummary(ctx, scope, url.Values{"revision": {"0"}}); e == nil {
+		t.Fatal("invalid zero revision accepted")
+	}
+
 	logs, e := s.LogSearch(ctx, scope, url.Values{"flow_id": {fid}})
 	if e != nil || len(logs.Items) != 1 || logs.Items[0].ExecutionID != second {
 		t.Fatalf("logs %+v %v", logs, e)

@@ -39,3 +39,14 @@ func TestExecutionVariableSecretFieldsAreMasked(t *testing.T) {
 		t.Fatal("scrubber mutated domain input")
 	}
 }
+
+func TestDurationSummaryUsesActualSamplesAndDoesNotFillMissing(t *testing.T) {
+	empty := durationSummary(nil, 3)
+	if empty.Mean != nil || empty.P95 != nil || empty.MissingCount != 3 {
+		t.Fatal("missing duration synthesized", empty)
+	}
+	actual := durationSummary([]float64{9, 2, 4}, 4)
+	if actual.SampleCount != 3 || actual.MissingCount != 1 || *actual.Mean != 5 || *actual.P50 != 4 || *actual.P95 != 9 {
+		t.Fatal("sample percentiles incorrect", actual)
+	}
+}

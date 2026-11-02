@@ -14217,6 +14217,13 @@ paths:
           minimum: 1
           maximum: 100
           default: 50
+      - in: query
+        name: revision
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 1000000
+        description: Exact frozen Flow revision; included in cursor scope.
       responses:
         '200':
           description: Real engine/domain result.
@@ -16785,6 +16792,13 @@ paths:
           name: until
           schema:
             type: string
+        - in: query
+          name: revision
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000000
+          description: Filter exact frozen Flow revision; omit for all revisions.
       responses:
         "200":
           description: Scoped domain result
@@ -48141,6 +48155,12 @@ components:
             - "null"
         state_source:
           type: string
+        duration:
+          $ref: "#/components/schemas/FlowsDurationSummary"
+        daily:
+          type: array
+          items:
+            $ref: "#/components/schemas/FlowsDailySummary"
       required:
         - total
         - states
@@ -48148,6 +48168,8 @@ components:
         - since
         - until
         - state_source
+        - duration
+        - daily
     FlowsLogSearchItem:
       type: object
       additionalProperties: false
@@ -48797,6 +48819,49 @@ components:
       required:
         - request_id
         - data
+      additionalProperties: false
+    FlowsDurationSummary:
+      type: object
+      properties:
+        sample_count:
+          type: integer
+          minimum: 0
+        missing_count:
+          type: integer
+          minimum: 0
+        mean_seconds: &a13
+          type:
+            - number
+            - "null"
+          minimum: 0
+        p50_seconds: *a13
+        p95_seconds: *a13
+        coverage:
+          type: string
+      required:
+        - sample_count
+        - missing_count
+        - mean_seconds
+        - p50_seconds
+        - p95_seconds
+        - coverage
+      additionalProperties: false
+    FlowsDailySummary:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        total:
+          type: integer
+          minimum: 0
+        failed:
+          type: integer
+          minimum: 0
+      required:
+        - date
+        - total
+        - failed
       additionalProperties: false
 x-implementation-policy:
   frontend-first: true
