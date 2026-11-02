@@ -1,8 +1,14 @@
+## 2026-11-02 用户最新安排：ZTP / 设备事件暂缓
+
+先记录、不急于开发。后续接入范围、前提、复用位置和必要验收统一见[ZTP / 设备事件后续事项](docs/flows-redesign/implementation.md#ztp-event-follow-up)。当前仍未接通，不计入已完成功能，不以来源字段或筛选入口冒充集成；本轮不扩展ZTP后端或部署。
+
+作业平台最近实现提交96c7d30已推送至feat/jobs-kestra-ui，未合并、未发布；下方“待Git同步”等是此前收尾快照。
+
 ## 2026-11-02 作业平台最后一批接续点
 
 分支feat/jobs-kestra-ui，工作区/home/ubuntu/keel-kestra-ui-dev。核心及持久批次09de2b7已推送；同工作树其他窗口另提交86a7f74（拓扑原型路由），保持原样，没有纳入本任务改动或回退。现在补完ExecutionBatchPanel、原生目录来源/通道/时间筛选与列配置；统计summary及执行列表按revision精确过滤，图表下钻保持范围；summary新增真实终态样本耗时与UTC日趋势，缺测不补零。
 
-最近检查：batch-result.json两组正式路由synthetic交互通过；Go TestWorkspaceQueryIntegration与TestDurationSummaryUsesActualSamplesAndDoesNotFillMissing通过，覆盖冻结版本排除、未采集样本和经验百分位。最新完整TypeScript/Vite构建通过（1m13s）；构建产物在临时5193预览，metrics-result.json两组检查通过，含实际耗时/不足样本和来源/通道/时间过滤/清除，无pageerror。截图已查看；单日趋势柱宽最后限制为28，定向SFC编译通过，不为该样式变更重跑整包。107项API台账检查通过。5180/8081/5181没改；临时预览随后停止。当前仅待本批Git同步，不扩展其他业务模块。
+最近检查：batch-result.json两组正式路由synthetic交互通过；Go TestWorkspaceQueryIntegration与TestDurationSummaryUsesActualSamplesAndDoesNotFillMissing通过，覆盖冻结版本排除、未采集样本和经验百分位。最新完整TypeScript/Vite构建通过（1m13s）；构建产物在临时5193预览，metrics-result.json两组检查通过，含实际耗时/不足样本和来源/通道/时间过滤/清除，无pageerror。截图已查看；单日趋势柱宽最后限制为28，定向SFC编译通过，不为该样式变更重跑整包。107项API台账检查通过。5180/8081/5181没改；临时预览随后停止。本批已由96c7d30提交并推送，不扩展其他业务模块。
 
 软件边界：受控设备Webhook/事件及ZTP业务消费者未接通，界面明确未启用，不属于只等真机；原生无设备安全Flow的Kestra触发器不等同设备事件。Worker Shell/Python/Namespace动态执行引用不获既有策略授权，当前用设备steps快照完成脚本闭环。真实服务器安装/续期/8设备混批/兼容性/规模验收未运行，不能标记完成。当前任务主线是原生UI替换和现有契约内的软件闭环，禁止重建其他域来掩盖边界。
 
