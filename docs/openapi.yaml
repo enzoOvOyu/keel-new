@@ -38,6 +38,56 @@ tags:
   - name: IA
     description: IA v2.3 project scope and lazy detail contracts
 paths:
+  /projects/{projectId}/kickoff/publications/{publicationId}/status:
+    get:
+      operationId: getKickoffPublicationStatus
+      tags:
+      - Kickoff
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: publicationId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Lightweight publication receipt
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required:
+                    - id
+                    - state
+                    - errorCode
+                    properties:
+                      id:
+                        type: string
+                      state:
+                        type: string
+                        enum:
+                        - pending
+                        - published
+                        - failed
+                      errorCode:
+                        type:
+                        - string
+                        - 'null'
+        '403':
+          description: Insufficient permission
+        '404':
+          description: Publication not found in project
   /projects/{projectId}/kickoff/history:
     post:
       operationId: replayKickoffHistoricalSource

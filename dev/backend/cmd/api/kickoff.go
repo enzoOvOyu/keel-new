@@ -76,6 +76,8 @@ func (s *Server) kickoffRoutes(w http.ResponseWriter, r *http.Request) bool {
 		fail(w, 503, "KICKOFF_AGENT_NOT_CONFIGURED")
 	case len(p) == 6 && p[5] == "history" && r.Method == "POST":
 		s.kickoffHistory(w, r)
+	case len(p) == 8 && p[5] == "publications" && p[7] == "status" && r.Method == "GET":
+		s.kickoffPublicationStatus(w, r, p[6])
 	default:
 		fail(w, 404, "KICKOFF_OPERATION_UNAVAILABLE")
 	}

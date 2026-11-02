@@ -227,3 +227,19 @@ func (s *Server) projectKickoffConfiguration(ctx context.Context, tx pgx.Tx, p k
 	}
 	return nil
 }
+
+// Polling a receipt must not reload a large immutable engineering model.
+func (s *Server) kickoffPublicationStatus(w http.ResponseWriter, r *http.Request, id string) {
+	var state string
+	var errorCode *string
+	e := s.db.QueryRow(r.Context(), `SELECT state,error_code FROM kickoff_publication WHERE project_id=$1 AND id::text=$2`, s.project, id).Scan(&state, &errorCode)
+	if e == pgx.ErrNoRows {
+		fail(w, 404, "KICKOFF_PUBLICATION_NOT_FOUND")
+		return
+	}
+	if e != nil {
+		fail(w, 500, "KICKOFF_PUBLICATION_UNAVAILABLE")
+		return
+	}
+	respond(w, 200, map[string]any{"id": id, "state": state, "errorCode": errorCode})
+}

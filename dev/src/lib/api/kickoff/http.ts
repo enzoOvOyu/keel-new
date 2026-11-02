@@ -10,7 +10,7 @@ export class HttpKickoffProvider implements KickoffAPI {
  private path=(suffix='')=>`projects/${encodeURIComponent(this.projectId)}/kickoff${suffix}`;
  subscribe=(fn:()=>void)=>{this.listeners.add(fn);return()=>{this.listeners.delete(fn);};};
  snapshot=()=>this.state;
- refresh=async()=>{if(this.controller.signal.aborted)this.controller=new AbortController();const state=await bomRequest<Workspace>(this.path('/workspace'),'GET',undefined,undefined,this.controller.signal);if(state.projectId!==this.projectId)throw Error('工作区项目与请求不一致');this.state=state;this.listeners.forEach(fn=>fn());};
+ refresh=async()=>{if(this.controller.signal.aborted)this.controller=new AbortController();const state=await bomRequest<Workspace>(this.path('/workspace'),'GET',undefined,undefined,this.controller.signal);if(state.projectId!==this.projectId)throw Error('工作区项目与请求不一致');const prior=new Set(this.state.publications.filter(p=>p.state==='published').map(p=>p.id));this.state=state;this.listeners.forEach(fn=>fn());if(state.publications.some(p=>p.state==='published'&&!prior.has(p.id)))window.dispatchEvent(new Event('keel-inventory-published'));};
  dispose=()=>{this.controller.abort();this.listeners.clear();};
  private command=async<T>(path:string,body:unknown,method='POST')=>{try{const result=await bomRequest<T>(this.path(path),method,body,undefined,this.controller.signal);await this.refresh();return result;}catch(error){if((error as {status?:number}).status===409)await this.refresh();throw error;}};
  addSources=async(files:File[])=>{for(const file of files){const body=new FormData();body.append('file',file);await this.command('/sources',body);}};
@@ -24,7 +24,9 @@ export class HttpKickoffProvider implements KickoffAPI {
   for(let i=0;result.state==='pending'&&i<60;i++){
    const signal=this.controller.signal;
    await new Promise<void>((resolve,reject)=>{const abort=()=>{clearTimeout(timer);reject(new DOMException('Aborted','AbortError'));};const timer=setTimeout(()=>{signal.removeEventListener('abort',abort);resolve();},1000);if(signal.aborted)abort();else signal.addEventListener('abort',abort,{once:true});});
-   result=await bomRequest<Publication>(this.path('/publications/'+encodeURIComponent(result.id)),'GET',undefined,undefined,signal);
+   const receipt=await bomRequest<{id:string;state:Publication['state'];errorCode:string|null}>(this.path('/publications/'+encodeURIComponent(result.id)+'/status'),'GET',undefined,undefined,signal);
+   result={...result,state:receipt.state,errorCode:receipt.errorCode??undefined};
+   if(result.state==='published')result=await bomRequest<Publication>(this.path('/publications/'+encodeURIComponent(result.id)),'GET',undefined,undefined,signal);
   }
   await this.refresh();
   if(result.state!=='published')throw Error(result.errorCode||'CMDB 投影仍在后台处理，请查看入库版本状态；无需重复提交。');
