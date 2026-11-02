@@ -1,0 +1,166 @@
+{
+  "scope": "real MM XLSX with synthetic SN only; real gpt-6.1-sol Responses calls; independent source XML ground truth",
+  "project_id": "proj-a59fa6bb-7c17-4325-9f83-fe8a64f09e2b",
+  "source_id": "26c1e246-1b5c-4974-90c6-1ef38b39998d",
+  "job_id": "0a33230f-71a4-4ea9-a856-eca13604aaf0",
+  "provider": {
+    "id": "8b8a86f6-2351-43f4-9816-b6019aef7ec2",
+    "model": "gpt-6.1-sol",
+    "protocol": "openai-responses",
+    "revision": 8
+  },
+  "agent_job_state": "succeeded",
+  "expected_terminations": 7154,
+  "actual_terminations": 7154,
+  "missing_or_changed_termination_tuples": 0,
+  "unexpected_termination_tuples": 0,
+  "missing_SN_cells": 0,
+  "source_port_pairs": 14308,
+  "extracted_port_spec_pairs": 5184,
+  "port_spec_pairs_missing": 9124,
+  "tables": [
+    {
+      "table_id": "equipment_specs",
+      "rows": 967,
+      "issues_by_field": {
+        "equipment_type": 778
+      }
+    },
+    {
+      "table_id": "network_roles",
+      "rows": 189,
+      "issues_by_field": {
+        "fabric": 189,
+        "plane": 189
+      }
+    },
+    {
+      "table_id": "placements",
+      "rows": 967,
+      "issues_by_field": {
+        "room_code": 967,
+        "mount_type": 967,
+        "face": 967
+      }
+    },
+    {
+      "table_id": "port_specs",
+      "rows": 5184,
+      "issues_by_field": {
+        "medium": 5184,
+        "connector": 5184,
+        "rate": 5184,
+        "rate_unit": 5184
+      }
+    },
+    {
+      "table_id": "power_profiles",
+      "rows": 9,
+      "issues_by_field": {
+        "source": 9
+      }
+    },
+    {
+      "table_id": "rack_capacity",
+      "rows": 56,
+      "issues_by_field": {
+        "basis": 56
+      }
+    },
+    {
+      "table_id": "racks",
+      "rows": 56,
+      "issues_by_field": {
+        "room_code": 56
+      }
+    },
+    {
+      "table_id": "terminations",
+      "rows": 7154,
+      "issues_by_field": {
+        "a_mac": 7154,
+        "b_rack_position": 7154,
+        "b_mac": 7154,
+        "termination_type": 7154
+      }
+    }
+  ],
+  "central_missing_input_count": 43,
+  "formal_model_equipment_count": 0,
+  "formal_model_connection_count": 0,
+  "overall": "PARTIAL_NEEDS_INPUT",
+  "published": false,
+  "adoption_gate": {
+    "http_status": 422,
+    "error": {
+      "code": "STEP_INPUT_INVALID",
+      "message": "STEP_INPUT_INVALID",
+      "retryable": false
+    },
+    "revision_unchanged": true,
+    "formal_assets_created": 0
+  },
+  "fixture_preparation": {
+    "source_sha256": "30481c4619366bcdc707c9b58f2118349eb599f4260d5f73010fe3b7a3782558",
+    "fixture_sha256": "15d0aefa5233cdfc5b72c75a1c04640c1206224fe4971a7f0c8e34c050bde108",
+    "synthetic_sn_labels": 971,
+    "inventory_rows": 967,
+    "duplicate_inventory_labels": 0,
+    "injected_cells_by_sheet": {
+      "Layout": 0,
+      "电力测算": 0,
+      "落位图": 0,
+      "距离图": 0,
+      "距离计算公式": 0,
+      "P2P-18": 0,
+      "物料": 0,
+      "工作量": 0,
+      "Network Information": 189,
+      "Server Information": 778,
+      "Cabling_EW_SP-LF": 5184,
+      "Cabling_NS": 968,
+      "Cabling_GB_OUT": 6912,
+      "Cabling_OOB": 432,
+      "Cabling_HDD_SSD_CPU": 812
+    },
+    "formulas_and_caches_preserved": true,
+    "source_unchanged": true,
+    "mac_injected": false
+  },
+  "attempts": [
+    {
+      "kind": "fresh_provider_run",
+      "provider_revision": 7,
+      "result": "FAILED_TRANSPORT_TIMEOUT",
+      "timeout_seconds": 30,
+      "token_budget": 2048
+    },
+    {
+      "kind": "fresh_provider_run",
+      "provider_revision": 8,
+      "result": "COMPLETED_WITH_MISSING_INPUTS",
+      "timeout_seconds": 120,
+      "token_budget": 8192
+    },
+    {
+      "kind": "checkpoint_replay",
+      "code_commit": "93a6a1e",
+      "new_model_calls": 0,
+      "result": "SN_AND_ENDPOINT_TUPLES_MATCH_GROUND_TRUTH"
+    }
+  ],
+  "known_agent_gaps": [
+    "port_specs只覆盖EW的5184个端口，遗漏其余9124个明确端口的规格候选身份",
+    "端接类型与对端机架位未形成可用绑定；机架位跨表关联能力尚未验收",
+    "没有完成允许路径、线缆/光模块规格及规则的可计算输入",
+    "服务器equipment_type、功率来源等仍需区分源信息缺失与映射能力不足"
+  ],
+  "source_missing_or_needs_engineer_confirmation": [
+    "MAC",
+    "机房编码与机柜尺寸/坐标系/朝向",
+    "安装方式/安装面",
+    "批准布线规则及通道建模",
+    "IP/ASN/BGP规划",
+    "电力场景、供电关系和容量依据"
+  ]
+}
