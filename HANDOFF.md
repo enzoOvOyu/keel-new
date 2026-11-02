@@ -1,3 +1,9 @@
+## 已完成里程碑事件：智能开局工作台前端部署至5180
+
+前端1706cbc已部署 `/home/ubuntu/.local/state/keel-deployments/workbench-1706cbc/dev`，5180由 `keel-dev-5180` 会话提供。前端构建通过，入口及新增工作台/建模编辑模块HTTP200；在线登录页无页面异常，发布源文件与提交一致。API保持e5faead和原进程2424213，健康检查200；没有数据库迁移或真实项目写入。旧前端启动器保留用于回退。详见[部署证据](docs/intelligent-deployment/workbench-alignment/deployment.json)。
+
+该事件覆盖下文“5180尚未部署”的历史说明。部署仅交付工作台界面及建模交互；没有宣称分步Agent、预填补充XLSX、规则参数模板或真实交付主链已完成，也未重复线上业务测试。5181原型服务保持。
+
 ## 已完成里程碑事件：智能开局工作台界面与建模交互对齐原型
 
 仅调整智能开局业务前端：五个工作区入口、五步输入/产物导航、由真实契约生成的集中建模卡片、CSV逐行编辑、三类发布域概览及未运行的gptsol6.1基准说明。保留现有来源、模型、计算、权限、版本和分域审核/发布接口。改动位于EngineeringWorkbench、EngineeringStudio、EngineeringStepInputs、engineeringInputCSV、EngineeringCalculationPanel及对应样式。

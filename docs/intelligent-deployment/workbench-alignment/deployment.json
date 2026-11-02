@@ -1,0 +1,30 @@
+{
+  "frontend_revision": "1706cbc",
+  "api_revision": "e5faead",
+  "frontend_directory": "/home/ubuntu/.local/state/keel-deployments/workbench-1706cbc/dev",
+  "frontend_pid": 2565959,
+  "frontend_port": 5180,
+  "api_pid": 2424213,
+  "api_port": 8081,
+  "scope": "Intelligent kickoff frontend only",
+  "checks": {
+    "/": 200,
+    "/src/features/EngineeringWorkbench.tsx": 200,
+    "/src/features/EngineeringStudio.tsx": 200,
+    "/src/features/EngineeringStepInputs.tsx": 200,
+    "/src/features/engineeringInputCSV.ts": 200,
+    "/src/features/engineering-workbench.css": 200,
+    "api_healthz": 200,
+    "api_pid_unchanged": true,
+    "served_source_matches_commit": "1706cbc"
+  },
+  "vite_build": "PASS",
+  "live_browser_login": "PASS; no page errors",
+  "database_migrations": [],
+  "rollback_frontend_launcher": "/home/ubuntu/.local/state/keel-deployments/fixed-step-e5faead/frontend-run.py",
+  "limitations": [
+    "Authenticated workbench interactions were previously checked with isolated synthetic responses; not repeated against live business data",
+    "No real model or import/publish acceptance in deployment",
+    "Scoped Agents, supplemental XLSX, friendly rule templates and real delivery-chain consumption remain incomplete"
+  ]
+}
