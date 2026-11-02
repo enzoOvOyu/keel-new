@@ -38,6 +38,120 @@ tags:
   - name: IA
     description: IA v2.3 project scope and lazy detail contracts
 paths:
+  /projects/{projectId}/kickoff/workspace:
+    get:
+      operationId: getKickoffWorkspace
+      tags:
+        - Kickoff
+      parameters:
+        - &a1
+          name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: "#/components/schemas/KickoffWorkspace"
+                  request_id:
+                    type: string
+  /projects/{projectId}/kickoff/models/{tableId}:
+    put:
+      operationId: saveKickoffModelInput
+      tags:
+        - Kickoff
+      parameters:
+        - *a1
+        - name: tableId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+                - rows
+                - source
+                - expectedRevision
+              properties:
+                rows:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/KickoffModelRow"
+                source:
+                  type: string
+                expectedRevision:
+                  type: integer
+                  minimum: 1
+      responses:
+        "200":
+          description: Saved input and workspace versions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    required:
+                      - version
+                      - revision
+                    properties:
+                      version:
+                        type: integer
+                      revision:
+                        type: integer
+  /projects/{projectId}/kickoff/sources:
+    post:
+      operationId: uploadKickoffSource
+      tags:
+        - Kickoff
+      parameters:
+        - *a1
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Stored immutable source reference
+  /projects/{projectId}/kickoff/sources/{sourceId}:
+    delete:
+      operationId: detachKickoffSource
+      tags:
+        - Kickoff
+      parameters:
+        - *a1
+        - name: sourceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Unused attachment detached; immutable source retained
   /cmdb/visualization/subgraph:
     get:
       operationId: getCMDBVisualSubgraph
@@ -18239,6 +18353,716 @@ components:
           schema:
             $ref: "#/components/schemas/ErrorEnvelope"
   schemas:
+    KickoffDomain:
+      type: string
+      enum:
+        - facility
+        - network
+        - provisioning
+        - cabling
+        - power
+    KickoffReviewState:
+      type: string
+      enum:
+        - ready
+        - blocked
+        - published
+    KickoffReadiness:
+      type: string
+      enum:
+        - ready
+        - partial
+        - needs_input
+    KickoffEvidence:
+      type: object
+      additionalProperties: false
+      properties:
+        sourceId:
+          type: string
+        sheet:
+          type: string
+        cell:
+          type: string
+        method:
+          type: string
+          enum:
+            - source
+            - mapping
+            - manual
+            - calculation
+        note:
+          type: string
+      required:
+        - sourceId
+        - sheet
+        - cell
+        - method
+    KickoffDevice:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        serial:
+          type: string
+        type:
+          type: string
+          enum:
+            - server
+            - switch
+        model:
+          type: string
+        rackId:
+          type: string
+        startU:
+          oneOf:
+            - type: number
+            - type: "null"
+        heightU:
+          oneOf:
+            - type: number
+            - type: "null"
+        role:
+          type: string
+        managementAddress:
+          type: string
+        evidence:
+          $ref: "#/components/schemas/KickoffEvidence"
+      required:
+        - id
+        - name
+        - serial
+        - type
+        - model
+        - rackId
+        - startU
+        - heightU
+        - role
+        - managementAddress
+        - evidence
+    KickoffPort:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        deviceId:
+          type: string
+        name:
+          type: string
+        mac:
+          type: string
+        speed:
+          type: string
+        role:
+          type: string
+        componentId:
+          type: string
+        evidence:
+          $ref: "#/components/schemas/KickoffEvidence"
+      required:
+        - id
+        - deviceId
+        - name
+        - speed
+        - role
+        - evidence
+    KickoffConnection:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        a:
+          type: string
+        b:
+          type: string
+        medium:
+          type: string
+        evidence:
+          $ref: "#/components/schemas/KickoffEvidence"
+      required:
+        - id
+        - a
+        - b
+        - medium
+        - evidence
+    KickoffComponent:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        deviceId:
+          type: string
+        type:
+          type: string
+        name:
+          type: string
+        model:
+          type: string
+        slot:
+          type: string
+        evidence:
+          $ref: "#/components/schemas/KickoffEvidence"
+      required:
+        - id
+        - deviceId
+        - type
+        - name
+        - model
+        - slot
+        - evidence
+    KickoffRack:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        room:
+          type: string
+        capacityU:
+          type: number
+        evidence:
+          $ref: "#/components/schemas/KickoffEvidence"
+      required:
+        - id
+        - name
+        - room
+        - capacityU
+        - evidence
+    KickoffSourceRegion:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        sheet:
+          type: string
+        range:
+          type: string
+        category:
+          type: string
+        rowCount:
+          type: number
+        state:
+          type: string
+          enum:
+            - extracted
+            - needs_input
+            - unmapped
+        note:
+          type: string
+      required:
+        - id
+        - sheet
+        - range
+        - category
+        - rowCount
+        - state
+        - note
+    KickoffSource:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        size:
+          type: string
+        version:
+          type: number
+        state:
+          type: string
+          enum:
+            - recognized
+            - awaiting_analysis
+            - needs_input
+        hash:
+          type: string
+        createdAt:
+          type: string
+        regions:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffSourceRegion"
+        originalAvailable:
+          type: boolean
+      required:
+        - id
+        - name
+        - size
+        - version
+        - state
+        - hash
+        - createdAt
+        - regions
+        - originalAvailable
+    KickoffIssue:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        scope:
+          type: string
+          enum:
+            - identity
+            - placement
+            - configuration
+        title:
+          type: string
+        description:
+          type: string
+        entityId:
+          type: string
+        field:
+          type: string
+        impact:
+          type: string
+        resolved:
+          type: boolean
+        evidence:
+          $ref: "#/components/schemas/KickoffEvidence"
+      required:
+        - id
+        - scope
+        - title
+        - description
+        - entityId
+        - field
+        - impact
+        - resolved
+        - evidence
+    KickoffModelField:
+      type: object
+      additionalProperties: false
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        kind:
+          type: string
+          enum:
+            - number
+            - positive
+            - integer
+            - select
+        options:
+          type: array
+          items:
+            type: string
+        hint:
+          type: string
+      required:
+        - key
+        - label
+    KickoffTableDefinition:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        domain:
+          $ref: "#/components/schemas/KickoffDomain"
+        name:
+          type: string
+        description:
+          type: string
+        consumer:
+          type: string
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffModelField"
+      required:
+        - id
+        - domain
+        - name
+        - description
+        - consumer
+        - fields
+    KickoffModelRow:
+      type: object
+      additionalProperties:
+        type: string
+    KickoffModelInput:
+      type: object
+      additionalProperties: false
+      properties:
+        tableId:
+          type: string
+        rows:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffModelRow"
+        version:
+          type: number
+        confirmed:
+          type: boolean
+        updatedAt:
+          type: string
+        source:
+          type: string
+      required:
+        - tableId
+        - rows
+        - version
+        - confirmed
+        - updatedAt
+        - source
+    KickoffCalculationRow:
+      type: object
+      additionalProperties: false
+      properties:
+        connectionId:
+          type: string
+        from:
+          type: string
+        to:
+          type: string
+        route:
+          type: array
+          items:
+            type: string
+        pathM:
+          type: number
+        leadM:
+          type: number
+        slackM:
+          type: number
+        calculatedM:
+          type: number
+        stockM:
+          oneOf:
+            - type: number
+            - type: "null"
+      required:
+        - connectionId
+        - from
+        - to
+        - route
+        - pathM
+        - leadM
+        - slackM
+        - calculatedM
+        - stockM
+    KickoffCalculation:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        domain:
+          type: string
+          enum:
+            - cabling
+            - power
+        inputDigest:
+          type: string
+        createdAt:
+          type: string
+        status:
+          $ref: "#/components/schemas/KickoffReadiness"
+        rows:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffCalculationRow"
+        issues:
+          type: array
+          items:
+            type: string
+        power:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              rackId:
+                type: string
+              loadKW:
+                oneOf:
+                  - type: number
+                  - type: "null"
+              capacityKW:
+                oneOf:
+                  - type: number
+                  - type: "null"
+              remainingKW:
+                oneOf:
+                  - type: number
+                  - type: "null"
+            required:
+              - rackId
+              - loadKW
+              - capacityKW
+              - remainingKW
+      required:
+        - id
+        - domain
+        - inputDigest
+        - createdAt
+        - status
+        - rows
+        - issues
+        - power
+    KickoffPublication:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        revision:
+          type: number
+        createdAt:
+          type: string
+        actor:
+          type: string
+        reason:
+          type: string
+        deviceIds:
+          type: array
+          items:
+            type: string
+        portIds:
+          type: array
+          items:
+            type: string
+        connectionIds:
+          type: array
+          items:
+            type: string
+        componentIds:
+          type: array
+          items:
+            type: string
+        placementIds:
+          type: array
+          items:
+            type: string
+        modelVersions:
+          type: object
+          additionalProperties:
+            type: number
+        modelSnapshot:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffModelInput"
+        rackSnapshot:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffRack"
+        deviceSnapshot:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffDevice"
+        counts:
+          type: object
+          additionalProperties:
+            type: number
+      required:
+        - id
+        - revision
+        - createdAt
+        - actor
+        - reason
+        - deviceIds
+        - portIds
+        - connectionIds
+        - componentIds
+        - placementIds
+        - modelVersions
+        - modelSnapshot
+        - rackSnapshot
+        - deviceSnapshot
+        - counts
+    KickoffActivity:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        action:
+          type: string
+        detail:
+          type: string
+        at:
+          type: string
+      required:
+        - id
+        - action
+        - detail
+        - at
+    KickoffWorkspace:
+      type: object
+      additionalProperties: false
+      properties:
+        schemaVersion:
+          type: number
+        projectId:
+          type: string
+        projectName:
+          type: string
+        revision:
+          type: number
+        devices:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffDevice"
+        ports:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffPort"
+        connections:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffConnection"
+        components:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffComponent"
+        racks:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffRack"
+        sources:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffSource"
+        issues:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffIssue"
+        models:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffModelInput"
+        calculations:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffCalculation"
+        publications:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffPublication"
+        activity:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffActivity"
+      required:
+        - schemaVersion
+        - projectId
+        - projectName
+        - revision
+        - devices
+        - ports
+        - connections
+        - components
+        - racks
+        - sources
+        - issues
+        - models
+        - calculations
+        - publications
+        - activity
+    KickoffCapability:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+        state:
+          $ref: "#/components/schemas/KickoffReadiness"
+        available:
+          type: number
+        total:
+          type: number
+        action:
+          type: string
+        href:
+          type: string
+      required:
+        - id
+        - title
+        - detail
+        - state
+        - available
+        - total
+        - action
+        - href
+    KickoffPublishPreview:
+      type: object
+      additionalProperties: false
+      properties:
+        devices:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffDevice"
+        ports:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffPort"
+        connections:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffConnection"
+        components:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffComponent"
+        placements:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffDevice"
+        held:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffDevice"
+        counts:
+          type: object
+          additionalProperties:
+            type: number
+      required:
+        - devices
+        - ports
+        - connections
+        - components
+        - placements
+        - held
+        - counts
+    KickoffImportPreview:
+      type: object
+      additionalProperties: false
+      properties:
+        rows:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffModelRow"
+        errors:
+          type: array
+          items:
+            type: string
+        unknownHeaders:
+          type: array
+          items:
+            type: string
+        sheet:
+          type: string
+      required:
+        - rows
+        - errors
+        - unknownHeaders
+        - sheet
     getExecutionDefinitionEnvelope:
       type: object
       additionalProperties: false

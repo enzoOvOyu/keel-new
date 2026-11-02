@@ -6,7 +6,7 @@ import {useProject} from './ProjectContext';
 import './sidebar.css';
 
 const topologyLinks=[['全局拓扑','/topology?view=global'],['网络架构','/topology?view=network'],['机柜管理','/racks'],['物理布线','/topology?view=cabling'],['链路追踪','/topology?view=trace'],['数据质量','/topology?view=quality']];
-function belongs(entry:Entry,path:string){return entry.id==='topology'?path.startsWith('/topology')||path.startsWith('/racks'):entry.scope==='project'&&entry.id!=='projects'?path.includes('/deploy/'+entry.id):path==='/'+entry.id||path.startsWith('/'+entry.id+'/')}
+function belongs(entry:Entry,path:string){if(entry.id==='kickoff')return /^\/p\/[^/]+\/kickoff(?:\/|$)/.test(path);return entry.id==='topology'?path.startsWith('/topology')||path.startsWith('/racks'):entry.scope==='project'&&entry.id!=='projects'?path.includes('/deploy/'+entry.id):path==='/'+entry.id||path.startsWith('/'+entry.id+'/')}
 function childActive(href:string,path:string,search:string){const target=new URL(href,'http://keel.local');return target.pathname==='/racks'?(path.startsWith('/racks')||path==='/topology'&&new URLSearchParams(search).get('view')==='groups'):target.searchParams.has('view')?path===target.pathname&&(new URLSearchParams(search).get('view')||'global')===target.searchParams.get('view'):path===target.pathname}
 export function SidebarNavigation({collapsed,favorites,onFavorite}:{collapsed:boolean;favorites:string[];onFavorite:(id:string)=>void}){const ctx=useProject(),location=useLocation();const current=entries.find(e=>!e.parent&&belongs(e,location.pathname))?.id||'';const [expanded,setExpanded]=useState(current);
  useEffect(()=>{setExpanded(current)},[current]);

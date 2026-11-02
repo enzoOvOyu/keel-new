@@ -79,6 +79,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if s.flowsRoutes(w, r) {
 		return
 	}
+	if s.kickoffRoutes(w, r) {
+		return
+	}
 	if s.engineeringCalculationRoutes(w, r) {
 		return
 	}

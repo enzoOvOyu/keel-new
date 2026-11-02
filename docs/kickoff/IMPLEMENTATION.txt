@@ -1,0 +1,35 @@
+智能开局工程移植实施台账
+
+唯一产品基准：kickoff/src、kickoff/OPTIMIZATION.txt、kickoff/CONTRACTS.txt。
+原型源码继续保留，不回写。集成代码：dev/src/features/kickoff；统一API：dev/src/lib/api/kickoff。
+复用现有App Shell/Router/ProjectContext/RBAC；/p/:projectId/kickoff/*。
+
+页面清单（全部已复制原型内容组件；真实浏览器视觉验收尚未运行）
+overview 启动总览：API工作区数据读取已接，消费能力及建议动作布局保留。
+sources 资料与识别：MinIO上传、摘要复用、附件移除、读取接口已实现；Agent待开发。
+review 数据核对：五分类表、筛选/分页、来源Drawer、问题确认UI已移植；确认API待实现。
+publish 入库与版本：范围选择、依赖预览、确认、版本及差异UI已移植；真实发布与回执待实现。
+models/facility 机房与机柜：4张表、机柜索引、XLSX/CSV编辑/导入/导出保留。
+models/network 网络与接入：7张表及交互保留。
+models/provisioning 装机准备：2张表及交互保留。
+models/cabling 布线与计算：6张表、路径配置、计算过程/结果/失效状态UI保留；服务端计算待实现。
+models/power 电力与冷却：4张表及负荷/容量UI保留；服务端计算待实现。
+
+已实现服务端切片
+GET /projects/{projectId}/kickoff/workspace：一致性快照读取；当前来源/工程输入可读取。
+POST /projects/{projectId}/kickoff/sources：实际对象存储、摘要、附件元数据。
+DELETE /projects/{projectId}/kickoff/sources/{sourceId}：移除未分析附件，原文件和元数据保留。
+PUT /projects/{projectId}/kickoff/models/{tableId}：23张表的后端字段/数值/凭据引用校验、乐观版本、不可变历史。
+迁移048尚未应用在线环境，服务尚未部署。
+
+尚未实现，不得宣称完整闭环
+工作区设备/组件/端口/关系/机柜/问题/计算/发布投影目前为空；不套用演示数据。
+工程输入尚未采用为正式领域实体，不能当作已经改变CMDB。
+对象核对/来源区域读取、确定性计算服务、范围审核发布、Outbox回执、差异、下游实际消费。
+Agent最后开发，不复用旧五步流程；只复用明确必要的基础设施和稳定实体身份。
+
+实际验证
+TypeScript检查通过，OpenAPI类型生成通过。
+Go cmd/api编译检查通过；kickoff字段校验定向用例覆盖未知列、缺值、非法尺寸、启动MAC、凭据引用。
+尚未执行真实数据库/对象存储集成检查或主应用视觉验收，未部署，不影响当前在线服务。
+后续每完成一项可验收切片立即提交；仅针对变化运行检查。

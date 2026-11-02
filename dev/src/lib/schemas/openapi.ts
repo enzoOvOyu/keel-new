@@ -4,6 +4,70 @@
  */
 
 export interface paths {
+    "/projects/{projectId}/kickoff/workspace": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getKickoffWorkspace"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/kickoff/models/{tableId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["saveKickoffModelInput"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/kickoff/sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["uploadKickoffSource"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/kickoff/sources/{sourceId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["detachKickoffSource"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/cmdb/visualization/subgraph": {
         parameters: {
             query?: never;
@@ -7060,6 +7124,226 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** @enum {string} */
+        KickoffDomain: "facility" | "network" | "provisioning" | "cabling" | "power";
+        /** @enum {string} */
+        KickoffReviewState: "ready" | "blocked" | "published";
+        /** @enum {string} */
+        KickoffReadiness: "ready" | "partial" | "needs_input";
+        KickoffEvidence: {
+            sourceId: string;
+            sheet: string;
+            cell: string;
+            /** @enum {string} */
+            method: "source" | "mapping" | "manual" | "calculation";
+            note?: string;
+        };
+        KickoffDevice: {
+            id: string;
+            name: string;
+            serial: string;
+            /** @enum {string} */
+            type: "server" | "switch";
+            model: string;
+            rackId: string;
+            startU: number | null;
+            heightU: number | null;
+            role: string;
+            managementAddress: string;
+            evidence: components["schemas"]["KickoffEvidence"];
+        };
+        KickoffPort: {
+            id: string;
+            deviceId: string;
+            name: string;
+            mac?: string;
+            speed: string;
+            role: string;
+            componentId?: string;
+            evidence: components["schemas"]["KickoffEvidence"];
+        };
+        KickoffConnection: {
+            id: string;
+            a: string;
+            b: string;
+            medium: string;
+            evidence: components["schemas"]["KickoffEvidence"];
+        };
+        KickoffComponent: {
+            id: string;
+            deviceId: string;
+            type: string;
+            name: string;
+            model: string;
+            slot: string;
+            evidence: components["schemas"]["KickoffEvidence"];
+        };
+        KickoffRack: {
+            id: string;
+            name: string;
+            room: string;
+            capacityU: number;
+            evidence: components["schemas"]["KickoffEvidence"];
+        };
+        KickoffSourceRegion: {
+            id: string;
+            sheet: string;
+            range: string;
+            category: string;
+            rowCount: number;
+            /** @enum {string} */
+            state: "extracted" | "needs_input" | "unmapped";
+            note: string;
+        };
+        KickoffSource: {
+            id: string;
+            name: string;
+            size: string;
+            version: number;
+            /** @enum {string} */
+            state: "recognized" | "awaiting_analysis" | "needs_input";
+            hash: string;
+            createdAt: string;
+            regions: components["schemas"]["KickoffSourceRegion"][];
+            originalAvailable: boolean;
+        };
+        KickoffIssue: {
+            id: string;
+            /** @enum {string} */
+            scope: "identity" | "placement" | "configuration";
+            title: string;
+            description: string;
+            entityId: string;
+            field: string;
+            impact: string;
+            resolved: boolean;
+            evidence: components["schemas"]["KickoffEvidence"];
+        };
+        KickoffModelField: {
+            key: string;
+            label: string;
+            /** @enum {string} */
+            kind?: "number" | "positive" | "integer" | "select";
+            options?: string[];
+            hint?: string;
+        };
+        KickoffTableDefinition: {
+            id: string;
+            domain: components["schemas"]["KickoffDomain"];
+            name: string;
+            description: string;
+            consumer: string;
+            fields: components["schemas"]["KickoffModelField"][];
+        };
+        KickoffModelRow: {
+            [key: string]: string;
+        };
+        KickoffModelInput: {
+            tableId: string;
+            rows: components["schemas"]["KickoffModelRow"][];
+            version: number;
+            confirmed: boolean;
+            updatedAt: string;
+            source: string;
+        };
+        KickoffCalculationRow: {
+            connectionId: string;
+            from: string;
+            to: string;
+            route: string[];
+            pathM: number;
+            leadM: number;
+            slackM: number;
+            calculatedM: number;
+            stockM: number | null;
+        };
+        KickoffCalculation: {
+            id: string;
+            /** @enum {string} */
+            domain: "cabling" | "power";
+            inputDigest: string;
+            createdAt: string;
+            status: components["schemas"]["KickoffReadiness"];
+            rows: components["schemas"]["KickoffCalculationRow"][];
+            issues: string[];
+            power: {
+                rackId: string;
+                loadKW: number | null;
+                capacityKW: number | null;
+                remainingKW: number | null;
+            }[];
+        };
+        KickoffPublication: {
+            id: string;
+            revision: number;
+            createdAt: string;
+            actor: string;
+            reason: string;
+            deviceIds: string[];
+            portIds: string[];
+            connectionIds: string[];
+            componentIds: string[];
+            placementIds: string[];
+            modelVersions: {
+                [key: string]: number;
+            };
+            modelSnapshot: components["schemas"]["KickoffModelInput"][];
+            rackSnapshot: components["schemas"]["KickoffRack"][];
+            deviceSnapshot: components["schemas"]["KickoffDevice"][];
+            counts: {
+                [key: string]: number;
+            };
+        };
+        KickoffActivity: {
+            id: string;
+            action: string;
+            detail: string;
+            at: string;
+        };
+        KickoffWorkspace: {
+            schemaVersion: number;
+            projectId: string;
+            projectName: string;
+            revision: number;
+            devices: components["schemas"]["KickoffDevice"][];
+            ports: components["schemas"]["KickoffPort"][];
+            connections: components["schemas"]["KickoffConnection"][];
+            components: components["schemas"]["KickoffComponent"][];
+            racks: components["schemas"]["KickoffRack"][];
+            sources: components["schemas"]["KickoffSource"][];
+            issues: components["schemas"]["KickoffIssue"][];
+            models: components["schemas"]["KickoffModelInput"][];
+            calculations: components["schemas"]["KickoffCalculation"][];
+            publications: components["schemas"]["KickoffPublication"][];
+            activity: components["schemas"]["KickoffActivity"][];
+        };
+        KickoffCapability: {
+            id: string;
+            title: string;
+            detail: string;
+            state: components["schemas"]["KickoffReadiness"];
+            available: number;
+            total: number;
+            action: string;
+            href: string;
+        };
+        KickoffPublishPreview: {
+            devices: components["schemas"]["KickoffDevice"][];
+            ports: components["schemas"]["KickoffPort"][];
+            connections: components["schemas"]["KickoffConnection"][];
+            components: components["schemas"]["KickoffComponent"][];
+            placements: components["schemas"]["KickoffDevice"][];
+            held: components["schemas"]["KickoffDevice"][];
+            counts: {
+                [key: string]: number;
+            };
+        };
+        KickoffImportPreview: {
+            rows: components["schemas"]["KickoffModelRow"][];
+            errors: string[];
+            unknownHeaders: string[];
+            sheet: string;
+        };
         getExecutionDefinitionEnvelope: {
             data: components["schemas"]["FlowsExecutionDefinition"];
             request_id: string;
@@ -17847,6 +18131,115 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    getKickoffWorkspace: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["KickoffWorkspace"];
+                        request_id?: string;
+                    };
+                };
+            };
+        };
+    };
+    saveKickoffModelInput: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                tableId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    rows: components["schemas"]["KickoffModelRow"][];
+                    source: string;
+                    expectedRevision: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Saved input and workspace versions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            version: number;
+                            revision: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    uploadKickoffSource: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Stored immutable source reference */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    detachKickoffSource: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                sourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Unused attachment detached; immutable source retained */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     getCMDBVisualSubgraph: {
         parameters: {
             query?: {

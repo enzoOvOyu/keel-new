@@ -1,0 +1,793 @@
+[
+  {
+    "id": "rooms",
+    "domain": "facility",
+    "name": "机房与坐标系",
+    "description": "地址可后补；真实空间布局需要明确坐标系和单位。",
+    "consumer": "机房空间图",
+    "fields": [
+      {
+        "key": "room_id",
+        "label": "机房引用"
+      },
+      {
+        "key": "name",
+        "label": "机房名称"
+      },
+      {
+        "key": "site",
+        "label": "场地"
+      },
+      {
+        "key": "address",
+        "label": "地理地址"
+      },
+      {
+        "key": "frame",
+        "label": "坐标系"
+      },
+      {
+        "key": "unit",
+        "label": "坐标单位"
+      }
+    ]
+  },
+  {
+    "id": "racks",
+    "domain": "facility",
+    "name": "机柜与几何",
+    "description": "按型号批量补充容量与尺寸，无需逐柜重复输入。",
+    "consumer": "机柜图与空间布局",
+    "fields": [
+      {
+        "key": "rack_id",
+        "label": "机柜引用"
+      },
+      {
+        "key": "room_id",
+        "label": "机房引用"
+      },
+      {
+        "key": "capacity_u",
+        "label": "容量U",
+        "kind": "positive"
+      },
+      {
+        "key": "width_mm",
+        "label": "宽mm",
+        "kind": "positive"
+      },
+      {
+        "key": "depth_mm",
+        "label": "深mm",
+        "kind": "positive"
+      },
+      {
+        "key": "x",
+        "label": "坐标X",
+        "kind": "number"
+      },
+      {
+        "key": "y",
+        "label": "坐标Y",
+        "kind": "number"
+      },
+      {
+        "key": "orientation",
+        "label": "朝向度",
+        "kind": "number"
+      },
+      {
+        "key": "frame",
+        "label": "坐标系"
+      },
+      {
+        "key": "unit",
+        "label": "坐标单位"
+      }
+    ]
+  },
+  {
+    "id": "equipment_specs",
+    "domain": "facility",
+    "name": "设备型号与尺寸",
+    "description": "型号参数只补充明确匹配的设备，不能替代实际组件清单。",
+    "consumer": "U位占用与安装剖面",
+    "fields": [
+      {
+        "key": "model",
+        "label": "型号"
+      },
+      {
+        "key": "height_u",
+        "label": "高度U",
+        "kind": "positive"
+      },
+      {
+        "key": "width_mm",
+        "label": "宽mm",
+        "kind": "positive"
+      },
+      {
+        "key": "depth_mm",
+        "label": "深mm",
+        "kind": "positive"
+      },
+      {
+        "key": "face",
+        "label": "安装面"
+      },
+      {
+        "key": "panel_ref",
+        "label": "面板版本引用"
+      }
+    ]
+  },
+  {
+    "id": "placements",
+    "domain": "facility",
+    "name": "设备落位",
+    "description": "已识别机柜与U位自动关联；未知位置保留为空。",
+    "consumer": "机柜立面与未定位清单",
+    "fields": [
+      {
+        "key": "device_id",
+        "label": "设备引用"
+      },
+      {
+        "key": "rack_id",
+        "label": "机柜引用"
+      },
+      {
+        "key": "start_u",
+        "label": "起始U",
+        "kind": "positive"
+      },
+      {
+        "key": "height_u",
+        "label": "占用U",
+        "kind": "positive"
+      },
+      {
+        "key": "face",
+        "label": "安装面"
+      },
+      {
+        "key": "position",
+        "label": "非U位置"
+      }
+    ]
+  },
+  {
+    "id": "management",
+    "domain": "network",
+    "name": "管理接入",
+    "description": "管理地址、BMC与业务网卡分开；这里只保存凭据引用。",
+    "consumer": "ZTP与管理接入",
+    "fields": [
+      {
+        "key": "device_id",
+        "label": "设备引用"
+      },
+      {
+        "key": "management_ip",
+        "label": "管理地址"
+      },
+      {
+        "key": "bmc_ip",
+        "label": "BMC地址"
+      },
+      {
+        "key": "management_port",
+        "label": "管理端口"
+      },
+      {
+        "key": "credential_ref",
+        "label": "凭据引用"
+      },
+      {
+        "key": "method",
+        "label": "接入方式"
+      }
+    ]
+  },
+  {
+    "id": "network_planes",
+    "domain": "network",
+    "name": "Fabric与Plane",
+    "description": "由明确规划定义，不能从物理连线推测逻辑平面。",
+    "consumer": "Fabric Blueprint",
+    "fields": [
+      {
+        "key": "fabric",
+        "label": "Fabric"
+      },
+      {
+        "key": "plane",
+        "label": "Plane"
+      },
+      {
+        "key": "role",
+        "label": "用途"
+      },
+      {
+        "key": "architecture",
+        "label": "网络架构"
+      },
+      {
+        "key": "profile",
+        "label": "策略版本引用"
+      }
+    ]
+  },
+  {
+    "id": "network_roles",
+    "domain": "network",
+    "name": "设备角色",
+    "description": "引用统一设备身份，支持同一设备的明确多Plane归属。",
+    "consumer": "角色与目标分组",
+    "fields": [
+      {
+        "key": "device_id",
+        "label": "设备引用"
+      },
+      {
+        "key": "fabric",
+        "label": "Fabric"
+      },
+      {
+        "key": "plane",
+        "label": "Plane"
+      },
+      {
+        "key": "role",
+        "label": "设备角色"
+      }
+    ]
+  },
+  {
+    "id": "network_interfaces",
+    "domain": "network",
+    "name": "接口与网络域",
+    "description": "物理端口关联逻辑接口，保留父端口与Breakout依据。",
+    "consumer": "接口配置",
+    "fields": [
+      {
+        "key": "device_id",
+        "label": "设备引用"
+      },
+      {
+        "key": "port",
+        "label": "物理端口"
+      },
+      {
+        "key": "interface",
+        "label": "逻辑接口"
+      },
+      {
+        "key": "plane",
+        "label": "Plane"
+      },
+      {
+        "key": "vlan",
+        "label": "VLAN"
+      },
+      {
+        "key": "vrf",
+        "label": "VRF"
+      },
+      {
+        "key": "parent_port",
+        "label": "父端口"
+      }
+    ]
+  },
+  {
+    "id": "network_addresses",
+    "domain": "network",
+    "name": "地址与ASN",
+    "description": "导入明确分配结果，或引用已批准的地址池与分配规则。",
+    "consumer": "地址与路由规划",
+    "fields": [
+      {
+        "key": "device_id",
+        "label": "设备引用"
+      },
+      {
+        "key": "interface",
+        "label": "接口"
+      },
+      {
+        "key": "address",
+        "label": "地址及前缀"
+      },
+      {
+        "key": "asn",
+        "label": "ASN",
+        "kind": "positive"
+      },
+      {
+        "key": "pool_ref",
+        "label": "批准地址池"
+      },
+      {
+        "key": "source",
+        "label": "规划依据"
+      }
+    ]
+  },
+  {
+    "id": "network_bgp",
+    "domain": "network",
+    "name": "邻居与协议",
+    "description": "邻居、BFD和路由策略必须有规划依据。",
+    "consumer": "协议配置生成",
+    "fields": [
+      {
+        "key": "device_id",
+        "label": "本端设备"
+      },
+      {
+        "key": "interface",
+        "label": "接口"
+      },
+      {
+        "key": "peer",
+        "label": "对端设备"
+      },
+      {
+        "key": "peer_address",
+        "label": "对端地址"
+      },
+      {
+        "key": "local_asn",
+        "label": "本端ASN",
+        "kind": "positive"
+      },
+      {
+        "key": "peer_asn",
+        "label": "对端ASN",
+        "kind": "positive"
+      },
+      {
+        "key": "family",
+        "label": "地址族"
+      },
+      {
+        "key": "bfd_ref",
+        "label": "BFD策略"
+      }
+    ]
+  },
+  {
+    "id": "network_policies",
+    "domain": "network",
+    "name": "网络策略",
+    "description": "按实际适用范围选择RoCE/QoS、EVPN或其他已批准策略。",
+    "consumer": "Fabric配置集",
+    "fields": [
+      {
+        "key": "scope",
+        "label": "设备或分组"
+      },
+      {
+        "key": "profile",
+        "label": "配置集版本"
+      },
+      {
+        "key": "roce",
+        "label": "RoCE/QoS策略"
+      },
+      {
+        "key": "ar",
+        "label": "路由策略"
+      },
+      {
+        "key": "evpn",
+        "label": "EVPN/VXLAN策略"
+      },
+      {
+        "key": "source",
+        "label": "依据"
+      }
+    ]
+  },
+  {
+    "id": "boot_interfaces",
+    "domain": "provisioning",
+    "name": "启动身份",
+    "description": "明确启动网卡及其MAC，不把任意业务端口MAC当成启动身份。",
+    "consumer": "PXE目标识别",
+    "fields": [
+      {
+        "key": "device_id",
+        "label": "设备引用"
+      },
+      {
+        "key": "port",
+        "label": "启动端口"
+      },
+      {
+        "key": "mac",
+        "label": "启动MAC"
+      },
+      {
+        "key": "boot_mode",
+        "label": "启动方式"
+      },
+      {
+        "key": "network",
+        "label": "安装网络"
+      },
+      {
+        "key": "address_policy",
+        "label": "地址策略"
+      }
+    ]
+  },
+  {
+    "id": "install_profiles",
+    "domain": "provisioning",
+    "name": "镜像与安装策略",
+    "description": "按设备组选择一次策略，实际执行前再校验镜像和设备兼容性。",
+    "consumer": "安装计划",
+    "fields": [
+      {
+        "key": "scope",
+        "label": "设备或分组"
+      },
+      {
+        "key": "architecture",
+        "label": "架构"
+      },
+      {
+        "key": "image_ref",
+        "label": "镜像版本引用"
+      },
+      {
+        "key": "disk_policy",
+        "label": "磁盘策略"
+      },
+      {
+        "key": "bios_ref",
+        "label": "BIOS配置引用"
+      },
+      {
+        "key": "firmware_ref",
+        "label": "固件基线"
+      },
+      {
+        "key": "credential_ref",
+        "label": "凭据引用"
+      }
+    ]
+  },
+  {
+    "id": "route_nodes",
+    "domain": "cabling",
+    "name": "通道节点",
+    "description": "登记允许走线的通道节点，名称和坐标均可来自布局资料。",
+    "consumer": "布线路径",
+    "fields": [
+      {
+        "key": "code",
+        "label": "节点编号"
+      },
+      {
+        "key": "room_id",
+        "label": "机房引用"
+      },
+      {
+        "key": "x",
+        "label": "坐标X",
+        "kind": "number"
+      },
+      {
+        "key": "y",
+        "label": "坐标Y",
+        "kind": "number"
+      },
+      {
+        "key": "z",
+        "label": "坐标Z",
+        "kind": "number"
+      },
+      {
+        "key": "unit",
+        "label": "坐标单位"
+      }
+    ]
+  },
+  {
+    "id": "route_edges",
+    "domain": "cabling",
+    "name": "允许路段",
+    "description": "计算仅使用明确路段；路段长度以米为单位。",
+    "consumer": "确定性路径计算",
+    "fields": [
+      {
+        "key": "code",
+        "label": "路段编号"
+      },
+      {
+        "key": "from",
+        "label": "起点节点"
+      },
+      {
+        "key": "to",
+        "label": "终点节点"
+      },
+      {
+        "key": "distance_m",
+        "label": "长度m",
+        "kind": "positive"
+      },
+      {
+        "key": "category",
+        "label": "线路类别"
+      },
+      {
+        "key": "source",
+        "label": "测量或规划依据"
+      }
+    ]
+  },
+  {
+    "id": "rack_access",
+    "domain": "cabling",
+    "name": "机柜接入点",
+    "description": "将机柜关联到通道图，缺少接入点只影响该柜线长计算。",
+    "consumer": "双端路径定位",
+    "fields": [
+      {
+        "key": "rack_id",
+        "label": "机柜引用"
+      },
+      {
+        "key": "node",
+        "label": "接入节点"
+      },
+      {
+        "key": "lead_m",
+        "label": "柜内引线m",
+        "kind": "number"
+      }
+    ]
+  },
+  {
+    "id": "cable_specs",
+    "domain": "cabling",
+    "name": "线缆与标准长度",
+    "description": "按规格逐行登记可采购长度，计算不改变实装长度。",
+    "consumer": "标准长度匹配",
+    "fields": [
+      {
+        "key": "code",
+        "label": "规格引用"
+      },
+      {
+        "key": "medium",
+        "label": "介质"
+      },
+      {
+        "key": "connector_a",
+        "label": "本端连接器"
+      },
+      {
+        "key": "connector_b",
+        "label": "对端连接器"
+      },
+      {
+        "key": "rate",
+        "label": "速率"
+      },
+      {
+        "key": "length_m",
+        "label": "标准长度m",
+        "kind": "positive"
+      },
+      {
+        "key": "optic_mode",
+        "label": "模块方式"
+      }
+    ]
+  },
+  {
+    "id": "optic_specs",
+    "domain": "cabling",
+    "name": "光模块与匹配",
+    "description": "按物理端口统计模块需求；没有依据时不默认每端一只。",
+    "consumer": "光模块需求",
+    "fields": [
+      {
+        "key": "model",
+        "label": "模块型号"
+      },
+      {
+        "key": "port_type",
+        "label": "端口类型"
+      },
+      {
+        "key": "medium",
+        "label": "介质"
+      },
+      {
+        "key": "rate",
+        "label": "速率"
+      },
+      {
+        "key": "reach_m",
+        "label": "适用距离m",
+        "kind": "positive"
+      },
+      {
+        "key": "source",
+        "label": "匹配依据"
+      }
+    ]
+  },
+  {
+    "id": "cabling_rules",
+    "domain": "cabling",
+    "name": "布线规则",
+    "description": "通道最短路径＋双端引线＋明确余量，再匹配同规格标准长度。",
+    "consumer": "确定性布线计算",
+    "fields": [
+      {
+        "key": "code",
+        "label": "规则编号"
+      },
+      {
+        "key": "version",
+        "label": "版本",
+        "kind": "positive"
+      },
+      {
+        "key": "strategy",
+        "label": "路径算法"
+      },
+      {
+        "key": "slack_m",
+        "label": "固定余量m",
+        "kind": "number"
+      },
+      {
+        "key": "slack_percent",
+        "label": "比例余量%",
+        "kind": "number"
+      },
+      {
+        "key": "cable_spec",
+        "label": "线缆规格引用"
+      },
+      {
+        "key": "source",
+        "label": "规则依据"
+      }
+    ]
+  },
+  {
+    "id": "power_profiles",
+    "domain": "power",
+    "name": "设备功率依据",
+    "description": "规划、铭牌与实测分开；本页负荷计算只采用明确规划功率。",
+    "consumer": "机柜负荷",
+    "fields": [
+      {
+        "key": "device_id",
+        "label": "设备引用"
+      },
+      {
+        "key": "power_kw",
+        "label": "功率kW",
+        "kind": "positive"
+      },
+      {
+        "key": "basis",
+        "label": "功率依据"
+      },
+      {
+        "key": "cooling",
+        "label": "冷却方式"
+      },
+      {
+        "key": "source",
+        "label": "来源"
+      }
+    ]
+  },
+  {
+    "id": "rack_capacity",
+    "domain": "power",
+    "name": "机柜容量",
+    "description": "容量未知不按零值处理，也不影响设备和连接入库。",
+    "consumer": "容量与冷却核算",
+    "fields": [
+      {
+        "key": "rack_id",
+        "label": "机柜引用"
+      },
+      {
+        "key": "capacity_kw",
+        "label": "可用容量kW",
+        "kind": "positive"
+      },
+      {
+        "key": "cooling",
+        "label": "冷却方式"
+      },
+      {
+        "key": "cooling_kw",
+        "label": "冷却容量kW",
+        "kind": "positive"
+      },
+      {
+        "key": "source",
+        "label": "容量依据"
+      }
+    ]
+  },
+  {
+    "id": "power_circuits",
+    "domain": "power",
+    "name": "PDU与回路",
+    "description": "复用已有设备身份，明确供电对象的上游关系。",
+    "consumer": "供电拓扑",
+    "fields": [
+      {
+        "key": "code",
+        "label": "供电对象"
+      },
+      {
+        "key": "rack_id",
+        "label": "机柜引用"
+      },
+      {
+        "key": "upstream",
+        "label": "上游引用"
+      },
+      {
+        "key": "circuit",
+        "label": "回路"
+      },
+      {
+        "key": "capacity_kw",
+        "label": "容量kW",
+        "kind": "positive"
+      },
+      {
+        "key": "group",
+        "label": "A/B分组"
+      }
+    ]
+  },
+  {
+    "id": "power_connections",
+    "domain": "power",
+    "name": "PSU供电连接",
+    "description": "必须有明确的电源口与回路关联，不能从A/B标签推测冗余成立。",
+    "consumer": "供电关系与冗余",
+    "fields": [
+      {
+        "key": "device_id",
+        "label": "设备引用"
+      },
+      {
+        "key": "psu",
+        "label": "电源口"
+      },
+      {
+        "key": "circuit",
+        "label": "回路"
+      },
+      {
+        "key": "group",
+        "label": "A/B分组"
+      },
+      {
+        "key": "allocation",
+        "label": "分摊规则引用"
+      }
+    ]
+  }
+]
