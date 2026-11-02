@@ -43832,6 +43832,7 @@ components:
         protocol:
           enum:
           - openai-chat
+          - openai-responses
           - keel-mapping
         endpoint:
           type: string
@@ -43914,6 +43915,7 @@ components:
         protocol:
           enum:
           - openai-chat
+          - openai-responses
           - keel-mapping
         endpoint:
           type: string
@@ -44007,6 +44009,7 @@ components:
         protocol:
           enum:
           - openai-chat
+          - openai-responses
           - keel-mapping
         is_default:
           type: boolean

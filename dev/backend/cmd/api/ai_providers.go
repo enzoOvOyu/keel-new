@@ -53,10 +53,17 @@ func aiEndpoint(endpoint, protocol string) (string, error) {
 	if e != nil || u.Host == "" || u.User != nil || u.RawQuery != "" || u.Fragment != "" || (u.Scheme != "https" && !(env("APP_ENV", "development") != "production" && u.Scheme == "http")) {
 		return "", errors.New("INVALID_PROVIDER_ENDPOINT")
 	}
-	if protocol == "openai-chat" {
+	if protocol == "openai-chat" || protocol == "openai-responses" {
 		u.Path = strings.TrimRight(u.Path, "/")
-		if !strings.HasSuffix(u.Path, "/chat/completions") {
-			u.Path += "/chat/completions"
+		suffix := "/chat/completions"
+		if protocol == "openai-responses" {
+			suffix = "/responses"
+			u.Path = strings.TrimSuffix(u.Path, "/chat/completions")
+		} else {
+			u.Path = strings.TrimSuffix(u.Path, "/responses")
+		}
+		if !strings.HasSuffix(u.Path, suffix) {
+			u.Path += suffix
 		}
 	}
 	return u.String(), nil
@@ -191,7 +198,7 @@ func (s *Server) aiProviderRoutes(w http.ResponseWriter, r *http.Request) bool {
 		}
 		c.Name = strings.TrimSpace(c.Name)
 		c.Model = strings.TrimSpace(c.Model)
-		if len([]rune(c.Name)) < 2 || len([]rune(c.Name)) > 120 || c.Model == "" || len(c.Model) > 200 || (c.Protocol != "openai-chat" && c.Protocol != "keel-mapping") || c.Timeout < 1 || c.Timeout > 120 || c.Budget < 128 || c.Budget > 32768 {
+		if len([]rune(c.Name)) < 2 || len([]rune(c.Name)) > 120 || c.Model == "" || len(c.Model) > 200 || (c.Protocol != "openai-chat" && c.Protocol != "openai-responses" && c.Protocol != "keel-mapping") || c.Timeout < 1 || c.Timeout > 120 || c.Budget < 128 || c.Budget > 32768 {
 			fail(w, 422, "INVALID_PROVIDER_CONFIGURATION")
 			return true
 		}

@@ -15733,7 +15733,7 @@ export interface components {
             id: string;
             name: string;
             /** @enum {unknown} */
-            protocol: "openai-chat" | "keel-mapping";
+            protocol: "openai-chat" | "openai-responses" | "keel-mapping";
             /** Format: uri */
             endpoint: string;
             model: string;
@@ -15757,7 +15757,7 @@ export interface components {
         AIProviderConfigurationCommand: {
             name: string;
             /** @enum {unknown} */
-            protocol: "openai-chat" | "keel-mapping";
+            protocol: "openai-chat" | "openai-responses" | "keel-mapping";
             /** Format: uri */
             endpoint: string;
             model: string;
@@ -15791,7 +15791,7 @@ export interface components {
             name: string;
             model: string;
             /** @enum {unknown} */
-            protocol: "openai-chat" | "keel-mapping";
+            protocol: "openai-chat" | "openai-responses" | "keel-mapping";
             is_default: boolean;
         };
         listAIProviderConfigurationsEnvelope: {

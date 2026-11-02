@@ -134,6 +134,9 @@ func (p *Provider) complete(ctx context.Context, prompt string, input any, funct
 		payload["tool_choice"] = "required"
 		payload["parallel_tool_calls"] = false
 	}
+	if p.Protocol == "openai-responses" {
+		payload = responsesPayload(payload)
+	}
 	b, _ := json.Marshal(payload)
 	req, e := http.NewRequestWithContext(ctx, "POST", p.Endpoint, bytes.NewReader(b))
 	if e != nil {
@@ -198,6 +201,12 @@ func (p *Provider) complete(ctx context.Context, prompt string, input any, funct
 		return nil, &ProviderError{Status: 200, Reason: reason}
 	}
 	p.Raw = append([]byte{}, raw...)
+	if p.Protocol == "openai-responses" {
+		raw, e = responsesCompletion(raw)
+		if e != nil {
+			return nil, e
+		}
+	}
 	var response struct {
 		Error *struct {
 			Code int `json:"code"`

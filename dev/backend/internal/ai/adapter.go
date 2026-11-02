@@ -259,6 +259,20 @@ func (p *Provider) Suggest(ctx context.Context, r Request) ([]Candidate, error) 
 	if budget < 1 {
 		budget = 2048
 	}
+	if p.Protocol == "openai-responses" {
+		p.TokenBudget = budget
+		content, err := p.completeJSON(ctx, prompt+"\nReturn a JSON object with a candidates array matching the mapping/v1 candidate schema.", r)
+		if err != nil {
+			return nil, err
+		}
+		var result struct {
+			Candidates json.RawMessage `json:"candidates"`
+		}
+		if json.Unmarshal(content, &result) != nil || len(result.Candidates) == 0 {
+			return nil, errors.New("SCHEMA_VALIDATION_FAILED")
+		}
+		return Decode(result.Candidates)
+	}
 	var body any = map[string]any{"model": p.Model, "input": r, "response_format": "mapping/v1", "system": prompt, "max_output_tokens": budget}
 	if p.Protocol == "openai-chat" {
 		input, _ := json.Marshal(r)
