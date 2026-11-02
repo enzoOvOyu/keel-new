@@ -68,10 +68,23 @@ func TestStandardFacilityPlacementChain(t *testing.T) {
 }
 func TestStandardPlacementBlocksMissingDependencies(t *testing.T) {
 	m := EmptyPhysical("p")
-	for _, q := range []InputPreviewRequest{standardRequest("racks", []string{"missing", "R1", "Rack", "42", "600", "1200", "2200"}), standardRequest("equipment_specs", []string{"missing", "server", "M", "2"})} {
+	for _, q := range []InputPreviewRequest{standardRequest("racks", []string{"missing", "R1", "Rack", "42", "600", "1200", "2200"})} {
 		if _, e := MergeStandardInput(m, q); e == nil {
 			t.Fatal("missing dependency accepted", q.TableID)
 		}
+	}
+}
+
+func TestInventoryWithoutTerminationsCreatesOnlySourceBackedInstances(t *testing.T) {
+	m := EmptyPhysical("inventory")
+	q := standardRequest("equipment_specs", []string{"source-SN", "server", "source-model", "2"}, []string{"", "server", "model-only", ""})
+	next, err := MergeStandardInput(m, q)
+	if err != nil || len(next.Equipment) != 1 || len(next.Ports) != 0 || next.Equipment[0].Serial == nil || *next.Equipment[0].Serial != "source-SN" || next.Equipment[0].IdentityKind != "planned_instance" {
+		t.Fatal("inventory identity lost or fabricated", err)
+	}
+	again, err := MergeStandardInput(next, q)
+	if err != nil || len(again.Equipment) != 1 || again.Equipment[0].EntityID != next.Equipment[0].EntityID {
+		t.Fatal("inventory reimport duplicated identity", err)
 	}
 }
 

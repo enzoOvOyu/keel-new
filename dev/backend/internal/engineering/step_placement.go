@@ -306,6 +306,12 @@ func MergeStandardInput(current PhysicalModel, q InputPreviewRequest) (PhysicalM
 				r.OrientationDegrees = text(v[12])
 			}
 		case "equipment_specs":
+			// Inventory rows with an explicit SN can introduce a planned instance
+			// even when the device has no termination row. Model-only rows remain
+			// in the source input and must not manufacture physical identities.
+			if v[0] == "" {
+				continue
+			}
 			found := -1
 			for i, eq := range next.Equipment {
 				if eq.Serial != nil && *eq.Serial == v[0] {
@@ -316,7 +322,9 @@ func MergeStandardInput(current PhysicalModel, q InputPreviewRequest) (PhysicalM
 				}
 			}
 			if found < 0 {
-				return current, fmt.Errorf("STEP_EQUIPMENT_REQUIRED")
+				found = len(next.Equipment)
+				serial := v[0]
+				next.Equipment = append(next.Equipment, EquipmentPlan{EntityVersion: version("equipment_serial", serial), EquipmentType: v[1], SourceModelLabel: v[2], Serial: &serial, Label: serial, Quantity: 1, IdentityKind: "planned_instance"})
 			}
 			eq := &next.Equipment[found]
 			eq.EquipmentType = v[1]

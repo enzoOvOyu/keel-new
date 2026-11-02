@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
@@ -417,6 +418,12 @@ func (s *Server) modelingRoutes(out http.ResponseWriter, r *http.Request, w engi
 		}
 	}
 	if action == "modeling-adopt" && r.Method == "POST" {
+		// Large source-backed plans can outlive the default HTTP write deadline.
+		// Keep the bounded synchronous adoption response alive through commit.
+		if err := http.NewResponseController(out).SetWriteDeadline(time.Now().Add(5 * time.Minute)); err != nil && !errors.Is(err, http.ErrNotSupported) {
+			reply(nil, err)
+			return true
+		}
 		var q engineering.ModelingAdoption
 		if !engineeringDecode(out, r, &q) {
 			return true
