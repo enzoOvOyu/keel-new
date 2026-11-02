@@ -1,5 +1,19 @@
 # 作业平台重构实施记录（技术域 Flows）
 
+## 2026-11-02 正式开发恢复：脚本文件工作台第一批
+
+分支仍为 `feat/jobs-kestra-ui`，工作区 `/home/ubuntu/keel-kestra-ui-dev`。用户已要求按原型继续正式开发；本批未发布、未合并，不改变5180/8081/5181。
+
+- 正式 `NamespaceFiles` 替换textarea：新增Shell/Python、多文件文本导入、搜索、Kestra Monaco在线编辑、保存版本、下载/历史、重新加载。复用已有namespace-artifacts API，保存带expected_revision，不走原来无版本的PUT。项目/用户/权限版本隔离的内存草稿和选择在面板重新挂载时保留，不写localStorage；刷新前提示未保存。
+- 普通引擎Flow可将已保存脚本内联为新任务，内容进入待保存的Flow定义；任务ID避重。受控设备任务保持原来的steps.command与QuickRun/审批链，不静默变成Kestra Worker脚本。Namespace动态文件引用绑定尚未完成。
+- 将原型验证过的Element Plus基础样式同步到`.keel-kestra`作用域，修正原生组件图标/加载等基础尺寸。保留二进制历史与Agent文件分发，折叠时不提前加载。
+- 修复本工作树dev/fixtures旧链接仍指向已删除keel-demo，改为仓库根fixtures；不复制数据、不恢复旧应用。
+- 验证：TypeScript、Vite生产构建通过（既有大chunk/依赖注释警告）；定向浏览器4组检查通过，无pageerror，使用拦截的synthetic契约响应，非真实Go/DB联调；内联脚本ID/快照检查通过。未做全量回归、真机测试或完整视觉验收。临时本地验证入口与服务已移除/停止。
+
+继续位置：`dev/src/features/flows/NamespaceFiles.tsx`、`jobs-native/NativeScriptEditorHost.tsx`、`flows/script-task.ts`、`lib/api/flows.ts`。后续优先完成原型多面板Visual/Topology/Files整体替换、服务端Flow目录分页/total/近期执行聚合、Execution生命周期页。此前约20%只属于旧原生替换估算，本批没有重新量化整个任务；不能把文件切片当全平台完成。后端既有缺口（证书轮换、可恢复批量安装、设备事件/ZTP消费者、新聚合查询）仍保留。
+
+
+
 ## 2026-11-02 脚本原型闭环
 
 补齐此前未完成的新增/导入/Monaco在线编辑/保存/引用闭环，入口为原型编辑器顶部及Files / 脚本。Namespace文件与内联任务明确区分，切换面板保留原型文件；实际上传和设备执行仍未接入。详见 [原型说明](prototype/README.md) 与prototype/scripts-validation.json。本次只改变独立原型，保持正式作业平台实施状态及5180/8081不变。

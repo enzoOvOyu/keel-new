@@ -118,3 +118,12 @@ Bootstrap需运维预置root可信helper、包摘要及HTTPS分发，未对生�
 - UI 调度表单保留保存的脚本类型、超时、目标并发和步骤；从 Flow 更新步骤是显式动作，不被刷新覆盖。
 
 新增接口尚未进行8081联调或迁移执行。已运行检查与剩余缺口见实施记录，不能以生成类型通过冒充接口运行验收。
+
+
+### 2026-11-02 正式脚本工作台接入（分支已实现、未部署）
+
+- 新增/导入文本先为内存草稿，保存调用既有 `POST /flows/{flowId}/namespace-artifacts`（FlowsFileUpload），使用UTF-8的base64和读取版本的expected_revision；409保持草稿，不自动覆盖，用户可确认重新加载。项目ID、CSRF与权限沿用现有Adapter/后端。
+- 内容读取优先使用 `GET /flows/{flowId}/namespace-artifacts/{revisionId}` 的原始字节响应；统一Adapter严格解码UTF-8，二进制只提供下载。未纳入Keel版本管理的历史引擎文本保留namespace-file只读兼容入口，其既有128KiB限制未改变。
+- 保存后刷新文件版本、上下文和分发历史。内存草稿按identity/permission_revision/project/flow隔离；不持久化浏览器秘密。权限判断由后端复核。
+- 脚本内联只修改待保存Flow，实际保存/发布仍走Flow Revision校验。引擎脚本与Keel设备通道不同；设备脚本继续使用受控steps。Namespace引用及Execution冻结文件版本的完整集成不在本批完成范围。
+- 未新增HTTP操作或修改Schema；OpenAPI/生成类型和真实接口注册表保持原契约。此处的浏览器验证使用synthetic拦截响应，不表示Go/数据库/设备闭环已验证。历史文件版本列表仍有既有500条上限，需要后续分页契约，不能当成无限完整文件目录。

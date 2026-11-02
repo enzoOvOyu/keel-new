@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import YAML from 'yaml';
-import { BinaryFiles } from './Completion';
 import { flowsKey, flowsApi, type Engine } from '@/lib/api/flows';
 import { Button, Table, Notice, Empty, State } from './ui';
 export function RevisionView({ values, current, onRestore, canEdit }: {
@@ -30,13 +29,7 @@ export function TriggerView({ source, onChange, onBuilder, canEdit }: {
     ;
     return <><div className="fl-toolbar"><h3>Triggers</h3><span className="spacer"/><span>修改进入同一 Flow 草稿，校验保存后生效。</span></div><Table<any> data={triggers} columns={[{ accessorKey: 'id', header: 'Trigger' }, { accessorKey: 'type', header: 'Type' }, { accessorKey: 'cron', header: 'Cron' }, { accessorKey: 'timezone', header: 'Timezone' }, { id: 'status', header: 'State', cell: ({ row }) => <State value={row.original.disabled ? 'DISABLED' : 'ENABLED'}/> }, { id: 'actions', header: 'Actions', cell: ({ row }) => <Button variant="outline" size="sm" disabled={!canEdit} onClick={() => update(row.index)}>{row.original.disabled ? '启用草稿' : '停用草稿'}</Button> }]}/><div className="fl-toolbar"><label>Trigger ID<input value={id} onChange={e => setId(e.target.value)}/></label><label>Cron<input placeholder="0 */6 * * *" value={cron} onChange={e => setCron(e.target.value)}/></label><label>Timezone<input value={zone} onChange={e => setZone(e.target.value)}/></label><Button disabled={!canEdit || !id || !cron || triggers.some((t: any) => t.id === id)} onClick={() => { doc.triggers = [...triggers, { id, type: 'io.kestra.plugin.core.trigger.Schedule', cron, timezone: zone, disabled: true }]; onChange(YAML.stringify(doc)); onBuilder(); }}>添加禁用的 Schedule 草稿</Button></div><p className="fl-note">调度属于 Kestra Flow；设备执行仍需有效项目授权、受控目标及通道，不会从任意计划绕过预检。Webhook 与事件触发可在 YAML 中配置并交由引擎验证。</p></>;
 }
-export function NamespaceFiles({ project, id, values, canEdit, onUse }: {
-    project: string;
-    id: string;
-    values: Engine[];
-    canEdit: boolean;
-    onUse?: (path:string,content:string)=>void;
-}) { const cache = useQueryClient(); const [path, setPath] = useState(''), [content, setContent] = useState(''), [loaded, setLoaded] = useState(''); const [dirty, setDirty] = useState(false); const read = useMutation({ mutationFn: (p: string) => flowsApi.file(project, id, p), onSuccess: f => { setPath(f.path); setLoaded(f.path); setContent(f.content); setDirty(false); } }); const save = useMutation({ mutationFn: () => flowsApi.saveFile(project, id, path, content), onSuccess: () => { setLoaded(path); setDirty(false); void cache.invalidateQueries({ queryKey: flowsKey('context') }); } }); return <><Notice error={read.error || save.error}/><div className="fl-context-columns"><section><h3>Namespace Files</h3><Table<any> data={values.map((v, i) => ({ ...v, id: String(v.fileName || v.name || i) }))} onSelect={v => read.mutate(String(v.fileName || v.name || v.id))} columns={[{ accessorKey: 'fileName', header: 'File' }, { accessorKey: 'type', header: 'Type' }, { accessorKey: 'size', header: 'Bytes' }]}/><Button variant="outline" disabled={!canEdit} onClick={() => { setPath(''); setLoaded(''); setContent(''); setDirty(true); }}>New text file</Button></section><aside><div className="fl-toolbar"><input aria-label="Namespace file path" placeholder="/scripts/collect.sh" value={path} disabled={!canEdit} onChange={e => { setPath(e.target.value); setDirty(true); }}/><Button disabled={!canEdit || !path || !dirty || save.isPending} onClick={() => save.mutate()}>Save file revision</Button></div><textarea aria-label="Namespace file content" className="fl-yaml" value={content} disabled={!canEdit} onChange={e => { setContent(e.target.value); setDirty(true); }}/><div className="fl-toolbar">{onUse&&<Button disabled={!loaded||dirty||read.isPending} onClick={()=>onUse(loaded,content)}>载入所选任务脚本</Button>}</div><small>{loaded || '新文件'} · 文本编辑上限 128 KiB；凭据只使用受控引用，不写入脚本文件。</small></aside></div><BinaryFiles project={project} id={id} canEdit={canEdit}/></>; }
+export { NamespaceFiles } from './NamespaceFiles';
 export function DependencyView({ project, id }: {
     project: string;
     id: string;

@@ -34,6 +34,7 @@ export const flowsApi = {
  schedule:(p:string,id:string)=>request<BatchSchedule>('/'+id+'/schedule',p),saveSchedule:(p:string,id:string,value:BatchSchedule)=>request<BatchSchedule>('/'+id+'/schedule',p,'PUT',value),
  fileVersions:(p:string,id:string)=>request<FileRevision[]>('/'+id+'/namespace-artifacts',p),uploadFile:(p:string,id:string,value:{path:string;data_base64:string;expected_revision:number})=>request<FileRevision>('/'+id+'/namespace-artifacts',p,'POST',value),
  distributeFile:(p:string,id:string,revision:string,value:Run)=>request<Execution>('/'+id+'/namespace-artifacts/'+revision+'/distribute',p,'POST',value),
+ fileText:async(p:string,id:string,revision:string)=>{const r=await fetch(flowsApi.fileDownloadURL(p,id,revision),{credentials:'same-origin'});if(!r.ok){if(r.status===401)window.dispatchEvent(new Event('keel-session-expired'));throw Error('文件读取失败（'+r.status+'）')}const data=await r.arrayBuffer();try{const text=new TextDecoder('utf-8',{fatal:true}).decode(data);if(text.includes('\0'))throw Error('BINARY_FILE');return text}catch{throw Error('该文件不是 UTF-8 文本，请通过文件分发面板下载。')}},
  fileDownloadURL:(p:string,id:string,revision:string)=>'/api/v1/flows/'+id+'/namespace-artifacts/'+revision+'?'+new URLSearchParams({project_id:p}),
  approvalRequest:(run:Run,reason:string)=>request<S['FlowsApprovalResult']>('/approval-request',run.project_id,'POST',{run,reason}),
  steps:(p:string|null,id:string)=>request<{asset_id:string;step_id:string;state:string;exit_code:number|null;stdout:string;stderr:string}[]>('/executions/'+id+'/steps',p),

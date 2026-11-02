@@ -1,3 +1,4 @@
+@use './native-foundation';
 // Keel integration: original Kestra theme rules are scoped by the Vite PostCSS plugin.
 @use '../../vendor/kestra/design-system/assets/styles/ks-tokens';
 @use '../../vendor/kestra/design-system/assets/styles/ks-theme-light';
