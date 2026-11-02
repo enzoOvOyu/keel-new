@@ -1,8 +1,10 @@
 package flows
 
 import (
+	"context"
 	"net/url"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -48,5 +50,22 @@ func TestDurationSummaryUsesActualSamplesAndDoesNotFillMissing(t *testing.T) {
 	actual := durationSummary([]float64{9, 2, 4}, 4)
 	if actual.SampleCount != 3 || actual.MissingCount != 1 || *actual.Mean != 5 || *actual.P50 != 4 || *actual.P95 != 9 {
 		t.Fatal("sample percentiles incorrect", actual)
+	}
+}
+
+func TestDeviceTaskDocumentationUsesJobContractWithoutEngine(t *testing.T) {
+	s := &Service{}
+	for _, kind := range []string{"keel.device.bash", "keel.device.python", "keel.device.command"} {
+		value, err := s.TaskDocumentation(context.Background(), Scope{}, kind)
+		if err != nil {
+			t.Fatal(err)
+		}
+		markdown := value["documentation"].(map[string]any)["markdown"].(string)
+		if value["type"] != kind || !strings.Contains(markdown, "IPMI-only") || !strings.Contains(markdown, "depends_on") {
+			t.Fatalf("incomplete device documentation: %v", value)
+		}
+	}
+	if _, err := s.TaskDocumentation(context.Background(), Scope{}, "keel.device.unsupported"); err == nil {
+		t.Fatal("unknown view type was accepted")
 	}
 }

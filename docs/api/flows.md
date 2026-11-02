@@ -140,7 +140,7 @@ OpenAPI为唯一字段定义。本节对应6个新增已登记查询：
 | GET `/flows/log-search` | FlowsLogSearchPage | 已脱敏flow_event日志，按Flow/Execution/Task/等级/文本/时间筛选，游标绑定用户+授权项目+查询；时间范围是采集事件时间。coverage明确不含尚未捕获的历史日志。 |
 | GET `/flows/executions/{executionId}/insights` | FlowsExecutionInsights | 稳定时间/ID相邻执行，真实parent_id谱系；按需查询引擎指标（metrics=false跳过），不将单位缺失解释为默认单位。引擎指标不可用返回metrics_error。 |
 | GET `/flows/executions/{executionId}/variables` | FlowsExecutionVariables | 输入按执行原Revision的SECRET定义脱敏，定义不可得时遮蔽所有输入；结构化敏感键和文本再次脱敏。产物仍经现有授权下载接口。 |
-| GET `/flows/task-documentation` | FlowsTaskDocumentation | 仅既有执行策略允许的类型，从固定Kestra插件文档API读取；不是安装插件或扩展执行权限入口。 |
+| GET `/flows/task-documentation` | FlowsTaskDocumentation | 既有策略允许的Kestra类型从固定插件API读取；keel.device.bash/python/command返回JobStep契约说明，仅为展示类型，不是引擎插件，也不扩展执行权限。 |
 
 所有操作逐请求使用flows:read与后端项目范围，400拒绝非法分页/时间/游标，404隐藏未授权执行，未连接引擎不伪造结果。所有响应包含request_id。相邻执行与谱系逐项授权；来源筛选不代表业务消费者已经接通。
 
@@ -188,3 +188,11 @@ Agent新参数`--renew-before`默认0（未启用），启用时要求HTTPS；`-
 Catalog新增state_counts（授权搜索/Namespace/目标筛选后、选择状态前的服务端计数），recent_executions（同项目最近最多10次，最新在前，保留recent_execution兼容），triggers（现有作用域Schedule与Flow定义，来源独立），updated_at/updated_by（flow.save审计，不用创建时间冒充修改时间；缺失为null）。不新增资产或迁移。执行详情新增可空flow_name，取同项目绑定名称，不改变冻结engine_flow_id。独立Go查询集成已核对历史顺序、状态页签计数、审计来源、停用计划与项目隔离；前端使用同一批准原型synthetic数据对照，非生产HTTP验收。
 
 保存视图仅为当前用户/权限版本/项目隔离的内存Query偏好，保存搜索和筛选，不保存执行目标或秘密。版本差异使用实际Revision source与当前草稿的Monaco Diff；源定义缺失时不生成假Diff。
+
+
+### 2026-11-02 脚本工作台与 Quick Run 衔接
+
+- 新建 Flow 的 Files 允许新增、导入及在线编辑，文件仅为用户/权限版本/项目隔离的 Query 内存草稿，不对 `new` 伪 ID 发文件 API。创建真实 Flow binding 后，草稿及当前文件选择转移至实际 Flow ID；再调用已有 namespace-artifacts 接口保存带 expected_revision 的文件版本。刷新未保存内容会丢失并提示，不声称已持久化。
+- 文件保存冲突保留编辑内容；已保存的 Shell/Python 文件经确认后复制为受控设备步骤的内容快照，或替换选中的设备步骤。单 command 定义首次扩展为多步骤时保留原命令。Namespace 动态执行引用继续禁用，不放宽 Worker Shell/Python 策略；当前 JobStep 没有独立文件来源绑定字段，不宣称支持文件版本自动跟随。
+- Visual、YAML、Topology、Docs 共用当前 Flow 定义；`keel.device.bash/python/command` 仅为 Docs/节点展示类型，提交给引擎的仍是原受控适配定义。Docs 按需使用既有 task-documentation 端点，不创建假插件。
+- Quick Run 的草稿字段先按 JobStep 结构限制给予即时反馈，后端仍独立校验授权、执行能力、维护态、目标版本与审批。目标/脚本/通道变更清除预检与审批；异步预检仅回填匹配当前请求的结果。创建执行固定所选目标 ID 与预检返回的目标版本。审批记录不是前端可自证的授权，启动时仍由后端核验。

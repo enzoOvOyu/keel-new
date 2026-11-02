@@ -1,6 +1,6 @@
 <a id="prototype-parity-correction-20261102"></a>
 
-## 2026-11-02 原型一致性整改与后续交互补齐（进行中）
+## 2026-11-02 原型一致性整改与后续交互补齐
 
 用户要求：先完成当前原型一致性整改，再完成下列新增交互整改；直接连续执行，不逐项等待确认。ZTP/设备事件仍按已记录安排暂缓，不扩大到该业务域。
 
@@ -12,11 +12,13 @@
 
 呈现整改证据：parity-validation/result.json使用批准原型同一份data.ts、1600×1000视口，5组交互通过、零后端写入；已查看目录/Builder/Execution/Revisions截图。保留正式Keel全局壳层，不复制原型隔离侧栏。子任务默认收起和目录行密度随后做了定向呈现修正，最终截图随交互补齐一并更新；不宣称像素级100%一致。Go查询集成通过，TypeScript通过首轮检查。
 
-**完成以上后继续（用户补充，尚未完成，不得提前勾选）：**
+**追加交互已实现并通过定向浏览器检查（synthetic API，不是真机验收）：**
 1. 新建交付任务五模块：按批准原型Visual / YAML / Topology / Files / Docs逐项核对完整性、切换保留、同源联动及保存/运行路径。
-2. Files输入交互：新增/导入、路径与语言、在线编辑、校验、保存版本、未保存处理、使用脚本、来源版本和错误反馈。已有部分能力，不等于完整闭环已验收。
-3. 添加任务显式提供Shell Script、Python Script，实际接入受控设备任务与脚本编辑；当前仅步骤类型选择不算完成，不开放未授权Worker执行或伪造插件。
-4. Quick Run：目标→脚本/通道→预检确认，覆盖前后返回、修改后预检失效、输入校验、审批、冻结目标/版本、提交结果与失败反馈。已有三步基础，仍需按原型专项整改。
+2. Files输入交互：新增/导入、路径与语言、在线编辑、校验、保存版本、未保存处理、使用脚本、来源版本和错误反馈。已改为原生文件树/Monaco/新建与导入弹窗；新建Flow文件草稿绑定后延续，保存冲突保留内容。
+3. 添加任务显式提供Shell Script、Python Script，实际接入受控设备任务与脚本编辑；已添加独立类型选择器及选中任务属性联动，不开放未授权Worker执行或伪造插件。
+4. Quick Run：目标→脚本/通道→预检确认，覆盖前后返回、修改后预检失效、输入校验、审批、冻结目标/版本、提交结果与失败反馈。三步前后切换、脚本修改后旧预检失效、冻结目标/版本提交和维护态禁用已检查；审批最终由后端重新授权。
+
+专项证据：`parity-validation/scripts-result.json` 与 formal-files/formal-quick-run 截图，5组交互、零浏览器异常、零后端/设备写入。覆盖新建Flow文件草稿转移、导入、保存冲突后重试、已保存快照使用、Shell/Python任务、设备Docs和QuickRun变更后重新预检及版本冻结提交。`TestDeviceTaskDocumentationUsesJobContractWithoutEngine`通过；客户端校验检查合法流水线、数值范围、重复/缺失/循环依赖和输出绑定。文件草稿仅保留内存，未保存时刷新会丢失并提示；动态Namespace引用仍不支持。没有执行全仓/真机/规模验收，完整构建结果见最新HANDOFF。
 
 所有条目分别记录实现、验证、限制；在feat/jobs-kestra-ui继续，不合并/发布到当前测试环境。代码索引：flows/{FlowsWorkspace,Builder,NamespaceFiles,QuickRun}.tsx，jobs-native/Native{Catalog,Visual,Workbench,Execution,QuickRun}.vue；API契约仍以docs/openapi.yaml为准。
 

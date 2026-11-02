@@ -16931,7 +16931,7 @@ paths:
       operationId: getFlowsTaskDocumentation
       tags:
         - FlowsReal
-      description: Authorized Keel job workspace query; source and missing evidence are explicit.
+      description: Read installed policy-allowed Kestra plugin documentation or built-in keel.device.bash/python/command JobStep documentation. Device identifiers are presentation types, not executable Kestra plugins.
       parameters:
         - in: query
           name: project_id

@@ -1,3 +1,13 @@
+## 2026-11-02 作业平台追加交互整改已接通（独立分支，未部署）
+
+工作树 `/home/ubuntu/keel-kestra-ui-dev`，分支 `feat/jobs-kestra-ui`。第一批呈现整改 `87ce273` 已推送 keel-new；本节随下一批脚本/QuickRun整改提交。没有合并 dev/main，没有改5180/8081/5181；本任务临时5193已停止，避免影响构建与其他窗口。
+
+**本批实现**：NativeFiles 文件树/Monaco/新建语言路径/导入目标目录/使用快照确认；新建Flow先编辑文件草稿，创建真实binding后转移缓存并保存文件版本；409保留草稿，未保存不允许引用；Namespace动态执行引用仍禁用。NativeVisual明确添加Shell Script/Python Script/Command，首次扩展多步保留原command。五模块共用canonical定义，设备Docs通过现有API返回JobStep说明（不是假Kestra插件）。QuickRun补结构错误即时反馈、异步预检请求匹配、变更清除旧预检/审批、冻结目标版本提交，去除残留旧向导状态。
+
+**实际验证**：5组专项浏览器交互通过，零pageerror；文件草稿转移/导入、保存冲突重试/快照使用、脚本类型与Docs、QuickRun返回修改后重新预检/冻结版本提交/维护态禁选。API全部拦截synthetic，没有后端或设备写入。证据 `docs/flows-redesign/parity-validation/scripts-result.json`、formal-files/formal-quick-run截图；截图已查看。Go文档契约定向测试通过；QuickRun合法流水线/数值/重复与缺失和循环依赖/输出绑定检查通过；107项API台账引用检查通过。最终 `npm run build`（TypeScript + Vite）通过，Vite耗时1m24s；保留既有大chunk警告，不为本次任务扩展全局打包重构。
+
+**限制与接续**：文件未保存草稿仅在当前内存会话，刷新会丢失并提示；当前JobStep没有文件来源自动绑定/动态跟随。预检READY不等于高危审批通过，Start仍检查批准记录。ZTP/设备事件继续按用户安排暂缓；真实设备、发行版/NOS兼容、规模验收未运行。当前聚焦的软件交互整改不等同原型像素100%或生产真机验收。定位 `flows/{NamespaceFiles,FlowsWorkspace,Builder,QuickRun,TaskDocumentation}.tsx`、`jobs-native/Native{Files,Visual,Workbench,QuickRun,FlowHeader}.vue`、`backend/internal/flows/workspace.go`；契约解释 `docs/api/flows.md`，唯一机器契约仍是openapi.yaml。
+
 ## 2026-11-02 原型整改第一批已接通，继续专项交互
 
 当前feat/jobs-kestra-ui未发布。目录状态页签/作用域保存视图/近期历史条/审计更新时间、Builder去重复表单/隐藏wrapper、原生Overview与Revision侧栏+Monaco Diff、Execution任务/Attempt/内联日志已接通。新增catalog展示字段与执行flow_name契约，未新增迁移。证据及当前限制见[整改记录](docs/flows-redesign/implementation.md#prototype-parity-correction-20261102)与parity-validation/result.json；同数据5组synthetic交互通过，零后端写入，Go隔离查询通过。不要把这些检查当像素级还原或真机验收。

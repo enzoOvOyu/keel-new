@@ -133,3 +133,16 @@ export function nativeTemplate(current: Definition, kind: string): Definition {
 
 // One canonical device execution, projected for editing without exposing the transport wrapper.
 export function deliverySteps(doc:Definition):any[]{const steps=inputDefault(doc,'steps',[]);return steps.length?steps:[{id:'command',kind:inputDefault(doc,'kind','bash'),command:inputDefault(doc,'command',''),depends_on:[],inputs:{},implicit:true}]}
+
+/** Client feedback mirrors JobStep structural limits; the server still authorizes every run. */
+export function runDraftError(request: {command:string;timeout_seconds:number;target_concurrency:number;steps?:{id:string;kind:string;command:string;depends_on:string[];inputs?:Record<string,string>}[]}):string {
+  if(!Number.isInteger(request.timeout_seconds)||request.timeout_seconds<1||request.timeout_seconds>3600)return '超时应为 1–3600 秒的整数';
+  if(!Number.isInteger(request.target_concurrency)||request.target_concurrency<1||request.target_concurrency>64)return '目标并发应为 1–64 的整数';
+  const steps=request.steps||[];
+  if(!steps.length)return request.command.trim()?'':'请输入脚本或命令';
+  if(steps.length>32)return '设备步骤最多 32 个';
+  const ids=new Set<string>();
+  for(const step of steps){if(!/^[A-Za-z0-9_-]{1,100}$/.test(step.id))return '步骤 ID 仅支持字母、数字、下划线和连字符，最长 100 字符';if(ids.has(step.id))return '步骤 ID 重复：'+step.id;ids.add(step.id);if(!step.command.trim())return step.id+'：请输入脚本';if(!['bash','python','command'].includes(step.kind))return step.id+'：请选择支持的脚本类型';if(new TextEncoder().encode(step.command).length>131072)return step.id+'：脚本超过 128 KiB';}
+  for(const step of steps){if(step.depends_on.some(id=>!ids.has(id)))return step.id+'：前置步骤不存在';for(const [name,id] of Object.entries(step.inputs||{})){if(!/^[A-Z][A-Z0-9_]{0,63}$/.test(name)||!step.depends_on.includes(id))return step.id+'：输出绑定必须使用合法 ENV 名称并引用直接前置步骤';}}
+  const done=new Set<string>();while(done.size<steps.length){const next=steps.find(s=>!done.has(s.id)&&s.depends_on.every(id=>done.has(id)));if(!next)return '步骤依赖形成循环';done.add(next.id)}return '';
+}

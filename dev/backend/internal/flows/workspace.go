@@ -599,6 +599,15 @@ func (s *Service) ExecutionInsights(ctx context.Context, p Scope, id string, q u
 	return out, nil
 }
 func (s *Service) TaskDocumentation(ctx context.Context, p Scope, kind string) (map[string]any, error) {
+	// View identifiers describe the existing JobStep contract, not Kestra plugins.
+	deviceDocs := map[string]string{
+		"keel.device.bash":    "Shell Script: command is executed by Bash on the authorized CMDB target, not on the Kestra Worker.",
+		"keel.device.python":  "Python Script: command is executed by the target Python runtime; an unavailable runtime is an execution error, not a successful fallback.",
+		"keel.device.command": "Command: command is executed through the approved Agent/SSH transport on the authorized CMDB target.",
+	}
+	if description, ok := deviceDocs[kind]; ok {
+		return map[string]any{"type": kind, "documentation": map[string]any{"markdown": description + "\n\nid: unique [A-Za-z0-9_-], 1–100 characters.\ncommand: non-empty script, at most 131072 bytes per step.\ndepends_on: existing predecessor IDs; cycles are rejected.\ninputs: ENV variable -> direct predecessor ID; ENV names use [A-Z][A-Z0-9_]{0,63}.\nAt most 32 device steps. Transport, asset revisions, approvals and target capabilities are rechecked before execution. Maintained targets remain IPMI-only.\n\nFiles are copied as an explicitly selected saved content snapshot; dynamic Namespace execution references are not supported."}, "policy": "Keel JobStep documentation; not an installed Kestra plugin or permission grant"}, nil
+	}
 	ns := "keel.docs"
 	source := fmt.Sprintf("id: docs\nnamespace: %s\ntasks:\n  - id: selected\n    type: %s\n", ns, kind)
 	if !strings.HasPrefix(kind, "io.kestra.") || strings.ContainsAny(kind, "\r\n /?") {
