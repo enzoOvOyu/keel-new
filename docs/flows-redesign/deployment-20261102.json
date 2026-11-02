@@ -70,5 +70,6 @@
     "No real-device lifecycle or full business acceptance executed.",
     "No automatic Agent package update. Per-step deadline requires advertised capability.",
     "Runtime is immutable exported combined commit, not the other branch working directory."
-  ]
+  ],
+  "code_revision": "9441a89"
 }
