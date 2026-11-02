@@ -13,7 +13,7 @@
 - `#agents`：Agent列表、设备详情抽屉、演示纳管与批准。
 - Quick Run：目标→任务→预检确认→原型执行，支持暂停/继续/终止，均不调用真实执行服务。
 
-Keel外壳仅保留一套导航、项目切换与主题；其他业务菜单在此独立原型中禁用，不制造假业务入口。项目切换用于目录筛选，本原型不提供真实授权。
+原型侧栏仅保留Flows、Executions、Agents三个作业平台入口，删除部署、拓扑、CMDB、系统管理等无关菜单。顶栏继续保留项目切换与主题；项目筛选不代表真实授权。此限制只针对独立演示，不修改正式应用的全局IA。
 
 ## 原生来源与边界
 
@@ -36,3 +36,9 @@ NODE_OPTIONS=--max-old-space-size=2048 node dev/node_modules/vite/bin/vite.js bu
 浏览器定向检查：`node docs/flows-redesign/prototype/verify.mjs`。结果写入`validation.json`，实际截图在`screenshots/`；只验证本原型，不能作为正式API、设备、完整编辑器或生产验收证据。
 
 本原型仅供用户先确认UI/UX。它不增加正式作业平台完成率，也不授权部署5180或合并dev/main。
+
+## 2026-11-02 UI尺寸与分页整改
+
+独立原型补齐Element Plus基础样式：icon、checkbox、select/option、scrollbar、popper、loading及overlay。组件命名空间保持kel；基础样式和主题变量限定在jp-preview-document，兼容挂载到body的下拉菜单，不影响拓扑原型或正式页面。下拉箭头原先150×150，加载圆环还会扩大到容器宽度；采用官方尺寸规则，加载圆环在紧凑原型中为24px。
+
+Flow、目标列表和Agent列表的页码/每页数量均与切片数据绑定；过滤后重置页码。目标列表只滚动数据行，分页栏保持可见。定向遍历记录见 [ui-audit.json](ui-audit.json)，复现脚本ui-audit.mjs；截图以screenshots/ui-fix-开头。未运行业务、后端或设备测试。

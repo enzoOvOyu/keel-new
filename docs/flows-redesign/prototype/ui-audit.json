@@ -1,0 +1,610 @@
+{
+  "status": "PASS",
+  "checks": [
+    "Sidebar only contains Flows, Executions and Agents",
+    "Flow previous/next changes page and rows",
+    "Native checkbox and batch action are usable",
+    "Editor, Monaco, Files, Docs, Revisions and Schedule dialog checked",
+    "Target table next page, size selection, and page reset work",
+    "Agent pagination and drawer checked",
+    "Quick Run three steps and dialog close checked",
+    "Light/dark primitive styles stay scoped to standalone preview"
+  ],
+  "measurements": [
+    {
+      "label": "flows with pagination",
+      "oversized": [],
+      "overflow": false,
+      "carets": [
+        {
+          "width": 14,
+          "height": 14
+        },
+        {
+          "width": 14,
+          "height": 14
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        }
+      ]
+    },
+    {
+      "label": "batch selection",
+      "oversized": [],
+      "overflow": false,
+      "carets": [
+        {
+          "width": 14,
+          "height": 14
+        },
+        {
+          "width": 14,
+          "height": 14
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        }
+      ]
+    },
+    {
+      "label": "empty result",
+      "oversized": [],
+      "overflow": false,
+      "carets": [
+        {
+          "width": 14,
+          "height": 14
+        }
+      ]
+    },
+    {
+      "label": "editor",
+      "oversized": [],
+      "overflow": false,
+      "carets": [
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        }
+      ]
+    },
+    {
+      "label": "Monaco panel",
+      "oversized": [],
+      "overflow": false,
+      "carets": [
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 0,
+          "height": 0
+        },
+        {
+          "width": 0,
+          "height": 0
+        },
+        {
+          "width": 0,
+          "height": 0
+        },
+        {
+          "width": 0,
+          "height": 0
+        },
+        {
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    {
+      "label": "Files panel",
+      "oversized": [],
+      "overflow": false,
+      "carets": [
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 0,
+          "height": 0
+        },
+        {
+          "width": 0,
+          "height": 0
+        },
+        {
+          "width": 0,
+          "height": 0
+        },
+        {
+          "width": 0,
+          "height": 0
+        },
+        {
+          "width": 0,
+          "height": 0
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        }
+      ]
+    },
+    {
+      "label": "Docs panel",
+      "oversized": [],
+      "overflow": false,
+      "carets": [
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 0,
+          "height": 0
+        },
+        {
+          "width": 0,
+          "height": 0
+        },
+        {
+          "width": 0,
+          "height": 0
+        },
+        {
+          "width": 0,
+          "height": 0
+        },
+        {
+          "width": 0,
+          "height": 0
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        }
+      ]
+    },
+    {
+      "label": "revisions",
+      "oversized": [],
+      "overflow": false,
+      "carets": []
+    },
+    {
+      "label": "schedule dialog",
+      "oversized": [],
+      "overflow": false,
+      "carets": [
+        {
+          "width": 16,
+          "height": 16
+        }
+      ]
+    },
+    {
+      "label": "execution Gantt",
+      "oversized": [],
+      "overflow": false,
+      "carets": [
+        {
+          "width": 16,
+          "height": 16
+        }
+      ]
+    },
+    {
+      "label": "execution topology",
+      "oversized": [],
+      "overflow": false,
+      "carets": [
+        {
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    {
+      "label": "teleported page-size menu",
+      "oversized": [],
+      "overflow": false,
+      "carets": [
+        {
+          "width": 14,
+          "height": 14
+        },
+        {
+          "width": 17.84173583984375,
+          "height": 17.841796875
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    {
+      "label": "target page size",
+      "oversized": [],
+      "overflow": false,
+      "carets": [
+        {
+          "width": 14,
+          "height": 14
+        },
+        {
+          "width": 18.78338623046875,
+          "height": 18.7833251953125
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    {
+      "label": "execution Logs",
+      "oversized": [],
+      "overflow": false,
+      "carets": [
+        {
+          "width": 14,
+          "height": 14
+        },
+        {
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    {
+      "label": "execution Variables & Outputs",
+      "oversized": [],
+      "overflow": false,
+      "carets": [
+        {
+          "width": 14,
+          "height": 14
+        },
+        {
+          "width": 14,
+          "height": 14
+        },
+        {
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    {
+      "label": "execution Audit / Context",
+      "oversized": [],
+      "overflow": false,
+      "carets": [
+        {
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    {
+      "label": "Agent drawer",
+      "oversized": [],
+      "overflow": false,
+      "carets": [
+        {
+          "width": 14,
+          "height": 14
+        },
+        {
+          "width": 14,
+          "height": 14
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    {
+      "label": "Quick Run targets",
+      "oversized": [],
+      "overflow": false,
+      "carets": [
+        {
+          "width": 14,
+          "height": 14
+        },
+        {
+          "width": 14,
+          "height": 14
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 16,
+          "height": 16
+        },
+        {
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    {
+      "label": "Quick Run script",
+      "oversized": [],
+      "overflow": false,
+      "carets": [
+        {
+          "width": 14,
+          "height": 14
+        },
+        {
+          "width": 14,
+          "height": 14
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 16,
+          "height": 16
+        },
+        {
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    {
+      "label": "Quick Run confirmation",
+      "oversized": [],
+      "overflow": false,
+      "carets": [
+        {
+          "width": 14,
+          "height": 14
+        },
+        {
+          "width": 14,
+          "height": 14
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 16,
+          "height": 16
+        },
+        {
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    {
+      "label": "light theme pagination",
+      "oversized": [],
+      "overflow": false,
+      "carets": [
+        {
+          "width": 14,
+          "height": 14
+        },
+        {
+          "width": 14,
+          "height": 14
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 12,
+          "height": 12
+        },
+        {
+          "width": 0,
+          "height": 0
+        },
+        {
+          "width": 0,
+          "height": 0
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "apiRequests": [],
+  "scope": "Standalone synthetic preview; no production UI or backend tests",
+  "root_cause": "Missing scoped Element Plus icon/select/loading/overlay primitive styles in standalone native Kestra preview",
+  "before": {
+    "select_caret_px": [
+      150,
+      150
+    ],
+    "loading_spinner_px": [
+      1182,
+      1182
+    ]
+  },
+  "after": {
+    "select_caret_px": [
+      14,
+      14
+    ],
+    "pagination_arrows_px": [
+      12,
+      12
+    ],
+    "loading_spinner_css_px": 24
+  }
+}

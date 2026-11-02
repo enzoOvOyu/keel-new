@@ -1,0 +1,28 @@
+// Element Plus primitives used internally by native Kestra components.
+// Scoped to this standalone document, including teleported select menus.
+@use '../../../dev/src/vendor/kestra/design-system/assets/styles/el-ns';
+@use 'element-plus/theme-chalk/src/base';
+@use 'element-plus/theme-chalk/src/icon';
+@use 'element-plus/theme-chalk/src/checkbox';
+@use 'element-plus/theme-chalk/src/scrollbar';
+@use 'element-plus/theme-chalk/src/select';
+@use 'element-plus/theme-chalk/src/option';
+@use 'element-plus/theme-chalk/src/popper';
+@use 'element-plus/theme-chalk/src/loading';
+@use 'element-plus/theme-chalk/src/overlay';
+
+html.jp-preview-document {
+  --kel-color-primary: var(--ks-text-link);
+  --kel-bg-color: var(--ks-bg-surface);
+  --kel-bg-color-overlay: var(--ks-bg-elevated);
+  --kel-fill-color-blank: var(--ks-bg-input);
+  --kel-fill-color-light: var(--ks-bg-tag-inactive);
+  --kel-text-color-primary: var(--ks-text-primary);
+  --kel-text-color-regular: var(--ks-text-primary);
+  --kel-text-color-secondary: var(--ks-text-secondary);
+  --kel-border-color: var(--ks-border-default);
+  --kel-border-color-light: var(--ks-border-subtle);
+  --kel-loading-spinner-size: 24px;
+  --kel-loading-fullscreen-spinner-size: 28px;
+  --kel-mask-color: color-mix(in srgb, var(--ks-bg-base) 80%, transparent);
+}

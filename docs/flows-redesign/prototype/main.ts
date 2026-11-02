@@ -3,6 +3,7 @@ import {createI18n} from 'vue-i18n';
 import {ElConfigProvider} from 'element-plus';
 import Prototype from './Prototype.vue';
 import {registerNativePanels} from '../../../dev/src/features/jobs-native/native-registration';
+import './native-foundation.scss';
 import '../../../dev/src/features/jobs-native/native-theme.scss';
 import './prototype.scss';
 const app=createApp(Prototype);registerNativePanels(app);app.component('ElConfigProvider',ElConfigProvider);
