@@ -64,23 +64,25 @@ type Target struct {
 	SSH          string         `json:"ssh_profile_id"`
 }
 type RunRequest struct {
-	Steps           []JobStep         `json:"steps,omitempty"`
-	ApprovalID      string            `json:"approval_id,omitempty"`
-	ApprovalAction  string            `json:"approval_action,omitempty"`
-	Inputs          map[string]string `json:"inputs,omitempty"`
-	TargetRevisions map[string]int64  `json:"target_revisions,omitempty"`
-	Project         string            `json:"project_id"`
-	Flow            string            `json:"flow_id"`
-	Revision        int               `json:"expected_revision"`
-	Targets         []string          `json:"target_ids"`
-	Kind            string            `json:"kind"`
-	Command         string            `json:"command"`
-	Policy          string            `json:"transport_policy"`
-	Timeout         int               `json:"timeout_seconds"`
-	Concurrency     int               `json:"target_concurrency"`
-	Retries         int               `json:"max_retries"`
-	Source          string            `json:"source_module"`
-	Parent          string            `json:"-"`
+	internalOperation bool              `json:"-"`
+	Steps             []JobStep         `json:"steps,omitempty"`
+	ApprovalID        string            `json:"approval_id,omitempty"`
+	ApprovalContext   string            `json:"approval_context,omitempty"`
+	ApprovalAction    string            `json:"approval_action,omitempty"`
+	Inputs            map[string]string `json:"inputs,omitempty"`
+	TargetRevisions   map[string]int64  `json:"target_revisions,omitempty"`
+	Project           string            `json:"project_id"`
+	Flow              string            `json:"flow_id"`
+	Revision          int               `json:"expected_revision"`
+	Targets           []string          `json:"target_ids"`
+	Kind              string            `json:"kind"`
+	Command           string            `json:"command"`
+	Policy            string            `json:"transport_policy"`
+	Timeout           int               `json:"timeout_seconds"`
+	Concurrency       int               `json:"target_concurrency"`
+	Retries           int               `json:"max_retries"`
+	Source            string            `json:"source_module"`
+	Parent            string            `json:"-"`
 }
 type Decision struct {
 	Asset     string `json:"asset_id"`

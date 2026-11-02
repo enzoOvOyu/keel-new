@@ -433,8 +433,8 @@ func main() {
 	}
 	s := &Server{db: db, objects: objects, bucket: bucket, project: env("KEEL_PROJECT_ID", "proj-b300-demo"), flows: flowService}
 	if address := os.Getenv("KEEL_AGENT_ENROLL_ADDR"); address != "" {
-		enrollment := &http.Server{Addr: address, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 20 * time.Second, WriteTimeout: 20 * time.Second, Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path != "/api/v1/flows/agents/register" {
+		enrollment := &http.Server{Addr: address, TLSConfig: &tls.Config{MinVersion: tls.VersionTLS13, ClientAuth: tls.RequestClientCert}, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 20 * time.Second, WriteTimeout: 20 * time.Second, Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path != "/api/v1/flows/agents/register" && r.URL.Path != "/api/v1/flows/agents/certificates/renew" && r.URL.Path != "/api/v1/flows/agents/certificates/activate" {
 				http.NotFound(w, r)
 				return
 			}
@@ -451,6 +451,7 @@ func main() {
 	if flowService.Engine.Base != "" {
 		go flowService.SyncLoop(ctx)
 	}
+	go flowService.OperationWorker(ctx)
 	go s.worker(ctx)
 	go s.engineeringWorker(ctx)
 	go s.engineeringCalculationWorker(ctx)

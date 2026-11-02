@@ -1,0 +1,11 @@
+{
+  "at": "2026-11-02T04:36:57.310Z",
+  "scope": "formal routes; synthetic intercepted API; no backend/database/device calls",
+  "checks": [
+    "历史补跑预览、冻结hash提交、逐次审批请求可操作",
+    "持久批次恢复使用当前revision并刷新进度",
+    "失败目标重试进入新预检向导并保留原目标和脚本；未执行设备",
+    "未配置Bootstrap时禁用安装；持久批次独立加载"
+  ],
+  "errors": []
+}

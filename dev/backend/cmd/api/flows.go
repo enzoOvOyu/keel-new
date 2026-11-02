@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -44,6 +45,34 @@ func readFlowInput(w http.ResponseWriter, r *http.Request, out any) bool {
 	return true
 }
 func (s *Server) flowsInternal(w http.ResponseWriter, r *http.Request) bool {
+	if r.URL.Path == "/api/v1/flows/agents/certificates/renew" || r.URL.Path == "/api/v1/flows/agents/certificates/activate" {
+		if r.Method != "POST" {
+			fail(w, 405, "METHOD_NOT_ALLOWED")
+			return true
+		}
+		if r.TLS == nil || len(r.TLS.PeerCertificates) == 0 {
+			fail(w, 403, "AGENT_CLIENT_CERTIFICATE_REQUIRED")
+			return true
+		}
+		var out flows.CertificateRotation
+		var e error
+		if strings.HasSuffix(r.URL.Path, "/renew") {
+			var input flows.CertificateRenewal
+			if !readFlowInput(w, r, &input) {
+				return true
+			}
+			out, e = s.flows.PrepareCertificateRenewal(r.Context(), r.TLS.PeerCertificates[0], input)
+		} else {
+			out, e = s.flows.ActivateCertificateRenewal(r.Context(), r.TLS.PeerCertificates[0])
+		}
+		if e != nil {
+			flowsFail(w, e)
+		} else {
+			respond(w, 200, out)
+		}
+		return true
+	}
+
 	if r.URL.Path == "/api/v1/flows/agents/register" && r.Method == "POST" {
 		var input flows.EnrollInput
 		if !readFlowInput(w, r, &input) {
@@ -111,6 +140,12 @@ func (s *Server) flowsRoutes(w http.ResponseWriter, r *http.Request) bool {
 		if r.URL.Path == "/api/v1/flows" {
 			permission = "flows:create"
 		}
+		if strings.Contains(r.URL.Path, "/backfill") {
+			permission = "flows:execute"
+		}
+		if strings.Contains(r.URL.Path, "/operation-jobs/") {
+			permission = "flows:read"
+		}
 		if strings.Contains(r.URL.Path, "/agents/") || strings.HasSuffix(r.URL.Path, "/ssh-trust") {
 			permission = "flows:edit"
 		}
@@ -131,6 +166,111 @@ func (s *Server) flowsRoutes(w http.ResponseWriter, r *http.Request) bool {
 	var e error
 	code := 200
 	switch {
+	case len(parts) == 3 && parts[1] == "schedule" && parts[2] == "status" && r.Method == "GET":
+		out, e = service.ScheduleStatus(ctx, scope, parts[0])
+	case len(parts) >= 2 && parts[1] == "backfill":
+		if r.Method == "GET" && len(parts) == 2 {
+			f, err := service.Flow(ctx, scope, parts[0])
+			if err != nil {
+				e = err
+				break
+			}
+			jobs, err := service.OperationJobs(ctx, scope, "backfill")
+			if err != nil {
+				e = err
+				break
+			}
+			filtered := []flows.OperationJob{}
+			for _, job := range jobs {
+				if job.Project != f.Project {
+					continue
+				}
+				run, err := service.OperationItemRequest(ctx, scope, job.ID, 0)
+				if err == nil && run.Flow == f.ID {
+					filtered = append(filtered, job)
+				}
+			}
+			out = filtered
+			break
+		}
+		if r.Method != "POST" {
+			fail(w, 405, "METHOD_NOT_ALLOWED")
+			return true
+		}
+		var input flows.BackfillRequest
+		if !readFlowInput(w, r, &input) {
+			return true
+		}
+		if len(parts) == 3 && parts[2] == "preview" {
+			out, e = service.BackfillPreview(ctx, scope, parts[0], input)
+		} else if len(parts) == 2 {
+			out, e = service.CreateBackfill(ctx, scope, parts[0], input, r.Header.Get("Idempotency-Key"))
+		} else {
+			fail(w, 404, "NOT_FOUND")
+			return true
+		}
+	case len(parts) == 5 && parts[0] == "operation-jobs" && parts[2] == "items" && parts[4] == "request" && r.Method == "GET":
+		ordinal, err := strconv.Atoi(parts[3])
+		if err != nil {
+			fail(w, 400, "OPERATION_ORDINAL_INVALID")
+			return true
+		}
+		job, err := service.OperationJob(ctx, scope, parts[1])
+		if err != nil {
+			e = err
+			break
+		}
+		if !subjectOf(ctx).Can("flows:execute", job.Project, "", "") {
+			fail(w, 403, "FORBIDDEN")
+			return true
+		}
+		out, e = service.OperationItemRequest(ctx, scope, parts[1], ordinal)
+	case len(parts) == 3 && parts[0] == "executions" && parts[2] == "replay-request" && r.Method == "GET":
+		ex, err := service.Execution(ctx, scope, parts[1])
+		if err != nil {
+			e = err
+			break
+		}
+		if !subjectOf(ctx).Can("flows:execute", ex.Project, "", "") {
+			fail(w, 403, "FORBIDDEN")
+			return true
+		}
+		out, e = service.ReplayRequest(ctx, scope, parts[1], r.URL.Query().Get("mode"), r.URL.Query().Get("nonce"))
+	case len(parts) == 3 && parts[0] == "executions" && parts[2] == "replay" && r.Method == "POST":
+		var input flows.ReplayInput
+		if !readFlowInput(w, r, &input) {
+			return true
+		}
+		out, e = service.Replay(ctx, scope, parts[1], input, r.Header.Get("Idempotency-Key"))
+	case path == "/agents/bootstrap-jobs" && r.Method == "GET":
+		out, e = service.OperationJobs(ctx, scope, "bootstrap")
+	case path == "/agents/bootstrap-jobs" && r.Method == "POST":
+		var input flows.BootstrapBatch
+		if !readFlowInput(w, r, &input) {
+			return true
+		}
+		out, e = service.CreateBootstrapBatch(ctx, scope, input, r.Header.Get("Idempotency-Key"))
+	case len(parts) == 2 && parts[0] == "operation-jobs" && r.Method == "GET":
+		out, e = service.OperationJob(ctx, scope, parts[1])
+	case len(parts) == 3 && parts[0] == "operation-jobs" && parts[2] == "actions" && r.Method == "POST":
+		var input flows.OperationAction
+		if !readFlowInput(w, r, &input) {
+			return true
+		}
+		job, err := service.OperationJob(ctx, scope, parts[1])
+		if err != nil {
+			flowsFail(w, err)
+			return true
+		}
+		required := "flows:edit"
+		if job.Kind == "backfill" {
+			required = "flows:execute"
+		}
+		if !subjectOf(ctx).Can(required, job.Project, "", "") {
+			fail(w, 403, "FORBIDDEN")
+			return true
+		}
+		out, e = service.OperationAction(ctx, scope, parts[1], input)
 	case path == "/catalog" && r.Method == "GET":
 		out, e = service.Catalog(ctx, scope, r.URL.Query())
 	case path == "/execution-summary" && r.Method == "GET":

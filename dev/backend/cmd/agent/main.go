@@ -64,7 +64,16 @@ func main() {
 	api := flag.String("enroll-url", "", "HTTPS Keel API URL")
 	tokenFile := flag.String("token-file", "", "one-use token file, removed after enrollment")
 	state := flag.String("state-dir", "/var/lib/keel-agent", "private persistent directory")
+	renewBefore := flag.Duration("renew-before", 0, "Renew client certificate when this long remains; zero disables automatic rotation")
+	renewInterval := flag.Duration("renew-check-interval", time.Hour, "Idle certificate renewal check interval")
 	flag.Parse()
+	if *renewBefore < 0 || *renewInterval <= 0 || (*renewBefore > 0 && !strings.HasPrefix(*api, "https://")) {
+		fatal("valid HTTPS enrollment URL and renewal intervals required")
+	}
+	if *renewBefore > 0 {
+		caps = append(caps, "certificate.renew")
+	}
+
 	if os.Geteuid() == 0 {
 		fatal("run agent as an unprivileged service user")
 	}
@@ -88,7 +97,7 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 	for ctx.Err() == nil {
-		if e := connect(ctx, *gateway, *state); e != nil {
+		if e := connect(ctx, *gateway, *state, renewalOptions{API: *api, Before: *renewBefore, CheckEvery: *renewInterval}); e != nil {
 			fmt.Fprintln(os.Stderr, "gateway disconnected; reconnecting without re-executing tasks")
 		}
 		select {
@@ -171,12 +180,13 @@ func (w *limitWriter) Write(p []byte) (int, error) {
 	}
 	return n, nil
 }
-func connect(ctx context.Context, address, dir string) error {
-	cert, e := tls.LoadX509KeyPair(filepath.Join(dir, "cert.pem"), filepath.Join(dir, "key.pem"))
+func connect(ctx context.Context, address, dir string, options ...renewalOptions) error {
+	certificateDir := credentialDirectory(dir)
+	cert, e := tls.LoadX509KeyPair(filepath.Join(certificateDir, "cert.pem"), filepath.Join(certificateDir, "key.pem"))
 	if e != nil {
 		return e
 	}
-	ca, e := os.ReadFile(filepath.Join(dir, "ca.pem"))
+	ca, e := os.ReadFile(filepath.Join(certificateDir, "ca.pem"))
 	if e != nil {
 		return e
 	}
@@ -203,6 +213,7 @@ func connect(ctx context.Context, address, dir string) error {
 	defer cancel()
 	go func() {
 		ticker := time.NewTicker(10 * time.Second)
+		lastRenewCheck := time.Time{}
 		defer ticker.Stop()
 		for {
 			select {
@@ -214,6 +225,22 @@ func connect(ctx context.Context, address, dir string) error {
 					return
 				}
 			case <-ticker.C:
+				if len(options) > 0 && options[0].Before > 0 && time.Since(lastRenewCheck) >= options[0].CheckEvery {
+					taskRegistry.Lock()
+					idle := len(taskRegistry.active) == 0
+					taskRegistry.Unlock()
+					if idle {
+						lastRenewCheck = time.Now()
+						rotated, err := rotateAgentCredentials(dir, options[0])
+						if err != nil {
+							fmt.Fprintln(os.Stderr, "certificate renewal pending; current credentials retained")
+						}
+						if rotated {
+							conn.Close()
+							return
+						}
+					}
+				}
 				send <- flows.AgentMessage{Kind: "heartbeat", Version: version, Capabilities: caps}
 			}
 		}

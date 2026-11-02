@@ -343,6 +343,10 @@ func (s *Service) Preflight(ctx context.Context, p Scope, r RunRequest) ([]Decis
 	return out, nil
 }
 func (s *Service) Start(ctx context.Context, p Scope, r RunRequest, key string) (Execution, error) {
+	if r.ApprovalContext != "" && !r.internalOperation {
+		return Execution{}, problem(422, "RESERVED_APPROVAL_CONTEXT_USE_OPERATION_ENDPOINT")
+	}
+
 	if r.Flow != "" && len(r.Targets) == 0 {
 		return s.StartNative(ctx, p, r, key)
 	}
@@ -590,6 +594,9 @@ func (s *Service) Retry(ctx context.Context, p Scope, id, key string) (Execution
 		return ex, problem(409, "NO_FAILED_TARGETS")
 	}
 	r.Parent = id
+	r.ApprovalID = ""
+	r.ApprovalContext = "retry:" + id + ":" + key
+	r.internalOperation = true
 	r.Source = "retry"
 	return s.Start(ctx, p, r, key)
 }
@@ -646,6 +653,9 @@ func (s *Service) Restart(ctx context.Context, p Scope, id, key string) (Executi
 		return ex, e
 	}
 	r.Parent = id
+	r.ApprovalID = ""
+	r.ApprovalContext = "restart:" + id + ":" + key
+	r.internalOperation = true
 	r.Source = "restart"
 	return s.Start(ctx, p, r, key)
 }

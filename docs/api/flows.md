@@ -149,3 +149,29 @@ OpenAPI为唯一字段定义。本节对应6个新增已登记查询：
 加载：目录按URL分页/筛选按需读取，Execution及日志仍沿用SSE；详情Tab、插件Docs、变量、指标按需读取；聚合缓存60s。Catalog当前对授权namespace元数据服务端筛选后分页，尚未建立独立索引投影；大目录成本需在实际规模验收，不能宣称无限规模或没有N+1开销。
 
 前端验证见`docs/flows-redesign/native-validation/result.json`；8组正式路由使用拦截synthetic API，无后端写入。后端`TestWorkspaceQueryIntegration`使用隔离keel_flows_dev数据库与本地synthetic Kestra，验证实际SQL/授权/脱敏，未连接设备。普通Go领域测试通过；cmd/api全包存在无关BOM测试失败，未删除或放宽用例。
+
+### 2026-11-02 持久业务批次、历史补跑及证书续期（分支实现，未部署）
+
+新增机器契约均在OpenAPI专用Flows* Schema及真实API台账；不复制字段定义。
+
+| API | 权限 / 行为 |
+|---|---|
+| GET/POST `/flows/agents/bootstrap-jobs` | read/edit；按项目及安装版本冻结最多200台现有服务器，Idempotency-Key绑定owner/project/请求。服务端串行派发已有SSH Bootstrap，浏览器关闭不丢进度。 |
+| GET `/flows/operation-jobs/{jobId}` | read且项目授权；返回持久逐项结果。最近批次列表最多50项，不表示无限历史。 |
+| POST `/flows/operation-jobs/{jobId}/actions` | bootstrap需edit，backfill需execute；expected_revision并发检查，pause/resume/cancel/retry-blocked/reconcile/authorize-item。cancel只停止未派发项，UNKNOWN不能盲重试。 |
+| POST `/flows/{flowId}/backfill/preview`、POST/GET `/flows/{flowId}/backfill` | 写需execute，读需read；历史区间/时区/已保存Schedule+Flow版本，返回实际Cron时刻、预检结果和preview_hash。每批最多200项，超限必须缩小窗口，不静默截断。 |
+| GET `/flows/operation-jobs/{jobId}/items/{ordinal}/request` | execute；返回待审批的冻结设备/脚本请求。每个历史时刻有独立approval_context；申请与执行仍走现有ApprovalRecord/签署，不复用旧调度批准。 |
+| GET `/flows/executions/{executionId}/replay-request`、POST `/flows/executions/{executionId}/replay` | execute；只针对终态原执行，全部或失败目标新运行。服务端核对原范围、重新预检与审批，生成parent谱系和独立幂等键，不直接调用引擎restart绕过设备控制。 |
+| POST `/flows/agents/certificates/renew`、POST `/flows/agents/certificates/activate` | 专用TLS监听上的Agent mTLS身份，不接受浏览器Session替代。旧证书申请CSR，新公钥证书完成激活证明后，事务切换active serial。 |
+
+批次完成表示Bootstrap请求已完成或新Execution已创建，不表示Agent身份批准或设备作业PASS。过期worker租约转UNKNOWN；bootstrap仅根据同资产/版本、任务后注册心跳对账；backfill仅关联已保存的相同approval_context执行，不盲目补发。派发前重载owner当前权限及维护态；maintained保持IPMI-only。项目存在批次历史时沿用PROJECT_FLOWS_REQUIRE_RETIREMENT，不能级联抹除执行记录。
+
+历史预览使用robfig/cron标准5字段UNIX表达式和已保存时区；不是第二套未来调度器，实际调度仍由Kestra负责。Quartz/秒字段及Sunday=7等未支持变体明确422，不擅自转译；需另行兼容后才开放。每个历史项独立scope，不会把一次批准当长期授权。客户端一般execute接口拒绝自带approval_context，只有经服务端验证的补跑/重跑入口可提交。
+
+Agent新参数`--renew-before`默认0（未启用），启用时要求HTTPS；`--renew-check-interval`默认1h是客户端检查间隔，不是监控保留/SLO。Agent空闲且服务端无活动任务才续期；完整新凭据暂存，激活成功后原子切换credentials-current，失败保留当前凭据和相同待续期公钥。旧serial在服务端不再获准派发。现有Agent须升级并配置参数；界面根据certificate.renew能力显示启用情况，不宣称当前已部署设备自动续期。
+
+部署前须依序应用迁移044并部署同版本API/Agent；主API启动OperationWorker。该迁移仅在隔离keel_flows_dev执行，不在本轮切换5180/8081或其他共享服务。数据库保存业务操作进度和公开证书，不保存Agent私钥。证书和Bootstrap仍需要原有受控CA、可信helper、签名/摘要包及公开TLS网关配置；本轮未连接生产服务器。
+
+实际证据：operation_jobs_test验证幂等、暂停/恢复、版本冲突、UNKNOWN对账；certificate_rotation_test及cmd/agent/certificates_test验证新旧密钥证明、续期失败保留、原子切换、维护态拒绝；backfill_integration_test验证旧审批被清除、两个历史项独立摘要、无批准时引擎零写入。Replay请求的范围和秘密脱敏由workspace_integration_test覆盖；完整审批签署后生产执行/设备兼容性及规模仍由后续环境联调验收。
+
+`GET /flows/{flowId}/schedule/status`（flows:read）补齐实际TriggerRuntime和最近50条flow_schedule_fire消费历史；从已授权binding对应的已保存辅助Schedule读取Kestra `/triggers/{namespace}/{flowId}`，只取cron。nextEvaluationDate是引擎下一次检查时间，不冒充承诺执行时间；runtime_error与null表示未知，不按本地Cron猜算补值。历史execution_id指向已有Keel Execution；原引擎标记执行不会被当成设备作业成功。实现依据固定v2.0.7 ApiTriggerState，隔离集成检查实际时间/disabled状态和跨项目拒绝。

@@ -62,7 +62,7 @@ func (s *Server) deleteProject(w http.ResponseWriter, r *http.Request, id string
 	}
 	// External engine definitions and enrolled agents require their own retirement
 	// lifecycle; this endpoint must not silently orphan them.
-	err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM flow_binding WHERE project_id=$1) OR EXISTS(SELECT 1 FROM flow_execution_binding WHERE project_id=$1) OR EXISTS(SELECT 1 FROM flow_agent WHERE project_id=$1)`, id).Scan(&busy)
+	err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM flow_binding WHERE project_id=$1) OR EXISTS(SELECT 1 FROM flow_execution_binding WHERE project_id=$1) OR EXISTS(SELECT 1 FROM flow_agent WHERE project_id=$1) OR EXISTS(SELECT 1 FROM flow_operation_job WHERE project_id=$1)`, id).Scan(&busy)
 	if err != nil {
 		fail(w, 500, "DATABASE_ERROR")
 		return

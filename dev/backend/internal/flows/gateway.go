@@ -50,6 +50,7 @@ func Unwire(v *structpb.Struct) AgentMessage {
 }
 
 type agentConnection struct {
+	serial  string
 	send    chan AgentMessage
 	pending map[string]chan Result
 	mu      sync.Mutex
@@ -59,10 +60,19 @@ type Gateway struct {
 	DB          *pgxpool.Pool
 	mu          sync.Mutex
 	connections map[string]*agentConnection
+	authorize   func(context.Context, string, string) error
 }
 
 func NewGateway(db *pgxpool.Pool) *Gateway {
-	return &Gateway{DB: db, connections: map[string]*agentConnection{}}
+	g := &Gateway{DB: db, connections: map[string]*agentConnection{}}
+	g.authorize = func(ctx context.Context, id, serial string) error {
+		var allowed bool
+		if err := db.QueryRow(ctx, `SELECT a.state='enrolled' AND a.certificate_serial=$2 AND a.certificate_expires_at>now() AND c.lifecycle_state<>'maintained' AND c.maintenance_state<>'maintained' FROM flow_agent a JOIN cmdb_entity c ON c.item_uid=a.asset_id WHERE a.id::text=$1`, id, serial).Scan(&allowed); err != nil || !allowed {
+			return problem(403, "AGENT_CHANNEL_NOT_AUTHORIZED")
+		}
+		return nil
+	}
+	return g
 }
 
 type gatewayServer interface{ Connect(grpc.ServerStream) error }
@@ -83,7 +93,7 @@ func (g *Gateway) Connect(stream grpc.ServerStream) error {
 	if e := g.DB.QueryRow(stream.Context(), `SELECT a.state,a.certificate_serial FROM flow_agent a JOIN cmdb_entity c ON c.item_uid=a.asset_id WHERE a.id::text=$1 AND c.lifecycle_state<>'maintained' AND c.maintenance_state<>'maintained'`, id).Scan(&state, &dbSerial); e != nil || state != "enrolled" || dbSerial != serial {
 		return errors.New("agent not approved")
 	}
-	c := &agentConnection{send: make(chan AgentMessage, 8), pending: map[string]chan Result{}, done: make(chan struct{})}
+	c := &agentConnection{serial: serial, send: make(chan AgentMessage, 8), pending: map[string]chan Result{}, done: make(chan struct{})}
 	g.mu.Lock()
 	if _, exists := g.connections[id]; exists {
 		g.mu.Unlock()
@@ -172,6 +182,13 @@ func (g *Gateway) Execute(ctx context.Context, id string, task Task) (Result, er
 	g.mu.Unlock()
 	if c == nil {
 		return Result{}, problem(409, "AGENT_OFFLINE")
+	}
+	// Production gateways install the database authorizer in NewGateway.
+	// In-memory channel protocol tests may inject their own authorizer.
+	if g.authorize != nil {
+		if err := g.authorize(ctx, id, c.serial); err != nil {
+			return Result{}, err
+		}
 	}
 	ch := make(chan Result, 1)
 	c.mu.Lock()

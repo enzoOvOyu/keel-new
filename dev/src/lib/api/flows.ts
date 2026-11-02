@@ -30,6 +30,16 @@ async function collection<T extends {id:string;project_id:string}>(path:string,p
  }
 }
 export const flowsApi = {
+ scheduleStatus:(p:string,id:string)=>request<S['FlowsScheduleStatus']>('/'+id+'/schedule/status',p),
+ replayRequest:(p:string|null,id:string,mode:'all'|'failed',nonce:string)=>request<Run>('/executions/'+id+'/replay-request?'+new URLSearchParams({mode,nonce}),p),
+ replay:(p:string,id:string,mode:'all'|'failed',run:Run,key:string)=>request<Execution>('/executions/'+id+'/replay',p,'POST',{mode,run},key),
+ backfillPreview:(p:string,id:string,value:S['FlowsBackfillRequest'])=>request<S['FlowsBackfillPreview']>('/'+id+'/backfill/preview',p,'POST',value),
+ createBackfill:(p:string,id:string,value:S['FlowsBackfillRequest'],key:string)=>request<S['FlowsOperationJob']>('/'+id+'/backfill',p,'POST',value,key),
+ backfills:(p:string,id:string)=>request<S['FlowsOperationJob'][]>('/'+id+'/backfill',p),
+ operationItemRequest:(p:string,id:string,ordinal:number)=>request<Run>('/operation-jobs/'+id+'/items/'+ordinal+'/request',p),
+ bootstrapJobs:(p:string|null)=>request<S['FlowsOperationJob'][]>('/agents/bootstrap-jobs',p),
+ bootstrapBatch:(p:string,asset_ids:string[],version:string,key:string)=>request<S['FlowsOperationJob']>('/agents/bootstrap-jobs',p,'POST',{project_id:p,asset_ids,version},key),
+ operationAction:(p:string,id:string,action:S['FlowsOperationAction']['action'],revision:number,extra:{ordinal?:number;approval_id?:string}={})=>request<S['FlowsOperationJob']>('/operation-jobs/'+id+'/actions',p,'POST',{action,expected_revision:revision,...extra}),
  variables:(p:string|null,id:string)=>request<S['FlowsExecutionVariables']>('/executions/'+id+'/variables',p),
  catalog:(p:string|null,filters:Record<string,string>,signal?:AbortSignal)=>request<S['FlowsCatalogPage']>('/catalog?'+new URLSearchParams(filters),p,'GET',undefined,undefined,signal),
  executionSummary:(p:string|null,filters:Record<string,string>={})=>request<S['FlowsExecutionSummary']>('/execution-summary?'+new URLSearchParams(filters),p),

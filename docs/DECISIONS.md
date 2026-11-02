@@ -117,3 +117,9 @@ P1待审核细化：规划工程身份到既有bom_item/CMDB身份的映射，pl
 ## IDE-P1-20261031 · 已批准继续重构
 
 用户明确在当前分支继续P1及分批实施，P0等待审核已结束。详细模型、版本/事实所有权、模块状态与发布边界见 [P1设计](intelligent-deployment/P1-DESIGN.txt)。新工程域优先于历史BOM中心约束；保留既有BOM身份、物理发布原子性、Outbox与CMDB画布。首批仅设备/组合和机房/落位，后续批次不以空壳声明已完成。审批复用已有RBAC；Golden外部消费、NH签署与样本人工Ground Truth尚未明确，不阻断物理模型设计。
+
+## 2026-11-02 作业平台独立分支兼容记录
+
+- 已确认origin/dev已存在038_engineering_analysis_artifacts至043_engineering_power_supply，本分支业务操作/证书迁移改名044_flows_operations，不覆盖其他开发的迁移。隔离keel_flows_dev曾以临时038验证相同表结构，已在核实该库没有eng_analysis_artifact后仅将本任务版本记录改为044；未更改任何已部署数据库或资产数据。正式合并前仍须核对届时dev编号，不擅自合并/部署。
+- Kestra v2.0.7标准Schedule和本期历史预览适配范围分别说明；Sunday=7等当前未适配变体返回unsupported，不自行解释成0。未来调度由Kestra负责，历史补跑不建立另一个调度权威源。
+- Worker Shell/Python及Namespace动态执行引用不能绕过既有ValidatePolicy。当前保存脚本以设备steps冻结内容并受Keel预检/审批；若后续需要Worker执行，须独立确定Worker信任与授权范围，不能因为原型能点就放宽生产权限。

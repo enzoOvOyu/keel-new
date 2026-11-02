@@ -98,6 +98,10 @@ func TestWorkspaceQueryIntegration(t *testing.T) {
 	if strings.Contains(string(bytes), "never-expose") {
 		t.Fatal("variables leaked SECRET input or output")
 	}
+	replay, e := s.ReplayRequest(ctx, scope, second, "all", "synthetic-replay-nonce")
+	if e != nil || replay.Project != project || replay.Flow != fid || replay.ApprovalID != "" || replay.Inputs["arbitrary"] != "" || replay.ApprovalContext != replayContext(second, "synthetic-replay-nonce") {
+		t.Fatalf("replay did not freeze scope or mask secrets: %+v %v", replay, e)
+	}
 	denied := Scope{User: user, Projects: []string{"unauthorized-synthetic"}}
 	if _, e = s.ExecutionInsights(ctx, denied, second, url.Values{}); e == nil {
 		t.Fatal("cross-project execution accepted")

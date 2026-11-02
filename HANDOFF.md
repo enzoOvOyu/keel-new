@@ -1,12 +1,16 @@
-## 2026-11-02 持续开发中（未发布；覆盖下方首批暂停点）
+## 2026-11-02 作业平台持续开发快照（独立分支，未发布）
 
-用户要求直接开发到完成，当前仍在feat/jobs-kestra-ui。已新增原生Visual/Topology/YAML/Files/模板/Docs同一编辑器、原生Flow Header、Execution详情（Gantt/Attempt/目标矩阵/日志/变量/指标/谱系）、三步QuickRun和Agents；React Portal只承接现有领域组件，保留同一React会话与QueryContext。前端代码在jobs-native/Native*.vue及Host，旧Builder已改为原生容器，FlowGraph独立复用。
+**位置**：`feat/jobs-kestra-ui` / `/home/ubuntu/keel-kestra-ui-dev`；已推送核心工作台521013b，后续业务批次/补跑/重跑/证书增量正在形成下一提交。不得合并dev/main、切换5180/8081/5181或复用共享生产数据库。本节覆盖下方约20%的旧暂停估算。用户要求继续到完成；最近进度80–85%是工作量估算，不是验收比例。
 
-后端workspace.go新增6个查询（catalog、execution-summary、log-search、execution insights、variables、task-documentation），OpenAPI/类型已补。Catalog由服务端授权后筛选分页/total/最近执行，state从Kestra读取；源码搜索使用引擎索引并再次交叉核对授权binding。跨执行日志只检索已持久化的脱敏flow_event，明确coverage不是全部历史。Variables按原Revision SECRET输入定义脱敏，schema缺失时遮蔽全部输入。未发布。
+**已完成代码**：Kestra原生多面板Visual/Topology/YAML/Files/模板/Docs、原生Flow Header、Execution Gantt/Attempt/目标矩阵/日志/变量/指标/谱系、三步QuickRun、Agent目录/详情。React Portal保留同一会话/ProjectContext/Query；设备执行仍走预检、批准及稳定CMDB ID。脚本仅加入受控设备steps，不放宽ValidatePolicy禁止Worker Shell/Python的规则。
 
-重要纠偏：既有ValidatePolicy拒绝Worker Shell/Python插件；不放宽限制。新保存脚本改为加入受控设备steps，仍经JobService/通道/预检/审批。上个首批“可新增引擎脚本任务”被本轮纠正；原型里的Namespace/Worker引用不作为已获准的正式执行能力。
+**新增后端**：workspace.go 6个目录/聚合/日志/执行诊断查询；operation_jobs.go持久Bootstrap/Backfill批次与租约/UNKNOWN对账；backfill.go历史Cron窗口预览与逐次独立审批；replay.go历史范围重新预检/重跑；certificate_rotation.go及cmd/agent/certificates.go两阶段mTLS续期，失败保留旧凭据、新密钥证明后原子切换。迁移044只在隔离keel_flows_dev应用（原临时038与origin/dev工程迁移冲突已改号，不覆盖038–043），未改当前部署数据库。API启动OperationWorker；安装包/可信helper/CA/HTTPS仍需配置，不假装生产设备已安装或续期。
 
-正在统一收尾/验证核心前端；构建曾通过，后续修改仍需最终受影响检查。Go flows测试通过；cmd/api全包测试有无关BOM用例TestFullResumeAppliesPreviouslyPartialSheetWithoutProvider失败，未改弱/删除用例，最终需区分报告。尚待：必要浏览器/契约联调、调度补跑、Agent持久批量安装/恢复与证书轮换、API登记/正式实施报告。禁止切换现有5180/8081/5181或合并dev/main。不要因某次构建通过宣称完整交付。
+**接续文件**：UI `flows/{FlowsWorkspace,Agents,QuickRun,BackfillWorkspace}.tsx`、`jobs-native/Native{Execution,Backfill,Agents}.vue`；API `lib/api/flows.ts`；Go `internal/flows/{operation_jobs,backfill,replay,certificate_rotation}.go`、`cmd/agent/certificates.go`；HTTP `cmd/api/flows.go`；唯一机器契约docs/openapi.yaml，解释docs/api/flows.md；真实台账107项已登记、部署revision保持原值。
+
+**已运行证据**：核心正式路由8组浏览器交互通过（拦截synthetic API，非Go/设备验收），截图/结果native-validation/；隔离DB查询/SECRET脱敏/项目拒绝集成通过；Bootstrap持久状态/UNKNOWN恢复、续期新旧密钥/原子切换/维护态拒绝检查通过；新增Backfill两项缺审批均BLOCKED且引擎零写入、独立摘要检查通过。Go API构建通过；107项契约引用检查通过。cmd/api全包旧BOM用例TestFullResumeAppliesPreviouslyPartialSheetWithoutProvider曾失败，未删除或放宽；不重跑无关套件。
+
+**正在进行**：本批提交与后续剩余交互核对。最终TypeScript、Vite生产打包（1m15s）及Go API构建通过；打包先前内存失败后已停止本任务5193临时服务并成功重跑，当前没有额外正式入口。新补跑/重试/纳管4组交互和主题同步检查已通过（synthetic）；Trigger运行态/最近50条消费历史已实现并通过隔离查询/越权拒绝检查，读取Kestra实际时间，不前端推算。Flow未保存草稿保留在用户/权限版本/项目隔离的Query缓存，不写localStorage。后续继续核对实际尚缺的交互，不以当前核心页面运行宣称整个任务完成。无生产设备验收、8设备混批/发行版/NOS兼容与规模结果。设备事件/ZTP消费者、原型Worker Namespace动态执行引用未实现；未满足后端前提的能力不得伪装启用。详细范围以docs/flows-redesign/implementation.md及API模块文档为准。
 
 ## 2026-11-02 正式开发恢复：脚本文件工作台第一批
 

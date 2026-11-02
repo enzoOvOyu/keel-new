@@ -191,6 +191,9 @@ func (s *Service) Enroll(ctx context.Context, input EnrollInput) (map[string]any
 	if e != nil {
 		return nil, problem(409, "AGENT_ALREADY_REGISTERED")
 	}
+	if _, e = tx.Exec(ctx, `UPDATE flow_agent_certificate_rotation SET state='superseded' WHERE agent_id=$1 AND state='pending'`, id); e != nil {
+		return nil, e
+	}
 	_, e = tx.Exec(ctx, `UPDATE flow_enrollment SET consumed_at=now() WHERE id=$1`, tokenID)
 	if e != nil {
 		return nil, e

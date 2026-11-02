@@ -16973,6 +16973,439 @@ paths:
           description: Resource unavailable
         "503":
           description: Engine not configured
+  /flows/agents/bootstrap-jobs:
+    get:
+      operationId: listFlowsBootstrapJobs
+      tags:
+        - FlowsReal
+      description: Persistent scoped business-operation progress; unknown side effects are never blindly retried.
+      parameters:
+        - in: query
+          name: project_id
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Domain result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listFlowsBootstrapJobsEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Permission, project or client certificate denied
+        "409":
+          description: Version, idempotency or operation state conflict
+    post:
+      operationId: createFlowsBootstrapJob
+      tags:
+        - FlowsReal
+      description: Persistent scoped business-operation progress; unknown side effects are never blindly retried.
+      parameters:
+        - in: query
+          name: project_id
+          schema: &a1
+            type: string
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Domain result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createFlowsBootstrapJobEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Permission, project or client certificate denied
+        "409":
+          description: Version, idempotency or operation state conflict
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FlowsBootstrapBatch"
+  /flows/operation-jobs/{jobId}:
+    get:
+      operationId: getFlowsOperationJob
+      tags:
+        - FlowsReal
+      description: Persistent scoped business-operation progress; unknown side effects are never blindly retried.
+      parameters:
+        - in: path
+          name: jobId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: project_id
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Domain result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getFlowsOperationJobEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Permission, project or client certificate denied
+        "409":
+          description: Version, idempotency or operation state conflict
+  /flows/operation-jobs/{jobId}/actions:
+    post:
+      operationId: actFlowsOperationJob
+      tags:
+        - FlowsReal
+      description: Persistent scoped business-operation progress; unknown side effects are never blindly retried.
+      parameters:
+        - in: path
+          name: jobId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: project_id
+          schema:
+            type: string
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Domain result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/actFlowsOperationJobEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Permission, project or client certificate denied
+        "409":
+          description: Version, idempotency or operation state conflict
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FlowsOperationAction"
+  /flows/agents/certificates/renew:
+    post:
+      operationId: renewFlowsAgentCertificate
+      tags:
+        - FlowsReal
+      description: Dedicated enrollment TLS listener; verified agent client certificate required, no browser credentials.
+      parameters:
+        - in: query
+          name: project_id
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Domain result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/renewFlowsAgentCertificateEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Permission, project or client certificate denied
+        "409":
+          description: Version, idempotency or operation state conflict
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FlowsCertificateRenewal"
+      security:
+        - agentMTLS: []
+  /flows/agents/certificates/activate:
+    post:
+      operationId: activateFlowsAgentCertificate
+      tags:
+        - FlowsReal
+      description: Dedicated enrollment TLS listener; verified agent client certificate required, no browser credentials.
+      parameters:
+        - in: query
+          name: project_id
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Domain result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/activateFlowsAgentCertificateEnvelope"
+        "400":
+          description: Invalid request
+        "403":
+          description: Permission, project or client certificate denied
+        "409":
+          description: Version, idempotency or operation state conflict
+      security:
+        - agentMTLS: []
+  /flows/{flowId}/backfill/preview:
+    post:
+      operationId: previewFlowsBackfill
+      tags:
+        - FlowsReal
+      description: Scoped historical batch replay; every occurrence revalidates permissions, target versions and approvals. No future scheduling.
+      parameters:
+        - in: path
+          name: flowId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: project_id
+          schema:
+            type: string
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Domain result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/previewFlowsBackfillEnvelope"
+        "403":
+          description: Scope denied
+        "409":
+          description: Revision, frozen preview or approval changed
+        "422":
+          description: Unsupported cron, invalid historical window or unavailable evidence
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FlowsBackfillRequest"
+  /flows/{flowId}/backfill:
+    post:
+      operationId: createFlowsBackfill
+      tags:
+        - FlowsReal
+      description: Scoped historical batch replay; every occurrence revalidates permissions, target versions and approvals. No future scheduling.
+      parameters:
+        - in: path
+          name: flowId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: project_id
+          schema:
+            type: string
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Domain result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createFlowsBackfillEnvelope"
+        "403":
+          description: Scope denied
+        "409":
+          description: Revision, frozen preview or approval changed
+        "422":
+          description: Unsupported cron, invalid historical window or unavailable evidence
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FlowsBackfillRequest"
+    get:
+      operationId: listFlowsBackfills
+      tags:
+        - FlowsReal
+      description: Scoped historical batch replay; every occurrence revalidates permissions, target versions and approvals. No future scheduling.
+      parameters:
+        - in: path
+          name: flowId
+          required: true
+          schema: &a2
+            type: string
+        - in: query
+          name: project_id
+          schema: *a2
+      responses:
+        "200":
+          description: Domain result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listFlowsBackfillsEnvelope"
+        "403":
+          description: Scope denied
+        "409":
+          description: Revision, frozen preview or approval changed
+        "422":
+          description: Unsupported cron, invalid historical window or unavailable evidence
+  /flows/operation-jobs/{jobId}/items/{ordinal}/request:
+    get:
+      operationId: getFlowsOperationItemRequest
+      tags:
+        - FlowsReal
+      description: Scoped historical batch replay; every occurrence revalidates permissions, target versions and approvals. No future scheduling.
+      parameters:
+        - in: path
+          name: ordinal
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: jobId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: project_id
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Domain result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getFlowsOperationItemRequestEnvelope"
+        "403":
+          description: Scope denied
+        "409":
+          description: Revision, frozen preview or approval changed
+        "422":
+          description: Unsupported cron, invalid historical window or unavailable evidence
+  /flows/executions/{executionId}/replay-request:
+    get:
+      operationId: getFlowsReplayRequest
+      tags:
+        - FlowsReal
+      description: New execution from historical inputs; new per-request approval context, freshly authorized targets and no copied approval.
+      parameters:
+        - in: path
+          name: executionId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: project_id
+          schema:
+            type: string
+        - in: query
+          name: mode
+          required: true
+          schema:
+            type: string
+            enum:
+              - all
+              - failed
+        - in: query
+          name: nonce
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Scoped result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getFlowsReplayRequestEnvelope"
+        "403":
+          description: Scope denied
+        "409":
+          description: Version, state or target changed
+        "422":
+          description: New approval or preflight required
+  /flows/executions/{executionId}/replay:
+    post:
+      operationId: createFlowsReplay
+      tags:
+        - FlowsReal
+      description: New execution from historical inputs; new per-request approval context, freshly authorized targets and no copied approval.
+      parameters:
+        - in: path
+          name: executionId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: project_id
+          schema:
+            type: string
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Scoped result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createFlowsReplayEnvelope"
+        "403":
+          description: Scope denied
+        "409":
+          description: Version, state or target changed
+        "422":
+          description: New approval or preflight required
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FlowsReplayInput"
+  /flows/{flowId}/schedule/status:
+    get:
+      operationId: getFlowsScheduleStatus
+      tags:
+        - FlowsReal
+      description: Actual Kestra trigger runtime and latest 50 persisted scoped consumption records; engine unavailable remains explicit, next evaluation is never synthesized.
+      parameters:
+        - in: path
+          name: flowId
+          required: true
+          schema: &a3
+            type: string
+        - in: query
+          name: project_id
+          schema: *a3
+      responses:
+        "200":
+          description: Schedule runtime and scoped history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getFlowsScheduleStatusEnvelope"
+        "403":
+          description: Project scope denied
+        "404":
+          description: Flow not accessible
 components:
   securitySchemes:
     bearerAuth:
@@ -16983,6 +17416,9 @@ components:
       type: apiKey
       in: cookie
       name: keel_session
+    agentMTLS:
+      type: mutualTLS
+      description: Agent-specific client certificate verified against controlled CA and active enrolled serial; dedicated enrollment TLS listener.
   parameters:
     ProjectId:
       in: path
@@ -18439,6 +18875,9 @@ components:
           type: string
         approval_action:
           type: string
+        approval_context:
+          type: string
+          description: Server-frozen per-occurrence approval context; never copied from a previous execution.
       required:
       - project_id
       - target_ids
@@ -47905,6 +48344,460 @@ components:
       required:
         - data
         - request_id
+    FlowsBootstrapBatch:
+      type: object
+      additionalProperties: false
+      properties:
+        project_id: &a1
+          type: string
+        asset_ids:
+          type: array
+          items: *a1
+        version: *a1
+      required:
+        - project_id
+        - asset_ids
+        - version
+    FlowsOperationAction:
+      type: object
+      additionalProperties: false
+      properties:
+        action:
+          type: string
+          enum:
+            - pause
+            - resume
+            - cancel
+            - retry-blocked
+            - reconcile
+            - authorize-item
+        expected_revision:
+          type: integer
+        ordinal:
+          type: integer
+        approval_id:
+          type: string
+      required:
+        - action
+        - expected_revision
+    FlowsOperationItem:
+      type: object
+      additionalProperties: false
+      properties:
+        ordinal:
+          type: integer
+        asset_id:
+          anyOf:
+            - &a2
+              type: string
+            - type: "null"
+        scheduled_at:
+          anyOf:
+            - *a2
+            - type: "null"
+        state:
+          type: string
+          enum:
+            - PENDING
+            - RUNNING
+            - SUCCEEDED
+            - BLOCKED
+            - UNKNOWN
+            - CANCELLED
+        execution_id:
+          anyOf:
+            - *a2
+            - type: "null"
+        result:
+          $ref: "#/components/schemas/FlowsEngine"
+        error_code:
+          anyOf:
+            - *a2
+            - type: "null"
+        started_at:
+          anyOf:
+            - *a2
+            - type: "null"
+        ended_at:
+          anyOf:
+            - *a2
+            - type: "null"
+      required:
+        - ordinal
+        - asset_id
+        - scheduled_at
+        - state
+        - execution_id
+        - result
+        - error_code
+        - started_at
+        - ended_at
+    FlowsOperationJob:
+      type: object
+      additionalProperties: false
+      properties:
+        id: &a3
+          type: string
+        project_id: *a3
+        owner_id: *a3
+        kind:
+          type: string
+          enum:
+            - bootstrap
+            - backfill
+        state:
+          type: string
+          enum:
+            - PENDING
+            - RUNNING
+            - PAUSED
+            - COMPLETED
+            - PARTIAL_FAILURE
+            - CANCELLED
+        revision:
+          type: integer
+        created_at: *a3
+        updated_at: *a3
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/FlowsOperationItem"
+      required:
+        - id
+        - project_id
+        - owner_id
+        - kind
+        - state
+        - revision
+        - created_at
+        - updated_at
+        - items
+    FlowsCertificateRenewal:
+      type: object
+      additionalProperties: false
+      properties:
+        csr:
+          type: string
+      required:
+        - csr
+    FlowsCertificateRotation:
+      type: object
+      additionalProperties: false
+      properties:
+        id: &a4
+          type: string
+        agent_id: *a4
+        certificate: *a4
+        ca: *a4
+        expires_at: *a4
+        state:
+          type: string
+          enum:
+            - pending
+            - active
+      required:
+        - id
+        - agent_id
+        - certificate
+        - ca
+        - expires_at
+        - state
+    listFlowsBootstrapJobsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/FlowsOperationJob"
+        request_id:
+          type: string
+          format: uuid
+      required:
+        - data
+        - request_id
+    createFlowsBootstrapJobEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: "#/components/schemas/FlowsOperationJob"
+        request_id:
+          type: string
+          format: uuid
+      required:
+        - data
+        - request_id
+    getFlowsOperationJobEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: "#/components/schemas/FlowsOperationJob"
+        request_id:
+          type: string
+          format: uuid
+      required:
+        - data
+        - request_id
+    actFlowsOperationJobEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: "#/components/schemas/FlowsOperationJob"
+        request_id:
+          type: string
+          format: uuid
+      required:
+        - data
+        - request_id
+    renewFlowsAgentCertificateEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: "#/components/schemas/FlowsCertificateRotation"
+        request_id:
+          type: string
+          format: uuid
+      required:
+        - data
+        - request_id
+    activateFlowsAgentCertificateEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: "#/components/schemas/FlowsCertificateRotation"
+        request_id:
+          type: string
+          format: uuid
+      required:
+        - data
+        - request_id
+    FlowsBackfillRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        start: &a5
+          type: string
+        end: *a5
+        expected_schedule_revision: &a6
+          type: integer
+        expected_flow_revision: *a6
+        preview_hash: *a5
+      required:
+        - start
+        - end
+        - expected_schedule_revision
+        - expected_flow_revision
+        - preview_hash
+    FlowsBackfillPreview:
+      type: object
+      additionalProperties: false
+      properties:
+        project_id: &a7
+          type: string
+        flow_id: *a7
+        cron: *a7
+        timezone: *a7
+        occurrences:
+          type: array
+          items: *a7
+        count:
+          type: integer
+        truncated: &a8
+          type: boolean
+        requires_approval: *a8
+        preview_hash: *a7
+        run:
+          $ref: "#/components/schemas/FlowsRun"
+      required:
+        - project_id
+        - flow_id
+        - cron
+        - timezone
+        - occurrences
+        - count
+        - truncated
+        - requires_approval
+        - preview_hash
+        - run
+    previewFlowsBackfillEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: "#/components/schemas/FlowsBackfillPreview"
+        request_id:
+          type: string
+          format: uuid
+      required:
+        - data
+        - request_id
+    createFlowsBackfillEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: "#/components/schemas/FlowsOperationJob"
+        request_id:
+          type: string
+          format: uuid
+      required:
+        - data
+        - request_id
+    listFlowsBackfillsEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/FlowsOperationJob"
+        request_id:
+          type: string
+          format: uuid
+      required:
+        - data
+        - request_id
+    getFlowsOperationItemRequestEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: "#/components/schemas/FlowsRun"
+        request_id:
+          type: string
+          format: uuid
+      required:
+        - data
+        - request_id
+    FlowsReplayInput:
+      type: object
+      additionalProperties: false
+      properties:
+        mode:
+          type: string
+          enum:
+            - all
+            - failed
+        run:
+          $ref: "#/components/schemas/FlowsRun"
+      required:
+        - mode
+        - run
+    getFlowsReplayRequestEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: "#/components/schemas/FlowsRun"
+        request_id:
+          type: string
+          format: uuid
+      required:
+        - data
+        - request_id
+    createFlowsReplayEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          $ref: "#/components/schemas/FlowsExecution"
+        request_id:
+          type: string
+          format: uuid
+      required:
+        - data
+        - request_id
+    FlowsTriggerRuntime:
+      type: object
+      properties:
+        triggerId:
+          type: string
+        updatedAt: &a9
+          type:
+            - string
+            - "null"
+          format: date-time
+        evaluatedAt: *a9
+        nextEvaluationDate: *a9
+        lastTriggeredDate: *a9
+        disabled: &a10
+          type: boolean
+        sourceDisabled: *a10
+        locked: *a10
+      required:
+        - triggerId
+        - updatedAt
+        - evaluatedAt
+        - nextEvaluationDate
+        - lastTriggeredDate
+        - disabled
+        - sourceDisabled
+        - locked
+      additionalProperties: false
+    FlowsScheduleFire:
+      type: object
+      properties:
+        engine_execution_id: &a11
+          type: string
+        execution_id: &a12
+          type:
+            - string
+            - "null"
+        state: *a11
+        error_code: *a12
+        created_at:
+          type: string
+          format: date-time
+      required:
+        - engine_execution_id
+        - execution_id
+        - state
+        - error_code
+        - created_at
+      additionalProperties: false
+    FlowsScheduleStatus:
+      type: object
+      properties:
+        configured:
+          type: boolean
+        runtime:
+          type: array
+          items:
+            $ref: "#/components/schemas/FlowsTriggerRuntime"
+        runtime_error:
+          type:
+            - string
+            - "null"
+        history:
+          type: array
+          items:
+            $ref: "#/components/schemas/FlowsScheduleFire"
+        source:
+          type: string
+      required:
+        - configured
+        - runtime
+        - runtime_error
+        - history
+        - source
+      additionalProperties: false
+    getFlowsScheduleStatusEnvelope:
+      type: object
+      properties:
+        request_id:
+          type: string
+          format: uuid
+        data:
+          $ref: "#/components/schemas/FlowsScheduleStatus"
+      required:
+        - request_id
+        - data
+      additionalProperties: false
 x-implementation-policy:
   frontend-first: true
   mock-provider-required: true
