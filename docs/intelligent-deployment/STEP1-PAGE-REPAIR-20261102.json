@@ -1,0 +1,21 @@
+{
+  "cause": "Frontend source release omitted the raw document imported by EngineeringWorkbench and kickoff prototype; Vite failed module resolution. Root HTTP200 and API health did not establish application availability.",
+  "repair": "Restored required document into the active release; application and API source code unchanged.",
+  "runtime_directory": "/home/ubuntu/.local/state/keel-deployments/step1-cleanup-31111a4",
+  "required_frontend_assets": [
+    "docs/intelligent-deployment/KICKOFF-STUDIO-IMPLEMENTATION.txt",
+    "fixtures/demo-full-64-b300/demo-seed.json",
+    "dev/fixtures/demo-full-64-b300"
+  ],
+  "document_sha256": "0b55a50c3cf3ee9d774bfd557258ada79a48bb757711e448ae085e1cce1d40c6",
+  "checks": {
+    "login": "PASS",
+    "engineering_workbench_rendered": true,
+    "vite_overlay": 0,
+    "page_errors": [],
+    "failed_modules": []
+  },
+  "workbench_module_http": 200,
+  "api_health_http": 200,
+  "new_agent_calls": 0
+}

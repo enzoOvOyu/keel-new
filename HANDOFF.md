@@ -1,3 +1,9 @@
+## 已完成里程碑事件：修复当前环境智能开局页面加载失败
+
+此次前端源发布漏带EngineeringWorkbench及原型通过?raw直接引用的docs/intelligent-deployment/KICKOFF-STUDIO-IMPLEMENTATION.txt，Vite模块解析失败；此前根页面/单个子模块HTTP200不足以说明应用可用。这是发布内容遗漏，API仍正常。现已将文件补齐到step1-cleanup-31111a4运行目录，并登记required_frontend_assets；后续源发布必须同时包含该文档、根fixtures及dev/fixtures链接，不能只导出dev/src。
+
+实际浏览器通过现有登录进入本轮独立项目的智能开局页，启动总览/资料与建模渲染成功，无Vite遮罩、pageerror或失败模块；工作台模块和API健康均HTTP200。未改业务代码、数据库、Provider，不增加Agent调用，不重跑开局业务验收。修复及证据见 [页面恢复记录](docs/intelligent-deployment/STEP1-PAGE-REPAIR-20261102.json)。
+
 ## 已完成里程碑事件：第一步清理已提交上线并完成一次真实Agent验证
 
 代码31111a4已部署API8081/前端5180，进程位置核对一致；Git后续4ec753f仅同步当前实施方案，未改运行代码。目录版本3，第一步移除退役列及八字段描述；旧草稿投影当前格式，历史原件/审计/属性保留。既有定向Go、TypeScript、类型生成、契约文档检查及API编译通过，在线健康及前端模块HTTP200。
