@@ -66,7 +66,7 @@ func (s *Server) modelingInputs(ctx context.Context, w engineering.Workspace, wi
 		if v.TableID == "terminations" {
 			current := v.Issues[:0]
 			for _, issue := range v.Issues {
-				if issue.Field != "termination_type" {
+				if issue.Field != "termination_type" && !(issue.Field == "b_rack_position" && issue.Code == "REQUIRED") {
 					current = append(current, issue)
 				}
 			}
@@ -346,7 +346,20 @@ func (s *Server) modelingRoutes(out http.ResponseWriter, r *http.Request, w engi
 	if action == "modeling-inputs" && r.Method == "GET" {
 		table := r.URL.Query().Get("table_id")
 		values, err := s.modelingInputs(ctx, w, table != "")
-		reply(modelingResponse(w, values, table), err)
+		response := modelingResponse(w, values, table)
+		if err == nil && table == "terminations" && w.HeadRevisionID != nil {
+			model, _, e := engineeringModel(ctx, s.db, *w.HeadRevisionID, s.project)
+			if e != nil {
+				reply(nil, e)
+				return true
+			}
+			inputs := []engineering.ModelingInput{}
+			for _, v := range values {
+				inputs = append(inputs, v.ModelingInput)
+			}
+			response.PlacementReferences = engineering.ResolveEndpointPlacements(model, inputs)
+		}
+		reply(response, err)
 		return true
 	}
 	if action == "modeling-inputs" && r.Method == "PUT" {

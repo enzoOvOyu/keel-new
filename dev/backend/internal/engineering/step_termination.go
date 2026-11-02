@@ -110,10 +110,12 @@ func MergeTerminations(current PhysicalModel, q InputPreviewRequest) (PhysicalMo
 				// original orientation; the archived input retains that new declaration.
 				continue
 			}
-			if c.BRackPosition != "" && c.BRackPosition != v[4] {
+			if v[4] != "" && c.BRackPosition != "" && c.BRackPosition != v[4] {
 				return current, fmt.Errorf("STEP_POSITION_CONFLICT: row %d", row+2)
 			}
-			c.BRackPosition = v[4]
+			if v[4] != "" {
+				c.BRackPosition = v[4]
+			}
 			continue
 		}
 		if used[endpoints[0]] || used[endpoints[1]] {

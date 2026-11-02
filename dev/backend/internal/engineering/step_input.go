@@ -50,7 +50,7 @@ type InputPreview struct {
 // A trailing ? declares a conditionally required field. The condition is shown
 // with the table; preview validates syntax, never declares a domain complete.
 func StepInputCatalog() InputCatalog {
-	c := InputCatalog{Version: "3", Tables: []InputTable{}}
+	c := InputCatalog{Version: "4", Tables: []InputTable{}}
 	add := func(id string, step int, name, condition, spec string) {
 		t := InputTable{ID: id, Step: step, Name: name, Condition: condition, Fields: []InputField{}}
 		switch id {
@@ -70,7 +70,7 @@ func StepInputCatalog() InputCatalog {
 		}
 		c.Tables = append(c.Tables, t)
 	}
-	add("terminations", 1, "设备关联", "核对本端与对端的设备身份、端口和位置；预览通过不代表关联已确认。", "a_serial:a端SN|a_mac:a端MAC:mac|a_port:a端端口|b_serial:b端SN|b_rack_position:b端机架位|b_mac:b端MAC:mac|b_port:b端端口")
+	add("terminations", 1, "设备关联", "确认两端设备身份和端口；位置声明可空，机柜与U位按SN复用第二步落位候选，缺失或冲突在第二步处理。", "a_serial:a端SN|a_mac:a端MAC:mac|a_port:a端端口|b_serial:b端SN|b_rack_position?:b端机架位|b_mac:b端MAC:mac|b_port:b端端口")
 	add("rooms", 2, "机房", "场地和机房编码在项目内唯一。", "site_code:场地编码|site_name:场地名称|room_code:机房编码|room_name:机房名称|coordinate_frame?:坐标系编码|coordinate_unit?:坐标单位")
 	add("racks", 2, "机柜", "U位检查需要容量U；空间计算需要毫米尺寸。", "room_code:机房编码|rack_code:机柜编码|name:机柜名称|capacity_u?:容量U:positive_integer|width_mm?:宽mm:positive|depth_mm?:深mm:positive|height_mm?:高mm:positive|coordinate_frame?:坐标系编码|x?:X:number|y?:Y:number|z?:Z:number|coordinate_unit?:坐标单位|orientation_deg?:朝向度:number")
 	add("equipment_specs", 2, "设备规格", "U位安装必须提供高度U；规格引用必须经确认。", "serial:设备SN|equipment_type:设备类型|model:型号或规格引用|height_u?:高度U:positive_integer")

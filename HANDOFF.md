@@ -1,3 +1,11 @@
+## 已完成里程碑事件：双端按SN复用结构化落位、第一步解除位置文本门禁（待历史候选重放）
+
+目录版本4：两端SN/MAC/端口仍必填，b_rack_position仅可空原始声明；重复采用空声明不覆盖既有位置文本。GET modeling-inputs?table_id=terminations新增只读placement_references，精确SN关联同任务placements候选和现有RackPlacement，返回机柜/U位、来源版本/行号、已有设备/落位ID及候选/模型/缺失/冲突状态。没有平行资产或落位事实表，不自动批准候选，不覆盖人工模型。
+
+第一步页面分开展示双端机柜/U位，提供位置待处理筛选和第二步补充入口；缺失/冲突不阻断独立身份采用，第二步落位/第三步布线条件保持。OpenAPI、生成类型、契约台账与实施方案同步。定向Go用例覆盖精确关联、冲突、人工位置保留、可空声明、后置条件不绕过，均通过；TypeScript、文档一致性和API构建通过。
+
+按用户要求，本次直接引用上轮MM保存的候选/来源执行定向采用与关联验证，禁止为了确定性关系/门禁修复再次整本AI解析；仅新资料、语义识别变化或候选本身无法复用时才调用模型。无新增上传或模型请求。本事件尚不宣称在线重放已通过。
+
 ## 已完成里程碑事件：修复当前环境智能开局页面加载失败
 
 此次前端源发布漏带EngineeringWorkbench及原型通过?raw直接引用的docs/intelligent-deployment/KICKOFF-STUDIO-IMPLEMENTATION.txt，Vite模块解析失败；此前根页面/单个子模块HTTP200不足以说明应用可用。这是发布内容遗漏，API仍正常。现已将文件补齐到step1-cleanup-31111a4运行目录，并登记required_frontend_assets；后续源发布必须同时包含该文档、根fixtures及dev/fixtures链接，不能只导出dev/src。

@@ -1497,7 +1497,7 @@
       "request_schema": null,
       "implementation": "implemented",
       "deployment": "deployed_4432065; startup checked, authenticated business acceptance not rerun",
-      "verification": "targeted isolated DB/MinIO lifecycle and synthetic UI; not per-endpoint production acceptance",
+      "verification": "Exact-SN placement read projection and optional step-one location covered by targeted Go tests; historical MM HTTP replay pending",
       "handler": "dev/backend/cmd/api/engineering_modeling.go",
       "source": "dev/backend/internal/engineering/modeling_input.go",
       "documentation": "docs/api/engineering.md",

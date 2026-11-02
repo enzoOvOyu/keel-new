@@ -47874,7 +47874,7 @@ components:
         - supports_confirmation
     IDEInputCatalog:
       type: object
-      description: Current five-step input catalog, version 3. Step 1 uses a_serial, a_mac, a_port, b_serial, b_rack_position, b_mac and b_port.
+      description: Current five-step input catalog, version 4. Step 1 requires endpoint SN, MAC and port on both sides. The optional b_rack_position preserves a source declaration; structured rack/U references reuse step 2 placement inputs and models by exact SN.
       additionalProperties: false
       properties:
         version: *a1
@@ -48168,6 +48168,44 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/IDEModelingInput"
+        placement_references:
+          description: Read-only references returned for table_id=terminations, joined by exact SN within the task. Candidate locations are not approved RackPlacement and do not satisfy cabling gates. Input row numbers refer to the placements table; original source evidence remains immutable.
+          type: array
+          items:
+            $ref: "#/components/schemas/IDEEndpointPlacementReference"
+    IDEEndpointPlacementReference:
+      type: object
+      additionalProperties: false
+      required:
+        - serial
+        - state
+        - input_rows
+      properties:
+        serial:
+          type: string
+        state:
+          type: string
+          enum: [candidate, model, missing, conflict]
+        equipment_id:
+          type: string
+        placement_id:
+          type: string
+        room_code:
+          type: string
+        rack_code:
+          type: string
+        start_u:
+          type: integer
+          minimum: 1
+        position_code:
+          type: string
+        input_version:
+          type: integer
+        input_rows:
+          type: array
+          items:
+            type: integer
+            minimum: 2
     IDEModelingInputEdit:
       type: object
       additionalProperties: false

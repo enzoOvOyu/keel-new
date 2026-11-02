@@ -10,7 +10,7 @@ import {modelCategories,modelForTable,modelInputState,modelStateLabels,studioMod
 
 export const studioViews=[['studio','启动总览',LayoutDashboard],['inputs','资料与建模',FolderOpen],['model','五步工程',GitBranch],['release','审核与交接',ShieldCheck],['benchmark','基准验收',Activity]] as const;
 export const studioSteps=[
- {name:'设备关联',module:'equipment',tab:'model',icon:Server,inputs:'本端 SN / MAC / 端口，对端 SN / 机架位 / MAC / 端口',outputs:'设备身份 · 端口 · 规划连接'},
+ {name:'设备关联',module:'equipment',tab:'model',icon:Server,inputs:'本端 SN / MAC / 端口 · 对端 SN / MAC / 端口 · 位置按 SN 关联第二步落位资料',outputs:'设备身份 · 端口 · 规划连接'},
  {name:'机房与落位',module:'facility_placement',tab:'model',icon:MapPin,inputs:'机房与坐标系 · 机柜尺寸与位置 · 设备高度、U 位和安装面',outputs:'FacilityModel · RackPlacement'},
  {name:'连线与布线',module:'connectivity_cabling',tab:'connectivity',icon:Cable,inputs:'两端端接 · 允许路径 · 线缆与光模块规格 · 已批准计算规则',outputs:'ConnectivityPlan · CablePlan · 材料与工程量'},
  {name:'逻辑网络',module:'network_design',tab:'network',icon:Network,inputs:'已发布物理连接版本 · 客户明确的端口、IP、ASN 与邻居',outputs:'NetworkPlan Revision · Golden 输入'},

@@ -1,4 +1,6 @@
-> 当前第一步输入已调整为本端SN/MAC/端口、对端SN/机架位/MAC/端口（目录版本3）。页面、模板、Agent候选和采用校验均不再包含已移除字段。已有旧格式草稿按当前列投影读取，原始对象及历史连接属性不删除；仍保留身份、MAC、端口占用和位置校验。此项不是完整开局已验收的声明。
+> 当前目录版本4：第一步仅要求双端SN/MAC/端口，b_rack_position为可空来源声明，不影响设备/端口关联采用。GET modeling-inputs?table_id=terminations新增只读placement_references：按本任务精确SN复用placements候选与现有RackPlacement，返回分离的机柜/U位、candidate/model/missing/conflict、已有设备/落位ID及placements版本/行号。候选不是正式落位；冲突不覆盖人工模型，第二步审核与第三步计算条件保持。历史MM候选可直接复用，不需要再做全量AI分析。
+
+> 当前第一步输入已调整为本端SN/MAC/端口、对端SN/机架位/MAC/端口（目录版本4）。页面、模板、Agent候选和采用校验均不再包含已移除字段。已有旧格式草稿按当前列投影读取，原始对象及历史连接属性不删除；仍保留身份、MAC、端口占用和位置校验。此项不是完整开局已验收的声明。
 
 > 当前在线：代码e5faead已部署8081/5180，数据库043无变更；健康、登录、目录/任务、模板、CMDB子图和前端模块检查通过。见[部署记录](../intelligent-deployment/DEPLOYMENT-FIVE-STEP-CHAIN-20261102.json)。下方2215177/未部署说明为历史；新分步Agent仍未完成。
 
@@ -178,7 +180,7 @@ Agent原生工具参数按Pydantic Schema校验，读取脱敏IR，以逐Sheet�
 
 ## 五步标准输入契约（开发中，未部署）
 
-`GET /projects/{projectId}/engineering-inputs` 返回版本3的五步模板目录、列名、类型、必填及条件说明。`GET .../engineering-inputs/{tableId}?format=csv|xlsx` 下载仅表头模板；XLSX使用文本表头，不包含真实资料。设备关联模板为a端SN/a端MAC/a端端口/b端SN/b端机架位/b端MAC/b端端口。
+`GET /projects/{projectId}/engineering-inputs` 返回版本4的五步模板目录、列名、类型、必填及条件说明。`GET .../engineering-inputs/{tableId}?format=csv|xlsx` 下载仅表头模板；XLSX使用文本表头，不包含真实资料。设备关联模板为a端SN/a端MAC/a端端口/b端SN/b端机架位/b端MAC/b端端口。
 
 `POST .../engineering-inputs/preview` 接受IDEInputPreviewRequest，返回逐行原值和字段问题。SN等身份字符串不转数字；MAC校验48位格式，数值按类型检查。表头、列序不符明确报错。该接口只做格式预览，不持久化、不认定工程模块就绪、不发布资产，不执行模型调用或规则计算。条件必填及跨表关系尚需后置建模校验。
 

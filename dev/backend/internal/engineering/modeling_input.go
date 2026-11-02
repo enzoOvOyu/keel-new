@@ -13,8 +13,24 @@ type ModelingInput struct {
 	Reason       string         `json:"reason"`
 }
 type ModelingInputs struct {
-	Revision int             `json:"revision"`
-	Items    []ModelingInput `json:"items"`
+	Revision            int                          `json:"revision"`
+	Items               []ModelingInput              `json:"items"`
+	PlacementReferences []EndpointPlacementReference `json:"placement_references,omitempty"`
+}
+
+// Read projection of existing placement inputs/models, never a second placement
+// fact source. Candidate references do not satisfy placement or cabling gates.
+type EndpointPlacementReference struct {
+	Serial       string `json:"serial"`
+	State        string `json:"state"`
+	EquipmentID  ID     `json:"equipment_id,omitempty"`
+	PlacementID  ID     `json:"placement_id,omitempty"`
+	RoomCode     string `json:"room_code,omitempty"`
+	RackCode     string `json:"rack_code,omitempty"`
+	StartU       *int   `json:"start_u,omitempty"`
+	PositionCode string `json:"position_code,omitempty"`
+	InputVersion int    `json:"input_version,omitempty"`
+	InputRows    []int  `json:"input_rows"`
 }
 type ModelingInputEdit struct {
 	ExpectedRevision int `json:"expected_revision"`
