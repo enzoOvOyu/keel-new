@@ -1,0 +1,431 @@
+Keel 智能开局工程：低交互、固定契约、分步 Agent 实施任务书
+版本：prototype-1 / 2026-11-02
+基准模型：gptsol6.1（严格采用用户给定标识，不推断其厂商或能力）
+目标仓库：enzoOvOyu/keel-new，当前工作分支 dev
+本文件可直接交给 Codex 作为实施输入。
+
+一、交付目标和本轮边界
+
+用户希望尽量少地交互，将不规范开局资料变成有工程依据的结构化计划，分域发布，使交付平台能够启动。允许机房、机柜、路径、规则、网络及供电等必要信息由人工建模导入。
+
+核心流程：
+批量资料 + 已有 CMDB + 工程建模包
+  → 资料分流
+  → 五个有界信息提取任务
+  → 固定格式候选 + 证据 + 确定性关联
+  → 一份集中补充清单
+  → 领域计算 / 跨域校验
+  → 审核及版本冻结
+  → CMDB 规划 / 工程计划 / 网络计划分域发布
+  → 六阶段交付主链的真实输入交接。
+
+本轮完成的是新路由 /kickoff-studio 的交互原型、独立原型数据契约、建模示例和本实施任务书。原型运行在 5081，与 5180/8081 现网隔离。原型不表示新 Agent、真实上传、真实发布或 gptsol6.1 已实现或验收。
+
+机房、机柜和布线规则不是附加选项，而是空间建模及工程计算的必要来源。仅有端接表不能推导走线路径、机柜尺寸、引入长度、余量和采购线长；这些必须由资料明确提供、共享型号/项目规则可靠关联，或者用户补充。
+
+不能承诺任意资料 100% 自动识别。可交付的承诺是：在明确支持的输入范围内，不静默丢失信息，不伪造关键字段，所有未解决项可见；用户补齐规定的工程依据后，固定契约业务链必须完成。损坏文件、模糊不可读扫描件和本来不存在的信息不能由模型保证恢复。
+
+低交互目标：充分资料的常规路径控制在三个主要操作批次：
+1. 确认工程范围，批量上传资料与可选建模包；
+2. 一次处理集中补充清单，或确认系统提出的唯一可靠关联；
+3. 批量审核各域产物并发布。
+这里的“批次”不是严格三个鼠标点击。冲突、审批职责分离及工程设计变更可能需要更多交互。实际验收记录人工字段数、编辑次数和确认次数，不用理想流程代替测量。
+
+二、已知必须解决的问题及现有能力
+
+事实来源：HANDOFF.md；docs/intelligent-deployment/P0-REVIEW.txt；SOURCE-UNDERSTANDING-REVIEW-20261101.txt；FIVE-STEP-CHAIN-ACCEPTANCE-20261102.json；当前代码。
+
+1. 固定输入链已在隔离合成项目验收，不等于真实非规范资料 Agent 验收。
+   已有五份标准 XLSX、结构化工程域、审核、事务 Outbox、CMDB 图表 API 和部分网络/供电计算。复用，不重写。
+2. 新资料分流及五步提取 Agent 未完成。旧 Agent 的“分析成功”不能证明字段、关系、数量和最终数据库状态正确。
+   历史真实资料分析存在数量误差、设备模块关系缺失、机柜对被误当端接、空间关系不完整等问题。
+3. MM 样本部分库存的 SN 列本来为空。189 个网络标签、778 个服务器标签不能直接等同 967 台具有真实身份的设备。
+   解决方式是规划身份候选 + 有依据的关联 + 明确缺口，不编造 SN/MAC。
+4. 固定格式规则参数对用户不够友好。需要机房/机柜/路径/线缆规格/规则建模入口，以及预填补充工作簿。
+5. Network 的目录条目不等于导入支持。当前核心 ethernet、IPv4/IPv6 BGP 能力与 BFD/QoS/Adaptive Routing/EVPN/VLAN/VRF 等缺口必须分别呈现。未实现的必选能力阻断发布，不得返回成功空计划。
+6. dev/src/lib/api/delivery.ts 仍使用 Mock。开局发布到真实主链状态/任务输入的消费必须单独实现与验收，否则“CMDB 已有数据”仍无法证明平台启动闭环。
+7. 大结果存储已有 MinIO/数据库方案。现有 engineering_artifacts.go 可以复用，不应再次创建另一套结果文件服务。
+8. 分步界面不等于所有域严格串行。网络不应等待线长/采购计算；电力不应等待网络设计结束。
+
+本任务书是根据上述证据提出的实施方案。未运行真实 gptsol6.1，也未据此认定所有失败由模型能力引起。
+
+三、五步固定契约和依赖
+
+步骤 1 / 设备关联
+  固定入口列：a_sn、a_mac、a_port、b_sn、b_rack_position、b_mac、b_port、termination_type。
+  展示名称：本端 SN、本端 MAC、本端端口、对端 SN、对端机架位、对端 MAC、对端端口、端接类型。
+  MAC 是本端 / 对端 MAC，不是泛称机柜 MAC。
+  容许缺字段候选进入草稿；最终关联所需的关键字段缺失或冲突时不能自动批准。保留八列，不静默删列或把未知当空字符串通过。
+  b_rack_position 先保留原值和解析候选，不凭一个机架标签猜测 Site/Room/U/设备高度。
+  身份优先级：已确认映射 > 明确稳定 ID/唯一 SN > 项目内唯一且有角色依据的 MAC > 人工确认。
+  MAC 可能属于接口或管理口，不能不加角色和项目约束就视为全局唯一设备键。
+  端口以稳定 Device ID + 标准化物理端口名定位；保留原始名字、breakout 父子关系。
+  输出：EquipmentPlan、DeviceAssembly、稳定规划身份、端口和连接候选。无 SN 的规划数量不是实物资产。
+
+步骤 2 / 机房与落位
+  输入：步骤 1 的身份，rooms、racks、placements、共享型号/设备高度依据。
+  输出：FacilityModel、RackPlacement；复用已有 CMDB 机柜图。
+  门禁：引用存在、单位明确、U 位范围/重叠、机柜尺寸与安装面等约束。
+  缺型号高度时展示缺口，不默认 1U；缺坐标不能默认 (0,0) 作为真实位置。
+
+步骤 3 / 连线与布线
+  分开输出 ConnectivityPlan 和 CablePlan。
+  物理连接依赖两端身份、端口、端接规格，不依赖路径计算完成。
+  线缆工程再依赖落位、通道、允许路径、线缆/光模块规格、已批准规则。
+  输出：连接、分段路径、计算长度、标准规格、光模块去重、标签、Material/Workload。
+  Estimated / Calculated / Confirmed / As-built 独立，计算长度不写 actual_installed_length。
+
+步骤 4 / 逻辑网络
+  输入：明确网络设计资料 + 已发布物理连接版本，不需要采购线长已确定。
+  输出：独立 NetworkPlan Revision；批准发布后 Golden 才能消费。
+  不补造 IP/ASN/邻居/VLAN/VNI/QoS，不把物理相连解释为已配置网络。
+  有界支持范围必须公开；必需协议未实现时保持 BLOCKED。
+
+步骤 5 / 电力与冷却
+  输入：设备身份、落位、功率/负载场景、机柜容量、上游回路/PSU/冷却依据。
+  输出：PowerPlan、RackPowerPlan、容量/负载/余量、供电计算及问题。
+  区分规划负载、观测功率、额定容量、可用容量和冗余场景。
+  冷却方式已知不等于冷却容量合格；需容量验收时缺容量即 NEEDS_INPUT。
+
+依赖图：
+  设备身份 ──→ 落位 ──→ 路径/规则计算 ──→ CablePlan / 材料 / 工程量
+      │           └──→ 供电输入/场景计算 ──→ PowerPlan
+      └──→ 端口/物理连接发布 ──→ 客户网络设计 ──→ NetworkPlan ──→ Golden
+
+UI 可保留五步，但审核和发布粒度需覆盖实际领域产物。Connectivity 能发布时不因 CablePlan 缺路径整体锁死。总交接门禁只检查项目显式选择的必需域；可选域的 NOT_APPLICABLE 必须有适用性依据，不能借此绕过必需域。
+
+四、工程建模导入：正式输入设计
+
+4.1 入口与格式
+
+同一工作台支持四条路径，最终走同一 Schema、校验和修订服务：
+A. 上传非规范资料，Agent 产生固定格式候选；
+B. 直接上传标准 XLSX 建模包；
+C. 单域标准 CSV 导入；
+D. 在页面编辑预填表，保存同样的类型化输入。
+
+固定格式是标准化输出契约，不强迫客户原文件按固定 Sheet 名制作。AI 识别原文件区域后映射到稳定 table_key；标准模板才使用约定 Sheet 名/表头。
+
+每张标准表包含 schema_version、业务主键及类型化列。复用 StepInputCatalog 与现有 XLSX 导入器，增量补齐缺少的领域字段，不建立另一套平行导入器。
+
+预填补充工作簿由后端生成：只包含缺失/冲突对象及所需表，附不可编辑的 source_ref/entity_ref/revision。已确认值可读，不要求用户重复抄写。上传时先 diff/预览，禁止覆盖人工确认值或基于旧修订静默写入。
+
+空值含义：未知、未提供、不适用要有独立状态；0 仅为真实数值。所有数值必须有单位或列级明示单位。SN/MAC/IP、机柜编号按文本处理，不能丢前导零。
+
+4.2 机房与机柜建模包
+
+sites / rooms：
+  site_code、site_name、room_code、room_name、coordinate_frame_id、origin_description、length_unit。
+  需要空间边界/碰撞校验时再必填边界或宽深高；本阶段不强制无关建筑信息。
+  主键项目内唯一；房间引用站点。坐标系的原点、轴方向、单位明确。
+
+racks：
+  rack_code、room_code、height_u、width、depth、dimension_unit、x、y、z、coordinate_unit、orientation_deg、mounting_reference。
+  尺寸可引用已审核 rack_model/version。引用不全时补齐，不默认 42U/600mm。
+  位置与已观察位置分层；通过规划位置发布，不覆盖 Observed。
+
+placements：
+  device_ref、rack_code、u_start、height_u、face、installation_orientation（按适用需要）、source_ref。
+  未按 U 安装的设备必须声明安装方式及相应位置约束，不能伪装成标准机架设备。
+  设备型号高度、方向和占位约束可从可信型号库关联，记录版本及来源。
+  人工确认的规划位置变更走 diff，不被重新分析覆盖。
+
+UI：导入包预览 → 显示机房/机柜/落位关联及冲突 → 一次采用；缺行在同一表编辑。
+现有机柜图直接消费审核后的 RackPlacement，不开发第二套机柜画布。
+
+4.3 物理通道与布线路径建模包
+
+route_nodes：
+  node_code、room_code、node_type、x/y/z、unit；机柜接入节点另有 rack_code / access_face / access_height。
+  node_type 可为机柜接入、桥架节点、竖井、配线架等已支持枚举。
+
+route_edges：
+  edge_code、from_node、to_node、allowed_medium、direction、length、length_unit、length_basis、source_ref。
+  需要容量校验时加可用容量及单位，未提供则不宣称容量验证通过。
+  length_basis 区分测量、批准设计、计算，不把坐标欧氏距离直接当作允许线路。
+  禁行边不可参与路径搜索；跨房间/楼层必须有实际边关系。
+
+rack_access：
+  rack_code、access_node、entry_side、entry_height、lead_rule_ref（仅在不能用统一明确参数时需要）。
+
+patch_panel / segment：
+  复用已有设备/端口身份。若路径经过配线架，分段记录两端和段规格，不能将逻辑两端距离当成一根实际线缆。
+
+cable_specs / optic_specs：
+  spec_code、medium、connector、fiber_count、rate、standard_lengths、length_unit、breakout_profile_ref（适用时）。
+  optic_spec、form_factor、supported_rate、reach、connector、端口兼容性和采购口径。
+  规格库是明确项目输入或已有批准型号，不由 Agent 猜测。
+  不同介质/速率/连接器不能仅凭长度匹配。标准规格不足时产生采购缺口，不随意向下取整。
+
+UI：路径表和接入表导入；用已有物理拓扑/Trace 预览可达性；每条候选线缆可查看采用的边、各段长度及规格。当前原型仅演示一条允许路径的确定性参考计算，不声称分段配线架/容量已实现。
+
+4.4 布线规则建模包（独立入口，不遗漏）
+
+rule_definition：
+  rule_id、domain、scope_type、scope_id、version、algorithm_id、algorithm_version、input_schema、output_schema、unit_contract、approval_status。
+rule_parameters：
+  rule_ref/version、parameter_name、typed_value、unit、source_ref。
+rule_bindings：
+  project/domain/region/equipment_type 的明确适用范围与优先级；不确定匹配报冲突。
+validation_cases：
+  case_id、typed_inputs、independent_expected_outputs、tolerance、expected_error（适用时）、reference_basis。
+
+页面向用户提供已支持算法与参数编辑，后台映射到现有 CalculationRule 注册表，不要求普通用户手写表达式 AST。参数不固定为样本常量。
+
+首批算法复用 shortest_path、明确引入长度、明确余量、标准规格选择。若客户要求不同计算公式，先作为未批准规则候选，经过可支持表达式验证和独立算例后才能启用。禁止 eval 任意 Python/JS。
+
+规则生命周期：DRAFT → VALIDATED（独立算例通过）→ APPROVED（具备权限的人审核）→ ACTIVE。
+计算运行冻结规则版本、输入修订和所用规格版本。更改参数产生新版本，不改旧计算。
+
+项目参考算例（仅合成 fixture）：允许路径 12m，两端引入各 2m，余量 10%；
+  required=(12+2+2)*(1+0.10)=17.6m；
+  可采购规格 [10,20,30,50]m → 选择 20m。
+该式和数字不得成为全局硬编码。正式用例还要覆盖不可达、单位转换、没有足够长规格、重复物理端口、breakout 和配线架分段。
+
+光模块计数按物理可插拔端口及器件能力去重，不能对逻辑子链路简单乘 2。原型“一条线缆、两只光模块”只适用于其明确的单链路算例。
+
+4.5 网络和电力建模导入
+
+网络：复用 network_planes/roles/interfaces/addresses/asns/bgp；补充来源版本、目标域、物理连接 revision。高级协议子表必须先实现对应结构化持久化/门禁，再允许 Agent 输出“可发布”。
+没有网络规划文件时，集中补充清单可以要求客户导入地址/ASN/邻居表或选择已批准规划；不能自动分配没有依据的配置。
+
+电力：复用 power_scope、设备功率、rack_capacity、回路、PSU 和规则引用。输入应包含容量依据、负载场景、A/B 供电关系、独立性依据及冷却方式；需容量判断时补充冷却容量和单位。
+不能把 nameplate 额定功率、实测功率、规划利用率和 A/B 冗余场景混为一个字段。原型的机柜负载汇总是 UI 示例，不替代现有完整回路/PSU模型。
+
+五、AI Agent 实施方案：从这里开始开发
+
+5.1 复用边界
+
+复用 internal/ai/engineering_agent.go 现有模型协议/工具运行能力，拆出按任务定义的提示与工具白名单；复用 cmd/api/engineering_job.go 作业和 engineering_artifacts.go 中间结果存储。
+复用 Workbook IR、inspect/read_range/公式工具、现有标准工作簿校验及合并函数、CalculationRule、Revision、Review、Publish、Outbox。
+不要新建通用多 Agent 平台，不引入第二个调度器，不让五个 Agent 互相无限循环聊天。
+
+新增的是：一个资料分流任务 + 五个有界提取任务定义 + 确定性标准化/关联服务 + 集中缺口汇总。
+“分步 Agent”表示同一运行时中的不同任务上下文、Schema 与工具权限，不必是六个服务或六个长期自治实例。
+
+5.2 资料预处理与分流
+
+在模型请求前：识别 MIME/容器、工作簿 Sheet/区域/合并单元格/表头/公式和缓存值，识别凭据字段，产生区域摘要。
+XLSX/CSV 为首期已支持输入。PDF/图像/OCR 等仅在解析适配器及可追溯证据实现后对外宣布支持；不把“可上传”当成“已支持读取”。
+对于不支持/损坏/缺密码的文件，保留输入记录，提示可接受转换或人工输入路径。
+
+分流任务输入：区域索引、有限表头/样本、对象类型词表、五步契约摘要。
+输出：每个区域的业务类别、可能目标步骤、有效范围、未知部分、需要进一步读取的区域，形成 ImportPlan。
+不固定原文件 Sheet 名，不固定表数量，不把 sheet 列表变成菜单或表结构。
+
+5.3 五步任务的严格边界
+
+任务 1：端接八字段、设备身份候选及已有引用；不能补造物理身份。
+任务 2：房间、机柜、落位、型号高度与空间字段映射；不能猜测坐标/U。
+任务 3：端口/连接规格、通道、线缆/光模块需求、规则映射候选；调用确定性计算而非自己估计总量。
+任务 4：提取显式网络设计；缺 IP/ASN/BGP 依据即产出缺口。
+任务 5：提取功率/场景/容量/回路/冷却，识别来源和状态。
+
+每个任务得到只相关的区域和已有实体索引；跨表补充通过 read-only 查询工具获取。
+任务输出是提取计划与结构化候选，不能直接正式提交 BOM/CMDB、批准规则或发布 NetworkPlan。
+
+5.4 提取计划优先于长篇生成
+
+AI 输出有限的 region_ref、header_mapping、data_rows、normalization、join_spec、fact/evidence refs。
+程序按计划逐行完整展开并验证，计数由代码从实体和关系计算。
+不要要求模型逐字生成几千行 JSON，也不要用模型口头总结的数量覆盖实际行数。
+每个有效区域/来源行最终标记为 extracted、needs_input、conflict、not_applicable（有理由）或 unsupported；未知列保留。
+
+跨源关联只能采用可验证键：已确认映射、唯一标识、已批准型号、项目局部命名规则。名称相似或邻近单元格只能提出候选。
+“联想补全”定义为检索可靠证据并提出可验证关联，不是创造业务事实。
+
+5.5 任务 DTO 和工具
+
+先对现有 OpenAPI 增量收紧类型，不用一个巨大 JSON 替代工程实体。
+建议任务包包含：
+  task_id / project_id / import_id / step_id / input_revision；
+  source_region_refs / canonical_index_ref / schema_version / rule_refs；
+  model_id / provider_revision / prompt_hash / extraction_policy_version；
+  attempt / token_limit / tool_limit / deadline / checkpoint_ref。
+输出包含：
+  extraction_plans、candidate_batch_ref、evidence_index_ref、coverage_ref；
+  missing_inputs、conflicts、unsupported、warnings；
+  consumed_revision 和 proposed_module_state。
+大型候选分页写 MinIO，摘要/索引与实体结构入 PostgreSQL。工具结果返回句柄、计数和可分页范围，不重复把全量结果塞入下一轮提示。
+
+工具复用/按需实现：
+  inspect_workbook、inspect_sheet、inspect_region、read_range；
+  inspect_formula、trace_formula_dependencies；
+  lookup_canonical_entities、lookup_approved_models、lookup_project_rules；
+  propose_mapping、resolve_cross_sheet_references、propose_engineering_model；
+  run_calculation（仅已有批准规则）、validate_model、analyze_validation_issues；
+  emit_missing_input。
+工具授权只读来源或写候选暂存；正式领域合并由受控业务服务执行。
+
+5.6 gptsol6.1 基准要求
+
+model_id 固定为 gptsol6.1，不改写别名，不静默 fallback。API Key 只存在系统管理 Provider 的受控秘密引用，不进入浏览器、日志或 fixture。
+先做一次可审计能力探测：真实端点、请求协议、工具调用、结构化输出、上下文限制、响应截止和用量字段；若不支持原生 Schema，用现有协议工具输出并做同样的服务器 Schema 校验，不假定能力。
+保存请求的 model_id 与响应可取得的 resolved model/version。未公开版本时标记 unavailable；提供方变更造成的复现限制必须报告。
+固定 prompt/tool/schema/decoder 配置、数据摘要、规则版本、任务预算。温度/seed 仅在 Provider 确实支持时设置和记录，不能宣称能保证确定性。
+
+任务预算是工程配置，不假装已从当前模型实测得到。可先采用“每个区域计划 8 次工具调用、最多一次语义纠正”的初始上限，使用首个真实样本测量后冻结；大型区域分批继续，不靠无限增加循环数。
+临时网络/429/5xx 可做有上限的传输重试并保留同一任务/幂等键；400/结构错误进入明确诊断，不用同一请求无限重试。
+一轮提取后只给具体校验问题；一次针对性纠正仍不满足则 NEEDS_INPUT/BLOCKED。用户补充/规则变更/新证据才能产生新修订并重开受影响任务。
+取消、超时、服务重启后使用持久化 checkpoint 恢复，不依赖进程内整本 Workbook 或单一长 HTTP 请求。
+
+5.7 数据与隐私
+
+原始工作簿不可变保存在项目隔离对象存储；hash、证据索引和任务状态入 PostgreSQL。
+建议沿用现有工程 artifact 命名体系，按 source/region/task/attempt/result/coverage/calculation 分层引用，不强制新桶或新服务。
+读取需授权；大文件通过分页/受控 URL，不直接暴露公开桶。
+凭据单元格仅提取存在提示/Vault 引用，不发送明文秘密。受仓库约束的真实 SN/IP/MAC 进入外部模型前使用稳定代理标识；真实值在本地确定性映射回填并留证据，避免把整份真实工作簿发给 Provider。
+测试原文件、真实行和秘密不进入 Git。Golden 真实 ground truth 保存在受控私有位置，Git 只记录摘要、Schema 与脱敏统计。
+
+六、固定契约、校验与领域发布
+
+正式对象继续使用三层：来源/理解、工程模型、校验/发布。
+字段级 provenance 至少引用 source_hash、region、cell/range、transformation、model/task/version、人工决策。推断与原文事实分开。
+模板映射 > 确定性规则 > AI 候选；AI 信心分数不是审批依据。
+
+校验分四层：
+1. Schema：类型、单位、枚举、必填与未知列；
+2. 域内：SN/MAC身份、端口占用、U位、路径可达、规格兼容、功率守恒等；
+3. 跨域：设备/机柜/端口引用、物理连接版本、供电与落位引用；
+4. 发布：当前 revision 审核、必需域无 BLOCK、人工确认字段未被覆盖。
+
+每个域保持 NOT_APPLICABLE/DETECTED/NEEDS_INPUT/READY/PROCESSING/IN_REVIEW/APPROVED/PUBLISHED/BLOCKED/STALE 语义；作业完成不自动代表 READY，更不代表 APPROVED。
+
+变更传播按真实依赖：机柜/落位改变影响相关路径和机柜电力；规则改变只失效其相关计算；网络规划变化不要求重新提取未变化的设备身份。保存旧发布版，产生新草稿；对旧审核和过期版本拒绝写入。
+
+采用现有事务与 Outbox：领域提交与事件同事务，幂等投影到 CMDB，失败可重放；重复同摘要不重复资产，异摘要要求新修订与差异审核。
+物料估算不作为已采购资产；规划设备不标 discovered；计算线长不标 as-built；NetworkPlan 不是已经下发的配置。
+
+六阶段交接：
+建立/补齐最小真实 adapter，从批准的 domain PublishRecord 引用集合建立 kickoff readiness 及目标设备组/端口/网络计划输入。
+交付主链仍是开局配置→网络就绪→装机→验机→NCCL测试→优雅退场。
+开局就绪允许启动后续任务，不代表网络/装机/NCCL已经通过。后续阶段只消费各自需要的已批准版本，源变更应显示 stale。
+现有 delivery mock 不得伪装真实消费端。生产发布失败与投影失败分别可见。
+
+七、统一工作台与交互实现
+
+唯一新增主路由 /kickoff-studio，内部视图使用 ?view=overview|models|steps|review|benchmark，步骤使用 ?step=1..5。不创建八个独立业务菜单。
+
+总览：五步状态、当前可执行动作、集中补充清单、输入和产物版本；进度基于实际校验，不显示虚假的模型百分比。
+资料与建模：批量资料入口、机房/机柜/落位、通道/规则/规格、网络/电力模型；单表编辑和批量核对均支持。
+五步工程：输入要求、候选结果、证据、冲突、计算和相关模型；必要补充同页完成。
+审核与交接：按域展开差异、来源、规则、版本和发布目标；批量审核保留每域 ReviewDecision，职责分离按现有 RBAC。
+基准验收：gptsol6.1 配置引用、被冻结的基准信息、独立预期、运行结果和人工补充次数。
+
+必要交互：
+- 表格逐格编辑、导入、下载模板、未知列反馈、行错误定位。
+- 导入有预览/diff；用户确认采用后进入草稿，不直接正式发布。
+- 明确原文、可靠关联、人工补充和计算结果的来源。
+- 缺口按对象/原因合并，已经填写的内容不反复问。
+- 导出一份预填补充 XLSX；页面补充与回传工作簿等价。
+- 参数变更显示影响范围，复用已有计算服务重新计算；旧发布版可查询。
+- 失败显示具体卡点和下一步动作；不无限 loading，不跳转登录或显示装载演示数据消息。
+
+本轮原型行为与限制：
+- 合成演示引用统一 demo-seed.json 的十个设备 ID，不复制另一套资产。
+- 九份简化建模表支持实际 CSV 导入、粘贴、行编辑和下载。
+- 表头、基本数字、引用、U 位、规则参考算例等交互校验已放在原型 adapter。
+- 可展示候选、确认人工补充 MAC、批量采用建模、执行一条路径参考计算、审核与模拟发布、查看旧发布/新草稿。
+- 来源入口仅登记用户选择的文件名，未解析真实 XLSX/PDF；“演示资料分析”只显示固定合成结果。
+- 网络 UI 仅格式预览，电力 UI 仅机柜汇总；高级协议、完整回路/PSU和全部物理关系校验是正式实现/现有后端接入任务。
+- 原型审核/发布是聚合演示，未演示每个领域独立授权；生产必须按本节实现独立门禁。
+- 不调用真实模型、不写真实库、不发网络配置。基准全部 NOT_RUN。
+- 原型数据存浏览器 localStorage，生产持久化仍必须复用 PostgreSQL/MinIO；不能照搬原型状态管理到后端。
+
+八、实施顺序及明确验收
+
+先检查本文件、AGENTS、HANDOFF 和对应代码，不全仓无目的 Review。优先复用已通过的固定格式链；不为了 Agent 重写 CMDB、机柜图和计算内核。
+
+M1 / 冻结输入与建模导入体验
+  交付：在当前真实 StepInputCatalog 上补齐必要建模字段、来源/单位/版本；前端接入已批准的原型交互；预填补充 XLSX；分域依赖和状态。
+  验收：通过人工标准输入，在一个独立项目走通五步及真实下游交接；关键跨域缺失和错误明确阻断，正常路径不需要改代码/SQL。
+  注意：现有五步隔离测试已通过部分，不重复泛测；新增项只测对应差异。
+
+M2 / gptsol6.1 + 资料分流 + 第一步纵向切片
+  交付：一次 Provider 能力探测；分区/分流；八字段提取计划；全量行确定性展开；来源覆盖；集中补充；持久化和恢复。
+  验收：真实资料→候选→人工补齐→固定契约→审核→物理规划发布；核对字段和关系，不以“job succeeded”判定。
+  这是新 Agent 开发的起点。先完成此链再扩展任务 2–5，避免同时铺开五个未经验证的 Agent。
+
+M3 / 扩展落位、布线、网络、电力提取任务
+  交付：复用同一运行时和Schema工具，按各域限定资料；规则候选映射；可靠跨表关联；按输入依赖并行。
+  验收：每域真实提取或明确缺口；用户补充建模后固定链可继续；网络/电力不受无关域阻塞。
+
+M4 / 最小交互闭环与真实交接
+  交付：集中缺口合并、批量审核、差异保护、版本失效、真实 delivery adapter、发布失败重放。
+  验收：真实 API/SQL/Outbox/CMDB 图表/Golden/主链输入版本一致；没有 Observed 污染、越权写入或伪通过。
+
+M5 / 冻结后的验收
+  交付：真实样本 Ground Truth、第二份结构不同真实资料、结构变体、gptsol6.1 五次独立运行报告。
+  五次仅在候选实现和配置冻结后执行。失败只修定位到的阻断并做定向验证，不每次改文案都重跑全部链。
+  如果某真实源缺字段，测试应该验证“准确提出缺口、人工补充后通过”，不能把源数据不存在算成模型应当猜出的成功项。
+
+里程碑完成时写 HANDOFF 的完成事件、变更、实测结果及限制；不写无意义计时流水。
+每项完整修改按仓库约定提交；推送前确认 enzoOvOyu/keel-new。未经明确授权不触碰生产设备。
+
+九、验收判据与停止条件
+
+固定输入链：
+- 合法输入确定性成功；关键身份/引用/数量/关系与独立预期一致；非法输入可定位拒绝。
+- 同摘要幂等；旧修订冲突；人工确认值保留；无 Observed 覆盖。
+- 机柜/U/空间单位、路径/标准线长/光模块、供电/容量分别核对。
+- 真实交付消费者拿到正确已发布版本，后续任务仍待执行。
+
+Agent：
+- 关键字段/关系 false positive 为 0 才能自动采用为候选中的确定性关联；其它不确定项进入人工审核，不以 confidence 放行。
+- 来源区域/行均有明确去向；记录 recall、precision、缺失、冲突及人工补充量，不能只报一个综合“识别率”。
+- 所有实际成功关键值可追到证据或批准规则；源中不存在的关键值不得伪造。
+- 固定模型/数据/配置下五次结果分别记录；报告五次均成功的观察，不宣称统计上保证 100% 永久可靠。
+- 结构变体用于证明同源鲁棒性；至少另一份真实不同结构材料才可讨论跨客户泛化。
+
+资源与效率：
+- 记录各步端到端时长、模型调用数、tokens、费用（Provider 提供才记录）、人工操作次数、重试原因、终态。
+- 同输入/同错误超过约定的一次纠正即停，给出可完成的补充入口；不继续消耗模型做无信息重试。
+- 当前任务验收阻断解决即可交付，不追加通用引擎、无关UI重构或无目的平台回归。
+
+十、代码入口和本轮契约注意事项
+
+现有业务：
+  dev/backend/internal/engineering/step_input.go
+  step_workbook.go、step_termination.go、step_placement.go、step_connectivity.go
+  step_cabling.go、step_network.go、step_power.go
+  dev/backend/internal/ai/engineering_agent.go
+  dev/backend/cmd/api/engineering_job.go、engineering_artifacts.go
+  engineering_standard_workbook.go、engineering_store.go、engineering_publish.go
+  dev/src/lib/api/delivery.ts（真实交接缺口）
+
+原型：
+  dev/prototypes/kickoff-studio/KickoffStudio.tsx
+  dev/prototypes/kickoff-studio/kickoff-studio.css
+  dev/prototypes/kickoff-studio/api.ts
+  fixtures/demo-full-64-b300/kickoff-studio.json（合成建模及统一资产引用）
+  dev/prototypes/kickoff-studio/main.tsx / vite.config.ts（独立入口及 5081 服务）
+  dev/prototypes/kickoff-studio/contracts.ts（仅原型 DTO，不改现有 OpenAPI）
+
+本轮的 get / act / saveModel / registerSources / configureBenchmark 仅为本地原型 adapter，不是 HTTP API。
+生产接入时将专用 UI adapter 映射到现有领域端点；不足的端点再按契约增量扩展。
+不要把原型 rows:string[][] 当最终领域事实结构，也不要把其一条参考连接误作已验证的全量端接输出。
+本轮不修改现有 OpenAPI、生成 SDK、应用主入口或 Go 业务代码。正式 API 契约在后续实施时增量定义。
+
+运行原型：
+  cd /home/ubuntu/keel-dev/dev
+  ./node_modules/.bin/vite --config prototypes/kickoff-studio/vite.config.ts
+  打开 http://localhost:5081/kickoff-studio
+原型有独立 Vite 入口，不挂载现有身份或业务 Provider，也不代理真实 /api；现有应用启动方式不变。
+
+十一、设计依据（不是性能保证）
+
+以下采用的是可验证的工程方法，不因文献名而宣称当前系统或 gptsol6.1 已达到对应成绩：
+
+[Building effective agents — Anthropic](https://www.anthropic.com/research/building-effective-agents)
+资料分流、有界任务和明确工具边界适合预定业务流程；本项目据此选择固定工作流内的局部智能，不建设无限自治循环。该文为 2024 年方法论，页面也提示工具生态已有变化，不称其为最新唯一方案。
+
+[SpreadsheetLLM — Microsoft Research / EMNLP 2024](https://www.microsoft.com/en-us/research/publication/encoding-spreadsheets-for-large-language-models/)
+表格结构、锚点和压缩编码比全文平铺更适合有限上下文；本项目沿用 Workbook IR 分区/索引/按需读取，不移植研究性能数字作为本系统承诺。
+
+[τ-bench — Yao et al.](https://arxiv.org/abs/2406.12045)
+最终数据库状态及重复运行可靠性比单轮文本自评更适合业务 Agent 验收；本项目采用独立预期和冻结后的多次验收，五次观察不等于普遍统计保证。
+
+[Persistence — LangGraph documentation](https://docs.langchain.com/oss/python/langgraph/persistence)
+检查点与持久化状态支持人工介入和恢复；本项目在已有 Go/PostgreSQL/MinIO 上落实同类机制，不因此引入 Python/LangGraph。
+
+本任务书中的具体 Schema、依赖和里程碑属于对 Keel 当前代码/需求的工程设计推论，需以实际实施验收记录证明完成。

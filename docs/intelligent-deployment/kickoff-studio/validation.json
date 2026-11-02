@@ -1,0 +1,22 @@
+{
+  "scope": "prototype only",
+  "status": "PASS",
+  "checks": [
+    "standalone route",
+    "real CSV import into prototype",
+    "identity confirmation",
+    "batch model adoption",
+    "17.6m calculated / 20m standard",
+    "review and simulated publish",
+    "reload persistence",
+    "invalid U rejected",
+    "model change invalidates review",
+    "gptsol6.1 NOT_RUN",
+    "implementation file download",
+    "390px layout"
+  ],
+  "page_errors": [],
+  "real_api_requests": [],
+  "real_model_calls": 0,
+  "production_modified": false
+}

@@ -1,0 +1,799 @@
+{
+  "schema_version": 1,
+  "project_id": "proj-b300-demo",
+  "project_name": "B300 工程启动 · 合成规划沙箱",
+  "asset_refs": [
+    "srv-0001",
+    "srv-0002",
+    "srv-0003",
+    "srv-0004",
+    "srv-0005",
+    "srv-0006",
+    "srv-0007",
+    "srv-0008",
+    "sw-leaf-0001",
+    "sw-leaf-0002"
+  ],
+  "models": [
+    {
+      "id": "rooms",
+      "name": "机房与坐标系",
+      "group": "facility",
+      "purpose": "明确机房边界、坐标原点与单位，所有机柜引用同一坐标系。",
+      "step_ids": [
+        2,
+        3,
+        5
+      ],
+      "columns": [
+        {
+          "key": "room_id",
+          "label": "机房编码",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "name",
+          "label": "机房名称",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "site",
+          "label": "站点",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "coordinate_frame",
+          "label": "坐标系",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "unit",
+          "label": "长度单位",
+          "kind": "text",
+          "required": true
+        }
+      ],
+      "rows": [
+        [
+          "room-demo",
+          "演示机房 A",
+          "合成园区",
+          "room-local",
+          "m"
+        ]
+      ],
+      "version": 1,
+      "status": "draft",
+      "source": "合成建模示例 · 待用户审核"
+    },
+    {
+      "id": "racks",
+      "name": "机柜与尺寸",
+      "group": "facility",
+      "purpose": "宽深高、容量、坐标及朝向形成明确的空间约束。",
+      "step_ids": [
+        2,
+        3,
+        5
+      ],
+      "columns": [
+        {
+          "key": "rack_id",
+          "label": "机柜 ID",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "room_id",
+          "label": "所属机房",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "height_u",
+          "label": "容量 U",
+          "kind": "integer",
+          "required": true
+        },
+        {
+          "key": "width_mm",
+          "label": "宽 mm",
+          "kind": "positive",
+          "required": true
+        },
+        {
+          "key": "depth_mm",
+          "label": "深 mm",
+          "kind": "positive",
+          "required": true
+        },
+        {
+          "key": "x_m",
+          "label": "X m",
+          "kind": "number",
+          "required": true
+        },
+        {
+          "key": "y_m",
+          "label": "Y m",
+          "kind": "number",
+          "required": true
+        },
+        {
+          "key": "orientation_deg",
+          "label": "朝向 °",
+          "kind": "number",
+          "required": true
+        }
+      ],
+      "rows": [
+        [
+          "rack-0001",
+          "room-demo",
+          "42",
+          "600",
+          "1200",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "rack-0002",
+          "room-demo",
+          "42",
+          "600",
+          "1200",
+          "6",
+          "0",
+          "180"
+        ]
+      ],
+      "version": 1,
+      "status": "draft",
+      "source": "合成建模示例 · 待用户审核"
+    },
+    {
+      "id": "placements",
+      "name": "设备落位",
+      "group": "facility",
+      "purpose": "复用 CMDB 身份；规划位置与演示库存中的既有位置分开。",
+      "step_ids": [
+        2,
+        3,
+        5
+      ],
+      "columns": [
+        {
+          "key": "device_id",
+          "label": "设备 ID",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "rack_id",
+          "label": "机柜 ID",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "u_start",
+          "label": "起始 U",
+          "kind": "integer",
+          "required": true
+        },
+        {
+          "key": "height_u",
+          "label": "设备高度 U",
+          "kind": "integer",
+          "required": true
+        },
+        {
+          "key": "face",
+          "label": "安装面",
+          "kind": "text",
+          "required": true
+        }
+      ],
+      "rows": [
+        [
+          "srv-0001",
+          "rack-0001",
+          "33",
+          "6",
+          "front"
+        ],
+        [
+          "srv-0002",
+          "rack-0001",
+          "27",
+          "6",
+          "front"
+        ],
+        [
+          "srv-0003",
+          "rack-0001",
+          "21",
+          "6",
+          "front"
+        ],
+        [
+          "srv-0004",
+          "rack-0001",
+          "15",
+          "6",
+          "front"
+        ],
+        [
+          "srv-0005",
+          "rack-0002",
+          "33",
+          "6",
+          "front"
+        ],
+        [
+          "srv-0006",
+          "rack-0002",
+          "27",
+          "6",
+          "front"
+        ],
+        [
+          "srv-0007",
+          "rack-0002",
+          "21",
+          "6",
+          "front"
+        ],
+        [
+          "srv-0008",
+          "rack-0002",
+          "15",
+          "6",
+          "front"
+        ],
+        [
+          "sw-leaf-0001",
+          "rack-0002",
+          "2",
+          "2",
+          "front"
+        ],
+        [
+          "sw-leaf-0002",
+          "rack-0001",
+          "2",
+          "2",
+          "front"
+        ]
+      ],
+      "version": 1,
+      "status": "draft",
+      "source": "合成建模示例 · 待用户审核"
+    },
+    {
+      "id": "route_nodes",
+      "name": "通道节点与机柜接入",
+      "group": "cabling",
+      "purpose": "机柜坐标不等于可走线路；显式定义接入点与走线节点。",
+      "step_ids": [
+        3
+      ],
+      "columns": [
+        {
+          "key": "node_id",
+          "label": "节点 ID",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "rack_id",
+          "label": "机柜接入 ID",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "x_m",
+          "label": "X m",
+          "kind": "number",
+          "required": true
+        },
+        {
+          "key": "y_m",
+          "label": "Y m",
+          "kind": "number",
+          "required": true
+        },
+        {
+          "key": "z_m",
+          "label": "Z m",
+          "kind": "number",
+          "required": true
+        }
+      ],
+      "rows": [
+        [
+          "tray-a",
+          "rack-0001",
+          "0",
+          "0",
+          "3"
+        ],
+        [
+          "tray-b",
+          "rack-0002",
+          "6",
+          "0",
+          "3"
+        ]
+      ],
+      "version": 1,
+      "status": "draft",
+      "source": "合成建模示例 · 待用户审核"
+    },
+    {
+      "id": "route_edges",
+      "name": "允许布线路径",
+      "group": "cabling",
+      "purpose": "用已测量或已审核的通道长度计算；不把欧氏距离默认为布线长度。",
+      "step_ids": [
+        3
+      ],
+      "columns": [
+        {
+          "key": "edge_id",
+          "label": "边 ID",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "from_node",
+          "label": "起点",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "to_node",
+          "label": "终点",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "length_m",
+          "label": "路径长度 m",
+          "kind": "positive",
+          "required": true
+        },
+        {
+          "key": "medium",
+          "label": "介质",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "basis",
+          "label": "长度依据",
+          "kind": "text",
+          "required": true
+        }
+      ],
+      "rows": [
+        [
+          "route-ab",
+          "tray-a",
+          "tray-b",
+          "12",
+          "fiber",
+          "合成参考路径，非实测"
+        ]
+      ],
+      "version": 1,
+      "status": "draft",
+      "source": "合成建模示例 · 待用户审核"
+    },
+    {
+      "id": "cable_specs",
+      "name": "线缆与光模块规格",
+      "group": "cabling",
+      "purpose": "标准线长和两端规格由项目选择，按物理端口计数。",
+      "step_ids": [
+        3
+      ],
+      "columns": [
+        {
+          "key": "spec_id",
+          "label": "规格 ID",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "medium",
+          "label": "介质",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "rate_gbps",
+          "label": "速率 Gbps",
+          "kind": "positive",
+          "required": true
+        },
+        {
+          "key": "connector",
+          "label": "连接器",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "standard_lengths_m",
+          "label": "可采购线长 m",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "optic_a",
+          "label": "本端光模块",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "optic_b",
+          "label": "对端光模块",
+          "kind": "text",
+          "required": true
+        }
+      ],
+      "rows": [
+        [
+          "fiber-400g",
+          "fiber",
+          "400",
+          "MPO",
+          "10;20;30;50",
+          "DEMO-400G-OPTIC",
+          "DEMO-400G-OPTIC"
+        ]
+      ],
+      "version": 1,
+      "status": "draft",
+      "source": "合成建模示例 · 待用户审核"
+    },
+    {
+      "id": "cabling_rules",
+      "name": "布线计算规则",
+      "group": "cabling",
+      "purpose": "选择有版本的算法与参数，通过独立参考算例后才可采用。",
+      "step_ids": [
+        3
+      ],
+      "columns": [
+        {
+          "key": "rule_id",
+          "label": "规则 ID",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "algorithm",
+          "label": "算法",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "lead_a_m",
+          "label": "本端引入 m",
+          "kind": "number",
+          "required": true
+        },
+        {
+          "key": "lead_b_m",
+          "label": "对端引入 m",
+          "kind": "number",
+          "required": true
+        },
+        {
+          "key": "slack_percent",
+          "label": "余量 %",
+          "kind": "number",
+          "required": true
+        },
+        {
+          "key": "reference_route_m",
+          "label": "参考路径 m",
+          "kind": "positive",
+          "required": true
+        },
+        {
+          "key": "expected_required_m",
+          "label": "独立预期 m",
+          "kind": "positive",
+          "required": true
+        },
+        {
+          "key": "expected_stock_m",
+          "label": "预期采购 m",
+          "kind": "positive",
+          "required": true
+        }
+      ],
+      "rows": [
+        [
+          "project-cable-rule",
+          "shortest_path",
+          "2",
+          "2",
+          "10",
+          "12",
+          "17.6",
+          "20"
+        ]
+      ],
+      "version": 1,
+      "status": "draft",
+      "source": "合成建模示例 · 待用户审核"
+    },
+    {
+      "id": "network",
+      "name": "逻辑网络依据",
+      "group": "network_power",
+      "purpose": "明确导入的端口/IP/ASN与邻居；原型不生成地址和配置。",
+      "step_ids": [
+        4
+      ],
+      "columns": [
+        {
+          "key": "device_id",
+          "label": "设备 ID",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "interface",
+          "label": "接口",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "address",
+          "label": "本端 IP/CIDR",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "asn",
+          "label": "本端 ASN",
+          "kind": "integer",
+          "required": true
+        },
+        {
+          "key": "peer_address",
+          "label": "对端 IP",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "peer_asn",
+          "label": "对端 ASN",
+          "kind": "integer",
+          "required": true
+        },
+        {
+          "key": "source",
+          "label": "规划依据",
+          "kind": "text",
+          "required": true
+        }
+      ],
+      "rows": [
+        [
+          "sw-leaf-0001",
+          "swp49",
+          "192.0.2.0/31",
+          "65001",
+          "192.0.2.1",
+          "65002",
+          "合成网络规划 v1"
+        ],
+        [
+          "sw-leaf-0002",
+          "swp49",
+          "192.0.2.1/31",
+          "65002",
+          "192.0.2.0",
+          "65001",
+          "合成网络规划 v1"
+        ]
+      ],
+      "version": 1,
+      "status": "draft",
+      "source": "合成建模示例 · 待用户审核"
+    },
+    {
+      "id": "power",
+      "name": "供电与冷却输入",
+      "group": "network_power",
+      "purpose": "规划负载、机柜容量与冷却方式分别导入；原型只展示机柜汇总。",
+      "step_ids": [
+        5
+      ],
+      "columns": [
+        {
+          "key": "rack_id",
+          "label": "机柜 ID",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "capacity_kw",
+          "label": "供电容量 kW",
+          "kind": "positive",
+          "required": true
+        },
+        {
+          "key": "planned_load_kw",
+          "label": "规划负载 kW",
+          "kind": "number",
+          "required": true
+        },
+        {
+          "key": "cooling_type",
+          "label": "冷却类型",
+          "kind": "text",
+          "required": true
+        },
+        {
+          "key": "source",
+          "label": "容量依据",
+          "kind": "text",
+          "required": true
+        }
+      ],
+      "rows": [
+        [
+          "rack-0001",
+          "80",
+          "40",
+          "liquid",
+          "合成配电设计 v1"
+        ],
+        [
+          "rack-0002",
+          "80",
+          "40",
+          "liquid",
+          "合成配电设计 v1"
+        ]
+      ],
+      "version": 1,
+      "status": "draft",
+      "source": "合成建模示例 · 待用户审核"
+    }
+  ],
+  "sources": [
+    {
+      "id": "source-layout",
+      "name": "示例设备与端接资料.xlsx",
+      "kind": "example",
+      "step_ids": [
+        1,
+        2,
+        3
+      ],
+      "status": "待演示分析"
+    },
+    {
+      "id": "source-models",
+      "name": "示例机房与布线建模.csv",
+      "kind": "example",
+      "step_ids": [
+        2,
+        3,
+        5
+      ],
+      "status": "待核对建模"
+    },
+    {
+      "id": "source-design",
+      "name": "示例网络与供电规划.csv",
+      "kind": "example",
+      "step_ids": [
+        4,
+        5
+      ],
+      "status": "待核对建模"
+    }
+  ],
+  "steps": [
+    {
+      "id": 1,
+      "name": "设备关联",
+      "summary": "八字段端接 → 稳定设备与端口身份",
+      "input_labels": [
+        "本端 SN / MAC / 端口",
+        "对端 SN / 机架位 / MAC / 端口",
+        "端接类型 · 确认身份关联"
+      ],
+      "outputs": [
+        "EquipmentPlan",
+        "DeviceAssembly",
+        "Planned Connection"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "机房与落位",
+      "summary": "机房、机柜与设备的空间约束",
+      "input_labels": [
+        "机房与坐标系",
+        "机柜尺寸与位置",
+        "设备 U 位与安装面"
+      ],
+      "outputs": [
+        "FacilityModel",
+        "RackPlacement"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "连线与布线",
+      "summary": "允许路径 + 已审核规则 → 工程量",
+      "input_labels": [
+        "两端端接与端口规格",
+        "通道节点与允许路径",
+        "线缆规格及布线规则"
+      ],
+      "outputs": [
+        "ConnectivityPlan",
+        "CablePlan",
+        "Material / Workload"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "逻辑网络",
+      "summary": "以客户网络规划为依据建立意图",
+      "input_labels": [
+        "物理连接版本",
+        "明确接口与地址规划",
+        "ASN 与邻居依据"
+      ],
+      "outputs": [
+        "NetworkPlan Revision",
+        "Golden 输入资格"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "电力与冷却",
+      "summary": "规划负载与容量分开计算",
+      "input_labels": [
+        "设备落位",
+        "供电容量与负载",
+        "冷却类型与容量依据"
+      ],
+      "outputs": [
+        "PowerPlan",
+        "RackCapacity"
+      ]
+    }
+  ],
+  "benchmark": {
+    "model_id": "gptsol6.1",
+    "provider_ref": "待配置真实 Provider 引用",
+    "prompt_version": "kickoff-scoped-v1",
+    "run_count": 5,
+    "status": "NOT_RUN",
+    "checks": [
+      "八字段逐字段与独立 Ground Truth 对比",
+      "SN / MAC / 端口关联精确率与遗漏率",
+      "有效区域覆盖率及未知行去向",
+      "单位、U 位、路径、规则独立算例",
+      "候选 → 审核 → 发布 → CMDB → 主链真实交接",
+      "冻结版本后的 5 次独立运行与人工补充次数"
+    ]
+  },
+  "supplemental_b_mac": "02:64:ff:01:00:01"
+}

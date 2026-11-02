@@ -1,3 +1,11 @@
+## 已完成里程碑事件：开局工程独立交互原型与实施方案
+
+用户本轮只要求设计原型和可交给 Codex 的实施方案，已再次明确不开发真实 Agent/后端。本轮交付独立目录 `dev/prototypes/kickoff-studio/`，主路由 `/kickoff-studio`，本地5081（tmux `keel-kickoff-prototype-5081`）。现有应用入口、OpenAPI/生成SDK与Go业务代码无变更，5180/8081现网未切换。
+
+原型覆盖五步输入产物、机房/机柜/落位、通道/规格/布线规则、网络/电力建模和集中补充审核；CSV导入/编辑、参考计算、模拟发布及修改后失效可操作。`gptsol6.1`固定为待运行基准，全部采用合成资料，未调用真实模型或API。正式Agent、真实XLSX提取和真实交付主链接入留待实施。完整方案见 [Codex实施任务书](docs/intelligent-deployment/KICKOFF-STUDIO-IMPLEMENTATION.txt)。
+
+定向原型TypeScript检查与浏览器交互通过：实际CSV导入、无效U位拒绝、17.6m/20m参考计算、模拟审核发布、刷新持久化、建模变更失效、方案下载及390px适配。浏览器无页面异常、真实API请求为0；[验证记录](docs/intelligent-deployment/kickoff-studio/validation.json)和同目录截图仅证明原型交互，不是业务/Agent验收。后续按方案从固定输入建模体验和资料分流+第一步纵向切片实施，禁止把原型adapter当正式领域实现。
+
 ## 已完成里程碑事件：五步连贯业务版本部署现有环境
 
 代码e5faead已部署8081后端与5180前端，发布目录/home/ubuntu/.local/state/keel-deployments/fixed-step-e5faead。Go构建、TypeScript/Vite打包通过；切换后健康检查、真实登录、工程目录/任务查询、CMDB子图、CSV/XLSX模板及前端入口模块均HTTP200，在线目录确认已包含新的shortest_path/已审批规则要求。检查Session已退出。数据库保持043，无新增迁移；原配置、MinIO、真实项目及其他工作区保持，原2215177启动器保留。见[部署记录](docs/intelligent-deployment/DEPLOYMENT-FIVE-STEP-CHAIN-20261102.json)。
