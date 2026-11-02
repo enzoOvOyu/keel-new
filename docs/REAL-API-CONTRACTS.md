@@ -1,5 +1,11 @@
 # 真实 API 契约与实现台账
 
+## 新kickoff工作台当前契约
+
+新工作台以 `docs/kickoff/IMPLEMENTATION.txt` 与 OpenAPI Kickoff* 为准，复用统一身份/RBAC、工程版本和CMDB服务，独立于下文历史五步交接门槛。`/projects/{projectId}/kickoff/*` 支持资料、23表输入、确定性计算、局部核对、选定范围入库及回执、历史候选复用。Agent仍明确未配置。
+
+发布冻结所选设备/组件/端口/连接、机柜与完整或部分位置闭包。已知机柜/start-U可先作为planned记录，未知高度/容量保持needs_input；placements计数只包含校验通过的精确落位。历史回执按冻结修订和对象闭包重建；后补配置不改变旧版本。数据库051仅扩展内部闭包类型，不改变HTTP字段。部署/真实MM结果见 `docs/kickoff/DEPLOYMENT.json`、`MM-HISTORY-CHECK.json`，没有成功记录前不声称验收通过。
+
 > 当前智能开局建模版本4432065已部署8081/5180，新增迁移045（不占用并行Flows的044）；见[部署记录](intelligent-deployment/modeling-closure/deployment.json)。原型建模/审核/交接闭环已落地，新分步Agent等待用户配置Provider；验证范围和历史记录分别保留。
 
 更新：2026-10-31。用途：后续迭代先从这里确认接口是否真实实现、部署到哪里、哪些行为已经验证，再定位变更涉及的代码。没有登记的操作不自动判为未实现，也不自动判为可用。

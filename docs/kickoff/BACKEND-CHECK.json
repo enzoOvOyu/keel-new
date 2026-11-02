@@ -16,7 +16,10 @@
     "idempotent repeat confirmation",
     "same-project historical source/candidate replay with stable IDs",
     "existing engineering physical publication flow",
-    "existing project deletion statement order and retained audit"
+    "existing project deletion statement order and retained audit",
+    "reviewed rack/start-U facts commit without unknown height or capacity",
+    "partial placement stays needs_input and is excluded from validated occupancy count",
+    "later geometry input does not mutate an older publication receipt"
   ],
   "commands": [
     "go test ./internal/kickoff",

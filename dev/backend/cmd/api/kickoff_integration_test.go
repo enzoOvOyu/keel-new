@@ -33,7 +33,7 @@ func TestKickoffBeforeAgent(t *testing.T) {
 		t.Fatal(e)
 	}
 	defer db.Close()
-	for _, name := range []string{"048_kickoff_workspace.sql", "049_kickoff_execution.sql", "050_kickoff_history.sql"} {
+	for _, name := range []string{"048_kickoff_workspace.sql", "049_kickoff_execution.sql", "050_kickoff_history.sql", "051_kickoff_location_closure.sql"} {
 		version, _ := strconv.Atoi(name[:3])
 		var applied bool
 		if e = db.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM schema_migration WHERE version=$1)`, version).Scan(&applied); e != nil {
@@ -152,7 +152,7 @@ func TestKickoffBeforeAgent(t *testing.T) {
 	rack2 := engineering.FacilityModel{EntityVersion: v("rack", "r2"), Kind: "rack", Label: "R2", CapacityU: &capacity, ParentID: &room.EntityID}
 	m.Equipment = []engineering.EquipmentPlan{a, b}
 	m.Facilities = []engineering.FacilityModel{room, rack1, rack2}
-	m.Placements = []engineering.RackPlacement{{EntityVersion: v("placement", "a"), EquipmentID: a.EntityID, RackID: rack1.EntityID, StartU: &start, HeightU: &height}, {EntityVersion: v("placement", "b"), EquipmentID: b.EntityID, RackID: rack2.EntityID, StartU: &start, HeightU: &height}}
+	m.Placements = []engineering.RackPlacement{{EntityVersion: v("placement", "a"), EquipmentID: a.EntityID, RackID: rack1.EntityID, StartU: &start}, {EntityVersion: v("placement", "b"), EquipmentID: b.EntityID, RackID: rack2.EntityID, StartU: &start, HeightU: &height}}
 	p1 := engineering.PlannedPort{EntityVersion: v("port", "a"), EquipmentID: a.EntityID, Name: "eth1", Role: "network", Medium: "DAC"}
 	p2 := engineering.PlannedPort{EntityVersion: v("port", "b"), EquipmentID: b.EntityID, Name: "eth1", Role: "network", Medium: "DAC"}
 	m.Ports = []engineering.PlannedPort{p1, p2}
@@ -214,6 +214,24 @@ func TestKickoffBeforeAgent(t *testing.T) {
 	}
 	if e = db.QueryRow(ctx, `SELECT count(*) FROM cmdb_asset_scope WHERE project_id=$1 AND asset_id=$2`, project, b.EntityID).Scan(&count); e != nil || count != 0 {
 		t.Fatalf("held device leaked: %d %v", count, e)
+	}
+	// Partial location is committed independently of geometric occupancy.
+	if len(publication.PlacementIDs) != 0 || len(publication.RackSnapshot) != 1 || publication.DeviceSnapshot[0].RackID != rack1.EntityID || publication.DeviceSnapshot[0].StartU == nil {
+		t.Fatalf("partial location receipt: %+v", publication)
+	}
+	var locationCount int
+	if e = db.QueryRow(ctx, `SELECT count(*) FROM cmdb_relationship WHERE project_id=$1 AND from_uid=$2 AND to_uid=$3 AND definition_id='located_in' AND fact_layer='planned' AND valid_to IS NULL`, project, a.EntityID, rack1.EntityID).Scan(&locationCount); e != nil || locationCount != 1 {
+		t.Fatalf("known rack relationship missing: %v", e)
+	}
+	var geometryUnknown bool
+	if e = db.QueryRow(ctx, `SELECT NOT (payload ? 'u_height') AND payload->>'u_start'='1' FROM cmdb_entity WHERE item_uid=$1`, a.EntityID).Scan(&geometryUnknown); e != nil || !geometryUnknown {
+		t.Fatalf("partial geometry lost or invented: %v", e)
+	}
+	save("racks", []map[string]string{{"rack_id": rack1.EntityID, "capacity_u": "48"}})
+	var previous kickoff.Publication
+	json.Unmarshal(call("GET", "publications/"+publication.ID, nil, 200), &previous)
+	if previous.RackSnapshot[0].CapacityU == nil || *previous.RackSnapshot[0].CapacityU != 42 || len(previous.PlacementIDs) != 0 {
+		t.Fatal("later input changed the old publication snapshot")
 	}
 	// Repeated confirmation of the exact scope is idempotent.
 	var retry kickoff.Publication

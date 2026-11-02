@@ -19,6 +19,8 @@ type Publication struct {
 	ConnectionIDs  []string       `json:"connectionIds"`
 	ComponentIDs   []string       `json:"componentIds"`
 	PlacementIDs   []string       `json:"placementIds"`
+	FacilityIDs    []string       `json:"-"`
+	LocationIDs    []string       `json:"-"`
 	ModelVersions  map[string]int `json:"modelVersions"`
 	ModelSnapshot  []ModelInput   `json:"modelSnapshot"`
 	RackSnapshot   []Rack         `json:"rackSnapshot"`
@@ -94,10 +96,24 @@ func Select(m engineering.PhysicalModel, v View, ids []string) (engineering.Phys
 		}
 	}
 	facilities := map[string]bool{}
+	placementCount := map[string]int{}
+	for _, placement := range m.Placements {
+		placementCount[placement.EquipmentID]++
+	}
 	for _, placement := range m.Placements {
 		if !selected[placement.EquipmentID] {
 			continue
 		}
+		knownRack := false
+		for _, rack := range m.Facilities {
+			if rack.EntityID == placement.RackID && rack.Kind == "rack" {
+				knownRack = true
+			}
+		}
+		if !knownRack || placementCount[placement.EquipmentID] != 1 {
+			continue
+		}
+		facilities[placement.RackID] = true
 		valid := placement.UsesNonUPosition() && placement.PositionCode != ""
 		if placement.StartU != nil && placement.HeightU != nil && *placement.StartU > 0 && *placement.HeightU > 0 {
 			for _, rack := range m.Facilities {
@@ -114,7 +130,10 @@ func Select(m engineering.PhysicalModel, v View, ids []string) (engineering.Phys
 		if valid {
 			subset.Placements = append(subset.Placements, placement)
 			p.PlacementIDs = append(p.PlacementIDs, placement.EquipmentID)
-			facilities[placement.RackID] = true
+		} else {
+			// A known rack association is useful before geometric occupancy is complete.
+			// Keep it distinct from the count of validated placements.
+			p.LocationIDs = append(p.LocationIDs, placement.EquipmentID)
 		}
 	}
 	for progress := true; progress; {
@@ -129,6 +148,7 @@ func Select(m engineering.PhysicalModel, v View, ids []string) (engineering.Phys
 	for _, f := range m.Facilities {
 		if facilities[f.EntityID] {
 			subset.Facilities = append(subset.Facilities, f)
+			p.FacilityIDs = append(p.FacilityIDs, f.EntityID)
 		}
 	}
 	for _, issue := range v.Issues {
@@ -155,4 +175,76 @@ func Select(m engineering.PhysicalModel, v View, ids []string) (engineering.Phys
 	}
 	p.Counts = map[string]int{"devices": len(p.DeviceIDs), "components": len(p.ComponentIDs), "ports": len(p.PortIDs), "connections": len(p.ConnectionIDs), "placements": len(p.PlacementIDs)}
 	return subset, p, nil
+}
+
+// FrozenModel reconstructs the approved object closure rather than rerunning
+// today's selection logic over an older publication.
+func FrozenModel(m engineering.PhysicalModel, p Publication) engineering.PhysicalModel {
+	keys := func(ids []string) map[string]bool {
+		out := map[string]bool{}
+		for _, id := range ids {
+			out[id] = true
+		}
+		return out
+	}
+	equipment := keys(append(append([]string{}, p.DeviceIDs...), p.ComponentIDs...))
+	ports, connections, placements, facilities := keys(p.PortIDs), keys(p.ConnectionIDs), keys(p.PlacementIDs), keys(p.FacilityIDs)
+	out := engineering.EmptyPhysical(m.ProjectID)
+	for _, v := range m.Equipment {
+		if equipment[v.EntityID] {
+			out.Equipment = append(out.Equipment, v)
+		}
+	}
+	for _, v := range m.Assemblies {
+		if equipment[v.ParentID] && equipment[v.ChildID] {
+			out.Assemblies = append(out.Assemblies, v)
+		}
+	}
+	for _, v := range m.Ports {
+		if ports[v.EntityID] {
+			out.Ports = append(out.Ports, v)
+		}
+	}
+	for _, v := range m.Connections {
+		if connections[v.EntityID] {
+			out.Connections = append(out.Connections, v)
+		}
+	}
+	for _, v := range m.Placements {
+		if placements[v.EquipmentID] {
+			out.Placements = append(out.Placements, v)
+			facilities[v.RackID] = true
+		}
+	}
+	// Publications before the facility-closure migration derived these ancestors
+	// exclusively from their approved complete placements.
+	for progress := true; progress; {
+		progress = false
+		for _, f := range m.Facilities {
+			if facilities[f.EntityID] && f.ParentID != nil && !facilities[*f.ParentID] {
+				facilities[*f.ParentID] = true
+				progress = true
+			}
+		}
+	}
+	for _, f := range m.Facilities {
+		if facilities[f.EntityID] {
+			out.Facilities = append(out.Facilities, f)
+		}
+	}
+	return out
+}
+
+func KnownLocations(m engineering.PhysicalModel, p Publication) engineering.PhysicalModel {
+	out := FrozenModel(m, p)
+	out.Placements = nil
+	for _, v := range m.Placements {
+		for _, id := range p.LocationIDs {
+			if v.EquipmentID == id {
+				out.Placements = append(out.Placements, v)
+				break
+			}
+		}
+	}
+	return out
 }

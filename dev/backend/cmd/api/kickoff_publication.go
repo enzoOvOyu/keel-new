@@ -19,17 +19,17 @@ func (s *Server) loadKickoffPublication(ctx context.Context, q engineeringQuery,
 	if err != nil {
 		return p, err
 	}
-	ids := []string{}
-	rows, err := q.Query(ctx, `SELECT entity_id::text FROM kickoff_publication_object WHERE publication_id=$1 AND kind='device' ORDER BY entity_id`, id)
+	objects := map[string][]string{"device": {}, "port": {}, "component": {}, "connection": {}, "placement": {}, "facility": {}, "location": {}}
+	rows, err := q.Query(ctx, `SELECT kind,entity_id::text FROM kickoff_publication_object WHERE publication_id=$1 ORDER BY kind,entity_id`, id)
 	if err != nil {
 		return p, err
 	}
 	for rows.Next() {
-		var key string
-		if err = rows.Scan(&key); err != nil {
+		var kind, key string
+		if err = rows.Scan(&kind, &key); err != nil {
 			break
 		}
-		ids = append(ids, key)
+		objects[kind] = append(objects[kind], key)
 	}
 	if err == nil {
 		err = rows.Err()
@@ -67,18 +67,49 @@ func (s *Server) loadKickoffPublication(ctx context.Context, q engineeringQuery,
 		return p, err
 	}
 	inputs = kickoff.ResolveReferences(model, inputs)
-	_, selection, err := kickoff.Select(model, kickoff.Project(model, ev, source, inputs), ids)
-	if err != nil {
-		return p, err
+	p.DeviceIDs, p.PortIDs, p.ComponentIDs = objects["device"], objects["port"], objects["component"]
+	p.ConnectionIDs, p.PlacementIDs = objects["connection"], objects["placement"]
+	p.FacilityIDs, p.LocationIDs = objects["facility"], objects["location"]
+	subset := kickoff.FrozenModel(model, p)
+	view := kickoff.Project(subset, ev, source, inputs)
+	selected := map[string]bool{}
+	for _, id := range p.DeviceIDs {
+		selected[id] = true
 	}
-	p.DeviceIDs = selection.DeviceIDs
-	p.PortIDs = selection.PortIDs
-	p.ConnectionIDs = selection.ConnectionIDs
-	p.ComponentIDs = selection.ComponentIDs
-	p.PlacementIDs = selection.PlacementIDs
-	p.DeviceSnapshot = selection.DeviceSnapshot
-	p.RackSnapshot = selection.RackSnapshot
-	p.Counts = selection.Counts
+	located := map[string]bool{}
+	for _, id := range append(append([]string{}, p.PlacementIDs...), p.LocationIDs...) {
+		located[id] = true
+	}
+	p.DeviceSnapshot, p.RackSnapshot = []kickoff.Device{}, view.Racks
+	for _, d := range view.Devices {
+		if selected[d.ID] {
+			if !located[d.ID] {
+				d.RackID = ""
+				d.StartU = nil
+			}
+			p.DeviceSnapshot = append(p.DeviceSnapshot, d)
+		}
+	}
+	// Full placements are already in the frozen subset. Partial locations only
+	// contribute source-backed rack/start-U facts, never a validated occupancy.
+	partial := map[string]bool{}
+	for _, id := range p.LocationIDs {
+		partial[id] = true
+	}
+	known := kickoff.Project(kickoff.KnownLocations(model, p), ev, source, inputs)
+	for _, d := range known.Devices {
+		if !located[d.ID] {
+			continue
+		}
+		for i := range p.DeviceSnapshot {
+			if p.DeviceSnapshot[i].ID == d.ID && partial[d.ID] {
+				p.DeviceSnapshot[i].RackID = d.RackID
+				p.DeviceSnapshot[i].StartU = d.StartU
+				p.DeviceSnapshot[i].HeightU = d.HeightU
+			}
+		}
+	}
+	p.Counts = map[string]int{"devices": len(p.DeviceIDs), "components": len(p.ComponentIDs), "ports": len(p.PortIDs), "connections": len(p.ConnectionIDs), "placements": len(p.PlacementIDs)}
 	p.ModelSnapshot = inputs
 	p.ModelVersions = map[string]int{}
 	for _, input := range inputs {
@@ -149,14 +180,11 @@ func (s *Server) projectKickoffPublication(ctx context.Context, tx pgx.Tx, event
 	if e != nil {
 		return e
 	}
-	model, ev, e := engineeringModel(ctx, tx, revision, project)
+	model, _, e := engineeringModel(ctx, tx, revision, project)
 	if e != nil {
 		return e
 	}
-	subset, _, e := kickoff.Select(model, kickoff.Project(model, ev, "", publication.ModelSnapshot), publication.DeviceIDs)
-	if e != nil {
-		return e
-	}
+	subset := kickoff.FrozenModel(model, publication)
 	if _, e = tx.Exec(ctx, `INSERT INTO bom_revision(id,import_id,project_id,digest) VALUES($1,$2,$3,$4) ON CONFLICT(id) DO NOTHING`, publication.ID, importID, project, engineering.Digest(subset)); e != nil {
 		return e
 	}
@@ -165,17 +193,24 @@ func (s *Server) projectKickoffPublication(ctx context.Context, tx pgx.Tx, event
 			return e
 		}
 	}
+	if len(publication.LocationIDs) > 0 {
+		if e = cmdbService(s).ProjectKnownLocations(ctx, tx, event+":known-locations", project, publication.ID, publication.Actor, kickoff.KnownLocations(model, publication)); e != nil {
+			return e
+		}
+	}
 	if e = s.projectKickoffConfiguration(ctx, tx, publication); e != nil {
 		return e
 	}
 	// Read the projection inside the same transaction before recording success.
-	for _, id := range append(append(append([]string{}, publication.DeviceIDs...), publication.PortIDs...), publication.ConnectionIDs...) {
-		var exists bool
-		if e = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM cmdb_asset_scope WHERE project_id=$1 AND asset_id=$2)`, project, id).Scan(&exists); e != nil {
-			return e
-		}
-		if !exists {
-			return fmt.Errorf("CMDB_RECEIPT_MISSING")
+	for _, ids := range [][]string{publication.DeviceIDs, publication.ComponentIDs, publication.PortIDs, publication.ConnectionIDs, publication.FacilityIDs} {
+		for _, id := range ids {
+			var exists bool
+			if e = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM cmdb_asset_scope WHERE project_id=$1 AND asset_id=$2)`, project, id).Scan(&exists); e != nil {
+				return e
+			}
+			if !exists {
+				return fmt.Errorf("CMDB_RECEIPT_MISSING")
+			}
 		}
 	}
 	_, e = tx.Exec(ctx, `UPDATE kickoff_publication SET state='published',error_code=NULL WHERE id=$1`, publication.ID)
