@@ -1,3 +1,9 @@
+## 已完成里程碑事件：五步连贯业务版本部署现有环境
+
+代码e5faead已部署8081后端与5180前端，发布目录/home/ubuntu/.local/state/keel-deployments/fixed-step-e5faead。Go构建、TypeScript/Vite打包通过；切换后健康检查、真实登录、工程目录/任务查询、CMDB子图、CSV/XLSX模板及前端入口模块均HTTP200，在线目录确认已包含新的shortest_path/已审批规则要求。检查Session已退出。数据库保持043，无新增迁移；原配置、MinIO、真实项目及其他工作区保持，原2215177启动器保留。见[部署记录](docs/intelligent-deployment/DEPLOYMENT-FIVE-STEP-CHAIN-20261102.json)。
+
+此前五步固定输入隔离验收有效，本次只做部署必要检查，没有在真实项目重复业务测试或操作网络/供电。新资料分流及分步提取Agent仍未完成；部署不代表这些能力已实现。此记录覆盖下文“现网仍2215177/本次未部署”的历史状态。
+
 ## 已完成里程碑事件：五步固定输入连贯业务验收
 
 五份合成XLSX在同一独立项目完成设备关联→机房落位→连接布线→核心IPv4 BGP网络→场景供电，实际核对PostgreSQL、MinIO来源索引、审核、Outbox、CMDB和图表API。第三步新增完整工作簿导入，引用已审批项目规则记录计算运行，按显式通道生成12m路径、17.6m计算长度、20m标准线、2只光模块及物料/施工需求；不产生实装长度或已采购资产。第五步十项机柜/回路/PSU计算应用后，前序模型、网络发布与Golden仍可读取。最终机柜容量/落位、服务器交换机矩阵、连接与物理Trace数据通过；Trace仍明确unverified。见[五步验收记录](docs/intelligent-deployment/FIVE-STEP-CHAIN-ACCEPTANCE-20261102.json)。

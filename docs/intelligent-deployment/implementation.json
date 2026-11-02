@@ -333,16 +333,17 @@
     ],
     "test_report": "docs/intelligent-deployment/FIXED-STEP-XLSX-TEST-20261101.json",
     "runtime_deployment": {
-      "code_revision": "2215177",
+      "code_revision": "e5faead",
       "database_migration": 43,
-      "evidence": "docs/intelligent-deployment/DEPLOYMENT-FIXED-STEPS-20261102.json",
-      "full_business_acceptance": "NOT COMPLETE"
+      "evidence": "docs/intelligent-deployment/DEPLOYMENT-FIVE-STEP-CHAIN-20261102.json",
+      "fixed_input_business_acceptance": "PASS_SYNTHETIC_ISOLATED; live deployment read/startup checks passed",
+      "agent_acceptance": "NOT_IMPLEMENTED_NOT_TESTED"
     },
     "fixed_input_chain_acceptance": {
       "status": "PASS_SYNTHETIC_ISOLATED",
       "evidence": "docs/intelligent-deployment/FIVE-STEP-CHAIN-ACCEPTANCE-20261102.json",
       "agent_acceptance": "NOT_IMPLEMENTED_NOT_TESTED",
-      "live_change_deployed": false
+      "live_change_deployed": true
     }
   }
 }

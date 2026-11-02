@@ -1,0 +1,69 @@
+{
+  "code_revision": "e5faead",
+  "branch": "dev",
+  "repository": "enzoOvOyu/keel-new",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/fixed-step-e5faead",
+  "api": {
+    "pid": 2424213,
+    "exe": "/home/ubuntu/.local/state/keel-deployments/fixed-step-e5faead/keel-api",
+    "cwd": "/home/ubuntu/keel/dev/backend",
+    "port": 8081,
+    "binary": "/home/ubuntu/.local/state/keel-deployments/fixed-step-e5faead/keel-api",
+    "sha256": "31ad8a22c99384f00155b0cf70a6c21432ef5e3f77b0b81f6c42183cbb4eb13d",
+    "session": "keel-cmdb-api"
+  },
+  "frontend": {
+    "pid": 2424246,
+    "exe": "/opt/keel-tools/node/bin/node",
+    "cwd": "/home/ubuntu/.local/state/keel-deployments/fixed-step-e5faead/dev",
+    "port": 5180,
+    "session": "keel-dev-5180",
+    "source": "git archive e5faead",
+    "fixture_path_verified": true
+  },
+  "database": {
+    "migration_before": 43,
+    "migration_after": 43,
+    "migrations_applied": [],
+    "schema_changed": false
+  },
+  "configuration": "Existing private environment, login/AI/MinIO configuration and data preserved; no changes to other worktrees or services",
+  "checks": {
+    "go_build": "PASS",
+    "frontend_typescript_and_vite_build": "PASS",
+    "api_healthz": 200,
+    "frontend_root": 200,
+    "authenticated_read_checks": {
+      "login": 200,
+      "projects": 200,
+      "project_id": "proj-b300-demo",
+      "projects/proj-b300-demo/engineering-inputs": 200,
+      "input_tables": 29,
+      "new_cabling_contract": "PASS: shortest_path and reviewed versioned rules advertised",
+      "projects/proj-b300-demo/engineering-imports": 200,
+      "cmdb/visualization/subgraph?project_id=proj-b300-demo": 200,
+      "template_csv": 200,
+      "template_xlsx": 200,
+      "frontend/": 200,
+      "frontend/src/app/main.tsx": 200,
+      "frontend/src/lib/api/index.tsx": 200,
+      "frontend/src/features/EngineeringStepInputs.tsx": 200,
+      "frontend/src/features/EngineeringPowerPanel.tsx": 200
+    },
+    "check_session_logged_out": true,
+    "browser_visual_acceptance": "NOT RUN; no UI behavior changes in this deployment; HTTP entry/module load verified"
+  },
+  "business_acceptance": "Prior isolated single-project five-step fixed-input acceptance retained; not repeated against live project during deployment",
+  "business_acceptance_evidence": "docs/intelligent-deployment/FIVE-STEP-CHAIN-ACCEPTANCE-20261102.json",
+  "rollback": {
+    "prior_code_revision": "2215177",
+    "api_launcher": "/home/ubuntu/.local/state/keel-deployments/fixed-step-e5faead/previous-api-run.py",
+    "frontend_launcher": "/home/ubuntu/.local/state/keel-deployments/fixed-step-e5faead/previous-frontend-run.py",
+    "database": "No migration in this release; previous2215177 uses same043 schema; no destructive restore or rollback performed"
+  },
+  "limits": [
+    "New source-triage and five scoped AI extraction Agents remain incomplete",
+    "Additional network protocol fixed inputs and real nonstandard customer-source acceptance remain incomplete",
+    "No live device/network/power operations or repeated full business tests during deployment"
+  ]
+}

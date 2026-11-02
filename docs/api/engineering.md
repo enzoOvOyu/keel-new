@@ -1,3 +1,5 @@
+> 当前在线：代码e5faead已部署8081/5180，数据库043无变更；健康、登录、目录/任务、模板、CMDB子图和前端模块检查通过。见[部署记录](../intelligent-deployment/DEPLOYMENT-FIVE-STEP-CHAIN-20261102.json)。下方2215177/未部署说明为历史；新分步Agent仍未完成。
+
 > 最新开发验收：五步固定输入链在隔离API通过，见[连贯验收](../intelligent-deployment/FIVE-STEP-CHAIN-ACCEPTANCE-20261102.json)。完整布线导入已补齐；新分步Agent仍未实现。以下旧阶段描述保留历史，现网仍2215177。
 
 > 当前发布：代码2215177已部署8081/5180、迁移043，证据见[部署记录](../intelligent-deployment/DEPLOYMENT-FIXED-STEPS-20261102.json)。下文“未部署”属于相应开发阶段历史；当前完整布线和新Agent仍未完成，发布检查不等于整体验收。
