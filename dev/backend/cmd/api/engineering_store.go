@@ -208,6 +208,14 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 		return "", e
 	}
 	defer tx.Rollback(ctx)
+	revision, e := s.saveEngineeringDraftTx(ctx, tx, source, expected, origin, actor, reason, x, p, inputs...)
+	if e != nil {
+		return "", e
+	}
+	return revision, tx.Commit(ctx)
+}
+func (s *Server) saveEngineeringDraftTx(ctx context.Context, tx pgx.Tx, source string, expected int, origin, actor, reason string, x engineering.Extraction, p engineering.EngineeringProposal, inputs ...standardInputAttachment) (string, error) {
+	var e error
 	var version int
 	var previous *string
 	if e = tx.QueryRow(ctx, `SELECT revision,head_revision_id::text FROM eng_source WHERE id::text=$1 AND project_id=$2 FOR UPDATE`, source, s.project).Scan(&version, &previous); e != nil {
@@ -611,7 +619,7 @@ func (s *Server) saveEngineeringDraft(ctx context.Context, source string, expect
 	if _, e = tx.Exec(ctx, `INSERT INTO audit_event(id,project_id,actor,action,resource_id,details) VALUES($1,$2,$3,'engineering.revised',$4,$5)`, uuid.NewString(), s.project, actor, source, jsonBytes(map[string]any{"revision_id": revision, "origin": origin, "reason": reason})); e != nil {
 		return "", e
 	}
-	return revision, tx.Commit(ctx)
+	return revision, nil
 }
 func (s *Server) engineeringWorkspace(ctx context.Context, id string) (engineering.Workspace, error) {
 	v := engineering.Workspace{Modules: []engineering.ModuleDetection{}, Targets: []engineering.TargetStatus{}, Issues: []engineering.ValidationIssue{}, Questions: []string{}, Steps: []engineering.EngineeringStep{}}

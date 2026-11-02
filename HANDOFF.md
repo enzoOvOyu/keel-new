@@ -8,13 +8,21 @@
 - 接续先读本节，再按`docs/REAL-API-CONTRACTS.md`、模块文档和`docs/flows-redesign/implementation.md`定位。不要再参考下方“独立作业分支/旧部署目录继续开发”的历史说明。
 - 清理清单与原分支SHA：`docs/git-baseline-20261102.json`；整合说明：`docs/integration-20261102.md`。既有未验收/真机限制维持原记录。
 
+## 已完成里程碑事件：新kickoff非Agent基础闭环与原型对照完成
+
+九个内容页、23张输入表、原型Drawer/表格/编辑/导入导出/版本交互均接入现有Shell、Router、ProjectContext、RBAC；旧BOM页面未用于替换原型。新增确定性工程输入生效、计算、范围审核、事务Outbox、CMDB投影/回执、历史候选复用与真实活动。源文件/历史复用原件在MinIO，核心事实继续使用eng_entity及类型化版本库；CMDB存规划事实和工程版本引用，不伪造成Observed。
+
+Go定向用例、隔离库与临时MinIO桶集成、受影响的原工程发布链路通过；覆盖10m参考线长、缺值非零、子集入库、幂等回执、历史复用、项目清理顺序及审计保留。主应用9页、23编辑器、Drawer、异步保存、项目隔离、只读权限和原项目路由通过协议回放检查；相对5195原型的字体、统计条、按钮、表格密度已做实际指标对照。全量TypeScript/Vite构建通过，原有OpenAPI路由和非Kickoff schemas保持不变。
+
+Agent按用户要求暂未开发，/analyze明确503，不伪造新资料解析成功。用户已要求自查后部署，再复用mm测试项目的历史资料/候选验收，不重新全量AI解析。发布和真实MM结果将记录docs/kickoff/DEPLOYMENT.json及MM-HISTORY-CHECK.json。未记录成功前不得把待部署或MM验收写成已完成。详见docs/kickoff/IMPLEMENTATION.txt、UI-CHECK.json、STYLE-CHECK.json。
+
 ## 已完成里程碑事件：新kickoff内容移植与来源/建模API切片
 
 新原型完整内容组件已复制到dev/src/features/kickoff，接入现有Shell/Router/ProjectContext/RBAC；原型仍留kickoff目录。九页面保留为“智能开局工程”子菜单，路由/p/:projectId/kickoff/*。独立CSS作用域及Portal容器保留原型内容样式；现有业务路由保持原入口。
 
 新API按原型契约实现工作区读取、MinIO资料上传/摘要复用/附件移除、23表版本保存。迁移048建立来源/输入暂存，不创建平行资产。OpenAPI及前端类型同步；TypeScript、Go编译及字段校验定向检查通过。未迁移在线库、未部署、未作浏览器视觉验收。
 
-整体任务仍未完成：真实对象投影/核对、领域模型采用、确定性计算、范围入库/Outbox回执/版本尚未接通；Agent按用户要求最后开发。用户最新明确本轮职责截止于正确录入CMDB并确认回执；拓扑、Fabric、装机的下游消费实现与联调不属于本轮范围，不作为验收前提。当前工作区对应对象集合明确为空，不能声称CMDB闭环。逐模块清单见docs/kickoff/IMPLEMENTATION.txt；继续以新原型为唯一业务基准，不读取/套用旧五步流程或旧交接门槛。
+整体任务仍未完成：真实对象投影/核对、领域模型采用、确定性计算、范围入库/Outbox回执/版本尚未接通；Agent按用户要求最后开发。用户最新明确本轮职责截止于正确录入CMDB并确认回执；用户随后进一步明确：原型启动总览的机柜图与空间、Fabric网络交付、装机管理区域必须实现真实状态、缺口、建议动作和路由跳转，依据CMDB入库结果及工程配置；这一块属于本轮验收，复用对应现有工作区。当前工作区对应对象集合明确为空，不能声称CMDB闭环。逐模块清单见docs/kickoff/IMPLEMENTATION.txt；继续以新原型为唯一业务基准，不读取/套用旧五步流程或旧交接门槛。
 
 ## 已完成里程碑事件：智能开局优化方案与独立工作台原型
 

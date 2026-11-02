@@ -5,10 +5,10 @@ import { Badge, Button, Heading, Section, Stat, formatDate } from '../components
 
 export default function Overview(){
   const {state:s,go}=useWorkspace();
-  const ready=eligibleDevices(s).length, published=new Set(s.publications.flatMap(p=>p.deviceIds)).size;
+  const ready=eligibleDevices(s).length, published=new Set(s.publications.filter(p=>p.state==='published').flatMap(p=>p.deviceIds)).size;
   const identity=s.issues.filter(i=>!i.resolved&&i.scope==='identity');
   const caps=capabilities(s);
-  const steps=[{label:'接入资料',detail:`${s.sources.length} 份资料已接入`,route:'sources',done:s.sources.some(v=>v.state==='recognized')},{label:'识别与核对',detail:`${identity.length} 项身份待确认`,route:'review',done:!identity.length},{label:'确认入库',detail:published?`${published} 台设备已入库`:`${ready} 台设备可先入库`,route:'publish',done:!!published},{label:'持续补充',detail:'按用途逐步完善',route:'models/facility',done:false}];
+  const steps=[{label:'接入资料',detail:`${s.sources.length} 份资料已接入`,route:'sources',done:s.sources.some(v=>v.state==='recognized')},{label:'识别与核对',detail:`${identity.length} 项身份待确认`,route:'review',done:s.devices.length>0&&!identity.length},{label:'确认入库',detail:published?`${published} 台设备已入库`:`${ready} 台设备可先入库`,route:'publish',done:!!published},{label:'持续补充',detail:'按用途逐步完善',route:'models/facility',done:false}];
   return <>
     <Heading eyebrow="INTELLIGENT KICKOFF" title="让资料成为可用的工程数据" description="先建立设备与关系，再让空间、网络和装机逐步就绪。" action={<><Button onClick={()=>go('sources')}><Plus size={15}/>添加资料</Button><Button kind="primary" onClick={()=>go(published?'models/facility':'publish')}>{published?'继续完善工程输入':'核对并入库'}<ArrowRight size={16}/></Button></>}/>
     <div className="project-banner"><div className="banner-icon"><Blocks size={24}/></div><div><div className="banner-kicker">当前工程</div><h2>{s.projectName}</h2><p>统一资产身份 · 分域补充 · 持续交付</p></div><div className="banner-meta"><span>资料版本<b>v{s.sources.reduce((n,x)=>Math.max(n,x.version),1)}</b></span><span>入库版本<b>{s.publications.length?`r${s.publications.length}`:'待确认'}</b></span><span>当前状态<Badge state={published?'published':'partial'}>{published?'最小开局已建立':'可开始最小开局'}</Badge></span></div></div>
@@ -24,7 +24,7 @@ export default function Overview(){
       </Section>
     </div><aside className="overview-aside">
       <section className="next-action"><div className="eyebrow"><Sparkles size={13}/> 建议动作</div><h2>{published?'继续补齐下游所需输入':`先让 ${ready} 台设备进入工作流`}</h2><p>{published?'资产清单已可读取。选择下一项需要启用的能力，集中补充它的必要信息。':'未完成的空间与工程参数可以后补。当前可用设备、端口和连接可以一次确认。'}</p><Button kind="primary" onClick={()=>go(published?'models/network':'publish')}>{published?'完善网络输入':'预览最小入库'}<ArrowRight size={15}/></Button><div className="next-foot"><Check size={13}/>保留全部待补充项</div></section>
-      <Section title="值得处理的事项" action={<button className="text-link" onClick={()=>go('review')}>全部<ArrowUpRight size={13}/></button>}><div className="action-list">{s.issues.filter(i=>!i.resolved).map(i=><button key={i.id} onClick={()=>go(i.scope==='configuration'?'models/cabling':'review?filter=issues')}><span className={'issue-dot '+i.scope}/><span><b>{i.title}</b><small>{i.impact}</small></span><ChevronRight size={14}/></button>)}{!s.issues.some(i=>!i.resolved)&&<p className="empty-inline">当前没有待确认事项</p>}</div></Section>
+      <Section title="值得处理的事项" action={<button className="text-link" onClick={()=>go('review')}>全部<ArrowUpRight size={13}/></button>}><div className="action-list">{s.issues.filter(i=>!i.resolved).map(i=><button key={i.id} onClick={()=>go(i.action??(i.scope==='configuration'?'models/cabling':'review?filter=issues'))}><span className={'issue-dot '+i.scope}/><span><b>{i.title}</b><small>{i.impact}</small></span><ChevronRight size={14}/></button>)}{!s.issues.some(i=>!i.resolved)&&<p className="empty-inline">当前没有待确认事项</p>}</div></Section>
       <Section title="最近活动"><ol className="activity-list">{s.activity.slice(0,4).map(a=><li key={a.id}><span className="activity-dot"/><div><b>{a.action}</b><p>{a.detail}</p><time>{formatDate(a.at)}</time></div></li>)}</ol></Section>
     </aside></div>
   </>;

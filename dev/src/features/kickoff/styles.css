@@ -19,3 +19,15 @@
 @media(max-width:760px){.kickoff-workspace .stat small,.kickoff-workspace .section-foot,.kickoff-workspace .domain-list small,.kickoff-workspace .domain-completion{font-size:9px}.kickoff-workspace .flow-input small,.kickoff-workspace .flow-outputs small{font-size:9px}.kickoff-workspace .flow-input b,.kickoff-workspace .flow-outputs b{font-size:11px}.kickoff-workspace .flow-outputs .badge{font-size:8px}.kickoff-workspace .next-action p{font-size:11px}.kickoff-workspace .action-list small{font-size:10px}}
 
 .kickoff-workspace{min-width:0}.kickoff-workspace #kickoff-portals{position:relative;z-index:60}
+/* Match the prototype's content metrics within the existing application shell. */
+.shell>.main-shell>main:has(>.kickoff-workspace){padding:0}
+.shell .kickoff-workspace{line-height:normal}
+.shell .kickoff-workspace .stat{display:block;padding:0 23px;border:0;border-right:1px solid var(--border);border-radius:0;background:transparent}
+.shell .kickoff-workspace .stat:last-child{border-right:0}
+.shell .kickoff-workspace .button:not(.primary){box-shadow:none}
+@media(max-width:1200px){.shell .kickoff-workspace .stat{padding:0 15px}}
+.shell .kickoff-workspace .stat{padding:0 23px!important;min-height:0!important}
+@media(max-width:1200px){.shell .kickoff-workspace .stat{padding:0 15px!important}}
+/* Keep large real-workbook issue sets inside the prototype's side panels. */
+.shell .kickoff-workspace .action-list{max-height:310px;overflow:auto}
+.shell .kickoff-workspace .review-issues{max-height:calc(100vh - 180px);overflow:auto;position:sticky;top:20px}

@@ -1,4 +1,9 @@
 export const engineeringMessages: Record<string, string> = {
+ KICKOFF_AGENT_NOT_CONFIGURED: 'Agent 尚未接入，资料已保存，可继续补充工程输入。',
+ KICKOFF_SOURCE_IMMUTABLE: '该资料已被分析或移除，不能重复移除。',
+ KICKOFF_ISSUE_STALE: '该问题对应的版本已更新，请重新核对。',
+ KICKOFF_PUBLICATION_PENDING: '已有入库任务正在等待 CMDB 回执，请查看入库版本。',
+
  STEP_POWER_PLAN_AMBIGUOUS: '当前标准入口需要一个明确的电力规划版本。',
  STEP_POWER_SCOPE_AMBIGUOUS: '每份电力资料只声明一个当前计算场景。',
  STEP_POWER_SOURCE_CONFLICT: '同一电力对象在本次资料中存在冲突值，请先核对。',

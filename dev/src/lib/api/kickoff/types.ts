@@ -10,14 +10,14 @@ export interface Device {
 export interface Port { id: string; deviceId: string; name: string; mac?: string; speed: string; role: string; componentId?: string; evidence: Evidence }
 export interface Connection { id: string; a: string; b: string; medium: string; evidence: Evidence }
 export interface Component { id: string; deviceId: string; type: string; name: string; model: string; slot: string; evidence: Evidence }
-export interface Rack { id: string; name: string; room: string; capacityU: number; evidence: Evidence }
+export interface Rack { id: string; name: string; room: string; capacityU: number | null; evidence: Evidence }
 export interface SourceRegion { id: string; sheet: string; range: string; category: string; rowCount: number; state: 'extracted' | 'needs_input' | 'unmapped'; note: string }
 export interface Source {
   id: string; name: string; size: string; version: number; state: 'recognized' | 'awaiting_analysis' | 'needs_input';
   hash: string; createdAt: string; regions: SourceRegion[]; originalAvailable: boolean;
 }
 export interface Issue {
-  id: string; scope: 'identity' | 'placement' | 'configuration'; title: string; description: string;
+  action?: string; id: string; scope: 'identity' | 'placement' | 'configuration'; title: string; description: string;
   entityId: string; field: string; impact: string; resolved: boolean; evidence: Evidence;
 }
 export interface ModelField { key: string; label: string; kind?: 'number' | 'positive' | 'integer' | 'select'; options?: string[]; hint?: string }
@@ -32,7 +32,7 @@ export interface Calculation {
   rows: CalculationRow[]; issues: string[]; power: { rackId: string; loadKW: number | null; capacityKW: number | null; remainingKW: number | null }[];
 }
 export interface Publication {
-  id: string; revision: number; createdAt: string; actor: string; reason: string; deviceIds: string[];
+  id: string; revision: number; createdAt: string; actor: string; reason: string; state: 'pending' | 'published' | 'failed'; errorCode?: string; deviceIds: string[];
   portIds: string[]; connectionIds: string[]; componentIds: string[]; placementIds: string[];
   modelVersions: Record<string, number>; modelSnapshot: ModelInput[]; rackSnapshot: Rack[]; deviceSnapshot: Device[]; counts: Record<string, number>;
 }

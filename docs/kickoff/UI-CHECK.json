@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "scope": "Main app UI with captured isolated-backend snapshot and transport replay; no live writes, no Agent",
+  "checked": [
+    "nine prototype pages integrated into one existing shell/router",
+    "prototype typography, stat strip, buttons and table density match",
+    "all 23 engineering input editors open and close",
+    "original evidence drawer opens inside scoped portal",
+    "async input save waits for provider readback",
+    "persisted server calculation displayed without spurious stale state",
+    "deferred Agent reports unavailable and preserves sources",
+    "ProjectContext denies unauthorized project before workspace request",
+    "existing projects route remains available",
+    "read-only RBAC disables model mutations"
+  ],
+  "errors": []
+}
