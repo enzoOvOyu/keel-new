@@ -71,7 +71,7 @@ func (s *Server) loadKickoffPublication(ctx context.Context, q engineeringQuery,
 	p.ConnectionIDs, p.PlacementIDs = objects["connection"], objects["placement"]
 	p.FacilityIDs, p.LocationIDs = objects["facility"], objects["location"]
 	subset := kickoff.FrozenModel(model, p)
-	view := kickoff.Project(subset, ev, source, inputs)
+	view := kickoff.Project(model, ev, source, inputs)
 	selected := map[string]bool{}
 	for _, id := range p.DeviceIDs {
 		selected[id] = true
@@ -80,7 +80,16 @@ func (s *Server) loadKickoffPublication(ctx context.Context, q engineeringQuery,
 	for _, id := range append(append([]string{}, p.PlacementIDs...), p.LocationIDs...) {
 		located[id] = true
 	}
-	p.DeviceSnapshot, p.RackSnapshot = []kickoff.Device{}, view.Racks
+	p.DeviceSnapshot, p.RackSnapshot = []kickoff.Device{}, []kickoff.Rack{}
+	facilities := map[string]bool{}
+	for _, f := range subset.Facilities {
+		facilities[f.EntityID] = true
+	}
+	for _, rack := range view.Racks {
+		if facilities[rack.ID] {
+			p.RackSnapshot = append(p.RackSnapshot, rack)
+		}
+	}
 	for _, d := range view.Devices {
 		if selected[d.ID] {
 			if !located[d.ID] {
@@ -88,25 +97,6 @@ func (s *Server) loadKickoffPublication(ctx context.Context, q engineeringQuery,
 				d.StartU = nil
 			}
 			p.DeviceSnapshot = append(p.DeviceSnapshot, d)
-		}
-	}
-	// Full placements are already in the frozen subset. Partial locations only
-	// contribute source-backed rack/start-U facts, never a validated occupancy.
-	partial := map[string]bool{}
-	for _, id := range p.LocationIDs {
-		partial[id] = true
-	}
-	known := kickoff.Project(kickoff.KnownLocations(model, p), ev, source, inputs)
-	for _, d := range known.Devices {
-		if !located[d.ID] {
-			continue
-		}
-		for i := range p.DeviceSnapshot {
-			if p.DeviceSnapshot[i].ID == d.ID && partial[d.ID] {
-				p.DeviceSnapshot[i].RackID = d.RackID
-				p.DeviceSnapshot[i].StartU = d.StartU
-				p.DeviceSnapshot[i].HeightU = d.HeightU
-			}
 		}
 	}
 	p.Counts = map[string]int{"devices": len(p.DeviceIDs), "components": len(p.ComponentIDs), "ports": len(p.PortIDs), "connections": len(p.ConnectionIDs), "placements": len(p.PlacementIDs)}

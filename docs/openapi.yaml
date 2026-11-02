@@ -352,6 +352,10 @@ paths:
         "403": *kickoffAction3
         "503":
           description: Agent not implemented in this delivery slice; source preserved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
   /projects/{projectId}/kickoff/workspace:
     get:
       operationId: getKickoffWorkspace
@@ -451,6 +455,21 @@ paths:
       responses:
         "201":
           description: Stored immutable source reference
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, request_id]
+                properties:
+                  request_id:
+                    type: string
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [id]
+                    properties:
+                      id:
+                        type: string
   /projects/{projectId}/kickoff/sources/{sourceId}:
     delete:
       operationId: detachKickoffSource
@@ -466,6 +485,21 @@ paths:
       responses:
         "200":
           description: Unused attachment detached; immutable source retained
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, request_id]
+                properties:
+                  request_id:
+                    type: string
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [removed]
+                    properties:
+                      removed:
+                        type: boolean
   /cmdb/visualization/subgraph:
     get:
       operationId: getCMDBVisualSubgraph
