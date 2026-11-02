@@ -1,0 +1,131 @@
+{
+  "at": "2026-11-02T11:36:40.926596+00:00",
+  "baseline": "8149c99e724151190f8b1ea9e19c13d76a512442",
+  "branches_before": [
+    {
+      "branch": "deploy/bom-agent-topology-1031",
+      "commit": "148b88d1cd4ed7aae411780ca40a22a5dce01951"
+    },
+    {
+      "branch": "deploy/bom-v5-flows-1031",
+      "commit": "138a86cc51dbc1c3612fbd1fb3a61b0666070914"
+    },
+    {
+      "branch": "deploy/jobs-ui-20261102",
+      "commit": "8149c99e724151190f8b1ea9e19c13d76a512442"
+    },
+    {
+      "branch": "deploy/project-delete-1031",
+      "commit": "2d669741b29bd8d17c6e7c3adf51873f0b526bea"
+    },
+    {
+      "branch": "dev",
+      "commit": "8149c99e724151190f8b1ea9e19c13d76a512442"
+    },
+    {
+      "branch": "feat/datacenter-visualization-approved",
+      "commit": "b1846451564a8be96dc093c46263df2f252068f5"
+    },
+    {
+      "branch": "feat/flows-redesign",
+      "commit": "95df50fec9dbd1923f1659e4f02e721c3ff46965"
+    },
+    {
+      "branch": "feat/job-platform-rebuild",
+      "commit": "2f5ed9267bb4aae51607e84ea5a1ec29215da426"
+    },
+    {
+      "branch": "feat/jobs-kestra-ui",
+      "commit": "ce1f199f40e6e2bbdbc16d693863d20fdb2a0928"
+    },
+    {
+      "branch": "feat/project-delete",
+      "commit": "1d6464ec8057f9faff8c00a67158f01fc781c41d"
+    },
+    {
+      "branch": "fix/bom-acceptance-root-causes",
+      "commit": "664f4a5b5c9952fcbf9772b04d5142257f5b7db6"
+    },
+    {
+      "branch": "fix/bom-agent-correctness",
+      "commit": "74ab238b5f4e58d7bf46c957478f2b31a825405c"
+    },
+    {
+      "branch": "fix/bom-source-closure",
+      "commit": "a12a5220a411fee1697c1943f4c93f2c01167394"
+    },
+    {
+      "branch": "integrate/all-keel-branches",
+      "commit": "fc07c70524edfed53ceb3c81ba431127b7b61abc"
+    },
+    {
+      "branch": "keel-new-main",
+      "commit": "74ab238b5f4e58d7bf46c957478f2b31a825405c"
+    },
+    {
+      "branch": "main",
+      "commit": "8149c99e724151190f8b1ea9e19c13d76a512442"
+    }
+  ],
+  "removed_worktrees": [
+    "/home/ubuntu/keel-bom-closure-dev",
+    "/home/ubuntu/keel-engineering-p0",
+    "/home/ubuntu/keel-integration",
+    "/home/ubuntu/keel-jobs-release-20261102",
+    "/home/ubuntu/keel-project-delete-deploy",
+    "/home/ubuntu/keel-project-delete-dev",
+    "/tmp/keel-agent-deploy",
+    "/tmp/keel-bom-agent-fix",
+    "/tmp/keel-bom-root-fix",
+    "/tmp/keel-bom-v5-deploy"
+  ],
+  "retained_runtime_worktrees": [
+    {
+      "path": "/home/ubuntu/keel-flows-dev",
+      "commit": "95df50fec9dbd1923f1659e4f02e721c3ff46965",
+      "reason": "existing runtime/dependency/private configuration reference; no development branch"
+    },
+    {
+      "path": "/home/ubuntu/keel-kestra-ui-dev",
+      "commit": "ce1f199f40e6e2bbdbc16d693863d20fdb2a0928",
+      "reason": "existing runtime/dependency/private configuration reference; no development branch"
+    },
+    {
+      "path": "/home/ubuntu/keel-visualization-dev",
+      "commit": "2f5ed9267bb4aae51607e84ea5a1ec29215da426",
+      "reason": "existing runtime/dependency/private configuration reference; no development branch"
+    }
+  ],
+  "active_branches": [
+    "main",
+    "dev"
+  ],
+  "development_workspace": "/home/ubuntu/keel-dev",
+  "application_directory": "dev/",
+  "deployed_application_commit": "9441a89",
+  "application_tree_matches_deployed": true,
+  "removed_local_and_remote_branches": [
+    "deploy/bom-agent-topology-1031",
+    "deploy/bom-v5-flows-1031",
+    "deploy/jobs-ui-20261102",
+    "deploy/project-delete-1031",
+    "feat/datacenter-visualization-approved",
+    "feat/flows-redesign",
+    "feat/job-platform-rebuild",
+    "feat/jobs-kestra-ui",
+    "feat/project-delete",
+    "fix/bom-acceptance-root-causes",
+    "fix/bom-agent-correctness",
+    "fix/bom-source-closure",
+    "integrate/all-keel-branches",
+    "keel-new-main"
+  ],
+  "checks": [
+    "all worktrees clean before cleanup",
+    "all removed branch tips are ancestors of8149c99",
+    "whole dev/ tree equals9441a89",
+    "5180 HTTP200 after cleanup",
+    "8081 health HTTP200 after cleanup"
+  ],
+  "historical_branches_are_not_development_entrypoints": true
+}
