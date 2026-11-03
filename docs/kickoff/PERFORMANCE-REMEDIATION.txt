@@ -1,0 +1,134 @@
+智能开局 → CMDB → 数据中心拓扑：性能与流程整改方案
+
+范围与证据
+本轮仅只读诊断和方案，不修改业务代码、数据库数据、运行配置或部署，不调用 AI。
+线上基线：9a3e03b；开发工作区：keel-dev/dev，调查前 HEAD c5cabe6（其后仅文档）。
+当前 MM 数据：971 台设备、14,308 个端口、7,154 条线缆、59 个已入库机柜；
+含项目锚点共 22,493 个 CMDB 实体，52,075 条有效关系。不是只有 971 行的查询。
+本次是单次顺序 API 测量、定向 SQL 执行计划和代码核查，不是并发压测或浏览器 FPS 验收。
+脱敏指标：PERFORMANCE-AUDIT.json。原始响应、完整 SQL 和会话仅留私有临时目录，不入 Git。
+
+实测结果（本机 API8081，已登录且授权）
+- GET kickoff/workspace：200，20.600 秒，12,883,631 字节。
+- GET cmdb/inventory：200，0.663 秒，4,842,312 字节，但数据被静默截断。
+- GET cmdb/dossier/catalog（MM、10 条）：200，0.179 秒，9,386 字节，total=22,492。
+- GET cmdb/dossier/tree（MM）：200，0.125 秒，623,134 字节。
+- GET cmdb/visualization/subgraph（MM、100 条）：504，5.010 秒，CMDB_QUERY_TIMEOUT。
+- GET cmdb/visualization/connections（MM、100 条）：504，5.014 秒，同上。
+- GET cmdb/visualization/matrix（MM、100 条）：504，5.008 秒，同上。
+- 与前端一致的 subgraph limit=200 定向采样：504，5.008 秒；观察到 SQL 临时文件写入。
+- 原 visualGroupSQL 在只读事务单独 EXPLAIN ANALYZE，15 秒仍未完成并被会话限时取消。
+
+1. 拓扑接口：分页发生在昂贵计算之后
+定位：dev/backend/internal/cmdb/visual_queries.go 的 visualCTE、visualGroupSQL、
+VisualSubgraph、VisualConnections、VisualMatrix；cmd/api/cmdb.go 的五秒查询期限。
+
+visible/rel 先装载授权项目的资产与关系；owners 从全部端口递归求设备；ends 处理全部
+线缆端点；con 被 MATERIALIZED；groups/matrix 再做全域聚合。末尾 LIMIT 100/200
+限制返回窗口，却没有限制前面的工作量。hierarchy 子图也同步等待全量线缆分组汇总。
+
+实际执行计划对 visible 中端口估计 112 行，实际 14,308；对 owner/ends 聚合估计 1 行，
+当前数据分别有 14,308 条端口归属和 14,308 条端接关系。由此采用多层 Nested Loop + CTE Scan；不能把现有
+from/to 索引存在等同于中间 CTE 能高效索引查找。单独汇总超过 15 秒证实此查询路径有
+独立瓶颈，但该超时执行没有返回完整实际逐节点耗时，不能伪造更细的耗时比例。
+
+visualBegin/visualEnd 还各自对项目资产/关系排序 string_agg 后计算全量指纹；每个请求
+重复两次。它是额外全域开销，当前证据不把它说成唯一或最大耗时来源。
+
+整改：
+- hierarchy 只查询当前层级、机柜及需要的设备摘要，线缆统计独立加载。
+- connections 先选当前项目/机柜/设备的线缆 ID 页，再按端点与设备 ID 查必要上下文。
+- 消除全项目 owner/ends/con 的重复重建；复用明确 contains 与端接关系，按批取数并
+  用 ID 索引关联。组统计用集合连接，不按每条线重复扫描中间表。
+- 根据改写后实际执行计划补必要的项目、关系类型及方向索引，不盲目堆索引。
+- 项目修订指纹避免每请求两次全表拼接；复用现有修订/Outbox 维护轻量失效标识，须
+  覆盖所有相关 CMDB 写入口并保持授权版本隔离，不能仅监听 kickoff。
+- 保留 snapshot/cursor、RBAC、partial 与事实分层语义，不靠全局关闭规划器选项或
+  拉长超时作为最终解决方案。查询投影如确有需要，只作可重建读取索引，不建第二资产源。
+
+2. 公共资产读取：硬截断导致页面关系不完整
+定位：dev/backend/internal/cmdb/query.go 的 RawAssets、InventorySnapshot；
+dev/src/lib/api/cmdb-http.ts 的 refreshCanonicalInventory。
+
+RawAssets 按名称排序后固定 LIMIT 10000；InventorySnapshot 返回 truncated=false。
+前端请求 inventory 时不传当前项目，在全部已授权项目中共同消耗这 10,000 个名额。
+本次响应 MM 设备类型 server/switch 齐全，但端口只返回 7,204 / 14,308；线缆 0 / 7,154。
+这是读取缺失，不能据此误判数据库未入库，更不能通过重新导入解决。
+
+整改：按项目与资源类型分页/按需查询，返回真实 total、has_more/partial；调用方只将
+已加载范围作判断，不能用局部集合断言连接不存在。兼容旧消费接口时明确迁移范围，
+不把 LIMIT 改成无限、也不将完整全库长期复制进浏览器全局 store。
+
+3. 开局工作台：每次读取重建当前模型及全部发布历史
+定位：cmd/api/kickoff.go 的 kickoffWorkspace；kickoff_publication.go 的
+loadKickoffPublications/loadKickoffPublication；internal/kickoff/model.go 的 Project。
+
+一个 workspace 响应含 14,308 端口、7,154 连接、全部计算、967 条问题及三份发布回执。
+其中端口约 4.36MB、连接 2.08MB、历史发布 4.31MB、计算 1.10MB（按紧凑 JSON 分项）。
+读取每份历史回执都重新加载完整工程模型、证据并执行 Project；当前模型也做一遍。
+Project 对每个对象线性遍历整个证据切片，复杂度随对象数×证据数增长。已有相关版本
+证据约 2.2万～2.4万条；这类重复工作随历史发布次数持续增长。
+
+整改：总览只返回统计/状态/当前修订，设备/端口/连接/问题服务端分页；证据、计算明细、
+历史版本与 diff 打开时再取。历史列表读轻量回执和冻结版本引用，不在普通 GET 中重新
+计算所有历史。证据、落位、配置映射用一次构造的 ID Map 关联，复用同修订已有结果。
+保留 MinIO 中原始资料与不可变来源；结构化查询留在工程模型/CMDB。将全部 JSON 搬到
+MinIO 不能解决列表查询与浏览器全量装载的问题。
+
+4. 前端装载和刷新范围超过交互需要
+定位：dev/src/lib/api/kickoff/http.ts；features/kickoff/Workspace.tsx、pages/Review.tsx、
+components/ui.tsx；lib/api/cmdb-http.ts；lib/api/index.tsx。
+
+Workspace 等整个大响应后才显示内容；保存/确认单项都会 await refresh 再全量刷新。
+首次进入时 Provider 的发布列表为空，已有 published 回执也被当成新发布，触发全局
+inventory 刷新。inventory 写全局 store 时 structuredClone 并通知订阅者。
+主表已有十条前端分页，不是将 14,308 行表格全部挂到 DOM；但搜索、排序、行模型仍
+依赖全量数组。Review 问题侧栏没有分页/虚拟化，967 张问题卡同时创建。
+
+整改：保持原型布局、密度、组件、Drawer 和操作，只改变数据装载方式。列表服务端
+分页，侧栏窗口化/分批展开，局部编辑仅失效受影响 query；首次读取不派发“新发布”。
+版本变化按项目刷新当前消费范围，不全平台重新装载。浏览器长任务/交互耗时需在修改
+后单独核验，本次未测得 FPS，不编造主线程各阶段耗时。
+
+5. unknown 至少有两类，处理方式不同
+状态：当前 MM 各类资产的 health、freshness、maintenance_state 全为 unknown。
+这些资产来自 planned 入库，尚无采集/维护依据；不能改成 healthy/fresh/maintained。
+前端应分别显示“待采集”“暂无观测”“尚未进入维护”，与字段缺失和接口失败区分。
+
+来源：MM 的 676,856 条字段来源记录（含多次发布历史）未提供 source_location.sheet/cell；
+其中 676,853 条以 source_type=bom、source_ref=engineering:* 存储。工程证据仍在 eng_evidence，
+但 CMDB 展示没有解析关联。抽查一个端口档案返回 30 条来源：30 条均无 Sheet/单元格，
+30 个 href 均错误指向 /deploy/bom/engineering:*。这是实际来源展示/路由接入缺陷。
+
+整改：根据真实来源类型解析工程证据与发布版本，补 source_location 或按引用查询；
+跳转到 kickoff 来源/版本/证据 Drawer。无观测显示规划语义，无字段显示具体缺项，
+接口失败显示明确错误和请求标识，不统一回退成 unknown。
+
+6. 当前流程验收不足及最小开局边界
+过去“入库成功”验证了写入/关系回读，未证明大数据量下页面和拓扑可使用。
+本次三笔发布均 published，资产与端接关系已在 CMDB；读取超时和截断并非重新 AI 解析
+或重新导入的理由。Fabric 和装机不纳入本次实施。
+
+967 台设备已有机柜及起始 U；301 台有高度，85 个工程机柜候选均无有效容量 U。
+完整审核落位仍为 0。已知位置可先显示，缺高度/容量只影响对应精确机柜图与占位计算，
+不应阻断资产、已知连接或整个拓扑查询。少量共性参数按型号/机柜批量补充，不要求逐台
+填写；缺参数不伪造满柜尺寸或已验证空闲空间。位置问题提示还应准确指向缺少高度/
+机柜容量，避免已有 rack/startU 却显示这些字段缺失。
+
+发布回执继续区分已提交、Outbox 投影中、投影完成/失败；消费查询失败另列可重试读取
+错误，不加一个“所有场景均就绪”才允许入库的全域门槛。证据、类型化数据、事务、幂等、
+原有稳定 ID 和人工确认均保留。
+
+实施顺序与验收（目标，尚未实现）
+A. 优先修拓扑 SQL 和 inventory 静默截断，恢复已入库资产可读、已知连接可查。
+B. 拆 workspace 大响应，消除历史全量重算与逐对象证据扫描，修改局部刷新和问题侧栏。
+C. 修正来源链接/来源字段与 unknown 语义，明确局部机柜几何缺口和发布/读取不同状态。
+
+保持现有环境、UI 与业务事实，仅使用当前 MM 历史资料定向验证，不重新调用 Agent。
+建议验收目标：同机环境总览/普通分页 API P95 <= 1秒；当前范围拓扑/矩阵 P95 <= 2秒；
+首屏摘要目标 <= 500KB，不含按需明细；不再出现上述 504。达标须记录有界重复测量，
+本次单次诊断不可写成 P95。浏览器首屏可操作目标 <= 2秒，翻页/选择无持续卡住。
+分页遍历后的 MM 971设备/14308端口/7154线缆须与库内计数相符；每条线缆两端可追溯。
+首页不下载全部历史和证据；仅进入页面不误触发发布刷新；补一项不全量重载。
+缺容量/高度显示局部待补，规划不冒充观测；来源能回到对应工程版本及已有单元格证据。
+不把达到性能目标等同于 Fabric、装机或真实设备验收。

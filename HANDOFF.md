@@ -8,6 +8,16 @@
 - 接续先读本节，再按`docs/REAL-API-CONTRACTS.md`、模块文档和`docs/flows-redesign/implementation.md`定位。不要再参考下方“独立作业分支/旧部署目录继续开发”的历史说明。
 - 清理清单与原分支SHA：`docs/git-baseline-20261102.json`；整合说明：`docs/integration-20261102.md`。既有未验收/真机限制维持原记录。
 
+## 已完成里程碑事件：MM规模性能与CMDB/拓扑只读诊断
+
+用户要求先给整改方案，尚未授权本轮实施。线上仍9a3e03b，业务代码、数据库与运行配置未修改，无新导入或AI调用。当前MM含971设备/14308端口/7154线缆/59已入库机柜，3笔published回执；不能将此前写入回读验收当作规模性能与拓扑可用验收。
+
+实测workspace 20.600秒/12.9MB；CMDB目录分页0.179秒；拓扑subgraph/connections/matrix均约5秒504 CMDB_QUERY_TIMEOUT。原拓扑汇总SQL只读单独执行15秒仍超时：全域CTE/端点归属与分组先计算、后分页，执行计划严重低估中间行数并使用嵌套循环。workspace还重建全部发布历史并逐对象扫描证据。
+
+另确认RawAssets固定LIMIT 10000而inventory宣称truncated=false；当前响应MM端口仅7204/14308、线缆0/7154，数据库原记录并未丢失。unknown须分规划尚无观测与来源接入缺陷：抽查端口30条来源均缺Sheet/单元格且错误跳转旧BOM engineering链接；工程证据仍在。967已知机柜/startU、301已知高度，但机柜容量均待补，精确落位仍0。
+
+详细问题、代码位置、整改次序与建议验收目标：docs/kickoff/PERFORMANCE-REMEDIATION.txt；脱敏单次测量：docs/kickoff/PERFORMANCE-AUDIT.json。仅定向API/SQL与代码核查，无浏览器性能或并发压测；原始响应/会话不入Git。下一步等待用户确认方案，范围限定开局→CMDB→数据中心拓扑，不扩展Fabric/装机或Agent。
+
 ## 已完成里程碑事件：统一前端视觉基准文档
 
 用户要求以后续智能开局工程原型统一前端风格。本次更新docs/DESIGN-SYSTEM.md，依据kickoff/src/styles.css、实际组件与已有截图固定颜色、字体、尺寸、间距、表格密度、页面布局、Drawer/Modal、状态及响应式规则，明确逐页迁移方式；docs/UI-REFERENCE.md同步指向新基准。作业平台保留原生组件及专业交互，通用视觉通过主题适配对齐，不再保留相互冲突的通用样式标准。

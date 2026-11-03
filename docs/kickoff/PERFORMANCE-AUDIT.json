@@ -1,0 +1,157 @@
+{
+  "scope": "Readonly diagnosis of kickoff -> CMDB -> datacenter topology; no application/database/deployment changes or AI calls",
+  "deployed_commit": "9a3e03b",
+  "source_commit_before_documentation": "c5cabe6",
+  "method": "Single sequential authorized HTTP measurements; SQL activity sampling; one 15-second-bounded read-only EXPLAIN ANALYZE cancelled at deadline; EXPLAIN without ANALYZE; source inspection. No concurrency or browser CPU/FPS profiling.",
+  "requests": [
+    {
+      "name": "kickoff_workspace",
+      "status": 200,
+      "seconds": 20.6,
+      "bytes": 12883631,
+      "error": null,
+      "collections": {
+        "activity": 11,
+        "calculations": 2,
+        "components": 0,
+        "connections": 7154,
+        "devices": 971,
+        "issues": 967,
+        "models": 4,
+        "ports": 14308,
+        "publications": 3,
+        "racks": 85,
+        "sources": 1
+      },
+      "total": null
+    },
+    {
+      "name": "inventory",
+      "status": 200,
+      "seconds": 0.663,
+      "bytes": 4842312,
+      "error": null,
+      "collections": {
+        "cables": 705,
+        "gpus": 279,
+        "nics": 340,
+        "optics": 0,
+        "ports": 4136,
+        "rack_placements": 389,
+        "racks": 75,
+        "servers": 842,
+        "switch_ports": 3410,
+        "switches": 213
+      },
+      "total": null
+    },
+    {
+      "name": "catalog",
+      "status": 200,
+      "seconds": 0.179,
+      "bytes": 9386,
+      "error": null,
+      "rows": 10,
+      "total": 22492,
+      "unknown_fields": {
+        "health": 10,
+        "freshness": 10,
+        "maintenance": 0,
+        "maintenance_state": 10,
+        "delivery_status": 0
+      }
+    },
+    {
+      "name": "tree",
+      "status": 200,
+      "seconds": 0.125,
+      "bytes": 623134,
+      "error": null,
+      "rows": 1,
+      "total": null
+    },
+    {
+      "name": "subgraph",
+      "status": 504,
+      "seconds": 5.01,
+      "bytes": 141,
+      "error": "CMDB_QUERY_TIMEOUT",
+      "total": null
+    },
+    {
+      "name": "connections",
+      "status": 504,
+      "seconds": 5.014,
+      "bytes": 141,
+      "error": "CMDB_QUERY_TIMEOUT",
+      "total": null
+    },
+    {
+      "name": "matrix",
+      "status": 504,
+      "seconds": 5.008,
+      "bytes": 141,
+      "error": "CMDB_QUERY_TIMEOUT",
+      "total": null
+    }
+  ],
+  "live_ui_query_limit_200": {
+    "status": 504,
+    "seconds": 5.008
+  },
+  "database": {
+    "devices": 971,
+    "ports": 14308,
+    "cables": 7154,
+    "published_racks": 59,
+    "entities_including_project": 22493,
+    "active_relationships": 52075,
+    "publications_published": 3
+  },
+  "inventory_read": {
+    "mm_ports": 7204,
+    "mm_cables": 0,
+    "reported_truncated": false,
+    "raw_asset_limit": 10000,
+    "request_project_filter": false
+  },
+  "workspace_components_mb": {
+    "ports": 4.364,
+    "connections": 2.075,
+    "publications": 4.308,
+    "calculations": 1.103
+  },
+  "sql": {
+    "visual_group_analyze_completed": false,
+    "statement_timeout_seconds": 15,
+    "plan_port_estimate": 112,
+    "plan_owner_estimate": 1,
+    "plan_ends_estimate": 1,
+    "observed_wait_event": "BufFileWrite",
+    "partial_actual_node_times_available": false
+  },
+  "provenance_sample": {
+    "http": 200,
+    "sample_asset_type": "port",
+    "rows": 30,
+    "missing_sheet": 30,
+    "missing_cell": 30,
+    "engineering_reference_old_bom_links": 30
+  },
+  "all_field_source_records": {
+    "includes_publication_history": true,
+    "rows": 676856,
+    "missing_sheet": 676856,
+    "missing_cell": 676856,
+    "engineering_reference_typed_bom": 676853
+  },
+  "placement": {
+    "known_rack_and_start_u": 967,
+    "positive_device_height": 301,
+    "positive_rack_capacity": 0,
+    "published_exact_placements": 0,
+    "unresolved_placement_issues": 967
+  },
+  "remediation_status": "PROPOSED_NOT_IMPLEMENTED",
+  "evidence_privacy": "Only aggregate counts and timings retained here; raw assets, original rows, SQL payloads, credentials and sessions excluded."
+}
