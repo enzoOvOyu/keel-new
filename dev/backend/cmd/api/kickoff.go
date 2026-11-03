@@ -114,6 +114,23 @@ func (s *Server) kickoffWorkspace(w http.ResponseWriter, r *http.Request) {
 		fail(w, 500, "KICKOFF_WORKSPACE_UNAVAILABLE")
 		return
 	}
+	if expected := r.URL.Query().Get("revision"); expected != "" && expected != strconv.Itoa(revision) {
+		fail(w, 409, "REVISION_CONFLICT")
+		return
+	}
+	artifactKey := ""
+	if r.URL.Query().Get("section") == "" && s.objects != nil {
+		artifactKey, err = s.kickoffWorkspaceKey(ctx, tx, revision, name)
+		if err != nil {
+			fail(w, 500, "KICKOFF_WORKSPACE_UNAVAILABLE")
+			return
+		}
+		if cached := s.readKickoffWorkspaceArtifact(ctx, artifactKey); cached != nil {
+			respondKickoffWorkspace(w, r, cached)
+			return
+		}
+	}
+
 	snapshot, err := s.kickoffReadSnapshot(ctx, tx, revision)
 	if err != nil {
 		fail(w, 500, "KICKOFF_MODEL_UNAVAILABLE")
@@ -365,7 +382,10 @@ func (s *Server) kickoffWorkspace(w http.ResponseWriter, r *http.Request) {
 		payload["ports"] = []any{}
 		payload["connections"] = []any{}
 	}
-	respond(w, 200, payload)
+	if section == "" {
+		s.saveKickoffWorkspaceArtifact(ctx, artifactKey, payload)
+	}
+	respondKickoffWorkspace(w, r, payload)
 }
 func (s *Server) kickoffSaveInput(w http.ResponseWriter, r *http.Request, table string) {
 	var body struct {

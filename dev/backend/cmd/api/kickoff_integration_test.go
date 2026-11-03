@@ -239,6 +239,35 @@ func TestKickoffBeforeAgent(t *testing.T) {
 	if retry.ID != publication.ID {
 		t.Fatal("retry created a second publication")
 	}
+	// A new browser/API process must use the persisted read artifact without
+	// rebuilding the full physical model. Stale fingerprints must be rejected.
+	beforeCache := snapshot()
+	var cacheRevision int
+	json.Unmarshal(beforeCache["revision"], &cacheRevision)
+	var cacheName string
+	if e = db.QueryRow(ctx, `SELECT name FROM project WHERE id=$1`, project).Scan(&cacheName); e != nil {
+		t.Fatal(e)
+	}
+	cacheKey, err := svc.kickoffWorkspaceKey(ctx, db, cacheRevision, cacheName)
+	if err != nil || len(svc.readKickoffWorkspaceArtifact(ctx, cacheKey)) == 0 {
+		t.Fatal("persisted workspace artifact unavailable", err)
+	}
+	if svc.readKickoffWorkspaceArtifact(ctx, cacheKey+"stale") != nil {
+		t.Fatal("stale workspace artifact accepted")
+	}
+	kickoffReads.Lock()
+	kickoffReads.entries = map[string]*kickoffRead{}
+	kickoffReads.Unlock()
+	afterCache := snapshot()
+	if !bytes.Equal(beforeCache["devices"], afterCache["devices"]) || !bytes.Equal(beforeCache["publications"], afterCache["publications"]) {
+		t.Fatal("persisted workspace contents changed")
+	}
+	kickoffReads.Lock()
+	rebuilt := len(kickoffReads.entries)
+	kickoffReads.Unlock()
+	if rebuilt != 0 {
+		t.Fatal("workspace rebuilt model despite valid persisted artifact")
+	}
 	call("POST", "sources/"+source+"/analyze", map[string]any{"expectedRevision": version()}, 503)
 	if path := os.Getenv("KEEL_KICKOFF_TEST_ARTIFACT"); path != "" {
 		state := snapshot()
