@@ -1,6 +1,6 @@
 # Kickoff · 当前 API 使用契约
 
-基准：dev/部署 `686e9ea`。产品行为见[模块定版](../modules/kickoff.md)。[OpenAPI](../openapi.yaml)定义唯一请求/响应/枚举；[注册表](real-api-registry.json)链接实现及证据。
+基准：dev/部署 `af63cb3`。产品行为见[模块定版](../modules/kickoff.md)。[OpenAPI](../openapi.yaml)定义唯一请求/响应/枚举；[注册表](real-api-registry.json)链接实现及证据。
 
 ## 操作索引
 
@@ -41,9 +41,9 @@
 
 `analyzeKickoffSource` 是已实现的明确拒绝入口：503 `KICKOFF_AGENT_NOT_CONFIGURED`。它没有成功分析结果，不因登记到真实接口表就成为Agent能力。
 
-当前网络输入及CMDB版本引用不等于完整Fabric NetworkPlan；缺口见[决策记录](../DECISIONS.md)。[部署证据](../kickoff/DEPLOYMENT.json)、[后端定向集成](../kickoff/BACKEND-CHECK.json)、[性能与在线读取](../kickoff/PERFORMANCE-RESULT.json)各自限定验证范围。本轮新增历史资料理解为源码及定向检查结果，未更新部署。
+当前网络输入及CMDB版本引用不等于完整Fabric NetworkPlan；缺口见[决策记录](../DECISIONS.md)。[部署证据](../kickoff/DEPLOYMENT.json)、[后端定向集成](../kickoff/BACKEND-CHECK.json)、[性能与在线读取](../kickoff/PERFORMANCE-RESULT.json)各自限定验证范围。本轮历史资料理解已部署并通过定向真实HTTP检查。
 
-## 历史资料理解派生读取（本轮源码，未部署）
+## 历史资料理解派生读取（已部署）
 
 - GET `sources/{sourceId}/understanding` (`getKickoffSourceUnderstanding`)：读取当前工程 head 的派生报告；未构建返回 unsupported/pending，不调用 AI。
 - POST `sources/{sourceId}/reuse-history` (`reuseKickoffSourceUnderstanding`)：需要 bom:import；复用现有原件、Proposal Columns/Records 与对象证据生成 MinIO 派生报告。同 source/head 重复操作返回同报告，不修改工程修订、输入、审批或 CMDB。
