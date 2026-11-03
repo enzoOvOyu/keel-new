@@ -99,6 +99,7 @@ func (s *Server) runKickoffAdoption(ctx context.Context, job, claim string, raw 
 	if !actor.Can("bom:edit", s.project, "", "") {
 		return errors.New("FORBIDDEN")
 	}
+	ctx = context.WithValue(ctx, principalKey{}, principal{Actor: actor.ID, Project: s.project, Subject: actor})
 	_, err = s.applyKickoffAdoption(ctx, request.SourceID, request.Body, request.Actor, job, claim)
 	return err
 }
