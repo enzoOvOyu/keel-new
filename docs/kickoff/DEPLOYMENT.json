@@ -1,19 +1,19 @@
 {
-  "code_revision": "98c41e8818bdac4a89b605c43e6186aac2254b86",
-  "frontend_code_revision": "98c41e8818bdac4a89b605c43e6186aac2254b86",
-  "backend_code_revision": "d2f9accb146239cc9191f3fa60c0442985af3e22",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-view-actions-98c41e8",
-  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-d2f9acc",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-view-actions-f41ec5e",
-  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-placement-a8e454c",
+  "code_revision": "d5c99fb049b1a89bc3de46ae3f76d6a8148733ad",
+  "frontend_code_revision": "d5c99fb049b1a89bc3de46ae3f76d6a8148733ad",
+  "backend_code_revision": "d5c99fb049b1a89bc3de46ae3f76d6a8148733ad",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-d5c99fb",
+  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-d5c99fb",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-view-actions-98c41e8",
+  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-d2f9acc",
   "ports": [
     5180,
     8081
   ],
   "migrations": [],
-  "api_restarted": false,
-  "binary_sha256": "d35fe3c08a2ae85e9bea80dc2c3cd4c686768a3c1a886b71b8930fa957dede59",
-  "frontend_index_sha256": "98f1dba0a36f58a0517912ffef4ab0750386c20a7fe34de21df7cef5b268bb4b",
+  "api_restarted": true,
+  "binary_sha256": "3f502c2b6bbd53cbf74a19cf93c68d1392b67adfadad24a30eb1bf63b14f3c4e",
+  "frontend_index_sha256": "94a73ead142cfb3ae0c9b8db65146a4f60e67d50d30f93d3fda30f687375c7c2",
   "status": "deployed",
   "binary_matches": true,
   "frontend_index_matches": true,
@@ -23,30 +23,7 @@
     "health": 200,
     "index_matches": true
   },
-  "business_tests": "Existing MM analysis reused; async adoption recovered and succeeded at revision 3: 971 devices, 14308 ports, 7154 connections, 122 racks. 10 candidate tables adopted, 4 remain. No new AI call; no CMDB publication.",
+  "business_tests": "NOT RUN per user: no new MM analysis, adoption or CMDB publication. Historical MM results belong to the previous Agent.",
   "provider_calls": 0,
-  "verification": "TypeScript/Vite and source/review/drawer checks passed; empty-state grid cascade corrected and full-width browser assertion plus screenshot verified with intercepted empty sources. No business writes.",
-  "task_history_verification": {
-    "status": "PASS",
-    "total": 6,
-    "kinds": [
-      "adoption"
-    ],
-    "selectedTaskDetail": true,
-    "analysisDetail": true,
-    "analysisLogCount": 25,
-    "understandingPresent": true
-  },
-  "ui_verification": {
-    "errors": [],
-    "source": "PASS",
-    "review": "PASS",
-    "empty": "PASS (intercepted empty source list; no project changes)",
-    "status": "PASS"
-  },
-  "empty_layout_verification": {
-    "errors": [],
-    "empty": "PASS (intercepted empty source list; no project changes)",
-    "status": "PASS"
-  }
+  "verification": "Targeted synthetic Go relation/protocol/evidence/privacy/cable/placement tests, Go build, TypeScript, Vite and API registry passed. Deployment health/index match only; real model/MM acceptance pending user instruction."
 }
