@@ -1,7 +1,11 @@
 {
-  "code_revision": "12af6e4ec606dfcd1a42c9c4773f7ebec8d44f84",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-review-12af6e4",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-understanding-af63cb3",
+  "code_revision": "82c3c5840834c8af9c209ec60cc2fed632218a57",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-compact-82c3c58",
+  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-review-12af6e4",
+  "backend_code_revision": "12af6e4ec606dfcd1a42c9c4773f7ebec8d44f84",
+  "backend_source_unchanged": true,
+  "api_restarted": false,
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-review-12af6e4",
   "ports": [
     5180,
     8081
@@ -9,95 +13,38 @@
   "migrations": [],
   "status": "deployed",
   "binary_sha256": "68656cabd3db5a6477034d096af27cedeae939783f58940b13cbf3aece062e1a",
-  "frontend_index_sha256": "e4181d1a6f8465839e97f89a73fee40ef40615a68a170bc9fafe26253f147fa1",
+  "frontend_index_sha256": "18c1d10045f19c83bfa346e6c7c506416b4a45db83d63dec81190b0977554ff9",
   "binary_matches": true,
   "frontend_index_matches": true,
   "live_checks": {
     "status": "PASS",
-    "scope": "Authenticated deployed HTTP read-only checks; no asset writes, imports or AI requests",
-    "checks": [
-      {
-        "endpoint": "http://localhost:8081/healthz",
-        "status": 200
-      },
-      {
-        "endpoint": "http://localhost:5180/",
-        "status": 200
-      },
-      {
-        "category": "devices",
-        "status": 200,
-        "rows": 10,
-        "total": 971,
-        "counts": {
-          "all": 971,
-          "geometry": 930,
-          "issues": 930,
-          "model_missing": 4,
-          "published": 971,
-          "unplaced": 4
-        }
-      },
-      {
-        "category": "components",
-        "status": 200,
-        "rows": 0,
-        "total": 0,
-        "counts": {}
-      },
-      {
-        "category": "ports",
-        "status": 200,
-        "rows": 10,
-        "total": 14308,
-        "counts": {
-          "all": 14308,
-          "issues": 14308,
-          "published": 14308,
-          "spec_missing": 14308
-        }
-      },
-      {
-        "category": "connections",
-        "status": 200,
-        "rows": 10,
-        "total": 7154,
-        "counts": {
-          "all": 7154,
-          "issues": 4,
-          "published": 7154,
-          "unplaced": 4
-        }
-      },
-      {
-        "category": "placements",
-        "status": 200,
-        "rows": 10,
-        "total": 971,
-        "counts": {
-          "all": 971,
-          "geometry": 930,
-          "issues": 930,
-          "model_missing": 4,
-          "published": 971,
-          "unplaced": 4
-        }
-      },
-      {
-        "filter": "unplaced",
-        "status": 200,
-        "total": 4
-      }
-    ],
-    "binary_matches": true,
+    "startup_http": {
+      "http://localhost:8081/healthz": 200,
+      "http://localhost:5180/": 200
+    },
     "frontend_index_matches": true,
-    "workspace_revision_unchanged": true,
-    "mutations": false,
-    "ai_requests": 0,
-    "limits": [
-      "Single sequential API samples, not P95/concurrency or full live browser acceptance"
-    ]
+    "binary_matches": true,
+    "api_restarted": false,
+    "mutations": false
   },
-  "agent_implemented": false,
-  "url": "http://localhost:5180/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/kickoff/review"
+  "live_ui": {
+    "status": "PASS",
+    "scope": "Authenticated live frontend and real API; read-only; no interception or screenshots",
+    "checks": [
+      "compact header and five-tab review loaded",
+      "default ten real records",
+      "25-record request and rendering",
+      "row heights 58\u201364px",
+      "sidebar has no horizontal overflow"
+    ],
+    "firstRowY": 305.5,
+    "rowHeightRange": [
+      60,
+      60
+    ],
+    "pageErrors": 0,
+    "kickoff_mutations": 0
+  },
+  "url": "http://localhost:5180/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/kickoff/review",
+  "agent_implemented": false
 }

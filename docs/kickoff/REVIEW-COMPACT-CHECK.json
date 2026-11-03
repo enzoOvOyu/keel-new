@@ -1,5 +1,5 @@
 {
-  "status": "implemented_verified_not_deployed",
+  "status": "deployed_live_readonly_ui_verified",
   "scope": "Local built frontend, synthetic protocol responses; no deployed API or business writes",
   "checks": [
     "compact title and single-line real-state summary; no decorative eyebrow/banner",
@@ -50,9 +50,28 @@
   "backend_and_http_contract_changes": false,
   "business_data_writes": false,
   "ai_requests": 0,
-  "scope_limit": "Local frontend protocol replay and synthetic visual evidence; not live MM or production browser acceptance. Running environment remains 12af6e4.",
+  "scope_limit": "Local synthetic protocol/visual checks plus authenticated live frontend read-only verification. No full MM re-import or AI acceptance.",
   "screenshots": [
     "docs/kickoff/screenshots/review-compact-desktop-synthetic.png",
     "docs/kickoff/screenshots/review-compact-narrow-synthetic.png"
-  ]
+  ],
+  "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+  "live_ui": {
+    "status": "PASS",
+    "scope": "Authenticated live frontend and real API; read-only; no interception or screenshots",
+    "checks": [
+      "compact header and five-tab review loaded",
+      "default ten real records",
+      "25-record request and rendering",
+      "row heights 58–64px",
+      "sidebar has no horizontal overflow"
+    ],
+    "firstRowY": 305.5,
+    "rowHeightRange": [
+      60,
+      60
+    ],
+    "pageErrors": 0,
+    "kickoff_mutations": 0
+  }
 }
