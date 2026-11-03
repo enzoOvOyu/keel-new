@@ -1,6 +1,6 @@
 # 真实 API 契约与实现台账
 
-> 当前开发增量：旧BOM前端及URL已退役，活跃入口直接使用kickoff；workspace按修订分页、review、preview及局部上下文，inventory真实分页和工程来源解析，拓扑SQL优化。变更已实现于dev但尚未部署，线上仍9a3e03b；实测与未达建议目标见[性能整改结果](kickoff/PERFORMANCE-RESULT.json)。请求/响应以本轮OpenAPI及生成类型为准。
+> 当前开发增量：旧BOM前端及URL已退役，活跃入口直接使用kickoff；workspace按修订分页、review、preview及局部上下文，inventory真实分页和工程来源解析，拓扑SQL优化。变更已部署686e9ea至5180/8081，认证读取与浏览器子集验证见docs/kickoff/DEPLOYMENT.json；实测与未达建议目标见[性能整改结果](kickoff/PERFORMANCE-RESULT.json)。请求/响应以本轮OpenAPI及生成类型为准。
 
 ## 新kickoff工作台当前契约
 

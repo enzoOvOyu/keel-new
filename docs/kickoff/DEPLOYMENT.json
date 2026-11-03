@@ -1,36 +1,142 @@
 {
-  "release_commit": "9a3e03b9095afa7c91214cd40c00292d288578ba",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-9a3e03b",
-  "url": "http://localhost:5180/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/kickoff/overview",
-  "api": "127.0.0.1:8081",
+  "code_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-perf-686e9ea",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-9a3e03b",
+  "frontend_mode": "verified production build via existing Vite preview",
+  "ports": [
+    5180,
+    8081
+  ],
+  "migrations": [],
+  "binary_sha256": "f80a0ba7f0314a11a9d1e91a81c6879b37ca8ec76d2cf90f918f3590cdec8bd2",
+  "frontend_index_sha256": "75808869015ac1a39b37586047ebd7c27d35cd08f623ef5fd234fbb5edb6be3f",
+  "status": "deployed",
+  "binary_matches": true,
+  "frontend_index_matches": true,
   "project_count_before_after": [
     4,
     4
   ],
-  "migrations": [
-    48,
-    49,
-    50,
-    51
-  ],
+  "url": "http://localhost:5180/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/kickoff/overview",
+  "api": "127.0.0.1:8081",
   "agent_implemented": false,
-  "binary_sha256": "8e0cea8f9b99795ff80567f071818157a2315860fc9f84ad9835fe1848820527",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/jobs-ui-20261102",
-  "status": "deployed",
-  "code_revision": "9a3e03b9095afa7c91214cd40c00292d288578ba",
-  "binary_matches": true,
   "startup_http": {
     "http://localhost:8081/healthz": 200,
     "http://localhost:5180/": 200
   },
-  "self_check": {
-    "backend": "PASS",
-    "ui": "PASS",
-    "prototype_metrics": "PASS",
-    "agent_implemented": false
+  "live_api": {
+    "kind": "authenticated_deployed_HTTP_via_existing_frontend_proxy",
+    "checks": [
+      {
+        "name": "workspace",
+        "status": 200,
+        "seconds": 2.105,
+        "bytes": 1151083,
+        "error": null,
+        "revision": 8,
+        "totals": {
+          "activity": 11,
+          "calculations": 0,
+          "components": 0,
+          "connections": 7154,
+          "devices": 971,
+          "issues": 967,
+          "models": 4,
+          "ports": 14308,
+          "publications": 3,
+          "racks": 85,
+          "sources": 1
+        },
+        "returned_ports": 0,
+        "returned_connections": 0
+      },
+      {
+        "name": "review_page",
+        "status": 200,
+        "seconds": 0.169,
+        "bytes": 3287,
+        "error": null,
+        "rows": 10,
+        "total": 14308
+      },
+      {
+        "name": "inventory_page",
+        "status": 200,
+        "seconds": 0.282,
+        "bytes": 967395,
+        "error": null,
+        "page": {
+          "has_more": true,
+          "limit": 2000
+        },
+        "truncated": true
+      },
+      {
+        "name": "catalog",
+        "status": 200,
+        "seconds": 0.162,
+        "bytes": 9386,
+        "error": null,
+        "total": 22492
+      },
+      {
+        "name": "subgraph",
+        "status": 200,
+        "seconds": 1.608,
+        "bytes": 240980,
+        "error": null,
+        "assets": 130,
+        "truncated": false,
+        "page": {
+          "limit": 100,
+          "has_more": true
+        }
+      },
+      {
+        "name": "matrix",
+        "status": 200,
+        "seconds": 1.589,
+        "bytes": 193028,
+        "error": null,
+        "cells": 100
+      },
+      {
+        "name": "connections",
+        "status": 200,
+        "seconds": 2.453,
+        "bytes": 788629,
+        "error": null,
+        "assets": 495,
+        "truncated": false,
+        "page": {
+          "limit": 100,
+          "has_more": true
+        }
+      }
+    ],
+    "mutations": false,
+    "ai_calls": false,
+    "sample": "single sequential requests; not P95"
   },
-  "mm_publication_revision": 2,
-  "mm_cmdb_receipt": "published",
-  "mm_location_increment_retry_count": 0,
-  "authenticated_workspace_read_seconds": 16.2
+  "live_ui": {
+    "status": "PASS",
+    "kind": "authenticated deployed frontend and API; no interception",
+    "checked": [
+      "live kickoff overview and sidebar",
+      "live port review page: ten rows",
+      "retired BOM shows application 404 without redirect",
+      "live authorized datacenter topology loaded"
+    ],
+    "fixture_requests": 0,
+    "inventory_requests": 0,
+    "page_errors": 0,
+    "mutations": false,
+    "screenshots": false,
+    "limits": "Application 404, not HTTP status 404; no FPS or concurrency measurement."
+  },
+  "limits": [
+    "Single HTTP timing samples, not P95/FPS/concurrency acceptance.",
+    "Suggested 1s/500KB summary and 2s all-query budgets not fully met.",
+    "Retired frontend URLs show application 404; SPA HTTP response may be 200."
+  ]
 }

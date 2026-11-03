@@ -1,12 +1,20 @@
 ## 唯一接续入口 · 2026-11-02 干净开发基线
 
 - **后续开发：`/home/ubuntu/keel-dev`，Git `dev`，应用目录 `dev/`。** `main`保留稳定整合基线，本轮kickoff新增功能在dev，未合并main。
-- 稳定基线9441a89已整合原开局与新版作业平台。本轮新kickoff继续在dev实现；当前5180/8081运行9a3e03b固定导出，原型5195及其他工作区保留。
+- 稳定基线9441a89已整合原开局与新版作业平台。本轮新kickoff继续在dev实现；当前5180/8081运行686e9ea固定发布（前端构建产物），原型5195及其他工作区保留。
 - GitHub `enzoOvOyu/keel-new`及本地仅保留main/dev。14个旧功能/修复/部署分支均已纳入后删除，10个无依赖旧工作区已移除；没有强制推送或删历史。
 - 原`keel-flows-dev`、`keel-kestra-ui-dev`、`keel-visualization-dev`只保留在线原型/依赖包/私有证书配置所需文件，已解除分支关联，**禁止在其中继续开发**。本次不迁移运行服务或删除其依赖。
-- 当前5180/8081已部署新kickoff固定发布9a3e03b，原型仍在5195。迁移048–051已应用；发布前备份及旧9441a89回退保留。详见docs/kickoff/DEPLOYMENT.json。
+- 当前5180/8081已部署智能开局整改686e9ea；原型5195及其他运行环境不变。本次未迁移数据库，保留原9a3e03b发布目录供回退。详见docs/kickoff/DEPLOYMENT.json。
 - 接续先读本节，再按`docs/REAL-API-CONTRACTS.md`、模块文档和`docs/flows-redesign/implementation.md`定位。不要再参考下方“独立作业分支/旧部署目录继续开发”的历史说明。
 - 清理清单与原分支SHA：`docs/git-baseline-20261102.json`；整合说明：`docs/integration-20261102.md`。既有未验收/真机限制维持原记录。
+
+## 最新里程碑事件：智能开局整改已部署并通过在线读取检查
+
+现5180/8081运行686e9ea，目录/home/ubuntu/.local/state/keel-deployments/kickoff-perf-686e9ea。前端使用已验证dist构建产物经原Vite工具提供服务，API代理、Cookie身份、原端口/配置/存储保留；旧9a3e03b目录作为回退。API运行二进制及前端index与发布文件一致。无迁移、资产导入或AI调用，项目数4→4；未合并main，其他端口和服务未动。
+
+经5180代理认证读取：workspace 2.105秒/1.151MB，端口第2页10条0.169秒，inventory首屏真实has_more/truncated；CMDB目录0.162秒；拓扑subgraph/matrix/connections均200，单次1.608/1.589/2.453秒，不再出现本次原5秒504。真实浏览器（未拦截API）已验证kickoff总览/侧栏、端口分页、旧BOM应用404无跳转、授权MM拓扑加载；fixture/inventory请求均0、页面异常0。
+
+在线读取和小范围浏览器验证已通过，但建议的1秒/500KB和所有拓扑2秒目标未全部达到，不宣称P95/FPS/并发或完整交付验收；旧地址是应用404而非服务端HTTP404。发布证据及回退入口：docs/kickoff/DEPLOYMENT.json；详细实测：docs/kickoff/PERFORMANCE-RESULT.json。下列“尚未部署”和“兼容跳转”条目保留历史过程，当前状态以本节为准。
 
 ## 最新里程碑事件：旧BOM前端及路由彻底退役
 

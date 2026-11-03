@@ -76,3 +76,5 @@ CMDB库存、来源、未知状态与拓扑性能整改见docs/CMDB-DOSSIER.md�
 旧BOM前端彻底退役增量：25个页面/组件/专属API文件删除；共享HTTP迁至lib/api/request.ts，Stage开局输入改读新kickoff，不运行旧前端handoff门禁。旧URL应用404，原有重定向协议检查已被新404检查取代。CMDB新事件、历史事件读取投影和来源链接均指向新开局，历史审计不改写。删除后的完整TS/Vite构建通过（Vite1m18），来源/分页只读核对通过。
 
 最终新协议回放PASS：旧URL保留地址并显示应用404，无兼容跳转；新kickoff分页、局部Drawer加载/失败/重试通过，独立页fixture/inventory请求0、页面异常0。不是服务端HTTP404/部署API/帧率验收。
+
+部署完成：686e9ea已发布至原5180/8081，固定dist及API二进制一致性通过；无迁移/新导入/AI调用。认证GET与真实浏览器子集检查通过，旧BOM应用404、MM拓扑正常返回。建议性能预算未全达，完整FPS/并发验收未执行，详见DEPLOYMENT.json。
