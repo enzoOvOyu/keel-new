@@ -244,7 +244,7 @@ Overview（阶段时间线/汇总）、Targets（目标矩阵）、Logs（实时
 - 产品名称固定为 **作业平台**。Flow、Execution是资源术语，保留`/flows`及既有API命名兼容，不把整个模块重新命名为Flows。
 - 用户已明确要求**直接复用Kestra开源前端组件、页面组织和UI/UX**，不是只借鉴颜色，也不是用React/shadcn重新画一套相似页面。不得再次以旧文档“不复制源码”为由退回自制界面。
 - 固定上游为Kestra `v2.0.7`、commit `49b62a2c820d37e98a1c7b63aa35fd83f960d4ec`。只复用Apache-2.0开源内容，保留LICENSE、来源和修改说明；不将上游locked/demo企业入口冒充可用功能，不替换Keel品牌。
-- [替换方案](flows-redesign/KESTRA-UI-REPLACEMENT.md)规定逐页替换、生命周期LC-01～14和上游源组件；[原任务](flows-redesign/keel-flows-module-build-spec.md)及同目录draw.io规定Keel业务覆盖。上游原生UI是实现与交互基准，不再按旧ASCII线框另造布局。
+- [替换方案](flows-redesign/KESTRA-UI-REPLACEMENT.md)规定逐页替换、生命周期LC-01～14和上游源组件；[原任务](archive/2026-11-03/keel-flows-module-build-spec.md)及同目录draw.io规定Keel业务覆盖。上游原生UI是实现与交互基准，不再按旧ASCII线框另造布局。
 - 当前开发分支、工作区和部署授权以[HANDOFF](../HANDOFF.md)及AGENTS.md为准；不从历史原型工作区继续业务开发。
 
 ### 10.2 原生模块与Keel边界
@@ -333,7 +333,7 @@ IA v2.3 顶栏品牌/环境/⌘K/通知/ProjectSwitcher/用户，左侧三分区
 
 ## IA v2.4 Mock 前端实施记录
 
-导航树、完整页面清单、路由/权限/作用域/加载策略、五/八Tab抽屉与API对照统一见 [IA24-IMPLEMENTATION-MATRIX.md](IA24-IMPLEMENTATION-MATRIX.md)。原FR-0…24、门禁、BOM与维护态规则保留。当前实现为前端Mock，不表示已实现Go/真实设备/真实AI。权威种子为 `fixtures/demo-full-64-b300/demo-seed.json`；原包83集合，补齐与规范化后集合数量以当前manifest为准，主项目硬件数量不变。结构检查、数据修复、契约与交互结果以IA24-*报告为准，无法采集/缺少证据保持unknown或阻断。
+导航树、完整页面清单、路由/权限/作用域/加载策略、五/八Tab抽屉与API对照统一见 [IA24-IMPLEMENTATION-MATRIX.md](archive/2026-11-03/IA24-IMPLEMENTATION-MATRIX.md)。原FR-0…24、门禁、BOM与维护态规则保留。当前实现为前端Mock，不表示已实现Go/真实设备/真实AI。权威种子为 `fixtures/demo-full-64-b300/demo-seed.json`；原包83集合，补齐与规范化后集合数量以当前manifest为准，主项目硬件数量不变。结构检查、数据修复、契约与交互结果以IA24-*报告为准，无法采集/缺少证据保持unknown或阻断。
 
 
 ## IA24-05 · 用户确认的GPU-NIC默认映射
@@ -342,19 +342,19 @@ IA v2.3 顶栏品牌/环境/⌘K/通知/ProjectSwitcher/用户，左侧三分区
 
 ## 当前六阶段主链路修正
 
-本轮用户明确废弃数字门禁作为主链。当前唯一业务顺序、状态机、逐目标放行、安全交接、独立BOM菜单与API约束以[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)为准。历史编号只按[DELIVERY-MIGRATION.md](DELIVERY-MIGRATION.md)追溯，不得用于解锁。验机失败关联统一Issues并定向复验；NCCL不反写验机；清理/归档/客户签署齐全后才进入维护态。NP仍是网络内部断言。当前仅前端Mock与契约实现，没有真实设备后端。
+本轮用户明确废弃数字门禁作为主链。当前唯一业务顺序、状态机、逐目标放行、安全交接、独立BOM菜单与API约束以[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)为准。历史编号只按[DELIVERY-MIGRATION.md](archive/2026-11-03/DELIVERY-MIGRATION.md)追溯，不得用于解锁。验机失败关联统一Issues并定向复验；NCCL不反写验机；清理/归档/客户签署齐全后才进入维护态。NP仍是网络内部断言。当前仅前端Mock与契约实现，没有真实设备后端。
 
 
 ## 单柜详情工作区增补
 
-固定单柜窄画布、左侧层级导航和右侧八Tab为本轮布局要求；交互、API、元数据、Mock来源及待执行验收见[RACK-WORKSPACE.md](RACK-WORKSPACE.md)。资产/位置和既有安全模型不变。右侧按需加载，不以缺失指标显示正常。当前构建/浏览器验证按用户安排等待统一执行。
+固定单柜窄画布、左侧层级导航和右侧八Tab为本轮布局要求；交互、API、元数据、Mock来源及待执行验收见[RACK-WORKSPACE.md](archive/2026-11-03/RACK-WORKSPACE.md)。资产/位置和既有安全模型不变。右侧按需加载，不以缺失指标显示正常。当前构建/浏览器验证按用户安排等待统一执行。
 
 
 ## Fabric Topology 增补
 
 Topology采用左侧主画布+右侧详情。Physical/Logical双视图切换保留筛选、设备与线缆上下文。规划虚线，观测实线；healthy绿、warning黄、critical红、unknown灰、planned蓝，配合文本。选中线缆高亮双端/路径，无关对象降低亮度；端口详情内联，设备详情使用唯一共享Drawer。
 
-完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。
+完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](archive/2026-11-03/FABRIC-TOPOLOGY.md)。
 
 
 ### Rack Mapping：所选设备关联追溯（当前定义）
@@ -375,11 +375,11 @@ Fabric无损、交换机无损抽屉、Topology健康详情、机柜Network共�
 
 CMDB左树+主工作区，五视图共享asset/filter URL。目录按类型字段呈现独立交付/维护/健康/完整性；关系采用React Flow+右侧来源/逐层展开面板，不重建拓扑引擎。设备沿用唯一五/八Tab抽屉，原始证据用Dialog。质量条目直接定位来源，不堆统计卡。
 
-唯一详细设计与模型边界见[CMDB-DOSSIER.md](CMDB-DOSSIER.md)。
+唯一详细设计与模型边界见[CMDB-DOSSIER.md](modules/cmdb.md)。
 
 ## BOM 真实开发增补
 
-用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。
+用户已授权在 `dev/` 真实实现 BOM 模块。数据与权限边界、版本/审核/Outbox、真实六步工作台及运行验收统一见 [BOM-REAL-DESIGN.md](archive/2026-11-03/BOM-REAL-DESIGN.md)。FR-2.1 和唯一 BOM/资产身份保持；其他模块的 Mock 状态不因本模块接入而视为后端已完成。实际通过范围以 BOM-REAL-ACCEPTANCE.json 为准。
 
 ## 2026-10-30 · 统一登录与身份管理
 
@@ -388,15 +388,15 @@ CMDB左树+主工作区，五视图共享asset/filter URL。目录按类型字�
 
 ## BOM Intelligence Agent 当前实施（2026-10-30）
 
-本轮仅 AI 智能识别：上传→真实分析进度→分类审核→确认入库。交换机/端接优先，单主编排器+Workbook IR 工具+独立 Schema/来源/覆盖校验。当前范围替代此前 BOM 双模式/六步 UI 描述，历史数据不删除；详细字段、状态、API、安全和验证边界统一见 [BOM-WORKBENCH-V2.md](BOM-WORKBENCH-V2.md)。保留 FR-2.1、项目权限、唯一资产身份和原事务 Outbox。完整导入入库闭环由用户验收；不以旧报告宣称当前通过。
+本轮仅 AI 智能识别：上传→真实分析进度→分类审核→确认入库。交换机/端接优先，单主编排器+Workbook IR 工具+独立 Schema/来源/覆盖校验。当前范围替代此前 BOM 双模式/六步 UI 描述，历史数据不删除；详细字段、状态、API、安全和验证边界统一见 [BOM-WORKBENCH-V2.md](archive/2026-11-03/BOM-WORKBENCH-V2.md)。保留 FR-2.1、项目权限、唯一资产身份和原事务 Outbox。完整导入入库闭环由用户验收；不以旧报告宣称当前通过。
 
 ## 2026-10-31 · 数据中心可视化 V3（设计评审）
 
-四页采用“Cluster/Hybrid、Fabric Flow、Connection Matrix、Metro + Tree/Table”的差异化工作区。默认正文占满宽度，选择对象才显示证据栏；继承现有字体、颜色与间距，不增加一排重复 KPI 卡片。束的交叉不等于连接、矩阵空格不等于正常、证据状态不并入位置/数量。完整视觉编码、密度与选择规则以 [topology.md §4、§6、§14](topology.md#4-四个模块的页面设计v3-权威方向) 为准，**不改变全局设计令牌或正式页面**。机柜不在本轮设计范围。
+四页采用“Cluster/Hybrid、Fabric Flow、Connection Matrix、Metro + Tree/Table”的差异化工作区。默认正文占满宽度，选择对象才显示证据栏；继承现有字体、颜色与间距，不增加一排重复 KPI 卡片。束的交叉不等于连接、矩阵空格不等于正常、证据状态不并入位置/数量。完整视觉编码、密度与选择规则以 [topology.md §4、§6、§14](archive/2026-11-03/topology.md#4-四个模块的页面设计v3-权威方向) 为准，**不改变全局设计令牌或正式页面**。机柜不在本轮设计范围。
 
 ## 2026-10-31 · 机柜可视化设计原型
 
-后续独立机柜设计以 [rack-visualization.md §4–6](rack-visualization.md#4-信息架构与交互) 为准：Gallery、Spatial、Dual 与剖面共用几何；安装面未知标注、深度未定界；整体范围与端口细节联动；Asset/Capacity/Compute 依数据启用；Front 选择打开资产与安装，Rear 选择打开端口与连接，同一设备 ID 与上下文同步；规划/实装缺少合格快照时隐藏入口，按数据能力逐级开放，规则见该文档 §4.4。新增样式限定于机柜原型路由及 rack-viz/rv-*/sr-*，继承全局 token，未更改正式页面或其他四个拓扑原型。
+后续独立机柜设计以 [rack-visualization.md §4–6](archive/2026-11-03/rack-visualization.md#4-信息架构与交互) 为准：Gallery、Spatial、Dual 与剖面共用几何；安装面未知标注、深度未定界；整体范围与端口细节联动；Asset/Capacity/Compute 依数据启用；Front 选择打开资产与安装，Rear 选择打开端口与连接，同一设备 ID 与上下文同步；规划/实装缺少合格快照时隐藏入口，按数据能力逐级开放，规则见该文档 §4.4。新增样式限定于机柜原型路由及 rack-viz/rv-*/sr-*，继承全局 token，未更改正式页面或其他四个拓扑原型。
 
 机房空间模式使用主 3D 画布与紧凑右侧机柜详情；颜色仅映射有来源的 U 占用率，选择态使用当前主题主强调色，容量语义色保持独立。机柜标签与同一资产立面联动，未知坐标用“示意排布”明确标记。此模式替换阵列“空间”展示，单柜几何/双面/Mapping 与原主题令牌保持不变，详见 rack-visualization.md §4.1a。
 

@@ -5,7 +5,7 @@
 ## 当前应用与依赖
 
 - 前端：`dev/`，React + TypeScript + Vite；安装及构建为 `cd dev && npm ci && npm run build`。
-- 后端：`dev/backend/`，Go；配置、启动和显式迁移见 [部署说明](docs/DEPLOYMENT.md)。凭据和原始Excel不入Git。
+- 后端：`dev/backend/`，Go；配置、启动和显式迁移见 [部署说明](docs/archive/2026-11-03/DEPLOYMENT.md)。凭据和原始Excel不入Git。
 - 根 `compose.yaml` 只提供PostgreSQL、Redis、MinIO。按需启动：`docker compose up -d postgres redis minio`；不再提供旧Web/Demo入口。不要为整理Git执行down或删除数据卷。
 - 当前服务仍为5180前端、8081 API、5181独立设计原型；运行工作区及二进制独立于Git分支，本次整理没有重启或迁移它们。新的dev工作区不会自动成为已部署环境。
 - 统一契约与真实实现范围见 [真实API入口](docs/REAL-API-CONTRACTS.md)。未接真实后端的领域继续使用dev中明确标记的Mock Adapter及现有fixtures。

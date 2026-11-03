@@ -1,0 +1,54 @@
+# 智能开局 Kickoff · 当前实现定版
+
+基准：dev 源码 `686e9ea`，主环境 5180/8081 已发布同版本；最新证据登记 `ed2c2c4`。本页以已实现结果定版，不再沿旧 BOM 四步/五步方案开发。
+
+## 产品与闭环
+
+资料接入 → 工程事实与输入建模 → 对象核对 → 有效范围确认入库 → CMDB 回执与版本追溯 → 持续补充。
+
+核心是把有来源的工程对象正确录入 CMDB。布线计算、功率、完整几何和网络配置可以后补，不作为所有资产的统一前置门槛；身份、端点等关键冲突只阻断受影响范围。规划数量不能伪造成实物设备。
+
+## 页面与交互
+
+入口 `/p/:projectId/kickoff/overview`，统一 Shell、ProjectContext、RBAC。旧 BOM 菜单、页面与 URL 已退役，旧地址显示应用404，不重定向；历史后端和资产不删除。
+
+| 页面 | 已实现行为 |
+|---|---|
+| overview | 工作区摘要、真实入库版本、缺口/建议动作、活动；机柜/Fabric/装机区域链接既有模块，不伪造后置完成 |
+| sources | MinIO 资料、摘要复用、附件移除、历史区域与来源；新文件等待 Agent，不能显示假解析结果 |
+| review | 设备/组件/端口/连接/落位，服务器分页/筛选/排序、局部核对、按对象加载来源 Drawer |
+| publish | 服务端完整范围预览、冻结闭包、确认、Outbox 状态/回执、历史差异与导出；排队不是入库完成 |
+| models/facility | 场地/机房/机柜、型号几何、设备位置；缺高度/容量保持未知 |
+| models/network | 网络域/角色、管理接入、接口、地址/ASN、协议/策略的版本化工程输入 |
+| models/provisioning | 启动身份、镜像、磁盘与架构等装机准备输入 |
+| models/cabling | 路径/规格/规则输入、确定性路径/引线/余量/标准长度计算；无规则不造线长 |
+| models/power | 功率、回路和容量输入；逐柜规划负荷、剩余容量、缺失与超限报告 |
+
+23 张输入表支持编辑、XLSX/CSV 预览/导入导出和未知列反馈。保存、计算、分页和 Drawer 按需加载；summary 不携带全部端口/连接，切换修订后清旧分页，不混版本。预览按服务端完整闭包计算，不以当前浏览器页作为总范围。
+
+## 事实、版本与集成
+
+- 复用 `eng_entity`、类型化工程版本、稳定资产 ID 和已有 ProjectEngineering 投影，不建第二 BOM/资产身份。
+- 源文件在 MinIO；工程输入不可变版本化。范围发布冻结 device/port/component/connection/placement/facility/location 引用，经同事务 Outbox 幂等投影，读取 CMDB 回执才标 published。
+- 已知机柜/start-U 可独立以 planned 发布，缺高度/柜容量仍为 needs_input，不计完整几何占位。后续输入变化不改写历史回执。
+- 历史复用限同项目不可变资料和已保存候选，保留原证据/修订；不再次调用 AI，不等于新资料识别能力。
+- 网络/装机/电力输入当前保留版本和规划关联；这不等于 Fabric 所需完整 Published NetworkPlan，更不等于设备已配置。
+
+## API 与代码入口
+
+[当前 API](../api/kickoff.md)；[OpenAPI](../openapi.yaml) 的 Kickoff*；[真实登记](../api/real-api-registry.json)。
+
+- [页面](../../dev/src/features/kickoff)、[Provider](../../dev/src/lib/api/kickoff)。
+- [HTTP 入口](../../dev/backend/cmd/api/kickoff.go)、[发布事务](../../dev/backend/cmd/api/kickoff_publication.go)、[领域计算](../../dev/backend/internal/kickoff)。
+- 相关迁移048–051；旧工程存储复用边界见[工程契约](../api/engineering.md)。
+- 批准的详细页面/输入基准：[原型说明](../../kickoff/OPTIMIZATION.txt)、[接入边界](../../kickoff/CONTRACTS.txt)。原型本地 Provider 不是正式后端。
+
+## 已验证和剩余
+
+| 已有证据 | 可以确认的范围 |
+|---|---|
+| [BACKEND-CHECK](../kickoff/BACKEND-CHECK.json)、[UI-CHECK](../kickoff/UI-CHECK.json) | 定向隔离集成、9页/23表/交互协议回放；不能当作全部真实页面写入验收 |
+| [MM-HISTORY-CHECK](../kickoff/MM-HISTORY-CHECK.json) | 历史候选入库：971设备、14308端口、7154双端连接；967已知位置关联59柜；精确几何占位0 |
+| [DEPLOYMENT](../kickoff/DEPLOYMENT.json)、[PERFORMANCE-RESULT](../kickoff/PERFORMANCE-RESULT.json) | 686e9ea 在线只读 API 及关键页面、分页、旧URL应用404；非 P95/FPS/并发验收 |
+
+新 Agent 未开发，analyze 明确503；历史候选组件0、4台通用设备待补类型，不声称新资料覆盖。布线 needs_input、电力 partial、缺几何继续如实显示。建议1s/500KB摘要和全部拓扑2s目标未全部达到。以上为后续明确缺口，不自动扩展本次任务。

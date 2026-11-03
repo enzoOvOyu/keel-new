@@ -28,4 +28,4 @@
 - [垂直俯视](screenshots-room/top-1600.png)
 - [1440px 适配](screenshots-room/oblique-1440.png)
 
-设计与参考出处统一见 [rack-visualization.md §4.1a](../rack-visualization.md#41a-机柜阵列--空间机房-3d-总览)。
+设计与参考出处统一见 [rack-visualization.md §4.1a](../archive/2026-11-03/rack-visualization.md#41a-机柜阵列--空间机房-3d-总览)。

@@ -1,3 +1,5 @@
+保留设计/原型资料：未实现部分继续作为Fabric后续需求。当前真实分支状态见 docs/modules/fabric.md，接口见 docs/api/fabric.md。下文SIMULATION_ONLY仅指独立5194原型，不代表真实分支或主环境已实现。
+
 Keel Fabric Provisioning · 产品架构与交互分析 v1
 2026-11-02 · 本地高保真前端原型，SIMULATION_ONLY
 依据：用户 Fabric Provisioning & Configuration Orchestration Design Brief v1.0。

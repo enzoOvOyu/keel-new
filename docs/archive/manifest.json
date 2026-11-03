@@ -1,0 +1,605 @@
+{
+  "date": "2026-11-03",
+  "baseline": "ed2c2c4",
+  "scope": "Documentation only; current five modules, legacy archive, no application or OpenAPI changes",
+  "preserved": "All prototype executable files, current evidence, and exact report paths referenced by scripts/fixtures remain in place",
+  "entries": [
+    {
+      "previous_path": "docs/PRD.md",
+      "current_path": "docs/archive/2026-11-03/PRD.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/SYSTEM-DESIGN.md",
+      "current_path": "docs/archive/2026-11-03/SYSTEM-DESIGN.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/DATA-DICTIONARY.md",
+      "current_path": "docs/archive/2026-11-03/DATA-DICTIONARY.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/ARCHITECTURE.md",
+      "current_path": "docs/archive/2026-11-03/ARCHITECTURE.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/DOMAIN-API-CONTRACTS.md",
+      "current_path": "docs/archive/2026-11-03/DOMAIN-API-CONTRACTS.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/IMPLEMENTATION-PLAN.md",
+      "current_path": "docs/archive/2026-11-03/IMPLEMENTATION-PLAN.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/ACCEPTANCE.md",
+      "current_path": "docs/archive/2026-11-03/ACCEPTANCE.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/TEST-STRATEGY.md",
+      "current_path": "docs/archive/2026-11-03/TEST-STRATEGY.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/DEPLOYMENT.md",
+      "current_path": "docs/archive/2026-11-03/DEPLOYMENT.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/WORK-QUEUE.md",
+      "current_path": "docs/archive/2026-11-03/WORK-QUEUE.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/UI-FLOWS.md",
+      "current_path": "docs/archive/2026-11-03/UI-FLOWS.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/IA-V2.3.md",
+      "current_path": "docs/archive/2026-11-03/IA-V2.3.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/IA-V2.4.md",
+      "current_path": "docs/archive/2026-11-03/IA-V2.4.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/IA24-IMPLEMENTATION-MATRIX.md",
+      "current_path": "docs/archive/2026-11-03/IA24-IMPLEMENTATION-MATRIX.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/IA-V2.4-MOCK-COVERAGE.md",
+      "current_path": "docs/archive/2026-11-03/IA-V2.4-MOCK-COVERAGE.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/BOM-REAL-DESIGN.md",
+      "current_path": "docs/archive/2026-11-03/BOM-REAL-DESIGN.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/BOM-WORKBENCH-V2.md",
+      "current_path": "docs/archive/2026-11-03/BOM-WORKBENCH-V2.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/BOM-REAL-IMPLEMENTATION-STATUS.md",
+      "current_path": "docs/archive/2026-11-03/BOM-REAL-IMPLEMENTATION-STATUS.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/BOM-AGENT-VALIDATION.md",
+      "current_path": "docs/archive/2026-11-03/BOM-AGENT-VALIDATION.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/DESIGN-ALIGNMENT-AUDIT.md",
+      "current_path": "docs/archive/2026-11-03/DESIGN-ALIGNMENT-AUDIT.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/FABRIC-TOPOLOGY.md",
+      "current_path": "docs/archive/2026-11-03/FABRIC-TOPOLOGY.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/RACK-DIAGRAM.md",
+      "current_path": "docs/archive/2026-11-03/RACK-DIAGRAM.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/RACK-WORKSPACE.md",
+      "current_path": "docs/archive/2026-11-03/RACK-WORKSPACE.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/DELIVERY-MIGRATION.md",
+      "current_path": "docs/archive/2026-11-03/DELIVERY-MIGRATION.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/topology.md",
+      "current_path": "docs/archive/2026-11-03/topology.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/rack-visualization.md",
+      "current_path": "docs/archive/2026-11-03/rack-visualization.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/NETBOM-REAL-ACCEPTANCE.json",
+      "current_path": "docs/archive/evidence/NETBOM-REAL-ACCEPTANCE.json",
+      "kind": "archive_move",
+      "sha256": "9d9feec394e262ace20625787f11951596d390217f685dc6e8c0a4163db88eef"
+    },
+    {
+      "previous_path": "docs/CMDB-COLUMNS-CHECK.json",
+      "current_path": "docs/archive/evidence/CMDB-COLUMNS-CHECK.json",
+      "kind": "archive_move",
+      "sha256": "0e7f2a71212500dc1d3117ab78f1ed11970c629e8ba371a75fd7eae3c45cef6c"
+    },
+    {
+      "previous_path": "docs/TOPOLOGY-DATA-NORMALIZATION.json",
+      "current_path": "docs/archive/evidence/TOPOLOGY-DATA-NORMALIZATION.json",
+      "kind": "archive_move",
+      "sha256": "adbc1e0b351c955ff301dd1f676f96e2e3326665d2e9cebe0e220fe97180f363"
+    },
+    {
+      "previous_path": "docs/TOPOLOGY-RACK-SMOKE.json",
+      "current_path": "docs/archive/evidence/TOPOLOGY-RACK-SMOKE.json",
+      "kind": "archive_move",
+      "sha256": "adfeb8517ede8c5a17c3cadb4801e443aa48ce886cb64c3273b8b532e9e00e6f"
+    },
+    {
+      "previous_path": "docs/CMDB-DOSSIER-VALIDATION.json",
+      "current_path": "docs/archive/evidence/CMDB-DOSSIER-VALIDATION.json",
+      "kind": "archive_move",
+      "sha256": "4507070e8426bb4861f7027d48434fdb45b15e1af9651cd83871cfd4e7bba0ae"
+    },
+    {
+      "previous_path": "docs/CMDB-DRAWER-CACHE-CHECK.json",
+      "current_path": "docs/archive/evidence/CMDB-DRAWER-CACHE-CHECK.json",
+      "kind": "archive_move",
+      "sha256": "fc85ea1ab14781899ca391402e1295042784aa5a2ff599fe7fabcb754a9283f3"
+    },
+    {
+      "previous_path": "docs/IMPLEMENTATION-STATUS.json",
+      "current_path": "docs/archive/evidence/IMPLEMENTATION-STATUS.json",
+      "kind": "archive_move",
+      "sha256": "bd7fa0b864c09cad64684887d5afadef6b9174c3703f80da6da7311645d80450"
+    },
+    {
+      "previous_path": "docs/OPERATIONS-OPENAPI-LINT.json",
+      "current_path": "docs/archive/evidence/OPERATIONS-OPENAPI-LINT.json",
+      "kind": "archive_move",
+      "sha256": "201737be7b0a80a6f166e2e1b6f6ecdda8eb91ec58a3a91b748645b8f1284289"
+    },
+    {
+      "previous_path": "docs/DELIVERY-MIGRATION.json",
+      "current_path": "docs/archive/evidence/DELIVERY-MIGRATION.json",
+      "kind": "archive_move",
+      "sha256": "83bc9c730524310661a142e4669a696847c6001399a57dcc1bc14fea7dd2f2da"
+    },
+    {
+      "previous_path": "docs/IA-V2.3-CHECK.json",
+      "current_path": "docs/archive/evidence/IA-V2.3-CHECK.json",
+      "kind": "archive_move",
+      "sha256": "8eb6248fac03b2afb44aa0ddc678aae379b212ed2c72fbfa61b18e24803e3f0e"
+    },
+    {
+      "previous_path": "docs/BOM-AGENT-CORRECTNESS-20261031.json",
+      "current_path": "docs/archive/evidence/BOM-AGENT-CORRECTNESS-20261031.json",
+      "kind": "archive_move",
+      "sha256": "be41588d13aea8b4072cce03c8d414c79f42d9585158fb0c6b54948def98072e"
+    },
+    {
+      "previous_path": "docs/OPERATIONS-CONSISTENCY.json",
+      "current_path": "docs/archive/evidence/OPERATIONS-CONSISTENCY.json",
+      "kind": "archive_move",
+      "sha256": "bbc2c56f1788651ea9f07b86034512939aec559d2da50d82160990fe61e45240"
+    },
+    {
+      "previous_path": "docs/DELIVERY-CONSISTENCY-STATUS.json",
+      "current_path": "docs/archive/evidence/DELIVERY-CONSISTENCY-STATUS.json",
+      "kind": "archive_move",
+      "sha256": "82ab809caa41185139ab2724ead3c6b686fcb0ee256d27bb3542a69ae6302079"
+    },
+    {
+      "previous_path": "docs/BOM-REAL-ACCEPTANCE.json",
+      "current_path": "docs/archive/evidence/BOM-REAL-ACCEPTANCE.json",
+      "kind": "archive_move",
+      "sha256": "4da5dcef62e11ee1101ad66d75ebda28b12bb8f4f4204d49cb9b356180f94a12"
+    },
+    {
+      "previous_path": "docs/git-baseline-20261102.json",
+      "current_path": "docs/archive/evidence/git-baseline-20261102.json",
+      "kind": "archive_move",
+      "sha256": "73b263e916cd9b68a4df4d6dac630a8fa72b0d6f263bfe93823b3204f1758822"
+    },
+    {
+      "previous_path": "docs/NETBOM-STRUCTURE-REPORT.json",
+      "current_path": "docs/archive/evidence/NETBOM-STRUCTURE-REPORT.json",
+      "kind": "archive_move",
+      "sha256": "418167b653ee1218b5d90c98cddef126b0704c8bd59f72c119d2030d60020e1c"
+    },
+    {
+      "previous_path": "docs/LOSSLESS-VALIDATION.json",
+      "current_path": "docs/archive/evidence/LOSSLESS-VALIDATION.json",
+      "kind": "archive_move",
+      "sha256": "1a00258b8c18c19b5af2629d83a02cfb79a601365304ec4a5b5532186ff58061"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/FIVE-STEP-REFACTOR-PLAN.txt",
+      "current_path": "docs/archive/intelligent-deployment/FIVE-STEP-REFACTOR-PLAN.txt",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/NETWORK-STANDARD-TEST-20261102.json",
+      "current_path": "docs/archive/intelligent-deployment/NETWORK-STANDARD-TEST-20261102.json",
+      "kind": "archive_move",
+      "sha256": "672fea8594721c876ab6d4903b6e806086e301c1b913a2caa6bb4dc1e8a7d615"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/RESEARCH-BACKED-IMPLEMENTATION-20261101.txt",
+      "current_path": "docs/archive/intelligent-deployment/RESEARCH-BACKED-IMPLEMENTATION-20261101.txt",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/p0-audit.json",
+      "current_path": "docs/archive/intelligent-deployment/p0-audit.json",
+      "kind": "archive_move",
+      "sha256": "e8cf638548b23b76facea67ecd02353fcd4cbce9c5daec0f413cbb84f0484d58"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/DEPLOYMENT-FIXED-STEPS-20261102.json",
+      "current_path": "docs/archive/intelligent-deployment/DEPLOYMENT-FIXED-STEPS-20261102.json",
+      "kind": "archive_move",
+      "sha256": "8f1497b1811708351445acc3add7c43a5f56058369430d6ed24963f1e155d0ee"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/S3-CONNECTIVITY.txt",
+      "current_path": "docs/archive/intelligent-deployment/S3-CONNECTIVITY.txt",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/ENDPOINT-PLACEMENT-REPLAY-20261102.json",
+      "current_path": "docs/archive/intelligent-deployment/ENDPOINT-PLACEMENT-REPLAY-20261102.json",
+      "kind": "archive_move",
+      "sha256": "0a3499df2e332560e18ec4b15b0eefa2528caeae5e6d9b07aa8fc7d8ba17ac59"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/STEP1-PAGE-REPAIR-20261102.json",
+      "current_path": "docs/archive/intelligent-deployment/STEP1-PAGE-REPAIR-20261102.json",
+      "kind": "archive_move",
+      "sha256": "e3eb39a2408e4eeab1566ee6778df5ad3c7836656666e2abf9d6c5ac8035014a"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/deployment-20261101.json",
+      "current_path": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "kind": "archive_move",
+      "sha256": "943c0e75b88db5de35bd11cb0668502e97da81189b137c7f456f5f9d44374644"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/P0-REVIEW.txt",
+      "current_path": "docs/archive/intelligent-deployment/P0-REVIEW.txt",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/ultra-model-test-20261101.json",
+      "current_path": "docs/archive/intelligent-deployment/ultra-model-test-20261101.json",
+      "kind": "archive_move",
+      "sha256": "74c8d1f36dee7492818fb19aed43cdc69ae1c01f291f0b841ff61917d3b566ed"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/MM-STEP1-CLEANUP-AGENT-VERIFICATION-20261102.json",
+      "current_path": "docs/archive/intelligent-deployment/MM-STEP1-CLEANUP-AGENT-VERIFICATION-20261102.json",
+      "kind": "archive_move",
+      "sha256": "215e74e38b6864a007810adbf01f6a4a97d5690ca0824d5129f17a993a9fe55a"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/P1-DESIGN.txt",
+      "current_path": "docs/archive/intelligent-deployment/P1-DESIGN.txt",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/AGENT-RELEASE-20261102.json",
+      "current_path": "docs/archive/intelligent-deployment/AGENT-RELEASE-20261102.json",
+      "kind": "archive_move",
+      "sha256": "f4b6213fead41978597e17c292ee1a16b4d1d0c56744dd28c53c15e8f6bf661f"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/DEPLOYMENT-FIVE-STEP-CHAIN-20261102.json",
+      "current_path": "docs/archive/intelligent-deployment/DEPLOYMENT-FIVE-STEP-CHAIN-20261102.json",
+      "kind": "archive_move",
+      "sha256": "d1b43b2e347891adec1a6d06cb5871248ddd4e98a4e35103a54f619fc8e514f7"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/p0-numeric-observations.json",
+      "current_path": "docs/archive/intelligent-deployment/p0-numeric-observations.json",
+      "kind": "archive_move",
+      "sha256": "222fbeaff6385a19123de2ee57d7679b0c4957ee1b7f81f4194429bf3bbe53bd"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/OPTIONAL-CONFIG-20261102.json",
+      "current_path": "docs/archive/intelligent-deployment/OPTIONAL-CONFIG-20261102.json",
+      "kind": "archive_move",
+      "sha256": "dac1349d51392c5e35ccc4ad7962d160edb9c495f6c2e44e2b9ae74e432ed566"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/p0-workbook-profile.json",
+      "current_path": "docs/archive/intelligent-deployment/p0-workbook-profile.json",
+      "kind": "archive_move",
+      "sha256": "e70439f8472eb99b4da6e041f9fb3bb7ac248b464ff772467c77f9ba9eed2e42"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/MM-SN-MAC-REPAIR-RELEASE-20261102.json",
+      "current_path": "docs/archive/intelligent-deployment/MM-SN-MAC-REPAIR-RELEASE-20261102.json",
+      "kind": "archive_move",
+      "sha256": "99a7b98dbae650392ce47bfa86fb3ed0cabac5c188fdfa68e4d1f098c1b99b49"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/MM-SN-MAC-POSTFIX-20261102.json",
+      "current_path": "docs/archive/intelligent-deployment/MM-SN-MAC-POSTFIX-20261102.json",
+      "kind": "archive_move",
+      "sha256": "97869f2ee1e275c79d6a13d0d2a9ca48b687dcb9e9cc7e4568fb6b936b4c7d91"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/ultra-repair-test-20261101.json",
+      "current_path": "docs/archive/intelligent-deployment/ultra-repair-test-20261101.json",
+      "kind": "archive_move",
+      "sha256": "070623f150d85e872524e1796f5dcf58a4558492d3739a9cab2051fa1b14ba18"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/POWER-STANDARD-TEST-20261102.json",
+      "current_path": "docs/archive/intelligent-deployment/POWER-STANDARD-TEST-20261102.json",
+      "kind": "archive_move",
+      "sha256": "ec8440018cbe0ec0218cdf1b9f341113caab9aceabbca30291760ee108359632"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/FIXED-STEP-XLSX-TEST-20261101.json",
+      "current_path": "docs/archive/intelligent-deployment/FIXED-STEP-XLSX-TEST-20261101.json",
+      "kind": "archive_move",
+      "sha256": "8c6dfe83d6bd854d27947c0f410275e88ff8bdcb4c2c28ccb97b2462e5052412"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/implementation.json",
+      "current_path": "docs/archive/intelligent-deployment/implementation.json",
+      "kind": "archive_move",
+      "sha256": "e021756746289d957f7bd229a5e2f0a5fa1ba5f7d34d43dd89774a916a97ae16"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/MM-SN-AGENT-TEST-20261102.json",
+      "current_path": "docs/archive/intelligent-deployment/MM-SN-AGENT-TEST-20261102.json",
+      "kind": "archive_move",
+      "sha256": "5fd21036c670018740bcbf4c729314643a5a53060e8c9e0d7bfd74bf373bbccb"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/deployment-agent-repair-20261101.json",
+      "current_path": "docs/archive/intelligent-deployment/deployment-agent-repair-20261101.json",
+      "kind": "archive_move",
+      "sha256": "10119898fe64176ec23e65fae87152c8a97ea7afdf583359360cb617dfca657e"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/MM-SN-MAC-FIXTURE-20261102.json",
+      "current_path": "docs/archive/intelligent-deployment/MM-SN-MAC-FIXTURE-20261102.json",
+      "kind": "archive_move",
+      "sha256": "696f1478acb0922aa9f1b760d1a70daf2fd321b77a4771ecd47df5fec03fd1e2"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/S1-WORKBENCH.txt",
+      "current_path": "docs/archive/intelligent-deployment/S1-WORKBENCH.txt",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/MM-SN-MAC-BASELINE-20261102.json",
+      "current_path": "docs/archive/intelligent-deployment/MM-SN-MAC-BASELINE-20261102.json",
+      "kind": "archive_move",
+      "sha256": "089015009d2052ad1b6c65eadb00acd91918ecc00534ac3814c65593b0607387"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/SOURCE-UNDERSTANDING-REVIEW-20261101.txt",
+      "current_path": "docs/archive/intelligent-deployment/SOURCE-UNDERSTANDING-REVIEW-20261101.txt",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/intelligent-deployment/agent-repair-test-20261101.json",
+      "current_path": "docs/archive/intelligent-deployment/agent-repair-test-20261101.json",
+      "kind": "archive_move",
+      "sha256": "99f523210461d067510b782f980f70342578a4ab29f99f0d9c270ac70b0fbde1"
+    },
+    {
+      "previous_path": "docs/topology/bom-v5-deployment-20261031.json",
+      "current_path": "docs/archive/evidence/topology/bom-v5-deployment-20261031.json",
+      "kind": "archive_move",
+      "sha256": "b0ee38c3d40ba616d063032dd86f415e1e2731e5d116347dd993a297a8b3a09d"
+    },
+    {
+      "previous_path": "docs/topology/bom-closure-root-cause-retest-20261031.json",
+      "current_path": "docs/archive/evidence/topology/bom-closure-root-cause-retest-20261031.json",
+      "kind": "archive_move",
+      "sha256": "a54529578f7071cabb6bb67083b0dd97574d60916559f88ecdf03ea1c38f6036"
+    },
+    {
+      "previous_path": "docs/topology/bom-import-acceptance-20261031.json",
+      "current_path": "docs/archive/evidence/topology/bom-import-acceptance-20261031.json",
+      "kind": "archive_move",
+      "sha256": "112eca24b38eea8712176e180b7d1bb3cf086d75ee20003842627c7e0e5faeb9"
+    },
+    {
+      "previous_path": "docs/topology/project-deletion-deployment-20261031.json",
+      "current_path": "docs/archive/evidence/topology/project-deletion-deployment-20261031.json",
+      "kind": "archive_move",
+      "sha256": "30d0f33cde84a8355392eb734ec430ef825a48c61843c4bd66d34089cf735c21"
+    },
+    {
+      "previous_path": "docs/topology/bom-root-fixes-20261031.json",
+      "current_path": "docs/archive/evidence/topology/bom-root-fixes-20261031.json",
+      "kind": "archive_move",
+      "sha256": "865c3c0813aabe748172ee987ddde89576890de50ce33a93dab1fa56355a1832"
+    },
+    {
+      "previous_path": "docs/topology/bom-source-closure-fixes-20261031.json",
+      "current_path": "docs/archive/evidence/topology/bom-source-closure-fixes-20261031.json",
+      "kind": "archive_move",
+      "sha256": "09390c617342401c79e7f383e94ebf36f8aa89b8dbba0de6bc51a821a37374e8"
+    },
+    {
+      "previous_path": "docs/topology/bom-v5-live-test-20261031.json",
+      "current_path": "docs/archive/evidence/topology/bom-v5-live-test-20261031.json",
+      "kind": "archive_move",
+      "sha256": "2d227355506a2d836eb80b7723d00fab0b2ec879fed4540b63751b392f526a51"
+    },
+    {
+      "previous_path": "docs/topology/bom-real-subset-acceptance-20261031.json",
+      "current_path": "docs/archive/evidence/topology/bom-real-subset-acceptance-20261031.json",
+      "kind": "archive_move",
+      "sha256": "59ec179465c0630e2f12f98ba57d51c47e5705829ee94ad6c54ce6c9b5499ea3"
+    },
+    {
+      "previous_path": "docs/topology/test-project-cleanup-20261031.json",
+      "current_path": "docs/archive/evidence/topology/test-project-cleanup-20261031.json",
+      "kind": "archive_move",
+      "sha256": "d15acb1b2ca40c0c8b04097579b2233abb9f57e4a50e738abfa59158d0a8c9f5"
+    },
+    {
+      "previous_path": "docs/topology/agent-deployment-20261031.json",
+      "current_path": "docs/archive/evidence/topology/agent-deployment-20261031.json",
+      "kind": "archive_move",
+      "sha256": "305ab27bd6342ca4e1607e4a9b0777e51f0fc83749c59e4b8f2ccc2e8fcbba28"
+    },
+    {
+      "previous_path": "docs/topology/bom-test-model-approval-proposal-20261031.json",
+      "current_path": "docs/archive/evidence/topology/bom-test-model-approval-proposal-20261031.json",
+      "kind": "archive_move",
+      "sha256": "1358d07fa29b3b1f6e6543ebce07cb4b988d282a6cc8a92bd6a0d5b5e2ed7a5e"
+    },
+    {
+      "previous_path": "docs/topology/project-deletion-20261031.md",
+      "current_path": "docs/archive/evidence/topology/project-deletion-20261031.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/CMDB-REAL-ACCEPTANCE.md",
+      "current_path": "docs/archive/2026-11-03/CMDB-REAL-ACCEPTANCE.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/integration-20261031.md",
+      "current_path": "docs/archive/2026-11-03/integration-20261031.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/integration-20261102.md",
+      "current_path": "docs/archive/2026-11-03/integration-20261102.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/flows-redesign/keel-flows-module-build-spec.md",
+      "current_path": "docs/archive/2026-11-03/keel-flows-module-build-spec.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/CMDB-REAL-DESIGN.md",
+      "current_path": "docs/modules/cmdb.md",
+      "kind": "module_replacement"
+    },
+    {
+      "previous_path": "docs/CMDB-DOSSIER.md",
+      "current_path": "docs/modules/cmdb.md",
+      "kind": "module_replacement"
+    },
+    {
+      "previous_path": "docs/DATACENTER-VISUALIZATION.md",
+      "current_path": "docs/archive/2026-11-03/DATACENTER-VISUALIZATION.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/OPERATIONS-CHANGELOG.md",
+      "current_path": "docs/archive/2026-11-03/OPERATIONS-CHANGELOG.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "docs/OPERATIONS-IMPACT.md",
+      "current_path": "docs/archive/2026-11-03/OPERATIONS-IMPACT.md",
+      "kind": "archive_move"
+    },
+    {
+      "previous_path": "HANDOFF.md",
+      "current_path": "docs/archive/2026-11-03/previous/HANDOFF.md",
+      "kind": "previous_text_snapshot"
+    },
+    {
+      "previous_path": "AGENTS.md",
+      "current_path": "docs/archive/2026-11-03/previous/AGENTS.md",
+      "kind": "previous_text_snapshot"
+    },
+    {
+      "previous_path": "docs/REAL-API-CONTRACTS.md",
+      "current_path": "docs/archive/2026-11-03/previous/docs/REAL-API-CONTRACTS.md",
+      "kind": "previous_text_snapshot"
+    },
+    {
+      "previous_path": "docs/DECISIONS.md",
+      "current_path": "docs/archive/2026-11-03/previous/docs/DECISIONS.md",
+      "kind": "previous_text_snapshot"
+    },
+    {
+      "previous_path": "docs/README.md",
+      "current_path": "docs/archive/2026-11-03/previous/docs/README.md",
+      "kind": "previous_text_snapshot"
+    },
+    {
+      "previous_path": "docs/CMDB-DOSSIER.md",
+      "current_path": "docs/archive/2026-11-03/previous/docs/CMDB-DOSSIER.md",
+      "kind": "previous_text_snapshot"
+    },
+    {
+      "previous_path": "docs/CMDB-REAL-DESIGN.md",
+      "current_path": "docs/archive/2026-11-03/previous/docs/CMDB-REAL-DESIGN.md",
+      "kind": "previous_text_snapshot"
+    },
+    {
+      "previous_path": "docs/api/flows.md",
+      "current_path": "docs/archive/2026-11-03/previous/docs/api/flows.md",
+      "kind": "previous_text_snapshot"
+    },
+    {
+      "previous_path": "docs/api/engineering.md",
+      "current_path": "docs/archive/2026-11-03/previous/docs/api/engineering.md",
+      "kind": "previous_text_snapshot"
+    },
+    {
+      "previous_path": "docs/kickoff/IMPLEMENTATION.txt",
+      "current_path": "docs/archive/2026-11-03/previous/docs/kickoff/IMPLEMENTATION.txt",
+      "kind": "previous_text_snapshot"
+    },
+    {
+      "previous_path": "docs/flows-redesign/implementation.md",
+      "current_path": "docs/archive/2026-11-03/previous/docs/flows-redesign/implementation.md",
+      "kind": "previous_text_snapshot"
+    },
+    {
+      "previous_path": "docs/flows-redesign/KESTRA-UI-REPLACEMENT.md",
+      "current_path": "docs/archive/2026-11-03/previous/docs/flows-redesign/KESTRA-UI-REPLACEMENT.md",
+      "kind": "previous_text_snapshot"
+    },
+    {
+      "previous_path": "docs/topology/implementation-report.md",
+      "current_path": "docs/archive/2026-11-03/previous/docs/topology/implementation-report.md",
+      "kind": "previous_text_snapshot"
+    },
+    {
+      "previous_path": "docs/API-OPERATION-INDEX.md",
+      "current_path": "docs/archive/2026-11-03/API-OPERATION-INDEX.md",
+      "kind": "previous_text_snapshot"
+    }
+  ]
+}

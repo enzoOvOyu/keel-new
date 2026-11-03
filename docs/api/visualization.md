@@ -1,12 +1,12 @@
 # 数据中心可视化 · 真实 API 使用契约
 
-核对基准：代码 `4541850`，2026-10-31。Base URL 为 `/api/v1`。字段/类型权威为 [OpenAPI](../openapi.yaml)，机器登记见 [注册表](real-api-registry.json)。本文记录语义和使用方式，不复制另一套完整 Schema。
+当前基准：dev/主环境 `686e9ea`，2026-11-03；产品行为见[模块定版](../modules/topology.md)。Base URL 为 `/api/v1`。字段/类型权威为 [OpenAPI](../openapi.yaml)，机器登记见 [注册表](real-api-registry.json)。本文记录语义和使用方式，不复制另一套完整 Schema。
 
 ## 本轮性能整改（已部署686e9ea）
 
 MM规模下原三个GET查询均触发5秒超时。当前改写关系优先聚合以避免中间行数估算坍缩；结构上下文从已选节点走现有关系索引，连接列表仅加载两端及父设备/机柜，不向兄弟端口扩散。physical+depth2显式设备root先补齐该设备组成上下文，保证Port Panel不因线缆分页而遗漏本设备端口，再与线缆范围合并作向上读取；远端设备不作同样扩展。矩阵分页与覆盖统计复用同次聚合。保留原5秒期限、RBAC、planned优先、歧义、cursor/snapshot及partial语义；没有新增资产事实源、索引或迁移。
 
-现有MM真实数据库的只读Service验证：subgraph 1498.582ms、matrix 1205.684ms、connections 1356.179ms，连接上下文495资产/549关系且未截断。是单轮样本，不能宣称P95达标；同代码先前连接样本2186.563ms。部署后的认证GET与浏览器加载子集已通过，详见docs/kickoff/DEPLOYMENT.json；未验证FPS或并发。证据将汇总于`docs/kickoff/PERFORMANCE-RESULT.json`；修复前证据见`docs/kickoff/PERFORMANCE-AUDIT.json`。
+现有MM真实数据库的只读Service验证：subgraph 1498.582ms、matrix 1205.684ms、connections 1356.179ms，连接上下文495资产/549关系且未截断。是单轮样本，不能宣称P95达标；同代码先前连接样本2186.563ms。部署后的认证GET与浏览器加载子集已通过，详见docs/kickoff/DEPLOYMENT.json；未验证FPS或并发。证据已汇总于`docs/kickoff/PERFORMANCE-RESULT.json`；修复前证据见`docs/kickoff/PERFORMANCE-AUDIT.json`。
 
 ## 使用边界
 
@@ -136,4 +136,4 @@ Cookie 由受控 Session 处理；不要把凭据复制进样例、日志或 Git
 - [部署证据](../topology/deployment-validation.json)：代码4541850、原5180/8081、4接口启动200、5页面加载，无 pageerror/失败可视化请求。
 - [代码检查](../topology/code-validation.json)：类型/构建、Go 编译和必要纯逻辑用例，保留当时范围。
 - [实施报告](../topology/implementation-report.md)：查询超时修复、性能观察与资料缺口。
-- 未做完整真实导入、全部交互闭环、生产规模基准。启动200和单次延迟不是这些能力的验收。
+- 当前最新上线与MM只读查询见[686e9ea发布证据](../kickoff/DEPLOYMENT.json)。未做全部交互闭环、现场实装或生产规模基准。启动200和单次延迟不是这些能力的验收。

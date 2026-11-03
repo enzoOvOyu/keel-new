@@ -153,24 +153,24 @@ Kestra参考执行、任务、日志和版本；Rackula参考机柜交互；Rack
 
 ## IA v2.4 Mock 前端实施记录
 
-导航树、完整页面清单、路由/权限/作用域/加载策略、五/八Tab抽屉与API对照统一见 [IA24-IMPLEMENTATION-MATRIX.md](IA24-IMPLEMENTATION-MATRIX.md)。原FR-0…24、门禁、BOM与维护态规则保留。当前实现为前端Mock，不表示已实现Go/真实设备/真实AI。权威种子为 `fixtures/demo-full-64-b300/demo-seed.json`；原包83集合，补齐与规范化后集合数量以当前manifest为准，主项目硬件数量不变。结构检查、数据修复、契约与交互结果以IA24-*报告为准，无法采集/缺少证据保持unknown或阻断。
+导航树、完整页面清单、路由/权限/作用域/加载策略、五/八Tab抽屉与API对照统一见 [IA24-IMPLEMENTATION-MATRIX.md](archive/2026-11-03/IA24-IMPLEMENTATION-MATRIX.md)。原FR-0…24、门禁、BOM与维护态规则保留。当前实现为前端Mock，不表示已实现Go/真实设备/真实AI。权威种子为 `fixtures/demo-full-64-b300/demo-seed.json`；原包83集合，补齐与规范化后集合数量以当前manifest为准，主项目硬件数量不变。结构检查、数据修复、契约与交互结果以IA24-*报告为准，无法采集/缺少证据保持unknown或阻断。
 
 
 ## 当前六阶段主链路修正
 
-本轮用户明确废弃数字门禁作为主链。当前唯一业务顺序、状态机、逐目标放行、安全交接、独立BOM菜单与API约束以[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)为准。历史编号只按[DELIVERY-MIGRATION.md](DELIVERY-MIGRATION.md)追溯，不得用于解锁。验机失败关联统一Issues并定向复验；NCCL不反写验机；清理/归档/客户签署齐全后才进入维护态。NP仍是网络内部断言。当前仅前端Mock与契约实现，没有真实设备后端。
+本轮用户明确废弃数字门禁作为主链。当前唯一业务顺序、状态机、逐目标放行、安全交接、独立BOM菜单与API约束以[DELIVERY-LIFECYCLE.md](DELIVERY-LIFECYCLE.md)为准。历史编号只按[DELIVERY-MIGRATION.md](archive/2026-11-03/DELIVERY-MIGRATION.md)追溯，不得用于解锁。验机失败关联统一Issues并定向复验；NCCL不反写验机；清理/归档/客户签署齐全后才进入维护态。NP仍是网络内部断言。当前仅前端Mock与契约实现，没有真实设备后端。
 
 
 ## 单柜详情工作区增补
 
-固定单柜窄画布、左侧层级导航和右侧八Tab为本轮布局要求；交互、API、元数据、Mock来源及待执行验收见[RACK-WORKSPACE.md](RACK-WORKSPACE.md)。资产/位置和既有安全模型不变。右侧按需加载，不以缺失指标显示正常。当前构建/浏览器验证按用户安排等待统一执行。
+固定单柜窄画布、左侧层级导航和右侧八Tab为本轮布局要求；交互、API、元数据、Mock来源及待执行验收见[RACK-WORKSPACE.md](archive/2026-11-03/RACK-WORKSPACE.md)。资产/位置和既有安全模型不变。右侧按需加载，不以缺失指标显示正常。当前构建/浏览器验证按用户安排等待统一执行。
 
 
 ## Fabric Topology 增补
 
 React Flow承载拓扑的缩放、平移、节点拖动、Minimap与自动布局；域模型由Keel定义。不能把网络拓扑做成RackView的替代品或一张端口巨表。详情遵循共享Drawer与紧凑DataTable，规划/观测的图例及证据状态始终可见。
 
-完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](FABRIC-TOPOLOGY.md)。
+完整导航、模型、交互、API表与实施边界见[FABRIC-TOPOLOGY.md](archive/2026-11-03/FABRIC-TOPOLOGY.md)。
 
 
 ## 无损网络分层证据 v2
@@ -187,24 +187,24 @@ React Flow承载拓扑的缩放、平移、节点拖动、Minimap与自动布局
 
 参考Infrahub对象/关系/来源/历史原则，使用原Keel布局、字体、间距、主题与组件。基线位于ui-baselines/cmdb-before；接入后截图位于cmdb-after。此次不修改DESIGN-SYSTEM或全局设计令牌。
 
-接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](CMDB-REAL-DESIGN.md)，具体HTTP Schema以openapi.yaml为准。
+接口对照、模型与实现边界统一见 [CMDB-REAL-DESIGN.md](modules/cmdb.md)，具体HTTP Schema以openapi.yaml为准。
 
 
 ## BOM Intelligence Agent 当前实施（2026-10-30）
 
-本轮仅 AI 智能识别：上传→真实分析进度→分类审核→确认入库。交换机/端接优先，单主编排器+Workbook IR 工具+独立 Schema/来源/覆盖校验。当前范围替代此前 BOM 双模式/六步 UI 描述，历史数据不删除；详细字段、状态、API、安全和验证边界统一见 [BOM-WORKBENCH-V2.md](BOM-WORKBENCH-V2.md)。保留 FR-2.1、项目权限、唯一资产身份和原事务 Outbox。完整导入入库闭环由用户验收；不以旧报告宣称当前通过。
+本轮仅 AI 智能识别：上传→真实分析进度→分类审核→确认入库。交换机/端接优先，单主编排器+Workbook IR 工具+独立 Schema/来源/覆盖校验。当前范围替代此前 BOM 双模式/六步 UI 描述，历史数据不删除；详细字段、状态、API、安全和验证边界统一见 [BOM-WORKBENCH-V2.md](archive/2026-11-03/BOM-WORKBENCH-V2.md)。保留 FR-2.1、项目权限、唯一资产身份和原事务 Outbox。完整导入入库闭环由用户验收；不以旧报告宣称当前通过。
 
 ## 2026-10-31 · 四页图表研究与原型 V3
 
-全局拓扑借鉴 Cluster Map / Hybrid Graph；网络架构借鉴角色骨架与语义束线；物理布线默认 Connection Matrix，Bipartite/BioFabric服务精确端点检查；追踪使用 Metro Route + Tree/Table。六篇研究的链接、实际阅读范围、采用理由及限制统一见 [topology.md §14](topology.md#14-研究依据方法取舍与视觉质量评价)，不把论文实验或算法名称冒充 Keel 能力。原型入口见该文 §7；机柜维持现状。此增补仅约束运维拓扑设计，不改变既有 Fabric 业务模块。
+全局拓扑借鉴 Cluster Map / Hybrid Graph；网络架构借鉴角色骨架与语义束线；物理布线默认 Connection Matrix，Bipartite/BioFabric服务精确端点检查；追踪使用 Metro Route + Tree/Table。六篇研究的链接、实际阅读范围、采用理由及限制统一见 [topology.md §14](archive/2026-11-03/topology.md#14-研究依据方法取舍与视觉质量评价)，不把论文实验或算法名称冒充 Keel 能力。原型入口见该文 §7；机柜维持现状。此增补仅约束运维拓扑设计，不改变既有 Fabric 业务模块。
 
 ## 2026-10-31 · 机柜设计后续授权
 
-Gallery 借鉴 NetBox 的系统登记数据可视化；Dual 借鉴 Rackula 的精确 U 坐标和撤销语义；Spatial 借鉴 Sunbird 的柜侧透视、安装对齐与容量/连接联动。多视图协调、语义缩放及选择性分解采用研究支持的交互，React + SVG 实现，各视角互补，不把缺失深度画成实物。实际研究范围、引用、许可边界和可运行入口统一见 [rack-visualization.md](rack-visualization.md)。不复制素材，不用旧 fixture 的 front 默认值补 CMDB 缺测。前文“机柜维持现状”仅指此前四页 V3 工作阶段。
+Gallery 借鉴 NetBox 的系统登记数据可视化；Dual 借鉴 Rackula 的精确 U 坐标和撤销语义；Spatial 借鉴 Sunbird 的柜侧透视、安装对齐与容量/连接联动。多视图协调、语义缩放及选择性分解采用研究支持的交互，React + SVG 实现，各视角互补，不把缺失深度画成实物。实际研究范围、引用、许可边界和可运行入口统一见 [rack-visualization.md](archive/2026-11-03/rack-visualization.md)。不复制素材，不用旧 fixture 的 front 默认值补 CMDB 缺测。前文“机柜维持现状”仅指此前四页 V3 工作阶段。
 
-本轮机柜原型自审落实为业务视角：Front 查设备/型号/安装，Rear 查登记端口/Cable/对端；端口索引不得伪装成实物面板坐标。跨柜连接可按稳定 ID 定位，缺失端点显式终止。Dual-State Comparison 按确认规划与实际数据能力分级，缺合格快照隐藏入口。详细交互与验证见 [机柜设计 §12](rack-visualization.md#12-参考资料自审与本轮修正2026-10-31)。
+本轮机柜原型自审落实为业务视角：Front 查设备/型号/安装，Rear 查登记端口/Cable/对端；端口索引不得伪装成实物面板坐标。跨柜连接可按稳定 ID 定位，缺失端点显式终止。Dual-State Comparison 按确认规划与实际数据能力分级，缺合格快照隐藏入口。详细交互与验证见 [机柜设计 §12](archive/2026-11-03/rack-visualization.md#12-参考资料自审与本轮修正2026-10-31)。
 
-机柜阵列“空间”模式新增机房级 3D 俯视，参考 Sunbird Data Center CMDB 的整体机房/容量/选中柜立面联动；资产阵列和单柜 SVG 不替换。示意排布、正式坐标边界、Three.js 隔离依赖与操作规范统一见 [rack-visualization.md §4.1a](rack-visualization.md#41a-机柜阵列--空间机房-3d-总览)。
+机柜阵列“空间”模式新增机房级 3D 俯视，参考 Sunbird Data Center CMDB 的整体机房/容量/选中柜立面联动；资产阵列和单柜 SVG 不替换。示意排布、正式坐标边界、Three.js 隔离依赖与操作规范统一见 [rack-visualization.md §4.1a](archive/2026-11-03/rack-visualization.md#41a-机柜阵列--空间机房-3d-总览)。
 
 
 ## Flows 包重构实施增补 · 2026-10-31

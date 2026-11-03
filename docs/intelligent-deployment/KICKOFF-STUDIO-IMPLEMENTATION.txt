@@ -35,7 +35,7 @@ Keel 智能开局工程：低交互、固定契约、分步 Agent 实施任务�
 
 二、已知必须解决的问题及现有能力
 
-事实来源：HANDOFF.md；docs/intelligent-deployment/P0-REVIEW.txt；SOURCE-UNDERSTANDING-REVIEW-20261101.txt；FIVE-STEP-CHAIN-ACCEPTANCE-20261102.json；当前代码。
+事实来源：HANDOFF.md；docs/archive/intelligent-deployment/P0-REVIEW.txt；SOURCE-UNDERSTANDING-REVIEW-20261101.txt；FIVE-STEP-CHAIN-ACCEPTANCE-20261102.json；当前代码。
 
 1. 固定输入链已在隔离合成项目验收，不等于真实非规范资料 Agent 验收。
    已有五份标准 XLSX、结构化工程域、审核、事务 Outbox、CMDB 图表 API 和部分网络/供电计算。复用，不重写。

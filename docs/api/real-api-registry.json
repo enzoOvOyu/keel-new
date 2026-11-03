@@ -1,7 +1,7 @@
 {
   "version": 1,
   "updated_at": "2026-11-03",
-  "coverage": "Kickoff performance remediation and legacy BOM frontend retirement deployed to existing 5180/8081. Authenticated MM GET checks and real live browser subset passed; no new data imports, migrations or AI calls. Other modules retain prior acceptance limits.",
+  "coverage": "Current module documentation baseline, 2026-11-03: deployed dev 686e9ea; CMDB routes additionally registered by source review only. Per-operation runtime verification is limited to cited evidence. Fabric 6a70041 belongs to a separate paused branch and is not included in this registry.",
   "schema_authority": "docs/openapi.yaml",
   "code_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
   "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
@@ -21,7 +21,8 @@
       "documentation": "docs/api/visualization.md",
       "verification_evidence": "docs/kickoff/PERFORMANCE-RESULT.json",
       "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
-      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json"
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "module": "topology"
     },
     {
       "method": "get",
@@ -37,7 +38,8 @@
       "documentation": "docs/api/visualization.md",
       "verification_evidence": "docs/kickoff/PERFORMANCE-RESULT.json",
       "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
-      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json"
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "module": "topology"
     },
     {
       "method": "get",
@@ -53,7 +55,8 @@
       "documentation": "docs/api/visualization.md",
       "verification_evidence": "docs/kickoff/PERFORMANCE-RESULT.json",
       "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
-      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json"
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "module": "topology"
     },
     {
       "method": "post",
@@ -68,7 +71,8 @@
       "service": "VisualTrace",
       "documentation": "docs/api/visualization.md",
       "request_schema": "InfrastructureTraceRequest",
-      "verification_evidence": "docs/topology/deployment-validation.json"
+      "verification_evidence": "docs/topology/deployment-validation.json",
+      "module": "topology"
     },
     {
       "method": "get",
@@ -81,7 +85,8 @@
       "handler": "dev/backend/cmd/api/cmdb.go",
       "source": "dev/backend/internal/cmdb/visualization.go",
       "service": "VisualizationDetail",
-      "documentation": "docs/api/visualization.md"
+      "documentation": "docs/api/visualization.md",
+      "module": "topology"
     },
     {
       "method": "get",
@@ -97,7 +102,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "listRealFlowsEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -115,7 +121,8 @@
       "request_schema": "FlowsSave",
       "deployed_revision": "9441a89",
       "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
-      "branch_implementation_note": "feat/jobs-kestra-ui: pinned script-source metadata and optional JobStep description/timeout; deployed as9441a89; startup subset checked; docs/api/flows.md"
+      "branch_implementation_note": "feat/jobs-kestra-ui: pinned script-source metadata and optional JobStep description/timeout; deployed as9441a89; startup subset checked; docs/api/flows.md",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -131,7 +138,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "getFlowRevisionsEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -147,7 +155,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "getFlowsCapabilitiesEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -163,7 +172,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "listFlowsTargetsEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -181,7 +191,8 @@
       "deployed_revision": "9441a89",
       "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
       "development_changes": "feat/jobs-kestra-ui only, not deployed: optional run/execution name persisted in existing request; list attention filter and business-name search; historical missing names remain null.",
-      "development_verification": "dev/backend/internal/flows/workspace_integration_test.go; docs/flows-redesign/parity-correction/result.json"
+      "development_verification": "dev/backend/internal/flows/workspace_integration_test.go; docs/flows-redesign/parity-correction/result.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -197,7 +208,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "listRealAgentsEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -213,7 +225,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "listFlowsSSHTrustEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -230,7 +243,8 @@
       "response_schema": "saveFlowsSSHTrustEnvelope",
       "request_schema": "FlowsSSHTrustInput",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -248,7 +262,8 @@
       "request_schema": "FlowsRun",
       "deployed_revision": "9441a89",
       "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
-      "branch_implementation_note": "feat/jobs-kestra-ui: optional JobStep description/timeout reuse existing Task budget/capabilities; deployed as9441a89; startup subset checked; docs/api/flows.md"
+      "branch_implementation_note": "feat/jobs-kestra-ui: optional JobStep description/timeout reuse existing Task budget/capabilities; deployed as9441a89; startup subset checked; docs/api/flows.md",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -268,7 +283,8 @@
       "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
       "development_changes": "feat/jobs-kestra-ui only, not deployed: optional run/execution name persisted in existing request; list attention filter and business-name search; historical missing names remain null.",
       "development_verification": "dev/backend/internal/flows/workspace_integration_test.go; docs/flows-redesign/parity-correction/result.json",
-      "branch_implementation_note": "feat/jobs-kestra-ui: optional JobStep description/timeout reuse existing Task budget/capabilities; deployed as9441a89; startup subset checked; docs/api/flows.md"
+      "branch_implementation_note": "feat/jobs-kestra-ui: optional JobStep description/timeout reuse existing Task budget/capabilities; deployed as9441a89; startup subset checked; docs/api/flows.md",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -284,7 +300,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "getRealFlowEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "put",
@@ -302,7 +319,8 @@
       "request_schema": "FlowsSave",
       "deployed_revision": "9441a89",
       "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
-      "branch_implementation_note": "feat/jobs-kestra-ui: pinned script-source metadata and optional JobStep description/timeout; deployed as9441a89; startup subset checked; docs/api/flows.md"
+      "branch_implementation_note": "feat/jobs-kestra-ui: pinned script-source metadata and optional JobStep description/timeout; deployed as9441a89; startup subset checked; docs/api/flows.md",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -319,7 +337,8 @@
       "response_schema": "validateRealFlowEnvelope",
       "request_schema": "FlowsValidationRequest",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -339,7 +358,8 @@
       "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
       "development_changes": "feat/jobs-kestra-ui only, not deployed: optional run/execution name persisted in existing request; list attention filter and business-name search; historical missing names remain null.",
       "development_verification": "dev/backend/internal/flows/workspace_integration_test.go; docs/flows-redesign/parity-correction/result.json",
-      "branch_implementation_note": "feat/jobs-kestra-ui: optional JobStep description/timeout reuse existing Task budget/capabilities; deployed as9441a89; startup subset checked; docs/api/flows.md"
+      "branch_implementation_note": "feat/jobs-kestra-ui: optional JobStep description/timeout reuse existing Task budget/capabilities; deployed as9441a89; startup subset checked; docs/api/flows.md",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -355,7 +375,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "getFlowDependenciesEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -371,7 +392,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "getFlowFilesEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -389,7 +411,8 @@
       "deployed_revision": "9441a89",
       "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
       "development_changes": "feat/jobs-kestra-ui only, not deployed: optional run/execution name persisted in existing request; list attention filter and business-name search; historical missing names remain null.",
-      "development_verification": "dev/backend/internal/flows/workspace_integration_test.go; docs/flows-redesign/parity-correction/result.json"
+      "development_verification": "dev/backend/internal/flows/workspace_integration_test.go; docs/flows-redesign/parity-correction/result.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -405,7 +428,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "getExecutionTargetsEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -421,7 +445,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "getExecutionLogsEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -437,7 +462,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "getExecutionOutputsEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -453,7 +479,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "getExecutionAuditEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -469,7 +496,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "actionExecutionPauseEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -485,7 +513,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "actionExecutionResumeEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -501,7 +530,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "actionExecutionKillEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -517,7 +547,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "actionExecutionRetryfailedtargetsEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -533,7 +564,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "getRealAgentEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -550,7 +582,8 @@
       "response_schema": "issueAgentEnrollmentEnvelope",
       "request_schema": "FlowsTokenRequest",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -567,7 +600,8 @@
       "response_schema": "agentApproveEnvelope",
       "request_schema": "FlowsReason",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -584,7 +618,8 @@
       "response_schema": "agentQuarantineEnvelope",
       "request_schema": "FlowsReason",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -601,7 +636,8 @@
       "response_schema": "agentRevokeEnvelope",
       "request_schema": "FlowsReason",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -617,7 +653,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "agentTasksEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -633,7 +670,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "agentAuditEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -649,7 +687,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "FlowsEventPageEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -665,7 +704,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "getFlowsTemplateEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -681,7 +721,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "getNamespaceFileEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "put",
@@ -698,7 +739,8 @@
       "response_schema": "saveNamespaceFileEnvelope",
       "request_schema": "FlowsNamespaceFile",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -715,7 +757,8 @@
       "response_schema": "bootstrapFlowsAgentEnvelope",
       "request_schema": "FlowsBootstrap",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -731,7 +774,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "actionExecutionRestartEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -746,7 +790,8 @@
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -763,7 +808,8 @@
       "response_schema": "registerFlowsAgentEnvelope",
       "request_schema": "FlowsEnrollmentInput",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -779,7 +825,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "getTargetScheduleEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "put",
@@ -796,7 +843,8 @@
       "response_schema": "saveTargetScheduleEnvelope",
       "request_schema": "FlowsSchedule",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -812,7 +860,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "listNamespaceFileVersionsEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -829,7 +878,8 @@
       "response_schema": "uploadNamespaceBinaryEnvelope",
       "request_schema": "FlowsFileUpload",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -846,7 +896,8 @@
       "response_schema": "distributeNamespaceRevisionEnvelope",
       "request_schema": "FlowsRun",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -861,7 +912,8 @@
       "source": "dev/backend/internal/flows",
       "documentation": "docs/api/flows.md",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -878,7 +930,8 @@
       "response_schema": "requestFlowsApprovalEnvelope",
       "request_schema": "FlowsApprovalRequest",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -894,7 +947,8 @@
       "documentation": "docs/api/flows.md",
       "response_schema": "getDeviceStepsEnvelope",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -909,7 +963,8 @@
       "service": "ExecutionDefinition",
       "documentation": "docs/api/flows.md",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -924,7 +979,8 @@
       "source": "dev/backend/cmd/api/engineering_store.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "post",
@@ -940,7 +996,8 @@
       "documentation": "docs/api/engineering.md",
       "request_schema": "IDEAttachSource",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -955,7 +1012,8 @@
       "source": "dev/backend/cmd/api/engineering_store.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "post",
@@ -971,7 +1029,8 @@
       "documentation": "docs/api/engineering.md",
       "request_schema": "IDEExpectedRevision",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -986,7 +1045,8 @@
       "source": "dev/backend/cmd/api/engineering_store.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "put",
@@ -1002,7 +1062,8 @@
       "documentation": "docs/api/engineering.md",
       "request_schema": "IDEModelEdit",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "post",
@@ -1018,7 +1079,8 @@
       "documentation": "docs/api/engineering.md",
       "request_schema": "IDETargetAction",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "post",
@@ -1034,7 +1096,8 @@
       "documentation": "docs/api/engineering.md",
       "request_schema": "IDETargetAction",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -1049,7 +1112,8 @@
       "source": "dev/backend/cmd/api/engineering_store.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -1064,7 +1128,8 @@
       "source": "dev/backend/cmd/api/engineering_store.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -1079,7 +1144,8 @@
       "source": "dev/backend/cmd/api/engineering_store.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -1094,7 +1160,8 @@
       "source": "dev/backend/cmd/api/engineering_calculation.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "post",
@@ -1110,7 +1177,8 @@
       "documentation": "docs/api/engineering.md",
       "request_schema": "IDERuleDraft",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -1125,7 +1193,8 @@
       "source": "dev/backend/cmd/api/engineering_calculation.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "post",
@@ -1141,7 +1210,8 @@
       "documentation": "docs/api/engineering.md",
       "request_schema": "IDERuleReview",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -1156,7 +1226,8 @@
       "source": "dev/backend/cmd/api/engineering_calculation.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -1171,7 +1242,8 @@
       "source": "dev/backend/cmd/api/engineering_calculation.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "post",
@@ -1187,7 +1259,8 @@
       "documentation": "docs/api/engineering.md",
       "request_schema": "IDECalculationRequest",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -1202,7 +1275,8 @@
       "source": "dev/backend/cmd/api/engineering_calculation.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "put",
@@ -1218,7 +1292,8 @@
       "source": "dev/backend/cmd/api/engineering_connectivity_store.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "put",
@@ -1234,7 +1309,8 @@
       "source": "dev/backend/cmd/api/engineering_power.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "post",
@@ -1250,7 +1326,8 @@
       "source": "dev/backend/cmd/api/engineering_power.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "put",
@@ -1266,7 +1343,8 @@
       "source": "dev/backend/cmd/api/engineering_estimates.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "put",
@@ -1282,7 +1360,8 @@
       "documentation": "docs/api/engineering.md",
       "request_schema": "IDENetworkEdit",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -1297,7 +1376,8 @@
       "source": "dev/backend/cmd/api/engineering_network.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -1312,7 +1392,8 @@
       "source": "dev/backend/cmd/api/engineering_network.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -1327,7 +1408,8 @@
       "source": "dev/backend/cmd/api/engineering_intelligence.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -1342,7 +1424,8 @@
       "source": "dev/backend/cmd/api/engineering_intelligence.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "post",
@@ -1358,7 +1441,8 @@
       "source": "dev/backend/cmd/api/engineering_reimport.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "post",
@@ -1374,7 +1458,8 @@
       "source": "dev/backend/cmd/api/engineering_reimport.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -1389,7 +1474,8 @@
       "source": "dev/backend/cmd/api/engineering_attributes.go",
       "documentation": "docs/api/engineering.md",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "post",
@@ -1405,7 +1491,8 @@
       "documentation": "docs/api/engineering.md",
       "request_schema": "IDEAttributeDraft",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "post",
@@ -1421,7 +1508,8 @@
       "documentation": "docs/api/engineering.md",
       "request_schema": "IDEAttributeReview",
       "deployed_revision": "5abb94f",
-      "deployment_evidence": "docs/intelligent-deployment/deployment-20261101.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/deployment-20261101.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -1434,8 +1522,9 @@
       "source": "dev/backend/internal/engineering/step_input.go",
       "documentation": "docs/api/engineering.md",
       "response_schema": "IDEInputCatalogResponse",
-      "verification_evidence": "docs/intelligent-deployment/OPTIONAL-CONFIG-20261102.json",
-      "deployment_evidence": "docs/intelligent-deployment/DEPLOYMENT-FIVE-STEP-CHAIN-20261102.json"
+      "verification_evidence": "docs/archive/intelligent-deployment/OPTIONAL-CONFIG-20261102.json",
+      "deployment_evidence": "docs/archive/intelligent-deployment/DEPLOYMENT-FIVE-STEP-CHAIN-20261102.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "post",
@@ -1449,8 +1538,9 @@
       "documentation": "docs/api/engineering.md",
       "response_schema": "IDEInputPreviewResponse",
       "request_schema": "IDEInputPreviewRequest",
-      "deployment_evidence": "docs/intelligent-deployment/DEPLOYMENT-FIVE-STEP-CHAIN-20261102.json",
-      "verification_evidence": "docs/intelligent-deployment/OPTIONAL-CONFIG-20261102.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/DEPLOYMENT-FIVE-STEP-CHAIN-20261102.json",
+      "verification_evidence": "docs/archive/intelligent-deployment/OPTIONAL-CONFIG-20261102.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -1463,7 +1553,8 @@
       "source": "dev/backend/internal/engineering/step_input.go",
       "documentation": "docs/api/engineering.md",
       "response_media_type": "text/csv",
-      "deployment_evidence": "docs/intelligent-deployment/DEPLOYMENT-FIVE-STEP-CHAIN-20261102.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/DEPLOYMENT-FIVE-STEP-CHAIN-20261102.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "post",
@@ -1477,8 +1568,9 @@
       "handler": "dev/backend/cmd/api/engineering.go",
       "source": "dev/backend/cmd/api/engineering_standard_input.go",
       "documentation": "docs/api/engineering.md",
-      "verification_evidence": "docs/intelligent-deployment/FIXED-STEP-XLSX-TEST-20261101.json",
-      "deployment_evidence": "docs/intelligent-deployment/DEPLOYMENT-FIVE-STEP-CHAIN-20261102.json"
+      "verification_evidence": "docs/archive/intelligent-deployment/FIXED-STEP-XLSX-TEST-20261101.json",
+      "deployment_evidence": "docs/archive/intelligent-deployment/DEPLOYMENT-FIVE-STEP-CHAIN-20261102.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "post",
@@ -1493,7 +1585,8 @@
       "source": "dev/backend/cmd/api/engineering_standard_workbook.go",
       "documentation": "docs/api/engineering.md",
       "verification_evidence": "docs/intelligent-deployment/FIVE-STEP-CHAIN-ACCEPTANCE-20261102.json",
-      "deployment_evidence": "docs/intelligent-deployment/DEPLOYMENT-FIVE-STEP-CHAIN-20261102.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/DEPLOYMENT-FIVE-STEP-CHAIN-20261102.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "post",
@@ -1508,7 +1601,8 @@
       "source": "dev/backend/cmd/api/engineering_standard_workbook.go",
       "documentation": "docs/api/engineering.md",
       "verification_evidence": "docs/intelligent-deployment/FIVE-STEP-CHAIN-ACCEPTANCE-20261102.json",
-      "deployment_evidence": "docs/intelligent-deployment/DEPLOYMENT-FIVE-STEP-CHAIN-20261102.json"
+      "deployment_evidence": "docs/archive/intelligent-deployment/DEPLOYMENT-FIVE-STEP-CHAIN-20261102.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -1522,7 +1616,8 @@
       "handler": "dev/backend/cmd/api/engineering_modeling.go",
       "source": "dev/backend/internal/engineering/modeling_input.go",
       "documentation": "docs/api/engineering.md",
-      "verification_evidence": "docs/intelligent-deployment/ENDPOINT-PLACEMENT-REPLAY-20261102.json"
+      "verification_evidence": "docs/archive/intelligent-deployment/ENDPOINT-PLACEMENT-REPLAY-20261102.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "put",
@@ -1536,7 +1631,8 @@
       "handler": "dev/backend/cmd/api/engineering_modeling.go",
       "source": "dev/backend/internal/engineering/modeling_input.go",
       "documentation": "docs/api/engineering.md",
-      "verification_evidence": "docs/intelligent-deployment/modeling-closure/verification.json"
+      "verification_evidence": "docs/intelligent-deployment/modeling-closure/verification.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -1550,7 +1646,8 @@
       "handler": "dev/backend/cmd/api/engineering_modeling.go",
       "source": "dev/backend/internal/engineering/modeling_input.go",
       "documentation": "docs/api/engineering.md",
-      "verification_evidence": "docs/intelligent-deployment/modeling-closure/verification.json"
+      "verification_evidence": "docs/intelligent-deployment/modeling-closure/verification.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "post",
@@ -1564,7 +1661,8 @@
       "handler": "dev/backend/cmd/api/engineering_modeling.go",
       "source": "dev/backend/internal/engineering/modeling_input.go",
       "documentation": "docs/api/engineering.md",
-      "verification_evidence": "docs/intelligent-deployment/modeling-closure/verification.json"
+      "verification_evidence": "docs/intelligent-deployment/modeling-closure/verification.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "post",
@@ -1578,7 +1676,8 @@
       "handler": "dev/backend/cmd/api/engineering_modeling.go",
       "source": "dev/backend/internal/engineering/modeling_input.go",
       "documentation": "docs/api/engineering.md",
-      "verification_evidence": "docs/intelligent-deployment/modeling-closure/verification.json"
+      "verification_evidence": "docs/intelligent-deployment/modeling-closure/verification.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -1591,7 +1690,8 @@
       "handler": "dev/backend/cmd/api/engineering_handoff.go",
       "source": "dev/backend/internal/engineering/modeling_input.go",
       "documentation": "docs/api/engineering.md",
-      "verification_evidence": "docs/intelligent-deployment/modeling-closure/verification.json"
+      "verification_evidence": "docs/intelligent-deployment/modeling-closure/verification.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "post",
@@ -1605,7 +1705,8 @@
       "handler": "dev/backend/cmd/api/engineering_handoff.go",
       "source": "dev/backend/internal/engineering/modeling_input.go",
       "documentation": "docs/api/engineering.md",
-      "verification_evidence": "docs/intelligent-deployment/modeling-closure/verification.json"
+      "verification_evidence": "docs/intelligent-deployment/modeling-closure/verification.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -1618,7 +1719,8 @@
       "handler": "dev/backend/cmd/api/engineering_handoff.go",
       "source": "dev/backend/internal/engineering/modeling_input.go",
       "documentation": "docs/api/engineering.md",
-      "verification_evidence": "docs/intelligent-deployment/modeling-closure/verification.json"
+      "verification_evidence": "docs/intelligent-deployment/modeling-closure/verification.json",
+      "module": "engineering_legacy"
     },
     {
       "method": "get",
@@ -1638,7 +1740,8 @@
       "loading": "on-demand; summary cache 60s",
       "side_effects": "refreshes existing execution projection where used; no device execution",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -1658,7 +1761,8 @@
       "loading": "on-demand; summary cache 60s",
       "side_effects": "refreshes existing execution projection where used; no device execution",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -1678,7 +1782,8 @@
       "loading": "on-demand; summary cache 60s",
       "side_effects": "refreshes existing execution projection where used; no device execution",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -1698,7 +1803,8 @@
       "loading": "on-demand; summary cache 60s",
       "side_effects": "refreshes existing execution projection where used; no device execution",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -1718,7 +1824,8 @@
       "loading": "on-demand; summary cache 60s",
       "side_effects": "refreshes existing execution projection where used; no device execution",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -1738,7 +1845,8 @@
       "loading": "on-demand; summary cache 60s",
       "side_effects": "refreshes existing execution projection where used; no device execution",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -1758,7 +1866,8 @@
       "loading": "on-demand; active operation progress poll 5s",
       "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -1778,7 +1887,8 @@
       "loading": "on-demand; active operation progress poll 5s",
       "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -1798,7 +1908,8 @@
       "loading": "on-demand; active operation progress poll 5s",
       "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -1818,7 +1929,8 @@
       "loading": "on-demand; active operation progress poll 5s",
       "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -1838,7 +1950,8 @@
       "loading": "on-demand; active operation progress poll 5s",
       "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -1858,7 +1971,8 @@
       "loading": "on-demand; active operation progress poll 5s",
       "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -1878,7 +1992,8 @@
       "loading": "on-demand; active operation progress poll 5s",
       "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -1898,7 +2013,8 @@
       "loading": "on-demand; active operation progress poll 5s",
       "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -1918,7 +2034,8 @@
       "loading": "on-demand; active operation progress poll 5s",
       "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -1938,7 +2055,8 @@
       "loading": "on-demand; active operation progress poll 5s",
       "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -1958,7 +2076,8 @@
       "loading": "on-demand; active operation progress poll 5s",
       "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "post",
@@ -1978,7 +2097,8 @@
       "loading": "on-demand; active operation progress poll 5s",
       "side_effects": "persists operation progress; bootstrap may dispatch authorized SSH; backfill/replay delegate fresh Start/preflight/approval; certificate rotation staged then activated by new-key proof",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -1998,7 +2118,8 @@
       "loading": "on-demand; 60s cache",
       "side_effects": "authorized read only; no future time calculation or trigger mutation",
       "deployed_revision": "9441a89",
-      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json"
+      "deployment_evidence": "docs/flows-redesign/deployment-20261102.json",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -2014,7 +2135,8 @@
       "scope": "explicit project_id; backend project authorization",
       "permission": "approval:read",
       "loading": "on-demand for an explicitly selected high-risk action",
-      "side_effects": "read-only; final approval digest and signer checks remain in Job Service"
+      "side_effects": "read-only; final approval digest and signer checks remain in Job Service",
+      "module": "jobs"
     },
     {
       "method": "get",
@@ -2026,7 +2148,7 @@
       "verification": "isolated_integration_and_MM_history_acceptance_see_evidence",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff_publication.go",
-      "documentation": "docs/REAL-API-CONTRACTS.md",
+      "documentation": "docs/api/kickoff.md",
       "verification_evidence": "docs/kickoff/BACKEND-CHECK.json",
       "deployed_revision": "9a3e03b9095afa7c91214cd40c00292d288578ba",
       "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
@@ -2035,7 +2157,8 @@
       "loading_cache": "Project-scoped workspace; cancellable requests; refresh after mutation; lightweight Outbox status polling",
       "errors": "409 stale revision; unknown geometry remains needs_input; identity/endpoint conflicts block affected scope",
       "side_effects": "read-only facts; workspace anchor may initialize",
-      "limitations": "No network execution; planned and observed remain separate"
+      "limitations": "No network execution; planned and observed remain separate",
+      "module": "kickoff"
     },
     {
       "method": "post",
@@ -2047,7 +2170,7 @@
       "verification": "isolated_integration_and_MM_history_acceptance_see_evidence",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff_history.go",
-      "documentation": "docs/REAL-API-CONTRACTS.md",
+      "documentation": "docs/api/kickoff.md",
       "verification_evidence": "docs/kickoff/BACKEND-CHECK.json",
       "deployed_revision": "9a3e03b9095afa7c91214cd40c00292d288578ba",
       "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
@@ -2056,7 +2179,8 @@
       "loading_cache": "Project-scoped workspace; cancellable requests; refresh after mutation; lightweight Outbox status polling",
       "errors": "409 stale revision; unknown geometry remains needs_input; identity/endpoint conflicts block affected scope",
       "side_effects": "versioned engineering facts, audit; publication additionally writes transactional Outbox",
-      "limitations": "No network execution; planned and observed remain separate"
+      "limitations": "No network execution; planned and observed remain separate",
+      "module": "kickoff"
     },
     {
       "method": "post",
@@ -2069,7 +2193,7 @@
       "verification": "isolated_integration_and_MM_history_acceptance_see_evidence",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff_operations.go",
-      "documentation": "docs/REAL-API-CONTRACTS.md",
+      "documentation": "docs/api/kickoff.md",
       "verification_evidence": "docs/kickoff/BACKEND-CHECK.json",
       "deployed_revision": "9a3e03b9095afa7c91214cd40c00292d288578ba",
       "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
@@ -2078,7 +2202,8 @@
       "loading_cache": "Project-scoped workspace; cancellable requests; refresh after mutation; lightweight Outbox status polling",
       "errors": "409 stale revision; unknown geometry remains needs_input; identity/endpoint conflicts block affected scope",
       "side_effects": "versioned engineering facts, audit; publication additionally writes transactional Outbox",
-      "limitations": "No network execution; planned and observed remain separate"
+      "limitations": "No network execution; planned and observed remain separate",
+      "module": "kickoff"
     },
     {
       "method": "post",
@@ -2091,7 +2216,7 @@
       "verification": "isolated_integration_and_MM_history_acceptance_see_evidence",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff_publication.go",
-      "documentation": "docs/REAL-API-CONTRACTS.md",
+      "documentation": "docs/api/kickoff.md",
       "verification_evidence": "docs/kickoff/BACKEND-CHECK.json",
       "deployed_revision": "9a3e03b9095afa7c91214cd40c00292d288578ba",
       "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
@@ -2100,7 +2225,8 @@
       "loading_cache": "Project-scoped workspace; cancellable requests; refresh after mutation; lightweight Outbox status polling",
       "errors": "409 stale revision; unknown geometry remains needs_input; identity/endpoint conflicts block affected scope",
       "side_effects": "versioned engineering facts, audit; publication additionally writes transactional Outbox",
-      "limitations": "No network execution; planned and observed remain separate"
+      "limitations": "No network execution; planned and observed remain separate",
+      "module": "kickoff"
     },
     {
       "method": "get",
@@ -2113,7 +2239,7 @@
       "verification": "isolated_integration_and_MM_history_acceptance_see_evidence",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff_publication.go",
-      "documentation": "docs/REAL-API-CONTRACTS.md",
+      "documentation": "docs/api/kickoff.md",
       "verification_evidence": "docs/kickoff/BACKEND-CHECK.json",
       "deployed_revision": "9a3e03b9095afa7c91214cd40c00292d288578ba",
       "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
@@ -2122,7 +2248,8 @@
       "loading_cache": "Project-scoped workspace; cancellable requests; refresh after mutation; lightweight Outbox status polling",
       "errors": "409 stale revision; unknown geometry remains needs_input; identity/endpoint conflicts block affected scope",
       "side_effects": "read-only facts; workspace anchor may initialize",
-      "limitations": "No network execution; planned and observed remain separate"
+      "limitations": "No network execution; planned and observed remain separate",
+      "module": "kickoff"
     },
     {
       "method": "post",
@@ -2134,7 +2261,7 @@
       "verification": "isolated_integration_and_MM_history_acceptance_see_evidence",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff_operations.go",
-      "documentation": "docs/REAL-API-CONTRACTS.md",
+      "documentation": "docs/api/kickoff.md",
       "verification_evidence": "docs/kickoff/BACKEND-CHECK.json",
       "deployed_revision": "9a3e03b9095afa7c91214cd40c00292d288578ba",
       "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
@@ -2143,7 +2270,8 @@
       "loading_cache": "Project-scoped workspace; cancellable requests; refresh after mutation; lightweight Outbox status polling",
       "errors": "409 stale revision; unknown geometry remains needs_input; identity/endpoint conflicts block affected scope",
       "side_effects": "versioned engineering facts, audit; publication additionally writes transactional Outbox",
-      "limitations": "No network execution; planned and observed remain separate"
+      "limitations": "No network execution; planned and observed remain separate",
+      "module": "kickoff"
     },
     {
       "method": "post",
@@ -2155,7 +2283,7 @@
       "verification": "isolated_integration_explicit_unavailable",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff.go",
-      "documentation": "docs/REAL-API-CONTRACTS.md",
+      "documentation": "docs/api/kickoff.md",
       "verification_evidence": "docs/kickoff/BACKEND-CHECK.json",
       "deployed_revision": "9a3e03b9095afa7c91214cd40c00292d288578ba",
       "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
@@ -2164,7 +2292,8 @@
       "loading_cache": "Project-scoped workspace; cancellable requests; refresh after mutation; lightweight Outbox status polling",
       "errors": "409 stale revision; unknown geometry remains needs_input; identity/endpoint conflicts block affected scope",
       "side_effects": "versioned engineering facts, audit; publication additionally writes transactional Outbox",
-      "limitations": "Agent is not implemented; no recognition success claimed"
+      "limitations": "Agent is not implemented; no recognition success claimed",
+      "module": "kickoff"
     },
     {
       "method": "get",
@@ -2176,7 +2305,7 @@
       "verification": "authenticated_live_GET_subset_and_browser_subset; see deployment evidence for exact checks; earlier read-only cases retained",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff.go",
-      "documentation": "docs/kickoff/IMPLEMENTATION.txt",
+      "documentation": "docs/api/kickoff.md",
       "verification_evidence": "docs/kickoff/PERFORMANCE-RESULT.json",
       "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
       "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
@@ -2186,7 +2315,8 @@
       "errors": "403 scope denied; 400 invalid query; 409 stale kickoff revision; service errors retained",
       "side_effects": "read projection only; preview does not approve or publish; no AI or device actions",
       "limitations": "Suggested latency/payload budgets not fully met; no FPS/concurrent load or full-module acceptance",
-      "loading": "on demand; revision-keyed bounded typed read cache and server pages; local object context"
+      "loading": "on demand; revision-keyed bounded typed read cache and server pages; local object context",
+      "module": "kickoff"
     },
     {
       "method": "put",
@@ -2198,7 +2328,7 @@
       "verification": "isolated_integration_and_MM_history_acceptance_see_evidence",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff.go",
-      "documentation": "docs/REAL-API-CONTRACTS.md",
+      "documentation": "docs/api/kickoff.md",
       "verification_evidence": "docs/kickoff/BACKEND-CHECK.json",
       "deployed_revision": "9a3e03b9095afa7c91214cd40c00292d288578ba",
       "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
@@ -2207,7 +2337,8 @@
       "loading_cache": "Project-scoped workspace; cancellable requests; refresh after mutation; lightweight Outbox status polling",
       "errors": "409 stale revision; unknown geometry remains needs_input; identity/endpoint conflicts block affected scope",
       "side_effects": "versioned engineering facts, audit; publication additionally writes transactional Outbox",
-      "limitations": "No network execution; planned and observed remain separate"
+      "limitations": "No network execution; planned and observed remain separate",
+      "module": "kickoff"
     },
     {
       "method": "post",
@@ -2219,7 +2350,7 @@
       "verification": "isolated_integration_and_MM_history_acceptance_see_evidence",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff.go",
-      "documentation": "docs/REAL-API-CONTRACTS.md",
+      "documentation": "docs/api/kickoff.md",
       "verification_evidence": "docs/kickoff/BACKEND-CHECK.json",
       "deployed_revision": "9a3e03b9095afa7c91214cd40c00292d288578ba",
       "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
@@ -2228,7 +2359,8 @@
       "loading_cache": "Project-scoped workspace; cancellable requests; refresh after mutation; lightweight Outbox status polling",
       "errors": "409 stale revision; unknown geometry remains needs_input; identity/endpoint conflicts block affected scope",
       "side_effects": "versioned engineering facts, audit; publication additionally writes transactional Outbox",
-      "limitations": "No network execution; planned and observed remain separate"
+      "limitations": "No network execution; planned and observed remain separate",
+      "module": "kickoff"
     },
     {
       "method": "delete",
@@ -2240,7 +2372,7 @@
       "verification": "isolated_integration_and_MM_history_acceptance_see_evidence",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff.go",
-      "documentation": "docs/REAL-API-CONTRACTS.md",
+      "documentation": "docs/api/kickoff.md",
       "verification_evidence": "docs/kickoff/BACKEND-CHECK.json",
       "deployed_revision": "9a3e03b9095afa7c91214cd40c00292d288578ba",
       "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
@@ -2249,7 +2381,8 @@
       "loading_cache": "Project-scoped workspace; cancellable requests; refresh after mutation; lightweight Outbox status polling",
       "errors": "409 stale revision; unknown geometry remains needs_input; identity/endpoint conflicts block affected scope",
       "side_effects": "versioned engineering facts, audit; publication additionally writes transactional Outbox",
-      "limitations": "No network execution; planned and observed remain separate"
+      "limitations": "No network execution; planned and observed remain separate",
+      "module": "kickoff"
     },
     {
       "method": "get",
@@ -2261,7 +2394,7 @@
       "verification": "authenticated_live_GET_subset_and_browser_subset; see deployment evidence for exact checks; earlier read-only cases retained",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff_review.go",
-      "documentation": "docs/kickoff/IMPLEMENTATION.txt",
+      "documentation": "docs/api/kickoff.md",
       "verification_evidence": "docs/kickoff/PERFORMANCE-RESULT.json",
       "scope": "explicit project authorization; current revision bound for kickoff paged reads and preview",
       "permission": "bom:read",
@@ -2270,7 +2403,8 @@
       "errors": "403 scope denied; 400 invalid query; 409 stale kickoff revision; service errors retained",
       "limitations": "Suggested latency/payload budgets not fully met; no FPS/concurrent load or full-module acceptance",
       "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
-      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json"
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "module": "kickoff"
     },
     {
       "method": "post",
@@ -2282,7 +2416,7 @@
       "verification": "authenticated_live_GET_subset_and_browser_subset; see deployment evidence for exact checks; earlier read-only cases retained",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff_review.go",
-      "documentation": "docs/kickoff/IMPLEMENTATION.txt",
+      "documentation": "docs/api/kickoff.md",
       "verification_evidence": "docs/kickoff/PERFORMANCE-RESULT.json",
       "scope": "explicit project authorization; current revision bound for kickoff paged reads and preview",
       "permission": "bom:read",
@@ -2291,7 +2425,8 @@
       "errors": "403 scope denied; 400 invalid query; 409 stale kickoff revision; service errors retained",
       "limitations": "Suggested latency/payload budgets not fully met; no FPS/concurrent load or full-module acceptance",
       "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
-      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json"
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "module": "kickoff"
     },
     {
       "method": "get",
@@ -2303,7 +2438,7 @@
       "verification": "authenticated_live_GET_subset_and_browser_subset; see deployment evidence for exact checks; earlier read-only cases retained",
       "handler": "dev/backend/cmd/api/cmdb.go",
       "source": "dev/backend/internal/cmdb/query.go",
-      "documentation": "docs/CMDB-DOSSIER.md",
+      "documentation": "docs/api/cmdb.md",
       "verification_evidence": "docs/kickoff/PERFORMANCE-RESULT.json",
       "scope": "authorized project/resource scope reapplied to every page and asset",
       "permission": "cmdb:read",
@@ -2312,7 +2447,8 @@
       "errors": "403 scope denied; 400 invalid query; 409 stale kickoff revision; service errors retained",
       "limitations": "Suggested latency/payload budgets not fully met; no FPS/concurrent load or full-module acceptance",
       "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
-      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json"
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "module": "cmdb"
     },
     {
       "method": "get",
@@ -2324,7 +2460,7 @@
       "verification": "authenticated_live_GET_subset_and_browser_subset; see deployment evidence for exact checks; earlier read-only cases retained",
       "handler": "dev/backend/cmd/api/cmdb.go",
       "source": "dev/backend/internal/cmdb/query.go",
-      "documentation": "docs/CMDB-DOSSIER.md",
+      "documentation": "docs/api/cmdb.md",
       "verification_evidence": "docs/kickoff/PERFORMANCE-RESULT.json",
       "scope": "authorized project/resource scope reapplied to every page and asset",
       "permission": "cmdb:read",
@@ -2333,10 +2469,641 @@
       "errors": "403 scope denied; 400 invalid query; 409 stale kickoff revision; service errors retained",
       "limitations": "Suggested latency/payload budgets not fully met; no FPS/concurrent load or full-module acceptance",
       "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
-      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json"
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "module": "cmdb"
+    },
+    {
+      "method": "get",
+      "path": "/cmdb/dossier/catalog",
+      "operation_id": "queryCmdbDossierCatalog",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "Read-only query; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "CmdbDossierCatalogEnvelope"
+    },
+    {
+      "method": "get",
+      "path": "/cmdb/dossier/tree",
+      "operation_id": "getCmdbDossierTree",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "Read-only query; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "CmdbDossierTreeEnvelope"
+    },
+    {
+      "method": "get",
+      "path": "/cmdb/dossier/relations",
+      "operation_id": "getCmdbDossierRelations",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "Read-only query; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "CmdbDossierRelationsEnvelope"
+    },
+    {
+      "method": "get",
+      "path": "/cmdb/dossier/assets/{asset_id}/configuration",
+      "operation_id": "getCmdbDossierconfiguration",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "Read-only query; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "CmdbDossierConfigEnvelope"
+    },
+    {
+      "method": "get",
+      "path": "/cmdb/dossier/assets/{asset_id}/lifecycle",
+      "operation_id": "getCmdbDossierlifecycle",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "Read-only query; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "CmdbDossierLifecycleEnvelope"
+    },
+    {
+      "method": "get",
+      "path": "/cmdb/dossier/quality",
+      "operation_id": "getCmdbDossierQuality",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "Read-only query; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "CmdbDossierQualityEnvelope"
+    },
+    {
+      "method": "patch",
+      "path": "/cmdb/dossier/manual-fields",
+      "operation_id": "patchCmdbManualFields",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "CMDB schema/changeset/manual annotation/saved-view mutation as applicable; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "CmdbDossierManualEnvelope",
+      "request_schema": "CmdbDossierManualRequest"
+    },
+    {
+      "method": "get",
+      "path": "/cmdb/dossier/saved-views",
+      "operation_id": "listCmdbSavedViews",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "Read-only query; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "CmdbDossierViewsEnvelope"
+    },
+    {
+      "method": "post",
+      "path": "/cmdb/dossier/saved-views",
+      "operation_id": "createCmdbSavedView",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "CMDB schema/changeset/manual annotation/saved-view mutation as applicable; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "CmdbDossierSavedViewEnvelope",
+      "request_schema": "CmdbDossierSaveViewRequest"
+    },
+    {
+      "method": "get",
+      "path": "/cmdb/dossier/evidence/{resource}/{record_id}",
+      "operation_id": "getCmdbDossierEvidence",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "Read-only query; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "CmdbDossierEvidenceEnvelope"
+    },
+    {
+      "method": "get",
+      "path": "/cmdb/schemas",
+      "operation_id": "getCMDBRegistry",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "Read-only query; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "getCMDBRegistryEnvelope"
+    },
+    {
+      "method": "post",
+      "path": "/cmdb/schemas",
+      "operation_id": "installCMDBSchema",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "CMDB schema/changeset/manual annotation/saved-view mutation as applicable; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "installCMDBSchemaEnvelope",
+      "request_schema": "CmdbSchemaCommand"
+    },
+    {
+      "method": "post",
+      "path": "/cmdb/schemas/validate",
+      "operation_id": "validateCMDBSchema",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "CMDB schema/changeset/manual annotation/saved-view mutation as applicable; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "validateCMDBSchemaEnvelope",
+      "request_schema": "CmdbSchemaCommand"
+    },
+    {
+      "method": "get",
+      "path": "/cmdb/schemas/versions",
+      "operation_id": "listCMDBSchemaVersions",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "Read-only query; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "listCMDBSchemaVersionsEnvelope"
+    },
+    {
+      "method": "get",
+      "path": "/cmdb/schemas/{schema_version}",
+      "operation_id": "getCMDBSchemaVersion",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "Read-only query; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "getCMDBSchemaVersionEnvelope"
+    },
+    {
+      "method": "get",
+      "path": "/cmdb/dossier/assets/{asset_id}",
+      "operation_id": "getCMDBDossierAsset",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "Read-only query; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "CmdbAssetDetailsEnvelope"
+    },
+    {
+      "method": "get",
+      "path": "/cmdb/dossier/assets/{asset_id}/drawer/{tab}",
+      "operation_id": "getCMDBDeviceDrawer",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "Read-only query; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "CmdbDrawerEnvelope"
+    },
+    {
+      "method": "get",
+      "path": "/cmdb/dossier/assets/{asset_id}/revisions",
+      "operation_id": "listCMDBAssetRevisions",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "Read-only query; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "listCMDBAssetRevisionsEnvelope"
+    },
+    {
+      "method": "get",
+      "path": "/cmdb/dossier/assets/{asset_id}/diff",
+      "operation_id": "diffCMDBAssetRevisions",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "Read-only query; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "diffCMDBAssetRevisionsEnvelope"
+    },
+    {
+      "method": "get",
+      "path": "/cmdb/changesets",
+      "operation_id": "listCMDBChangeSets",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "Read-only query; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "listCMDBChangeSetsEnvelope"
+    },
+    {
+      "method": "post",
+      "path": "/cmdb/changesets",
+      "operation_id": "createCMDBChangeSet",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "CMDB schema/changeset/manual annotation/saved-view mutation as applicable; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "createCMDBChangeSetEnvelope",
+      "request_schema": "CmdbChangeSetCommand"
+    },
+    {
+      "method": "get",
+      "path": "/cmdb/changesets/{changeset_id}/diff",
+      "operation_id": "previewCMDBChangeSet",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "Read-only query; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "previewCMDBChangeSetEnvelope"
+    },
+    {
+      "method": "post",
+      "path": "/cmdb/changesets/{changeset_id}/submit",
+      "operation_id": "submitCMDBChangeSet",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "CMDB schema/changeset/manual annotation/saved-view mutation as applicable; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "submitCMDBChangeSetEnvelope",
+      "request_schema": "CmdbChangeSetAction"
+    },
+    {
+      "method": "post",
+      "path": "/cmdb/changesets/{changeset_id}/approve",
+      "operation_id": "approveCMDBChangeSet",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "CMDB schema/changeset/manual annotation/saved-view mutation as applicable; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "approveCMDBChangeSetEnvelope",
+      "request_schema": "CmdbChangeSetAction"
+    },
+    {
+      "method": "post",
+      "path": "/cmdb/changesets/{changeset_id}/reject",
+      "operation_id": "rejectCMDBChangeSet",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "CMDB schema/changeset/manual annotation/saved-view mutation as applicable; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "rejectCMDBChangeSetEnvelope",
+      "request_schema": "CmdbChangeSetAction"
+    },
+    {
+      "method": "post",
+      "path": "/cmdb/changesets/{changeset_id}/publish",
+      "operation_id": "publishCMDBChangeSet",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "CMDB schema/changeset/manual annotation/saved-view mutation as applicable; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "publishCMDBChangeSetEnvelope",
+      "request_schema": "CmdbChangeSetAction"
+    },
+    {
+      "method": "get",
+      "path": "/cmdb/relationships/{relationship_id}/revisions",
+      "operation_id": "listCMDBRelationshipRevisions",
+      "module": "cmdb",
+      "implementation": "implemented_source_review",
+      "deployment": "source_in_deployed_revision; endpoint_runtime_not_rechecked",
+      "verification": "source_route_service_crosscheck_only; historical_module_evidence_is_not_per_endpoint_acceptance",
+      "handler": "dev/backend/cmd/api/cmdb.go",
+      "source": "dev/backend/internal/cmdb",
+      "documentation": "docs/api/cmdb.md",
+      "response_status": "200",
+      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "verification_evidence": "docs/CMDB-REAL-BACKEND-CHECK.json",
+      "scope": "Session-authorized project/resource scope; object and relation endpoints reauthorize",
+      "permission": "cmdb:read; writes additionally require operation-specific create/edit/delete/approve/execute or admin:edit as documented",
+      "loading_cache": "On-demand; scope/permission_revision in client query key; bounds and revision handling in docs/api/cmdb.md",
+      "errors": "Existing error envelope; 400 invalid input, 403 scope, 404 unavailable object, 409 revision, 422 domain constraints",
+      "side_effects": "Read-only query; no device execution",
+      "limitations": "Registration confirms route/service existence, not field-by-field conformance or new runtime acceptance",
+      "response_schema": "listCMDBRelationshipRevisionsEnvelope"
     }
   ],
-  "development_note": "当前运行ceab753/v40，迁移038；真实MM/Ultra分析提案已完整保存，资料理解验收未通过。当前结论见docs/intelligent-deployment/SOURCE-UNDERSTANDING-REVIEW-20261101.txt；未正式发布、未进行模型对照或跨客户验收。",
+  "development_note": "Current main environment 5180/8081: 686e9ea, evidence docs/kickoff/DEPLOYMENT.json. Kickoff Agent remains unimplemented (503). Fabric separate branch paused; see docs/modules/fabric.md. No application tests, deployment, migrations or device calls performed by the documentation curation task.",
   "last_deployed_changes": {
     "branch": "dev",
     "base_revision": "f941397",
