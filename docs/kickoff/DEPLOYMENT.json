@@ -1,10 +1,10 @@
 {
-  "code_revision": "2357457672926097fe86374b61695ab048209581",
-  "frontend_code_revision": "2357457672926097fe86374b61695ab048209581",
+  "code_revision": "ef08c25d889e5c2cbc72ff508d1b2b446fdb5edf",
+  "frontend_code_revision": "ef08c25d889e5c2cbc72ff508d1b2b446fdb5edf",
   "backend_code_revision": "aabae089188ac541402661c6e2d1edc79b5a8e9e",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-workflows-2357457",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-gaps-ef08c25",
   "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-workflows-aabae08",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-workflows-aabae08",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-workflows-2357457",
   "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-rack-display-00fdf47",
   "ports": [
     5180,
@@ -13,11 +13,11 @@
   "migrations": [],
   "api_restarted": false,
   "binary_sha256": "8a1d85d96243df635e6b5a583b4927f4b2f3b83bc29ea8977f73c83d38bbbe61",
-  "frontend_index_sha256": "e4aecd5a09d5291fee1c2293247cb7c5f1ddf0e9a816abd367e29076113a10e1",
+  "frontend_index_sha256": "a11dfff053fe746d8d59f95d12eb8c6e022f5b9ecbb0cf298441b632b985b066",
   "status": "deployed",
   "binary_matches": true,
   "frontend_index_matches": true,
-  "old_assets_retained": 437,
+  "old_assets_retained": 500,
   "checks": {
     "health": 200,
     "frontend": 200,
@@ -26,14 +26,13 @@
   "business_tests": "NOT RUN",
   "provider_calls": 0,
   "ui_read_only": {
-    "pages": [
-      "facility table and drawer",
-      "unified publication scope",
-      "compact analysis actions"
-    ],
     "errors": [],
     "writes": [],
+    "checks": [
+      "capacity: 73 missing racks, capacity field only",
+      "height: 670 devices automatically grouped"
+    ],
     "status": "PASS"
   },
-  "verification": "TypeScript + Vite + Go build; focused facility baseline unit test; three read-only pages. No model invocation, import or CMDB publication."
+  "verification": "TypeScript and Vite pass; read-only gap display and two automatic-scope dialogs pass; no AI, import, model save or publication writes."
 }
