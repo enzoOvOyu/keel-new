@@ -1,5 +1,5 @@
 {
-  "status": "implemented_verified_pending_deployment",
+  "status": "deployed_targeted_checks_passed",
   "scope": "Scope selection and sidebar history; same-version publication coverage check; original confirmation action and modal retained",
   "frontend_build": "PASS: npm run build (TypeScript + Vite)",
   "confirmation_button_and_modal": "PASS: byte-for-byte comparison with pre-change source blocks",
@@ -46,5 +46,24 @@
     "No real project publication or CMDB write executed by validation",
     "Exact engineering revision/input-version coverage, not arbitrary field-level semantic diff",
     "Pending records and identity conflicts remain unselectable; published records remain selectable for explicit supplements"
-  ]
+  ],
+  "live_ui": {
+    "status": "PASS",
+    "scope": "Authenticated deployed MM page; real read-only range preview and unchanged modal open/cancel, no publication submission or screenshots",
+    "checks": [
+      "scope description integrated into main card",
+      "version/history card is first in right sidebar",
+      "published devices not selected by default",
+      "all selection/clear controls available",
+      "real range preview enables original confirmation action",
+      "original modal explanation and return action preserved",
+      "empty selection disables original confirmation action"
+    ],
+    "historyRecords": 3,
+    "pageErrors": 0,
+    "publicationSubmitRequests": 0
+  },
+  "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+  "workspace_revision_unchanged": true,
+  "publication_count_unchanged": true
 }
