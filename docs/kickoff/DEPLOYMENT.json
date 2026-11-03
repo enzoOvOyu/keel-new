@@ -1,45 +1,41 @@
 {
-  "code_revision": "0ee1b002842e47dbab5256482c1f0f6e2f685c1e",
-  "frontend_code_revision": "0ee1b002842e47dbab5256482c1f0f6e2f685c1e",
+  "code_revision": "d8814215095cdc13dcd4356e5e7af548e2db78ad",
+  "frontend_code_revision": "d8814215095cdc13dcd4356e5e7af548e2db78ad",
   "backend_code_revision": "0ee1b002842e47dbab5256482c1f0f6e2f685c1e",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-facility-power-0ee1b00",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-view-actions-d881421",
   "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-facility-power-0ee1b00",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-agent-minimal-6d8a6b7",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-facility-power-0ee1b00",
   "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-agent-minimal-6d8a6b7",
   "ports": [
     5180,
     8081
   ],
   "migrations": [],
-  "api_restarted": true,
+  "api_restarted": false,
   "binary_sha256": "2b6684a214cfc1f2782c5e6b98c9eda1d91c9b7977b3b86d489b9b448ccf21d1",
-  "frontend_index_sha256": "bdf1201e3e2c50d273fae28cbcffcdebb3ef1e501129e4e68b64ade9a9695d14",
+  "frontend_index_sha256": "465e92477856ae3f69a754c4b1f10b8b26a1aa61b43c6c9c9bd323cf9ae739c6",
   "status": "deployed",
   "binary_matches": true,
   "frontend_index_matches": true,
   "old_assets_retained": 750,
   "checks": {
-    "health": 200,
     "frontend": 200,
+    "health": 200,
     "index_matches": true
   },
   "business_tests": "NOT RUN",
   "provider_calls": 0,
-  "verification": "Existing power calculation unit test, TypeScript, Vite; no live model or asset writes.",
+  "verification": "Bounded TypeScript and Vite build passed; frontend asset match and API health checked. No AI or business writes.",
   "ui_verification": {
-    "errors": [],
     "checks": [
-      "return navigation reuses CMDB and connection check cache",
-      "one row button opens shared modal tabs, XLSX entry and planned-only power fields",
-      "browser-only save triggers recheck and retains modal for next table; no real business write"
+      "全局拓扑: scoped modal 机房信息/机柜关联与规格/设备落位",
+      "网络架构: scoped modal 设备角色",
+      "物理布线: complete, no action",
+      "链路追踪: complete, no action",
+      "机柜与机房: scoped modal 机房信息/机柜关联与规格/机柜供电容量/设备落位/设备规划功率"
     ],
-    "realWrites": [],
-    "syntheticSaves": 1,
-    "status": "PASS",
-    "requests": 12,
-    "evidence": [
-      "/tmp/keel-facility-power-page.png",
-      "/tmp/keel-facility-power-dialog.png"
-    ]
+    "errors": [],
+    "writes": [],
+    "status": "PASS"
   }
 }

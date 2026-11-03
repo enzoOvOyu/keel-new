@@ -7,14 +7,14 @@
 | 范围 | 当前事实 |
 |---|---|
 | 主开发 | `/home/ubuntu/keel-dev`，分支`dev`，应用目录`dev/`；文档定版已整合；本轮历史资料理解已提交dev并按用户要求发布 |
-| 当前主环境 | 5180前端`0ee1b00` / 8081 API `0ee1b00`；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json)记录publish、设施与Agent整改部署；启动、只读页面与浏览器模拟保存检查通过；真实发布与模型效果等待用户统一测试指令 |
+| 当前主环境 | 5180前端`d881421` / 8081 API `0ee1b00`；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json)记录publish、设施与Agent整改部署；启动、只读页面与浏览器模拟保存检查通过；真实发布与模型效果等待用户统一测试指令 |
 | Fabric | `/home/ubuntu/keel-fabric-dev`，`feat/fabric-rebuild@6a70041`；5197/8100分支预览，未并入dev；**用户要求暂停，等待上游接入修复通知** |
 | 原型 | Kickoff5195、拓扑/机柜5181、Fabric5194仅设计参考，不是正式事实或执行来源；本次不启停服务 |
 | main与旧目录 | main保留稳定基线；旧Flows/Kestra/visualization detached目录仅残留原型/运行依赖，不在那里继续开发；本次不合并或推送main |
 
 ## 本轮整改已部署：等待统一测试（优先于旧自动测试安排）
 
-当前5180前端与8081 API均为0ee1b00；目录`/home/ubuntu/.local/state/keel-deployments/kickoff-facility-power-0ee1b00`。无迁移，保留旧静态资源；前端/API均可回退kickoff-agent-minimal-6d8a6b7。规划供电缺口、单一补录入口和会话缓存已部署；Go功率定向单测、TypeScript、Vite、契约检查通过。MM只读页面及浏览器模拟保存验证通过，无页面异常或真实业务写入；完整MM智能识别与真实发布未运行。网络角色发布投影仍为独立遗留缺口，不在本次范围。
+当前5180前端为d881421（/home/ubuntu/.local/state/keel-deployments/kickoff-view-actions-d881421），8081 API仍为0ee1b00（kickoff-facility-power-0ee1b00）。最新前端可回退kickoff-facility-power-0ee1b00。无迁移，保留旧静态资源；前端/API均可回退kickoff-agent-minimal-6d8a6b7。规划供电缺口、单一补录入口和会话缓存已部署；Go功率定向单测、TypeScript、Vite、契约检查通过。MM只读页面及浏览器模拟保存验证通过，无页面异常或真实业务写入；完整MM智能识别与真实发布未运行。网络角色发布投影仍为独立遗留缺口，不在本次范围。
 
 下列publish/Agent条目为既有能力记录，机房机柜UI以本轮“拓扑资料补齐”为准。
 
@@ -105,3 +105,9 @@ API目录`/home/ubuntu/.local/state/keel-deployments/kickoff-cold-802a001`，前
 环境中断：2026-11-03虚拟机已重启，原构建已不存在，未部署本轮UI。恢复时约13GB内存可用；上次启动日志存在09:30全局OOM且杀死Node进程，不能据此归因到尚未部署的浏览器缓存。先恢复原运行服务，不运行新构建或业务测试。
 
 恢复结果：启动原有keel-dev-postgres/redis/minio容器及0ee1b00前端/API运行脚本，5180首页与8081 healthz均200；约13.6GB可用内存。未重建镜像、构建前端或运行业务测试；本轮五视图补录代码仍在工作区未验收未部署，浏览器持久缓存方案已移除。
+
+## 五视图补录入口纠正已部署（d881421）
+
+五个消费视图的资料状态之后按缺项提供单一补录按钮，完整行隐藏；全局归属与网络角色限制字段，导入合并保留已有隐藏字段。机柜/机房按缺项切表；双端连接弹窗定位缺项，修改继续复用现有CMDB关系变更。仅更新5180前端，8081未重启，无迁移或业务写入。
+
+TypeScript（2GiB JS堆上限）、Vite（3GiB JS堆上限）串行通过，部署产物匹配与API健康检查通过。定向只读页面验证：PASS；证据见DEPLOYMENT.json。没有启动Agent、导入或实际补录保存。Redis缓存尚未实施，整份浏览器持久缓存方案已撤回，本次不宣称解决浏览器重载缓存。
