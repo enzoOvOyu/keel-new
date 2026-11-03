@@ -7253,6 +7253,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/fabric/workspace": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read durable Fabric workspace and current published dependencies */
+        get: operations["getFabricWorkspace"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/fabric/commands": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Apply project-scoped versioned Fabric command
+         * @description Transactional PostgreSQL state/audit/idempotency. Only confirmed Kickoff publications. Structured intent is not executable NOS configuration. No simulated discovery, execution, telemetry or approval. Missing native renderer and adapter block production writes; signatures use existing approval API.
+         */
+        post: operations["executeFabricCommand"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -18218,6 +18255,362 @@ export interface components {
         };
         FabricInputPageEnvelope: {
             data: components["schemas"]["FabricInputPage"];
+            request_id: string;
+        };
+        FabricStudioBlueprint: {
+            id: string;
+            fabricId: string;
+            revision: number;
+            inputSnapshotId: string;
+            topologyType: string;
+            planeCount: number;
+            tierCount: number;
+            deviceGroupIds: string[];
+            profileRevisionIds: string[];
+            /** @enum {string} */
+            status: "DRAFT" | "COMMITTED" | "STALE";
+            /** Format: date-time */
+            createdAt: string;
+        };
+        FabricStudioProfile: {
+            id: string;
+            name: string;
+            version: string;
+            /** @enum {string} */
+            domain: "SWITCH" | "HOST" | "MULTIPLANE";
+            roleSelector: string[];
+            policyRefs: string[];
+            capabilityConstraints: string[];
+            schemaVersion: string;
+            status: string;
+            features: string[];
+            description: string;
+        };
+        FabricStudioParameters: {
+            asn: number | null;
+            address: string;
+            pfc: number | null;
+            ecn: string;
+            bgpPeers: components["schemas"]["FabricStudioPeer"][];
+            vrf: string;
+            vni: number | null;
+            sourceRefs: string[];
+        };
+        FabricStudioPeer: {
+            deviceId: string;
+            asn: number;
+            address: string;
+        };
+        FabricStudioSemanticChange: {
+            field: string;
+            before: string;
+            after: string;
+            /** @enum {string} */
+            operation: "ADD" | "MODIFY" | "DELETE";
+            sourceRef: string;
+        };
+        FabricStudioArtifact: {
+            id: string;
+            deviceId: string;
+            /** @enum {string} */
+            domain: "SWITCH" | "HOST" | "MULTIPLANE";
+            format: string;
+            hash: string;
+            sourceRefs: string[];
+            capabilityRevision: string;
+            contentRef: string;
+            /** @enum {string} */
+            validationStatus: "PASS" | "WARNING" | "BLOCKED" | "UNSUPPORTED" | "STALE" | "NOT_RUN";
+            content: string;
+            commands: string;
+            changes: components["schemas"]["FabricStudioSemanticChange"][];
+            unsupported: string[];
+            missing: string[];
+            profileId: string;
+            profileVersion: string;
+            inputSnapshotId: string;
+            parameters: components["schemas"]["FabricStudioParameters"];
+        };
+        FabricStudioBuild: {
+            id: string;
+            blueprintRevisionId: string;
+            inputSnapshotId: string;
+            profileRevisionIds: string[];
+            compilerVersion: string;
+            /** @enum {string} */
+            status: "BUILDING" | "BUILT" | "INVALID" | "STALE";
+            artifactIds: string[];
+            /** Format: date-time */
+            createdAt: string;
+            targetDeviceIds: string[];
+        };
+        FabricStudioFinding: {
+            id: string;
+            deviceId?: string;
+            checkId: string;
+            /** @enum {string} */
+            domain: "SWITCH" | "HOST" | "MULTIPLANE";
+            /** @enum {string} */
+            status: "PASS" | "WARNING" | "BLOCKED" | "UNSUPPORTED" | "STALE" | "NOT_RUN";
+            expected?: string;
+            actual?: string;
+            sourceRef?: string;
+            message: string;
+            evidenceRef?: string;
+            required: boolean;
+        };
+        FabricStudioValidation: {
+            id: string;
+            configBuildId: string;
+            /** @enum {string} */
+            status: "PASS" | "WARNING" | "BLOCKED" | "UNSUPPORTED" | "STALE" | "NOT_RUN";
+            passed: number;
+            warnings: number;
+            blocked: number;
+            unsupported: number;
+            findings: components["schemas"]["FabricStudioFinding"][];
+            evidenceRefs: string[];
+            /** Format: date-time */
+            createdAt: string;
+        };
+        FabricStudioWave: {
+            id: string;
+            sequence: number;
+            targetDeviceIds: string[];
+            taskBindings: string[];
+            maxConcurrency: number;
+            executionRefs: string[];
+            dependsOn: string[];
+        };
+        FabricStudioRollout: {
+            id: string;
+            /** @enum {string} */
+            strategy: "CANARY" | "PROGRESSIVE" | "SERIAL" | "PARALLEL";
+            waves: components["schemas"]["FabricStudioWave"][];
+            maxConcurrency: number;
+            timeoutSeconds: number;
+            retryPolicyRef: string;
+            safe: boolean;
+            warnings: string[];
+        };
+        FabricStudioApproval: {
+            actorId: string;
+            actorName: string;
+            decision: string;
+            reason: string;
+            /** Format: date-time */
+            at: string;
+        };
+        FabricStudioChange: {
+            id: string;
+            configBuildId: string;
+            validationRunId: string;
+            targetDeviceIds: string[];
+            riskLevel: string;
+            /** @enum {string} */
+            approvalStatus: "DRAFT" | "IN_REVIEW" | "APPROVED" | "REJECTED" | "STALE";
+            rolloutPlanId: string;
+            sourceSnapshotId: string;
+            purpose: string;
+            createdBy: string;
+            /** Format: date-time */
+            createdAt: string;
+            window: string;
+            approval?: components["schemas"]["FabricStudioApproval"];
+            taskBindingId: string;
+            warningAcknowledgement: string;
+            executionId?: string;
+            approvalId?: string;
+        };
+        FabricStudioStage: {
+            label: string;
+            state: string;
+            /** Format: date-time */
+            at?: string;
+        };
+        FabricStudioEnrollment: {
+            id: string;
+            deviceId: string;
+            profileId: string;
+            profileRevision: string;
+            bootstrapArtifactId: string;
+            managementAddress?: string;
+            discoveredIdentity: {
+                [key: string]: string;
+            };
+            matchedDeviceId?: string;
+            jobExecutionId?: string;
+            /** @enum {string} */
+            status: "UNKNOWN" | "DISCOVERED" | "MATCH_PENDING" | "QUEUED" | "RUNNING" | "SUCCESS" | "FAILED";
+            evidenceRefs: string[];
+            timeline: components["schemas"]["FabricStudioStage"][];
+            attempt: number;
+            error?: string;
+        };
+        FabricStudioTargetRun: {
+            deviceId: string;
+            state: string;
+            attempt: number;
+            stage: string;
+            error?: string;
+            logs: string[];
+            outputRefs: string[];
+            /** Format: date-time */
+            startedAt?: string;
+            /** Format: date-time */
+            completedAt?: string;
+        };
+        FabricStudioExecution: {
+            provider: string;
+            executionId: string;
+            flowId: string;
+            flowRevision: number;
+            taskRunIds: string[];
+            state: string;
+            rawState: string;
+            logRef: string;
+            outputRefs: string[];
+            /** Format: date-time */
+            startedAt: string;
+            /** Format: date-time */
+            completedAt?: string;
+            targets: components["schemas"]["FabricStudioTargetRun"][];
+            changeSetId: string;
+            wave: number;
+            failureMode: string;
+        };
+        FabricStudioComparison: {
+            deviceId: string;
+            artifactId: string;
+            desired: string;
+            rendered: string;
+            applied: string;
+            operational: string;
+            /** @enum {string} */
+            state: "COMPLIANT" | "DRIFTED" | "UNKNOWN" | "NOT_VERIFIED";
+            findings: components["schemas"]["FabricStudioFinding"][];
+            observedAt: string | null;
+            source: string;
+        };
+        FabricStudioAssurance: {
+            id: string;
+            buildId: string;
+            inputSnapshotId: string;
+            executionIds: string[];
+            /** Format: date-time */
+            createdAt: string;
+            records: components["schemas"]["FabricStudioComparison"][];
+            /** @enum {string} */
+            status: "COMPLIANT" | "DRIFTED" | "UNKNOWN" | "NOT_VERIFIED";
+        };
+        FabricStudioDrift: {
+            id: string;
+            deviceId: string;
+            field: string;
+            expected: string;
+            observed: string;
+            /** Format: date-time */
+            at: string;
+            /** @enum {string} */
+            state: "OPEN" | "RESOLVED";
+            sourceRef: string;
+        };
+        FabricStudioReady: {
+            id: string;
+            inputSnapshotId: string;
+            buildId: string;
+            assuranceId: string;
+            deviceIds: string[];
+            /** Format: date-time */
+            createdAt: string;
+            /** @enum {string} */
+            status: "READY";
+            limitations: string[];
+        };
+        FabricStudioAudit: {
+            id: string;
+            /** Format: date-time */
+            at: string;
+            actor: string;
+            action: string;
+            ref: string;
+        };
+        FabricStudioState: {
+            schemaVersion: number;
+            projectId: string;
+            actorId: string;
+            inputId: string | null;
+            blueprints: components["schemas"]["FabricStudioBlueprint"][];
+            builds: components["schemas"]["FabricStudioBuild"][];
+            artifacts: components["schemas"]["FabricStudioArtifact"][];
+            validations: components["schemas"]["FabricStudioValidation"][];
+            changes: components["schemas"]["FabricStudioChange"][];
+            rollouts: components["schemas"]["FabricStudioRollout"][];
+            enrollments: components["schemas"]["FabricStudioEnrollment"][];
+            executions: components["schemas"]["FabricStudioExecution"][];
+            assurances: components["schemas"]["FabricStudioAssurance"][];
+            drifts: components["schemas"]["FabricStudioDrift"][];
+            readyRecords: components["schemas"]["FabricStudioReady"][];
+            audit: components["schemas"]["FabricStudioAudit"][];
+            providerConnected: boolean;
+            profileRevisions: components["schemas"]["FabricStudioProfile"][];
+        };
+        FabricStudioCommand: {
+            /** @enum {string} */
+            action: "adopt" | "commitBlueprint" | "reviseBlueprint" | "revertBlueprint" | "publishProfile" | "compile" | "validate" | "createChange" | "submit" | "approve" | "match" | "startZtp" | "finishZtp" | "deploy" | "advance" | "control" | "collect" | "ready";
+            expectedRevision: number;
+            id?: string;
+            ids?: string[];
+            /** @enum {string} */
+            domain?: "SWITCH" | "HOST" | "MULTIPLANE";
+            profile?: string;
+            task?: string;
+            strategy?: string;
+            purpose?: string;
+            window?: string;
+            acknowledgement?: string;
+            reason?: string;
+            decision?: string;
+            control?: string;
+        };
+        FabricStudioTask: {
+            id: string;
+            provider: string;
+            namespace: string;
+            flowId: string;
+            flowRevision: number;
+            name: string;
+            inputSchemaVersion: string;
+            inputSchema: components["schemas"]["FabricStudioTaskInput"][];
+            outputSchema: string[];
+            supportedTargetKinds: string[];
+            capabilityTags: string[];
+            supportsDryRun: boolean;
+            supportsRollback: boolean;
+            supportsPause: boolean;
+            supportsCancel: boolean;
+            retryPolicyRef: string;
+            concurrencyPolicy: string;
+            available: boolean;
+            /** @enum {string} */
+            source: "FLOW_CATALOG";
+            timeoutSeconds: number;
+        };
+        FabricStudioTaskInput: {
+            name: string;
+            type: string;
+            required: boolean;
+        };
+        FabricWorkspace: {
+            revision: number;
+            state: components["schemas"]["FabricStudioState"];
+            inputs: components["schemas"]["FabricInputPage"];
+            tasks: components["schemas"]["FabricStudioTask"][];
+            resultId?: string;
+            inputDigest: string;
+        };
+        FabricWorkspaceEnvelope: {
+            data: components["schemas"]["FabricWorkspace"];
             request_id: string;
         };
     };
@@ -40320,6 +40713,126 @@ export interface operations {
             };
             /** @description Published input or receipt query failed */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getFabricWorkspace: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Persisted workspace and authorized read models */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FabricWorkspaceEnvelope"];
+                };
+            };
+            /** @description Permission or project membership denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision, upstream version or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing facts, evidence or required device adapter */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Storage failed */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Dependency unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    executeFabricCommand: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FabricStudioCommand"];
+            };
+        };
+        responses: {
+            /** @description Persisted workspace and authorized read models */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FabricWorkspaceEnvelope"];
+                };
+            };
+            /** @description Permission or project membership denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Revision, upstream version or idempotency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing facts, evidence or required device adapter */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Storage failed */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Dependency unavailable */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

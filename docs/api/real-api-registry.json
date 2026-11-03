@@ -2258,6 +2258,31 @@
       "handler": "dev/backend/cmd/api/fabric.go",
       "source": "dev/backend/cmd/api/fabric.go",
       "documentation": "docs/api/fabric.md"
+    },
+    {
+      "method": "get",
+      "path": "/projects/{projectId}/fabric/workspace",
+      "operation_id": "getFabricWorkspace",
+      "response_schema": "FabricWorkspaceEnvelope",
+      "implementation": "implemented",
+      "deployment": "branch_preview_8100",
+      "verification": "real API checks in progress; no device execution",
+      "handler": "dev/backend/cmd/api/fabric_studio.go",
+      "source": "dev/src/lib/api/fabric/http.ts",
+      "documentation": "docs/api/fabric.md"
+    },
+    {
+      "method": "post",
+      "path": "/projects/{projectId}/fabric/commands",
+      "operation_id": "executeFabricCommand",
+      "response_schema": "FabricWorkspaceEnvelope",
+      "implementation": "implemented",
+      "deployment": "branch_preview_8100",
+      "verification": "real API checks in progress; no device execution",
+      "handler": "dev/backend/cmd/api/fabric_studio.go",
+      "source": "dev/src/lib/api/fabric/http.ts",
+      "documentation": "docs/api/fabric.md",
+      "request_schema": "FabricStudioCommand"
     }
   ],
   "development_note": "当前运行ceab753/v40，迁移038；真实MM/Ultra分析提案已完整保存，资料理解验收未通过。当前结论见docs/intelligent-deployment/SOURCE-UNDERSTANDING-REVIEW-20261101.txt；未正式发布、未进行模型对照或跨客户验收。"

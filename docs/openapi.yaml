@@ -18647,6 +18647,79 @@ paths:
           description: Project fabric:read and cmdb:read permissions required
         "500":
           description: Published input or receipt query failed
+  /projects/{projectId}/fabric/workspace:
+    get:
+      operationId: getFabricWorkspace
+      tags:
+      - Fabric
+      summary: Read durable Fabric workspace and current published dependencies
+      security:
+      - cookieSession: []
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Persisted workspace and authorized read models
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FabricWorkspaceEnvelope'
+        '403':
+          description: Permission or project membership denied
+        '409':
+          description: Revision, upstream version or idempotency conflict
+        '422':
+          description: Missing facts, evidence or required device adapter
+        '500':
+          description: Storage failed
+        '503':
+          description: Dependency unavailable
+  /projects/{projectId}/fabric/commands:
+    post:
+      operationId: executeFabricCommand
+      tags:
+      - Fabric
+      summary: Apply project-scoped versioned Fabric command
+      security:
+      - cookieSession: []
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Persisted workspace and authorized read models
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FabricWorkspaceEnvelope'
+        '403':
+          description: Permission or project membership denied
+        '409':
+          description: Revision, upstream version or idempotency conflict
+        '422':
+          description: Missing facts, evidence or required device adapter
+        '500':
+          description: Storage failed
+        '503':
+          description: Dependency unavailable
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FabricStudioCommand'
+      description: Transactional PostgreSQL state/audit/idempotency. Only confirmed
+        Kickoff publications. Structured intent is not executable NOS configuration.
+        No simulated discovery, execution, telemetry or approval. Missing native renderer
+        and adapter block production writes; signatures use existing approval API.
 components:
   securitySchemes:
     bearerAuth:
@@ -52000,15 +52073,15 @@ components:
         - digest
         - missingAssetIds
       properties:
-        id: &a2
+        id: &fabricInputString
           type: string
-        projectId: *a2
+        projectId: *fabricInputString
         revision:
           type: integer
         publishedAt:
           type: string
           format: date-time
-        modelRevisionId: *a2
+        modelRevisionId: *fabricInputString
         inputVersions:
           type: object
           additionalProperties:
@@ -52026,10 +52099,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/IDENetworkPlan"
-        digest: *a2
+        digest: *fabricInputString
         missingAssetIds:
           type: array
-          items: *a2
+          items: *fabricInputString
     FabricInputPage:
       type: object
       additionalProperties: false
@@ -52040,7 +52113,7 @@ components:
         - inputs
         - nextCursor
       properties:
-        projectId: &a2
+        projectId: &fabricPageString
           type: string
         status:
           type: string
@@ -52048,7 +52121,7 @@ components:
             - WAITING_FOR_KICKOFF
             - EMPTY
             - AVAILABLE
-        message: *a2
+        message: *fabricInputString
         inputs:
           type: array
           items:
@@ -52068,6 +52141,1154 @@ components:
           $ref: "#/components/schemas/FabricInputPage"
         request_id:
           type: string
+    FabricStudioBlueprint:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - fabricId
+      - revision
+      - inputSnapshotId
+      - topologyType
+      - planeCount
+      - tierCount
+      - deviceGroupIds
+      - profileRevisionIds
+      - status
+      - createdAt
+      properties:
+        id:
+          type: string
+        fabricId:
+          type: string
+        revision:
+          type: integer
+        inputSnapshotId:
+          type: string
+        topologyType:
+          type: string
+        planeCount:
+          type: integer
+        tierCount:
+          type: integer
+        deviceGroupIds:
+          type: array
+          items:
+            type: string
+        profileRevisionIds:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - COMMITTED
+          - STALE
+        createdAt:
+          type: string
+          format: date-time
+    FabricStudioProfile:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - name
+      - version
+      - domain
+      - roleSelector
+      - policyRefs
+      - capabilityConstraints
+      - schemaVersion
+      - status
+      - features
+      - description
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+        domain:
+          type: string
+          enum:
+          - SWITCH
+          - HOST
+          - MULTIPLANE
+        roleSelector:
+          type: array
+          items:
+            type: string
+        policyRefs:
+          type: array
+          items:
+            type: string
+        capabilityConstraints:
+          type: array
+          items:
+            type: string
+        schemaVersion:
+          type: string
+        status:
+          type: string
+        features:
+          type: array
+          items:
+            type: string
+        description:
+          type: string
+    FabricStudioParameters:
+      type: object
+      additionalProperties: false
+      required:
+      - asn
+      - address
+      - pfc
+      - ecn
+      - bgpPeers
+      - vrf
+      - vni
+      - sourceRefs
+      properties:
+        asn:
+          anyOf:
+          - type: integer
+          - type: 'null'
+        address:
+          type: string
+        pfc:
+          anyOf:
+          - type: integer
+          - type: 'null'
+        ecn:
+          type: string
+        bgpPeers:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioPeer'
+        vrf:
+          type: string
+        vni:
+          anyOf:
+          - type: integer
+          - type: 'null'
+        sourceRefs:
+          type: array
+          items:
+            type: string
+    FabricStudioPeer:
+      type: object
+      additionalProperties: false
+      required:
+      - deviceId
+      - asn
+      - address
+      properties:
+        deviceId:
+          type: string
+        asn:
+          type: integer
+        address:
+          type: string
+    FabricStudioSemanticChange:
+      type: object
+      additionalProperties: false
+      required:
+      - field
+      - before
+      - after
+      - operation
+      - sourceRef
+      properties:
+        field:
+          type: string
+        before:
+          type: string
+        after:
+          type: string
+        operation:
+          type: string
+          enum:
+          - ADD
+          - MODIFY
+          - DELETE
+        sourceRef:
+          type: string
+    FabricStudioArtifact:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - deviceId
+      - domain
+      - format
+      - hash
+      - sourceRefs
+      - capabilityRevision
+      - contentRef
+      - validationStatus
+      - content
+      - commands
+      - changes
+      - unsupported
+      - missing
+      - profileId
+      - profileVersion
+      - inputSnapshotId
+      - parameters
+      properties:
+        id:
+          type: string
+        deviceId:
+          type: string
+        domain:
+          type: string
+          enum:
+          - SWITCH
+          - HOST
+          - MULTIPLANE
+        format:
+          type: string
+        hash:
+          type: string
+        sourceRefs:
+          type: array
+          items:
+            type: string
+        capabilityRevision:
+          type: string
+        contentRef:
+          type: string
+        validationStatus:
+          type: string
+          enum:
+          - PASS
+          - WARNING
+          - BLOCKED
+          - UNSUPPORTED
+          - STALE
+          - NOT_RUN
+        content:
+          type: string
+        commands:
+          type: string
+        changes:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioSemanticChange'
+        unsupported:
+          type: array
+          items:
+            type: string
+        missing:
+          type: array
+          items:
+            type: string
+        profileId:
+          type: string
+        profileVersion:
+          type: string
+        inputSnapshotId:
+          type: string
+        parameters:
+          $ref: '#/components/schemas/FabricStudioParameters'
+    FabricStudioBuild:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - blueprintRevisionId
+      - inputSnapshotId
+      - profileRevisionIds
+      - compilerVersion
+      - status
+      - artifactIds
+      - createdAt
+      - targetDeviceIds
+      properties:
+        id:
+          type: string
+        blueprintRevisionId:
+          type: string
+        inputSnapshotId:
+          type: string
+        profileRevisionIds:
+          type: array
+          items:
+            type: string
+        compilerVersion:
+          type: string
+        status:
+          type: string
+          enum:
+          - BUILDING
+          - BUILT
+          - INVALID
+          - STALE
+        artifactIds:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        targetDeviceIds:
+          type: array
+          items:
+            type: string
+    FabricStudioFinding:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - checkId
+      - domain
+      - status
+      - message
+      - required
+      properties:
+        id:
+          type: string
+        deviceId:
+          type: string
+        checkId:
+          type: string
+        domain:
+          type: string
+          enum:
+          - SWITCH
+          - HOST
+          - MULTIPLANE
+        status:
+          type: string
+          enum:
+          - PASS
+          - WARNING
+          - BLOCKED
+          - UNSUPPORTED
+          - STALE
+          - NOT_RUN
+        expected:
+          type: string
+        actual:
+          type: string
+        sourceRef:
+          type: string
+        message:
+          type: string
+        evidenceRef:
+          type: string
+        required:
+          type: boolean
+    FabricStudioValidation:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - configBuildId
+      - status
+      - passed
+      - warnings
+      - blocked
+      - unsupported
+      - findings
+      - evidenceRefs
+      - createdAt
+      properties:
+        id:
+          type: string
+        configBuildId:
+          type: string
+        status:
+          type: string
+          enum:
+          - PASS
+          - WARNING
+          - BLOCKED
+          - UNSUPPORTED
+          - STALE
+          - NOT_RUN
+        passed:
+          type: integer
+        warnings:
+          type: integer
+        blocked:
+          type: integer
+        unsupported:
+          type: integer
+        findings:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioFinding'
+        evidenceRefs:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+    FabricStudioWave:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - sequence
+      - targetDeviceIds
+      - taskBindings
+      - maxConcurrency
+      - executionRefs
+      - dependsOn
+      properties:
+        id:
+          type: string
+        sequence:
+          type: integer
+        targetDeviceIds:
+          type: array
+          items:
+            type: string
+        taskBindings:
+          type: array
+          items:
+            type: string
+        maxConcurrency:
+          type: integer
+        executionRefs:
+          type: array
+          items:
+            type: string
+        dependsOn:
+          type: array
+          items:
+            type: string
+    FabricStudioRollout:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - strategy
+      - waves
+      - maxConcurrency
+      - timeoutSeconds
+      - retryPolicyRef
+      - safe
+      - warnings
+      properties:
+        id:
+          type: string
+        strategy:
+          type: string
+          enum:
+          - CANARY
+          - PROGRESSIVE
+          - SERIAL
+          - PARALLEL
+        waves:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioWave'
+        maxConcurrency:
+          type: integer
+        timeoutSeconds:
+          type: integer
+        retryPolicyRef:
+          type: string
+        safe:
+          type: boolean
+        warnings:
+          type: array
+          items:
+            type: string
+    FabricStudioApproval:
+      type: object
+      additionalProperties: false
+      required:
+      - actorId
+      - actorName
+      - decision
+      - reason
+      - at
+      properties:
+        actorId:
+          type: string
+        actorName:
+          type: string
+        decision:
+          type: string
+        reason:
+          type: string
+        at:
+          type: string
+          format: date-time
+    FabricStudioChange:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - configBuildId
+      - validationRunId
+      - targetDeviceIds
+      - riskLevel
+      - approvalStatus
+      - rolloutPlanId
+      - sourceSnapshotId
+      - purpose
+      - createdBy
+      - createdAt
+      - window
+      - taskBindingId
+      - warningAcknowledgement
+      properties:
+        id:
+          type: string
+        configBuildId:
+          type: string
+        validationRunId:
+          type: string
+        targetDeviceIds:
+          type: array
+          items:
+            type: string
+        riskLevel:
+          type: string
+        approvalStatus:
+          type: string
+          enum:
+          - DRAFT
+          - IN_REVIEW
+          - APPROVED
+          - REJECTED
+          - STALE
+        rolloutPlanId:
+          type: string
+        sourceSnapshotId:
+          type: string
+        purpose:
+          type: string
+        createdBy:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        window:
+          type: string
+        approval:
+          $ref: '#/components/schemas/FabricStudioApproval'
+        taskBindingId:
+          type: string
+        warningAcknowledgement:
+          type: string
+        executionId:
+          type: string
+        approvalId:
+          type: string
+    FabricStudioStage:
+      type: object
+      additionalProperties: false
+      required:
+      - label
+      - state
+      properties:
+        label:
+          type: string
+        state:
+          type: string
+        at:
+          type: string
+          format: date-time
+    FabricStudioEnrollment:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - deviceId
+      - profileId
+      - profileRevision
+      - bootstrapArtifactId
+      - discoveredIdentity
+      - status
+      - evidenceRefs
+      - timeline
+      - attempt
+      properties:
+        id:
+          type: string
+        deviceId:
+          type: string
+        profileId:
+          type: string
+        profileRevision:
+          type: string
+        bootstrapArtifactId:
+          type: string
+        managementAddress:
+          type: string
+        discoveredIdentity:
+          type: object
+          additionalProperties:
+            type: string
+        matchedDeviceId:
+          type: string
+        jobExecutionId:
+          type: string
+        status:
+          type: string
+          enum:
+          - UNKNOWN
+          - DISCOVERED
+          - MATCH_PENDING
+          - QUEUED
+          - RUNNING
+          - SUCCESS
+          - FAILED
+        evidenceRefs:
+          type: array
+          items:
+            type: string
+        timeline:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioStage'
+        attempt:
+          type: integer
+        error:
+          type: string
+    FabricStudioTargetRun:
+      type: object
+      additionalProperties: false
+      required:
+      - deviceId
+      - state
+      - attempt
+      - stage
+      - logs
+      - outputRefs
+      properties:
+        deviceId:
+          type: string
+        state:
+          type: string
+        attempt:
+          type: integer
+        stage:
+          type: string
+        error:
+          type: string
+        logs:
+          type: array
+          items:
+            type: string
+        outputRefs:
+          type: array
+          items:
+            type: string
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+    FabricStudioExecution:
+      type: object
+      additionalProperties: false
+      required:
+      - provider
+      - executionId
+      - flowId
+      - flowRevision
+      - taskRunIds
+      - state
+      - rawState
+      - logRef
+      - outputRefs
+      - startedAt
+      - targets
+      - changeSetId
+      - wave
+      - failureMode
+      properties:
+        provider:
+          type: string
+        executionId:
+          type: string
+        flowId:
+          type: string
+        flowRevision:
+          type: integer
+        taskRunIds:
+          type: array
+          items:
+            type: string
+        state:
+          type: string
+        rawState:
+          type: string
+        logRef:
+          type: string
+        outputRefs:
+          type: array
+          items:
+            type: string
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        targets:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioTargetRun'
+        changeSetId:
+          type: string
+        wave:
+          type: integer
+        failureMode:
+          type: string
+    FabricStudioComparison:
+      type: object
+      additionalProperties: false
+      required:
+      - deviceId
+      - artifactId
+      - desired
+      - rendered
+      - applied
+      - operational
+      - state
+      - findings
+      - observedAt
+      - source
+      properties:
+        deviceId:
+          type: string
+        artifactId:
+          type: string
+        desired:
+          type: string
+        rendered:
+          type: string
+        applied:
+          type: string
+        operational:
+          type: string
+        state:
+          type: string
+          enum:
+          - COMPLIANT
+          - DRIFTED
+          - UNKNOWN
+          - NOT_VERIFIED
+        findings:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioFinding'
+        observedAt:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+        source:
+          type: string
+    FabricStudioAssurance:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - buildId
+      - inputSnapshotId
+      - executionIds
+      - createdAt
+      - records
+      - status
+      properties:
+        id:
+          type: string
+        buildId:
+          type: string
+        inputSnapshotId:
+          type: string
+        executionIds:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        records:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioComparison'
+        status:
+          type: string
+          enum:
+          - COMPLIANT
+          - DRIFTED
+          - UNKNOWN
+          - NOT_VERIFIED
+    FabricStudioDrift:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - deviceId
+      - field
+      - expected
+      - observed
+      - at
+      - state
+      - sourceRef
+      properties:
+        id:
+          type: string
+        deviceId:
+          type: string
+        field:
+          type: string
+        expected:
+          type: string
+        observed:
+          type: string
+        at:
+          type: string
+          format: date-time
+        state:
+          type: string
+          enum:
+          - OPEN
+          - RESOLVED
+        sourceRef:
+          type: string
+    FabricStudioReady:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - inputSnapshotId
+      - buildId
+      - assuranceId
+      - deviceIds
+      - createdAt
+      - status
+      - limitations
+      properties:
+        id:
+          type: string
+        inputSnapshotId:
+          type: string
+        buildId:
+          type: string
+        assuranceId:
+          type: string
+        deviceIds:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
+          - READY
+        limitations:
+          type: array
+          items:
+            type: string
+    FabricStudioAudit:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - at
+      - actor
+      - action
+      - ref
+      properties:
+        id:
+          type: string
+        at:
+          type: string
+          format: date-time
+        actor:
+          type: string
+        action:
+          type: string
+        ref:
+          type: string
+    FabricStudioState:
+      type: object
+      additionalProperties: false
+      required:
+      - schemaVersion
+      - projectId
+      - actorId
+      - inputId
+      - blueprints
+      - builds
+      - artifacts
+      - validations
+      - changes
+      - rollouts
+      - enrollments
+      - executions
+      - assurances
+      - drifts
+      - readyRecords
+      - audit
+      - providerConnected
+      - profileRevisions
+      properties:
+        schemaVersion:
+          type: integer
+        projectId:
+          type: string
+        actorId:
+          type: string
+        inputId:
+          anyOf:
+          - type: string
+          - type: 'null'
+        blueprints:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioBlueprint'
+        builds:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioBuild'
+        artifacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioArtifact'
+        validations:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioValidation'
+        changes:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioChange'
+        rollouts:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioRollout'
+        enrollments:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioEnrollment'
+        executions:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioExecution'
+        assurances:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioAssurance'
+        drifts:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioDrift'
+        readyRecords:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioReady'
+        audit:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioAudit'
+        providerConnected:
+          type: boolean
+        profileRevisions:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioProfile'
+    FabricStudioCommand:
+      type: object
+      additionalProperties: false
+      required:
+      - action
+      - expectedRevision
+      properties:
+        action:
+          type: string
+          enum:
+          - adopt
+          - commitBlueprint
+          - reviseBlueprint
+          - revertBlueprint
+          - publishProfile
+          - compile
+          - validate
+          - createChange
+          - submit
+          - approve
+          - match
+          - startZtp
+          - finishZtp
+          - deploy
+          - advance
+          - control
+          - collect
+          - ready
+        expectedRevision:
+          type: integer
+        id:
+          type: string
+        ids:
+          type: array
+          items:
+            type: string
+        domain:
+          type: string
+          enum:
+          - SWITCH
+          - HOST
+          - MULTIPLANE
+        profile:
+          type: string
+        task:
+          type: string
+        strategy:
+          type: string
+        purpose:
+          type: string
+        window:
+          type: string
+        acknowledgement:
+          type: string
+        reason:
+          type: string
+        decision:
+          type: string
+        control:
+          type: string
+    FabricStudioTask:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - provider
+      - namespace
+      - flowId
+      - flowRevision
+      - name
+      - inputSchemaVersion
+      - inputSchema
+      - outputSchema
+      - supportedTargetKinds
+      - capabilityTags
+      - supportsDryRun
+      - supportsRollback
+      - supportsPause
+      - supportsCancel
+      - retryPolicyRef
+      - concurrencyPolicy
+      - available
+      - source
+      - timeoutSeconds
+      properties:
+        id:
+          type: string
+        provider:
+          type: string
+        namespace:
+          type: string
+        flowId:
+          type: string
+        flowRevision:
+          type: integer
+        name:
+          type: string
+        inputSchemaVersion:
+          type: string
+        inputSchema:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioTaskInput'
+        outputSchema:
+          type: array
+          items:
+            type: string
+        supportedTargetKinds:
+          type: array
+          items:
+            type: string
+        capabilityTags:
+          type: array
+          items:
+            type: string
+        supportsDryRun:
+          type: boolean
+        supportsRollback:
+          type: boolean
+        supportsPause:
+          type: boolean
+        supportsCancel:
+          type: boolean
+        retryPolicyRef:
+          type: string
+        concurrencyPolicy:
+          type: string
+        available:
+          type: boolean
+        source:
+          type: string
+          enum:
+          - FLOW_CATALOG
+        timeoutSeconds:
+          type: integer
+    FabricStudioTaskInput:
+      type: object
+      additionalProperties: false
+      required:
+      - name
+      - type
+      - required
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        required:
+          type: boolean
+    FabricWorkspace:
+      type: object
+      additionalProperties: false
+      required:
+      - revision
+      - state
+      - inputs
+      - tasks
+      - inputDigest
+      properties:
+        revision:
+          type: integer
+        state:
+          $ref: '#/components/schemas/FabricStudioState'
+        inputs:
+          $ref: '#/components/schemas/FabricInputPage'
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/FabricStudioTask'
+        resultId:
+          type: string
+        inputDigest:
+          type: string
+    FabricWorkspaceEnvelope:
+      type: object
+      additionalProperties: false
+      required:
+      - data
+      - request_id
+      properties:
+        data:
+          $ref: '#/components/schemas/FabricWorkspace'
+        request_id:
+          type: string
+
 x-implementation-policy:
   frontend-first: true
   mock-provider-required: true

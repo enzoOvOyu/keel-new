@@ -46,7 +46,7 @@ func (s *Server) fabricRoutes(w http.ResponseWriter, r *http.Request) bool {
 	}
 	project := parts[3]
 	actor := subjectOf(r.Context())
-	if !actor.Can("fabric:read", project, "", "") || !actor.Can("cmdb:read", project, "", "") {
+	if !fabricAuthorizedProject(r, project) || !actor.Can("fabric:read", project, "", "") || !actor.Can("cmdb:read", project, "", "") {
 		fail(w, 403, "FORBIDDEN")
 		return true
 	}
@@ -102,7 +102,7 @@ func (s *Server) fabricPublishedInputs(ctx context.Context, project, before stri
 	}
 	for i := range page.Inputs {
 		p := &page.Inputs[i]
-		ar, e := s.db.Query(ctx, `SELECT o.entity_id::text,c.asset_type,c.name,c.version,c.source_type,c.payload FROM kickoff_publication_object o LEFT JOIN cmdb_entity c ON c.item_uid=o.entity_id::text AND EXISTS(SELECT 1 FROM cmdb_asset_scope sc WHERE sc.asset_id=c.item_uid AND sc.project_id=$2) WHERE o.publication_id::text=$1 ORDER BY o.entity_id`, p.ID, project)
+		ar, e := s.db.Query(ctx, `SELECT DISTINCT o.entity_id::text,c.asset_type,c.name,c.version,c.source_type,c.payload FROM kickoff_publication_object o LEFT JOIN cmdb_entity c ON c.item_uid=o.entity_id::text AND EXISTS(SELECT 1 FROM cmdb_asset_scope sc WHERE sc.asset_id=c.item_uid AND sc.project_id=$2) WHERE o.publication_id::text=$1 ORDER BY o.entity_id::text`, p.ID, project)
 		if e != nil {
 			return page, e
 		}
@@ -186,4 +186,10 @@ func fabricInputDigest(p fabricPublishedInput) string {
 	}{p.ID, p.ModelRevision, p.InputVersions, p.AssetVersions})
 	sum := sha256.Sum256(value)
 	return hex.EncodeToString(sum[:])
+}
+
+func fabricDigest(v any) string {
+	b, _ := json.Marshal(v)
+	h := sha256.Sum256(b)
+	return hex.EncodeToString(h[:])
 }

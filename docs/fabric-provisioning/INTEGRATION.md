@@ -1,38 +1,27 @@
-# Fabric 原型工程化接入 · 第一切片
+# Fabric 原型工程化接入 · 真实持久化切片
 
-分支feat/fabric-rebuild，工作区/home/ubuntu/keel-fabric-dev。主应用路由/p/:projectId/deploy/fabric/{overview,blueprint,onboarding,configuration,validation,deployments,assurance,settings}。不是新应用，不新增createRoot或BrowserRouter，不改变部署/运维/系统三个平面。
+分支 feat/fabric-rebuild，工作区 /home/ubuntu/keel-fabric-dev。设计入口为本目录 CONTRACTS.txt 与 IMPLEMENTATION.txt；用户已明确，不再以缺少 FABRIC-DESIGN-CONTRACT.md 作为阻塞。
 
-## 视觉与交互
+## 页面
 
-直接迁入5194 React原型Pages、Dialogs、Topology、ui及其CSS；没有用旧Fabric/NetworkWorkspace替代。原独立App Shell由现有Shell/Sidebar/Header承接，八个页面登记为Fabric子菜单。沿用原页面标题、布局、表格、过滤、Graph/Tabs、Inspector、Drawer、Dialog与状态链。CSS在构建时限定.fabric-workspace，Portal容器也在作用域内；host.css仅调整Fabric内容区几何，其他页面不受影响。
+八个已迁入原型页面继续使用当前 Shell / Sidebar / Header / ProjectContext / Session，路由 /p/:projectId/deploy/fabric/{overview,blueprint,onboarding,configuration,validation,deployments,assurance,settings}。保留原型页面结构、表格、Topology、Dialog/Drawer；真实数据的未知状态按原样式表达，不用旧页面替换。
 
-当前尚未找到FABRIC-DESIGN-CONTRACT.md。已向用户询问路径；没有自行编造同名文件或宣称通过该文档验收。source-manifest记录原型源码摘要；现有5194为当前可读取的唯一视觉源码，不假设其等同尚未提供的另一份Astra文件。
+主应用中的模拟 Provider、设备/作业/观测模拟 Adapter 已删除。没有 VITE_FABRIC_PROVIDER 开关，没有 fixture/localStorage/sessionStorage 回退。模拟结果选择、漂移注入和虚构默认时间窗已移除；原型中的假设备数/800G、Plane 和网络参数不进入真实展示。真实大范围拓扑按 18 个设备一组显示，保留缩放和角色/Plane 过滤；未确认角色独立展示，不推断 Leaf/Spine。
 
-## 数据边界
+## 后端
 
-Mock/Http共用FabricFixture/FabricState等页面DTO，统一位于src/lib/api/fabric；页面不直接读取fixture。Mock显式VITE_FABRIC_PROVIDER=mock，用项目隔离sessionStorage；主应用身份来自Session，无模拟身份下拉。其他项目上的Mock数据是明确合成切片，不能当作这些项目的真实资产。
+合入 dev 已提交的最新 Kickoff 发布链；不是复制另一窗口未提交代码。只读 publication + CMDB scope，按稳定 ID 去重，保留设备/端口/Cable 身份。迁移 052 新增 Fabric 工作区与幂等回执，资产不复制。增量迁移前 Schema 备份保存在本机私有 .local-fabric 目录，不提交 Git。
 
-默认Http模式只读取本切片真实GET输入API，将Kickoff已发布范围与授权CMDB投影为同一页面模型；不猜测型号/端口/Plane/NOS/实际配置/LLDP。真实写操作尚未接入时明确不可用，绝不回退Mock。下一切片再实现输入采用及Blueprint修订持久化，其后按产物→校验审批→受控执行→回采推进，不一次性重写全后端。
+真实采用/Blueprint/意图产物/预检持久化及统一审批路径见 docs/api/fabric.md。编译器仅生成明确类型的结构化意图，缺少原生 Renderer 和设备能力时不可执行。ZTP、实际下发、真实独立回采和回滚没有假成功路径。
 
-## Kickoff依赖
+现有发布数据不含 NetworkPlan；任务目录没有可用的 Fabric 任务声明。配置预检必须如实阻断；物理布线展示不等于网络方案已批准。
 
-用户指定另一窗口的新Kickoff作为唯一发布上游。依赖其published状态、publication_object、publication_input和CMDB回执；不复制未提交开发，不重复建模或导入。检查时用户所述5191未监听；当前已知原型5195、集成页5196。端口不是数据契约，正式读取后端API。
+## 运行隔离
 
-上游迁移049未部署时API返回WAITING_FOR_KICKOFF；未发布/failed/pending范围不出现在输入列表。新API本身不创建workspace，不运行AI，不写数据库或调用设备。
+前端 5197，tmux keel-fabric-integrated，代理真实 Go 8100（tmux keel-fabric-real-api）。使用已有受控环境配置和同一开发数据库，关闭后台通用 Worker，未绑定重复 Agent 网关/注册端口。5180/8081 与独立5194原型不变。该分支预览不是现网部署。
 
-## 文件映射
+## 验证记录
 
-- src/features/fabric/Workspace.tsx：复用Shell/ProjectContext/Session/Query，注册原型WorkspaceContext。
-- Pages.tsx / Dialogs.tsx / Topology.tsx / ui.tsx：保留原型内容组件；仅导入路径、异步命令、Portal与真实/模拟来源标识适配。
-- styles.css：原型CSS；host.css：Fabric独占内容区几何。
-- src/lib/api/fabric/{types,mock,adapters,http,provider}.ts：统一页面模型、原型演示状态机、真实只读Adapter与显式Provider选择。
-- cmd/api/fabric.go：getFabricPublishedInputs，复用CMDB身份及engineeringModel读取。
-- docs/openapi.yaml / 生成类型 / docs/api/fabric.md / API台账：当前只读切片契约。
+真实 API 检查已通过：稳定ID去重、旧版本409、证据缺失阻断、PostgreSQL刷新恢复、项目拒绝；8页真实接口渲染及配置Dialog打开，0 pageerror。使用已发布开发库22,492条对象，967台服务器/交换机，0个NetworkPlan，0个适配Fabric的任务声明；没有设备调用。首次执行另已验证同key重放只增加一次版本。4项Go定向检查通过。TypeScript + 生产构建通过（Vite 1m32s）；仅保留既有依赖注释和大chunk告警，未做无关依赖重构。136项真实API台账引用检查通过。历史 integration/result.json 的合成 API 拦截只证明此前原型接入，不作为本切片真实 API 证据。真实检查不调用设备，不模拟网络执行。
 
-## 验证范围
-
-integration/result.json记录8页主应用加载、无重复Shell、发布输入Dialog/Mock采用、Sidebar/Blueprint Commit、配置Dialog；零pageerror，所有API拦截synthetic，无后端或设备写入。截图只能证明当前Mock接入，不能代替设计契约逐项/像素批准。
-
-Go针对摘要与项目拒绝的检查通过；真实Kickoff/CMDB联合数据与数据库分页尚未验证，不宣称只读API已经在线可用。本分支未部署5180/8081，也未迁移在线数据库。
-
-最终TS复核与生产构建通过（Vite1m23s）；Go API构建和2项定向检查通过；123项API台账引用通过。当前主应用隔离预览5197返回200，tmux keel-fabric-integrated，显式Mock；不是5180发布。
+真实检查采用现有数据库记录，不证明现场设备或 NOS 兼容。只读目视检查 overview/configuration 截图；实际截图保存在 /tmp/keel-fabric-real-check，未提交真实资产截图。后续调整了未知角色的紧凑分行及DEV标识，需以最终源代码为准，不宣称像素100%验收。

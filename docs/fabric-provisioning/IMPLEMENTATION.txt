@@ -26,3 +26,6 @@ NetworkReady只证明选中Build范围的模拟闭环，不代表整个Fabric或
 
 设计入口：DESIGN.txt、REFERENCES.txt、CONTRACTS.txt、lifecycle.mmd。
 开发已收口；后续按用户评审修改，不继续扩大开发或重复回归。
+
+2026-11-03 主应用真实接入增补（优先于原型模拟描述）
+用户已要求不使用 Mock。生产组件只消费真实API；原型中的合成发布/任务/能力/执行/观测不会迁入主应用。当前实现与API语义统一见 ../api/fabric.md 和 INTEGRATION.md；机器Schema仅由 ../openapi.yaml 定义。迁移052负责真实工作区及幂等回执；已有Kickoff/CMDB/审批/作业能力保持原所有权。没有设备适配器时明确阻断，不将配置意图JSON冒充可下发NVUE。

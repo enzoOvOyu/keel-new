@@ -3,9 +3,9 @@
 ## Fabric 原型接入（2026-11-02，本分支当前任务）
 
 - 用户明确要求在feat/fabric-rebuild、/home/ubuntu/keel-fabric-dev接入Astra确认原型；复用当前Shell、ProjectContext和RBAC，保留页面布局/信息层级/密度/Drawer/交互，不用旧页面替换，不自行设计。
-- FABRIC-DESIGN-CONTRACT.md为用户指定验收标准；文件未提供时记录缺失并询问路径，不编造同名标准或声称100%通过。当前可读原型为dev/prototypes/fabric-studio（5194）。
+- 用户已确认设计/实施入口为 docs/fabric-provisioning/CONTRACTS.txt 与 IMPLEMENTATION.txt；原型 dev/prototypes/fabric-studio（5194）。不再以缺少另一个命名文件为由阻塞。
 - 另一窗口的新Kickoff为资产和规划发布上游，仅消费published范围与CMDB回执；不复制未提交代码、不重复导入或建设CMDB。按纵向切片落地，不一次性重写后端；真实接口未接通不可回退为模拟成功。
-- 分支预览可显式VITE_FABRIC_PROVIDER=mock，但不等同真实后端/设备验收；不擅自部署5180/8081。
+- 用户最新要求 Fabric 主应用禁止 Mock：只能使用真实 API，不能从 fixture、浏览器状态或模拟执行回退。独立原型不是生产数据来源。分支预览5197→8100，关闭重复后台Worker；不擅自部署5180/8081。
 
 
 ## 开发分支与 Demo 隔离（2026-11-01，优先于旧分支说明）

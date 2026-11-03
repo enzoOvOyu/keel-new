@@ -1,14 +1,16 @@
-## 当前任务 · Fabric Astra原型工程化第一切片（2026-11-02）
+## 当前任务 · Fabric 真实 API 持久化切片（2026-11-03）
 
-独立分支feat/fabric-rebuild，工作区/home/ubuntu/keel-fabric-dev，基线d9e2b77。原“空白页”仅为本轮之前历史，现已迁入全部8页原型内容、Topology、Dialog/Drawer/Table和状态交互；复用主应用Shell与ProjectContext/Session，不嵌套新Router/入口，不用旧Fabric组件替代。
+工作区 /home/ubuntu/keel-fabric-dev，分支 feat/fabric-rebuild。已合入 dev 最新已提交 Kickoff 依赖（合并提交 c5c19fb）。设计入口用户已明确为 docs/fabric-provisioning/CONTRACTS.txt、IMPLEMENTATION.txt，不再等待另一个同名验收文件。
 
-正式路由/p/:projectId/deploy/fabric/{overview,blueprint,onboarding,configuration,validation,deployments,assurance,settings}。隔离主应用预览5197（显式Mock），原5194原型和5180/8081保持原样。默认Real Provider仅读新Kickoff已发布范围及当前授权CMDB回执，不执行模拟写入。新getFabricPublishedInputs接口、生成类型/123项台账/模块契约已同步；无新DB实体/迁移。
+用户明确禁止 Mock。主应用 Fabric 已删除模拟 Provider/Adapter 和开关，八页使用真实 Http Provider；保留原型布局及共享主 Shell。5197→8100 为隔离分支预览，后台 Worker 关闭，不影响5180/8081。独立5194原型不作为资产或执行来源。
 
-关键依赖：另一个窗口新Kickoff的publication及迁移049尚未同步/部署；其未提交代码没有复制。本轮不将既有旧工程输入替代新Kickoff。用户所述5191未监听，现有Kickoff原型5195、集成5196；正式依赖API，不靠端口抓页面数据。
+已实现输入采用、Blueprint/Profile 修订、结构化意图、预检的 PostgreSQL 持久化；迁移052已应用开发库，仅新增Fabric工作区/幂等回执。命令含项目鉴权、版本冲突、幂等和同事务审计。复用现有审批/Flow查询，不复制 CMDB/Execution。真实发布设备同时出现在device/placement时去重。
 
-关键验收缺口：本机未找到FABRIC-DESIGN-CONTRACT.md，已询问用户路径。当前按5194可读React源保留设计，但不声称通过该文件或像素级100%验收。source-manifest保留源码摘要。后续先取得验收契约，再做输入采用/Blueprint持久化切片，随后编译、校验审批、受控执行、回采，不能把Mock全流程当真实落地。
+真实限制：当前发布没有 NetworkPlan；没有原生 NOS Renderer/设备能力证据/批准执行适配器。结构化意图不是可执行配置；Build INVALID、预检 BLOCKED，不能签批执行或伪造 READY。ZTP、真实回采、漂移、回滚仍待后续切片；证据缺口报告保持 UNKNOWN。
 
-已运行：8页加载、单Shell、来源Dialog/Mock采用、Sidebar/Blueprint Commit及配置Dialog检查通过，零pageerror，API全部synthetic拦截、无后端设备写入。Go摘要/项目拒绝检查与API构建通过；TS/Vite构建通过（Vite1m23s，既有体积/依赖注释告警）。未做真实Kickoff/CMDB联合验收。详细位置docs/fabric-provisioning/INTEGRATION.md、docs/api/fabric.md、integration/result.json。下文为历史记录。
+关键文件：dev/backend/cmd/api/fabric{,_studio,_configuration,_operations}.go、internal/fabric/model.go、migrations/052_fabric_workspace.sql、dev/src/lib/api/fabric/http.ts；文档与真实接口表 docs/api/fabric.md、docs/fabric-provisioning/INTEGRATION.md、docs/openapi.yaml、docs/api/real-api-registry.json。真实定向检查脚本 dev/scripts/check-fabric-real.mjs；凭据/会话/截图在私有临时目录，不写Git。
+
+4项Go定向检查、TypeScript与生产构建、136项API台账检查通过；真实Session/API/数据库与8页浏览器检查通过。具体范围/证据见 INTEGRATION.md。旧 integration/result.json 为合成API拦截历史，不能当真实后端验收。下文均为历史，不覆盖本快照。
 
 ## 当前任务 · 2026-11-02 Fabric重构空白起点
 
