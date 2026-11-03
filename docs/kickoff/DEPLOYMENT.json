@@ -1,23 +1,23 @@
 {
-  "code_revision": "66ce278e3ce47ee1aa189a3aee4a1713afa3a1a7",
-  "frontend_code_revision": "66ce278e3ce47ee1aa189a3aee4a1713afa3a1a7",
-  "backend_code_revision": "66ce278e3ce47ee1aa189a3aee4a1713afa3a1a7",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-domain-66ce278",
-  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-domain-66ce278",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-perf-22d885e",
-  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-cold-802a001",
+  "code_revision": "2357457672926097fe86374b61695ab048209581",
+  "frontend_code_revision": "2357457672926097fe86374b61695ab048209581",
+  "backend_code_revision": "aabae089188ac541402661c6e2d1edc79b5a8e9e",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-workflows-2357457",
+  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-workflows-aabae08",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-workflows-aabae08",
+  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-rack-display-00fdf47",
   "ports": [
     5180,
     8081
   ],
   "migrations": [],
-  "api_restarted": true,
-  "binary_sha256": "aa7027764c8e198fa9ff1f0085789c20b267293535348c8ddb015a599af166a7",
-  "frontend_index_sha256": "7b218d0853c60a89548e0bc9918793ef3bf896a4b1f921f6bdb9bdd541419873",
+  "api_restarted": false,
+  "binary_sha256": "8a1d85d96243df635e6b5a583b4927f4b2f3b83bc29ea8977f73c83d38bbbe61",
+  "frontend_index_sha256": "e4aecd5a09d5291fee1c2293247cb7c5f1ddf0e9a816abd367e29076113a10e1",
   "status": "deployed",
   "binary_matches": true,
   "frontend_index_matches": true,
-  "old_assets_retained": 250,
+  "old_assets_retained": 437,
   "checks": {
     "health": 200,
     "frontend": 200,
@@ -25,39 +25,15 @@
   },
   "business_tests": "NOT RUN",
   "provider_calls": 0,
-  "static_checks": [
-    {
-      "path": "/startup.css",
-      "status": 200,
-      "mime": "text/css"
-    },
-    {
-      "path": "/assets/index-zC83Fy2E.js",
-      "status": 200,
-      "mime": "text/javascript"
-    },
-    {
-      "path": "/assets/index-BvlS0FnI.css",
-      "status": 200,
-      "mime": "text/css"
-    },
-    {
-      "path": "/assets/ApprovedTopologyWorkspace-BP1PAbA4.js",
-      "status": 200,
-      "mime": "text/javascript"
-    }
-  ],
-  "active_agent_jobs_before_after": [
-    0,
-    0
-  ],
-  "live_checks": {
-    "status": "PASS",
-    "startup_http": {
-      "http://localhost:8081/healthz": 200,
-      "http://localhost:5180/": 200
-    },
-    "static_resources": "PASS; includes previous topology chunk",
-    "scope": "service startup and static asset loading only; no business/Agent acceptance"
-  }
+  "ui_read_only": {
+    "pages": [
+      "facility table and drawer",
+      "unified publication scope",
+      "compact analysis actions"
+    ],
+    "errors": [],
+    "writes": [],
+    "status": "PASS"
+  },
+  "verification": "TypeScript + Vite + Go build; focused facility baseline unit test; three read-only pages. No model invocation, import or CMDB publication."
 }
