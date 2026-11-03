@@ -1,101 +1,63 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useWorkspace } from '../../context';
-import { placementReady, type PublicationOptions } from '../../lib/api';
-import { Badge, Button, DataTable, Notice, Section } from '../ui';
-import { entityOptions, filled, modelRows, numeric, positiveU, resolveEntity } from './FacilityEntities';
-import { FacilityGapEditor } from './FacilityGapEditor';
-import { RackDetail } from './RackDetail';
-import { FacilityLayoutEditor } from './FacilityLayoutEditor';
-import { FacilityBatchEditor } from './FacilityBatchEditor';
+import {useEffect,useMemo,useState} from 'react';
+import {useWorkspace} from '../../context';
+import {infrastructureApi,type InfraAsset} from '../../../../lib/api/infrastructure';
+import {geometry} from '../../../infrastructure/approved/rack/model';
+import {layoutRack} from '../../../infrastructure/approved/rack/geometry';
+import {Button,DataTable,Notice,Section} from '../ui';
+import {ModelEditor} from '../ModelEditor';
+import {modelRows} from './FacilityEntities';
+import type {ModelRow} from '../../lib/api';
 import './facility.css';
 
-type CoverageKey = 'conflicts' | 'room' | 'capacity' | 'height' | 'u' | 'placement' | 'coordinates';
-export function FacilityPanel({ activeRack, selectRack, edit }: { activeRack: string | null; selectRack: (id: string | null) => void; edit: (table: string) => void }) {
-  const { state: s, api, can } = useWorkspace();
-  const [filter, setFilter] = useState<CoverageKey>();
-  const [geometryFields,setGeometryFields]=useState<string[]>();
-  const [gapEditor,setGapEditor]=useState<'height'|'placement'>();
-  const [selected, setSelected] = useState<string[]>([]);
-  const [batch, setBatch] = useState<'room' | 'geometry' | 'height' | 'coordinates'>();
-  const publicationKey = `${s.projectId}:${s.revision}:` + s.publications.map(p => `${p.id}:${p.state}`).sort().join('|');
-  const [publicationResult, setPublicationResult] = useState<{ key: string; value?: PublicationOptions; error?: string }>();
-  const [retry, setRetry] = useState(0);
-  useEffect(() => {
-    let active = true;
-    void api.publicationOptions(s.revision).then(value => {
-      if (active && value.revision === s.revision) setPublicationResult({ key: publicationKey, value });
-    }).catch((e: Error) => { if (active) setPublicationResult({ key: publicationKey, error: e.message }); });
-    return () => { active = false; };
-  }, [api, publicationKey, retry]);
-  const publicationOptions = publicationResult?.key === publicationKey ? publicationResult.value : undefined;
-  const publicationError = publicationResult?.key === publicationKey ? publicationResult.error : undefined;
-  const facilityOptions = new Map(publicationOptions?.facilities?.map(f => [f.id, f]) ?? []);
-  const rooms = entityOptions(s, 'room_id');
-  const rackInputs = modelRows(s, 'racks');
-  const rackEntities = entityOptions(s, 'rack_id');
-  const racks = useMemo(() => s.racks.map(r => {
-    const row = rackInputs.find(v => resolveEntity(rackEntities, v.rack_id) === r.id);
-    const roomId = resolveEntity(rooms, row?.room_id || r.room);
-    const room = rooms.find(v => v.id === roomId);
-    const devices = s.devices.filter(d => d.rackId === r.id);
-    const conflicts = new Set<string>();
-    for (const d of devices) {
-      if (positiveU(d.startU) && positiveU(d.heightU) && positiveU(r.capacityU) && d.startU + d.heightU - 1 > r.capacityU) conflicts.add(d.id);
-    }
-    // Missing fields remain gaps; actual placement conflicts are reported separately.
-    const conflictIssues = s.issues.filter(i => !i.resolved && (i.entityId === r.id || i.scope === 'placement' && devices.some(d => d.id === i.entityId)) &&
-      !/未知|缺少|缺失|待补充|不足以|无法|不能确认/.test(i.title) && /冲突|重叠|越界|超出|重复|多个规划|无效/.test(i.title));
-    for (const issue of conflictIssues) if (devices.some(d => d.id === issue.entityId)) conflicts.add(issue.entityId);
-    const complete = devices.filter(d => placementReady(s, d) && !conflicts.has(d.id));
-    const published = devices.filter(d => s.publications.some(p => p.state === 'published' && p.deviceIds.includes(d.id))).length;
-    const pending = devices.filter(d => s.publications.some(p => p.state === 'pending' && p.deviceIds.includes(d.id))).length;
-    const failed = devices.filter(d => s.publications.some(p => p.state === 'failed' && p.deviceIds.includes(d.id)) && !s.publications.some(p => p.state === 'published' && p.deviceIds.includes(d.id))).length;
-    const rackReceipt = s.publications.some(p => p.state === 'published' && (p.facilityIds?.includes(r.id) ?? p.rackSnapshot.some(v => v.id === r.id)));
-    const coordinates = !!row && numeric(row.x) && numeric(row.y) && filled(row.frame) && ['mm', 'cm', 'm'].includes(row.unit);
-    const gaps = [!room && '机房归属', !positiveU(r.capacityU) && '容量', !numeric(row?.width_mm) || Number(row?.width_mm) <= 0 ? '宽度' : '', !numeric(row?.depth_mm) || Number(row?.depth_mm) <= 0 ? '深度' : '',
-      devices.some(d => !positiveU(d.heightU)) && '设备高度', devices.some(d => !positiveU(d.startU)) && 'U位', !coordinates && '平面位置'].filter(Boolean) as string[];
-    return { ...r, row, room, roomId, devices, conflicts, conflictIssues, complete, published, pending, failed, rackReceipt, coordinates, gaps };
-  }), [s, rackInputs]);
-  const visibleRacks = filter === 'conflicts' ? racks.filter(r=>r.conflicts.size||r.conflictIssues.length) : racks;
-  const selectedIds = selected.filter(id => racks.some(r => r.id === id));
-  const publicationLabel = (id: string, receipt: boolean) => {
-    const option = facilityOptions.get(id);
-    if (option) return { new: '待发布', changed: '待增补', unchanged: '已发布 · 无变化', blocked: '待处理 · 发布阻断', pending: '等待设施回执' }[option.state];
-    return receipt ? '有历史设施回执 · 当前输入待核对' : publicationOptions || publicationError ? '设施发布状态待核对' : '正在核对设施发布状态';
-  };
-  const openBatch=(mode:'room'|'geometry'|'coordinates',ids:string[],fields?:string[])=>{setSelected(ids);setGeometryFields(fields);setBatch(mode)};
-  const roomGaps=racks.filter(r=>!r.room),capacityGaps=racks.filter(r=>!positiveU(r.capacityU));
-  const heightGaps=s.devices.filter(d=>!positiveU(d.heightU));
-  const positionGaps=s.devices.filter(d=>!s.racks.some(r=>r.id===d.rackId)||!positiveU(d.startU)||!d.model&&!positiveU(d.heightU));
-  const conflicts=racks.filter(r=>r.conflicts.size||r.conflictIssues.length);
-  const layoutGaps=racks.filter(r=>!r.coordinates);
-  const gapRows=[
-   {title:'机柜尚未关联机房',count:roomGaps.length,unit:'个机柜',note:'指定这些机柜属于哪个机房。',action:'批量关联机房',run:()=>openBatch('room',roomGaps.map(r=>r.id))},
-   {title:'机柜容量未明确',count:capacityGaps.length,unit:'个机柜',note:'填写机柜可用的总 U 数，用于检查设备是否装得下。',action:'批量补录容量',run:()=>openBatch('geometry',capacityGaps.map(r=>r.id),['capacity_u'])},
-   {title:'设备高度未明确',count:heightGaps.length,unit:'台设备',note:`涉及 ${new Set(heightGaps.map(d=>d.model).filter(Boolean)).size} 种已知型号，同型号填写一次。`,action:'按型号批量补录',run:()=>setGapEditor('height')},
-   {title:'设备安装位置待补充',count:positionGaps.length,unit:'台设备',note:'补充所在机柜、起始 U 位；无型号设备可逐台填写高度。',action:'补录安装位置',run:()=>setGapEditor('placement')},
-  ];
-  const pending=gapRows.filter(g=>g.count>0);
-  const sizeGaps=racks.filter(r=>r.gaps.includes('宽度')||r.gaps.includes('深度'));
-  return <Section title="机房、机柜与设备关联" caption="展示前置资料已有的归属与落位信息；仅对缺失或冲突的信息提供补录。">
-    <div className="facility-relation-summary"><span>{rooms.length} 个机房</span><span>{racks.length} 个机柜 · {racks.length-roomGaps.length} 个已关联机房</span><span>{s.devices.length} 台设备 · {s.devices.filter(d=>s.racks.some(r=>r.id===d.rackId)).length} 台已关联机柜</span></div>
-    <DataTable data={visibleRacks} pageSize={5} searchPlaceholder="搜索机柜、机房或缺失项" columns={[
-      {accessorKey:'name',header:'机柜',cell:({row})=><span>{row.original.name}</span>},
-      {id:'room',accessorFn:r=>r.room?.label||'待关联',header:'所属机房'},
-      {accessorKey:'capacityU',header:'容量',cell:({getValue})=>getValue()?`${getValue()} U`:'待补充'},
-      {id:'devices',header:'设备 / 完整占位',cell:({row})=>`${row.original.devices.length} / ${row.original.complete.length}`},
-      {id:'gaps',accessorFn:r=>r.gaps.join('、'),header:'缺口与冲突',cell:({row})=><div className="facility-table-gaps">{!!row.original.conflicts.size&&<Badge state="blocked">{row.original.conflicts.size} 台占位冲突</Badge>}{row.original.conflictIssues.some(i=>i.entityId===row.original.id)&&<Badge state="blocked">机柜字段冲突</Badge>}<span>{row.original.gaps.join('、')||'当前统计项齐备'}</span></div>},
-      {id:'publication',header:'入库状态',cell:({row})=>publicationLabel(row.original.id,row.original.rackReceipt)},
-    ]}/>
-
-    {!!pending.length&&<div className="facility-inline-gaps"><b>以下信息需要补充</b>{pending.map(g=><div className="facility-inline-gap" key={g.title}><span>{g.title} · <strong>{g.count} {g.unit}</strong></span><small>{g.note}</small><Button kind="ghost" disabled={!can('bom:edit')} onClick={g.run}>{g.action}</Button></div>)}</div>}
-    {!pending.length&&!conflicts.length&&racks.length>0&&<p className="facility-relation-ready">机房归属与机柜立面所需信息已齐备。</p>}
-    {!!conflicts.length&&<Notice tone="warning">{conflicts.length} 个机柜存在占位或字段冲突。<Button onClick={()=>setFilter(filter==='conflicts'?undefined:'conflicts')}>{filter==='conflicts'?'查看全部关联':'查看冲突机柜'}</Button><Button disabled={!can('bom:edit')} onClick={()=>edit('placements')}>核对安装位置</Button></Notice>}
-    {(layoutGaps.length>0||sizeGaps.length>0)&&<details className="facility-later"><summary>平面拓扑所需信息 · 可后补，不阻断机柜立面</summary><div className="facility-inline-gaps">{!!layoutGaps.length&&<div className="facility-inline-gap"><span>{layoutGaps.length} 个机柜缺少平面位置</span><Button disabled={!can('bom:edit')} kind="ghost" onClick={()=>openBatch('coordinates',layoutGaps.map(r=>r.id))}>补录机房布局</Button></div>}{!!sizeGaps.length&&<div className="facility-inline-gap"><span>{sizeGaps.length} 个机柜缺少宽度或深度</span><Button disabled={!can('bom:edit')} kind="ghost" onClick={()=>openBatch('geometry',sizeGaps.map(r=>r.id),['width_mm','depth_mm'])}>批量补录尺寸</Button></div>}</div></details>}
-    {publicationError&&<Notice tone="warning">入库状态暂未读取：{publicationError}<Button onClick={()=>setRetry(v=>v+1)}>重新读取</Button></Notice>}
-    {gapEditor&&<FacilityGapEditor mode={gapEditor} close={()=>setGapEditor(undefined)}/>}
-    {activeRack&&racks.some(r=>r.id===activeRack)&&<RackDetail key={activeRack} id={activeRack} close={()=>selectRack(null)} edit={edit}/>}
-    {batch==='coordinates'&&<FacilityLayoutEditor rackIds={selectedIds} close={()=>setBatch(undefined)}/>}
-    {batch && batch!=='coordinates' && <FacilityBatchEditor geometryFields={geometryFields} key={batch} mode={batch} rackIds={selectedIds} close={() => setBatch(undefined)}/>}
-  </Section>;
+type Gap={id:string;name:string;table:'racks'|'placements';field:string;message:string};
+const number=(value:unknown)=>value===null||value===undefined||value===''||!Number.isFinite(Number(value))?null:Number(value);
+export function FacilityPanel(_: {activeRack:string|null;selectRack:(id:string|null)=>void;edit:(table:string)=>void}){
+ const {state:s,can,go}=useWorkspace();
+ const [assets,setAssets]=useState<InfraAsset[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[partial,setPartial]=useState(false),[retry,setRetry]=useState(0);
+ const [editor,setEditor]=useState<{table:string;ids?:string[];rows:ModelRow[]}>();
+ const publicationKey=s.publications.map(p=>p.id+':'+p.state).join('|');
+ useEffect(()=>{const controller=new AbortController();setLoading(true);setError('');setAssets([]);setPartial(false);
+  void(async()=>{const all=new Map<string,InfraAsset>();let cursor:string|undefined,snapshot:string|undefined,incomplete=false;
+   do{const page=await infrastructureApi.subgraph(s.projectId,{view:'hierarchy',depth:1,limit:200,cursor,snapshot_id:snapshot},controller.signal);snapshot=page.snapshot_id;for(const asset of page.assets)all.set(asset.id,asset);incomplete ||= page.truncated;cursor=page.page.has_more?page.page.next_cursor??undefined:undefined;if(page.page.has_more&&!cursor)throw Error('CMDB 分页未完成，请重新检查。');}while(cursor);
+   if(!controller.signal.aborted){setAssets([...all.values()]);setPartial(incomplete)}
+  })().catch(e=>{if(!controller.signal.aborted)setError(e.message)}).finally(()=>{if(!controller.signal.aborted)setLoading(false)});
+  return()=>controller.abort();
+ },[s.projectId,publicationKey,retry]);
+ const check=useMemo(()=>{
+  const racks=assets.filter(a=>a.type==='rack'),rooms=assets.filter(a=>a.type==='pod');
+  const devices=assets.filter(a=>['server','switch','device','pdu','patch_panel'].includes(a.type));
+  const gaps:Gap[]=[];
+  const add=(a:InfraAsset,table:Gap['table'],field:string,message:string)=>gaps.push({id:a.id,name:a.name,table,field,message});
+  for(const rack of racks){
+   if(!rooms.some(r=>r.id===rack.fields.pod_id))add(rack,'racks','room_id','尚未关联机房');
+   const capacity=number(rack.fields.u_height),items=devices.filter(d=>d.fields.rack_id===rack.id);
+   if(capacity===null||capacity<=0)add(rack,'racks','capacity_u','机柜总 U 高未明确');
+   else for(const issue of layoutRack(capacity,items.map(d=>geometry(d)),number(rack.fields.depth_mm)).issues){for(const id of issue.ids){const d=items.find(d=>d.id===id);if(d)add(d,'placements',issue.kind==='missing'?'start_u':'placement',issue.message)}}
+  }
+  for(const d of devices){if(!racks.some(r=>r.id===d.fields.rack_id))add(d,'placements','rack_id','设备尚未关联机柜');const g=geometry(d);if(g.height===null||g.height<0||!Number.isInteger(g.height*2))add(d,'placements','height_u','设备占用高度未明确');if(g.height!==0&&(g.u===null||g.u<1||!Number.isInteger(g.u*2)))add(d,'placements','start_u','设备起始 U 位未明确');}
+  return {racks,rooms,devices,gaps:[...new Map(gaps.map(g=>[g.id+g.field+g.message,g])).values()]};
+ },[assets]);
+ const draft=(g:Gap)=>{
+  if(g.table==='racks'){const r=s.racks.find(r=>r.id===g.id);const row=modelRows(s,'racks').find(r=>r.rack_id===g.id);return g.field==='room_id'?row?.room_id||r?.room:g.field==='capacity_u'?row?.capacity_u||r?.capacityU:null;}
+  const d=s.devices.find(d=>d.id===g.id);return g.field==='rack_id'?d?.rackId:g.field==='height_u'?d?.heightU:g.field==='start_u'?d?.startU:null;
+ };
+ const open=(table:'racks'|'placements')=>{
+  const ids=[...new Set(check.gaps.filter(g=>g.table===table).map(g=>g.id))];
+  const key=table==='racks'?'rack_id':'device_id';const rows=structuredClone(modelRows(s,table));
+  for(const id of ids){if(rows.some(r=>r[key]===id))continue;const a=assets.find(a=>a.id===id)!;const text=(v:unknown)=>v==null?'':String(v);
+   rows.push(table==='racks'?{rack_id:id,room_id:text(a.fields.pod_id),capacity_u:text(a.fields.u_height),width_mm:text(a.fields.width_mm),depth_mm:text(a.fields.depth_mm)}:{device_id:id,rack_id:text(a.fields.rack_id),start_u:text(a.fields.u_start??a.fields.rack_u),height_u:text(a.fields.u_height),face:text(a.fields.mounting_face??a.fields.face)});
+  }
+  setEditor({table,ids,rows});
+ };
+ return <Section title="已入库信息 · 机柜图检查" caption="读取 CMDB 已入库的机房、机柜和设备，按数据中心机柜图的同一套落位规则检查；工程草稿不计作已满足。">
+  {loading?<p className="facility-relation-summary" role="status">正在检查已入库关联与机柜图所需信息…</p>:error?<Notice tone="error">{error}<Button onClick={()=>setRetry(n=>n+1)}>重新检查</Button></Notice>:<>
+   <div className="facility-relation-summary"><span>{check.rooms.length} 个机房</span><span>{check.racks.length} 个已入库机柜</span><span>{check.devices.length} 台已入库设备</span></div>
+   {partial&&<Notice tone="warning">CMDB 返回的数据不完整，暂不能判定全部满足。<Button onClick={()=>setRetry(n=>n+1)}>重新检查</Button></Notice>}
+   {!partial&&!check.gaps.length&&check.racks.length>0&&<p className="facility-relation-ready">全部满足机房关联与机柜图绘制要求。</p>}
+   {!check.racks.length&&!check.devices.length&&<p className="facility-relation-summary">尚无已入库的机柜或设备；先在入库与版本确认已核对的数据。</p>}
+   <DataTable data={check.racks} pageSize={5} columns={[{accessorKey:'name',header:'已入库机柜'},{id:'room',header:'关联机房',cell:({row})=>check.rooms.find(r=>r.id===row.original.fields.pod_id)?.name||'未关联'},{id:'u',header:'容量 U',cell:({row})=>row.original.fields.u_height??'未提供'},{id:'devices',header:'关联设备',cell:({row})=>check.devices.filter(d=>d.fields.rack_id===row.original.id).length},{id:'status',header:'机柜图信息',cell:({row})=>{const ids=new Set([row.original.id,...check.devices.filter(d=>d.fields.rack_id===row.original.id).map(d=>d.id)]);const n=check.gaps.filter(g=>ids.has(g.id)).length;return n?`${n} 项待补充或核对`:partial?'待完成检查':'已满足'}}]}/>
+   {!!check.gaps.length&&<div className="facility-inline-gaps"><b>与机柜图要求的差距 · {check.gaps.length} 项</b><DataTable data={check.gaps} pageSize={10} columns={[{accessorKey:'name',header:'受影响对象'},{accessorKey:'message',header:'缺失或冲突信息'},{id:'draft',header:'补录进度',cell:({row})=>draft(row.original)?'工程输入已有候选值 · 待核对入库':'待填写'}]}/><div className="actions">{check.gaps.some(g=>g.field==='room_id')&&!modelRows(s,'rooms').length&&<Button disabled={!can('bom:edit')} onClick={()=>setEditor({table:'rooms',rows:[]})}>补充机房</Button>}{check.gaps.some(g=>g.table==='racks')&&<Button disabled={!can('bom:edit')} onClick={()=>open('racks')}>补录机房关联 / 机柜信息</Button>}{check.gaps.some(g=>g.table==='placements')&&<Button disabled={!can('bom:edit')} onClick={()=>open('placements')}>补录设备落位信息</Button>}<Button onClick={()=>go('publish')}>核对补录并入库</Button></div><p className="muted small-copy">补录窗口支持在线表格编辑和 XLSX / CSV 导入；确认入库后重新检查，不把未入库的候选值当成已满足。</p></div>}
+  </>}
+  {editor&&<ModelEditor tableId={editor.table} initialRows={editor.rows} targetIds={editor.ids} entityChoices={{room_id:check.rooms.map(a=>({id:a.id,label:a.name})),rack_id:check.racks.map(a=>({id:a.id,label:a.name})),device_id:check.devices.map(a=>({id:a.id,label:a.name}))}} close={()=>setEditor(undefined)}/>}
+ </Section>;
 }
