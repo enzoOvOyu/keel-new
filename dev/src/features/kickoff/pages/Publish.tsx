@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { ArrowRight, Check, CheckCircle2, ChevronRight, Database, Download, History, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Check, CheckCircle2, ChevronRight, Database, Download, History, ShieldCheck, Loader2 } from 'lucide-react';
 import { useWorkspace } from '../context';
 import { capabilities, eligibleDevices, type Publication, type Device } from '../lib/api';
 import { Badge, Button, DataTable, Empty, Field, Heading, KV, Modal, Notice, Section, formatDate } from '../components/ui';
@@ -39,9 +39,9 @@ export default function Publish(){
   const selectAll=()=>setSelected(allSelected?[]:[...valid]);
   return <div className="publication-page">
     <Heading eyebrow="PUBLISH & EVOLVE" title="入库与版本" description="选择本次设备范围，确认入库；历史回执与增补记录在右侧查看。" action={<Button kind="primary" disabled={evaluating||!!evaluationError||publishing||!p.devices.length||!can('bom:execute')||!can('bom:review')} onClick={()=>{setExpected(s.revision);setConfirm(true);}}><Database size={16}/>确认本次入库</Button>}/>
-    {evaluationError&&<Notice tone="warning">{evaluationError}</Notice>}{evaluating&&<Notice>正在核对完整入库范围…</Notice>}
+    {evaluationError&&<Notice tone="warning">{evaluationError}</Notice>}
     {success&&<div className="publish-success"><CheckCircle2 size={23}/><div><b>本次范围已入库 · r{success.revision} · {success.counts.devices} 台设备</b><p>已确认数据进入当前资产视图，工程补充不会生成另一套身份。</p></div><Button onClick={()=>go('overview')}>查看启动总览<ArrowRight size={14}/></Button></div>}
-    <div className="publish-layout"><div><Section title="本次确认范围" caption="以设备为单位选择，关联对象自动随本次范围一同确认。" action={<Button kind="ghost" disabled={!valid.size||publishing} onClick={selectAll}><Check size={14}/>{allSelected?'取消全选':'选择全部可入库设备'}</Button>}>
+    <div className="publish-layout"><div><Section title="本次确认范围" caption="以设备为单位选择，关联对象自动随本次范围一同确认。" action={<Button kind="secondary" className="publication-select-all" aria-label={allSelected?'取消全选':'选择全部可入库设备'} aria-busy={evaluating&&selected.length>0} disabled={!valid.size||publishing} onClick={selectAll}>{evaluating&&selected.length>0?<Loader2 size={14} className="animate-spin"/>:<Check size={14}/>}<span>{allSelected?'取消全选':'选择全部可入库设备'}</span>{evaluating&&selected.length>0&&<small>· 核对中</small>}</Button>}>
       <div className="publication-scope-note"><ShieldCheck size={17}/><div><b>确认身份、来源与关系端点，已知数据可以先入库。</b><p>自动包含所选设备的组件、端口，以及双端均在范围内的连接。机房坐标、布线、网络和电力信息可后补；未选设备及原始资料继续保留。</p></div></div>
       <div className="publish-counts">{Object.entries(p.counts).map(([key,n])=><div key={key}><strong>{selected.length&&(evaluating||evaluation?.selectionKey!==selectionKey)?'—':n.toLocaleString()}</strong><span>{labels[key]}</span></div>)}</div>
       <div className="publication-selection"><span><b>已选择 {selectedCount} 台</b> / 共 {s.devices.length} 台设备</span><span>{p.held.length} 台暂未纳入</span>{selected.length>0&&<Button kind="ghost" disabled={publishing} onClick={()=>setSelected([])}>清空选择</Button>}<button className="text-link" onClick={()=>go('review')}>前往数据核对<ArrowRight size={13}/></button></div>
