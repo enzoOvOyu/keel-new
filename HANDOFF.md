@@ -7,14 +7,14 @@
 | 范围 | 当前事实 |
 |---|---|
 | 主开发 | `/home/ubuntu/keel-dev`，分支`dev`，应用目录`dev/`；文档定版已整合；本轮历史资料理解已提交dev并按用户要求发布 |
-| 当前主环境 | 5180前端`860029b` / 8081 API `932c424`；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json)记录publish、设施与Agent整改部署；启动、只读页面与浏览器模拟保存检查通过；真实发布与模型效果等待用户统一测试指令 |
+| 当前主环境 | 5180前端`860029b` / 8081 API `a8e454c`；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json)记录publish、设施与Agent整改部署；启动、只读页面与浏览器模拟保存检查通过；真实发布与模型效果等待用户统一测试指令 |
 | Fabric | `/home/ubuntu/keel-fabric-dev`，`feat/fabric-rebuild@6a70041`；5197/8100分支预览，未并入dev；**用户要求暂停，等待上游接入修复通知** |
 | 原型 | Kickoff5195、拓扑/机柜5181、Fabric5194仅设计参考，不是正式事实或执行来源；本次不启停服务 |
 | main与旧目录 | main保留稳定基线；旧Flows/Kestra/visualization detached目录仅残留原型/运行依赖，不在那里继续开发；本次不合并或推送main |
 
 ## 本轮整改已部署：等待统一测试（优先于旧自动测试安排）
 
-当前5180前端860029b，目录`/home/ubuntu/.local/state/keel-deployments/kickoff-view-actions-860029b`；API932c424，目录`/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-api-932c424`。前端已按用户要求恢复资料页改版前布局，保留异步采用适配。202返回和活动任务去重已验证；真实MM采用仍失败（INVALID_OR_DUPLICATE_ENTITY_ID），不能宣称入库通过。已定位设备UUID被复用为落位ID，修复代码及定向用例在工作区，未部署。前端回退TypeScript/Vite/只读页面检查通过，无新业务写入。
+当前前端860029b；API已部署a8e454c。落位ID与设备ID冲突、后台审计缺少principal两处实际阻断已修复。复用agent测试1103已有MM候选的后台任务成功恢复并完成：工作区revision3，971设备/14308端口/7154连接/122机柜；10类采用、4类保留未采用，尚未发布CMDB。新版资料页与独立任务历史API本轮完成源码，待集成部署。
 
 下列publish/Agent条目为既有能力记录，机房机柜UI以本轮“拓扑资料补齐”为准。
 
@@ -127,3 +127,18 @@ agent测试1103的新Agent分析已成功：971设备、14308端口、7154连接
 恢复d881421资料与识别页面布局和样式，撤回本轮左右任务区、日志抽屉及动效设计。保留后端已部署异步采用接口的最小适配及任务状态，以避免旧页面把202任务回执误当采用结果。后台采用保持932c424，无新Agent分析或业务提交。后续未部署的落位身份修复仍在工作区，未纳入本次前端回退。构建和实际部署结果随后登记。
 
 前端回退已完成并部署860029b，原资料页结构检查通过、无页面错误；API维持932c424。后台采用成功链路尚未通过，待发布落位独立身份修复后复用候选验证，不需重跑AI。
+
+## 后台 Agent 任务历史/详情 API（本轮源码，未部署）
+
+新增同项目、未移除资料及bom:read隔离的GET sources/{sourceId}/tasks和tasks/{jobId}，复用eng_job/eng_step，无新表。列表offset=0/limit=20（最大50），详情仅所选任务真实日志；understanding只取该分析或采用显式关联分析的既有报告artifact，无证据省略。GET绕开workspace初始化，严格只读。实现见dev/backend/cmd/api/kickoff_tasks.go与kickoff.go，协议/生成类型/注册表和docs/api/kickoff.md同步。按用户要求不编译/测试Go、不部署、不提交、不重跑AI或业务写入；由用户统一构建和行为验证。未编辑kickoff_agent_adopt.go、kickoff_adoption_job.go、internal/kickoff/model.go及前端Adapter/组件；工作区其他协作者修改独立保留。
+
+本轮实际检查：OpenAPI类型生成、git diff --check通过；check-real-api-docs.mjs仅报Deployment revision mismatch（共享部署记录已更新a8e454c，registry顶层仍860029b），未覆盖并行部署元数据。Go编译/测试及接口行为验证NOT RUN。
+
+## 本轮gpt-6.1-sol medium协作
+
+用户重新明确前端布局：五步横排保留第二行；资料包缩窄/文件名省略；右侧仅分析操作长条；每次分析/采用任务独立记录和日志抽屉。委派两个子任务分别实现前端、历史API，主Agent负责采用阻断与整合；指定gpt-6.1-sol medium的协作调用被账号拒绝，不能宣称由该模型完成。落位独立ID修复3590d0c已发布；真实恢复测试又定位后台审计缺少principal导致进程panic，a8e454c使用重新授权的actor恢复审计上下文并恢复API。原持久任务等待/进行恢复，无AI重跑，采用成功仍待最终回执。
+
+
+## 资料任务集成完成（待本轮发布）
+
+删除拖拽大卡片；资料包184px且文件名截断，五步保留第二行，右侧仅分析操作卡；每次任务分页记录、所选任务日志/证据Drawer，真实活动动效。后台采用开始日志及成功日志已补齐，成功日志和工程写入同事务。TypeScript检查、Go编译及3个证据/落位定向用例通过；Vite与部署检查执行中。MM采用成功不等于CMDB入库，4类未采用候选和967项工程核对事项仍需处理；本轮不扩大到发布和重新分析。

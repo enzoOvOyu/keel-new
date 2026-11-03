@@ -53,6 +53,8 @@ export interface FacilityPublicationOption extends PublicationOption {label:stri
 export interface PublicationOptions {revision:number;devices:PublicationOption[];facilities?:FacilityPublicationOption[]}
 export interface KickoffAPI {
  refresh?():Promise<void>;
+ sourceTasks?(sourceId:string,offset?:number,limit?:number):Promise<SourceTaskPage>;
+ sourceTask?(sourceId:string,jobId:string):Promise<SourceTaskDetail>;
  adoptionStatus?(sourceId:string):Promise<AdoptionTask|null>;
  startSourceAnalysis?(id:string,domains:AnalysisDomain[]):Promise<{jobId:string;state:string}>;
  sourceAnalysis?(id:string,jobId?:string):Promise<SourceAnalysis>;
@@ -106,3 +108,7 @@ export interface AgentFieldEvidence {row:number;region:string;sheet:string;sourc
 export interface AgentDraft {tableId:string;domain:AnalysisDomain;rowCount:number;previewLimit:number;rows:ModelRow[];issues:{row:number;field:string;code:string;message:string}[];baseVersion:number;evidence:AgentFieldEvidence[]}
 export interface AdoptionTask {jobId:string;state:'pending'|'running'|'succeeded'|'failed';errorCode?:string;result?:{revision:number;adoptedTableIds:string[];skippedTableIds:string[]}}
 export interface SourceAnalysis {adoption?:AdoptionTask;coverageTotal?:number;missingTotal?:number;coverageTruncated?:boolean;missingTruncated?:boolean;jobId:string|null;state:'idle'|'pending'|'running'|'succeeded'|'failed';errorCode?:string;domains:AnalysisDomain[];coverage:{region:string;step:number;state:string;rows:number;reason:string}[];missing:string[];drafts:AgentDraft[]}
+
+export interface SourceTask {id:string;kind:'analysis'|'adoption';state:string;createdAt:string;updatedAt:string;errorCode?:string;analysisJobId?:string}
+export interface SourceTaskPage {items:SourceTask[];offset:number;limit:number;total:number}
+export interface SourceTaskDetail {task:SourceTask;steps:{sequence:number;tool:string;state:string;detail:string;createdAt:string}[];understanding?:SourceUnderstanding}

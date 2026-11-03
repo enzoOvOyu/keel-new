@@ -4,6 +4,40 @@
  */
 
 export interface paths {
+    "/projects/{projectId}/kickoff/sources/{sourceId}/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Requires bom:read. Strict project and non-detached source scope; only kickoff-domain-agent/v1 and kickoff-adoption/v1 jobs. No workspace initialization, AI, business writes or server cache. */
+        get: operations["listKickoffSourceTasks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/kickoff/sources/{sourceId}/tasks/{jobId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Requires bom:read. Strict project and non-detached source scope; only kickoff-domain-agent/v1 and kickoff-adoption/v1 jobs. No workspace initialization, AI, business writes or server cache. */
+        get: operations["getKickoffSourceTask"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/projects/{projectId}/kickoff/sources/{sourceId}/understanding": {
         parameters: {
             query?: never;
@@ -7808,6 +7842,41 @@ export interface components {
             jobId: string;
             expectedRevision: number;
             tableIds?: string[];
+        };
+        KickoffSourceTask: {
+            id: string;
+            /** @enum {string} */
+            kind: "analysis" | "adoption";
+            /** @enum {string} */
+            state: "pending" | "running" | "succeeded" | "failed";
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            errorCode?: string;
+            /** @description Adoption only: explicit proposal.body.jobId; absent when not recorded. */
+            analysisJobId?: string;
+        };
+        KickoffSourceTaskStep: {
+            sequence: number;
+            tool: string;
+            state: string;
+            detail: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        KickoffSourceTaskPage: {
+            items: components["schemas"]["KickoffSourceTask"][];
+            offset: number;
+            limit: number;
+            total: number;
+        };
+        KickoffSourceTaskDetail: {
+            task: components["schemas"]["KickoffSourceTask"];
+            /** @description All persisted eng_step entries for the requested task only, ordered by sequence ASC. Adoption never borrows analysis logs. */
+            steps: components["schemas"]["KickoffSourceTaskStep"][];
+            /** @description Existing SourceUnderstanding report for this analysis, or the adoption’s explicitly linked same-source/project analysis. Omitted without a succeeded report artifact; no synthetic or latest-task fallback. */
+            understanding?: components["schemas"]["KickoffUnderstanding"];
         };
         KickoffAdoptionTask: {
             jobId: string;
@@ -18696,6 +18765,152 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    listKickoffSourceTasks: {
+        parameters: {
+            query?: {
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                projectId: string;
+                sourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Read-only persisted task history, ordered by createdAt DESC then id DESC. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["KickoffSourceTaskPage"];
+                        request_id: string;
+                    };
+                };
+            };
+            /** @description Invalid pagination: offset must be nonnegative; limit must be 1..50. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Project-scoped bom:read permission required. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Active source or task not found in this project/source. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Task history or artifact read failed. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Existing understanding artifact storage unavailable or hash mismatch. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    getKickoffSourceTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                sourceId: string;
+                jobId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Read-only persisted task detail; only this task supplies logs. Understanding requires an existing report artifact for the exact analysis task. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["KickoffSourceTaskDetail"];
+                        request_id: string;
+                    };
+                };
+            };
+            /** @description Invalid pagination: offset must be nonnegative; limit must be 1..50. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Project-scoped bom:read permission required. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Active source or task not found in this project/source. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Task history or artifact read failed. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Existing understanding artifact storage unavailable or hash mismatch. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
     getKickoffSourceUnderstanding: {
         parameters: {
             query?: {

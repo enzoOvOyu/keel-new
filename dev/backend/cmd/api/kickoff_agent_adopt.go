@@ -96,6 +96,9 @@ func (s *Server) applyKickoffAdoption(ctx context.Context, source string, body k
 		sort.Strings(skipped)
 		receipt := map[string]any{"revision": body.ExpectedRevision, "adoptedTableIds": adopted, "skippedTableIds": skipped}
 		if task != "" {
+			if _, e := tx.Exec(ctx, `INSERT INTO eng_step(job_id,sequence,tool,state,detail) SELECT $1,COALESCE(max(sequence),0)+1,'adoption_completed','succeeded',$2 FROM eng_step WHERE job_id=$1`, task, "候选采用已提交，工程版本和来源证据已保存"); e != nil {
+				return nil, e
+			}
 			tag, e := tx.Exec(ctx, `UPDATE eng_job SET proposal=jsonb_set(proposal,'{result}',$4::jsonb),state='succeeded',updated_at=now() WHERE id=$1 AND project_id=$2 AND claim_id=$3 AND state='running'`, task, s.project, claim, jsonBytes(receipt))
 			if e != nil {
 				return nil, e
@@ -231,6 +234,9 @@ func (s *Server) applyKickoffAdoption(ctx context.Context, source string, body k
 	}
 	receipt := map[string]any{"revision": revision, "adoptedTableIds": adopted, "skippedTableIds": skipped}
 	if task != "" {
+		if _, e := tx.Exec(ctx, `INSERT INTO eng_step(job_id,sequence,tool,state,detail) SELECT $1,COALESCE(max(sequence),0)+1,'adoption_completed','succeeded',$2 FROM eng_step WHERE job_id=$1`, task, "候选采用已提交，工程版本和来源证据已保存"); e != nil {
+			return nil, e
+		}
 		tag, e := tx.Exec(ctx, `UPDATE eng_job SET proposal=jsonb_set(proposal,'{result}',$4::jsonb),state='succeeded',updated_at=now() WHERE id=$1 AND project_id=$2 AND claim_id=$3 AND state='running'`, task, s.project, claim, jsonBytes(receipt))
 		if e != nil {
 			return nil, e

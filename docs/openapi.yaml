@@ -38,6 +38,157 @@ tags:
   - name: IA
     description: IA v2.3 project scope and lazy detail contracts
 paths:
+  /projects/{projectId}/kickoff/sources/{sourceId}/tasks:
+    get:
+      operationId: listKickoffSourceTasks
+      tags:
+        - Kickoff
+      description: Requires bom:read. Strict project and non-detached source scope;
+        only kickoff-domain-agent/v1 and kickoff-adoption/v1 jobs. No workspace
+        initialization, AI, business writes or server cache.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: sourceId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+      responses:
+        "200":
+          description: Read-only persisted task history, ordered by createdAt DESC then id
+            DESC.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: "#/components/schemas/KickoffSourceTaskPage"
+                  request_id:
+                    type: string
+                required:
+                  - data
+                  - request_id
+        "400":
+          description: "Invalid pagination: offset must be nonnegative; limit must be 1..50."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "403":
+          description: Project-scoped bom:read permission required.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "404":
+          description: Active source or task not found in this project/source.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "500":
+          description: Task history or artifact read failed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "503":
+          description: Existing understanding artifact storage unavailable or hash mismatch.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /projects/{projectId}/kickoff/sources/{sourceId}/tasks/{jobId}:
+    get:
+      operationId: getKickoffSourceTask
+      tags:
+        - Kickoff
+      description: Requires bom:read. Strict project and non-detached source scope;
+        only kickoff-domain-agent/v1 and kickoff-adoption/v1 jobs. No workspace
+        initialization, AI, business writes or server cache.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: sourceId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: jobId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Read-only persisted task detail; only this task supplies logs.
+            Understanding requires an existing report artifact for the exact
+            analysis task.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: "#/components/schemas/KickoffSourceTaskDetail"
+                  request_id:
+                    type: string
+                required:
+                  - data
+                  - request_id
+        "400":
+          description: "Invalid pagination: offset must be nonnegative; limit must be 1..50."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "403":
+          description: Project-scoped bom:read permission required.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "404":
+          description: Active source or task not found in this project/source.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "500":
+          description: Task history or artifact read failed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "503":
+          description: Existing understanding artifact storage unavailable or hash mismatch.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
   /projects/{projectId}/kickoff/sources/{sourceId}/understanding:
     get:
       operationId: getKickoffSourceUnderstanding
@@ -20495,6 +20646,106 @@ components:
           uniqueItems: true
           items: {type: string}
       required: [jobId, expectedRevision]
+    KickoffSourceTask:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        kind:
+          type: string
+          enum:
+            - analysis
+            - adoption
+        state:
+          type: string
+          enum:
+            - pending
+            - running
+            - succeeded
+            - failed
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        errorCode:
+          type: string
+        analysisJobId:
+          type: string
+          description: "Adoption only: explicit proposal.body.jobId; absent when not recorded."
+      required:
+        - id
+        - kind
+        - state
+        - createdAt
+        - updatedAt
+    KickoffSourceTaskStep:
+      type: object
+      additionalProperties: false
+      properties:
+        sequence:
+          type: integer
+        tool:
+          type: string
+        state:
+          type: string
+        detail:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - sequence
+        - tool
+        - state
+        - detail
+        - createdAt
+    KickoffSourceTaskPage:
+      type: object
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffSourceTask"
+        offset:
+          type: integer
+          minimum: 0
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 50
+        total:
+          type: integer
+          minimum: 0
+      required:
+        - items
+        - offset
+        - limit
+        - total
+    KickoffSourceTaskDetail:
+      type: object
+      additionalProperties: false
+      properties:
+        task:
+          $ref: "#/components/schemas/KickoffSourceTask"
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffSourceTaskStep"
+          description: All persisted eng_step entries for the requested task only, ordered
+            by sequence ASC. Adoption never borrows analysis logs.
+        understanding:
+          $ref: "#/components/schemas/KickoffUnderstanding"
+          description: Existing SourceUnderstanding report for this analysis, or the
+            adoption’s explicitly linked same-source/project analysis. Omitted
+            without a succeeded report artifact; no synthetic or latest-task
+            fallback.
+      required:
+        - task
+        - steps
     KickoffAdoptionTask:
       type: object
       additionalProperties: false

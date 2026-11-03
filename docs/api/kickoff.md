@@ -13,6 +13,8 @@
 | GET | `/projects/{projectId}/kickoff/publications/{publicationId}` | `getKickoffPublicationReceipt` |
 | POST | `/projects/{projectId}/kickoff/issues/{issueId}/resolve` | `resolveKickoffIssue` |
 | POST | `/projects/{projectId}/kickoff/sources/{sourceId}/analyze` | `analyzeKickoffSource` |
+| GET | `/projects/{projectId}/kickoff/sources/{sourceId}/tasks` | `listKickoffSourceTasks` |
+| GET | `/projects/{projectId}/kickoff/sources/{sourceId}/tasks/{jobId}` | `getKickoffSourceTask` |
 | GET | `/projects/{projectId}/kickoff/workspace` | `getKickoffWorkspace` |
 | PUT | `/projects/{projectId}/kickoff/models/{tableId}` | `saveKickoffModelInput` |
 | POST | `/projects/{projectId}/kickoff/sources` | `uploadKickoffSource` |
@@ -148,3 +150,13 @@ POST analysis/adopt返回202与KickoffAdoptionTask，不等待合并；任务复
 证据改为候选行摘要索引，设备SN及设备/端口名索引保留歧义处理，避免采用期间平方级重复扫描与哈希。失败可查看原因后重试，重试不重新调用AI。
 
 用户要求回退：资料页已恢复d881421布局，撤回左右任务栏与日志抽屉设计；后台异步采用接口及必要前端任务状态保留。上文资料页新版布局描述仅历史，不作为当前页面说明。
+
+## 后台 Agent 任务历史与详情（本轮源码，未部署）
+
+- `GET /projects/{projectId}/kickoff/sources/{sourceId}/tasks`，operationId `listKickoffSourceTasks`：返回 `{items,offset,limit,total}`。默认 offset=0、limit=20；offset须为非负整数，limit为1..50，非法值返回400 `KICKOFF_TASK_PAGINATION_INVALID`，不静默截断。按createdAt倒序、id倒序稳定排序；空列表为items=[]、total=0，越界页仍返回真实total。
+- `GET /projects/{projectId}/kickoff/sources/{sourceId}/tasks/{jobId}`，operationId `getKickoffSourceTask`：返回 `{task,steps,understanding?}`。task为 `KickoffSourceTask`；id、kind、state、createdAt、updatedAt必填，errorCode和analysisJobId按实际记录可选。kind仅analysis（kickoff-domain-agent/v1）或adoption（kickoff-adoption/v1）；analysisJobId仅采用任务的proposal.body.jobId，不推断最新分析任务。
+- 两接口均要求统一Session及当前项目 `bom:read`，同时限定未移除的kickoff_source、同项目eng_source及eng_job.proposal.sourceId，不因共用工程源/文件摘要而串资料历史。无授权403；资料不存在/已移除404 `KICKOFF_SOURCE_NOT_FOUND`；详情任务不属该项目/资料/类型404 `KICKOFF_TASK_NOT_FOUND`。
+- 详情steps仅该jobId已持久化的eng_step，按sequence升序返回，包含sequence/tool/state/detail/createdAt；没有日志返回[]，不借用分析任务日志、不合成采用步骤。失败码来自eng_job.error_code，不用错误码伪造日志。
+- understanding复用现有SourceUnderstanding（OpenAPI `KickoffUnderstanding`）结构：仅读取当前分析任务、或采用任务显式关联且同项目/同资料的分析任务已成功持久化的kickoff_domain_understanding artifact。没有该证据就省略，不生成pending报告、不回退最新任务或历史报告；既有artifact读取/摘要校验失败按原接口返回500/503，不伪造结果。旧分析任务仅有结构artifact而没有理解报告时也省略。
+- 列表在同一只读快照计算total和当前页；详情按需读取日志与可选报告，不加载候选/工作簿，不新增表、不初始化workspace、不调用AI或业务写入，无服务端派生缓存。前端缓存必须按身份、授权、projectId/sourceId/jobId和分页隔离；活动任务刷新由调用方控制。任务状态可以在下一次请求变化，分页不是跨请求冻结快照。
+- 本轮仅实现及契约同步：按用户要求未运行Go编译/测试、HTTP或数据库验收；未部署、未提交，交由用户统一构建验证。完整日志不设分页；采用日志若未记录，后端不能补造。

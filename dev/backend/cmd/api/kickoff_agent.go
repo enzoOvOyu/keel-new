@@ -343,6 +343,9 @@ func (s *Server) runKickoffAgentJob(ctx context.Context, job, claim, source stri
 		return true, err
 	}
 	if request.Kind == kickoffAdoptionKind {
+		if err := trace("adoption_started", "running", "正在校验版本并合并所选候选"); err != nil {
+			return true, err
+		}
 		err := s.runKickoffAdoption(ctx, job, claim, raw)
 		if err != nil {
 			detail := "ADOPTION_INTERNAL_ERROR"

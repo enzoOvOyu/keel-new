@@ -56,6 +56,15 @@ func (s *Server) kickoffRoutes(w http.ResponseWriter, r *http.Request) bool {
 	scoped := *s
 	scoped.project = p[3]
 	s = &scoped
+	// Task history is strictly read-only, including the first request.
+	if (len(p) == 8 || len(p) == 9) && p[5] == "sources" && p[7] == "tasks" && r.Method == "GET" {
+		job := ""
+		if len(p) == 9 {
+			job = p[8]
+		}
+		s.kickoffTasks(w, r, p[6], job)
+		return true
+	}
 	if _, err := s.db.Exec(r.Context(), `INSERT INTO kickoff_workspace(project_id) VALUES($1) ON CONFLICT DO NOTHING`, s.project); err != nil {
 		fail(w, 500, "KICKOFF_WORKSPACE_UNAVAILABLE")
 		return true
