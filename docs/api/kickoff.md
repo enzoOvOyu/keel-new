@@ -91,3 +91,7 @@ GET publication-options（getKickoffPublicationOptions，bom:read）在同项目
 ### 2026-11-03 性能实现说明
 
 HTTP字段与业务校验不变。按项目、工程head及workspace修订复用有界派生读模型（最多3份，空闲10分钟）；publication-options与capabilities还核对发布ID/回执状态，避免pending→published后复用旧结果。历史区域按source/head复用。发布事务继续实时验证，批量SQL不放宽项目隔离、来源、Outbox及回执门槛。真实验证和冷/热耗时见[性能记录](../kickoff/PERFORMANCE-20261103.json)。
+
+### 首次打开派生快照（802a001）
+
+GET workspace（无section）可读取同项目MinIO私有派生摘要；命中前用数据库一致性读校验名称、修订、模型head、资料状态/head及发布状态。一个对象覆盖旧派生版本，不作为正式工程事实；失配/不可用回源。响应根据Accept-Encoding支持gzip，JSON Schema未变化。快照实现版本变更须升级workspace-read版本标识；测试覆盖失效与进程缓存清空。见[冷打开验证](../kickoff/COLD-OPEN-PERFORMANCE.json)。

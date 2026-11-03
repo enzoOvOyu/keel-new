@@ -1,0 +1,39 @@
+{
+  "status": "PASS",
+  "backend_revision": "802a001",
+  "frontend_revision": "22d885e",
+  "before_api_restart_new_browser": {
+    "httpMs": 44,
+    "status": 200,
+    "encoding": "gzip",
+    "transferBytes": 201657,
+    "devices": 971,
+    "revision": 13,
+    "publications": 4,
+    "visibleMs": 601,
+    "errors": []
+  },
+  "after_api_restart_new_browser": {
+    "httpMs": 65,
+    "status": 200,
+    "encoding": "gzip",
+    "transferBytes": 201505,
+    "devices": 971,
+    "revision": 13,
+    "publications": 4,
+    "visibleMs": 592,
+    "errors": []
+  },
+  "method": "Materialize versioned private MinIO workspace artifact; terminate API process; restart same release; launch fresh Chromium context with authentication state only; first workspace request and content visibility measured. No in-process model or browser resource cache reused.",
+  "validation": [
+    "TestWorkspaceCompression: gzip negotiation and JSON envelope preserved",
+    "TestKickoffBeforeAgent: isolated PostgreSQL/MinIO; stale fingerprint rejected; clearing in-process cache does not rebuild model; publication/input changes continue reflected",
+    "go test ./cmd/api -run TestKickoff passed",
+    "Go API build passed"
+  ],
+  "limits": [
+    "Missing artifact or a new engineering revision still requires one initial rebuild; subsequent first visits reuse the persisted artifact.",
+    "MinIO unavailable falls back to database reconstruction; no stale artifact returned.",
+    "No real MM publication submitted; current r13/four publications reflect current environment state, not writes by this check."
+  ]
+}

@@ -7,7 +7,7 @@
 | 范围 | 当前事实 |
 |---|---|
 | 主开发 | `/home/ubuntu/keel-dev`，分支`dev`，应用目录`dev/`；文档定版已整合；本轮历史资料理解已提交dev并按用户要求发布 |
-| 当前主环境 | 5180前端发布`22d885e`；8081 API发布`1d68a05`；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json)记录逐设备实际变化筛选与核对处理入口；真实MM只读验证808台禁用、163台待增补可选，无发布写入 |
+| 当前主环境 | 5180前端发布`22d885e`；8081 API发布`802a001`；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json)记录逐设备实际变化筛选与核对处理入口；真实MM只读验证808台禁用、163台待增补可选，无发布写入 |
 | Fabric | `/home/ubuntu/keel-fabric-dev`，`feat/fabric-rebuild@6a70041`；5197/8100分支预览，未并入dev；**用户要求暂停，等待上游接入修复通知** |
 | 原型 | Kickoff5195、拓扑/机柜5181、Fabric5194仅设计参考，不是正式事实或执行来源；本次不启停服务 |
 | main与旧目录 | main保留稳定基线；旧Flows/Kestra/visualization detached目录仅残留原型/运行依赖，不在那里继续开发；本次不合并或推送main |
@@ -34,7 +34,13 @@
 
 真实页面不再触发Identity外层全量CMDB装载；修复MM切换作业平台连续20余次inventory请求。工程证据按集合读取，设备输入按归属比较，发布对象与CMDB规划字段批量写入，回执用集合校验。工作区派生缓存受项目/输入修订/模型head约束，空闲10分钟、最多3份；入库判断和下游摘要额外核对发布ID/状态，历史区域按源head复用。正式发布仍在事务中重新校验，不用缓存替代审批或回执。
 
-最新真实MM只读测量：冷工作区1978ms、首次范围判断2388ms；重复请求78ms/22ms。四个跨菜单导航无全量inventory/fixture请求、无脚本错误；观察时间含固定600ms等待，不当作绘制耗时。真实MM保持revision12、808无变化/163待增补。隔离PostgreSQL/MinIO完整发布与回执、部分落位、重复提交通过并清理隔离库/桶；未提交真实MM，未测900设备写入吞吐。相关Kickoff/CMDB测试、前端构建通过；更广cmd/api测试存在旧BOM识别测试失败，本次未扩展修复。证据：[性能记录](docs/kickoff/PERFORMANCE-20261103.json)。前端目录kickoff-perf-22d885e、API目录kickoff-perf-1d68a05，旧静态资源保留，无迁移。
+前轮1d68a05真实MM只读测量：冷工作区1978ms、首次范围判断2388ms；重复请求78ms/22ms。四个跨菜单导航无全量inventory/fixture请求、无脚本错误；观察时间含固定600ms等待，不当作绘制耗时。前轮测量时真实MM为revision12、808无变化/163待增补。隔离PostgreSQL/MinIO完整发布与回执、部分落位、重复提交通过并清理隔离库/桶；未提交真实MM，未测900设备写入吞吐。相关Kickoff/CMDB测试、前端构建通过；更广cmd/api测试存在旧BOM识别测试失败，本次未扩展修复。证据：[性能记录](docs/kickoff/PERFORMANCE-20261103.json)。该轮前端目录kickoff-perf-22d885e、API目录kickoff-perf-1d68a05；当前API见下节802a001。旧静态资源保留，无迁移。
+
+## 首次进入工作区优化（已部署802a001）
+
+首次全量模型还原约1.2秒、首页约1.1MB。现在仅工作区摘要增加私有MinIO派生读快照（每项目一个gzip对象，原始资料不变），每次访问仍经RBAC并在数据库一致性快照中校验项目/名称/workspace修订/工程head/资料head与状态/发布回执状态。字段与HTTP JSON契约不变，支持Accept-Encoding:gzip。正式提交、preview、设备选项与详情仍实时读取其原有路径；快照不充当发布依据。缓存缺失、版本变化或MinIO不可用回源重建，不接受旧快照；有界对象存储超时不阻断业务。新修订首次生成仍有重建成本。
+
+API目录`/home/ubuntu/.local/state/keel-deployments/kickoff-cold-802a001`，前端仍22d885e。服务重启后、新浏览器首次进入真实MM：接口65ms、页面内容592ms可见、传输201505字节，971设备/r13/4发布记录、无脚本错误。本次未提交MM；环境修订已由此前r12变化为r13，以真实读取为准。隔离测试确认内存缓存清空后不重建模型、快照版本不匹配拒用、发布/配置更新结果正确，gzip内容一致；定向测试及Go构建通过，无迁移。证据：[首次打开检查](docs/kickoff/COLD-OPEN-PERFORMANCE.json)。
 
 ## 验证和接续
 

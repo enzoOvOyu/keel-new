@@ -4,7 +4,7 @@
   "coverage": "Current module documentation baseline, 2026-11-03: deployed dev 686e9ea; CMDB routes additionally registered by source review only. Per-operation runtime verification is limited to cited evidence. Fabric 6a70041 belongs to a separate paused branch and is not included in this registry.",
   "schema_authority": "docs/openapi.yaml",
   "code_revision": "c6d5bc4b61f4e18844903369be64b30d5004dda0",
-  "deployed_revision": "1d68a05",
+  "deployed_revision": "802a001",
   "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
   "operations": [
     {
@@ -3169,7 +3169,7 @@
       "deployed_revision": "c6d5bc4b61f4e18844903369be64b30d5004dda0"
     }
   ],
-  "development_note": "Frontend 22d885e / API 1d68a05: real routes skip full inventory bootstrap; revision/receipt-aware derived read caches and batch publication SQL. See docs/kickoff/PERFORMANCE-20261103.json. No real MM publication writes.",
+  "development_note": "Frontend 22d885e / API 802a001: versioned private MinIO workspace read artifact and gzip. API restart plus fresh browser first-open: HTTP65ms, visible592ms,201505 transferred bytes; current MM revision13/four publications read only. See docs/kickoff/COLD-OPEN-PERFORMANCE.json.",
   "last_deployed_changes": {
     "branch": "dev",
     "base_revision": "3c0ac07",
