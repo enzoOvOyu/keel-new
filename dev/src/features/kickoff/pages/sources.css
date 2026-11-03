@@ -18,7 +18,7 @@
 .kickoff-workspace .source-page-layout .recognition-step{min-width:0;flex:1;gap:5px}
 .kickoff-workspace .source-page-layout .recognition-step>b{min-width:0}
 .kickoff-workspace .source-page-layout .recognition-step>svg{display:none}
-.kickoff-workspace .source-page-layout .source-agent-actions{grid-column:2;grid-row:2/span 4;min-width:0;margin:0;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
+.kickoff-workspace .source-page-layout .source-agent-actions{grid-column:2;grid-row:2/span 2;min-width:0;margin:0;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
 .kickoff-workspace .source-page-layout .source-agent-actions .source-analysis-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:16px;border:0}
 .kickoff-workspace .source-page-layout .source-agent-actions .source-analysis-toolbar>b{font-size:13px;font-weight:600;flex-basis:100%}
 .kickoff-workspace .source-page-layout .source-agent-actions .source-analysis-status{font-size:11px;flex-basis:100%;line-height:1.6;overflow-wrap:anywhere}
@@ -34,7 +34,12 @@
 .kickoff-workspace .source-task-row>.text-link{justify-self:start}
 .kickoff-workspace .source-task-pagination{display:flex;justify-content:flex-end;align-items:center;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:10px;color:var(--muted)}
 .kickoff-workspace .source-task-pagination>span{margin-right:auto}
-.kickoff-workspace .source-page-layout .source-region-layout{grid-template-columns:150px minmax(0,1fr)}
+.kickoff-workspace .source-page-layout .source-region-layout{grid-column:1/-1;grid-template-columns:190px minmax(0,1fr);min-height:600px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.kickoff-workspace .source-page-layout .region-rail{max-height:720px;overflow:auto}
+.kickoff-workspace .source-page-layout .region-content{min-width:0}
+.kickoff-workspace .source-page-layout .source-task-history{max-height:200px;overflow:auto}
+.kickoff-workspace .source-page-layout .source-task-history-heading{position:sticky;top:0;background:var(--surface);z-index:1}
+.kickoff-workspace .source-page-layout .source-footer{grid-column:1/-1}
 .kickoff-workspace .source-task-detail{font-size:11px;line-height:1.7;overflow-wrap:anywhere}
 .kickoff-workspace .source-task-detail h3{font-size:13px;margin:22px 0 12px}
 .kickoff-workspace .source-task-detail p{margin:6px 0;white-space:pre-wrap}
