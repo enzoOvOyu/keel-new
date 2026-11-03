@@ -58,7 +58,8 @@ func validateKickoffMappings(w bom.Workbook, regions []KickoffRegion, step int, 
 			if b.Classification != "" {
 				allowed := map[string]bool{"server": true, "switch": true, "gpu": true, "nic": true}
 				axis := b.Classification == "rack_u_axis" && (b.Normalize == "u_scale_capacity" || b.Normalize == "u_grid_start" || b.Normalize == "u_grid_height")
-				if !axis && (m.Table != "equipment_specs" || b.Field != "equipment_type" || !allowed[b.Classification] || b.Normalize != "") {
+				typedEntity := m.Table == "equipment_specs" || m.Table == "kickoff23/devices" || m.Table == "kickoff23/components"
+				if !axis && (!typedEntity || b.Field != "equipment_type" || !allowed[b.Classification] || b.Normalize != "") {
 					return fmt.Errorf("INVALID_EQUIPMENT_CLASSIFICATION: %s", b.Field)
 				}
 			}

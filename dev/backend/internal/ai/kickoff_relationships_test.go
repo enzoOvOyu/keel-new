@@ -171,3 +171,17 @@ func TestKickoffVerifiedTextFeedsRelationsWithoutLeaking(t *testing.T) {
 		t.Fatal("original workbook mutated")
 	}
 }
+
+func TestKickoffAssessedDeviceTypeIsSemanticNotIdentity(t *testing.T) {
+	w, _ := relationWorkbook()
+	bounds := engineering.Bounds{StartRow: 2, EndRow: 3, StartColumn: 1, EndColumn: 5}
+	r := KickoffRegion{ID: "inventory", Sheet: "inventory", Bounds: bounds}
+	m := KickoffMapping{Region: r.ID, Table: "kickoff23/devices", Bounds: bounds, Layout: "rows", KeyColumn: 1, Bindings: []KickoffBinding{{Field: "equipment_type", Column: 2, Classification: "switch"}}}
+	if err := validateKickoffMappings(w, []KickoffRegion{r}, 1, KickoffTaskResult{Mappings: []KickoffMapping{m}}); err != nil {
+		t.Fatal(err)
+	}
+	m.Bindings[0].Field = "serial"
+	if validateKickoffMappings(w, []KickoffRegion{r}, 1, KickoffTaskResult{Mappings: []KickoffMapping{m}}) == nil {
+		t.Fatal("semantic classification fabricated identity")
+	}
+}
