@@ -19,7 +19,9 @@ export function requiresLegacyFixtures(pathname:string):boolean{
  const parts=pathname.split('/').filter(Boolean);
  const offset=parts[0]==='p'&&parts[2]==='deploy'?3:0;
  const entry=entries.find(e=>e.id===parts[offset]);
- if(!entry||['kickoff','cmdb','topology','racks'].includes(entry.id))return false;
+ if(!entry||['projects','kickoff','cmdb','topology','racks','flows'].includes(entry.id))return false;
  const view=parts[offset+1];
+ if(entry.id==='admin'&&['users','members','roles','sessions','logins','audit','approvals','ssh','ai-provider'].includes(view||'users'))return false;
+ if(entry.id==='ai'&&view==='providers')return false;
  return !view||!entry.views||entry.id==='flows'||entry.views.some(v=>v.id===view);
 }

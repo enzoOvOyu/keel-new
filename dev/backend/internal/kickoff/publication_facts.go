@@ -94,6 +94,10 @@ func PublicationFacts(m engineering.PhysicalModel, inputs []ModelInput) map[stri
 			id = *f.ParentID
 		}
 	}
+	deviceIDs := make([]string, 0, len(devices))
+	for id := range devices {
+		deviceIDs = append(deviceIDs, id)
+	}
 	inputs = ResolveReferences(m, inputs)
 	for _, input := range inputs {
 		rows := map[string][]string{}
@@ -108,7 +112,15 @@ func PublicationFacts(m engineering.PhysicalModel, inputs []ModelInput) map[stri
 				continue
 			}
 			digest := engineering.Digest(value)
-			for root, device := range devices {
+			candidates := deviceIDs
+			if id := row["device_id"]; id != "" {
+				candidates = nil
+				if root := owner[id]; root != "" {
+					candidates = []string{root}
+				}
+			}
+			for _, root := range candidates {
+				device := devices[root]
 				matches := true
 				if id := row["device_id"]; id != "" {
 					matches = owner[id] == root

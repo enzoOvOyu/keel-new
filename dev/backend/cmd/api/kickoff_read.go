@@ -50,11 +50,12 @@ func (s *Server) kickoffReadSnapshot(ctx context.Context, q engineeringQuery, re
 	key := fmt.Sprintf("%p:%s:%d:%s", s.db, s.project, revision, head)
 	kickoffReads.Lock()
 	for k, v := range kickoffReads.entries {
-		if time.Since(v.at) > time.Minute {
+		if time.Since(v.at) > 10*time.Minute {
 			delete(kickoffReads.entries, k)
 		}
 	}
 	if v := kickoffReads.entries[key]; v != nil {
+		v.at = time.Now()
 		kickoffReads.Unlock()
 		return v, nil
 	}

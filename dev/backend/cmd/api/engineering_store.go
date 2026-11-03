@@ -72,7 +72,7 @@ func engineeringModel(ctx context.Context, q engineeringQuery, revision, project
 			extra = `, 'depth_mm',t.depth_mm::text`
 		}
 		var raw []byte
-		sql := `SELECT COALESCE(jsonb_agg(jsonb_strip_nulls(to_jsonb(t)||jsonb_build_object('provenance_id',v.provenance_id,'maturity',v.maturity,'attributes','[]'::jsonb,'evidence_ids',COALESCE((SELECT jsonb_agg(e.id ORDER BY e.id) FROM eng_evidence e WHERE e.revision_id=t.revision_id AND e.entity_id=t.entity_id),'[]'::jsonb)` + extra + `)) ORDER BY t.entity_id),'[]'::jsonb) FROM ` + entry.table + ` t JOIN eng_entity_version v USING(revision_id,entity_id) WHERE t.revision_id=$1`
+		sql := `WITH evidence AS MATERIALIZED (SELECT entity_id,jsonb_agg(id ORDER BY id) AS ids FROM eng_evidence WHERE revision_id=$1 GROUP BY entity_id) SELECT COALESCE(jsonb_agg(jsonb_strip_nulls(to_jsonb(t)||jsonb_build_object('provenance_id',v.provenance_id,'maturity',v.maturity,'attributes','[]'::jsonb,'evidence_ids',COALESCE(e.ids,'[]'::jsonb)` + extra + `)) ORDER BY t.entity_id),'[]'::jsonb) FROM ` + entry.table + ` t JOIN eng_entity_version v USING(revision_id,entity_id) LEFT JOIN evidence e ON e.entity_id=t.entity_id WHERE t.revision_id=$1`
 		if e := q.QueryRow(ctx, sql, revision).Scan(&raw); e != nil {
 			return m, evidence, e
 		}

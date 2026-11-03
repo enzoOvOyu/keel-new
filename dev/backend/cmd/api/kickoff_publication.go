@@ -196,17 +196,18 @@ func (s *Server) projectKickoffPublication(ctx context.Context, tx pgx.Tx, event
 		return e
 	}
 	// Read the projection inside the same transaction before recording success.
-	for _, ids := range [][]string{publication.DeviceIDs, publication.ComponentIDs, publication.PortIDs, publication.ConnectionIDs, publication.FacilityIDs} {
-		for _, id := range ids {
-			var exists bool
-			if e = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM cmdb_asset_scope WHERE project_id=$1 AND asset_id=$2)`, project, id).Scan(&exists); e != nil {
-				return e
-			}
-			if !exists {
-				return fmt.Errorf("CMDB_RECEIPT_MISSING")
-			}
-		}
+	ids := []string{}
+	for _, group := range [][]string{publication.DeviceIDs, publication.ComponentIDs, publication.PortIDs, publication.ConnectionIDs, publication.FacilityIDs} {
+		ids = append(ids, group...)
 	}
+	var missing bool
+	if e = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM unnest($2::uuid[]) AS expected(id) WHERE NOT EXISTS(SELECT 1 FROM cmdb_asset_scope s WHERE s.project_id=$1 AND s.asset_id=expected.id))`, project, ids).Scan(&missing); e != nil {
+		return e
+	}
+	if missing {
+		return fmt.Errorf("CMDB_RECEIPT_MISSING")
+	}
+
 	_, e = tx.Exec(ctx, `UPDATE kickoff_publication SET state='published',error_code=NULL WHERE id=$1`, publication.ID)
 	return e
 }

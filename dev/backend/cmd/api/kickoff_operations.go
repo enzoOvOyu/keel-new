@@ -357,10 +357,8 @@ func (s *Server) kickoffPublish(w http.ResponseWriter, r *http.Request) {
 		_, e = tx.Exec(ctx, `INSERT INTO kickoff_publication(id,project_id,revision,expected_revision,model_revision,actor,reason,import_id,outbox_id,created_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`, p.ID, s.project, p.Revision, body.ExpectedRevision, revision, p.Actor, p.Reason, importID, event, p.CreatedAt)
 	}
 	for kind, ids := range map[string][]string{"device": p.DeviceIDs, "port": p.PortIDs, "component": p.ComponentIDs, "connection": p.ConnectionIDs, "placement": p.PlacementIDs, "facility": p.FacilityIDs, "location": p.LocationIDs} {
-		for _, id := range ids {
-			if e == nil {
-				_, e = tx.Exec(ctx, `INSERT INTO kickoff_publication_object VALUES($1,$2,$3)`, p.ID, id, kind)
-			}
+		if e == nil && len(ids) > 0 {
+			_, e = tx.Exec(ctx, `INSERT INTO kickoff_publication_object SELECT $1,id,$3 FROM unnest($2::uuid[]) AS objects(id)`, p.ID, ids, kind)
 		}
 	}
 	for _, input := range inputs {
