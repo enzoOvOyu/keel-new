@@ -1,19 +1,19 @@
 {
-  "code_revision": "d8814215095cdc13dcd4356e5e7af548e2db78ad",
-  "frontend_code_revision": "d8814215095cdc13dcd4356e5e7af548e2db78ad",
-  "backend_code_revision": "0ee1b002842e47dbab5256482c1f0f6e2f685c1e",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-view-actions-d881421",
-  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-facility-power-0ee1b00",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-facility-power-0ee1b00",
-  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-agent-minimal-6d8a6b7",
+  "code_revision": "860029b346cd76d307d2fe99788dd84c63dd0bf0",
+  "frontend_code_revision": "860029b346cd76d307d2fe99788dd84c63dd0bf0",
+  "backend_code_revision": "932c424c4d006adcb0c90a8befe984fa58d24676",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-view-actions-860029b",
+  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-api-932c424",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-23bd22a",
+  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-23bd22a",
   "ports": [
     5180,
     8081
   ],
   "migrations": [],
   "api_restarted": false,
-  "binary_sha256": "2b6684a214cfc1f2782c5e6b98c9eda1d91c9b7977b3b86d489b9b448ccf21d1",
-  "frontend_index_sha256": "465e92477856ae3f69a754c4b1f10b8b26a1aa61b43c6c9c9bd323cf9ae739c6",
+  "binary_sha256": "b698cf3840b2b95318945c983f254339d61c8b21a239311bcda73aaedbee9ef8",
+  "frontend_index_sha256": "d063eb9ba909461f8d95dfb1235bca3202d30dc260a13c1641cb90692630275c",
   "status": "deployed",
   "binary_matches": true,
   "frontend_index_matches": true,
@@ -23,19 +23,11 @@
     "health": 200,
     "index_matches": true
   },
-  "business_tests": "NOT RUN",
+  "business_tests": "MM async adoption: 202 in 0.011s and same-task duplicate submission passed; worker failed INVALID_OR_DUPLICATE_ENTITY_ID; placement identity fix not deployed.",
   "provider_calls": 0,
-  "verification": "Bounded TypeScript and Vite build passed; frontend asset match and API health checked. No AI or business writes.",
+  "verification": "TypeScript/Vite passed with bounded heap; original source layout restored, read-only browser check passed; no new business writes during rollback.",
   "ui_verification": {
-    "checks": [
-      "全局拓扑: scoped modal 机房信息/机柜关联与规格/设备落位",
-      "网络架构: scoped modal 设备角色",
-      "物理布线: complete, no action",
-      "链路追踪: complete, no action",
-      "机柜与机房: scoped modal 机房信息/机柜关联与规格/机柜供电容量/设备落位/设备规划功率"
-    ],
     "errors": [],
-    "writes": [],
     "status": "PASS"
   }
 }
