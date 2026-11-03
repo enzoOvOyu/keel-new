@@ -1,11 +1,27 @@
 {
-  "status": "deployed_live_readonly_ui_verified",
+  "status": "implemented_verified_deployment_pending",
   "scope": "Local built frontend, synthetic protocol responses; no deployed API or business writes",
+  "alignment": {
+    "titleSize": "26px",
+    "referenceSize": "26px",
+    "titleWeight": "650",
+    "referenceWeight": "650",
+    "contentTop": 92,
+    "workbenchTop": 92,
+    "statsAboveFindings": true,
+    "statsAlignedToFindings": true,
+    "railBottom": 868.09375,
+    "selectedTabBackground": "rgb(255, 255, 255)",
+    "inactiveTabBackground": "rgba(0, 0, 0, 0)"
+  },
   "checks": [
-    "compact title and single-line real-state summary; no decorative eyebrow/banner",
+    "standard title size, weight and content top match other Kickoff headings",
+    "statistics card above right-hand findings",
+    "distinct selected entity navigation",
+    "standard page heading and compact sidebar counters; no decorative eyebrow/banner",
     "five entity tabs and all quick filters retained",
     "single toolbar search/facets/export",
-    "first row above 330px",
+    "first row above 365px with standard page header",
     "all measured desktop row heights 58–64px",
     "two problem tags and accessible +N menu with remaining findings",
     "no horizontal overflow in issue sidebar",
@@ -17,7 +33,7 @@
     "zero page errors or fixture loads"
   ],
   "metrics": {
-    "firstRowY": 305.5,
+    "firstRowY": 336.59375,
     "rowHeights": [
       60,
       60,
@@ -31,12 +47,12 @@
       60
     ],
     "toolbarControlTops": [
-      235,
-      234,
-      234,
-      234,
-      234,
-      232
+      266.09375,
+      265.09375,
+      265.09375,
+      265.09375,
+      265.09375,
+      263.09375
     ],
     "documentWidth": 1440,
     "viewport": 1440,
@@ -46,32 +62,13 @@
   "requests": 15,
   "pageErrors": 0,
   "fixtureRequests": 0,
-  "frontend_build": "PASS: npm run build (TypeScript + Vite), final isolated compact header and tab styles",
+  "frontend_build": "PASS: TypeScript via npm run build; final Vite build includes header, primary-tab and sidebar-card styles",
   "backend_and_http_contract_changes": false,
   "business_data_writes": false,
   "ai_requests": 0,
-  "scope_limit": "Local synthetic protocol/visual checks plus authenticated live frontend read-only verification. No full MM re-import or AI acceptance.",
   "screenshots": [
     "docs/kickoff/screenshots/review-compact-desktop-synthetic.png",
     "docs/kickoff/screenshots/review-compact-narrow-synthetic.png"
   ],
-  "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
-  "live_ui": {
-    "status": "PASS",
-    "scope": "Authenticated live frontend and real API; read-only; no interception or screenshots",
-    "checks": [
-      "compact header and five-tab review loaded",
-      "default ten real records",
-      "25-record request and rendering",
-      "row heights 58–64px",
-      "sidebar has no horizontal overflow"
-    ],
-    "firstRowY": 305.5,
-    "rowHeightRange": [
-      60,
-      60
-    ],
-    "pageErrors": 0,
-    "kickoff_mutations": 0
-  }
+  "scope_limit": "Synthetic protocol and visual checks; live deployment verification follows release."
 }
