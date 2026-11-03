@@ -7,7 +7,7 @@
 | 范围 | 当前事实 |
 |---|---|
 | 主开发 | `/home/ubuntu/keel-dev`，分支`dev`，应用目录`dev/`；文档定版已整合；本轮历史资料理解已提交dev并按用户要求发布 |
-| 当前主环境 | 5180前端/8081 API发布`c6d5bc4b61f4e18844903369be64b30d5004dda0`；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json)记录逐设备实际变化筛选与核对处理入口；真实MM只读验证808台禁用、163台待增补可选，无发布写入 |
+| 当前主环境 | 5180前端发布`0239e8a`；8081 API保持`c6d5bc4b61f4e18844903369be64b30d5004dda0`；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json)记录逐设备实际变化筛选与核对处理入口；真实MM只读验证808台禁用、163台待增补可选，无发布写入 |
 | Fabric | `/home/ubuntu/keel-fabric-dev`，`feat/fabric-rebuild@6a70041`；5197/8100分支预览，未并入dev；**用户要求暂停，等待上游接入修复通知** |
 | 原型 | Kickoff5195、拓扑/机柜5181、Fabric5194仅设计参考，不是正式事实或执行来源；本次不启停服务 |
 | main与旧目录 | main保留稳定基线；旧Flows/Kestra/visualization detached目录仅残留原型/运行依赖，不在那里继续开发；本次不合并或推送main |
@@ -26,9 +26,9 @@
 
 当前全平台仍遵守六阶段，但后续按模块授权实现和发布，不把这些剩余事项展开成一次全量开发。
 
-## 未完成功能入口清理（本地开发，未部署）
+## 未完成功能入口清理（已部署）
 
-保留部署项目、Kickoff、数据中心拓扑/机柜、CMDB、作业平台和完整平台设置。其余13个模块移除Mock子菜单及主路由页面挂载，统一显示“功能建设中”，旧子路由同样进入占位页，不触发legacy fixture加载或原模块轮询。移除通知中心合成告警及全局搜索的Mock工单入口。真实AI Provider旧入口转到平台设置。共享Provider、fixture和领域源码仍为保留模块/测试依赖，不进行整库删除；真实数据库、MinIO及独立Fabric工作区未修改。变更位于app/main.tsx、registry.ts、api/project-scope.ts及GlobalSearch.tsx。TypeScript检查、git diff --check和保留模块分派/部署项目页面逐字对比通过；未部署、未执行浏览器或真实业务回归。
+保留部署项目、Kickoff、数据中心拓扑/机柜、CMDB、作业平台和完整平台设置。其余13个模块移除Mock子菜单及主路由页面挂载，统一显示“功能建设中”，旧子路由同样进入占位页，不触发legacy fixture加载或原模块轮询。移除通知中心合成告警及全局搜索的Mock工单入口。真实AI Provider旧入口转到平台设置。共享Provider、fixture和领域源码仍为保留模块/测试依赖，不进行整库删除；真实数据库、MinIO及独立Fabric工作区未修改。变更位于app/main.tsx、registry.ts、api/project-scope.ts及GlobalSearch.tsx。最终TypeScript及Vite构建通过；发布前已修复菜单分组结束符。部署目录`/home/ubuntu/.local/state/keel-deployments/module-cleanup-0239e8a`，只切换前端，保留前版静态资源。23个登录态页面入口验收通过：15个占位/旧子路由无fixture请求，8个保留功能入口可加载，浏览器脚本异常0；占位页和拓扑截图已检查。验收记录见部署目录acceptance.json。未执行入库、作业或数据库写入；页面加载不代表全部业务回归。
 
 ## 验证和接续
 

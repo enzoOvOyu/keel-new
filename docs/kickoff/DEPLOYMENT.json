@@ -1,18 +1,18 @@
 {
-  "code_revision": "c6d5bc4b61f4e18844903369be64b30d5004dda0",
+  "code_revision": "0239e8a",
   "backend_code_revision": "c6d5bc4b61f4e18844903369be64b30d5004dda0",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-actual-changes-c6d5bc4",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/module-cleanup-0239e8a",
   "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-actual-changes-c6d5bc4",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-select-progress-3c0ac07",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-actual-changes-c6d5bc4",
   "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-publish-fdd86dd",
   "ports": [
     5180,
     8081
   ],
   "migrations": [],
-  "api_restarted": true,
+  "api_restarted": false,
   "binary_sha256": "9c313c8c72184985b93a5456d563d2f2e4cfa8d93cbffaa158cea43397f4a41a",
-  "frontend_index_sha256": "826452e6cb08818110a0cc2c61402b23485f4e8683c3d660d6aad881d848794f",
+  "frontend_index_sha256": "4679945fffaac87f4f8e8611fbd2869455a5ea0f8e851b9c7f9a9563d169c41c",
   "status": "deployed",
   "binary_matches": true,
   "frontend_index_matches": true,
@@ -38,12 +38,134 @@
       "review link reaches nonempty processing action",
       "unchanged confirmation UI and business data preserved"
     ],
-    "reviewAction": "\u8865\u5145\u5efa\u6a21",
+    "reviewAction": "补充建模",
     "pageErrors": 0,
     "publicationSubmitRequests": 0,
     "workspaceRevision": 12,
     "publicationCount": 3
   },
   "agent_implemented": false,
-  "url": "http://localhost:5180/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/kickoff/publish"
+  "url": "http://localhost:5180/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/kickoff/publish",
+  "navigation_cleanup_acceptance": {
+    "status": "PASS",
+    "results": [
+      {
+        "path": "/dashboard",
+        "status": "PASS",
+        "fixtureRequests": 0
+      },
+      {
+        "path": "/fleet",
+        "status": "PASS",
+        "fixtureRequests": 0
+      },
+      {
+        "path": "/issues",
+        "status": "PASS",
+        "fixtureRequests": 0
+      },
+      {
+        "path": "/monitor",
+        "status": "PASS",
+        "fixtureRequests": 0
+      },
+      {
+        "path": "/ai",
+        "status": "PASS",
+        "fixtureRequests": 0
+      },
+      {
+        "path": "/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/deploy/overview",
+        "status": "PASS",
+        "fixtureRequests": 0
+      },
+      {
+        "path": "/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/deploy/fabric",
+        "status": "PASS",
+        "fixtureRequests": 0
+      },
+      {
+        "path": "/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/deploy/config",
+        "status": "PASS",
+        "fixtureRequests": 0
+      },
+      {
+        "path": "/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/deploy/provision",
+        "status": "PASS",
+        "fixtureRequests": 0
+      },
+      {
+        "path": "/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/deploy/validation",
+        "status": "PASS",
+        "fixtureRequests": 0
+      },
+      {
+        "path": "/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/deploy/nettest",
+        "status": "PASS",
+        "fixtureRequests": 0
+      },
+      {
+        "path": "/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/deploy/nccl",
+        "status": "PASS",
+        "fixtureRequests": 0
+      },
+      {
+        "path": "/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/deploy/cleanup",
+        "status": "PASS",
+        "fixtureRequests": 0
+      },
+      {
+        "path": "/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/deploy/fabric/ztp",
+        "status": "PASS",
+        "fixtureRequests": 0
+      },
+      {
+        "path": "/monitor/alerts",
+        "status": "PASS",
+        "fixtureRequests": 0
+      },
+      {
+        "path": "/projects",
+        "status": "PASS",
+        "scope": "authenticated page load"
+      },
+      {
+        "path": "/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/kickoff/review",
+        "status": "PASS",
+        "scope": "authenticated page load"
+      },
+      {
+        "path": "/topology",
+        "status": "PASS",
+        "scope": "authenticated page load"
+      },
+      {
+        "path": "/racks",
+        "status": "PASS",
+        "scope": "authenticated page load"
+      },
+      {
+        "path": "/cmdb",
+        "status": "PASS",
+        "scope": "authenticated page load"
+      },
+      {
+        "path": "/flows",
+        "status": "PASS",
+        "scope": "authenticated page load"
+      },
+      {
+        "path": "/admin/users",
+        "status": "PASS",
+        "scope": "authenticated page load"
+      },
+      {
+        "path": "/admin/ai-provider",
+        "status": "PASS",
+        "scope": "authenticated page load"
+      }
+    ],
+    "pageErrors": [],
+    "scope": "read-only navigation; no import, publication or job execution"
+  }
 }
