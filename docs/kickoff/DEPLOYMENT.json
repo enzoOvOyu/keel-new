@@ -1,23 +1,23 @@
 {
-  "code_revision": "6d8a6b77c674c10bb19e892981a098f3ee0c237f",
-  "frontend_code_revision": "6d8a6b77c674c10bb19e892981a098f3ee0c237f",
-  "backend_code_revision": "6d8a6b77c674c10bb19e892981a098f3ee0c237f",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-agent-minimal-6d8a6b7",
-  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-agent-minimal-6d8a6b7",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-topology-input-313ede2",
-  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-workflows-aabae08",
+  "code_revision": "0ee1b002842e47dbab5256482c1f0f6e2f685c1e",
+  "frontend_code_revision": "0ee1b002842e47dbab5256482c1f0f6e2f685c1e",
+  "backend_code_revision": "0ee1b002842e47dbab5256482c1f0f6e2f685c1e",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-facility-power-0ee1b00",
+  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-facility-power-0ee1b00",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-agent-minimal-6d8a6b7",
+  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-agent-minimal-6d8a6b7",
   "ports": [
     5180,
     8081
   ],
   "migrations": [],
   "api_restarted": true,
-  "binary_sha256": "747d39cdc041021c325e6797a4f10ca11596192f2842f9797675908286d459cf",
-  "frontend_index_sha256": "5f2f7066fb7ab6d8cd2206d054e7e571c53b764b6e2c59f067277564ae4c08f4",
+  "binary_sha256": "2b6684a214cfc1f2782c5e6b98c9eda1d91c9b7977b3b86d489b9b448ccf21d1",
+  "frontend_index_sha256": "bdf1201e3e2c50d273fae28cbcffcdebb3ef1e501129e4e68b64ade9a9695d14",
   "status": "deployed",
   "binary_matches": true,
   "frontend_index_matches": true,
-  "old_assets_retained": 688,
+  "old_assets_retained": 750,
   "checks": {
     "health": 200,
     "frontend": 200,
@@ -25,27 +25,21 @@
   },
   "business_tests": "NOT RUN",
   "provider_calls": 0,
-  "verification": "Focused Go tests, TypeScript, Vite; local MM drawing region capacity/occupancy only. No live model or asset writes.",
-  "api_read_only": {
-    "status": "PASS",
+  "verification": "Existing power calculation unit test, TypeScript, Vite; no live model or asset writes.",
+  "ui_verification": {
+    "errors": [],
     "checks": [
-      {
-        "endpoint": "/analysis",
-        "status": 200
-      },
-      {
-        "endpoint": "/understanding",
-        "status": 200
-      }
+      "return navigation reuses CMDB and connection check cache",
+      "one row button opens shared modal tabs, XLSX entry and planned-only power fields",
+      "browser-only save triggers recheck and retains modal for next table; no real business write"
     ],
-    "providerCalls": 0,
-    "businessWrites": 0
-  },
-  "local_fixture": {
-    "scope": "one rack drawing region in local MM XLSX",
-    "capacity_u": 52,
-    "occupied_blocks": 9,
-    "provider_calls": 0,
-    "full_agent_acceptance": "NOT RUN"
+    "realWrites": [],
+    "syntheticSaves": 1,
+    "status": "PASS",
+    "requests": 12,
+    "evidence": [
+      "/tmp/keel-facility-power-page.png",
+      "/tmp/keel-facility-power-dialog.png"
+    ]
   }
 }

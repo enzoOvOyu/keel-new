@@ -3,8 +3,8 @@
   "updated_at": "2026-11-03",
   "coverage": "Current module documentation baseline, 2026-11-03: deployed dev 686e9ea; CMDB routes additionally registered by source review only. Per-operation runtime verification is limited to cited evidence. Fabric 6a70041 belongs to a separate paused branch and is not included in this registry.",
   "schema_authority": "docs/openapi.yaml",
-  "code_revision": "6d8a6b77c674c10bb19e892981a098f3ee0c237f",
-  "deployed_revision": "6d8a6b77c674c10bb19e892981a098f3ee0c237f",
+  "code_revision": "0ee1b002842e47dbab5256482c1f0f6e2f685c1e",
+  "deployed_revision": "0ee1b002842e47dbab5256482c1f0f6e2f685c1e",
   "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
   "operations": [
     {
@@ -3222,7 +3222,7 @@
       "development_changes": ""
     }
   ],
-  "development_note": "Agent minimal repair deployed 6d8a6b7 (frontend/API): partial domain reuse, provider failure isolation, source-backed rack drawing normalization. Existing understanding enums extended, no new endpoints. Focused tests/local fixture/read-only HTTP passed; live provider acceptance NOT RUN.",
+  "development_note": "Facility power gaps, scoped supplement tabs and session query cache deployed 0ee1b00. Existing CMDB query projects approved planned power/capacity; rack capacity publication reuses transaction. Focused compilation/unit checks and read-only UI/browser-intercepted save passed; real publication and live Agent acceptance NOT RUN.",
   "last_deployed_changes": {
     "branch": "dev",
     "base_revision": "3c0ac07",
