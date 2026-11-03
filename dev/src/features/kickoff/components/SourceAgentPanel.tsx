@@ -30,22 +30,18 @@ export function SourceAgentPanel({sourceId,sourceName,onResult,children}:{source
  const draft=report?.drafts.find(d=>d.tableId===preview);
  if(!api.sourceAnalysis||!api.startSourceAnalysis||!api.adoptSourceAnalysis)return <>{children}</>;
  return <div className="source-analysis">
-  <div className="source-task-heading"><Bot size={18}/><div><b>Agent 识别任务</b><small>当前资料 · 分域提取与候选核对</small></div></div>
   <div className="source-analysis-flow">
    {children}
   <div className="source-analysis-toolbar">
-   <span className="source-analysis-status" role="status">{report?states[report.state]:'正在读取分析状态…'}{report?.state==='failed'&&report.errorCode?' · '+apiError(report.errorCode):''}</span>
+   <span className="source-analysis-status" role="status">{adopting?'候选采用任务处理中':report?states[report.state]:'正在读取分析状态…'}{report?.state==='failed'&&report.errorCode?' · '+apiError(report.errorCode):''}{report?.adoption?.state==='failed'?' · 采用失败：'+apiError(report.adoption.errorCode??'ENGINEERING_ANALYSIS_FAILED'):''}{report?.adoption?.state==='succeeded'?' · 候选已采用，可进入数据核对':''}</span>
    <div className="actions">
     <Button disabled={!supported||!report||busy||running||adopting||!can('bom:import')} onClick={()=>setScopeOpen(true)}>分析范围</Button>
-    <Button kind="primary" disabled={!supported||!report||busy||running||adopting||!can('bom:import')} onClick={()=>void start(domains.map(d=>d.id))}>{busy?'正在排队…':running?states[report!.state]:report?.state==='succeeded'?'重新分析资料':'开始分析'}</Button>
+    <Button kind="primary" disabled={!supported||!report||busy||running||adopting||!can('bom:import')} onClick={()=>void start(domains.map(d=>d.id))}>{adopting?'正在采用…':busy?'正在排队…':running?states[report!.state]:report?.state==='succeeded'?'重新分析资料':'开始分析'}</Button>
    </div>
   </div>
   </div>
-  {(running||adopting)&&<div className="agent-execution-status" role="status"><LoaderCircle size={17} className="agent-spinner"/><div><b>{adopting?'正在采用候选':'Agent 正在识别资料'}</b><p>{adopting?'正在合并候选并保存；可切换页面或刷新，返回后继续查看任务状态。':'任务在后台执行，结果就绪后展示候选与来源。'}</p><div className="agent-progress" role="progressbar" aria-label={adopting?'候选采用处理中':'资料分析执行中'}><span/></div><small>等待服务端完成，当前未返回百分比</small></div></div>}
-  {report?.state==='succeeded'&&!adopting&&<p className="agent-completion"><CheckCircle2 size={15}/>识别任务已完成 · {report.drafts.length?`${report.drafts.length} 类候选待核对采用`:'当前无待采用候选'}</p>}
-  {report?.adoption&&<div className="agent-completion" role="status">采用任务 {report.adoption.jobId.slice(0,8)} · {{pending:'排队中',running:'执行中',succeeded:'已完成',failed:'失败'}[report.adoption.state]}{report.adoption.state==='succeeded'&&<Button onClick={()=>go('review')}>去数据核对</Button>}</div>}
   {!supported&&<Notice tone="warning">当前自动分析支持 XLSX；其他格式保留为附件。</Notice>}
-  {(error||report?.adoption?.state==='failed')&&<Notice tone="error">{error||apiError(report?.adoption?.errorCode??'KICKOFF_ADOPTION_FAILED')}<Button kind="ghost" onClick={()=>setRetry(v=>v+1)}>重新读取</Button></Notice>}
+  {error&&<Notice tone="error">{error}<Button kind="ghost" onClick={()=>setRetry(v=>v+1)}>重新读取</Button></Notice>}
   {scopeOpen&&<Modal title="选择分析范围" description="只重新识别所选内容，其他结果保留；已有人工确认值不会被自动覆盖。" close={()=>setScopeOpen(false)}>
    <div className="agent-domain-options">{domains.map(d=><label key={d.id}><input type="checkbox" checked={selected.includes(d.id)} onChange={e=>setSelected(v=>e.target.checked?[...v,d.id]:v.filter(x=>x!==d.id))}/>{d.label}</label>)}</div>
    <div className="actions"><Button onClick={()=>setScopeOpen(false)}>取消</Button><Button kind="primary" disabled={!selected.length||busy||running} onClick={()=>void start(selected)}>分析所选内容</Button></div>
