@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { ArrowRight, Check, ChevronRight, FileSpreadsheet, FolderOpen, Plus, Search, Trash2, UploadCloud } from 'lucide-react';
+import { ArrowRight, Check, ChevronRight, FileSpreadsheet, FolderOpen, Plus, Search, Trash2 } from 'lucide-react';
 import {SourceAgentPanel} from '../components/SourceAgentPanel';
 import { useWorkspace } from '../context';
 import type { SourceRegionPreview, SourceUnderstanding } from '../lib/api';
-import { Badge, Button, Empty, Heading, Notice, Tabs, formatDate } from '../components/ui';
+import { Badge, Button, Empty, Heading, Notice, Tabs, Modal, formatDate } from '../components/ui';
 
 const columnLabel=(column:number)=>{let label='';for(let n=column;n>0;n=Math.floor((n-1)/26))label=String.fromCharCode(65+(n-1)%26)+label;return label;};
 const stepNames = {structure:'工作簿结构',regions:'数据区域',semantics:'语义分类',relationships:'跨表关联',fields:'字段核对'};
@@ -24,7 +24,8 @@ export default function Sources(){
  const [loading,setLoading]=useState(false),[previewLoading,setPreviewLoading]=useState(false);
  const [error,setError]=useState(''),[previewError,setPreviewError]=useState('');
  const [retry,setRetry]=useState(0),[previewRetry,setPreviewRetry]=useState(0);
- const [uploading,setUploading]=useState(false),[drag,setDrag]=useState(false),[reusing,setReusing]=useState(false);
+ const [uploading,setUploading]=useState(false),[reusing,setReusing]=useState(false);
+ const [logsOpen,setLogsOpen]=useState(false);
  const picker=useRef<HTMLInputElement>(null);
  const requestKey=`${s.projectId}:${sourceId??''}:${s.revision}`;
  const requestKeyRef=useRef<string|null>(requestKey);
@@ -39,11 +40,11 @@ export default function Sources(){
   return()=>{active=false;};
  },[api,sourceId,s.revision,retry]);
  useEffect(()=>{let active=true;setPreview(undefined);setPreviewError('');
-  if(!sourceId||!region||!currentReport)return;
+  if(!logsOpen||!sourceId||!region||!currentReport)return;
   setPreviewLoading(true);
   void api.sourceRegionPreview(sourceId,region.id,offset,currentReport.revisionId,view).then(data=>{if(active){if(data.revisionId!==currentReport.revisionId)throw Error('资料版本已变化，请重新读取识别结果');setPreview(data);}}).catch(e=>{if(active)setPreviewError(e.message);}).finally(()=>{if(active)setPreviewLoading(false);});
   return()=>{active=false;};
- },[api,sourceId,region?.id,currentReport?.revisionId,offset,view,previewRetry]);
+ },[api,sourceId,region?.id,currentReport?.revisionId,offset,view,previewRetry,logsOpen]);
  const add=async(files:File[])=>{setError('');setUploading(true);try{await api.addSources(files);notify('资料已添加，可点击开始分析');}catch(e){setError((e as Error).message);}finally{setUploading(false);}};
  const reuse=async()=>{if(!sourceId)return;const key=requestKeyRef.current;setReusing(true);setError('');try{const data=await api.reuseSourceHistory(sourceId);if(requestKeyRef.current!==key)return;setReport(data);setOffset(0);setPreviewRetry(n=>n+1);notify('已复用历史资料与证据，未调用 AI，也未修改已确认输入');}catch(e){if(requestKeyRef.current===key)setError((e as Error).message);}finally{if(requestKeyRef.current===key)setReusing(false);}};
  const columns=[...new Set(preview?.rows.flatMap(row=>row.cells.map(cell=>cell.column))??[])].sort((a,b)=>a-b);
@@ -51,13 +52,16 @@ export default function Sources(){
  return <>
   <Heading eyebrow="SOURCES & INTELLIGENCE" title="资料与识别" description="一次接入多份资料，分类、关联，保留每项数据的依据。" action={<Button kind="primary" onClick={()=>picker.current?.click()} disabled={uploading||!can('bom:import')}><Plus size={15}/>添加资料</Button>}/>
   <input ref={picker} hidden type="file" multiple accept=".xlsx,.csv,.pdf,.txt" onChange={e=>{void add([...e.target.files??[]]);e.target.value='';}}/>
-  <div className={`upload-strip ${drag?'dragging':''}`} onDragOver={e=>{e.preventDefault();setDrag(true);}} onDragLeave={()=>setDrag(false)} onDrop={e=>{e.preventDefault();setDrag(false);if(can('bom:import')&&!uploading)void add([...e.dataTransfer.files]);}}><span className="upload-icon"><UploadCloud size={23}/></span><div><b>{uploading?'正在登记资料…':'将工程资料拖入此处'}</b><p>设备清单、端接表、机柜布局、网络规划可以一起提交。</p></div><span className="file-formats">XLSX · CSV · PDF · TXT</span><Button onClick={()=>picker.current?.click()} disabled={uploading||!can('bom:import')}>选择文件</Button></div>
-  <div className="source-layout"><aside className="source-rail"><div className="rail-heading"><b>资料包</b><span>{s.sources.length}</span></div>{s.sources.map(item=><button className={'source-file '+(sourceId===item.id?'selected':'')} key={item.id} onClick={()=>{setParams({source:item.id});setRegionId('');setOffset(0);}}><FileSpreadsheet size={20}/><span><b>{item.name}</b><small>{item.size} · v{item.version}</small><Badge state={item.state}>{sourceLabels[item.state]??item.state}</Badge></span></button>)}<div className="source-rail-foot"><FolderOpen size={15}/><span>相同内容按摘要复用，增补资料独立处理。</span></div></aside>
+  <div className="source-layout source-task-layout"><div className="source-document-column"><aside className="source-rail"><div className="rail-heading"><b>资料包</b><span>{s.sources.length}</span></div>{s.sources.map(item=><button className={'source-file '+(sourceId===item.id?'selected':'')} key={item.id} onClick={()=>{setParams({source:item.id});setRegionId('');setOffset(0);}}><FileSpreadsheet size={20}/><span><b>{item.name}</b><small>{item.size} · v{item.version}</small><Badge state={item.state}>{sourceLabels[item.state]??item.state}</Badge></span></button>)}<div className="source-rail-foot"><FolderOpen size={15}/><span>相同内容按摘要复用，增补资料独立处理。</span></div></aside>
    <div className="source-main">{source?<>
     <div className="source-header"><FileSpreadsheet size={22}/><div><h2>{source.name}</h2><p>{source.size} · 添加于 {formatDate(source.createdAt)}</p></div><Badge state={source.state}>{sourceLabels[source.state]??source.state}</Badge><Button disabled={reusing||loading||!can('bom:import')} onClick={()=>void reuse()}>{reusing?'正在复用历史资料…':'复用历史资料'}</Button><Button onClick={()=>go('review')}>核对识别结果<ArrowRight size={14}/></Button></div>
-    <SourceAgentPanel key={source.id} sourceId={source.id} sourceName={source.name} onResult={()=>setRetry(n=>n+1)}>{currentReport&&(<div className="recognition-pipeline">{Object.entries(stepNames).map(([id,label],i)=>{const step=currentReport.steps.find(x=>x.id===id);return <div key={id} className={`recognition-step ${step?.state??'pending'}`} title={step?.note??'尚无阶段结果'}><span>{step?.state==='complete'?<Check size={12}/>:<Search size={12}/>}</span><b>{label}<small>{stepStates[step?.state??'pending']}{step&&step.total>0?` ${step.completed}/${step.total}`:''}</small></b>{i<4&&<ChevronRight size={13}/>}</div>;})}</div>)}</SourceAgentPanel>
+
     {error&&<Notice tone="error">{error}<Button onClick={()=>setRetry(n=>n+1)}>重新读取</Button></Notice>}
-    {loading?<div className="empty" aria-busy="true" role="status">正在读取资料理解与历史证据…</div>:currentReport&&<>
+    <button className="source-log-entry" onClick={()=>setLogsOpen(true)}><span><b>资料理解与候选证据</b><small>{loading?'正在读取资料日志':`${regions.length} 个数据区域 · 查看五步理解、来源及候选证据`}</small></span><ChevronRight size={17}/></button>
+    <div className="source-footer"><span>SHA-256 <code>{source.hash.slice(0,28)}…</code></span>{source.state==='awaiting_analysis'&&<Button kind="ghost" disabled={!can('bom:import')} onClick={()=>{void api.removeSource(source.id).then(()=>setParams({})).catch(e=>setError(e.message));}}><Trash2 size={13}/>移除待分析资料</Button>}<button className="text-link" onClick={()=>notify('原始资料与历史工程证据保留独立版本；复用不调用 AI，不覆盖已确认输入。')}>来源版本说明</button></div>
+   </>:<Empty title="添加第一份工程资料" description="无需先选择工程步骤，资料按内容分类。" action={<Button disabled={!can('bom:import')} onClick={()=>picker.current?.click()}>选择文件</Button>}/>}</div>
+  </div>{source&&<aside className="source-task-column"><SourceAgentPanel key={source.id} sourceId={source.id} sourceName={source.name} onResult={()=>setRetry(n=>n+1)}/></aside>}</div>
+  {logsOpen&&source&&<Modal drawer wide title="资料理解与候选证据" description={source.name} close={()=>setLogsOpen(false)}>{currentReport&&(<div className="recognition-pipeline">{Object.entries(stepNames).map(([id,label],i)=>{const step=currentReport.steps.find(x=>x.id===id);return <div key={id} className={`recognition-step ${step?.state??'pending'}`} title={step?.note??'尚无阶段结果'}><span>{step?.state==='complete'?<Check size={12}/>:<Search size={12}/>}</span><b>{label}<small>{stepStates[step?.state??'pending']}{step&&step.total>0?` ${step.completed}/${step.total}`:''}</small></b>{i<4&&<ChevronRight size={13}/>}</div>;})}</div>)}    {loading?<div className="empty" aria-busy="true" role="status">正在读取资料理解与历史证据…</div>:currentReport&&<>
 
      <div className="source-understanding-note"><b>{currentReport.origin==='agent'?'Agent 资料理解与候选证据':currentReport.origin==='history'?'历史资料与已有候选复用':'尚无资料识别结果'}</b>{currentReport.limitations.map((note,i)=><p key={i}>{note}</p>)}</div>
      {regions.length?<div className="source-region-layout"><div className="region-rail"><small>工作表与数据区域</small>{regions.map(r=><button className={region?.id===r.id?'active':''} key={r.id} onClick={()=>{setRegionId(r.id);setOffset(0);setPreview(undefined);}}><span><b>{r.sheet}</b><small>{r.range} · {r.category==='unknown'?'待分类':r.category}</small></span><span className="region-count">{r.rowCount}</span></button>)}</div><div className="region-content">
@@ -74,8 +78,6 @@ export default function Sources(){
      </div></div>:<Empty title="暂无数据区域结果" description="识别完成后在此查看数据区域；已有历史资料可通过“复用历史资料”查看。"/>}
      <div className="source-stage-notes">{currentReport.steps.filter(step=>step.note).map(step=><p key={step.id}><b>{stepNames[step.id]}：</b>{step.note}</p>)}</div>
     </>}
-    <div className="source-footer"><span>SHA-256 <code>{source.hash.slice(0,28)}…</code></span>{source.state==='awaiting_analysis'&&<Button kind="ghost" disabled={!can('bom:import')} onClick={()=>{void api.removeSource(source.id).then(()=>setParams({})).catch(e=>setError(e.message));}}><Trash2 size={13}/>移除待分析资料</Button>}<button className="text-link" onClick={()=>notify('原始资料与历史工程证据保留独立版本；复用不调用 AI，不覆盖已确认输入。')}>来源版本说明</button></div>
-   </>:<Empty title="添加第一份工程资料" description="无需先选择工程步骤，资料按内容分类。" action={<Button disabled={!can('bom:import')} onClick={()=>picker.current?.click()}>选择文件</Button>}/>}</div>
-  </div>
+</Modal>}
  </>;
 }

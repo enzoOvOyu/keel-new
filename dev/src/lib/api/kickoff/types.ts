@@ -52,6 +52,7 @@ export interface PublicationOption {id:string;state:'new'|'changed'|'unchanged'|
 export interface FacilityPublicationOption extends PublicationOption {label:string;kind:string}
 export interface PublicationOptions {revision:number;devices:PublicationOption[];facilities?:FacilityPublicationOption[]}
 export interface KickoffAPI {
+ refresh?():Promise<void>;
  startSourceAnalysis?(id:string,domains:AnalysisDomain[]):Promise<{jobId:string;state:string}>;
  sourceAnalysis?(id:string,jobId?:string):Promise<SourceAnalysis>;
  adoptSourceAnalysis?(id:string,jobId:string,tableIds:string[]):Promise<{revision:number;adoptedTableIds:string[];skippedTableIds:string[]}>;

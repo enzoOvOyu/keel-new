@@ -248,3 +248,25 @@
 .kickoff-workspace .source-analysis-flow>.source-analysis-toolbar{margin-left:auto;padding:0;border:0;flex-direction:column;align-items:flex-end;gap:6px}
 .kickoff-workspace .source-analysis-flow .source-analysis-status{font-size:11px}
 @media(max-width:760px){.kickoff-workspace .source-analysis-flow>.recognition-pipeline{min-width:0;flex-basis:100%}.kickoff-workspace .source-analysis-flow>.source-analysis-toolbar{flex-direction:row;align-items:center;width:100%;justify-content:space-between}}
+/* Source documents and the active Agent task share a single workbench. */
+.kickoff-workspace .source-task-layout{display:grid;grid-template-columns:minmax(240px,320px) minmax(0,1fr);gap:18px;align-items:start}
+.kickoff-workspace .source-document-column{min-width:0;display:grid;gap:14px}
+.kickoff-workspace .source-task-layout .source-rail{width:auto;min-width:0;padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--surface,#fff)}
+.kickoff-workspace .source-task-layout .source-file{padding:10px 8px;gap:8px;margin:4px 0}.kickoff-workspace .source-task-layout .source-file>svg{width:17px;flex-shrink:0}.kickoff-workspace .source-task-layout .source-file b{font-size:12px;overflow-wrap:anywhere}.kickoff-workspace .source-task-layout .source-file small{font-size:11px}
+.kickoff-workspace .source-task-layout .source-main{min-width:0;border:1px solid var(--border);border-radius:8px;background:var(--surface,#fff)}
+.kickoff-workspace .source-task-layout .source-header{padding:14px;flex-wrap:wrap;gap:10px}.kickoff-workspace .source-task-layout .source-header h2{font-size:13px;overflow-wrap:anywhere}.kickoff-workspace .source-task-layout .source-header>div{min-width:0;flex:1}.kickoff-workspace .source-task-layout .source-header .button{font-size:12px}
+.kickoff-workspace .source-task-layout .source-footer{padding:12px;flex-wrap:wrap;font-size:11px;gap:8px}
+.kickoff-workspace .source-task-column{min-width:0;border:1px solid var(--border);border-radius:8px;background:var(--surface,#fff)}
+.kickoff-workspace .source-task-heading{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--border);color:var(--accent,#167461)}
+.kickoff-workspace .source-task-heading b{display:block;font-size:14px;color:var(--text)}.kickoff-workspace .source-task-heading small{display:block;margin-top:4px;font-size:12px;color:var(--muted)}
+.kickoff-workspace .source-task-column .source-analysis-toolbar{width:100%;flex-direction:row;align-items:center;justify-content:space-between}.kickoff-workspace .source-task-column .source-analysis-results{margin:14px}.kickoff-workspace .source-task-column .source-analysis-flow{padding:14px}
+.kickoff-workspace .source-log-entry{display:flex;align-items:center;justify-content:space-between;width:100%;gap:12px;padding:16px;text-align:left;background:transparent;border:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);cursor:pointer;color:var(--text)}
+.kickoff-workspace .source-log-entry b{font-size:13px}.kickoff-workspace .source-log-entry small{display:block;margin-top:6px;color:var(--muted);font-size:12px;line-height:1.6}
+.kickoff-workspace .agent-execution-status{display:flex;gap:10px;margin:14px;padding:14px;background:var(--accent-soft,#eef7f2);border-radius:6px;color:var(--accent,#167461)}
+.kickoff-workspace .agent-execution-status>div{flex:1;min-width:0}.kickoff-workspace .agent-execution-status b{font-size:13px}.kickoff-workspace .agent-execution-status p,.kickoff-workspace .agent-execution-status small{font-size:12px;line-height:1.6;color:var(--muted)}
+.kickoff-workspace .agent-spinner{animation:agent-spin 1.2s linear infinite;flex-shrink:0}.kickoff-workspace .agent-progress{height:4px;overflow:hidden;background:#dcebe3;border-radius:4px;margin:12px 0 6px}.kickoff-workspace .agent-progress span{display:block;width:35%;height:100%;background:#23836b;animation:agent-progress 1.6s ease-in-out infinite}
+.kickoff-workspace .agent-completion{display:flex;align-items:center;gap:8px;padding:0 16px;font-size:12px;color:var(--accent,#167461)}
+@keyframes agent-spin{to{transform:rotate(360deg)}}@keyframes agent-progress{from{transform:translateX(-100%)}to{transform:translateX(390%)}}
+@media(prefers-reduced-motion:reduce){.kickoff-workspace .agent-spinner,.kickoff-workspace .agent-progress span{animation:none}}
+@media(max-width:1050px){.kickoff-workspace .source-task-layout{grid-template-columns:1fr}.kickoff-workspace .source-document-column{grid-template-columns:minmax(200px,1fr) minmax(240px,1fr)}}
+@media(max-width:650px){.kickoff-workspace .source-document-column{grid-template-columns:1fr}.kickoff-workspace .source-task-column .source-analysis-toolbar{flex-wrap:wrap}}
