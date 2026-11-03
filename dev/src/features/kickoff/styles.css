@@ -233,3 +233,18 @@
 .kickoff-workspace .publication-capability-delta{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:12px;grid-column:1/-1}.kickoff-workspace .publication-capability-delta span{white-space:nowrap}
 
 .kickoff-workspace .agent-domain-options{display:flex;flex-wrap:wrap;gap:10px 20px;padding:12px 0}.kickoff-workspace .agent-domain-options label{display:flex;align-items:center;gap:6px;font-size:12px}.kickoff-workspace .source-agent-evidence{display:flex;flex-wrap:wrap;gap:8px 14px;padding:10px 0;border-bottom:1px solid var(--border)}.kickoff-workspace .agent-region-coverage{margin:12px 0}
+
+.kickoff-workspace .source-analysis-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 18px;border-bottom:1px solid var(--border)}
+.kickoff-workspace .source-analysis-status{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.kickoff-workspace .source-analysis-toolbar .actions{margin:0;flex-shrink:0}
+.kickoff-workspace .source-analysis-results{margin:12px 18px;border:1px solid var(--border);border-radius:6px;padding:12px}
+.kickoff-workspace .source-analysis-results>summary{font-size:13px;font-weight:600;cursor:pointer;color:var(--text)}
+.kickoff-workspace .source-analysis-results>summary>span{font-weight:400;font-size:12px;color:var(--muted);margin-left:12px}
+.kickoff-workspace .source-analysis-results>.actions{flex-wrap:wrap;justify-content:space-between}
+@media(max-width:760px){.kickoff-workspace .source-analysis-toolbar{flex-wrap:wrap}.kickoff-workspace .source-analysis-results>summary>span{display:block;margin:6px 0 0}}
+
+.kickoff-workspace .source-analysis-flow{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.kickoff-workspace .source-analysis-flow>.recognition-pipeline{flex:1;min-width:500px;margin:0;padding:0;border:0}
+.kickoff-workspace .source-analysis-flow>.source-analysis-toolbar{margin-left:auto;padding:0;border:0;flex-direction:column;align-items:flex-end;gap:6px}
+.kickoff-workspace .source-analysis-flow .source-analysis-status{font-size:11px}
+@media(max-width:760px){.kickoff-workspace .source-analysis-flow>.recognition-pipeline{min-width:0;flex-basis:100%}.kickoff-workspace .source-analysis-flow>.source-analysis-toolbar{flex-direction:row;align-items:center;width:100%;justify-content:space-between}}

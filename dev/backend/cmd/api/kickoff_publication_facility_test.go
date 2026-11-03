@@ -100,6 +100,69 @@ func TestKickoffPublicationFacilityFactsCompareContent(t *testing.T) {
 	}
 }
 
+func TestKickoffPublishedAncestorOnlyAdvancesExistingFacilityFacts(t *testing.T) {
+	for _, change := range []string{"none", "device", "port", "placement", "rack", "input"} {
+		t.Run(change, func(t *testing.T) {
+			m := kickoffPublicationFacilityFixture()
+			m.Equipment = []engineering.EquipmentPlan{{EntityVersion: kickoffPublicationTestVersion("device"), EquipmentType: "server", Label: "Device", IdentityKind: "planned_instance", Quantity: 1}}
+			m.Ports = []engineering.PlannedPort{{EntityVersion: kickoffPublicationTestVersion("port"), EquipmentID: "device", Name: "eth1"}}
+			start := 1
+			m.Placements = []engineering.RackPlacement{{EntityVersion: kickoffPublicationTestVersion("placement"), EquipmentID: "device", RackID: "rack", StartU: &start}}
+			inputs := []kickoff.ModelInput{{TableID: "racks", Rows: []map[string]string{{"rack_id": "rack", "name": "Original"}}}}
+			baseline := kickoff.PublicationFacts(m, inputs)
+			for id, values := range kickoff.FacilityPublicationFacts(m, inputs) {
+				baseline[id] = values
+			}
+			baseline["unrelated"] = map[string]string{"equipment:unrelated": "original"}
+			delete(baseline, "other-room") // Unpublished objects must stay new.
+			before, err := json.Marshal(baseline)
+			if err != nil {
+				t.Fatal(err)
+			}
+			m.Facilities[1].Label = "Published room rename"
+			switch change {
+			case "device":
+				m.Equipment[0].Label = "Unpublished device rename"
+			case "port":
+				m.Ports[0].Name = "eth2"
+			case "placement":
+				start = 3
+			case "rack":
+				capacity := 48
+				m.Facilities[2].CapacityU = &capacity
+			case "input":
+				inputs[0].Rows[0]["name"] = "Unpublished input"
+			}
+			frozen, _, err := kickoff.SelectScope(m, kickoff.Project(m, nil, "", nil), nil, []string{"room"}, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			published := kickoff.FacilityPublicationFacts(frozen, inputs)
+			syncKickoffPublishedFacilityFacts(baseline, frozen, published)
+			actual := kickoff.PublicationFacts(m, inputs)
+			for id, values := range kickoff.FacilityPublicationFacts(m, inputs) {
+				actual[id] = values
+			}
+			if got := kickoff.PublicationChanged(actual["device"], baseline["device"]); got != (change != "none") {
+				t.Fatalf("device changed=%v after room publication, unpublished change=%s", got, change)
+			}
+			if got := kickoff.PublicationChanged(actual["rack"], baseline["rack"]); got != (change == "rack" || change == "input") {
+				t.Fatalf("rack changed=%v after room publication, unpublished change=%s", got, change)
+			}
+			var expected map[string]map[string]string
+			if err := json.Unmarshal(before, &expected); err != nil {
+				t.Fatal(err)
+			}
+			for _, id := range []string{"device", "rack", "room"} {
+				expected[id]["facility:room"] = published["room"]["facility:room"]
+			}
+			if !reflect.DeepEqual(baseline, expected) {
+				t.Fatal("ancestor publication changed unrelated facts, added keys or created a baseline")
+			}
+		})
+	}
+}
+
 func TestKickoffPublicationKnownLocationKeepsAncestors(t *testing.T) {
 	m := kickoffPublicationFacilityFixture()
 	m.Equipment = []engineering.EquipmentPlan{{EntityVersion: kickoffPublicationTestVersion("device"), EquipmentType: "server", Label: "Device", IdentityKind: "planned_instance", Quantity: 1}}

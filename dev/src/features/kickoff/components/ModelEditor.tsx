@@ -10,6 +10,9 @@ import './facility/facility.css';
 export function ModelEditor({ tableId, close }: { tableId: string; close: () => void }) {
   const { api, state, run, can } = useWorkspace();
   const def = tableById(tableId);
+  const [showAdvanced,setShowAdvanced]=useState(false);
+  const advancedKeys=tableId==='rooms'?['frame','unit']:tableId==='racks'?['x','y','orientation','frame','unit']:[];
+  const visibleFields=def.fields.filter(f=>showAdvanced||!advancedKeys.includes(f.key));
   const existing = state.models.find(m => m.tableId === tableId);
   const [rows, setRows] = useState<ModelRow[]>(() => structuredClone(existing?.rows ?? []));
   const [preview, setPreview] = useState<ImportPreview>(), [error, setError] = useState(''), [source, setSource] = useState('页面编辑');
@@ -51,9 +54,10 @@ export function ModelEditor({ tableId, close }: { tableId: string; close: () => 
         setPreview(undefined); setPage(0); setDirty(true);
       }}>采用 {preview.rows.length} 行到编辑区</Button></div>
     </div>}
-    <div className="editor-grid table-scroll"><table><thead><tr><th>#</th>{def.fields.map(f => <th key={f.key}><b>{f.label}</b><code>{f.key}</code></th>)}<th>操作</th></tr></thead><tbody>{pageRows.map((row, index) => {
+    {!!advancedKeys.length&&<div className="editor-tools"><span>机房布局可从机柜清单按排位和实际间距设置。</span><Button kind="ghost" onClick={()=>setShowAdvanced(v=>!v)}>{showAdvanced?'收起高级位置参数':'高级位置参数'}</Button></div>}
+    <div className="editor-grid table-scroll"><table><thead><tr><th>#</th>{visibleFields.map(f => <th key={f.key}><b>{f.label}</b><code>{f.key}</code></th>)}<th>操作</th></tr></thead><tbody>{pageRows.map((row, index) => {
       const absolute = page * pageSize + index;
-      return <tr key={absolute}><td>{absolute + 1}</td>{def.fields.map(f => <td key={f.key}>
+      return <tr key={absolute}><td>{absolute + 1}</td>{visibleFields.map(f => <td key={f.key}>
         {isReference(f.key) ? <EntityField label={`${f.label} 第${absolute + 1}行`} value={row[f.key] ?? ''} options={options(f.key)} own={ownReference(f.key)} ownName={tableId === 'rooms' && f.key === 'room_id' ? row.name : undefined} onNameChange={tableId === 'rooms' && f.key === 'room_id' ? value => update(absolute, 'name', value) : undefined} disabled={!editable} onChange={value => update(absolute, f.key, value)}/> :
           <input aria-label={`${f.label} 第${absolute + 1}行`} inputMode={f.kind === 'positive' || f.kind === 'number' ? 'decimal' : undefined} disabled={!editable} value={row[f.key] ?? ''} placeholder="待补充" onChange={e => update(absolute, f.key, e.target.value)}/>}
       </td>)}<td><button className="icon-button" disabled={!editable} aria-label={`删除第${absolute + 1}行`} onClick={() => { setRows(rows.filter((_, i) => i !== absolute)); setPage(Math.min(page, Math.max(0, Math.ceil((rows.length - 1) / pageSize) - 1))); setDirty(true); }}><Trash2 size={14}/></button></td></tr>;

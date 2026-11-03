@@ -39,3 +39,6 @@
 .kickoff-workspace .facility-assignment-preview .notice{margin:12px}
 @media(max-width:1100px){.kickoff-workspace .facility-coverage{grid-template-columns:repeat(3,minmax(0,1fr))}.kickoff-workspace .facility-coverage>button{border-bottom:1px solid var(--border)}.kickoff-workspace .facility-batch-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.kickoff-workspace .facility-coverage{grid-template-columns:repeat(2,minmax(0,1fr))}.kickoff-workspace .facility-batch-fields{grid-template-columns:minmax(0,1fr)}.kickoff-workspace .facility-racks{grid-template-columns:minmax(0,1fr)}}
+.kickoff-workspace .facility-table-gaps{display:flex;flex-direction:column;align-items:flex-start;gap:5px;max-width:240px;white-space:normal;line-height:1.6}
+.kickoff-workspace .facility-table-gaps>span:last-child{color:var(--muted);font-size:12px}
+.kickoff-workspace .facility-batch-fields{border:0;min-width:0;padding:0}

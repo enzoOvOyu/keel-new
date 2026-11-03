@@ -7,7 +7,7 @@ import { EntityField, entityOptions, filled, modelRows, numeric, positiveU, reso
 
 type Mode = 'room' | 'geometry' | 'height' | 'coordinates';
 type Change = { target: string; field: string; before: string; after: string; grid: string };
-type Plan = { rows: ModelRow[]; changes: Change[]; notes: string[]; revision: number; projectId: string; affected: number; heightConflict: boolean };
+type Plan = { rows: ModelRow[]; changes: Change[]; notes: string[]; revision: number; projectId: string; affected: number;  };
 const titles: Record<Mode, string> = { room: '批量关联机房', geometry: '批量容量与尺寸', height: '按型号补高度', coordinates: '按明确参数生成坐标' };
 
 export function FacilityBatchEditor({ mode, rackIds, close }: { mode: Mode; rackIds: string[]; close: () => void }) {
@@ -96,12 +96,8 @@ export function FacilityBatchEditor({ mode, rackIds, close }: { mode: Mode; rack
           if (changes.length > start) affected++;
         });
       }
-      const heightConflict = mode === 'height' && heightConflicts.length > 0;
-      if (heightConflict) {
-        notes.push(`${heightConflicts.length} 台实例已有不同高度，已保护；本次型号批量保存被阻止。请逐设备核对落位或拆分真实型号，不能用全型号默认值覆盖实例。`);
-        affected = 0;
-      }
-      setPlan({ rows, changes, notes, revision: s.revision, projectId: s.projectId, affected, heightConflict });
+      if (mode === 'height' && heightConflicts.length > 0) notes.push(`${heightConflicts.length} 台实例已有不同高度，保留原值；本次仅向缺高度的设备补充型号默认高度。`);
+      setPlan({ rows, changes, notes, revision: s.revision, projectId: s.projectId, affected });
     } catch (e) { setPlan(undefined); setError((e as Error).message); }
   }
   const stale = !!plan && (plan.revision !== s.revision || plan.projectId !== s.projectId);
@@ -115,7 +111,7 @@ export function FacilityBatchEditor({ mode, rackIds, close }: { mode: Mode; rack
     </fieldset>
     {mode !== 'height' && <details className="facility-selection"><summary>赋值顺序 · {racks.length} 个机柜（按选择顺序）</summary><ol>{racks.map(r => <li key={r.id}>{r.name}<small>{r.id}</small></li>)}</ol></details>}
     {mode === 'height' && existingHeight.length > 0 && <div className="facility-assignment-preview"><div className="facility-filter-heading"><b>已有实例高度 · {existingHeight.length} 台保护</b><span>{heightConflicts.length} 台与拟填高度不同</span></div>
-      <DataTable data={existingHeight} pageSize={8} columns={[{ accessorKey: 'name', header: '设备' }, { accessorKey: 'heightU', header: '已有高度 U' }, { id: 'protection', header: '保护 / 冲突', cell: ({ row }) => numeric(values.height_u) && row.original.heightU !== Number(values.height_u) ? '高度不同 · 阻止全型号保存' : '已有值保留' }]}/>
+      <DataTable data={existingHeight} pageSize={8} columns={[{ accessorKey: 'name', header: '设备' }, { accessorKey: 'heightU', header: '已有高度 U' }, { id: 'protection', header: '保护 / 冲突', cell: ({ row }) => numeric(values.height_u) && row.original.heightU !== Number(values.height_u) ? '高度不同 · 保留实例原值' : '已有值保留' }]}/>
     </div>}
     {mode === 'coordinates' && <Notice>坐标为规划输入，无默认距离。X = 起点 X + 列偏移 × ΔX；Y = 起点 Y + 行偏移 × ΔY。已有完整或部分坐标默认整组保留；尺寸不用于猜测间距。</Notice>}
     {error && <Notice tone="error">{error}</Notice>}
@@ -126,8 +122,8 @@ export function FacilityBatchEditor({ mode, rackIds, close }: { mode: Mode; rack
       {!plan.changes.length && <Notice>没有可赋值的空缺，已有值保持不变。</Notice>}
     </div>}
     {stale && <Notice tone="warning">工程版本已变化，请重新生成预览后保存。</Notice>}
-    <div className="modal-actions"><Button disabled={saving} onClick={close}>取消</Button><Button disabled={saving || !can('bom:edit')} onClick={preview}>生成赋值预览</Button><Button kind="primary" disabled={saving || !can('bom:edit') || !plan?.changes.length || plan.heightConflict || stale} onClick={async () => {
-      if (!plan || stale || saving || plan.heightConflict) return;
+    <div className="modal-actions"><Button disabled={saving} onClick={close}>取消</Button><Button disabled={saving || !can('bom:edit')} onClick={preview}>生成赋值预览</Button><Button kind="primary" disabled={saving || !can('bom:edit') || !plan?.changes.length || stale} onClick={async () => {
+      if (!plan || stale || saving) return;
       setSaving(true);
       const saved = await run('批量工程输入已保存', () => api.saveModel(table, plan.rows, titles[mode]));
       setSaving(false);

@@ -16,8 +16,8 @@ const table = (id: string, domain: Domain, name: string, description: string, co
   ({ id, domain, name, description, consumer, fields: fields(spec) });
 
 export const tables: TableDefinition[] = [
-  table('rooms','facility','机房与坐标系','地址可后补；真实空间布局需要明确坐标系和单位。','机房空间图','room_id:机房引用|name:机房名称|site:场地|address:地理地址|frame:坐标系|unit:坐标单位'),
-  table('racks','facility','机柜与几何','按型号批量补充容量与尺寸，无需逐柜重复输入。','机柜图与空间布局','rack_id:机柜引用|room_id:机房引用|capacity_u:容量U:positive|width_mm:宽mm:positive|depth_mm:深mm:positive|x:坐标X:number|y:坐标Y:number|orientation:朝向度:number|frame:坐标系|unit:坐标单位'),
+  table('rooms','facility','机房管理','维护机房名称与归属；地址可后补，平面位置通过机房布局设置。','机房空间图','room_id:机房引用|name:机房名称|site:场地|address:地理地址|frame:坐标系|unit:坐标单位'),
+  table('racks','facility','机柜规格与位置','维护机柜归属和规格；可从机柜清单批量设置机房布局。','机柜图与空间布局','rack_id:机柜引用|room_id:机房引用|capacity_u:容量U:positive|width_mm:宽mm:positive|depth_mm:深mm:positive|x:坐标X:number|y:坐标Y:number|orientation:朝向度:number|frame:坐标系|unit:坐标单位'),
   table('equipment_specs','facility','设备型号与尺寸','型号参数只补充明确匹配的设备，不能替代实际组件清单。','U位占用与安装剖面','model:型号|height_u:高度U:positive|width_mm:宽mm:positive|depth_mm:深mm:positive|face:安装面|panel_ref:面板版本引用'),
   table('placements','facility','设备落位','已识别机柜与U位自动关联；未知位置保留为空。','机柜立面与未定位清单','device_id:设备引用|rack_id:机柜引用|start_u:起始U:positive|height_u:占用U:positive|face:安装面|position:非U位置'),
   table('management','network','管理接入','管理地址、BMC与业务网卡分开；这里只保存凭据引用。','ZTP与管理接入','device_id:设备引用|management_ip:管理地址|bmc_ip:BMC地址|management_port:管理端口|credential_ref:凭据引用|method:接入方式'),

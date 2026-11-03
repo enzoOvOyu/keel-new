@@ -200,6 +200,7 @@ func (s *Server) kickoffPublicationDeviceOptions(ctx context.Context, q engineer
 				baseline[id][key] = value
 			}
 		}
+		syncKickoffPublishedFacilityFacts(baseline, frozen, facts)
 		if len(frozen.Connections) > 0 {
 			// Referenced peer ports are intentionally outside the frozen write
 			// scope. Use the approved head to recover their device ownership,
@@ -261,4 +262,18 @@ func (s *Server) kickoffPublicationDeviceOptions(ctx context.Context, q engineer
 		result.Facilities = append(result.Facilities, kickoffPublicationFacilityOption{kickoffPublicationOption: option(f.EntityID), Label: label, Kind: f.Kind})
 	}
 	return result, nil
+}
+
+// An independently published ancestor also advances its fact in existing
+// descendant baselines. Do not add relationships or copy unpublished inputs.
+func syncKickoffPublishedFacilityFacts(baseline map[string]map[string]string, frozen engineering.PhysicalModel, facts map[string]map[string]string) {
+	for _, facility := range frozen.Facilities {
+		key := "facility:" + facility.EntityID
+		value := facts[facility.EntityID][key]
+		for _, values := range baseline {
+			if _, exists := values[key]; exists {
+				values[key] = value
+			}
+		}
+	}
 }
