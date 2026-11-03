@@ -7,6 +7,7 @@ import {Button,DataTable,Notice,Section} from '../ui';
 import {ModelEditor} from '../ModelEditor';
 import {modelRows} from './FacilityEntities';
 import type {ModelRow} from '../../lib/api';
+import {TopologyPrerequisites} from './TopologyPrerequisites';
 import './facility.css';
 
 type Gap={id:string;name:string;table:'racks'|'placements';field:string;message:string};
@@ -14,12 +15,13 @@ const number=(value:unknown)=>value===null||value===undefined||value===''||!Numb
 export function FacilityPanel(_: {activeRack:string|null;selectRack:(id:string|null)=>void;edit:(table:string)=>void}){
  const {state:s,can,go}=useWorkspace();
  const [assets,setAssets]=useState<InfraAsset[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[partial,setPartial]=useState(false),[retry,setRetry]=useState(0);
+ const [snapshot,setSnapshot]=useState('');
  const [editor,setEditor]=useState<{table:string;ids?:string[];rows:ModelRow[]}>();
  const publicationKey=s.publications.map(p=>p.id+':'+p.state).join('|');
  useEffect(()=>{const controller=new AbortController();setLoading(true);setError('');setAssets([]);setPartial(false);
   void(async()=>{const all=new Map<string,InfraAsset>();let cursor:string|undefined,snapshot:string|undefined,incomplete=false;
    do{const page=await infrastructureApi.subgraph(s.projectId,{view:'hierarchy',depth:1,limit:200,cursor,snapshot_id:snapshot},controller.signal);snapshot=page.snapshot_id;for(const asset of page.assets)all.set(asset.id,asset);incomplete ||= page.truncated;cursor=page.page.has_more?page.page.next_cursor??undefined:undefined;if(page.page.has_more&&!cursor)throw Error('CMDB 分页未完成，请重新检查。');}while(cursor);
-   if(!controller.signal.aborted){setAssets([...all.values()]);setPartial(incomplete)}
+   if(!controller.signal.aborted){setAssets([...all.values()]);setPartial(incomplete);setSnapshot(snapshot??'')}
   })().catch(e=>{if(!controller.signal.aborted)setError(e.message)}).finally(()=>{if(!controller.signal.aborted)setLoading(false)});
   return()=>controller.abort();
  },[s.projectId,publicationKey,retry]);
@@ -49,11 +51,11 @@ export function FacilityPanel(_: {activeRack:string|null;selectRack:(id:string|n
   }
   setEditor({table,ids,rows});
  };
- return <Section title="已入库信息 · 机柜图检查" caption="读取 CMDB 已入库的机房、机柜和设备，按数据中心机柜图的同一套落位规则检查；工程草稿不计作已满足。">
+ return <Section title="已入库信息 · 拓扑资料补齐" caption="对照数据中心拓扑需要的已入库信息，仅补充实际缺项。未入库的工程输入不计作完成。" action={<Button onClick={()=>setRetry(n=>n+1)}>刷新检查</Button>}>
   {loading?<p className="facility-relation-summary" role="status">正在检查已入库关联与机柜图所需信息…</p>:error?<Notice tone="error">{error}<Button onClick={()=>setRetry(n=>n+1)}>重新检查</Button></Notice>:<>
    <div className="facility-relation-summary"><span>{check.rooms.length} 个机房</span><span>{check.racks.length} 个已入库机柜</span><span>{check.devices.length} 台已入库设备</span></div>
    {partial&&<Notice tone="warning">CMDB 返回的数据不完整，暂不能判定全部满足。<Button onClick={()=>setRetry(n=>n+1)}>重新检查</Button></Notice>}
-   {!partial&&!check.gaps.length&&check.racks.length>0&&<p className="facility-relation-ready">全部满足机房关联与机柜图绘制要求。</p>}
+   <TopologyPrerequisites key={s.projectId+':'+snapshot+':'+retry} assets={assets} snapshot={snapshot} rackGaps={check.gaps.length} partial={partial} refresh={()=>setRetry(n=>n+1)}/>
    {!check.racks.length&&!check.devices.length&&<p className="facility-relation-summary">尚无已入库的机柜或设备；先在入库与版本确认已核对的数据。</p>}
    <DataTable data={check.racks} pageSize={5} columns={[{accessorKey:'name',header:'已入库机柜'},{id:'room',header:'关联机房',cell:({row})=>check.rooms.find(r=>r.id===row.original.fields.pod_id)?.name||'未关联'},{id:'u',header:'容量 U',cell:({row})=>row.original.fields.u_height??'未提供'},{id:'devices',header:'关联设备',cell:({row})=>check.devices.filter(d=>d.fields.rack_id===row.original.id).length},{id:'status',header:'机柜图信息',cell:({row})=>{const ids=new Set([row.original.id,...check.devices.filter(d=>d.fields.rack_id===row.original.id).map(d=>d.id)]);const n=check.gaps.filter(g=>ids.has(g.id)).length;return n?`${n} 项待补充或核对`:partial?'待完成检查':'已满足'}}]}/>
    {!!check.gaps.length&&<div className="facility-inline-gaps"><b>与机柜图要求的差距 · {check.gaps.length} 项</b><DataTable data={check.gaps} pageSize={10} columns={[{accessorKey:'name',header:'受影响对象'},{accessorKey:'message',header:'缺失或冲突信息'},{id:'draft',header:'补录进度',cell:({row})=>draft(row.original)?'工程输入已有候选值 · 待核对入库':'待填写'}]}/><div className="actions">{check.gaps.some(g=>g.field==='room_id')&&!modelRows(s,'rooms').length&&<Button disabled={!can('bom:edit')} onClick={()=>setEditor({table:'rooms',rows:[]})}>补充机房</Button>}{check.gaps.some(g=>g.table==='racks')&&<Button disabled={!can('bom:edit')} onClick={()=>open('racks')}>补录机房关联 / 机柜信息</Button>}{check.gaps.some(g=>g.table==='placements')&&<Button disabled={!can('bom:edit')} onClick={()=>open('placements')}>补录设备落位信息</Button>}<Button onClick={()=>go('publish')}>核对补录并入库</Button></div><p className="muted small-copy">补录窗口支持在线表格编辑和 XLSX / CSV 导入；确认入库后重新检查，不把未入库的候选值当成已满足。</p></div>}
