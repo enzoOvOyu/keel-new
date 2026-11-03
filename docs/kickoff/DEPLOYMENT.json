@@ -1,10 +1,10 @@
 {
-  "code_revision": "f41ec5eb77201e871a92b1f1b1f72d2098105a03",
-  "frontend_code_revision": "f41ec5eb77201e871a92b1f1b1f72d2098105a03",
+  "code_revision": "98c41e8818bdac4a89b605c43e6186aac2254b86",
+  "frontend_code_revision": "98c41e8818bdac4a89b605c43e6186aac2254b86",
   "backend_code_revision": "d2f9accb146239cc9191f3fa60c0442985af3e22",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-view-actions-f41ec5e",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-view-actions-98c41e8",
   "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-d2f9acc",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-view-actions-7279568",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-view-actions-f41ec5e",
   "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-placement-a8e454c",
   "ports": [
     5180,
@@ -13,7 +13,7 @@
   "migrations": [],
   "api_restarted": false,
   "binary_sha256": "d35fe3c08a2ae85e9bea80dc2c3cd4c686768a3c1a886b71b8930fa957dede59",
-  "frontend_index_sha256": "06005cbd6df5cedad236231296214f56ef76eb004ba5731a7cc1daca3dfeb6c2",
+  "frontend_index_sha256": "98f1dba0a36f58a0517912ffef4ab0750386c20a7fe34de21df7cef5b268bb4b",
   "status": "deployed",
   "binary_matches": true,
   "frontend_index_matches": true,
@@ -25,7 +25,7 @@
   },
   "business_tests": "Existing MM analysis reused; async adoption recovered and succeeded at revision 3: 971 devices, 14308 ports, 7154 connections, 122 racks. 10 candidate tables adopted, 4 remain. No new AI call; no CMDB publication.",
   "provider_calls": 0,
-  "verification": "TypeScript/Vite/diff checks passed; read-only source/review/drawer checks and intercepted empty-source UI check passed. No AI calls, API changes or business writes.",
+  "verification": "TypeScript/Vite and source/review/drawer checks passed; empty-state grid cascade corrected and full-width browser assertion plus screenshot verified with intercepted empty sources. No business writes.",
   "task_history_verification": {
     "status": "PASS",
     "total": 6,
@@ -41,6 +41,11 @@
     "errors": [],
     "source": "PASS",
     "review": "PASS",
+    "empty": "PASS (intercepted empty source list; no project changes)",
+    "status": "PASS"
+  },
+  "empty_layout_verification": {
+    "errors": [],
     "empty": "PASS (intercepted empty source list; no project changes)",
     "status": "PASS"
   }
