@@ -155,7 +155,7 @@ func kickoffAgentUnderstandingReport(source, job string, wb bom.Workbook, result
 			}
 		}
 	}
-	coveredRegions, semanticRegions := 0, 0
+	coveredRegions, semanticRegions, notApplicableRegions := 0, 0, 0
 	for _, region := range structure.Regions {
 		from, _ := excelize.CoordinatesToCellName(region.FirstColumn, region.Start)
 		to, _ := excelize.CoordinatesToCellName(region.LastColumn, region.End)
@@ -164,10 +164,12 @@ func kickoffAgentUnderstandingReport(source, job string, wb bom.Workbook, result
 		objects := map[string]bool{}
 		mapped := map[string]bool{}
 		routed := map[string]bool{}
+		applicableRoute := false
 		categories := map[string]bool{}
 		for _, route := range result.Regions {
 			if route.Sheet == region.Sheet && route.Bounds.EndRow >= region.Start && route.Bounds.StartRow <= region.End && route.Bounds.EndColumn >= region.FirstColumn && route.Bounds.StartColumn <= region.LastColumn {
 				routed[route.ID] = true
+				applicableRoute = applicableRoute || len(route.Steps) > 0
 			}
 		}
 		for _, candidate := range result.Candidates {
@@ -204,6 +206,12 @@ func kickoffAgentUnderstandingReport(source, job string, wb bom.Workbook, result
 		if len(routed) > 0 {
 			coveredRegions++
 		}
+		if len(routed) > 0 && !applicableRoute {
+			notApplicableRegions++
+			value.Category = "not_applicable"
+			value.State = "extracted"
+			value.Note = "已识别为非工程输入区域"
+		}
 		if len(categories) > 0 {
 			semanticRegions++
 			for domain := range categories {
@@ -219,13 +227,15 @@ func kickoffAgentUnderstandingReport(source, job string, wb bom.Workbook, result
 			value.Mappings = append(value.Mappings, understandingMapping{Field: field, Kind: "field", Count: count})
 		}
 		sort.Slice(value.Mappings, func(i, j int) bool { return value.Mappings[i].Field < value.Mappings[j].Field })
-		if value.CoveredCells < value.TotalCells {
+		if value.CoveredCells < value.TotalCells && (len(routed) == 0 || applicableRoute) {
 			value.Issues = append(value.Issues, fmt.Sprintf("%d个来源单元格尚无已展开字段证据（包含表头/未支持字段，不自动忽略）", value.TotalCells-value.CoveredCells))
 		}
-		if len(categories) == 0 {
+		if len(categories) == 0 && (len(routed) == 0 || applicableRoute) {
 			value.Issues = append(value.Issues, "未形成来源支持的语义字段，不能按Agent分类自评为完成")
 		}
-		value.Note = fmt.Sprintf("来源字段证据%d条；覆盖%d/%d个单元格；候选对象%d个", value.FieldEvidenceCount, value.CoveredCells, value.TotalCells, value.ObjectCount)
+		if value.Category != "not_applicable" {
+			value.Note = fmt.Sprintf("来源字段证据%d条；覆盖%d/%d个单元格；候选对象%d个", value.FieldEvidenceCount, value.CoveredCells, value.TotalCells, value.ObjectCount)
+		}
 		report.Regions = append(report.Regions, value)
 	}
 	step := func(id string, completed, total int, note string) understandingStep {
@@ -234,13 +244,29 @@ func kickoffAgentUnderstandingReport(source, job string, wb bom.Workbook, result
 	report.Steps = []understandingStep{
 		step("structure", structure.Sheets, structure.Sheets, fmt.Sprintf("Parser解析%d张工作表、%d个非敏感单元格；隐藏Sheet与区域保留", structure.Sheets, structure.Cells)),
 		step("regions", coveredRegions, len(structure.Regions), "按WorkbookIR结构分块核对Agent路由；没有路由的区域保留为缺口"),
-		step("semantics", semanticRegions, len(structure.Regions), "仅有本地展开字段来源的区域计已分类；标签和模型自评不计完成"),
+		step("semantics", semanticRegions, len(structure.Regions)-notApplicableRegions, "仅有本地展开字段来源的区域计已分类；标签和模型自评不计完成"),
 		step("relationships", validRelations, relations, "只计唯一精确来源键/本地lookup和独立重算公式；缺身份、非唯一键、公式缓存不算完成"),
 		step("fields", validFields, totalFields+missingFields, "核对候选字段的来源、类型与明确缺失；标题及备注不冒充必填字段，未映射来源仍在区域覆盖与缺口中保留"),
 	}
-	if relations == 0 {
-		report.Steps[3].State = "partial"
-		report.Steps[3].Note = "未形成可独立验证的跨表/公式关联；不推定该阶段完成"
+	if relations == 0 && len(result.Missing) == 0 && len(result.Candidates) > 0 {
+		report.Steps[3].State = "not_applicable"
+		report.Steps[3].Note = "当前来源支持的候选不涉及跨表/公式关联"
+	}
+	if notApplicableRegions > 0 && notApplicableRegions == len(structure.Regions) {
+		for _, i := range []int{2, 3, 4} {
+			report.Steps[i].State = "not_applicable"
+			report.Steps[i].Note = "所有已识别区域均不属于本次工程输入"
+		}
+	}
+	complete := len(report.Regions) > 0 && len(result.Missing) == 0
+	for _, candidate := range result.Candidates {
+		complete = complete && len(candidate.Issues) == 0
+	}
+	for _, step := range report.Steps {
+		complete = complete && (step.State == "complete" || step.State == "not_applicable")
+	}
+	if complete {
+		report.State = "recognized"
 	}
 	return report
 }

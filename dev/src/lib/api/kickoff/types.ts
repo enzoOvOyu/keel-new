@@ -88,8 +88,8 @@ export interface ReviewRow {id:string;name:string;description:string;reference:s
 export interface ReviewPage {revision:number;rows:ReviewRow[];total:number;offset:number;limit:number;hasMore:boolean;counts:Record<string,number>;facets:Record<'type'|'model'|'rack'|'source',{value:string;label:string}[]>}
 
 export interface SourceUnderstanding {
- sourceId:string; revisionId:string; state:'historical'|'partial'|'unsupported'; origin:'history'|'agent'|'none';
- steps:{id:'structure'|'regions'|'semantics'|'relationships'|'fields';state:'complete'|'partial'|'pending'|'unsupported';count:number;completed:number;total:number;note:string}[];
+ sourceId:string; revisionId:string; state:'historical'|'recognized'|'partial'|'unsupported'; origin:'history'|'agent'|'none';
+ steps:{id:'structure'|'regions'|'semantics'|'relationships'|'fields';state:'complete'|'partial'|'pending'|'unsupported'|'not_applicable';count:number;completed:number;total:number;note:string}[];
  regions:(SourceRegion & {categories:string[];evidenceCount:number;fieldEvidenceCount:number;objectCount:number;coveredCells:number;totalCells:number;mappings:{field:string;kind:'field'|'object';count:number}[];issues:string[]})[];
  limitations:string[];
 }

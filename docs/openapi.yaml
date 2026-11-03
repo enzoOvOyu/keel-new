@@ -19506,6 +19506,7 @@ components:
           - partial
           - pending
           - unsupported
+          - not_applicable
         count: &id001
           type: integer
         completed: *id001
@@ -19597,6 +19598,7 @@ components:
           type: string
           enum:
           - historical
+          - recognized
           - partial
           - unsupported
         origin:

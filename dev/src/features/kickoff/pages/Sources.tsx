@@ -8,7 +8,7 @@ import { Badge, Button, Empty, Heading, Notice, Tabs, formatDate } from '../comp
 
 const columnLabel=(column:number)=>{let label='';for(let n=column;n>0;n=Math.floor((n-1)/26))label=String.fromCharCode(65+(n-1)%26)+label;return label;};
 const stepNames = {structure:'工作簿结构',regions:'数据区域',semantics:'语义分类',relationships:'跨表关联',fields:'字段核对'};
-const stepStates = {complete:'已完成',partial:'部分完成',pending:'待处理',unsupported:'暂无结果'};
+const stepStates = {complete:'已完成',partial:'部分完成',pending:'待处理',unsupported:'暂无结果',not_applicable:'不适用'};
 const sourceLabels:Record<string,string> = {historical:'历史资料复用',partial:'部分识别',recognized:'已有识别结果',awaiting_analysis:'待分析',needs_input:'待补充'};
 const objectKind=(kind:string):'device'|'port'|'connection'|'component'|'evidence'=>['device','port','connection','component'].includes(kind)?kind as 'device'|'port'|'connection'|'component':'evidence';
 

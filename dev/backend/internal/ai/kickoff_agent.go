@@ -49,6 +49,7 @@ type KickoffMapping struct {
 	Bindings  []KickoffBinding   `json:"bindings"`
 }
 type KickoffTaskResult struct {
+	Failure  string           `json:"failure,omitempty"`
 	Mappings []KickoffMapping `json:"mappings"`
 	Missing  []string         `json:"missing_inputs"`
 }
@@ -382,11 +383,12 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 	if err := artifact("kickoff_manifest", map[string]any{"fingerprint": fingerprint, "source_hash": hooks.SourceHash, "model_id": p.Model, "provider_id": p.ConfigID, "provider_revision": p.ConfigRevision, "checkpoint_version": engineeringCheckpointVersion}); err != nil {
 		return result, err
 	}
+	var unavailable error
 	for step := 1; step <= lastStep; step++ {
 		if !selected[step] {
 			continue
 		}
-		if _, ok := cp.Tasks[step]; ok {
+		if cached, ok := cp.Tasks[step]; ok && cached.Failure == "" {
 			continue
 		}
 		regions := []KickoffRegion{}
@@ -400,7 +402,9 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 		}
 		task := KickoffTaskResult{Mappings: []KickoffMapping{}, Missing: []string{}}
 		if len(regions) == 0 {
-			task.Missing = append(task.Missing, fmt.Sprintf("步骤%d：资料中未发现本步明确依据，请补充建模输入。", step))
+			if !extended {
+				task.Missing = append(task.Missing, fmt.Sprintf("步骤%d：资料中未发现本步明确依据，请补充建模输入。", step))
+			}
 		} else {
 			tables := []engineering.InputTable{}
 			for _, t := range catalog.Tables {
@@ -408,32 +412,43 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 					tables = append(tables, t)
 				}
 			}
-			err := ask(fmt.Sprintf("extract_step_%d", step), map[string]any{"regions": regions, "source_regions": cp.Regions, "region_samples": kickoffSamples(safe, regions), "tables": tables, "prior_tasks": kickoffTaskIndex(cp.Tasks)}, func(raw []byte) error {
-				var proposed KickoffTaskResult
-				if err := kickoffDecode(raw, &proposed); err != nil {
-					return err
-				}
-				if extended {
-					for _, m := range proposed.Mappings {
-						if !strings.HasPrefix(m.Table, "kickoff23/") {
-							return errors.New("KICKOFF23_TARGET_REQUIRED")
+			err := unavailable
+			if err == nil {
+				err = ask(fmt.Sprintf("extract_step_%d", step), map[string]any{"regions": regions, "source_regions": cp.Regions, "region_samples": kickoffSamples(safe, regions), "tables": tables, "prior_tasks": kickoffTaskIndex(cp.Tasks)}, func(raw []byte) error {
+					var proposed KickoffTaskResult
+					if err := kickoffDecode(raw, &proposed); err != nil {
+						return err
+					}
+					if proposed.Failure != "" {
+						return errors.New("INVALID_TASK_FAILURE_FIELD")
+					}
+					if extended {
+						for _, m := range proposed.Mappings {
+							if !strings.HasPrefix(m.Table, "kickoff23/") {
+								return errors.New("KICKOFF23_TARGET_REQUIRED")
+							}
 						}
 					}
-				}
-				if err := validateKickoffMappings(original, regions, step, proposed); err != nil {
-					return err
-				}
-				task = proposed
-				return nil
-			})
+					if err := validateKickoffMappings(original, regions, step, proposed); err != nil {
+						return err
+					}
+					task = proposed
+					return nil
+				})
+			}
 			if err != nil {
 				if ctx.Err() != nil {
 					return result, ctx.Err()
 				}
 				var providerErr *ProviderError
-				if errors.As(err, &providerErr) || kickoffAgentFatal(err) {
+				providerFailure := errors.As(err, &providerErr) || strings.HasPrefix(err.Error(), "PROVIDER_")
+				if !extended && providerFailure || kickoffAgentFatal(err) && !providerFailure {
 					return result, err
 				}
+				if providerFailure {
+					unavailable = err
+				}
+				task.Failure = err.Error()
 				task.Missing = []string{fmt.Sprintf("步骤%d：提取未完成（%s），请补充对应建模输入。", step, err.Error())}
 				task.Mappings = nil
 			}
@@ -479,7 +494,8 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 	rowsByTable := map[string][][]string{}
 	result.Missing = append(result.Missing, cp.Missing...)
 	for step := 1; step <= lastStep; step++ {
-		if !selected[step] {
+		_, recorded := cp.Tasks[step]
+		if !selected[step] && (!extended || !recorded) {
 			continue
 		}
 		task := cp.Tasks[step]
@@ -535,7 +551,8 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 			return result, err
 		}
 		for _, step := range r.Steps {
-			if !selected[step] {
+			_, recorded := cp.Tasks[step]
+			if !selected[step] && (!extended || !recorded) {
 				continue
 			}
 			found := false
@@ -592,6 +609,9 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 		return result, err
 	}
 	result.Regions = cp.Regions
+	if unavailable != nil && len(result.Candidates) == 0 {
+		return result, unavailable
+	}
 	return result, nil
 }
 func kickoffTaskIndex(tasks map[int]KickoffTaskResult) any {

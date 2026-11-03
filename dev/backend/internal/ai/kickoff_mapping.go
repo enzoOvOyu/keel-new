@@ -54,14 +54,15 @@ func validateKickoffMappings(w bom.Workbook, regions []KickoffRegion, step int, 
 			fields[b.Field] = true
 			if b.Classification != "" {
 				allowed := map[string]bool{"server": true, "switch": true, "gpu": true, "nic": true}
-				if m.Table != "equipment_specs" || b.Field != "equipment_type" || !allowed[b.Classification] || b.Normalize != "" {
+				axis := b.Classification == "rack_u_axis" && (b.Normalize == "u_scale_capacity" || b.Normalize == "u_grid_start" || b.Normalize == "u_grid_height")
+				if !axis && (m.Table != "equipment_specs" || b.Field != "equipment_type" || !allowed[b.Classification] || b.Normalize != "") {
 					return fmt.Errorf("INVALID_EQUIPMENT_CLASSIFICATION: %s", b.Field)
 				}
 			}
 			if b.Column < 0 || b.Row < 0 || b.Row > 20000 || b.Column > 256 || b.OffsetColumn < -256 || b.OffsetColumn > 256 || b.OffsetRow < -20000 || b.OffsetRow > 20000 {
 				return fmt.Errorf("INVALID_COORDINATE: %s", b.Field)
 			}
-			if b.Normalize != "" && b.Normalize != "trim" && b.Normalize != "unit" && b.Normalize != "mount_type" && b.Normalize != "face" && b.Normalize != "equipment_type" && b.Normalize != "rate_value" && b.Normalize != "rate_unit" && b.Normalize != "u_scale_capacity" && b.Normalize != "u_range_start" && b.Normalize != "u_range_height" {
+			if b.Normalize != "" && b.Normalize != "trim" && b.Normalize != "unit" && b.Normalize != "mount_type" && b.Normalize != "face" && b.Normalize != "equipment_type" && b.Normalize != "rate_value" && b.Normalize != "rate_unit" && b.Normalize != "u_scale_capacity" && b.Normalize != "u_range_start" && b.Normalize != "u_range_height" && b.Normalize != "u_grid_start" && b.Normalize != "u_grid_height" {
 				return fmt.Errorf("UNSUPPORTED_NORMALIZATION: %s", b.Normalize)
 			}
 			tableID := strings.TrimPrefix(m.Table, "kickoff23/")
@@ -69,6 +70,10 @@ func validateKickoffMappings(w bom.Workbook, regions []KickoffRegion, step int, 
 			case "u_scale_capacity":
 				if tableID != "racks" || b.Field != "capacity_u" || b.Lookup != nil || b.Column < m.Bounds.StartColumn || b.Column > m.Bounds.EndColumn || b.Row != 0 || b.OffsetRow != 0 || b.OffsetColumn != 0 {
 					return fmt.Errorf("INVALID_U_SCALE_NORMALIZATION: %s", b.Field)
+				}
+			case "u_grid_start", "u_grid_height":
+				if tableID != "placements" || b.Normalize == "u_grid_start" && b.Field != "start_u" || b.Normalize == "u_grid_height" && b.Field != "height_u" || b.Column < 1 || b.Lookup != nil {
+					return fmt.Errorf("INVALID_U_GRID_NORMALIZATION: %s", b.Field)
 				}
 			case "u_range_start", "u_range_height":
 				if tableID != "placements" || b.Normalize == "u_range_start" && b.Field != "start_u" || b.Normalize == "u_range_height" && b.Field != "height_u" {
@@ -191,7 +196,7 @@ func expandKickoffRegion(w bom.Workbook, region KickoffRegion, m KickoffMapping)
 					value = ""
 					missing = append(missing, b.Field+":公式缓存需独立核对")
 				}
-				if b.Classification != "" && value != "" {
+				if b.Classification != "" && b.Classification != "rack_u_axis" && value != "" {
 					value = b.Classification
 					refs[b.Field].(map[string]any)["state"] = "ai_classification_needs_review"
 				}
@@ -264,6 +269,15 @@ func expandKickoffRegion(w bom.Workbook, region KickoffRegion, m KickoffMapping)
 					refs[b.Field].(map[string]any)["normalized_value"] = value
 					if value == "" {
 						missing = append(missing, b.Field+":无法确认明确带U标识的连续U区间")
+					}
+				}
+				if b.Normalize == "u_grid_start" || b.Normalize == "u_grid_height" {
+					derived := kickoffUGridPlacement(sheet, region, m, b, key)
+					value = derived.Value
+					refs[b.Field].(map[string]any)["normalization_evidence"] = derived.Evidence
+					refs[b.Field].(map[string]any)["normalized_value"] = value
+					if derived.Missing != "" {
+						missing = append(missing, b.Field+":"+derived.Missing)
 					}
 				}
 				for i, f := range table.Fields {

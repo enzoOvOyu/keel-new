@@ -2,6 +2,7 @@ package ai
 
 import (
 	"keel.local/dev/internal/bom"
+	"keel.local/dev/internal/engineering"
 	"regexp"
 	"sort"
 	"strconv"
@@ -111,7 +112,7 @@ func kickoffUScaleCapacity(sheet bom.Sheet, region KickoffRegion, mapping Kickof
 	first, previous, direction := 0, 0, 0
 	for i, cell := range ticks {
 		number, marked, _ := kickoffUPosition(cell.Value)
-		if !marked && len(headers) == 0 {
+		if !marked && len(headers) == 0 && !(binding.Classification == "rack_u_axis" && kickoffPairedRackAxis(sheet, region, binding.Column, ticks)) {
 			out.Missing = "数字刻度缺少明确U标识或邻近U表头"
 			return out
 		}
@@ -155,4 +156,117 @@ func kickoffUScaleCapacity(sheet bom.Sheet, region KickoffRegion, mapping Kickof
 	out.Evidence["ticks"], out.Evidence["unit_headers"] = proof, headers
 	out.Evidence["normalized_value"] = out.Value
 	return out
+}
+
+// A merged occupied block is measured against explicit U ticks, never against
+// spreadsheet row counts, row heights, borders, or blank cells.
+func kickoffUGridPlacement(sheet bom.Sheet, region KickoffRegion, mapping KickoffMapping, binding KickoffBinding, key bom.Cell) kickoffLayoutValue {
+	out := kickoffLayoutValue{Evidence: map[string]any{"rule": "occupied_block_u_axis", "sheet": sheet.Name, "occupied_cell": key.Ref}, Missing: "设备占位缺少完整、明确的U刻度依据"}
+	axisMapping := mapping
+	axisMapping.Bounds = region.Bounds
+	scale := kickoffUScaleCapacity(sheet, region, axisMapping, KickoffBinding{Column: binding.Column, Classification: binding.Classification})
+	if scale.Missing != "" {
+		return out
+	}
+	first, last := key.Row, key.Row
+	merged := false
+	for _, area := range sheet.Merges {
+		parts := strings.Split(area, ":")
+		if len(parts) != 2 {
+			continue
+		}
+		c1, r1 := kickoffAddress(parts[0])
+		c2, r2 := kickoffAddress(parts[1])
+		if key.Row == r1 && key.Column == c1 && r2 > r1 {
+			if binding.Column >= c1 && binding.Column <= c2 || r1 < region.Bounds.StartRow || r2 > region.Bounds.EndRow {
+				return out
+			}
+			first, last, merged = r1, r2, true
+			out.Evidence["mapping_bounds"] = engineering.Bounds{StartRow: r1, EndRow: r2, StartColumn: c1, EndColumn: c2}
+			break
+		}
+	}
+	if binding.Normalize == "u_grid_height" && !merged {
+		out.Missing = "单个设备标记仅能定位起始U，未明确设备占用高度"
+		return out
+	}
+	ticks := map[int]bom.Cell{}
+	for _, c := range sheet.Cells {
+		if c.Column == binding.Column {
+			ticks[c.Row] = c
+		}
+	}
+	low, high, previous, direction := 0, 0, 0, 0
+	proof := []any{}
+	for row := first; row <= last; row++ {
+		c, ok := ticks[row]
+		n, _, valid := kickoffUPosition(c.Value)
+		if !ok || !valid || c.Sensitive || c.Formula != "" {
+			return out
+		}
+		if row == first {
+			low, high = n, n
+		} else {
+			delta := n - previous
+			if delta != 1 && delta != -1 || direction != 0 && delta != direction {
+				return out
+			}
+			direction = delta
+			low = min(low, n)
+			high = max(high, n)
+		}
+		previous = n
+		proof = append(proof, map[string]any{"sheet": sheet.Name, "cell": c.Ref, "value": c.Value, "u": n})
+	}
+	out.Value = strconv.Itoa(low)
+	if binding.Normalize == "u_grid_height" {
+		out.Value = strconv.Itoa(high - low + 1)
+	}
+	out.Missing = ""
+	out.Evidence["ticks"] = proof
+	out.Evidence["normalized_value"] = out.Value
+	return out
+}
+
+// Bare numbers require an explicit AI classification AND a paired drawing axis
+// around occupied blocks; numbering a normal table cannot establish rack units.
+func kickoffPairedRackAxis(sheet bom.Sheet, region KickoffRegion, axis int, ticks []bom.Cell) bool {
+	if len(ticks) < 2 {
+		return false
+	}
+	index := map[[2]int]bom.Cell{}
+	for _, c := range sheet.Cells {
+		index[[2]int{c.Row, c.Column}] = c
+	}
+	for col := region.Bounds.StartColumn; col <= region.Bounds.EndColumn; col++ {
+		if col == axis {
+			continue
+		}
+		same := true
+		for _, tick := range ticks {
+			c := index[[2]int{tick.Row, col}]
+			a, _, av := kickoffUPosition(tick.Value)
+			b, _, bv := kickoffUPosition(c.Value)
+			if !av || !bv || a != b || c.Sensitive || c.Formula != "" {
+				same = false
+				break
+			}
+		}
+		if !same {
+			continue
+		}
+		for _, area := range sheet.Merges {
+			parts := strings.Split(area, ":")
+			if len(parts) != 2 {
+				continue
+			}
+			c1, r1 := kickoffAddress(parts[0])
+			c2, r2 := kickoffAddress(parts[1])
+			anchor := index[[2]int{r1, c1}]
+			if c1 > min(axis, col) && c2 < max(axis, col) && r2 > r1 && r1 >= ticks[0].Row && r2 <= ticks[len(ticks)-1].Row && !anchor.Sensitive && (strings.TrimSpace(anchor.Value) != "" || anchor.Formula != "") {
+				return true
+			}
+		}
+	}
+	return false
 }

@@ -7431,7 +7431,7 @@ export interface components {
             /** @enum {string} */
             id: "structure" | "regions" | "semantics" | "relationships" | "fields";
             /** @enum {string} */
-            state: "complete" | "partial" | "pending" | "unsupported";
+            state: "complete" | "partial" | "pending" | "unsupported" | "not_applicable";
             count: number;
             completed: number;
             total: number;
@@ -7465,7 +7465,7 @@ export interface components {
             sourceId: string;
             revisionId: string;
             /** @enum {string} */
-            state: "historical" | "partial" | "unsupported";
+            state: "historical" | "recognized" | "partial" | "unsupported";
             /** @enum {string} */
             origin: "history" | "agent" | "none";
             steps: components["schemas"]["KickoffUnderstandingStep"][];
