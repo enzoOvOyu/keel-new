@@ -124,3 +124,11 @@ Agent操作：
 Excel机柜图复用现有映射与证据：支持明确U刻度容量、U区间，以及占位块与U轴对齐的起始U/高度。裸数字刻度必须由Agent提出rack_u_axis分类，并通过双侧一致刻度、连续1..N及中间合并占位块的本地验证；普通行号、像素尺寸和无依据高度不被接受。单个未合并标记不推测高度。无固定Sheet/列/容量。使用原normalizationEvidence记录占位范围和刻度，不新增接口。
 
 Understanding步骤新增not_applicable；总状态可为recognized，仍只表示分析结果，不能替代采用或发布。此次更新后提示词指纹改变，旧指纹不会冒充新规则分析结果。MM落位图一个真实区域本地验证52U及9个占位块；未调用真实Provider，不表示完整MM智能识别验收。
+
+## 机柜逐行补录与供电检查
+
+质量状态后仅一个补充信息入口，弹窗按缺项切换rooms/racks/placements/power_profiles/rack_capacity，复用原ModelEditor在线表格及XLSX导入。规划功率窗口限定planned行，保留其他依据；每表应用后可继续切换，未保存切换仍需明确放弃。保存工程输入不替代确认入库。
+
+发布选中机柜时，rack_capacity.capacity_kw随原事务记录为CMDB planned_power_capacity_kw；设备planned_power_kw继续复用既有发布记录。供电不足或未知只影响容量判断，不扩大成全域入库门槛。
+
+检查结果使用现有React Query会话缓存，key包含用户/权限版本/项目/工作区修订/发布状态；连接缺项缓存随检查快照复用。不因页面重挂载或焦点变化自动重查；30分钟无观察者后可回收。工程输入保存改变工作区修订，自动更新；手动刷新重取CMDB，失败显示旧结果及错误。未增加Redis/MinIO第二缓存事实源。

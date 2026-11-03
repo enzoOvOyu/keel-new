@@ -1,4 +1,6 @@
-import {useEffect,useState} from 'react';
+import {useState} from 'react';
+import {useQuery} from '@tanstack/react-query';
+import {identitySnapshot} from '../../../../lib/api/identityBridge';
 import {useNavigate} from 'react-router-dom';
 import {infrastructureApi,type InfraAsset,type InfraQuerySnapshot} from '../../../../lib/api/infrastructure';
 import {useWorkspace} from '../../context';
@@ -7,16 +9,15 @@ import {ModelEditor} from '../ModelEditor';
 import {modelRows} from './FacilityEntities';
 
 // Reuse the server's missing-endpoint filter; never load all ports or connections.
-export function TopologyPrerequisites({assets,snapshot,rackGaps,partial,refresh}:{assets:InfraAsset[];snapshot:string;rackGaps:number;partial:boolean;refresh:()=>void}){
+export function TopologyPrerequisites({assets,snapshot,rackGaps,partial,refresh,cacheRevision}:{assets:InfraAsset[];snapshot:string;rackGaps:number;partial:boolean;refresh:()=>void;cacheRevision:number}){
  const {state:s,can,go}=useWorkspace(),navigate=useNavigate();
- const [result,setResult]=useState<{missing:InfraQuerySnapshot;hasConnections:boolean}>();
- const [error,setError]=useState(''),[cursor,setCursor]=useState<string>();
+ const [cursor,setCursor]=useState<string>();
  const [editRoles,setEditRoles]=useState(false);
- useEffect(()=>{const abort=new AbortController();setResult(undefined);setError('');
-  Promise.all([infrastructureApi.connections(s.projectId,{status:'incomplete',limit:10,snapshot_id:snapshot,cursor},abort.signal),infrastructureApi.connections(s.projectId,{limit:1,snapshot_id:snapshot},abort.signal)])
-   .then(([missing,all])=>{if(!abort.signal.aborted)setResult({missing,hasConnections:all.cables.length>0})}).catch(e=>{if(!abort.signal.aborted)setError(e.message)});
-  return()=>abort.abort();
- },[s.projectId,snapshot,cursor]);
+ const identity=identitySnapshot();
+ const query=useQuery({queryKey:['kickoff-facility-connections',identity?.user.id,identity?.permission_revision,s.projectId,snapshot,cacheRevision,cursor],staleTime:Infinity,gcTime:30*60*1000,refetchOnMount:false,refetchOnWindowFocus:false,
+  queryFn:async({signal})=>{const [missing,all]=await Promise.all([infrastructureApi.connections(s.projectId,{status:'incomplete',limit:10,snapshot_id:snapshot,cursor},signal),infrastructureApi.connections(s.projectId,{limit:1,snapshot_id:snapshot},signal)]);return {missing,hasConnections:all.cables.length>0}}
+ });
+ const result=query.data,error=query.error?.message;
  const switches=assets.filter(a=>a.type==='switch'),roles=switches.filter(a=>!String(a.fields.role??'').trim());
  const locations=assets.filter(a=>a.type==='rack'&&!assets.some(r=>r.type==='pod'&&r.id===a.fields.pod_id)).length+assets.filter(a=>['server','switch','device','pdu','patch_panel'].includes(a.type)&&!assets.some(r=>r.type==='rack'&&r.id===a.fields.rack_id)).length;
  const missing=result?.missing;
@@ -28,7 +29,7 @@ export function TopologyPrerequisites({assets,snapshot,rackGaps,partial,refresh}
   {name:'网络架构',requirement:'设备角色与双端连接；Fabric 使用已登记归属',status:partial?'待完成检查':!switches.length?'尚无交换机资料':roles.length?`${roles.length} 台缺少角色`:connectionStatus},
   {name:'物理布线',requirement:'线缆两端端口及所属设备',status:connectionStatus},
   {name:'链路追踪',requirement:'已登记的双端物理连接',status:connectionStatus},
-  {name:'机柜与机房',requirement:'机房归属、机柜容量、设备机柜与 U 位 / 高度',status:baseStatus(rackGaps)},
+  {name:'机柜与机房',requirement:'机房归属、U位 / 高度、机柜供电容量与设备规划功率',status:baseStatus(rackGaps)},
  ];
  const cmdb=(id:string,changeset?:string)=>navigate('/cmdb/history?'+new URLSearchParams({project_id:s.projectId,asset:id,...(changeset?{changeset}:{})}));
  return <div className="facility-topology-check">

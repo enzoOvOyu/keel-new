@@ -291,6 +291,23 @@ func (s *Server) projectKickoffConfiguration(ctx context.Context, tx pgx.Tx, p k
 			}
 		}
 	}
+	// Rack power planning is independently publishable with the selected rack;
+	// it does not change observed consumption or physical nameplate capacity.
+	for _, rack := range p.RackSnapshot {
+		for _, row := range kickoff.Rows(p.ModelSnapshot, "rack_capacity") {
+			if row["rack_id"] != rack.ID {
+				continue
+			}
+			value, err := strconv.ParseFloat(row["capacity_kw"], 64)
+			if err != nil || value <= 0 {
+				continue
+			}
+			if _, err = tx.Exec(ctx, `INSERT INTO cmdb_field_source(id,asset_id,field_name,value,source_type,source_ref,fact_layer,revision,operator,approval_status,support,freshness,evidence_refs,project_id) VALUES($1,$2,'planned_power_capacity_kw',$3,'bom',$4,'planned',$5,$6,'approved','supported','unknown',$7,$8) ON CONFLICT(asset_id,field_name,source_ref,fact_layer) DO NOTHING`, uuid.NewString(), rack.ID, jsonBytes(value), "engineering:"+p.ID, p.ID, p.Actor, jsonBytes([]string{p.ID}), s.project); err != nil {
+				return err
+			}
+		}
+	}
+
 	return nil
 }
 

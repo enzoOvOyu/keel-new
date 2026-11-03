@@ -3,11 +3,11 @@ import { Download, Plus, Save, Trash2, Upload } from 'lucide-react';
 import { useWorkspace } from '../context';
 import { tableById, type ModelRow, type ImportPreview } from '../lib/api';
 import { exportWorkbook, readModelFile } from '../lib/api/workbook';
-import { Button, Modal, Notice } from './ui';
+import { Button, Modal, Notice, Tabs } from './ui';
 import { EntityField, entityOptions, resolveEntity } from './facility/FacilityEntities';
 import './facility/facility.css';
 
-export function ModelEditor({ tableId, close, initialRows, targetIds, entityChoices }: { tableId: string; close: () => void; initialRows?:ModelRow[]; targetIds?:string[]; entityChoices?:Record<string,{id:string;label:string}[]> }) {
+export function ModelEditor({ tableId, close, initialRows, targetIds, entityChoices, relatedTables, onTableChange, title, keepOpenOnSave }: { keepOpenOnSave?:boolean; relatedTables?:{id:string;label:string}[]; onTableChange?:(id:string)=>void; title?:string; tableId: string; close: () => void; initialRows?:ModelRow[]; targetIds?:string[]; entityChoices?:Record<string,{id:string;label:string}[]> }) {
   const { api, state, run, can } = useWorkspace();
   const def = tableById(tableId);
   const [showAdvanced,setShowAdvanced]=useState(false);
@@ -17,10 +17,10 @@ export function ModelEditor({ tableId, close, initialRows, targetIds, entityChoi
   const [rows, setRows] = useState<ModelRow[]>(() => structuredClone(initialRows ?? existing?.rows ?? []));
   const [preview, setPreview] = useState<ImportPreview>(), [error, setError] = useState(''), [source, setSource] = useState('页面编辑');
   const [page, setPage] = useState(0), [dirty, setDirty] = useState(false), [saving, setSaving] = useState(false);
-  const [baseRevision] = useState(state.revision);
+  const [baseRevision,setBaseRevision] = useState(state.revision);
   const picker = useRef<HTMLInputElement>(null);
-  const scopeKey=tableId==='racks'?'rack_id':'device_id';
-  const scopedRows=rows.map((row,index)=>({row,index})).filter(v=>!targetIds||targetIds.includes(v.row[scopeKey]));
+  const scopeKey=['racks','rack_capacity'].includes(tableId)?'rack_id':'device_id';
+  const scopedRows=rows.map((row,index)=>({row,index})).filter(v=>!targetIds||targetIds.includes(v.row[scopeKey])&&(tableId!=='power_profiles'||v.row.basis==='planned'));
   const pageSize = 12, pageRows = scopedRows.slice(page * pageSize, (page + 1) * pageSize);
   const editable = can('bom:edit') && !saving;
   const stale = baseRevision !== state.revision;
@@ -34,7 +34,8 @@ export function ModelEditor({ tableId, close, initialRows, targetIds, entityChoi
   }
   const finish = () => { if (saving || dirty && !window.confirm('有尚未应用的编辑。放弃这些编辑并关闭？')) return; close(); };
   const update = (absolute: number, key: string, value: string) => { setRows(v => v.map((r, i) => i === absolute ? { ...r, [key]: value } : r)); setDirty(true); };
-  return <Modal title={def.name + ' · 编辑输入'} description={def.description} close={finish} wide>
+  return <Modal title={title??def.name + ' · 编辑输入'} description={def.description} close={finish} wide>
+    <>{relatedTables&&<Tabs items={relatedTables} value={tableId} onChange={id=>{if(saving||dirty&&!window.confirm('切换前有未保存的编辑，是否放弃？'))return;onTableChange?.(id)}}/>}</>
     <div className="editor-tools"><div><b>{scopedRows.length} 行待核对</b><span>空配置可以保留，使用时再检查对应条件。</span></div><div className="actions">
       <Button onClick={() => exportWorkbook(def, [], true)}><Download size={14}/>下载XLSX模板</Button>
       <Button onClick={() => exportWorkbook(def, scopedRows.map(v=>v.row), false)}><Download size={14}/>导出当前输入</Button>
@@ -54,11 +55,11 @@ export function ModelEditor({ tableId, close, initialRows, targetIds, entityChoi
       <div className="actions"><Button disabled={!editable} onClick={() => setPreview(undefined)}>取消导入</Button><Button kind="primary" disabled={!editable || !!preview.errors.length} onClick={() => {
         const incoming=preview.rows.map(row=>Object.fromEntries(Object.entries(row).map(([key,value])=>[key,isReference(key)?resolveEntity(options(key),value):value])));
         if(targetIds){
-          const outside=incoming.filter(row=>!targetIds.includes(row[scopeKey]));
+          const outside=incoming.filter(row=>!targetIds.includes(row[scopeKey])||tableId==='power_profiles'&&row.basis!=='planned');
           if(outside.length){setError('导入包含本次补录范围以外的对象，请仅保留当前缺口对象。');return;}
           setRows(current=>{
             const next=[...current];
-            for(const row of incoming){const index=next.findIndex(v=>v[scopeKey]===row[scopeKey]);if(index>=0)next[index]={...next[index],...Object.fromEntries(Object.entries(row).filter(([,v])=>v!==''))};}
+            for(const row of incoming){const index=next.findIndex(v=>v[scopeKey]===row[scopeKey]&&(tableId!=='power_profiles'||v.basis===row.basis));if(index>=0)next[index]={...next[index],...Object.fromEntries(Object.entries(row).filter(([,v])=>v!==''))};}
             return next;
           });
         }else setRows(incoming);
@@ -66,10 +67,10 @@ export function ModelEditor({ tableId, close, initialRows, targetIds, entityChoi
       }}>采用 {preview.rows.length} 行到编辑区</Button></div>
     </div>}
     {!!advancedKeys.length&&<div className="editor-tools"><span>高级位置字段仅在需要绘制机房平面时补充。</span><Button kind="ghost" onClick={()=>setShowAdvanced(v=>!v)}>{showAdvanced?'收起高级位置参数':'高级位置参数'}</Button></div>}
-    {targetIds&&<div className="editor-tools"><span>已限定为本次缺口对象；已有值保留。</span><EntityField label={tableId==='racks'?'批量关联机房':'批量关联机柜'} value="" options={options(tableId==='racks'?'room_id':'rack_id')} onChange={value=>{const key=tableId==='racks'?'room_id':'rack_id';setRows(current=>current.map(row=>targetIds.includes(row[scopeKey])&&!row[key]?{...row,[key]:value}:row));setDirty(true)}}/></div>}
+    {targetIds&&['racks','placements'].includes(tableId)&&<div className="editor-tools"><span>已限定为本次缺口对象；已有值保留。</span><EntityField label={tableId==='racks'?'批量关联机房':'批量关联机柜'} value="" options={options(tableId==='racks'?'room_id':'rack_id')} onChange={value=>{const key=tableId==='racks'?'room_id':'rack_id';setRows(current=>current.map(row=>targetIds.includes(row[scopeKey])&&!row[key]?{...row,[key]:value}:row));setDirty(true)}}/></div>}
     <div className="editor-grid table-scroll"><table><thead><tr><th>#</th>{visibleFields.map(f => <th key={f.key}><b>{f.label}</b><code>{f.key}</code></th>)}<th>操作</th></tr></thead><tbody>{pageRows.map(({row,index:absolute}) => {
       return <tr key={absolute}><td>{absolute + 1}</td>{visibleFields.map(f => <td key={f.key}>
-        {isReference(f.key) ? <EntityField label={`${f.label} 第${absolute + 1}行`} value={row[f.key] ?? ''} options={options(f.key)} own={ownReference(f.key)} ownName={tableId === 'rooms' && f.key === 'room_id' ? row.name : undefined} onNameChange={tableId === 'rooms' && f.key === 'room_id' ? value => update(absolute, 'name', value) : undefined} disabled={!editable||!!targetIds&&f.key===scopeKey} onChange={value => update(absolute, f.key, value)}/> :
+        {tableId==='power_profiles'&&targetIds&&f.key==='basis'?<span>规划功率</span>:isReference(f.key) ? <EntityField label={`${f.label} 第${absolute + 1}行`} value={row[f.key] ?? ''} options={options(f.key)} own={ownReference(f.key)} ownName={tableId === 'rooms' && f.key === 'room_id' ? row.name : undefined} onNameChange={tableId === 'rooms' && f.key === 'room_id' ? value => update(absolute, 'name', value) : undefined} disabled={!editable||!!targetIds&&f.key===scopeKey} onChange={value => update(absolute, f.key, value)}/> :
           <input aria-label={`${f.label} 第${absolute + 1}行`} inputMode={f.kind === 'positive' || f.kind === 'number' ? 'decimal' : undefined} disabled={!editable} value={row[f.key] ?? ''} placeholder="待补充" onChange={e => update(absolute, f.key, e.target.value)}/>}
       </td>)}<td><button className="icon-button" disabled={!editable||!!targetIds} aria-label={`删除第${absolute + 1}行`} onClick={() => { setRows(rows.filter((_, i) => i !== absolute)); setPage(Math.min(page, Math.max(0, Math.ceil((rows.length - 1) / pageSize) - 1))); setDirty(true); }}><Trash2 size={14}/></button></td></tr>;
     })}</tbody></table>{!rows.length && <div className="editor-empty">从 XLSX 导入，或新增一行开始填写。暂时没有依据时可以留空。</div>}</div>
@@ -80,7 +81,7 @@ export function ModelEditor({ tableId, close, initialRows, targetIds, entityChoi
       const normalized = rows.map(row => Object.fromEntries(Object.entries(row).map(([key, value]) => [key, isReference(key) ? resolveEntity(options(key), value) : value])));
       const saved = await run('工程输入已更新', () => api.saveModel(tableId, normalized, source));
       setSaving(false);
-      if (saved) { setDirty(false); close(); }
+      if (saved) { setDirty(false); setRows(normalized);setBaseRevision(api.snapshot().revision);if(!keepOpenOnSave)close(); }
     }}><Save size={14}/>{saving ? '正在保存' : '应用输入'}</Button></div>
   </Modal>;
 }

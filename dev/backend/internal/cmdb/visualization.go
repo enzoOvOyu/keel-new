@@ -145,6 +145,40 @@ func (s Service) visualizationRead(ctx context.Context, scope Scope, rack, focus
 	for _, asset := range all {
 		assetIDs = append(assetIDs, asset.ID)
 	}
+	// Read approved planning evidence in one scoped query, without mixing it
+	// with observed draw or loading a separate dossier for every device.
+	powerIDs := []string{}
+	for _, a := range all {
+		switch a.Type {
+		case "rack", "server", "switch", "device", "pdu", "patch_panel":
+			powerIDs = append(powerIDs, a.ID)
+		}
+	}
+	powerArgs := append(scope.Args(), powerIDs)
+	powerRows, err := tx.Query(ctx, `SELECT DISTINCT ON(asset_id,project_id,field_name) asset_id,project_id,field_name,value,source_ref FROM cmdb_field_source WHERE asset_id=ANY($3::text[]) AND (project_id=ANY($1::text[]) OR project_id||':'||asset_id=ANY($2::text[])) AND field_name IN('planned_power_kw','planned_power_capacity_kw') AND fact_layer='planned' AND approval_status='approved' ORDER BY asset_id,project_id,field_name,updated_at DESC,id DESC`, powerArgs...)
+	if err != nil {
+		return out, err
+	}
+	for powerRows.Next() {
+		var id, project, field, source string
+		var raw []byte
+		if err = powerRows.Scan(&id, &project, &field, &raw, &source); err != nil {
+			powerRows.Close()
+			return out, err
+		}
+		if a := index[id]; a != nil && a.Project == project {
+			var value float64
+			if json.Unmarshal(raw, &value) == nil && value >= 0 {
+				a.Fields[field] = value
+				a.Fields[field+"_source_ref"] = source
+			}
+		}
+	}
+	if err = powerRows.Err(); err != nil {
+		powerRows.Close()
+		return out, err
+	}
+	powerRows.Close()
 	relationArgs := append(scope.Args(), assetIDs)
 	rels, e := tx.Query(ctx, `SELECT r.id::text,r.from_uid,r.to_uid,r.definition_id,r.fact_layer,r.source_type,r.source_ref,r.version FROM cmdb_relationship r WHERE r.valid_to IS NULL AND `+RelationshipVisible("r")+` AND r.from_uid=ANY($3::text[]) AND r.to_uid=ANY($3::text[]) ORDER BY r.id LIMIT 20001`, relationArgs...)
 	if e != nil {

@@ -137,3 +137,7 @@ Cookie 由受控 Session 处理；不要把凭据复制进样例、日志或 Git
 - [代码检查](../topology/code-validation.json)：类型/构建、Go 编译和必要纯逻辑用例，保留当时范围。
 - [实施报告](../topology/implementation-report.md)：查询超时修复、性能观察与资料缺口。
 - 当前最新上线与MM只读查询见[686e9ea发布证据](../kickoff/DEPLOYMENT.json)。未做全部交互闭环、现场实装或生产规模基准。启动200和单次延迟不是这些能力的验收。
+
+## 已入库供电依据
+
+现有可视化资产fields追加planned_power_kw（设备规划功率kW）、planned_power_capacity_kw（机柜规划可用供电容量kW）及对应_source_ref。读取同项目、同授权资产范围的cmdb_field_source，限定planned/approved，按updated_at选最近依据；批量读取当前返回设备/机柜，不逐设备调用dossier。power_used_kw仍为独立的既有用电字段，不充当规划功率。未知值不按零处理。此投影提供输入依据，不意味着深度/承重/完整可安装设备数已完成计算。
