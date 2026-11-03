@@ -1,6 +1,6 @@
 # Kickoff · 当前 API 使用契约
 
-基准：dev/部署 `fdd86dd`。产品行为见[模块定版](../modules/kickoff.md)。[OpenAPI](../openapi.yaml)定义唯一请求/响应/枚举；[注册表](real-api-registry.json)链接实现及证据。
+基准：dev/部署 `c6d5bc4`。产品行为见[模块定版](../modules/kickoff.md)。[OpenAPI](../openapi.yaml)定义唯一请求/响应/枚举；[注册表](real-api-registry.json)链接实现及证据。
 
 ## 操作索引
 
@@ -78,10 +78,12 @@ POST publications 保留原权限、事务、同 expectedRevision 幂等与 Outb
 
 证据见 [PUBLISH-SCOPE-CHECK](../kickoff/PUBLISH-SCOPE-CHECK.json)；合成UI测试不等于真实MM发布验收，真实数据仅用于只读SQL覆盖核查。
 
-## 可选设备判断与核对入口（最新源码）
+## 可选设备判断与核对入口（已部署）
 
 GET publication-options（getKickoffPublicationOptions，bom:read）在同项目只读快照中返回revision及逐设备new/changed/unchanged/blocked/pending，不返回整本工作簿或完整拓扑。比较现有类型化设备、所属组件/端口、关联连接、机柜/落位和相关工程输入与已成功发布范围；忽略工程修订/证据ID、输入版本号和行顺序，仅内容变化才标changed。发布内容基线按历史对象累积，避免后续小范围发布使原有连接被误判为新增。物理删除仍走CMDB变更流程，不在本接口隐式删除。
 
 入库页只允许new/changed选择和全选；unchanged显示“已同步·无变化”并禁用；加载失败不默认放行。已有pending及身份冲突禁用。首次数据、修订和回执状态变化时读取判断，成功后清理选择；不修改确认按钮与确认弹窗。后端在创建发布前复用实际内容判断，全部所选对象无变化时拒绝创建新记录。
 
 核对链接优先以SN定位；数据核对“处理”列不再留横线：有事项调用原处理流程，无事项提供“查看详情”。这不把没有待处理事项解释为运行健康。
+
+实际MM只读检查：971台中808台无变化禁用、163台待增补可选；核对跳转后处理列有有效操作。项目修订12/发布记录3未变；没有真实发布写入验收。

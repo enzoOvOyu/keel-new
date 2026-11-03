@@ -89,7 +89,7 @@
     "api_restarted": false
   },
   "actual_change_filter": {
-    "status": "implemented_verified_pending_deployment",
+    "status": "deployed_live_readonly_verified",
     "unit_tests": "PASS: metadata/input-version/row-order ignored; actual port/connection/scoped input changes detected without enabling unrelated devices",
     "existing_data_readonly": {
       "counts": {
@@ -126,6 +126,28 @@
     "limits": [
       "Present engineering objects and scoped input content; physical removals require CMDB change process",
       "No real publication POST or CMDB writes executed by validation"
-    ]
+    ],
+    "live_ui": {
+      "status": "PASS",
+      "scope": "Authenticated deployed MM page; real eligibility/filter and review navigation; no publication POST or screenshots",
+      "counts": {
+        "changed": 163,
+        "unchanged": 808
+      },
+      "selectable": 163,
+      "total": 971,
+      "checks": [
+        "unchanged device checkbox disabled and excluded from select-all",
+        "changed/new devices are selected and selectable",
+        "review link reaches nonempty processing action",
+        "unchanged confirmation UI and business data preserved"
+      ],
+      "reviewAction": "补充建模",
+      "pageErrors": 0,
+      "publicationSubmitRequests": 0,
+      "workspaceRevision": 12,
+      "publicationCount": 3
+    },
+    "deployment_evidence": "docs/kickoff/DEPLOYMENT.json"
   }
 }

@@ -1,18 +1,18 @@
 {
-  "backend_code_revision": "fdd86ddc477a400e0d4ed099145a1c412bfc84d8",
-  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-publish-fdd86dd",
+  "code_revision": "c6d5bc4b61f4e18844903369be64b30d5004dda0",
+  "backend_code_revision": "c6d5bc4b61f4e18844903369be64b30d5004dda0",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-actual-changes-c6d5bc4",
+  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-actual-changes-c6d5bc4",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-select-progress-3c0ac07",
+  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-publish-fdd86dd",
   "ports": [
     5180,
     8081
   ],
-  "binary_sha256": "ef3a724c7beb05affbc265f9c3cdd2f1e7640d271d20929be22055e9e1f6e46a",
-  "code_revision": "3c0ac07fc20b0290267052e0e3e8a8c23f619ce8",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-select-progress-3c0ac07",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-publish-fdd86dd",
-  "frontend_index_sha256": "bb9ee302442bfc46e944395db2a072d80ed385d69a35cac0653a97fcd8cb53cd",
-  "api_restarted": false,
-  "backend_source_unchanged": true,
   "migrations": [],
+  "api_restarted": true,
+  "binary_sha256": "9c313c8c72184985b93a5456d563d2f2e4cfa8d93cbffaa158cea43397f4a41a",
+  "frontend_index_sha256": "826452e6cb08818110a0cc2c61402b23485f4e8683c3d660d6aad881d848794f",
   "status": "deployed",
   "binary_matches": true,
   "frontend_index_matches": true,
@@ -25,20 +25,24 @@
   },
   "live_ui": {
     "status": "PASS",
-    "scope": "Authenticated deployed page; real read-only preview held briefly at browser boundary to observe loading; no publication writes",
+    "scope": "Authenticated deployed MM page; real eligibility/filter and review navigation; no publication POST or screenshots",
+    "counts": {
+      "changed": 163,
+      "unchanged": 808
+    },
+    "selectable": 163,
+    "total": 971,
     "checks": [
-      "range-check progress appears inside colored select/cancel button",
-      "no top loading notice",
-      "scope panel and selection button width stay fixed during loading",
-      "confirm action disabled until evaluation",
-      "cancel-all remains usable during evaluation",
-      "late preview response does not restore cleared selection"
+      "unchanged device checkbox disabled and excluded from select-all",
+      "changed/new devices are selected and selectable",
+      "review link reaches nonempty processing action",
+      "unchanged confirmation UI and business data preserved"
     ],
-    "panelTopDelta": 0,
-    "buttonWidthDelta": 0,
-    "buttonBackground": "rgb(223, 239, 231)",
+    "reviewAction": "\u8865\u5145\u5efa\u6a21",
     "pageErrors": 0,
-    "publicationSubmitRequests": 0
+    "publicationSubmitRequests": 0,
+    "workspaceRevision": 12,
+    "publicationCount": 3
   },
   "agent_implemented": false,
   "url": "http://localhost:5180/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/kickoff/publish"

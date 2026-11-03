@@ -3,8 +3,8 @@
   "updated_at": "2026-11-03",
   "coverage": "Current module documentation baseline, 2026-11-03: deployed dev 686e9ea; CMDB routes additionally registered by source review only. Per-operation runtime verification is limited to cited evidence. Fabric 6a70041 belongs to a separate paused branch and is not included in this registry.",
   "schema_authority": "docs/openapi.yaml",
-  "code_revision": "3c0ac07fc20b0290267052e0e3e8a8c23f619ce8",
-  "deployed_revision": "3c0ac07fc20b0290267052e0e3e8a8c23f619ce8",
+  "code_revision": "c6d5bc4b61f4e18844903369be64b30d5004dda0",
+  "deployed_revision": "c6d5bc4b61f4e18844903369be64b30d5004dda0",
   "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
   "operations": [
     {
@@ -3154,8 +3154,8 @@
       "operation_id": "getKickoffPublicationOptions",
       "response_schema": "KickoffPublicationOptions",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "targeted Go content comparisons and read-only existing-data checks; publication selection UI",
+      "deployment": "deployed",
+      "verification": "Go actual-change cases, read-only existing-data SQL, synthetic UI, live authenticated MM options/selection/review navigation",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff_publication_options.go",
       "documentation": "docs/api/kickoff.md",
@@ -3165,18 +3165,19 @@
       "side_effects": "none; no publication/CMDB/AI writes",
       "loading": "on publication page entry and revision/receipt change; typed identifiers and states only",
       "errors": "403 denied, 409 stale, 500 unavailable; no fallback to enabling selection",
-      "limitations": "Present engineering objects and scoped inputs; physical removal requires CMDB change process"
+      "limitations": "Present engineering objects and scoped inputs; physical removal requires CMDB change process",
+      "deployed_revision": "c6d5bc4b61f4e18844903369be64b30d5004dda0"
     }
   ],
-  "development_note": "Frontend 5180: 3c0ac07 selection-button progress with green background, no top loading notice. API unchanged at fdd86dd and not restarted. Live delayed read-only preview verified zero panel/button layout movement and cancel-all availability. No publication writes or schema changes.",
+  "development_note": "Current frontend/API c6d5bc4: actual per-device content change filter; unchanged published assets disabled and excluded from select-all. Live MM 808 unchanged/163 changed; review actions restored. No real publication writes or AI calls.",
   "last_deployed_changes": {
     "branch": "dev",
-    "base_revision": "fdd86dd",
-    "code_revision": "3c0ac07fc20b0290267052e0e3e8a8c23f619ce8",
-    "backend_code_revision": "fdd86ddc477a400e0d4ed099145a1c412bfc84d8",
-    "deployed_revision": "3c0ac07fc20b0290267052e0e3e8a8c23f619ce8",
+    "base_revision": "3c0ac07",
+    "code_revision": "c6d5bc4b61f4e18844903369be64b30d5004dda0",
+    "backend_code_revision": "c6d5bc4b61f4e18844903369be64b30d5004dda0",
+    "deployed_revision": "c6d5bc4b61f4e18844903369be64b30d5004dda0",
     "deployed": true,
-    "scope": "Frontend-only selection button background and inline range-check progress; remove top loading notice",
+    "scope": "Actual per-device change eligibility and review processing actions",
     "evidence": "docs/kickoff/PUBLISH-SCOPE-CHECK.json",
     "state": "deployed_live_readonly_ui_verified"
   }
