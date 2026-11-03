@@ -95,3 +95,18 @@ HTTP字段与业务校验不变。按项目、工程head及workspace修订复用
 ### 首次打开派生快照（802a001）
 
 GET workspace（无section）可读取同项目MinIO私有派生摘要；命中前用数据库一致性读校验名称、修订、模型head、资料状态/head及发布状态。一个对象覆盖旧派生版本，不作为正式工程事实；失配/不可用回源。响应根据Accept-Encoding支持gzip，JSON Schema未变化。快照实现版本变更须升级workspace-read版本标识；测试覆盖失效与进程缓存清空。见[冷打开验证](../kickoff/COLD-OPEN-PERFORMANCE.json)。
+
+### 当前开发：设施增量与分域 Agent（待统一测试，未部署）
+
+publish/preview 新增可选 `facilityIds`，设备可为空但总范围不能为空。设施选项返回实际差异和 `label/kind`；空机柜/机房、容量坐标可独立发布，祖先设施进入冻结闭包。回执增加 `facilityIds`，counts区分 `facilities`、`locations`、`placements`。引用同项目已发布端口不重复发布对端设备，端点不明仍阻断对应连接；比较基线只推进实际发布的连接事实，不能覆盖对端其他事实。幂等同时比较设备/设施请求范围，继续使用原Outbox事务。
+
+Agent操作：
+- `POST sources/{sourceId}/analyze`：`bom:import`，请求 `{expectedRevision,domains?}`，返回202任务ID；仅排队，不在HTTP请求中调用模型。域为equipment/facility/cabling/network/power/provisioning。
+- `GET sources/{sourceId}/analysis?jobId=`：`bom:read`，返回持久状态、覆盖总数/截断提示、每表最多20行候选及其证据；完整结果在MinIO。前端仅pending/running时轮询，离开取消读取，不取消后台任务。
+- `POST sources/{sourceId}/analysis/adopt`：`bom:edit`，请求 `{jobId,expectedRevision,tableIds?}`。人工采用只新增/补空，分别校验工作区版本、工程源版本与表版本；不自动发布CMDB。已采用表不重复默认选择。
+
+原understanding/region-preview按同项目新Agent任务返回真实结构、区域、语义、关联、字段五步证据；无新任务保留历史读取。`origin=agent`不代表候选已确认。新Agent复用现有Parser、Provider和eng_job/checkpoint，23类工程输入与四类物理实体显式区分，旧StepInputCatalog候选不自动转换。仅支持XLSX，不宣称OCR/PDF解析或真实MM识别效果已经验收。
+
+机房机柜仍为四类输入：真实覆盖率与缺口筛选、实体选择、批量预览保存。坐标ΔX/ΔY是同一参考点的坐标步距，不是机柜净距，无默认现实距离；型号高度补齐保护实例已有不同高度。机柜预览复用原CMDB工作台，入口明确只展示已入库数据，没有新建草稿画布。
+
+接口字段以OpenAPI为准。常见失败：400域/表/任务参数，403授权，404资料/任务，409版本变化/任务活动/结果未就绪，422候选或依赖不成立，503MinIO不可用。模型失败保留异步失败状态和来源；单域缺输入保留其余域候选。当前只有代码与编译，测试、Provider、真实资料识别及入库验收均NOT RUN。

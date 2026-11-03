@@ -404,6 +404,7 @@ func kickoffReviewPage(w http.ResponseWriter, r *http.Request, view kickoff.View
 func (s *Server) kickoffPreview(w http.ResponseWriter, r *http.Request) {
 	var body struct {
 		DeviceIDs        []string `json:"deviceIds"`
+		FacilityIDs      []string `json:"facilityIds"`
 		ExpectedRevision int      `json:"expectedRevision"`
 	}
 	if !engineeringDecode(w, r, &body) {
@@ -430,7 +431,7 @@ func (s *Server) kickoffPreview(w http.ResponseWriter, r *http.Request) {
 		fail(w, 500, "KICKOFF_MODEL_UNAVAILABLE")
 		return
 	}
-	_, receipt, err := kickoff.Select(read.model, read.detail(), body.DeviceIDs)
+	_, receipt, err := s.kickoffSelectPublication(ctx, tx, read.model, read.detail(), body.DeviceIDs, body.FacilityIDs)
 	if err != nil {
 		fail(w, 422, err.Error())
 		return

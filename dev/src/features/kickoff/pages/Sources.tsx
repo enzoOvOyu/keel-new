@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ArrowRight, Check, ChevronRight, FileSpreadsheet, FolderOpen, Plus, Search, Trash2, UploadCloud } from 'lucide-react';
+import {SourceAgentPanel} from '../components/SourceAgentPanel';
 import { useWorkspace } from '../context';
 import type { SourceRegionPreview, SourceUnderstanding } from '../lib/api';
 import { Badge, Button, Empty, Heading, Notice, Tabs, formatDate } from '../components/ui';
@@ -32,9 +33,9 @@ export default function Sources(){
  const currentReport=report?.sourceId===sourceId?report:undefined;
  const regions=currentReport?.regions??[];
  const region=regions.find(r=>r.id===regionId)??regions[0];
- useEffect(()=>{let active=true;setLoading(true);setError('');setReport(undefined);setOffset(0);setRegionId('');
+ useEffect(()=>{let active=true;setLoading(report?.sourceId!==sourceId);setError('');if(report?.sourceId!==sourceId){setReport(undefined);setOffset(0);setRegionId('');}
   if(!sourceId){setLoading(false);return;}
-  void api.sourceUnderstanding(sourceId).then(data=>{if(active)setReport(data);}).catch(e=>{if(active)setError(e.message);}).finally(()=>{if(active)setLoading(false);});
+  void api.sourceUnderstanding(sourceId).then(data=>{if(active){if(report?.revisionId!==data.revisionId){setOffset(0);setRegionId('');}setReport(data);}}).catch(e=>{if(active)setError(e.message);}).finally(()=>{if(active)setLoading(false);});
   return()=>{active=false;};
  },[api,sourceId,s.revision,retry]);
  useEffect(()=>{let active=true;setPreview(undefined);setPreviewError('');
@@ -54,10 +55,11 @@ export default function Sources(){
   <div className="source-layout"><aside className="source-rail"><div className="rail-heading"><b>资料包</b><span>{s.sources.length}</span></div>{s.sources.map(item=><button className={'source-file '+(sourceId===item.id?'selected':'')} key={item.id} onClick={()=>{setParams({source:item.id});setRegionId('');setOffset(0);}}><FileSpreadsheet size={20}/><span><b>{item.name}</b><small>{item.size} · v{item.version}</small><Badge state={item.state}>{sourceLabels[item.state]??item.state}</Badge></span></button>)}<div className="source-rail-foot"><FolderOpen size={15}/><span>相同内容按摘要复用，增补资料独立处理。</span></div></aside>
    <div className="source-main">{source?<>
     <div className="source-header"><FileSpreadsheet size={22}/><div><h2>{source.name}</h2><p>{source.size} · 添加于 {formatDate(source.createdAt)}</p></div><Badge state={source.state}>{sourceLabels[source.state]??source.state}</Badge><Button disabled={reusing||loading||!can('bom:import')} onClick={()=>void reuse()}>{reusing?'正在复用历史资料…':'复用历史资料'}</Button><Button onClick={()=>go('review')}>核对识别结果<ArrowRight size={14}/></Button></div>
+    <SourceAgentPanel key={source.id} sourceId={source.id} sourceName={source.name} onResult={()=>setRetry(n=>n+1)}/>
     {error&&<Notice tone="error">{error}<Button onClick={()=>setRetry(n=>n+1)}>重新读取</Button></Notice>}
     {loading?<div className="empty" aria-busy="true" role="status">正在读取资料理解与历史证据…</div>:currentReport&&<>
      <div className="recognition-pipeline">{Object.entries(stepNames).map(([id,label],i)=>{const step=currentReport.steps.find(x=>x.id===id);return <div key={id} className={`recognition-step ${step?.state??'pending'}`} title={step?.note??'尚无阶段结果'}><span>{step?.state==='complete'?<Check size={12}/>:<Search size={12}/>}</span><b>{label}<small>{stepStates[step?.state??'pending']}{step&&step.total>0?` ${step.completed}/${step.total}`:''}</small></b>{i<4&&<ChevronRight size={13}/>}</div>;})}</div>
-     <div className="source-understanding-note"><b>{currentReport.origin==='history'?'历史资料与已有候选复用':'尚无资料识别结果'}</b>{currentReport.limitations.map((note,i)=><p key={i}>{note}</p>)}</div>
+     <div className="source-understanding-note"><b>{currentReport.origin==='agent'?'Agent 资料理解与候选证据':currentReport.origin==='history'?'历史资料与已有候选复用':'尚无资料识别结果'}</b>{currentReport.limitations.map((note,i)=><p key={i}>{note}</p>)}</div>
      {regions.length?<div className="source-region-layout"><div className="region-rail"><small>工作表与数据区域</small>{regions.map(r=><button className={region?.id===r.id?'active':''} key={r.id} onClick={()=>{setRegionId(r.id);setOffset(0);setPreview(undefined);}}><span><b>{r.sheet}</b><small>{r.range} · {r.category==='unknown'?'待分类':r.category}</small></span><span className="region-count">{r.rowCount}</span></button>)}</div><div className="region-content">
       <div className="region-heading"><div><h3>{region?.sheet}</h3><p>{region?.note}</p></div><Badge state={region?.state??'needs_input'}/></div>
       <Tabs items={[{id:'source',label:'来源数据'},{id:'normalized',label:'标准化对象'}]} value={view} onChange={value=>{setView(value as 'source'|'normalized');setOffset(0);setPreview(undefined);}}/>

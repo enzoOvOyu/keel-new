@@ -229,3 +229,7 @@
 .kickoff-workspace .publication-select-all.button:hover{background:#dfefe7;border-color:#80b49f;color:#104f40}
 .kickoff-workspace .publication-select-all.button:focus-visible{outline:2px solid #15715e;outline-offset:2px}
 .kickoff-workspace .publication-select-all small{font-size:11px;font-weight:400;color:#527e6b;white-space:nowrap}
+
+.kickoff-workspace .publication-capability-delta{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:12px;grid-column:1/-1}.kickoff-workspace .publication-capability-delta span{white-space:nowrap}
+
+.kickoff-workspace .agent-domain-options{display:flex;flex-wrap:wrap;gap:10px 20px;padding:12px 0}.kickoff-workspace .agent-domain-options label{display:flex;align-items:center;gap:6px;font-size:12px}.kickoff-workspace .source-agent-evidence{display:flex;flex-wrap:wrap;gap:8px 14px;padding:10px 0;border-bottom:1px solid var(--border)}.kickoff-workspace .agent-region-coverage{margin:12px 0}

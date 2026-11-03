@@ -393,3 +393,6 @@ func cablingRate(value, unit string) (int64, error) {
 	}
 	return n.Num().Int64(), nil
 }
+
+// ParseRateBPS shares deterministic rate/unit conversion with physical candidates.
+func ParseRateBPS(value, unit string) (int64, error) { return cablingRate(value, unit) }

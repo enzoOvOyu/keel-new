@@ -61,8 +61,19 @@ func validateKickoffMappings(w bom.Workbook, regions []KickoffRegion, step int, 
 			if b.Column < 0 || b.Row < 0 || b.Row > 20000 || b.Column > 256 || b.OffsetColumn < -256 || b.OffsetColumn > 256 || b.OffsetRow < -20000 || b.OffsetRow > 20000 {
 				return fmt.Errorf("INVALID_COORDINATE: %s", b.Field)
 			}
-			if b.Normalize != "" && b.Normalize != "trim" && b.Normalize != "unit" && b.Normalize != "mount_type" && b.Normalize != "face" && b.Normalize != "equipment_type" && b.Normalize != "rate_value" && b.Normalize != "rate_unit" {
+			if b.Normalize != "" && b.Normalize != "trim" && b.Normalize != "unit" && b.Normalize != "mount_type" && b.Normalize != "face" && b.Normalize != "equipment_type" && b.Normalize != "rate_value" && b.Normalize != "rate_unit" && b.Normalize != "u_scale_capacity" && b.Normalize != "u_range_start" && b.Normalize != "u_range_height" {
 				return fmt.Errorf("UNSUPPORTED_NORMALIZATION: %s", b.Normalize)
+			}
+			tableID := strings.TrimPrefix(m.Table, "kickoff23/")
+			switch b.Normalize {
+			case "u_scale_capacity":
+				if tableID != "racks" || b.Field != "capacity_u" || b.Lookup != nil || b.Column < m.Bounds.StartColumn || b.Column > m.Bounds.EndColumn || b.Row != 0 || b.OffsetRow != 0 || b.OffsetColumn != 0 {
+					return fmt.Errorf("INVALID_U_SCALE_NORMALIZATION: %s", b.Field)
+				}
+			case "u_range_start", "u_range_height":
+				if tableID != "placements" || b.Normalize == "u_range_start" && b.Field != "start_u" || b.Normalize == "u_range_height" && b.Field != "height_u" {
+					return fmt.Errorf("INVALID_U_RANGE_NORMALIZATION: %s", b.Field)
+				}
 			}
 			if (b.Normalize == "rate_value" && b.Field != "rate") || (b.Normalize == "rate_unit" && b.Field != "rate_unit") {
 				return fmt.Errorf("INVALID_RATE_NORMALIZATION: %s", b.Field)
@@ -110,6 +121,12 @@ func expandKickoffRegion(w bom.Workbook, region KickoffRegion, m KickoffMapping)
 	}
 	rows := [][]string{}
 	evidence := []any{}
+	scales := map[string]kickoffLayoutValue{}
+	for _, b := range m.Bindings {
+		if b.Normalize == "u_scale_capacity" {
+			scales[b.Field] = kickoffUScaleCapacity(sheet, region, m, b)
+		}
+	}
 	lookupIndices := map[string]map[string][]bom.Cell{}
 	for _, b := range m.Bindings {
 		if b.Lookup == nil {
@@ -226,6 +243,27 @@ func expandKickoffRegion(w bom.Workbook, region KickoffRegion, m KickoffMapping)
 					value = number
 					if b.Normalize == "rate_unit" {
 						value = unit
+					}
+				}
+				if b.Normalize == "u_scale_capacity" {
+					scale := scales[b.Field]
+					value = scale.Value
+					refs[b.Field].(map[string]any)["normalization_evidence"] = scale.Evidence
+					refs[b.Field].(map[string]any)["normalized_value"] = value
+					if scale.Missing != "" {
+						missing = append(missing, b.Field+":"+scale.Missing)
+					}
+				}
+				if b.Normalize == "u_range_start" || b.Normalize == "u_range_height" {
+					start, height := kickoffURange(value)
+					value = start
+					if b.Normalize == "u_range_height" {
+						value = height
+					}
+					refs[b.Field].(map[string]any)["normalization_evidence"] = map[string]string{"rule": "inclusive_u_range", "start_u": start, "height_u": height}
+					refs[b.Field].(map[string]any)["normalized_value"] = value
+					if value == "" {
+						missing = append(missing, b.Field+":无法确认明确带U标识的连续U区间")
 					}
 				}
 				for i, f := range table.Fields {

@@ -28,9 +28,10 @@ func kickoffScopeCovered(priorIDs, wanted []string, priorVersions, versions map[
 	}
 	return true
 }
-func kickoffCoveredPublication(ctx context.Context, q engineeringQuery, project, head string, ids []string, versions map[string]int) (string, error) {
+func kickoffCoveredPublication(ctx context.Context, q engineeringQuery, project, head string, ids []string, versions map[string]int, facilityIDs ...[]string) (string, error) {
 	rows, err := q.Query(ctx, `SELECT p.state,
  COALESCE((SELECT jsonb_agg(o.entity_id::text) FROM kickoff_publication_object o WHERE o.publication_id=p.id AND o.kind='device'),'[]'::jsonb),
+ COALESCE((SELECT jsonb_agg(o.entity_id::text) FROM kickoff_publication_object o WHERE o.publication_id=p.id AND o.kind='facility'),'[]'::jsonb),
  COALESCE((SELECT jsonb_object_agg(i.table_id,i.version) FROM kickoff_publication_input i WHERE i.publication_id=p.id),'{}'::jsonb)
  FROM kickoff_publication p WHERE p.project_id=$1 AND p.model_revision=$2 AND p.state IN ('published','pending') ORDER BY p.revision DESC`, project, head)
 	if err != nil {
@@ -39,8 +40,8 @@ func kickoffCoveredPublication(ctx context.Context, q engineeringQuery, project,
 	defer rows.Close()
 	for rows.Next() {
 		var state string
-		var rawIDs, rawVersions []byte
-		if err = rows.Scan(&state, &rawIDs, &rawVersions); err != nil {
+		var rawIDs, rawFacilities, rawVersions []byte
+		if err = rows.Scan(&state, &rawIDs, &rawFacilities, &rawVersions); err != nil {
 			return "", err
 		}
 		var priorIDs []string
@@ -48,10 +49,29 @@ func kickoffCoveredPublication(ctx context.Context, q engineeringQuery, project,
 		if err = json.Unmarshal(rawIDs, &priorIDs); err != nil {
 			return "", fmt.Errorf("publication scope: %w", err)
 		}
+		var priorFacilities []string
+		if err = json.Unmarshal(rawFacilities, &priorFacilities); err != nil {
+			return "", fmt.Errorf("publication facilities: %w", err)
+		}
 		if err = json.Unmarshal(rawVersions, &priorVersions); err != nil {
 			return "", fmt.Errorf("publication inputs: %w", err)
 		}
-		if kickoffScopeCovered(priorIDs, ids, priorVersions, versions) {
+		priorScope, wanted := []string{}, []string{}
+		for _, id := range priorIDs {
+			priorScope = append(priorScope, "device:"+id)
+		}
+		for _, id := range priorFacilities {
+			priorScope = append(priorScope, "facility:"+id)
+		}
+		for _, id := range ids {
+			wanted = append(wanted, "device:"+id)
+		}
+		for _, facilities := range facilityIDs {
+			for _, id := range facilities {
+				wanted = append(wanted, "facility:"+id)
+			}
+		}
+		if kickoffScopeCovered(priorScope, wanted, priorVersions, versions) {
 			return state, nil
 		}
 	}

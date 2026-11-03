@@ -12,6 +12,38 @@ import (
 	"strconv"
 )
 
+func (s *Server) kickoffSelectPublication(ctx context.Context, q engineeringQuery, model engineering.PhysicalModel, view kickoff.View, deviceIDs, facilityIDs []string) (engineering.PhysicalModel, kickoff.Publication, error) {
+	ports := map[string]engineering.PlannedPort{}
+	if len(deviceIDs) > 0 && len(model.Connections) > 0 {
+		ids := []string{}
+		for _, connection := range model.Connections {
+			ids = append(ids, connection.APortID, connection.ZPortID)
+			ids = append(ids, connection.PatchPortIDs...)
+		}
+		rows, err := q.Query(ctx, `SELECT e.item_uid,COALESCE(NULLIF(e.payload->>'device_id',''),e.payload->>'parent_uid',''),COALESCE(e.payload->>'physical_name',e.name),NULLIF(e.payload->>'parent_port_id','')
+ FROM cmdb_entity e JOIN cmdb_asset_scope s ON s.asset_id=e.item_uid AND s.project_id=$1
+ WHERE e.item_uid=ANY($2::text[]) AND e.asset_type='port' AND e.lifecycle_state<>'retired'`, s.project, ids)
+		if err != nil {
+			return engineering.PhysicalModel{}, kickoff.Publication{}, err
+		}
+		for rows.Next() {
+			var port engineering.PlannedPort
+			if err = rows.Scan(&port.EntityID, &port.EquipmentID, &port.Name, &port.ParentPortID); err != nil {
+				break
+			}
+			ports[port.EntityID] = port
+		}
+		if err == nil {
+			err = rows.Err()
+		}
+		rows.Close()
+		if err != nil {
+			return engineering.PhysicalModel{}, kickoff.Publication{}, err
+		}
+	}
+	return kickoff.SelectScope(model, view, deviceIDs, facilityIDs, ports)
+}
+
 func (s *Server) loadKickoffPublication(ctx context.Context, q engineeringQuery, id string) (kickoff.Publication, error) {
 	var p kickoff.Publication
 	var revision, source string
@@ -99,7 +131,7 @@ func (s *Server) loadKickoffPublication(ctx context.Context, q engineeringQuery,
 			p.DeviceSnapshot = append(p.DeviceSnapshot, d)
 		}
 	}
-	p.Counts = map[string]int{"devices": len(p.DeviceIDs), "components": len(p.ComponentIDs), "ports": len(p.PortIDs), "connections": len(p.ConnectionIDs), "placements": len(p.PlacementIDs)}
+	p.Counts = map[string]int{"devices": len(p.DeviceIDs), "components": len(p.ComponentIDs), "ports": len(p.PortIDs), "connections": len(p.ConnectionIDs), "placements": len(p.PlacementIDs), "facilities": len(p.FacilityIDs), "locations": len(p.LocationIDs)}
 	p.ModelSnapshot = inputs
 	p.ModelVersions = map[string]int{}
 	for _, input := range inputs {
@@ -124,6 +156,7 @@ func (s *Server) loadKickoffPublications(ctx context.Context, q engineeringQuery
 	rows, err := q.Query(ctx, `SELECT p.id::text,p.revision,p.created_at,p.actor,p.reason,p.state,p.error_code,
  COALESCE((SELECT jsonb_object_agg(kind,n) FROM (SELECT kind,count(*) n FROM kickoff_publication_object WHERE publication_id=p.id GROUP BY kind) c),'{}'::jsonb),
  COALESCE((SELECT jsonb_agg(entity_id::text ORDER BY entity_id) FROM kickoff_publication_object WHERE publication_id=p.id AND kind='device'),'[]'::jsonb),
+ COALESCE((SELECT jsonb_agg(entity_id::text ORDER BY entity_id) FROM kickoff_publication_object WHERE publication_id=p.id AND kind='facility'),'[]'::jsonb),
  COALESCE((SELECT jsonb_object_agg(table_id,version) FROM kickoff_publication_input WHERE publication_id=p.id),'{}'::jsonb)
  FROM kickoff_publication p WHERE p.project_id=$1 ORDER BY p.revision`, s.project)
 	if err != nil {
@@ -131,9 +164,9 @@ func (s *Server) loadKickoffPublications(ctx context.Context, q engineeringQuery
 	}
 	defer rows.Close()
 	for rows.Next() {
-		p := kickoff.Publication{PortIDs: []string{}, ConnectionIDs: []string{}, ComponentIDs: []string{}, PlacementIDs: []string{}, ModelSnapshot: []kickoff.ModelInput{}, RackSnapshot: []kickoff.Rack{}, DeviceSnapshot: []kickoff.Device{}, Counts: map[string]int{}}
-		var counts, ids, versions []byte
-		if err := rows.Scan(&p.ID, &p.Revision, &p.CreatedAt, &p.Actor, &p.Reason, &p.State, &p.ErrorCode, &counts, &ids, &versions); err != nil {
+		p := kickoff.Publication{PortIDs: []string{}, ConnectionIDs: []string{}, ComponentIDs: []string{}, PlacementIDs: []string{}, FacilityIDs: []string{}, ModelSnapshot: []kickoff.ModelInput{}, RackSnapshot: []kickoff.Rack{}, DeviceSnapshot: []kickoff.Device{}, Counts: map[string]int{}}
+		var counts, ids, facilities, versions []byte
+		if err := rows.Scan(&p.ID, &p.Revision, &p.CreatedAt, &p.Actor, &p.Reason, &p.State, &p.ErrorCode, &counts, &ids, &facilities, &versions); err != nil {
 			return nil, err
 		}
 		var kinds map[string]int
@@ -143,10 +176,13 @@ func (s *Server) loadKickoffPublications(ctx context.Context, q engineeringQuery
 		if err := json.Unmarshal(ids, &p.DeviceIDs); err != nil {
 			return nil, err
 		}
+		if err := json.Unmarshal(facilities, &p.FacilityIDs); err != nil {
+			return nil, err
+		}
 		if err := json.Unmarshal(versions, &p.ModelVersions); err != nil {
 			return nil, err
 		}
-		for singular, plural := range map[string]string{"device": "devices", "port": "ports", "component": "components", "connection": "connections", "placement": "placements"} {
+		for singular, plural := range map[string]string{"device": "devices", "port": "ports", "component": "components", "connection": "connections", "placement": "placements", "facility": "facilities", "location": "locations"} {
 			p.Counts[plural] = kinds[singular]
 		}
 		out = append(out, p)

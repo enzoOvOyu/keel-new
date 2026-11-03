@@ -15,9 +15,15 @@ type kickoffPublicationOption struct {
 	State  string `json:"state"`
 	Reason string `json:"reason"`
 }
+type kickoffPublicationFacilityOption struct {
+	kickoffPublicationOption
+	Label string `json:"label"`
+	Kind  string `json:"kind"`
+}
 type kickoffPublicationOptions struct {
-	Revision int                        `json:"revision"`
-	Devices  []kickoffPublicationOption `json:"devices"`
+	Revision   int                                `json:"revision"`
+	Devices    []kickoffPublicationOption         `json:"devices"`
+	Facilities []kickoffPublicationFacilityOption `json:"facilities"`
 }
 type kickoffPublicationBaseline struct {
 	pub  kickoff.Publication
@@ -70,8 +76,8 @@ func (s *Server) kickoffPublicationOptions(w http.ResponseWriter, r *http.Reques
 }
 
 func (s *Server) kickoffPublicationDeviceOptions(ctx context.Context, q engineeringQuery, current engineering.PhysicalModel, inputs []kickoff.ModelInput, view kickoff.View, revision int) (kickoffPublicationOptions, error) {
-	result := kickoffPublicationOptions{Revision: revision, Devices: []kickoffPublicationOption{}}
-	if len(view.Devices) == 0 {
+	result := kickoffPublicationOptions{Revision: revision, Devices: []kickoffPublicationOption{}, Facilities: []kickoffPublicationFacilityOption{}}
+	if len(view.Devices) == 0 && len(current.Facilities) == 0 {
 		return result, nil
 	}
 	var currentHead string
@@ -163,7 +169,7 @@ func (s *Server) kickoffPublicationDeviceOptions(ctx context.Context, q engineer
 	for _, record := range ledger {
 		p := record.pub
 		if p.State == "pending" {
-			for _, id := range p.DeviceIDs {
+			for _, id := range append(append([]string{}, p.DeviceIDs...), p.FacilityIDs...) {
 				pending[id] = true
 			}
 			continue
@@ -179,7 +185,14 @@ func (s *Server) kickoffPublicationDeviceOptions(ctx context.Context, q engineer
 		frozen := kickoff.FrozenModel(model, p)
 		frozen.Placements = append(frozen.Placements, kickoff.KnownLocations(model, p).Placements...)
 		facts := kickoff.PublicationFacts(frozen, p.ModelSnapshot)
-		for _, id := range p.DeviceIDs {
+		for id, values := range kickoff.FacilityPublicationFacts(frozen, p.ModelSnapshot) {
+			facts[id] = values
+		}
+		scopeIDs := append([]string{}, p.DeviceIDs...)
+		for _, f := range frozen.Facilities {
+			scopeIDs = append(scopeIDs, f.EntityID)
+		}
+		for _, id := range scopeIDs {
 			if baseline[id] == nil {
 				baseline[id] = map[string]string{}
 			}
@@ -187,25 +200,47 @@ func (s *Server) kickoffPublicationDeviceOptions(ctx context.Context, q engineer
 				baseline[id][key] = value
 			}
 		}
+		if len(frozen.Connections) > 0 {
+			// Referenced peer ports are intentionally outside the frozen write
+			// scope. Use the approved head to recover their device ownership,
+			// and advance only published connection facts on existing baselines.
+			connectionModel := engineering.EmptyPhysical(model.ProjectID)
+			connectionModel.Equipment, connectionModel.Assemblies = model.Equipment, model.Assemblies
+			connectionModel.Ports, connectionModel.Connections = model.Ports, frozen.Connections
+			for id, values := range kickoff.PublicationFacts(connectionModel, nil) {
+				if baseline[id] == nil {
+					continue
+				}
+				for _, connection := range frozen.Connections {
+					key := "connection:" + connection.EntityID
+					if value, ok := values[key]; ok {
+						baseline[id][key] = value
+					}
+				}
+			}
+		}
 	}
 	actual := kickoff.PublicationFacts(current, inputs)
+	for id, values := range kickoff.FacilityPublicationFacts(current, inputs) {
+		actual[id] = values
+	}
 	blocked := map[string]bool{}
 	for _, i := range view.Issues {
 		if !i.Resolved && i.Scope == "identity" {
 			blocked[i.EntityID] = true
 		}
 	}
-	for _, d := range view.Devices {
-		v := kickoffPublicationOption{ID: d.ID, State: "new", Reason: "尚未入库"}
+	option := func(id string) kickoffPublicationOption {
+		v := kickoffPublicationOption{ID: id, State: "new", Reason: "尚未入库"}
 		switch {
-		case blocked[d.ID]:
+		case blocked[id]:
 			v.State = "blocked"
 			v.Reason = "身份待确认"
-		case pending[d.ID]:
+		case pending[id]:
 			v.State = "pending"
 			v.Reason = "正在等待入库回执"
-		case baseline[d.ID] != nil:
-			if kickoff.PublicationChanged(actual[d.ID], baseline[d.ID]) {
+		case baseline[id] != nil:
+			if kickoff.PublicationChanged(actual[id], baseline[id]) {
 				v.State = "changed"
 				v.Reason = "已入库，有待发布增补"
 			} else {
@@ -213,7 +248,17 @@ func (s *Server) kickoffPublicationDeviceOptions(ctx context.Context, q engineer
 				v.Reason = "已入库，无待发布变化"
 			}
 		}
-		result.Devices = append(result.Devices, v)
+		return v
+	}
+	for _, d := range view.Devices {
+		result.Devices = append(result.Devices, option(d.ID))
+	}
+	for _, f := range current.Facilities {
+		label := f.Label
+		if label == "" {
+			label = f.Code
+		}
+		result.Facilities = append(result.Facilities, kickoffPublicationFacilityOption{kickoffPublicationOption: option(f.EntityID), Label: label, Kind: f.Kind})
 	}
 	return result, nil
 }

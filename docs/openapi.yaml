@@ -347,7 +347,21 @@ paths:
             schema:
               type: object
               additionalProperties: false
+              anyOf:
+                - required: [deviceIds]
+                  properties:
+                    deviceIds:
+                      minItems: 1
+                - required: [facilityIds]
+                  properties:
+                    facilityIds:
+                      minItems: 1
               properties:
+                facilityIds:
+                  type: array
+                  uniqueItems: true
+                  items:
+                    type: string
                 deviceIds:
                   type: array
                   items: *kickoffRead_a2_1
@@ -641,10 +655,23 @@ paths:
             schema:
               type: object
               additionalProperties: false
+              anyOf:
+                - required: [deviceIds]
+                  properties:
+                    deviceIds:
+                      minItems: 1
+                - required: [facilityIds]
+                  properties:
+                    facilityIds:
+                      minItems: 1
               properties:
+                facilityIds:
+                  type: array
+                  uniqueItems: true
+                  items:
+                    type: string
                 deviceIds:
                   type: array
-                  minItems: 1
                   uniqueItems: true
                   items:
                     type: string
@@ -762,30 +789,110 @@ paths:
   /projects/{projectId}/kickoff/sources/{sourceId}/analyze:
     post:
       operationId: analyzeKickoffSource
-      tags:
-        - Kickoff
+      tags: [Kickoff]
       parameters:
         - *kickoffAction6
         - name: sourceId
           in: path
           required: true
-          schema:
-            type: string
+          schema: {type: string}
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              additionalProperties: false
-              properties:
-                expectedRevision: *kickoffAction2
-              required:
-                - expectedRevision
+              $ref: "#/components/schemas/KickoffAnalysisRequest"
       responses:
+        "202":
+          description: Project-scoped Agent operation; candidates require explicit adoption
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/KickoffAnalysisQueued"
+                  request_id:
+                    type: string
+                required: [data, request_id]
         "403": *kickoffAction3
+        "409": *kickoffAction4
+        "422": *kickoffAction5
         "503":
-          description: Agent not implemented in this delivery slice; source preserved
+          description: Analysis storage or configured provider unavailable; no facts adopted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /projects/{projectId}/kickoff/sources/{sourceId}/analysis:
+    get:
+      operationId: getKickoffSourceAnalysis
+      tags: [Kickoff]
+      parameters:
+        - *kickoffAction6
+        - name: sourceId
+          in: path
+          required: true
+          schema: {type: string}
+        - name: jobId
+          in: query
+          schema: {type: string}
+      responses:
+        "200":
+          description: Project-scoped Agent operation; candidates require explicit adoption
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/KickoffSourceAnalysis"
+                  request_id:
+                    type: string
+                required: [data, request_id]
+        "403": *kickoffAction3
+        "409": *kickoffAction4
+        "422": *kickoffAction5
+        "503":
+          description: Analysis storage or configured provider unavailable; no facts adopted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /projects/{projectId}/kickoff/sources/{sourceId}/analysis/adopt:
+    post:
+      operationId: adoptKickoffSourceAnalysis
+      tags: [Kickoff]
+      parameters:
+        - *kickoffAction6
+        - name: sourceId
+          in: path
+          required: true
+          schema: {type: string}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KickoffAnalysisAdoptRequest"
+      responses:
+        "200":
+          description: Project-scoped Agent operation; candidates require explicit adoption
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/KickoffAnalysisAdoption"
+                  request_id:
+                    type: string
+                required: [data, request_id]
+        "403": *kickoffAction3
+        "409": *kickoffAction4
+        "422": *kickoffAction5
+        "503":
+          description: Analysis storage or configured provider unavailable; no facts adopted
           content:
             application/json:
               schema:
@@ -19496,6 +19603,7 @@ components:
           type: string
           enum:
           - history
+          - agent
           - none
         steps:
           type: array
@@ -19912,6 +20020,10 @@ components:
             - failed
         errorCode:
           type: string
+        facilityIds:
+          type: array
+          items:
+            type: string
         deviceIds:
           type: array
           items:
@@ -20181,6 +20293,189 @@ components:
         - ports
         - connections
         - components
+    KickoffAnalysisDomain:
+      type: string
+      enum: [equipment, facility, cabling, network, power, provisioning]
+    KickoffAnalysisRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        expectedRevision: {type: integer, minimum: 0}
+        domains:
+          type: array
+          uniqueItems: true
+          items: {$ref: "#/components/schemas/KickoffAnalysisDomain"}
+      required: [expectedRevision]
+    KickoffAnalysisQueued:
+      type: object
+      additionalProperties: false
+      properties:
+        jobId: {type: string}
+        state: {type: string, enum: [pending]}
+      required: [jobId, state]
+    KickoffAgentIssue:
+      type: object
+      properties:
+        row: {type: integer}
+        field: {type: string}
+        code: {type: string}
+        message: {type: string}
+    KickoffAgentNormalizationEvidence:
+      type: object
+      additionalProperties: false
+      properties:
+        rule: {type: string}
+        sheet: {type: string}
+        column: {type: integer}
+        mapping_bounds: {$ref: "#/components/schemas/KickoffAgentBounds"}
+        region_bounds: {$ref: "#/components/schemas/KickoffAgentBounds"}
+        start_u: {type: string}
+        height_u: {type: string}
+        normalized_value: {type: string}
+        ticks:
+          type: array
+          items:
+            type: object
+            properties:
+              sheet: {type: string}
+              cell: {type: string}
+              value: {type: string}
+              u: {type: integer}
+            required: [sheet, cell, value, u]
+        unit_headers:
+          type: array
+          items:
+            type: object
+            properties:
+              sheet: {type: string}
+              cell: {type: string}
+              value: {type: string}
+            required: [sheet, cell, value]
+      required: [rule]
+    KickoffAgentBounds:
+      type: object
+      additionalProperties: false
+      properties:
+        start_row: {type: integer}
+        end_row: {type: integer}
+        start_column: {type: integer}
+        end_column: {type: integer}
+      required: [start_row, end_row, start_column, end_column]
+    KickoffAgentFieldEvidence:
+      type: object
+      additionalProperties: false
+      properties:
+        sheet: {type: string}
+        cell: {type: string}
+        formula: {type: boolean}
+        calculationRunId: {type: string}
+        lookup:
+          type: object
+          additionalProperties: false
+          properties:
+            sheet: {type: string}
+            key_column: {type: integer}
+            value_column: {type: integer}
+            start_row: {type: integer}
+            end_row: {type: integer}
+          required: [sheet, key_column, value_column, start_row, end_row]
+        normalizationEvidence: {$ref: "#/components/schemas/KickoffAgentNormalizationEvidence"}
+        normalization: {type: string}
+        classification: {type: string}
+      required: [sheet, cell, formula]
+    KickoffAgentEvidence:
+      type: object
+      additionalProperties: false
+      properties:
+        row: {type: integer}
+        region: {type: string}
+        sheet: {type: string}
+        sourceRow: {type: integer}
+        sourceColumn: {type: integer}
+        fields:
+          type: object
+          additionalProperties: {$ref: "#/components/schemas/KickoffAgentFieldEvidence"}
+        missing:
+          type: array
+          items: {type: string}
+      required: [row, region, sheet, sourceRow, sourceColumn, fields, missing]
+    KickoffAgentDraft:
+      type: object
+      additionalProperties: false
+      properties:
+        tableId: {type: string}
+        domain: {$ref: "#/components/schemas/KickoffAnalysisDomain"}
+        rowCount: {type: integer, minimum: 0}
+        previewLimit: {type: integer, maximum: 20}
+        baseVersion: {type: integer}
+        rows:
+          type: array
+          maxItems: 20
+          items: {$ref: "#/components/schemas/KickoffModelRow"}
+        issues:
+          type: array
+          items: {$ref: "#/components/schemas/KickoffAgentIssue"}
+        evidence:
+          type: array
+          items: {$ref: "#/components/schemas/KickoffAgentEvidence"}
+      required: [tableId, domain, rowCount, previewLimit, baseVersion, rows, issues, evidence]
+    KickoffAgentCoverage:
+      type: object
+      additionalProperties: false
+      properties:
+        region: {type: string}
+        step: {type: integer}
+        state: {type: string}
+        rows: {type: integer}
+        reason: {type: string}
+      required: [region, step, state, rows, reason]
+    KickoffSourceAnalysis:
+      type: object
+      additionalProperties: false
+      properties:
+        coverageTruncated: {type: boolean}
+        missingTruncated: {type: boolean}
+        coverageTotal: {type: integer, minimum: 0}
+        missingTotal: {type: integer, minimum: 0}
+        jobId: {type: [string, 'null']}
+        state: {type: string, enum: [idle, pending, running, succeeded, failed]}
+        errorCode: {type: string}
+        domains:
+          type: array
+          items: {$ref: "#/components/schemas/KickoffAnalysisDomain"}
+        coverage:
+          type: array
+          items: {$ref: "#/components/schemas/KickoffAgentCoverage"}
+        missing:
+          type: array
+          items: {type: string}
+        drafts:
+          type: array
+          items: {$ref: "#/components/schemas/KickoffAgentDraft"}
+      required: [jobId, state, domains, coverage, missing, drafts]
+    KickoffAnalysisAdoptRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        jobId: {type: string}
+        expectedRevision: {type: integer, minimum: 0}
+        tableIds:
+          type: array
+          uniqueItems: true
+          items: {type: string}
+      required: [jobId, expectedRevision]
+    KickoffAnalysisAdoption:
+      type: object
+      additionalProperties: false
+      properties:
+        revision: {type: integer}
+        adoptedTableIds:
+          type: array
+          items: {type: string}
+        skippedTableIds:
+          type: array
+          items: {type: string}
+      required: [revision, adoptedTableIds, skippedTableIds]
     KickoffPublicationOption:
       type: object
       additionalProperties: false
@@ -20193,6 +20488,23 @@ components:
         reason:
           type: string
       required: [id, state, reason]
+    KickoffFacilityPublicationOption:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        state:
+          type: string
+          enum: [new, changed, unchanged, blocked, pending]
+        reason:
+          type: string
+        label:
+          type: string
+        kind:
+          type: string
+          enum: [site, room, rack]
+      required: [id, state, reason, label, kind]
     KickoffPublicationOptions:
       type: object
       additionalProperties: false
@@ -20200,6 +20512,10 @@ components:
         revision:
           type: integer
           minimum: 0
+        facilities:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffFacilityPublicationOption"
         devices:
           type: array
           items:

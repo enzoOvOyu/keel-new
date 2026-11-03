@@ -213,6 +213,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/kickoff/sources/{sourceId}/analysis": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getKickoffSourceAnalysis"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/kickoff/sources/{sourceId}/analysis/adopt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adoptKickoffSourceAnalysis"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/projects/{projectId}/kickoff/workspace": {
         parameters: {
             query?: never;
@@ -7435,7 +7467,7 @@ export interface components {
             /** @enum {string} */
             state: "historical" | "partial" | "unsupported";
             /** @enum {string} */
-            origin: "history" | "none";
+            origin: "history" | "agent" | "none";
             steps: components["schemas"]["KickoffUnderstandingStep"][];
             regions: components["schemas"]["KickoffUnderstandingRegion"][];
             limitations: string[];
@@ -7574,6 +7606,7 @@ export interface components {
             /** @enum {string} */
             state: "pending" | "published" | "failed";
             errorCode?: string;
+            facilityIds?: string[];
             deviceIds: string[];
             portIds: string[];
             connectionIds: string[];
@@ -7668,14 +7701,136 @@ export interface components {
             connections: components["schemas"]["KickoffConnection"][];
             components: components["schemas"]["KickoffComponent"][];
         };
+        /** @enum {string} */
+        KickoffAnalysisDomain: "equipment" | "facility" | "cabling" | "network" | "power" | "provisioning";
+        KickoffAnalysisRequest: {
+            expectedRevision: number;
+            domains?: components["schemas"]["KickoffAnalysisDomain"][];
+        };
+        KickoffAnalysisQueued: {
+            jobId: string;
+            /** @enum {string} */
+            state: "pending";
+        };
+        KickoffAgentIssue: {
+            row?: number;
+            field?: string;
+            code?: string;
+            message?: string;
+        };
+        KickoffAgentNormalizationEvidence: {
+            rule: string;
+            sheet?: string;
+            column?: number;
+            mapping_bounds?: components["schemas"]["KickoffAgentBounds"];
+            region_bounds?: components["schemas"]["KickoffAgentBounds"];
+            start_u?: string;
+            height_u?: string;
+            normalized_value?: string;
+            ticks?: {
+                sheet: string;
+                cell: string;
+                value: string;
+                u: number;
+            }[];
+            unit_headers?: {
+                sheet: string;
+                cell: string;
+                value: string;
+            }[];
+        };
+        KickoffAgentBounds: {
+            start_row: number;
+            end_row: number;
+            start_column: number;
+            end_column: number;
+        };
+        KickoffAgentFieldEvidence: {
+            sheet: string;
+            cell: string;
+            formula: boolean;
+            calculationRunId?: string;
+            lookup?: {
+                sheet: string;
+                key_column: number;
+                value_column: number;
+                start_row: number;
+                end_row: number;
+            };
+            normalizationEvidence?: components["schemas"]["KickoffAgentNormalizationEvidence"];
+            normalization?: string;
+            classification?: string;
+        };
+        KickoffAgentEvidence: {
+            row: number;
+            region: string;
+            sheet: string;
+            sourceRow: number;
+            sourceColumn: number;
+            fields: {
+                [key: string]: components["schemas"]["KickoffAgentFieldEvidence"];
+            };
+            missing: string[];
+        };
+        KickoffAgentDraft: {
+            tableId: string;
+            domain: components["schemas"]["KickoffAnalysisDomain"];
+            rowCount: number;
+            previewLimit: number;
+            baseVersion: number;
+            rows: components["schemas"]["KickoffModelRow"][];
+            issues: components["schemas"]["KickoffAgentIssue"][];
+            evidence: components["schemas"]["KickoffAgentEvidence"][];
+        };
+        KickoffAgentCoverage: {
+            region: string;
+            step: number;
+            state: string;
+            rows: number;
+            reason: string;
+        };
+        KickoffSourceAnalysis: {
+            coverageTruncated?: boolean;
+            missingTruncated?: boolean;
+            coverageTotal?: number;
+            missingTotal?: number;
+            jobId: string | null;
+            /** @enum {string} */
+            state: "idle" | "pending" | "running" | "succeeded" | "failed";
+            errorCode?: string;
+            domains: components["schemas"]["KickoffAnalysisDomain"][];
+            coverage: components["schemas"]["KickoffAgentCoverage"][];
+            missing: string[];
+            drafts: components["schemas"]["KickoffAgentDraft"][];
+        };
+        KickoffAnalysisAdoptRequest: {
+            jobId: string;
+            expectedRevision: number;
+            tableIds?: string[];
+        };
+        KickoffAnalysisAdoption: {
+            revision: number;
+            adoptedTableIds: string[];
+            skippedTableIds: string[];
+        };
         KickoffPublicationOption: {
             id: string;
             /** @enum {string} */
             state: "new" | "changed" | "unchanged" | "blocked" | "pending";
             reason: string;
         };
+        KickoffFacilityPublicationOption: {
+            id: string;
+            /** @enum {string} */
+            state: "new" | "changed" | "unchanged" | "blocked" | "pending";
+            reason: string;
+            label: string;
+            /** @enum {string} */
+            kind: "site" | "room" | "rack";
+        };
         KickoffPublicationOptions: {
             revision: number;
+            facilities?: components["schemas"]["KickoffFacilityPublicationOption"][];
             devices: components["schemas"]["KickoffPublicationOption"][];
         };
         KickoffScopeEvaluation: {
@@ -18846,8 +19001,13 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    facilityIds?: string[];
                     deviceIds: string[];
                     expectedRevision: number;
+                } | {
+                    deviceIds: unknown;
+                } | {
+                    facilityIds: unknown;
                 };
             };
         };
@@ -19092,9 +19252,14 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    facilityIds?: string[];
                     deviceIds: string[];
                     reason: string;
                     expectedRevision: number;
+                } | {
+                    deviceIds: unknown;
+                } | {
+                    facilityIds: unknown;
                 };
             };
         };
@@ -19242,12 +19407,22 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": {
-                    expectedRevision: number;
-                };
+                "application/json": components["schemas"]["KickoffAnalysisRequest"];
             };
         };
         responses: {
+            /** @description Project-scoped Agent operation; candidates require explicit adoption */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["KickoffAnalysisQueued"];
+                        request_id: string;
+                    };
+                };
+            };
             /** @description Insufficient project or operation permission */
             403: {
                 headers: {
@@ -19255,7 +19430,139 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Agent not implemented in this delivery slice; source preserved */
+            /** @description Workspace revision changed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid object, dependency or input */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Analysis storage or configured provider unavailable; no facts adopted */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    getKickoffSourceAnalysis: {
+        parameters: {
+            query?: {
+                jobId?: string;
+            };
+            header?: never;
+            path: {
+                projectId: string;
+                sourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Project-scoped Agent operation; candidates require explicit adoption */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["KickoffSourceAnalysis"];
+                        request_id: string;
+                    };
+                };
+            };
+            /** @description Insufficient project or operation permission */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Workspace revision changed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid object, dependency or input */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Analysis storage or configured provider unavailable; no facts adopted */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    adoptKickoffSourceAnalysis: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                sourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["KickoffAnalysisAdoptRequest"];
+            };
+        };
+        responses: {
+            /** @description Project-scoped Agent operation; candidates require explicit adoption */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["KickoffAnalysisAdoption"];
+                        request_id: string;
+                    };
+                };
+            };
+            /** @description Insufficient project or operation permission */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Workspace revision changed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid object, dependency or input */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Analysis storage or configured provider unavailable; no facts adopted */
             503: {
                 headers: {
                     [name: string]: unknown;

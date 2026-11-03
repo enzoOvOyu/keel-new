@@ -33,7 +33,7 @@ export interface Calculation {
 }
 export interface Publication {
   id: string; revision: number; createdAt: string; actor: string; reason: string; state: 'pending' | 'published' | 'failed'; errorCode?: string; deviceIds: string[];
-  portIds: string[]; connectionIds: string[]; componentIds: string[]; placementIds: string[];
+  facilityIds?: string[]; portIds: string[]; connectionIds: string[]; componentIds: string[]; placementIds: string[];
   modelVersions: Record<string, number>; modelSnapshot: ModelInput[]; rackSnapshot: Rack[]; deviceSnapshot: Device[]; counts: Record<string, number>;
 }
 export interface Activity { id: string; action: string; detail: string; at: string }
@@ -49,13 +49,18 @@ export interface Capability { id: string; title: string; detail: string; state: 
 export interface PublishPreview { devices: Device[]; ports: Port[]; connections: Connection[]; components: Component[]; placements: Device[]; held: Device[]; counts: Record<string, number> }
 export interface ImportPreview { rows: ModelRow[]; errors: string[]; unknownHeaders: string[]; sheet: string }
 export interface PublicationOption {id:string;state:'new'|'changed'|'unchanged'|'blocked'|'pending';reason:string}
-export interface PublicationOptions {revision:number;devices:PublicationOption[]}
+export interface FacilityPublicationOption extends PublicationOption {label:string;kind:string}
+export interface PublicationOptions {revision:number;devices:PublicationOption[];facilities?:FacilityPublicationOption[]}
 export interface KickoffAPI {
+ startSourceAnalysis?(id:string,domains:AnalysisDomain[]):Promise<{jobId:string;state:string}>;
+ sourceAnalysis?(id:string,jobId?:string):Promise<SourceAnalysis>;
+ adoptSourceAnalysis?(id:string,jobId:string,tableIds:string[]):Promise<{revision:number;adoptedTableIds:string[];skippedTableIds:string[]}>;
+
  publicationOptions(revision:number):Promise<PublicationOptions>;
  sourceUnderstanding(id:string):Promise<SourceUnderstanding>;
  reuseSourceHistory(id:string):Promise<SourceUnderstanding>;
  sourceRegionPreview(sourceId:string,regionId:string,offset:number,revisionId:string,view:'source'|'normalized'):Promise<SourceRegionPreview>;
-  evaluatePublication?(ids:string[],revision:number):Promise<{revision:number;counts:Record<string,number>}>;
+  evaluatePublication?(ids:string[],revision:number,facilityIds?:string[]):Promise<{revision:number;counts:Record<string,number>}>;
   loadContext?(id:string):Promise<void>;
   exportReview?(query:URLSearchParams):Promise<ReviewRow[]>;
   reviewPage?(query:URLSearchParams):Promise<ReviewPage>;
@@ -69,7 +74,7 @@ export interface KickoffAPI {
   resolveIssue(id: string, value: string): Promise<void>;
   saveModel(tableId: string, rows: ModelRow[], source: string): Promise<void>;
   previewPublication(ids: string[]): PublishPreview;
-  publish(ids: string[], reason: string, expectedRevision: number): Promise<Publication>;
+  publish(ids: string[], reason: string, expectedRevision: number, facilityIds?:string[]): Promise<Publication>;
   calculate(domain: 'cabling' | 'power'): Promise<Calculation>;
 }
 
@@ -83,7 +88,7 @@ export interface ReviewRow {id:string;name:string;description:string;reference:s
 export interface ReviewPage {revision:number;rows:ReviewRow[];total:number;offset:number;limit:number;hasMore:boolean;counts:Record<string,number>;facets:Record<'type'|'model'|'rack'|'source',{value:string;label:string}[]>}
 
 export interface SourceUnderstanding {
- sourceId:string; revisionId:string; state:'historical'|'partial'|'unsupported'; origin:'history'|'none';
+ sourceId:string; revisionId:string; state:'historical'|'partial'|'unsupported'; origin:'history'|'agent'|'none';
  steps:{id:'structure'|'regions'|'semantics'|'relationships'|'fields';state:'complete'|'partial'|'pending'|'unsupported';count:number;completed:number;total:number;note:string}[];
  regions:(SourceRegion & {categories:string[];evidenceCount:number;fieldEvidenceCount:number;objectCount:number;coveredCells:number;totalCells:number;mappings:{field:string;kind:'field'|'object';count:number}[];issues:string[]})[];
  limitations:string[];
@@ -92,3 +97,9 @@ export interface SourceRegionPreview {
  sourceId:string;revisionId:string;regionId:string;offset:number;limit:number;total:number;
  rows:{row:number;objects:{id:string;kind:string;label:string;fields:{field:string;value:string}[];evidence:number}[];cells:{cell:string;column:number;value:string;formula:string;sensitive:boolean;fields:string[];entityIds:string[]}[]}[];
 }
+
+export type AnalysisDomain='equipment'|'facility'|'cabling'|'network'|'power'|'provisioning';
+export interface AgentNormalizationEvidence {rule:string;sheet?:string;column?:number;mapping_bounds?:{start_row:number;end_row:number;start_column:number;end_column:number};region_bounds?:{start_row:number;end_row:number;start_column:number;end_column:number};ticks?:{sheet:string;cell:string;value:string;u:number}[];unit_headers?:{sheet:string;cell:string;value:string}[];start_u?:string;height_u?:string;normalized_value?:string}
+export interface AgentFieldEvidence {row:number;region:string;sheet:string;sourceRow:number;sourceColumn:number;fields:Record<string,{sheet:string;cell:string;formula:boolean;normalizationEvidence?:AgentNormalizationEvidence;calculationRunId?:string;lookup?:{sheet:string;key_column:number;value_column:number;start_row:number;end_row:number};normalization?:string;classification?:string}>;missing:string[]}
+export interface AgentDraft {tableId:string;domain:AnalysisDomain;rowCount:number;previewLimit:number;rows:ModelRow[];issues:{row:number;field:string;code:string;message:string}[];baseVersion:number;evidence:AgentFieldEvidence[]}
+export interface SourceAnalysis {coverageTotal?:number;missingTotal?:number;coverageTruncated?:boolean;missingTruncated?:boolean;jobId:string|null;state:'idle'|'pending'|'running'|'succeeded'|'failed';errorCode?:string;domains:AnalysisDomain[];coverage:{region:string;step:number;state:string;rows:number;reason:string}[];missing:string[];drafts:AgentDraft[]}

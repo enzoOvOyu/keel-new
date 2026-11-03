@@ -42,6 +42,9 @@ func (s *Server) kickoffRoutes(w http.ResponseWriter, r *http.Request) bool {
 		if p[5] == "sources" || p[5] == "history" {
 			permission = "bom:import"
 		}
+		if len(p) == 9 && p[5] == "sources" && p[7] == "analysis" && p[8] == "adopt" {
+			permission = "bom:edit"
+		}
 		if p[5] == "publications" {
 			permission = "bom:execute"
 		}
@@ -61,11 +64,15 @@ func (s *Server) kickoffRoutes(w http.ResponseWriter, r *http.Request) bool {
 	case len(p) == 6 && p[5] == "publication-options" && r.Method == "GET":
 		s.kickoffPublicationOptions(w, r)
 	case len(p) == 8 && p[5] == "sources" && p[7] == "understanding" && r.Method == "GET":
-		s.kickoffUnderstanding(w, r, p[6], false)
+		if !s.kickoffAgentUnderstanding(w, r, p[6]) {
+			s.kickoffUnderstanding(w, r, p[6], false)
+		}
 	case len(p) == 8 && p[5] == "sources" && p[7] == "reuse-history" && r.Method == "POST":
 		s.kickoffUnderstanding(w, r, p[6], true)
 	case len(p) == 10 && p[5] == "sources" && p[7] == "regions" && p[9] == "preview" && r.Method == "GET":
-		s.kickoffRegionPreview(w, r, p[6], p[8])
+		if !s.kickoffAgentRegionPreview(w, r, p[6], p[8]) {
+			s.kickoffRegionPreview(w, r, p[6], p[8])
+		}
 	case len(p) == 6 && p[5] == "preview" && r.Method == "POST":
 		s.kickoffPreview(w, r)
 	case len(p) == 6 && p[5] == "review" && r.Method == "GET":
@@ -90,7 +97,11 @@ func (s *Server) kickoffRoutes(w http.ResponseWriter, r *http.Request) bool {
 	case len(p) == 7 && p[5] == "publications" && r.Method == "GET":
 		s.kickoffPublication(w, r, p[6])
 	case len(p) == 8 && p[5] == "sources" && p[7] == "analyze" && r.Method == "POST":
-		fail(w, 503, "KICKOFF_AGENT_NOT_CONFIGURED")
+		s.kickoffAgentAnalyze(w, r, p[6])
+	case len(p) == 8 && p[5] == "sources" && p[7] == "analysis" && r.Method == "GET":
+		s.kickoffAgentAnalysis(w, r, p[6])
+	case len(p) == 9 && p[5] == "sources" && p[7] == "analysis" && p[8] == "adopt" && r.Method == "POST":
+		s.kickoffAgentAdopt(w, r, p[6])
 	case len(p) == 6 && p[5] == "history" && r.Method == "POST":
 		s.kickoffHistory(w, r)
 	case len(p) == 8 && p[5] == "publications" && p[7] == "status" && r.Method == "GET":

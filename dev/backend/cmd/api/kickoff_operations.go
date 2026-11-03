@@ -234,6 +234,7 @@ func (s *Server) kickoffPublish(w http.ResponseWriter, r *http.Request) {
 	}
 	var body struct {
 		DeviceIDs        []string `json:"deviceIds"`
+		FacilityIDs      []string `json:"facilityIds"`
 		Reason           string   `json:"reason"`
 		ExpectedRevision int      `json:"expectedRevision"`
 	}
@@ -259,7 +260,17 @@ func (s *Server) kickoffPublish(w http.ResponseWriter, r *http.Request) {
 			kickoffFailure(w, err)
 			return
 		}
-		if engineering.Digest(sortedKickoffIDs(prior.DeviceIDs)) != engineering.Digest(sortedKickoffIDs(body.DeviceIDs)) || prior.Reason != body.Reason {
+		var digest string
+		if err = tx.QueryRow(ctx, `SELECT digest FROM eng_review WHERE project_id=$1 AND id=$2 AND target='KICKOFF_SELECTED_SCOPE'`, s.project, priorID).Scan(&digest); err != nil {
+			kickoffFailure(w, err)
+			return
+		}
+		matches := digest == kickoffPublicationRequestDigest(body.DeviceIDs, body.FacilityIDs)
+		// Older device-only reviews used the model's device ordering as their digest.
+		if len(body.FacilityIDs) == 0 && digest == engineering.Digest(prior.DeviceIDs) {
+			matches = engineering.Digest(sortedKickoffIDs(prior.DeviceIDs)) == engineering.Digest(sortedKickoffIDs(body.DeviceIDs))
+		}
+		if !matches || prior.Reason != body.Reason {
 			fail(w, 409, "IDEMPOTENCY_KEY_REUSED")
 			return
 		}
@@ -286,7 +297,7 @@ func (s *Server) kickoffPublish(w http.ResponseWriter, r *http.Request) {
 	}
 	inputs = kickoff.ResolveReferences(model, inputs)
 	view := kickoff.Project(model, ev, source, inputs)
-	_, p, e := kickoff.Select(model, view, body.DeviceIDs)
+	_, p, e := s.kickoffSelectPublication(ctx, tx, model, view, body.DeviceIDs, body.FacilityIDs)
 	if e != nil {
 		kickoffFailure(w, e)
 		return
@@ -300,8 +311,11 @@ func (s *Server) kickoffPublish(w http.ResponseWriter, r *http.Request) {
 	for _, v := range options.Devices {
 		stateByID[v.ID] = v.State
 	}
+	for _, v := range options.Facilities {
+		stateByID[v.ID] = v.State
+	}
 	changed := false
-	for _, id := range body.DeviceIDs {
+	for _, id := range append(append([]string{}, body.DeviceIDs...), body.FacilityIDs...) {
 		if stateByID[id] == "pending" {
 			fail(w, 409, "KICKOFF_PUBLICATION_PENDING")
 			return
@@ -324,7 +338,7 @@ func (s *Server) kickoffPublish(w http.ResponseWriter, r *http.Request) {
 	for _, input := range inputs {
 		versions[input.TableID] = input.Version
 	}
-	covered, err := kickoffCoveredPublication(ctx, tx, s.project, revision, p.DeviceIDs, versions)
+	covered, err := kickoffCoveredPublication(ctx, tx, s.project, revision, p.DeviceIDs, versions, p.FacilityIDs)
 	if err != nil {
 		fail(w, 500, "KICKOFF_PUBLICATION_UNAVAILABLE")
 		return
@@ -367,7 +381,7 @@ func (s *Server) kickoffPublish(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if e == nil {
-		_, e = tx.Exec(ctx, `INSERT INTO eng_review(id,project_id,source_id,target,revision_id,digest,decision,actor,reason) VALUES($1,$2,$3,'KICKOFF_SELECTED_SCOPE',$4,$5,'approve',$6,$7)`, p.ID, s.project, source, revision, engineering.Digest(p.DeviceIDs), p.Actor, p.Reason)
+		_, e = tx.Exec(ctx, `INSERT INTO eng_review(id,project_id,source_id,target,revision_id,digest,decision,actor,reason) VALUES($1,$2,$3,'KICKOFF_SELECTED_SCOPE',$4,$5,'approve',$6,$7)`, p.ID, s.project, source, revision, kickoffPublicationRequestDigest(body.DeviceIDs, body.FacilityIDs), p.Actor, p.Reason)
 	}
 	if e == nil {
 		_, e = tx.Exec(ctx, `INSERT INTO audit_event(id,project_id,actor,action,resource_id,details) VALUES($1,$2,$3,'kickoff.confirmed',$4,$5)`, uuid.NewString(), s.project, p.Actor, p.ID, jsonBytes(p.Counts))
@@ -380,6 +394,13 @@ func (s *Server) kickoffPublish(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respond(w, 202, p)
+}
+
+func kickoffPublicationRequestDigest(deviceIDs, facilityIDs []string) string {
+	return engineering.Digest(struct {
+		DeviceIDs   []string `json:"deviceIds"`
+		FacilityIDs []string `json:"facilityIds"`
+	}{sortedKickoffIDs(deviceIDs), sortedKickoffIDs(facilityIDs)})
 }
 
 func sortedKickoffIDs(ids []string) []string {

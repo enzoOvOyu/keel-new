@@ -10,6 +10,7 @@ import (
 	"io"
 	"keel.local/dev/internal/bom"
 	"keel.local/dev/internal/engineering"
+	"keel.local/dev/internal/kickoff"
 	"sort"
 	"strings"
 )
@@ -76,9 +77,12 @@ type KickoffDraft struct {
 	Issues  []engineering.InputProblem `json:"issues"`
 }
 type KickoffResult struct {
-	Drafts   []KickoffDraft    `json:"drafts"`
-	Missing  []string          `json:"missing_inputs"`
-	Coverage []KickoffCoverage `json:"coverage"`
+	Candidates     []KickoffAgentCandidate `json:"candidates,omitempty"`
+	Regions        []KickoffRegion         `json:"regions,omitempty"`
+	SourceCoverage []any                   `json:"source_coverage,omitempty"`
+	Drafts         []KickoffDraft          `json:"drafts"`
+	Missing        []string                `json:"missing_inputs"`
+	Coverage       []KickoffCoverage       `json:"coverage"`
 }
 
 func kickoffDecode(raw []byte, out any) error {
@@ -113,7 +117,7 @@ func kickoffBounds(w bom.Workbook, sheet string, b engineering.Bounds) bool {
 	return b.EndRow <= maxRow && b.EndColumn <= maxCol
 }
 func kickoffTable(id string) (engineering.InputTable, bool) {
-	for _, t := range engineering.StepInputCatalog().Tables {
+	for _, t := range append(engineering.StepInputCatalog().Tables, KickoffAgentCatalog().Tables...) {
 		if t.ID == id {
 			return t, true
 		}
@@ -121,10 +125,26 @@ func kickoffTable(id string) (engineering.InputTable, bool) {
 	return engineering.InputTable{}, false
 }
 
-func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbook, trace func(string, string, string) error, hooks EngineeringToolHooks) (KickoffResult, error) {
+func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbook, trace func(string, string, string) error, hooks EngineeringToolHooks, options ...KickoffAgentOptions) (KickoffResult, error) {
 	result := KickoffResult{Drafts: []KickoffDraft{}, Missing: []string{}, Coverage: []KickoffCoverage{}}
-	promptSource, _ := prompts.ReadFile("prompts/kickoff-v1.txt")
-	fingerprint := engineering.Digest([]any{hooks.SourceHash, p.ConfigID, p.ConfigRevision, p.Model, string(promptSource), engineering.StepInputCatalog().Version})
+	catalog := engineering.StepInputCatalog()
+	promptPath := "prompts/kickoff-v1.txt"
+	selected := map[int]bool{1: true, 2: true, 3: true, 4: true, 5: true}
+	extended := len(options) > 0
+	if extended {
+		catalog = KickoffAgentCatalog()
+		promptPath = "prompts/kickoff-domains-v1.txt"
+		selected = map[int]bool{}
+		for _, domain := range options[0].Domains {
+			selected[KickoffAgentStep(domain)] = true
+		}
+	}
+	lastStep := 5
+	if extended {
+		lastStep = 6
+	}
+	promptSource, _ := prompts.ReadFile(promptPath)
+	fingerprint := engineering.Digest([]any{hooks.SourceHash, p.ConfigID, p.ConfigRevision, p.Model, string(promptSource), catalog.Version})
 	cp := KickoffCheckpoint{Fingerprint: fingerprint, Regions: []KickoffRegion{}, Tasks: map[int]KickoffTaskResult{}, Coverage: []KickoffCoverage{}}
 	if hooks.Resume != nil && hooks.Resume.Version == engineeringCheckpointVersion && hooks.Resume.Kickoff != nil && hooks.Resume.Kickoff.Fingerprint == fingerprint {
 		cp = *hooks.Resume.Kickoff
@@ -156,7 +176,7 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 			input["history"] = boundedEngineeringHistory(history)
 			input["remaining_tool_calls"] = max(0, 6-turn)
 			input["must_finish"] = turn >= 6
-			prompt, _ := prompts.ReadFile("prompts/kickoff-v1.txt")
+			prompt, _ := prompts.ReadFile(promptPath)
 			callPrompt := string(prompt) + "\nTask: " + task
 			if turn >= 6 {
 				callPrompt += "\nNo read/tool calls remain. Return the final route or extraction plan now, with explicit missing_inputs for unresolved facts. Do not request another tool."
@@ -306,7 +326,7 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 			preview := kickoffPreview(s)
 			sheets = append(sheets, preview)
 		}
-		err := ask("route", map[string]any{"sheets": sheets, "steps": engineering.StepInputCatalog()}, func(raw []byte) error {
+		err := ask("route", map[string]any{"sheets": sheets, "steps": catalog}, func(raw []byte) error {
 			var plan struct {
 				Regions []KickoffRegion `json:"regions"`
 				Missing []string        `json:"missing_inputs,omitempty"`
@@ -323,7 +343,7 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 				seen[r.ID] = true
 				covered[r.Sheet] = true
 				for _, step := range r.Steps {
-					if step < 1 || step > 5 {
+					if step < 1 || step > lastStep {
 						return errors.New("INVALID_STEP")
 					}
 				}
@@ -338,7 +358,19 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 			return nil
 		})
 		if err != nil {
-			return result, err
+			if !extended || kickoffAgentFatal(err) {
+				return result, err
+			}
+			cp.Missing = append(cp.Missing, "语义区域路由未完成；保留Parser结构区域供各域独立提取")
+			for _, r := range bom.NewWorkbookIR(safe).InspectWorkbook() {
+				steps := []int{}
+				for step := 1; step <= lastStep; step++ {
+					if selected[step] {
+						steps = append(steps, step)
+					}
+				}
+				cp.Regions = append(cp.Regions, KickoffRegion{ID: r.ID, Sheet: r.Sheet, Bounds: engineering.Bounds{StartRow: r.Start, EndRow: r.End, StartColumn: r.FirstColumn, EndColumn: r.LastColumn}, Steps: steps, Reason: "Parser结构区域；语义分类未完成"})
+			}
 		}
 		if err = artifact("kickoff_import_plan", cp.Regions); err != nil {
 			return result, err
@@ -350,7 +382,10 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 	if err := artifact("kickoff_manifest", map[string]any{"fingerprint": fingerprint, "source_hash": hooks.SourceHash, "model_id": p.Model, "provider_id": p.ConfigID, "provider_revision": p.ConfigRevision, "checkpoint_version": engineeringCheckpointVersion}); err != nil {
 		return result, err
 	}
-	for step := 1; step <= 5; step++ {
+	for step := 1; step <= lastStep; step++ {
+		if !selected[step] {
+			continue
+		}
 		if _, ok := cp.Tasks[step]; ok {
 			continue
 		}
@@ -368,7 +403,7 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 			task.Missing = append(task.Missing, fmt.Sprintf("步骤%d：资料中未发现本步明确依据，请补充建模输入。", step))
 		} else {
 			tables := []engineering.InputTable{}
-			for _, t := range engineering.StepInputCatalog().Tables {
+			for _, t := range catalog.Tables {
 				if t.Step == step {
 					tables = append(tables, t)
 				}
@@ -377,6 +412,13 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 				var proposed KickoffTaskResult
 				if err := kickoffDecode(raw, &proposed); err != nil {
 					return err
+				}
+				if extended {
+					for _, m := range proposed.Mappings {
+						if !strings.HasPrefix(m.Table, "kickoff23/") {
+							return errors.New("KICKOFF23_TARGET_REQUIRED")
+						}
+					}
 				}
 				if err := validateKickoffMappings(original, regions, step, proposed); err != nil {
 					return err
@@ -389,7 +431,7 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 					return result, ctx.Err()
 				}
 				var providerErr *ProviderError
-				if errors.As(err, &providerErr) {
+				if errors.As(err, &providerErr) || kickoffAgentFatal(err) {
 					return result, err
 				}
 				task.Missing = []string{fmt.Sprintf("步骤%d：提取未完成（%s），请补充对应建模输入。", step, err.Error())}
@@ -431,9 +473,15 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 			return result, err
 		}
 	}
+	if extended {
+		original = kickoffAgentFilteredWorkbook(original)
+	}
 	rowsByTable := map[string][][]string{}
 	result.Missing = append(result.Missing, cp.Missing...)
-	for step := 1; step <= 5; step++ {
+	for step := 1; step <= lastStep; step++ {
+		if !selected[step] {
+			continue
+		}
 		task := cp.Tasks[step]
 		result.Missing = append(result.Missing, task.Missing...)
 		for _, mapping := range task.Mappings {
@@ -446,7 +494,32 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 				return KickoffRegion{}
 			}(), mapping)
 			if err != nil {
-				return result, err
+				if !extended {
+					return result, err
+				}
+				result.Missing = append(result.Missing, fmt.Sprintf("%s/%s: expansion failed", KickoffAgentDomain(step), mapping.Region))
+				result.Coverage = append(result.Coverage, KickoffCoverage{Region: mapping.Region, Step: step, State: "needs_input", Reason: "EXPANSION_FAILED"})
+				continue
+			}
+			if extended {
+				candidate := kickoffAgentCandidate(mapping.Table, rows, evidence)
+				for i := range candidate.Evidence {
+					for field, cell := range candidate.Evidence[i].Fields {
+						for _, binding := range mapping.Bindings {
+							if binding.Field == field {
+								cell.Lookup = binding.Lookup
+							}
+						}
+						if v, ok := cp.Verified[cell.Sheet+"!"+cell.Cell]; ok {
+							cell.Formula = true
+							cell.CalculationRunID = v.RunID
+						}
+						candidate.Evidence[i].Fields[field] = cell
+					}
+				}
+				result.Candidates = append(result.Candidates, candidate)
+				// Keep exact coordinates, never cached secrets, in public artifacts.
+				evidence = candidate.Evidence
 			}
 			rowsByTable[mapping.Table] = append(rowsByTable[mapping.Table], rows...)
 			if err = artifact("kickoff_evidence", evidence); err != nil {
@@ -456,10 +529,15 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 		}
 	}
 	for _, r := range cp.Regions {
-		if err := artifact("kickoff_region_coverage", kickoffRegionCoverage(original, r, cp.Tasks)); err != nil {
+		covered := kickoffRegionCoverage(original, r, cp.Tasks)
+		result.SourceCoverage = append(result.SourceCoverage, covered)
+		if err := artifact("kickoff_region_coverage", covered); err != nil {
 			return result, err
 		}
 		for _, step := range r.Steps {
+			if !selected[step] {
+				continue
+			}
 			found := false
 			for _, c := range result.Coverage {
 				if c.Region == r.ID && c.Step == step {
@@ -476,7 +554,10 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 	}
 	// Reuse the verified endpoint identities instead of asking the model to
 	// rediscover them for step 3. This does not supply missing port specs.
-	projected := completeKickoffPortIdentities(rowsByTable)
+	projected := []any{}
+	if !extended {
+		projected = completeKickoffPortIdentities(rowsByTable)
+	}
 	if len(projected) > 0 {
 		result.Missing = append(result.Missing, fmt.Sprintf("端口规格：从端接候选补齐%d个端口身份，介质、连接器和速率仍须来源证据或人工补充。", len(projected)))
 		if err := artifact("kickoff_port_identity_projection", projected); err != nil {
@@ -489,6 +570,9 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 	}
 	sort.Strings(ids)
 	for _, id := range ids {
+		if extended {
+			continue
+		}
 		t, _ := kickoffTable(id)
 		var b bytes.Buffer
 		writer := csv.NewWriter(&b)
@@ -507,6 +591,7 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 	if err := artifact("kickoff_coverage", result.Coverage); err != nil {
 		return result, err
 	}
+	result.Regions = cp.Regions
 	return result, nil
 }
 func kickoffTaskIndex(tasks map[int]KickoffTaskResult) any {
@@ -515,4 +600,196 @@ func kickoffTaskIndex(tasks map[int]KickoffTaskResult) any {
 		out[k] = map[string]any{"mapping_count": len(v.Mappings), "missing_inputs": v.Missing}
 	}
 	return out
+}
+
+// KickoffAgentOptions selects domains without creating another model client or queue.
+type KickoffAgentOptions struct{ Domains []string }
+
+type KickoffAgentNormalizationTick struct {
+	Sheet string `json:"sheet"`
+	Cell  string `json:"cell"`
+	Value string `json:"value"`
+	U     int    `json:"u"`
+}
+type KickoffAgentNormalizationHeader struct {
+	Sheet string `json:"sheet"`
+	Cell  string `json:"cell"`
+	Value string `json:"value"`
+}
+type KickoffAgentNormalizationEvidence struct {
+	Rule            string                            `json:"rule"`
+	Sheet           string                            `json:"sheet,omitempty"`
+	Column          int                               `json:"column,omitempty"`
+	MappingBounds   *engineering.Bounds               `json:"mapping_bounds,omitempty"`
+	RegionBounds    *engineering.Bounds               `json:"region_bounds,omitempty"`
+	Ticks           []KickoffAgentNormalizationTick   `json:"ticks,omitempty"`
+	UnitHeaders     []KickoffAgentNormalizationHeader `json:"unit_headers,omitempty"`
+	StartU          string                            `json:"start_u,omitempty"`
+	HeightU         string                            `json:"height_u,omitempty"`
+	NormalizedValue string                            `json:"normalized_value,omitempty"`
+}
+type KickoffAgentCell struct {
+	Sheet                 string                             `json:"sheet"`
+	Cell                  string                             `json:"cell"`
+	Normalization         string                             `json:"normalization,omitempty"`
+	Classification        string                             `json:"classification,omitempty"`
+	Formula               bool                               `json:"formula"`
+	Lookup                *KickoffLookup                     `json:"lookup,omitempty"`
+	CalculationRunID      string                             `json:"calculationRunId,omitempty"`
+	NormalizationEvidence *KickoffAgentNormalizationEvidence `json:"normalizationEvidence,omitempty"`
+}
+type KickoffAgentEvidence struct {
+	Row          int                         `json:"row"`
+	Region       string                      `json:"region"`
+	Sheet        string                      `json:"sheet"`
+	SourceRow    int                         `json:"sourceRow"`
+	SourceColumn int                         `json:"sourceColumn"`
+	Fields       map[string]KickoffAgentCell `json:"fields"`
+	Missing      []string                    `json:"missing"`
+}
+type KickoffAgentCandidate struct {
+	TableID     string                     `json:"tableId"`
+	Domain      string                     `json:"domain"`
+	Rows        []map[string]string        `json:"rows"`
+	Issues      []engineering.InputProblem `json:"issues"`
+	Evidence    []KickoffAgentEvidence     `json:"evidence"`
+	BaseVersion int                        `json:"baseVersion"`
+}
+
+func KickoffAgentStep(domain string) int {
+	return map[string]int{"equipment": 1, "facility": 2, "cabling": 3, "network": 4, "power": 5, "provisioning": 6}[domain]
+}
+func KickoffAgentDomain(step int) string {
+	return map[int]string{1: "equipment", 2: "facility", 3: "cabling", 4: "network", 5: "power", 6: "provisioning"}[step]
+}
+
+// A namespace explicitly distinguishes the new 23-table field contract from
+// identically named legacy StepInputCatalog tables. No CSV header guessing.
+func KickoffAgentCatalog() engineering.InputCatalog {
+	c := engineering.InputCatalog{Version: "kickoff23-agent/v1", Tables: []engineering.InputTable{}}
+	add := func(id, domain, fields string) {
+		t := engineering.InputTable{ID: "kickoff23/" + id, Step: KickoffAgentStep(domain), Name: id, Fields: []engineering.InputField{}}
+		for _, field := range strings.Split(fields, "|") {
+			t.Fields = append(t.Fields, engineering.InputField{Code: field, Label: field, Kind: "text"})
+		}
+		c.Tables = append(c.Tables, t)
+	}
+	add("devices", "equipment", "serial|label|equipment_type|model")
+	add("ports", "equipment", "serial|port|mac|medium|connector|rate|rate_unit|parent_port|breakout_index|role")
+	add("connections", "equipment", "a_serial|a_port|b_serial|b_port")
+	add("components", "equipment", "parent_serial|serial|label|equipment_type|model|slot")
+	add("rooms", "facility", "room_id|name|site|address|frame|unit")
+	add("racks", "facility", "rack_id|room_id|capacity_u|width_mm|depth_mm|x|y|orientation|frame|unit")
+	add("equipment_specs", "facility", "model|height_u|width_mm|depth_mm|face|panel_ref")
+	add("placements", "facility", "device_id|rack_id|start_u|height_u|face|position")
+	add("management", "network", "device_id|management_ip|bmc_ip|management_port|credential_ref|method")
+	add("network_planes", "network", "fabric|plane|role|architecture|profile")
+	add("network_roles", "network", "device_id|fabric|plane|role")
+	add("network_interfaces", "network", "device_id|port|interface|plane|vlan|vrf|parent_port")
+	add("network_addresses", "network", "device_id|interface|address|asn|pool_ref|source")
+	add("network_bgp", "network", "device_id|interface|peer|peer_address|local_asn|peer_asn|family|bfd_ref")
+	add("network_policies", "network", "scope|profile|roce|ar|evpn|source")
+	add("boot_interfaces", "provisioning", "device_id|port|mac|boot_mode|network|address_policy")
+	add("install_profiles", "provisioning", "scope|architecture|image_ref|disk_policy|bios_ref|firmware_ref|credential_ref")
+	add("route_nodes", "cabling", "code|room_id|x|y|z|unit")
+	add("route_edges", "cabling", "code|from|to|distance_m|category|source")
+	add("rack_access", "cabling", "rack_id|node|lead_m")
+	add("cable_specs", "cabling", "code|medium|connector_a|connector_b|rate|length_m|optic_mode")
+	add("optic_specs", "cabling", "model|port_type|medium|rate|reach_m|source")
+	add("cabling_rules", "cabling", "code|version|strategy|slack_m|slack_percent|cable_spec|source")
+	add("power_profiles", "power", "device_id|power_kw|basis|cooling|source")
+	add("rack_capacity", "power", "rack_id|capacity_kw|cooling|cooling_kw|source")
+	add("power_circuits", "power", "code|rack_id|upstream|circuit|capacity_kw|group")
+	add("power_connections", "power", "device_id|psu|circuit|group|allocation")
+	return c
+}
+func kickoffAgentCandidate(tableID string, rows [][]string, evidence any) KickoffAgentCandidate {
+	t, _ := kickoffTable(tableID)
+	c := KickoffAgentCandidate{TableID: strings.TrimPrefix(tableID, "kickoff23/"), Domain: KickoffAgentDomain(t.Step), Rows: []map[string]string{}, Issues: []engineering.InputProblem{}, Evidence: []KickoffAgentEvidence{}}
+	for _, row := range rows {
+		values := map[string]string{}
+		for i, f := range t.Fields {
+			if i < len(row) {
+				values[f.Code] = row[i]
+			}
+		}
+		if c.Domain != "equipment" {
+			if err := kickoff.ValidateInput(c.TableID, []map[string]string{values}); err != nil {
+				c.Issues = append(c.Issues, engineering.InputProblem{Row: len(c.Rows) + 1, Code: "KICKOFF_INPUT_INVALID", Message: err.Error()})
+			}
+		}
+		c.Rows = append(c.Rows, values)
+	}
+	raw, _ := json.Marshal(evidence)
+	var refs []struct {
+		Row          *int   `json:"row"`
+		Region       string `json:"source_region"`
+		Sheet        string `json:"source_sheet"`
+		SourceRow    int    `json:"source_row"`
+		SourceColumn int    `json:"source_column"`
+		Fields       map[string]struct {
+			Sheet                 string                             `json:"sheet"`
+			Cell                  string                             `json:"cell"`
+			Formula               string                             `json:"formula"`
+			Normalization         string                             `json:"normalization"`
+			Classification        string                             `json:"classification"`
+			NormalizationEvidence *KickoffAgentNormalizationEvidence `json:"normalization_evidence"`
+			NormalizedValue       string                             `json:"normalized_value"`
+		} `json:"fields"`
+		Missing []string `json:"missing_inputs"`
+	}
+	_ = json.Unmarshal(raw, &refs)
+	for _, ref := range refs {
+		row := 0
+		if ref.Row != nil {
+			row = *ref.Row - 1
+		}
+		e := KickoffAgentEvidence{Row: row, Region: ref.Region, Sheet: ref.Sheet, SourceRow: ref.SourceRow, SourceColumn: ref.SourceColumn, Fields: map[string]KickoffAgentCell{}, Missing: ref.Missing}
+		if e.Missing == nil {
+			e.Missing = []string{}
+		}
+		for field, cell := range ref.Fields {
+			if cell.NormalizationEvidence != nil {
+				cell.NormalizationEvidence.NormalizedValue = cell.NormalizedValue
+				if cell.NormalizationEvidence.Sheet == "" {
+					cell.NormalizationEvidence.Sheet = cell.Sheet
+				}
+			}
+			e.Fields[field] = KickoffAgentCell{Sheet: cell.Sheet, Cell: cell.Cell, Formula: cell.Formula != "", Normalization: cell.Normalization, Classification: cell.Classification, NormalizationEvidence: cell.NormalizationEvidence}
+		}
+		c.Evidence = append(c.Evidence, e)
+	}
+	return c
+}
+func kickoffAgentFilteredWorkbook(w bom.Workbook) bom.Workbook {
+	out := w
+	out.Sheets = append([]bom.Sheet{}, w.Sheets...)
+	for i := range out.Sheets {
+		out.Sheets[i].Cells = append([]bom.Cell{}, w.Sheets[i].Cells...)
+		for j := range out.Sheets[i].Cells {
+			c := &out.Sheets[i].Cells[j]
+			if c.Sensitive || bom.Sensitive(c.Value) {
+				c.Value = ""
+				c.Formula = ""
+				c.Sensitive = true
+			}
+		}
+	}
+	return out
+}
+
+func kickoffAgentFatal(err error) bool {
+	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		return true
+	}
+	var providerErr *ProviderError
+	if errors.As(err, &providerErr) {
+		return true
+	}
+	for _, code := range []string{"AI_PROVIDER_NOT_CONFIGURED", "AI_CREDENTIAL_UNAVAILABLE", "PROVIDER_NOT_AVAILABLE", "PROVIDER_ERROR", "PROVIDER_TIMEOUT_OR_UNAVAILABLE", "PROVIDER_RESPONSE_FAILED", "ANALYSIS_STORAGE_UNAVAILABLE", "ANALYSIS_ARTIFACT_HASH_MISMATCH", "ENGINEERING_JOB_CLAIM_LOST"} {
+		if strings.HasPrefix(err.Error(), code) {
+			return true
+		}
+	}
+	return false
 }
