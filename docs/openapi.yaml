@@ -860,6 +860,34 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorEnvelope"
   /projects/{projectId}/kickoff/sources/{sourceId}/analysis/adopt:
+    get:
+      operationId: getKickoffAdoptionStatus
+      tags: [Kickoff]
+      parameters:
+        - *kickoffAction6
+        - name: sourceId
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        "200":
+          description: Latest durable adoption task; no candidate artifact loading
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/KickoffAdoptionTask'
+                  request_id: {type: string}
+                required: [data, request_id]
+        "403": *kickoffAction3
+        "404":
+          description: Source not found in the authorized project
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ErrorEnvelope'}
+
     post:
       operationId: adoptKickoffSourceAnalysis
       tags: [Kickoff]
@@ -876,15 +904,15 @@ paths:
             schema:
               $ref: "#/components/schemas/KickoffAnalysisAdoptRequest"
       responses:
-        "200":
-          description: Project-scoped Agent operation; candidates require explicit adoption
+        "202":
+          description: Adoption queued in durable background worker; inspect source analysis adoption status
           content:
             application/json:
               schema:
                 type: object
                 properties:
                   data:
-                    $ref: "#/components/schemas/KickoffAnalysisAdoption"
+                    $ref: "#/components/schemas/KickoffAdoptionTask"
                   request_id:
                     type: string
                 required: [data, request_id]
@@ -20435,6 +20463,7 @@ components:
       type: object
       additionalProperties: false
       properties:
+        adoption: {$ref: '#/components/schemas/KickoffAdoptionTask'}
         coverageTruncated: {type: boolean}
         missingTruncated: {type: boolean}
         coverageTotal: {type: integer, minimum: 0}
@@ -20466,6 +20495,15 @@ components:
           uniqueItems: true
           items: {type: string}
       required: [jobId, expectedRevision]
+    KickoffAdoptionTask:
+      type: object
+      additionalProperties: false
+      properties:
+        jobId: {type: string}
+        state: {type: string, enum: [pending, running, succeeded, failed]}
+        errorCode: {type: string}
+        result: {$ref: '#/components/schemas/KickoffAnalysisAdoption'}
+      required: [jobId, state]
     KickoffAnalysisAdoption:
       type: object
       additionalProperties: false

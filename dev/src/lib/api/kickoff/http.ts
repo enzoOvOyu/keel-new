@@ -1,6 +1,6 @@
 import { apiRequest } from '../request';
 import { publishPreview } from './provider';
-import type { KickoffAPI, Workspace, ModelRow, Publication, Calculation, ReviewPage, SourceUnderstanding, SourceRegionPreview, PublicationOptions, AnalysisDomain, SourceAnalysis } from './types';
+import type { KickoffAPI, Workspace, ModelRow, Publication, Calculation, ReviewPage, SourceUnderstanding, SourceRegionPreview, PublicationOptions, AnalysisDomain, SourceAnalysis,AdoptionTask } from './types';
 
 export class HttpKickoffProvider implements KickoffAPI {
  private state:Workspace;
@@ -26,11 +26,9 @@ export class HttpKickoffProvider implements KickoffAPI {
  addSources=async(files:File[])=>{try{for(const file of files){const body=new FormData();body.append('file',file);await apiRequest(this.path('/sources'),'POST',body,undefined,this.controller.signal);}}finally{await this.refresh();}};
  startSourceAnalysis=(id:string,domains:AnalysisDomain[])=>apiRequest<{jobId:string;state:string}>(this.path('/sources/'+encodeURIComponent(id)+'/analyze'),'POST',{expectedRevision:this.state.revision,domains},undefined,this.controller.signal);
  sourceAnalysis=(id:string,jobId?:string)=>apiRequest<SourceAnalysis>(this.path('/sources/'+encodeURIComponent(id)+'/analysis'+(jobId?'?jobId='+encodeURIComponent(jobId):'')),'GET',undefined,undefined,this.controller.signal);
- adoptSourceAnalysis=async(id:string,jobId:string,tableIds:string[])=>{
-  const result=await apiRequest<{revision:number;adoptedTableIds:string[];skippedTableIds:string[]}>(this.path('/sources/'+encodeURIComponent(id)+'/analysis/adopt'),'POST',{jobId,tableIds,expectedRevision:this.state.revision});
-  if(!this.controller.signal.aborted)await this.refresh();
-  return result;
- };
+ adoptSourceAnalysis=(id:string,jobId:string,tableIds:string[])=>apiRequest<AdoptionTask>(this.path('/sources/'+encodeURIComponent(id)+'/analysis/adopt'),'POST',{jobId,tableIds,expectedRevision:this.state.revision},undefined,this.controller.signal);
+
+ adoptionStatus=(id:string)=>apiRequest<AdoptionTask|null>(this.path('/sources/'+encodeURIComponent(id)+'/analysis/adopt'),'GET',undefined,undefined,this.controller.signal);
  sourceUnderstanding=(id:string)=>apiRequest<SourceUnderstanding>(this.path('/sources/'+encodeURIComponent(id)+'/understanding'),'GET',undefined,undefined,this.controller.signal);
  reuseSourceHistory=async(id:string)=>{const report=await apiRequest<SourceUnderstanding>(this.path('/sources/'+encodeURIComponent(id)+'/reuse-history'),'POST',{},undefined,this.controller.signal);await this.refresh();return report;};
  sourceRegionPreview=(sourceId:string,regionId:string,offset:number,revisionId:string,view:'source'|'normalized')=>apiRequest<SourceRegionPreview>(this.path('/sources/'+encodeURIComponent(sourceId)+'/regions/'+encodeURIComponent(regionId)+'/preview?'+new URLSearchParams({offset:String(offset),limit:'20',revisionId,view})),'GET',undefined,undefined,this.controller.signal);

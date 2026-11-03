@@ -8,26 +8,22 @@ import {Button,DataTable,Modal,Notice} from './ui';
 const domains:{id:AnalysisDomain;label:string}[]=[{id:'equipment',label:'设备、组件与连接'},{id:'facility',label:'机房与落位'},{id:'cabling',label:'布线规则与物料'},{id:'network',label:'网络规划'},{id:'power',label:'电力与冷却'},{id:'provisioning',label:'装机准备'}];
 const states={idle:'尚未分析',pending:'已排队',running:'正在分析',succeeded:'候选已生成',failed:'分析失败'};
 export function SourceAgentPanel({sourceId,sourceName,onResult,children}:{sourceId:string;sourceName:string;onResult:()=>void;children?:ReactNode}){
- const {api,state:workspace,can,notify,inspect}=useWorkspace();
+ const {api,state:workspace,can,notify,inspect,go}=useWorkspace();
  const [selected,setSelected]=useState<AnalysisDomain[]>(domains.map(d=>d.id));
  const [report,setReport]=useState<SourceAnalysis>(),[error,setError]=useState(''),[busy,setBusy]=useState(false),[retry,setRetry]=useState(0);
  const [tables,setTables]=useState<string[]>([]),[preview,setPreview]=useState<string>();
  const [scopeOpen,setScopeOpen]=useState(false);
  const adoptionKey=['kickoff-adoption',workspace.projectId,sourceId];
  const pending=useMutationState({filters:{mutationKey:adoptionKey,status:'pending'},select:m=>m.state.submittedAt});
- const adopting=pending.length>0;
- const adoption=useMutation({mutationKey:adoptionKey,mutationFn:({jobId,tableIds}:{jobId:string;tableIds:string[]})=>api.adoptSourceAnalysis!(sourceId,jobId,tableIds),onSuccess:result=>{notify(`已采用 ${result.adoptedTableIds.length} 类候选；${result.skippedTableIds.length} 类保持原值`);setTables([]);},onError:e=>setError(e.message)});
-
- const completed=useMutationState({filters:{mutationKey:adoptionKey,status:'success'},select:m=>m.state.submittedAt});
- const completedAt=Math.max(0,...completed);
- useEffect(()=>{if(!completedAt)return;let active=true;void Promise.resolve(api.refresh?.()).then(()=>{if(active){setRetry(v=>v+1);onResult();}}).catch(e=>{if(active)setError(e.message)});return()=>{active=false};},[api,sourceId,completedAt]);
- const failures=useMutationState({filters:{mutationKey:adoptionKey,status:'error'},select:m=>({at:m.state.submittedAt,message:(m.state.error as Error)?.message})});
- const lastFailure=failures.filter(f=>f.at>completedAt).at(-1);
+ const adopting=pending.length>0||report?.adoption?.state==='pending'||report?.adoption?.state==='running';
+ const adoption=useMutation({mutationKey:adoptionKey,mutationFn:({jobId,tableIds}:{jobId:string;tableIds:string[]})=>api.adoptSourceAnalysis!(sourceId,jobId,tableIds),onSuccess:task=>{notify('采用任务已提交，正在后台执行');setReport(v=>v?{...v,adoption:task}:v);setRetry(v=>v+1);},onError:e=>setError(e.message)});
+ useEffect(()=>{if(report?.adoption?.state!=='succeeded')return;let active=true;void Promise.resolve(api.refresh?.()).then(()=>{if(active){onResult();notify(`采用完成：${report.adoption?.result?.adoptedTableIds.length??0} 类候选，可进入数据核对`);}}).catch(e=>{if(active)setError(e.message)});return()=>{active=false};},[api,sourceId,report?.adoption?.jobId,report?.adoption?.state]);
  const supported=/\.xlsx$/i.test(sourceName);
  const running=report?.state==='pending'||report?.state==='running';
  useEffect(()=>{let live=true;let timer:ReturnType<typeof setTimeout>|undefined;let terminalNotified=false;
-  setReport(undefined);setTables([]);setError('');setPreview(undefined);
-  const read=async()=>{try{const value=await api.sourceAnalysis!(sourceId);if(!live)return;setReport(value);if(value.state==='pending'||value.state==='running'){timer=setTimeout(read,2000);}else if(value.state==='succeeded'&&!terminalNotified){terminalNotified=true;const needs=new Set(value.coverage.filter(c=>c.state==='needs_input').map(c=>c.step));setSelected(domains.filter((_,i)=>needs.has(i+1)).map(d=>d.id));setTables(value.drafts.filter(d=>d.rowCount>0).map(d=>d.tableId));onResult();}else if(value.state==='failed'&&!terminalNotified){terminalNotified=true;onResult();}}catch(e){if(live&&(e as Error).name!=='AbortError')setError((e as Error).message);}};
+  setTables([]);setError('');setPreview(undefined);
+  const readAdoption=async()=>{try{const task=await api.adoptionStatus!(sourceId);if(!live)return;if(task)setReport(v=>v?{...v,adoption:task}:v);if(task?.state==='pending'||task?.state==='running')timer=setTimeout(readAdoption,2000);else void read();}catch(e){if(live)setError((e as Error).message)}};
+  const read=async()=>{try{const value=await api.sourceAnalysis!(sourceId);if(!live)return;setReport(value);if(value.state==='pending'||value.state==='running'||value.adoption?.state==='pending'||value.adoption?.state==='running'){timer=setTimeout((value.adoption?.state==='pending'||value.adoption?.state==='running')&&api.adoptionStatus?readAdoption:read,2000);}else if(value.state==='succeeded'&&!terminalNotified){terminalNotified=true;const needs=new Set(value.coverage.filter(c=>c.state==='needs_input').map(c=>c.step));setSelected(domains.filter((_,i)=>needs.has(i+1)).map(d=>d.id));setTables(value.drafts.filter(d=>d.rowCount>0).map(d=>d.tableId));onResult();}else if(value.state==='failed'&&!terminalNotified){terminalNotified=true;onResult();}}catch(e){if(live&&(e as Error).name!=='AbortError')setError((e as Error).message);}};
   if(api.sourceAnalysis)void read();return()=>{live=false;if(timer)clearTimeout(timer)};
  },[api,sourceId,retry]);
  const start=async(scope:AnalysisDomain[])=>{setBusy(true);setError('');try{await api.startSourceAnalysis!(sourceId,scope);setScopeOpen(false);setRetry(v=>v+1);onResult();notify('分析任务已排队；候选生成后仍需确认采用。');}catch(e){setError((e as Error).message);}finally{setBusy(false)}};
@@ -45,10 +41,11 @@ export function SourceAgentPanel({sourceId,sourceName,onResult,children}:{source
    </div>
   </div>
   </div>
-  {(running||adopting)&&<div className="agent-execution-status" role="status"><LoaderCircle size={17} className="agent-spinner"/><div><b>{adopting?'正在采用候选':'Agent 正在识别资料'}</b><p>{adopting?'正在合并候选并保存；可切换页面，返回后继续查看。':'任务在后台执行，结果就绪后展示候选与来源。'}</p><div className="agent-progress" role="progressbar" aria-label={adopting?'候选采用处理中':'资料分析执行中'}><span/></div><small>等待服务端完成，当前未返回百分比</small></div></div>}
+  {(running||adopting)&&<div className="agent-execution-status" role="status"><LoaderCircle size={17} className="agent-spinner"/><div><b>{adopting?'正在采用候选':'Agent 正在识别资料'}</b><p>{adopting?'正在合并候选并保存；可切换页面或刷新，返回后继续查看任务状态。':'任务在后台执行，结果就绪后展示候选与来源。'}</p><div className="agent-progress" role="progressbar" aria-label={adopting?'候选采用处理中':'资料分析执行中'}><span/></div><small>等待服务端完成，当前未返回百分比</small></div></div>}
   {report?.state==='succeeded'&&!adopting&&<p className="agent-completion"><CheckCircle2 size={15}/>识别任务已完成 · {report.drafts.length?`${report.drafts.length} 类候选待核对采用`:'当前无待采用候选'}</p>}
+  {report?.adoption&&<div className="agent-completion" role="status">采用任务 {report.adoption.jobId.slice(0,8)} · {{pending:'排队中',running:'执行中',succeeded:'已完成',failed:'失败'}[report.adoption.state]}{report.adoption.state==='succeeded'&&<Button onClick={()=>go('review')}>去数据核对</Button>}</div>}
   {!supported&&<Notice tone="warning">当前自动分析支持 XLSX；其他格式保留为附件。</Notice>}
-  {(error||lastFailure)&&<Notice tone="error">{error||lastFailure?.message}<Button kind="ghost" onClick={()=>setRetry(v=>v+1)}>重新读取</Button></Notice>}
+  {(error||report?.adoption?.state==='failed')&&<Notice tone="error">{error||apiError(report?.adoption?.errorCode??'KICKOFF_ADOPTION_FAILED')}<Button kind="ghost" onClick={()=>setRetry(v=>v+1)}>重新读取</Button></Notice>}
   {scopeOpen&&<Modal title="选择分析范围" description="只重新识别所选内容，其他结果保留；已有人工确认值不会被自动覆盖。" close={()=>setScopeOpen(false)}>
    <div className="agent-domain-options">{domains.map(d=><label key={d.id}><input type="checkbox" checked={selected.includes(d.id)} onChange={e=>setSelected(v=>e.target.checked?[...v,d.id]:v.filter(x=>x!==d.id))}/>{d.label}</label>)}</div>
    <div className="actions"><Button onClick={()=>setScopeOpen(false)}>取消</Button><Button kind="primary" disabled={!selected.length||busy||running} onClick={()=>void start(selected)}>分析所选内容</Button></div>

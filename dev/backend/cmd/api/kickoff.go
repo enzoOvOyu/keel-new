@@ -100,6 +100,8 @@ func (s *Server) kickoffRoutes(w http.ResponseWriter, r *http.Request) bool {
 		s.kickoffAgentAnalyze(w, r, p[6])
 	case len(p) == 8 && p[5] == "sources" && p[7] == "analysis" && r.Method == "GET":
 		s.kickoffAgentAnalysis(w, r, p[6])
+	case len(p) == 9 && p[5] == "sources" && p[7] == "analysis" && p[8] == "adopt" && r.Method == "GET":
+		s.kickoffAdoptionStatus(w, r, p[6])
 	case len(p) == 9 && p[5] == "sources" && p[7] == "analysis" && p[8] == "adopt" && r.Method == "POST":
 		s.kickoffAgentAdopt(w, r, p[6])
 	case len(p) == 6 && p[5] == "history" && r.Method == "POST":

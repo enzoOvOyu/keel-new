@@ -35,6 +35,7 @@ type kickoffAgentRequest struct {
 	AdoptedTableIDs        []string       `json:"adoptedTableIds,omitempty"`
 }
 type kickoffAgentAnalysisResponse struct {
+	Adoption          *kickoffAdoptionStatus     `json:"adoption,omitempty"`
 	CoverageTotal     int                        `json:"coverageTotal"`
 	MissingTotal      int                        `json:"missingTotal"`
 	CoverageTruncated bool                       `json:"coverageTruncated"`
@@ -233,6 +234,11 @@ func (s *Server) kickoffAgentAnalysis(w http.ResponseWriter, r *http.Request, so
 		kickoffAgentFailure(w, err)
 		return
 	}
+	out.Adoption, err = s.adoptionStatus(r.Context(), source)
+	if err != nil {
+		kickoffAgentFailure(w, err)
+		return
+	}
 	out.JobID = &job
 	out.State = state
 	out.ErrorCode = code
@@ -333,6 +339,9 @@ func (s *Server) runKickoffAgentJob(ctx context.Context, job, claim, source stri
 	}
 	if err := json.Unmarshal(raw, &request); err != nil {
 		return true, err
+	}
+	if request.Kind == kickoffAdoptionKind {
+		return true, s.runKickoffAdoption(ctx, job, claim, raw)
 	}
 	if request.Kind != kickoffAgentKind {
 		return false, nil

@@ -236,7 +236,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["getKickoffAdoptionStatus"];
         put?: never;
         post: operations["adoptKickoffSourceAnalysis"];
         delete?: never;
@@ -7790,6 +7790,7 @@ export interface components {
             reason: string;
         };
         KickoffSourceAnalysis: {
+            adoption?: components["schemas"]["KickoffAdoptionTask"];
             coverageTruncated?: boolean;
             missingTruncated?: boolean;
             coverageTotal?: number;
@@ -7807,6 +7808,13 @@ export interface components {
             jobId: string;
             expectedRevision: number;
             tableIds?: string[];
+        };
+        KickoffAdoptionTask: {
+            jobId: string;
+            /** @enum {string} */
+            state: "pending" | "running" | "succeeded" | "failed";
+            errorCode?: string;
+            result?: components["schemas"]["KickoffAnalysisAdoption"];
         };
         KickoffAnalysisAdoption: {
             revision: number;
@@ -19513,6 +19521,48 @@ export interface operations {
             };
         };
     };
+    getKickoffAdoptionStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                sourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Latest durable adoption task; no candidate artifact loading */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["KickoffAdoptionTask"];
+                        request_id: string;
+                    };
+                };
+            };
+            /** @description Insufficient project or operation permission */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Source not found in the authorized project */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
     adoptKickoffSourceAnalysis: {
         parameters: {
             query?: never;
@@ -19529,14 +19579,14 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Project-scoped Agent operation; candidates require explicit adoption */
-            200: {
+            /** @description Adoption queued in durable background worker; inspect source analysis adoption status */
+            202: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        data: components["schemas"]["KickoffAnalysisAdoption"];
+                        data: components["schemas"]["KickoffAdoptionTask"];
                         request_id: string;
                     };
                 };

@@ -53,9 +53,10 @@ export interface FacilityPublicationOption extends PublicationOption {label:stri
 export interface PublicationOptions {revision:number;devices:PublicationOption[];facilities?:FacilityPublicationOption[]}
 export interface KickoffAPI {
  refresh?():Promise<void>;
+ adoptionStatus?(sourceId:string):Promise<AdoptionTask|null>;
  startSourceAnalysis?(id:string,domains:AnalysisDomain[]):Promise<{jobId:string;state:string}>;
  sourceAnalysis?(id:string,jobId?:string):Promise<SourceAnalysis>;
- adoptSourceAnalysis?(id:string,jobId:string,tableIds:string[]):Promise<{revision:number;adoptedTableIds:string[];skippedTableIds:string[]}>;
+ adoptSourceAnalysis?(id:string,jobId:string,tableIds:string[]):Promise<AdoptionTask>;
 
  publicationOptions(revision:number):Promise<PublicationOptions>;
  sourceUnderstanding(id:string):Promise<SourceUnderstanding>;
@@ -103,4 +104,5 @@ export type AnalysisDomain='equipment'|'facility'|'cabling'|'network'|'power'|'p
 export interface AgentNormalizationEvidence {rule:string;sheet?:string;column?:number;mapping_bounds?:{start_row:number;end_row:number;start_column:number;end_column:number};region_bounds?:{start_row:number;end_row:number;start_column:number;end_column:number};ticks?:{sheet:string;cell:string;value:string;u:number}[];unit_headers?:{sheet:string;cell:string;value:string}[];start_u?:string;height_u?:string;normalized_value?:string}
 export interface AgentFieldEvidence {row:number;region:string;sheet:string;sourceRow:number;sourceColumn:number;fields:Record<string,{sheet:string;cell:string;formula:boolean;normalizationEvidence?:AgentNormalizationEvidence;calculationRunId?:string;lookup?:{sheet:string;key_column:number;value_column:number;start_row:number;end_row:number};normalization?:string;classification?:string}>;missing:string[]}
 export interface AgentDraft {tableId:string;domain:AnalysisDomain;rowCount:number;previewLimit:number;rows:ModelRow[];issues:{row:number;field:string;code:string;message:string}[];baseVersion:number;evidence:AgentFieldEvidence[]}
-export interface SourceAnalysis {coverageTotal?:number;missingTotal?:number;coverageTruncated?:boolean;missingTruncated?:boolean;jobId:string|null;state:'idle'|'pending'|'running'|'succeeded'|'failed';errorCode?:string;domains:AnalysisDomain[];coverage:{region:string;step:number;state:string;rows:number;reason:string}[];missing:string[];drafts:AgentDraft[]}
+export interface AdoptionTask {jobId:string;state:'pending'|'running'|'succeeded'|'failed';errorCode?:string;result?:{revision:number;adoptedTableIds:string[];skippedTableIds:string[]}}
+export interface SourceAnalysis {adoption?:AdoptionTask;coverageTotal?:number;missingTotal?:number;coverageTruncated?:boolean;missingTruncated?:boolean;jobId:string|null;state:'idle'|'pending'|'running'|'succeeded'|'failed';errorCode?:string;domains:AnalysisDomain[];coverage:{region:string;step:number;state:string;rows:number;reason:string}[];missing:string[];drafts:AgentDraft[]}

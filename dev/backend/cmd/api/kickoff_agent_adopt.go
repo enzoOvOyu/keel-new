@@ -1,10 +1,10 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net"
-	"net/http"
 	"sort"
 	"strconv"
 	"strings"
@@ -16,39 +16,29 @@ import (
 	"keel.local/dev/internal/kickoff"
 )
 
-func (s *Server) kickoffAgentAdopt(w http.ResponseWriter, r *http.Request, source string) {
-	if !kickoffAgentPermission(w, r, s.project, "bom:edit") {
-		return
-	}
-	var body struct {
-		JobID            string   `json:"jobId"`
-		ExpectedRevision int      `json:"expectedRevision"`
-		TableIDs         []string `json:"tableIds"`
-	}
-	if !engineeringDecode(w, r, &body) {
-		return
-	}
+type kickoffAdoptBody struct {
+	JobID            string   `json:"jobId"`
+	ExpectedRevision int      `json:"expectedRevision"`
+	TableIDs         []string `json:"tableIds"`
+}
+
+func (s *Server) applyKickoffAdoption(ctx context.Context, source string, body kickoffAdoptBody, actor, task, claim string) (map[string]any, error) {
 	if body.JobID == "" {
-		fail(w, 400, "KICKOFF_AGENT_JOB_REQUIRED")
-		return
+		return nil, errors.New("KICKOFF_AGENT_JOB_REQUIRED")
 	}
-	job, state, _, request, err := s.kickoffAgentJob(r.Context(), source, body.JobID)
+	job, state, _, request, err := s.kickoffAgentJob(ctx, source, body.JobID)
 	if errors.Is(err, pgx.ErrNoRows) {
-		fail(w, 404, "KICKOFF_ANALYSIS_NOT_FOUND")
-		return
+		return nil, errors.New("KICKOFF_ANALYSIS_NOT_FOUND")
 	}
 	if err != nil {
-		kickoffAgentFailure(w, err)
-		return
+		return nil, err
 	}
 	if state != "succeeded" {
-		fail(w, 409, "KICKOFF_ANALYSIS_NOT_READY")
-		return
+		return nil, errors.New("KICKOFF_ANALYSIS_NOT_READY")
 	}
 	var result ai.KickoffResult
-	if err = s.kickoffAgentArtifact(r.Context(), job, "kickoff_domain_result", &result); err != nil {
-		kickoffAgentFailure(w, err)
-		return
+	if err = s.kickoffAgentArtifact(ctx, job, "kickoff_domain_result", &result); err != nil {
+		return nil, err
 	}
 	candidates := map[string]ai.KickoffAgentCandidate{}
 	selected := map[string]bool{}
@@ -62,42 +52,34 @@ func (s *Server) kickoffAgentAdopt(w http.ResponseWriter, r *http.Request, sourc
 	} else {
 		for _, table := range body.TableIDs {
 			if _, ok := candidates[table]; !ok {
-				fail(w, 400, "KICKOFF_AGENT_TABLE_INVALID")
-				return
+				return nil, errors.New("KICKOFF_AGENT_TABLE_INVALID")
 			}
 			selected[table] = true
 		}
 	}
 	if len(selected) == 0 {
-		fail(w, 422, "KICKOFF_AGENT_NO_CANDIDATES")
-		return
+		return nil, errors.New("KICKOFF_AGENT_NO_CANDIDATES")
 	}
-	ctx := r.Context()
 	tx, err := s.db.Begin(ctx)
 	if err != nil {
-		kickoffAgentFailure(w, err)
-		return
+		return nil, err
 	}
 	defer tx.Rollback(ctx)
 	if err = kickoffLock(ctx, tx, s.project, body.ExpectedRevision); err != nil {
-		kickoffAgentFailure(w, err)
-		return
+		return nil, err
 	}
 	var raw []byte
 	var analysisSource string
 	var expectedSource, actualSource int
 	err = tx.QueryRow(ctx, `SELECT j.proposal,j.source_id::text,j.expected_revision,e.revision FROM eng_job j JOIN eng_source e ON e.id=j.source_id WHERE j.id=$1 AND j.project_id=$2 AND j.state='succeeded' FOR UPDATE OF j,e`, job, s.project).Scan(&raw, &analysisSource, &expectedSource, &actualSource)
 	if err != nil {
-		kickoffAgentFailure(w, err)
-		return
+		return nil, err
 	}
 	if err = json.Unmarshal(raw, &request); err != nil {
-		kickoffAgentFailure(w, err)
-		return
+		return nil, err
 	}
 	if request.SourceID != source || request.Kind != kickoffAgentKind {
-		fail(w, 404, "KICKOFF_ANALYSIS_NOT_FOUND")
-		return
+		return nil, errors.New("KICKOFF_ANALYSIS_NOT_FOUND")
 	}
 	already := map[string]bool{}
 	for _, id := range request.AdoptedTableIDs {
@@ -112,20 +94,30 @@ func (s *Server) kickoffAgentAdopt(w http.ResponseWriter, r *http.Request, sourc
 	}
 	if len(selected) == 0 {
 		sort.Strings(skipped)
-		respond(w, 200, map[string]any{"revision": body.ExpectedRevision, "adoptedTableIds": adopted, "skippedTableIds": skipped})
-		return
+		receipt := map[string]any{"revision": body.ExpectedRevision, "adoptedTableIds": adopted, "skippedTableIds": skipped}
+		if task != "" {
+			tag, e := tx.Exec(ctx, `UPDATE eng_job SET proposal=jsonb_set(proposal,'{result}',$4::jsonb),state='succeeded',updated_at=now() WHERE id=$1 AND project_id=$2 AND claim_id=$3 AND state='running'`, task, s.project, claim, jsonBytes(receipt))
+			if e != nil {
+				return nil, e
+			}
+			if tag.RowsAffected() != 1 {
+				return nil, errors.New("ENGINEERING_JOB_CLAIM_LOST")
+			}
+		}
+		if err = tx.Commit(ctx); err != nil {
+			return nil, err
+		}
+		return receipt, nil
 	}
 	if request.AdoptionSourceRevision > 0 {
 		expectedSource = request.AdoptionSourceRevision
 	}
 	if actualSource != expectedSource {
-		fail(w, 409, "REVISION_CONFLICT")
-		return
+		return nil, errors.New("REVISION_CONFLICT")
 	}
 	inputs, err := loadKickoffInputs(ctx, tx, s.project)
 	if err != nil {
-		kickoffAgentFailure(w, err)
-		return
+		return nil, err
 	}
 	current := map[string]kickoff.ModelInput{}
 	for _, input := range inputs {
@@ -133,20 +125,17 @@ func (s *Server) kickoffAgentAdopt(w http.ResponseWriter, r *http.Request, sourc
 	}
 	for table := range selected {
 		if current[table].Version != request.BaseVersions[table] {
-			fail(w, 409, "REVISION_CONFLICT")
-			return
+			return nil, errors.New("REVISION_CONFLICT")
 		}
 	}
 	model, evidence, target, err := s.kickoffModel(ctx, tx)
 	if err != nil {
-		kickoffAgentFailure(w, err)
-		return
+		return nil, err
 	}
 	if target == "" {
-		target, err = s.ensureKickoffDomain(ctx, tx, subjectOf(ctx).ID)
+		target, err = s.ensureKickoffDomain(ctx, tx, actor)
 		if err != nil {
-			kickoffAgentFailure(w, err)
-			return
+			return nil, err
 		}
 	}
 	before := engineering.Digest(model)
@@ -181,9 +170,8 @@ func (s *Server) kickoffAgentAdopt(w http.ResponseWriter, r *http.Request, sourc
 			skipped = append(skipped, table)
 			continue
 		}
-		if _, err = tx.Exec(ctx, `INSERT INTO kickoff_input_revision(project_id,table_id,version,workspace_revision,rows,source,actor) VALUES($1,$2,$3,$4,$5,$6,$7)`, s.project, table, current[table].Version+1, body.ExpectedRevision+1, jsonBytes(rows), "Agent候选人工采用 · "+job, subjectOf(ctx).ID); err != nil {
-			kickoffAgentFailure(w, err)
-			return
+		if _, err = tx.Exec(ctx, `INSERT INTO kickoff_input_revision(project_id,table_id,version,workspace_revision,rows,source,actor) VALUES($1,$2,$3,$4,$5,$6,$7)`, s.project, table, current[table].Version+1, body.ExpectedRevision+1, jsonBytes(rows), "Agent候选人工采用 · "+job, actor); err != nil {
+			return nil, err
 		}
 		adopted = append(adopted, table)
 	}
@@ -193,32 +181,27 @@ func (s *Server) kickoffAgentAdopt(w http.ResponseWriter, r *http.Request, sourc
 		// resolve against the same adopted revision; no automatic publication occurs.
 		inputs, err = loadKickoffInputs(ctx, tx, s.project)
 		if err != nil {
-			kickoffAgentFailure(w, err)
-			return
+			return nil, err
 		}
 		inputs = kickoff.ResolveReferences(model, inputs)
 		if err = kickoff.ApplyInputs(&model, inputs); err != nil {
-			fail(w, 422, "KICKOFF_CANDIDATE_INVALID")
-			return
+			return nil, errors.New("KICKOFF_CANDIDATE_INVALID")
 		}
 		if before != engineering.Digest(model) {
 			var version int
 			var proposalRaw []byte
 			if err = tx.QueryRow(ctx, `SELECT e.revision,r.proposal FROM eng_source e JOIN eng_revision r ON r.id=e.head_revision_id WHERE e.id=$1 AND e.project_id=$2 FOR UPDATE OF e`, target, s.project).Scan(&version, &proposalRaw); err != nil {
-				kickoffAgentFailure(w, err)
-				return
+				return nil, err
 			}
 			var proposal engineering.EngineeringProposal
 			if err = json.Unmarshal(proposalRaw, &proposal); err != nil {
-				kickoffAgentFailure(w, err)
-				return
+				return nil, err
 			}
 			proposal.Summary = "人工采用Kickoff分域候选"
 			var adoptedRevision string
-			adoptedRevision, err = s.saveEngineeringDraftTx(ctx, tx, target, version, "human", subjectOf(ctx).ID, "Kickoff candidate adoption: "+job, engineering.Extraction{Model: model, Evidence: evidence}, proposal)
+			adoptedRevision, err = s.saveEngineeringDraftTx(ctx, tx, target, version, "human", actor, "Kickoff candidate adoption: "+job, engineering.Extraction{Model: model, Evidence: evidence}, proposal)
 			if err != nil {
-				kickoffAgentFailure(w, err)
-				return
+				return nil, err
 			}
 			// Human revision handling adds manual change markers. Keep the immutable
 			// source coordinates as well, rather than replacing them with those markers.
@@ -227,37 +210,41 @@ func (s *Server) kickoffAgentAdopt(w http.ResponseWriter, r *http.Request, sourc
 					continue
 				}
 				if _, err = tx.Exec(ctx, `INSERT INTO eng_evidence(revision_id,entity_id,id,sheet,cell,field,formula,calculation_run_id,source_id) SELECT $1,$2,$3,$4,$5,$6,$7,$8,$9 WHERE EXISTS(SELECT 1 FROM eng_entity_version WHERE revision_id=$1 AND entity_id=$2) ON CONFLICT DO NOTHING`, adoptedRevision, ev.EntityID, ev.ID, ev.Sheet, ev.Cell, ev.Field, ev.Formula, ev.CalculationRunID, ev.SourceID); err != nil {
-					kickoffAgentFailure(w, err)
-					return
+					return nil, err
 				}
 			}
 		}
 		revision++
 		if _, err = tx.Exec(ctx, `UPDATE kickoff_workspace SET revision=$2 WHERE project_id=$1`, s.project, revision); err != nil {
-			kickoffAgentFailure(w, err)
-			return
+			return nil, err
 		}
 		if err = tx.QueryRow(ctx, `SELECT revision FROM eng_source WHERE id=$1 AND project_id=$2`, analysisSource, s.project).Scan(&request.AdoptionSourceRevision); err != nil {
-			kickoffAgentFailure(w, err)
-			return
+			return nil, err
 		}
 		request.AdoptedTableIDs = append(request.AdoptedTableIDs, adopted...)
 		if _, err = tx.Exec(ctx, `UPDATE eng_job SET proposal=$3 WHERE id=$1 AND project_id=$2`, job, s.project, jsonBytes(request)); err != nil {
-			kickoffAgentFailure(w, err)
-			return
+			return nil, err
 		}
 		if err = s.kickoffAudit(ctx, tx, "kickoff.analysis.adopted", source, map[string]any{"jobId": job, "tableIds": adopted, "revision": revision}); err != nil {
-			kickoffAgentFailure(w, err)
-			return
+			return nil, err
+		}
+	}
+	receipt := map[string]any{"revision": revision, "adoptedTableIds": adopted, "skippedTableIds": skipped}
+	if task != "" {
+		tag, e := tx.Exec(ctx, `UPDATE eng_job SET proposal=jsonb_set(proposal,'{result}',$4::jsonb),state='succeeded',updated_at=now() WHERE id=$1 AND project_id=$2 AND claim_id=$3 AND state='running'`, task, s.project, claim, jsonBytes(receipt))
+		if e != nil {
+			return nil, e
+		}
+		if tag.RowsAffected() != 1 {
+			return nil, errors.New("ENGINEERING_JOB_CLAIM_LOST")
 		}
 	}
 	if err = tx.Commit(ctx); err != nil {
-		kickoffAgentFailure(w, err)
-		return
+		return nil, err
 	}
 	sort.Strings(adopted)
 	sort.Strings(skipped)
-	respond(w, 200, map[string]any{"revision": revision, "adoptedTableIds": adopted, "skippedTableIds": skipped})
+	return receipt, nil
 }
 
 func kickoffAgentValidRows(c ai.KickoffAgentCandidate) []map[string]string {
@@ -402,42 +389,58 @@ func kickoffAgentMergePhysical(m *engineering.PhysicalModel, evidence *[]enginee
 	version := func(kind, key string) engineering.EntityVersion {
 		return engineering.EntityVersion{EntityID: engineering.StableID(m.ProjectID, kind, key), Maturity: engineering.Estimated, EvidenceIDs: []string{}, Attributes: []engineering.AttributeValue{}}
 	}
+	deviceIndex := map[string]int{}
+	portIndex := map[string]int{}
+	register := func(index map[string]int, key string, at int) {
+		if key == "" {
+			return
+		}
+		if previous, ok := index[key]; ok && previous != at {
+			index[key] = -2
+		} else {
+			index[key] = at
+		}
+	}
+	for i, d := range m.Equipment {
+		if d.Serial != nil {
+			register(deviceIndex, *d.Serial, i)
+		}
+	}
+	for i, p := range m.Ports {
+		register(portIndex, p.EquipmentID+"\x00"+p.Name, i)
+	}
 	findDevice := func(serial string) int {
-		found := -1
 		if serial == "" {
-			return found
+			return -1
 		}
-		for i, d := range m.Equipment {
-			if d.Serial != nil && *d.Serial == serial {
-				if found != -1 {
-					return -2
-				}
-				found = i
-			}
+		if at, ok := deviceIndex[serial]; ok {
+			return at
 		}
-		return found
+		return -1
 	}
 	findPort := func(device, name string) int {
-		found := -1
-		for i, p := range m.Ports {
-			if p.EquipmentID == device && p.Name == name {
-				if found != -1 {
-					return -2
-				}
-				found = i
-			}
+		if at, ok := portIndex[device+"\x00"+name]; ok {
+			return at
 		}
-		return found
+		return -1
 	}
 	knownEvidence := map[string]bool{}
 	for _, e := range *evidence {
 		knownEvidence[e.ID] = true
 	}
+	evidenceByRow := map[string][]ai.KickoffAgentEvidence{}
+	rowDigests := make([]string, len(c.Rows))
+	for i, row := range c.Rows {
+		rowDigests[i] = engineering.Digest(row)
+	}
+	for _, ref := range c.Evidence {
+		if ref.Row > 0 && ref.Row <= len(rowDigests) {
+			key := rowDigests[ref.Row-1]
+			evidenceByRow[key] = append(evidenceByRow[key], ref)
+		}
+	}
 	addEvidence := func(entity string, row map[string]string) {
-		for _, ref := range c.Evidence {
-			if ref.Row < 1 || ref.Row > len(c.Rows) || engineering.Digest(c.Rows[ref.Row-1]) != engineering.Digest(row) {
-				continue
-			}
+		for _, ref := range evidenceByRow[engineering.Digest(row)] {
 			for field, cell := range ref.Fields {
 				if row[field] == "" || cell.Cell == "" {
 					continue
@@ -503,6 +506,7 @@ func kickoffAgentMergePhysical(m *engineering.PhysicalModel, evidence *[]enginee
 						}
 					}
 					m.Equipment = append(m.Equipment, d)
+					register(deviceIndex, serial, at)
 				}
 			}
 			d := &m.Equipment[at]
@@ -560,6 +564,7 @@ func kickoffAgentMergePhysical(m *engineering.PhysicalModel, evidence *[]enginee
 			if at < 0 {
 				at = len(m.Ports)
 				m.Ports = append(m.Ports, engineering.PlannedPort{EntityVersion: version("port", device+"\x00"+name), EquipmentID: device, Name: name})
+				register(portIndex, device+"\x00"+name, at)
 			}
 			p := &m.Ports[at]
 			if p.MAC == nil && row["mac"] != "" {
