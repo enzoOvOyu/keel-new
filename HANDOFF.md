@@ -46,6 +46,18 @@
 
 本轮TypeScript、Vite、契约检查及只读页面核查通过；未调用Agent、保存输入、导入或确认入库。不新增API、Schema、数据模型或拓扑渲染器。
 
+## Agent定向代码核查（未修改实现、未调用Provider）
+
+定位保持：不规范XLSX → 来源支持的映射/关联候选 → 本地确定性展开与校验 → 人工采用；不承担CMDB发布或拓扑绘制。当前复用Parser、Provider、多轮工具、checkpoint、MinIO及人工采用，不建议重写或再建Agent。
+
+确认的整改点：
+- kickoff-domains-v1.txt第22/24行对U刻度聚合互相矛盾，且仍混入旧五步/旧表名指令；应保留当前kickoff23目录与已实现normalize规则。
+- internal/ai/kickoff_agent.go对ProviderError直接退出，而候选展开和kickoff_domain_result只在全部域循环后生成；前域checkpoint仍在，但后域失败会令已完成域无法在analysis/adopt中使用。需分域产物与失败状态隔离，不自动重复调用Provider。
+- 局部重跑保留其他域checkpoint，但结果只展开selected域；analysis默认只读最新任务，UI未聚合历史域结果。历史未采用候选仍在MinIO却会从当前视图消失。应按同源指纹合并各域最近有效结果，并保留表/源版本核对。
+- kickoff_agent_understanding.go总状态固定partial；明确不适用区域仍在语义分母，无关联时固定partial。完成状态与未完成/不适用需分开，不能以强制PASS解决。
+
+本轮仅静态核对直接调用链，未做真实模型、保存、导入、部署或端到端测试；以上不代表真实MM识别准确率已经验收。既有网络角色发布投影缺口属于发布链，不追加到Agent职责。
+
 ## 智能开局持续部署授权
 
 用户已明确要求：后续智能开局修改完成必要检查后，自动部署到现有5180/8081，无需再次等待发布指令。保留可回退发布，沿用端口、配置和存储；只改前端时不重启未改的API。此授权不等于合并main、导入业务数据、重跑AI或发布其他模块。
