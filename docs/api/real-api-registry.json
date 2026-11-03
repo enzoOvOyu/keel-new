@@ -2226,7 +2226,8 @@
       "errors": "409 stale revision; unknown geometry remains needs_input; identity/endpoint conflicts block affected scope",
       "side_effects": "versioned engineering facts, audit; publication additionally writes transactional Outbox",
       "limitations": "No network execution; planned and observed remain separate",
-      "module": "kickoff"
+      "module": "kickoff",
+      "pending_source_changes": "Before new publication creation, reject already covered same engineering/input versions with 422 KICKOFF_NO_CHANGES or 409 KICKOFF_PUBLICATION_PENDING; no request/response schema changes. Evidence docs/kickoff/PUBLISH-SCOPE-CHECK.json"
     },
     {
       "method": "get",

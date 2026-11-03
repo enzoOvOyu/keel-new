@@ -296,6 +296,24 @@ func (s *Server) kickoffPublish(w http.ResponseWriter, r *http.Request) {
 		kickoffFailure(w, e)
 		return
 	}
+	versions := map[string]int{}
+	for _, input := range inputs {
+		versions[input.TableID] = input.Version
+	}
+	covered, err := kickoffCoveredPublication(ctx, tx, s.project, revision, p.DeviceIDs, versions)
+	if err != nil {
+		fail(w, 500, "KICKOFF_PUBLICATION_UNAVAILABLE")
+		return
+	}
+	if covered == "published" {
+		fail(w, 422, "KICKOFF_NO_CHANGES")
+		return
+	}
+	if covered == "pending" {
+		fail(w, 409, "KICKOFF_PUBLICATION_PENDING")
+		return
+	}
+
 	p.ID = uuid.NewString()
 	p.Actor = subjectOf(ctx).ID
 	p.Reason = body.Reason

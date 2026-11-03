@@ -19044,14 +19044,14 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Workspace revision changed */
+            /** @description REVISION_CONFLICT, IDEMPOTENCY_KEY_REUSED, or KICKOFF_PUBLICATION_PENDING when a prior pending scope covers the same engineering and input versions. */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Invalid object, dependency or input */
+            /** @description Invalid selected scope or KICKOFF_NO_CHANGES when a successful receipt already covers the same engineering revision, input versions, and selected devices. No new publication or Outbox is created. */
             422: {
                 headers: {
                     [name: string]: unknown;

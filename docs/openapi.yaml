@@ -639,8 +639,10 @@ paths:
                   - data
                   - request_id
         "403": *kickoffAction3
-        "409": *kickoffAction4
-        "422": *kickoffAction5
+        "409":
+          description: REVISION_CONFLICT, IDEMPOTENCY_KEY_REUSED, or KICKOFF_PUBLICATION_PENDING when a prior pending scope covers the same engineering and input versions.
+        "422":
+          description: Invalid selected scope or KICKOFF_NO_CHANGES when a successful receipt already covers the same engineering revision, input versions, and selected devices. No new publication or Outbox is created.
   /projects/{projectId}/kickoff/publications/{publicationId}:
     get:
       operationId: getKickoffPublicationReceipt
