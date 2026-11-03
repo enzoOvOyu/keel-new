@@ -1,38 +1,58 @@
 智能开局工程移植实施台账
 
 唯一产品基准：kickoff/src、kickoff/OPTIMIZATION.txt、kickoff/CONTRACTS.txt。
-原型源码继续保留，不回写。集成代码：dev/src/features/kickoff；统一API：dev/src/lib/api/kickoff。
-复用现有App Shell/Router/ProjectContext/RBAC；/p/:projectId/kickoff/*。
+原型保持独立；内容组件复制到dev/src/features/kickoff，API集中在dev/src/lib/api/kickoff。
+复用App Shell、Router、ProjectContext、RBAC；入口/p/:projectId/kickoff/overview；一级菜单“智能开局工程”。
 
-用户最新范围确认：本轮职责截止于数据核对、工程计算、正确录入CMDB并确认入库回执。
-拓扑、Fabric、装机等下游消费的实现与联调不属于本轮任务，也不作为本轮验收前提。
+页面覆盖
+1 overview 启动总览：真实入库版本、能力状态/缺口、建议动作、活动与工作区跳转。
+2 sources 资料与识别：MinIO存储、摘要复用、附件移除、历史区域/工作表、真实来源引用。
+3 review 数据核对：设备/组件/端口/连接/落位，筛选/分页/选择、来源Drawer、局部身份与位置核对。
+4 publish 入库与版本：本次对象闭包、审核确认、Outbox、回执、版本/差异/导出；排队不显示为已入库。
+5 models/facility：机房/场地、机柜/几何、型号参数、设备落位；未知参数保留未知。
+6 models/network：管理接入、域/角色、接口、地址/ASN、协议与策略的版本化输入。
+7 models/provisioning：启动身份、镜像/磁盘/架构等策略输入。
+8 models/cabling：通道/路段/接入、规格/光模块/规则；确定性最短路径、引线、余量、标准长度与分布。
+9 models/power：功率/容量/回路/供电输入，逐柜规划负荷、剩余容量与缺失/超限报告。
+全部23张输入表保留XLSX/CSV预览、未知列反馈、编辑、导入导出；复用原型表格与Modal，不替换为旧页面。
 
-页面清单（全部已复制原型内容组件；真实浏览器视觉验收尚未运行）
-overview 启动总览：API工作区数据读取已接，消费能力及建议动作布局保留。
-sources 资料与识别：MinIO上传、摘要复用、附件移除、读取接口已实现；Agent待开发。
-review 数据核对：五分类表、筛选/分页、来源Drawer、问题确认UI已移植；确认API待实现。
-publish 入库与版本：范围选择、依赖预览、确认、版本及差异UI已移植；真实发布与回执待实现。
-models/facility 机房与机柜：4张表、机柜索引、XLSX/CSV编辑/导入/导出保留。
-models/network 网络与接入：7张表及交互保留。
-models/provisioning 装机准备：2张表及交互保留。
-models/cabling 布线与计算：6张表、路径配置、计算过程/结果/失效状态UI保留；服务端计算待实现。
-models/power 电力与冷却：4张表及负荷/容量UI保留；服务端计算待实现。
+后端与事实
+048：工作区、不可变输入版本、对象来源；049：计算、核对、范围发布、输入/对象引用；050：历史复用溯源；051：冻结机柜/部分位置对象闭包。
+工程实体和稳定ID复用eng_entity及既有类型化工程版本库；新工作区独立编排，不运行旧五步采用/交接门槛。
+设备/组件/端口/连接/机柜/落位从真实工程版本读取。输入通过确定性精确引用关联生效，不能猜测机房、U数或配置。
+网络/装机/电力等工程输入保留版本；CMDB存可追溯配置版本引用，接入/启动/功率事实分层记录为planned。
+CMDB投影复用现有ProjectEngineering；冻结独立范围，事务Outbox/幂等消费，读取资产范围回执后显示published。
+缺空间/线长/功率/完整网络配置不阻断独立有效设备及连接；数量组不伪造成实物。保留原始来源和库存事实。
+项目清理保留审计；新外键适配现有删除事务，不改变其他模块的删除SQL。
+历史复用只读取同项目不可变资料/候选并复制到新工作区；保留资产ID与原修订引用，不调用AI、不覆盖旧工作流。
 
-已实现服务端切片
-GET /projects/{projectId}/kickoff/workspace：一致性快照读取；当前来源/工程输入可读取。
-POST /projects/{projectId}/kickoff/sources：实际对象存储、摘要、附件元数据。
-DELETE /projects/{projectId}/kickoff/sources/{sourceId}：移除未分析附件，原文件和元数据保留。
-PUT /projects/{projectId}/kickoff/models/{tableId}：23张表的后端字段/数值/凭据引用校验、乐观版本、不可变历史。
-迁移048尚未应用在线环境，服务尚未部署。
+API契约
+GET workspace；POST/DELETE sources；PUT models/:tableId；POST calculations；POST issues/:id/resolve；
+POST publications；GET publications/:id；POST history。全部位于/projects/:projectId/kickoff/。
+OpenAPI、前端类型已同步；既有1025个schema及原有路由保留（仅Kickoff schema按新契约更新）。
 
-尚未实现，不得宣称完整闭环
-工作区设备/组件/端口/关系/机柜/问题/计算/发布投影目前为空；不套用演示数据。
-工程输入尚未采用为正式领域实体，不能当作已经改变CMDB。
-对象核对/来源区域读取、确定性计算服务、范围审核发布、Outbox回执、差异。
-Agent最后开发，不复用旧五步流程；只复用明确必要的基础设施和稳定实体身份。
+当前保留的明确边界
+Agent按用户要求最后开发。新资料/analyze返回503 KICKOFF_AGENT_NOT_CONFIGURED；资料保留，不伪造解析结果。
+历史候选复用不等于新Agent/MM识别验收。缺少的工程配置和原始数据仍会显示待补充。
+原型总览的机柜图与空间、Fabric、装机区域必须实现真实状态/缺口/建议动作/跳转；对应现有工作区继续复用。
+真实网络配置、设备执行不属于本轮写入CMDB的实现范围，不声称已执行。
 
-实际验证
-TypeScript检查通过，OpenAPI类型生成通过。
-Go cmd/api编译检查通过；kickoff字段校验定向用例覆盖未知列、缺值、非法尺寸、启动MAC、凭据引用。
-尚未执行真实数据库/对象存储集成检查或主应用视觉验收，未部署，不影响当前在线服务。
-后续每完成一项可验收切片立即提交；仅针对变化运行检查。
+定向检查
+Go计算/字段/机房层级用例通过；隔离数据库+临时MinIO桶验证上传、输入生效、10m独立参考计算、范围入库、
+旧工程发布链路、幂等回执、历史复用及原项目删除顺序；详细结果记录到验收报告。
+主应用浏览器使用真实隔离库快照与协议回放：9页面、23编辑器、Drawer、异步保存、权限/项目隔离、现有项目路由。
+对照未修改的5195原型核查字体、统计条、按钮、表格密度；发现的全局样式影响已限定在Kickoff作用域修正。
+完整构建通过；不以编译通过替代业务验收。部署与真实MM历史验收结果以DEPLOYMENT.json、MM-HISTORY-CHECK.json为准。
+
+MM验收阻断修复
+关系基数使用稳定顺序的资产行锁，避免万级端口耗尽事务advisory锁表；保留同事务原子性和基数检查。
+明确机柜和起始U位独立保留为planned，缺高度/容量时placement_status=needs_input，不计入精确落位数。
+历史回执按当时保存的device/port/component/connection/placement/facility/location闭包重建，不随新选择逻辑变化。
+定向隔离集成已覆盖部分位置落库、未知高度保留、旧回执不受后续48U输入修改影响；MM在线结果另记。
+
+阶段交付
+非Agent工作台及后端闭环已部署5180/8081。MM历史候选复用已得到两笔published回执，位置增量重试0；
+971设备、14308端口、7154双端连接、967条已知位置对应59个机柜的CMDB读回均通过。85机柜候选中26个
+没有本次设备引用，保留在建模输入。完整几何占位0；布线待规则/路径，电力partial，没有伪造安装或计算完成。
+在线主应用4个关键MM页面通过，九页/23表的原型及交互检查见既有UI-CHECK；不重复全平台回归。
+历史候选组件0和4台通用设备仍是上游资料/Agent待补边界；新Agent按约定最后开发，不包含在本阶段验收。

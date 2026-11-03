@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
@@ -17,24 +16,17 @@ import (
 	"time"
 )
 
-type kickoffInput struct {
-	TableID   string              `json:"tableId"`
-	Rows      []map[string]string `json:"rows"`
-	Version   int                 `json:"version"`
-	Confirmed bool                `json:"confirmed"`
-	UpdatedAt time.Time           `json:"updatedAt"`
-	Source    string              `json:"source"`
-}
+type kickoffInput = kickoff.ModelInput
 type kickoffSource struct {
-	ID                string    `json:"id"`
-	Name              string    `json:"name"`
-	Size              string    `json:"size"`
-	Version           int       `json:"version"`
-	State             string    `json:"state"`
-	Hash              string    `json:"hash"`
-	CreatedAt         time.Time `json:"createdAt"`
-	Regions           []any     `json:"regions"`
-	OriginalAvailable bool      `json:"originalAvailable"`
+	ID                string          `json:"id"`
+	Name              string          `json:"name"`
+	Size              string          `json:"size"`
+	Version           int             `json:"version"`
+	State             string          `json:"state"`
+	Hash              string          `json:"hash"`
+	CreatedAt         time.Time       `json:"createdAt"`
+	Regions           []kickoffRegion `json:"regions"`
+	OriginalAvailable bool            `json:"originalAvailable"`
 }
 
 func (s *Server) kickoffRoutes(w http.ResponseWriter, r *http.Request) bool {
@@ -45,7 +37,7 @@ func (s *Server) kickoffRoutes(w http.ResponseWriter, r *http.Request) bool {
 	permission := "bom:read"
 	if r.Method != "GET" {
 		permission = "bom:edit"
-		if p[5] == "sources" {
+		if p[5] == "sources" || p[5] == "history" {
 			permission = "bom:import"
 		}
 		if p[5] == "publications" {
@@ -72,6 +64,20 @@ func (s *Server) kickoffRoutes(w http.ResponseWriter, r *http.Request) bool {
 		s.kickoffUpload(w, r)
 	case len(p) == 7 && p[5] == "sources" && r.Method == "DELETE":
 		s.kickoffRemoveSource(w, r, p[6])
+	case len(p) == 6 && p[5] == "calculations" && r.Method == "POST":
+		s.kickoffCalculate(w, r)
+	case len(p) == 8 && p[5] == "issues" && p[7] == "resolve" && r.Method == "POST":
+		s.kickoffResolve(w, r, p[6])
+	case len(p) == 6 && p[5] == "publications" && r.Method == "POST":
+		s.kickoffPublish(w, r)
+	case len(p) == 7 && p[5] == "publications" && r.Method == "GET":
+		s.kickoffPublication(w, r, p[6])
+	case len(p) == 8 && p[5] == "sources" && p[7] == "analyze" && r.Method == "POST":
+		fail(w, 503, "KICKOFF_AGENT_NOT_CONFIGURED")
+	case len(p) == 6 && p[5] == "history" && r.Method == "POST":
+		s.kickoffHistory(w, r)
+	case len(p) == 8 && p[5] == "publications" && p[7] == "status" && r.Method == "GET":
+		s.kickoffPublicationStatus(w, r, p[6])
 	default:
 		fail(w, 404, "KICKOFF_OPERATION_UNAVAILABLE")
 	}
@@ -91,39 +97,26 @@ func (s *Server) kickoffWorkspace(w http.ResponseWriter, r *http.Request) {
 		fail(w, 500, "KICKOFF_WORKSPACE_UNAVAILABLE")
 		return
 	}
-	inputs := []kickoffInput{}
-	rows, err := tx.Query(ctx, `SELECT DISTINCT ON(table_id) table_id,rows,version,created_at,source FROM kickoff_input_revision WHERE project_id=$1 ORDER BY table_id,version DESC`, s.project)
+	inputs, err := loadKickoffInputs(ctx, tx, s.project)
 	if err != nil {
 		fail(w, 500, "KICKOFF_INPUT_UNAVAILABLE")
 		return
 	}
-	for rows.Next() {
-		var input kickoffInput
-		var raw []byte
-		if err = rows.Scan(&input.TableID, &raw, &input.Version, &input.UpdatedAt, &input.Source); err != nil {
-			break
-		}
-		if err = json.Unmarshal(raw, &input.Rows); err != nil {
-			break
-		}
-		inputs = append(inputs, input)
-	}
-	if err == nil {
-		err = rows.Err()
-	}
-	rows.Close()
+	model, evidence, sourceID, err := s.kickoffModel(ctx, tx)
 	if err != nil {
-		fail(w, 500, "KICKOFF_INPUT_UNAVAILABLE")
+		fail(w, 500, "KICKOFF_MODEL_UNAVAILABLE")
 		return
 	}
+	inputs = kickoff.ResolveReferences(model, inputs)
+	view := kickoff.Project(model, evidence, sourceID, inputs)
 	sources := []kickoffSource{}
-	rows, err = tx.Query(ctx, `SELECT id::text,filename,byte_size,state,sha256,created_at FROM kickoff_source WHERE project_id=$1 AND detached_at IS NULL ORDER BY created_at`, s.project)
+	rows, err := tx.Query(ctx, `SELECT id::text,filename,byte_size,state,sha256,created_at FROM kickoff_source WHERE project_id=$1 AND detached_at IS NULL ORDER BY created_at`, s.project)
 	if err != nil {
 		fail(w, 500, "KICKOFF_SOURCE_UNAVAILABLE")
 		return
 	}
 	for rows.Next() {
-		v := kickoffSource{Version: 1, Regions: []any{}, OriginalAvailable: true}
+		v := kickoffSource{Version: 1, Regions: []kickoffRegion{}, OriginalAvailable: true}
 		var size int64
 		if err = rows.Scan(&v.ID, &v.Name, &size, &v.State, &v.Hash, &v.CreatedAt); err != nil {
 			break
@@ -139,11 +132,33 @@ func (s *Server) kickoffWorkspace(w http.ResponseWriter, r *http.Request) {
 		fail(w, 500, "KICKOFF_SOURCE_UNAVAILABLE")
 		return
 	}
+	for i := range sources {
+		sources[i].Regions, err = loadKickoffRegions(ctx, tx, sources[i].ID)
+		if err != nil {
+			fail(w, 500, "KICKOFF_REGIONS_UNAVAILABLE")
+			return
+		}
+	}
+	calculations, err := loadKickoffCalculations(ctx, tx, s.project)
+	if err != nil {
+		fail(w, 500, "KICKOFF_CALCULATION_UNAVAILABLE")
+		return
+	}
+	publications, err := s.loadKickoffPublications(ctx, tx)
+	if err != nil {
+		fail(w, 500, "KICKOFF_PUBLICATION_UNAVAILABLE")
+		return
+	}
+	activity, err := loadKickoffActivity(ctx, tx, s.project)
+	if err != nil {
+		fail(w, 500, "KICKOFF_ACTIVITY_UNAVAILABLE")
+		return
+	}
 	if err = tx.Commit(ctx); err != nil {
 		fail(w, 500, "KICKOFF_WORKSPACE_UNAVAILABLE")
 		return
 	}
-	respond(w, 200, map[string]any{"schemaVersion": 1, "projectId": s.project, "projectName": name, "revision": revision, "models": inputs, "sources": sources, "devices": []any{}, "ports": []any{}, "connections": []any{}, "components": []any{}, "racks": []any{}, "issues": []any{}, "calculations": []any{}, "publications": []any{}, "activity": []any{}})
+	respond(w, 200, map[string]any{"schemaVersion": 1, "projectId": s.project, "projectName": name, "revision": revision, "models": inputs, "sources": sources, "devices": view.Devices, "ports": view.Ports, "connections": view.Connections, "components": view.Components, "racks": view.Racks, "issues": view.Issues, "calculations": calculations, "publications": publications, "activity": activity})
 }
 func (s *Server) kickoffSaveInput(w http.ResponseWriter, r *http.Request, table string) {
 	var body struct {
@@ -179,6 +194,16 @@ func (s *Server) kickoffSaveInput(w http.ResponseWriter, r *http.Request, table 
 	}
 	var version int
 	err = tx.QueryRow(ctx, `INSERT INTO kickoff_input_revision(project_id,table_id,version,workspace_revision,rows,source,actor) SELECT $1,$2,COALESCE(max(version),0)+1,$3,$4,$5,$6 FROM kickoff_input_revision WHERE project_id=$1 AND table_id=$2 RETURNING version`, s.project, table, revision, jsonBytes(body.Rows), body.Source, subjectOf(ctx).ID).Scan(&version)
+	if err == nil {
+		err = s.applyKickoffInputs(ctx, tx, subjectOf(ctx).ID, body.Source)
+	}
+	if err != nil {
+		fail(w, 422, err.Error())
+		return
+	}
+	if err == nil {
+		err = s.kickoffAudit(ctx, tx, "kickoff.input.saved", table, map[string]any{"version": version, "rows": len(body.Rows)})
+	}
 	if err != nil || tx.Commit(ctx) != nil {
 		fail(w, 500, "KICKOFF_INPUT_UNAVAILABLE")
 		return
@@ -221,6 +246,12 @@ func (s *Server) kickoffUpload(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		_, err = tx.Exec(r.Context(), `UPDATE kickoff_workspace SET revision=revision+1 WHERE project_id=$1`, s.project)
 	}
+	if err == nil {
+		err = s.applyKickoffInputs(r.Context(), tx, subjectOf(r.Context()).ID, "资料接入")
+	}
+	if err == nil {
+		err = s.kickoffAudit(r.Context(), tx, "kickoff.source.attached", id, map[string]any{"bytes": len(raw)})
+	}
 	if err != nil || tx.Commit(r.Context()) != nil {
 		fail(w, 500, "KICKOFF_SOURCE_UNAVAILABLE")
 		return
@@ -247,6 +278,10 @@ func (s *Server) kickoffRemoveSource(w http.ResponseWriter, r *http.Request, id 
 	}
 	if _, err = tx.Exec(ctx, `UPDATE kickoff_workspace SET revision=revision+1 WHERE project_id=$1`, s.project); err != nil {
 		fail(w, 500, "KICKOFF_WORKSPACE_UNAVAILABLE")
+		return
+	}
+	if err = s.kickoffAudit(ctx, tx, "kickoff.source.detached", id, map[string]bool{"retained": true}); err != nil {
+		kickoffFailure(w, err)
 		return
 	}
 	if err = tx.Commit(ctx); err != nil {

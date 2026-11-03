@@ -8,7 +8,7 @@ export function Button({children,kind='secondary',...props}:React.ButtonHTMLAttr
   return <SharedButton type="button" {...props} className={`button ${kind} ${props.className??''}`}>{children}</SharedButton>;
 }
 export function Badge({state,children}:{state:string;children?:ReactNode}) {
-  const labels:Record<string,string>={ready:'可用',partial:'部分就绪',needs_input:'待补充',blocked:'待确认',published:'已入库',recognized:'已识别',awaiting_analysis:'待分析',extracted:'已提取',unmapped:'待映射',source:'原始资料',mapping:'关联提取',manual:'人工确认',calculation:'计算结果',stale:'待重新计算'};
+  const labels:Record<string,string>={ready:'可用',partial:'部分就绪',needs_input:'待补充',blocked:'待确认',published:'已入库',recognized:'已识别',awaiting_analysis:'待分析',extracted:'已提取',unmapped:'待映射',source:'原始资料',mapping:'关联提取',manual:'人工确认',calculation:'计算结果',stale:'待重新计算',pending:'等待CMDB回执',failed:'入库失败'};
   return <span className={`badge ${state}`}><i/>{children??labels[state]??state}</span>;
 }
 export function Heading({eyebrow,title,description,action}:{eyebrow:string;title:string;description:string;action?:ReactNode}) {

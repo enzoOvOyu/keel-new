@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 import type { Evidence, KickoffAPI, Workspace } from './lib/api';
 export interface WorkspaceContextValue {
-  api: KickoffAPI; state: Workspace; go: (route:string)=>void;
+  api: KickoffAPI; state: Workspace; can:(permission:string)=>boolean; go: (route:string)=>void;
   notify: (message:string, error?:boolean)=>void;
   inspect: (kind:'device'|'port'|'connection'|'component'|'evidence', id:string, evidence?:Evidence)=>void;
   run: (message:string, action:()=>unknown)=>Promise<boolean>;

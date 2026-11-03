@@ -1,0 +1,35 @@
+{
+  "status": "PASS",
+  "scope": "pre-Agent typed engineering and CMDB integration",
+  "real_database": true,
+  "real_object_storage": true,
+  "isolated_database_and_bucket_cleaned": true,
+  "real_ai": false,
+  "checks": [
+    "typed input validation and named room/site hierarchy",
+    "6m path + 1m each lead + 2m slack = 10m; matching stock length",
+    "missing power remains unknown; explicit zero honored",
+    "actual XLSX upload and immutable source reference",
+    "modeling input adoption and stale revision rejection",
+    "valid subset queued without invalid device",
+    "transactional Outbox projection and CMDB receipt",
+    "idempotent repeat confirmation",
+    "same-project historical source/candidate replay with stable IDs",
+    "existing engineering physical publication flow",
+    "existing project deletion statement order and retained audit",
+    "reviewed rack/start-U facts commit without unknown height or capacity",
+    "partial placement stays needs_input and is excluded from validated occupancy count",
+    "later geometry input does not mutate an older publication receipt"
+  ],
+  "commands": [
+    "go test ./internal/kickoff",
+    "python3 dev/scripts/check-kickoff-backend.py",
+    "npm run build",
+    "npm run generate:api",
+    "tsc --noEmit"
+  ],
+  "limitations": [
+    "Candidates are prepared synthetic fixtures; no new Agent analysis",
+    "Browser check uses captured backend snapshot and protocol replay; live deployment/MM verification recorded separately"
+  ]
+}

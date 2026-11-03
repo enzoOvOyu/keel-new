@@ -1,0 +1,66 @@
+{
+  "status": "PASS",
+  "project_id": "proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db",
+  "original_source_id": "d0bd91eb-7a87-4990-b41d-965a78af8682",
+  "publication_id": "2164eb1f-651a-44ea-96a5-e49deff2c076",
+  "counts": {
+    "devices": 971,
+    "ports": 14308,
+    "connections": 7154,
+    "components": 0,
+    "racks": 85,
+    "devices_with_rack": 967,
+    "devices_with_start_u": 967,
+    "source_regions": 15
+  },
+  "published": {
+    "components": 0,
+    "connections": 7154,
+    "devices": 971,
+    "placements": 0,
+    "ports": 14308
+  },
+  "stable_ids_preserved": true,
+  "connections_and_port_ownership_verified": true,
+  "cmdb_receipt": "published",
+  "ai_job_counts_before_after": [
+    [
+      0,
+      0
+    ],
+    [
+      0,
+      0
+    ]
+  ],
+  "new_provider_calls": 0,
+  "cmdb_object_coverage": {
+    "facility": 59,
+    "device": 971,
+    "location": 967,
+    "connection": 7154,
+    "port": 14308
+  },
+  "cmdb_connections_with_two_endpoints": 7154,
+  "cmdb_known_rack_start_u": 967,
+  "referenced_racks": 59,
+  "unreferenced_rack_candidates": 26,
+  "calculations": [
+    {
+      "domain": "cabling",
+      "status": "needs_input",
+      "result_rows": 0,
+      "issue_count": 1
+    },
+    {
+      "domain": "power",
+      "status": "partial",
+      "result_rows": 59,
+      "issue_count": 118
+    }
+  ],
+  "limitations": [
+    "Historical typed candidates reused; this is not a new Agent recognition acceptance",
+    "Missing room/capacity/height/path/network/power input remains explicit; planning is not observed installation"
+  ]
+}

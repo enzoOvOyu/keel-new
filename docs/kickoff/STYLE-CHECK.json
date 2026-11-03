@@ -1,0 +1,150 @@
+{
+  "status": "PASS",
+  "comparisons": [
+    {
+      "selector": "h1",
+      "prototype": {
+        "fontSize": "26px",
+        "fontWeight": "650",
+        "lineHeight": "35.1px",
+        "paddingTop": "0px",
+        "paddingRight": "0px",
+        "paddingBottom": "0px",
+        "paddingLeft": "0px",
+        "borderTopWidth": "0px",
+        "borderBottomWidth": "0px",
+        "borderRadius": "0px",
+        "boxShadow": "none"
+      },
+      "integrated": {
+        "fontSize": "26px",
+        "fontWeight": "650",
+        "lineHeight": "35.1px",
+        "paddingTop": "0px",
+        "paddingRight": "0px",
+        "paddingBottom": "0px",
+        "paddingLeft": "0px",
+        "borderTopWidth": "0px",
+        "borderBottomWidth": "0px",
+        "borderRadius": "0px",
+        "boxShadow": "none"
+      }
+    },
+    {
+      "selector": ".stat",
+      "prototype": {
+        "fontSize": "13px",
+        "fontWeight": "400",
+        "lineHeight": "normal",
+        "paddingTop": "0px",
+        "paddingRight": "23px",
+        "paddingBottom": "0px",
+        "paddingLeft": "23px",
+        "borderTopWidth": "0px",
+        "borderBottomWidth": "0px",
+        "borderRadius": "0px",
+        "boxShadow": "none"
+      },
+      "integrated": {
+        "fontSize": "13px",
+        "fontWeight": "400",
+        "lineHeight": "normal",
+        "paddingTop": "0px",
+        "paddingRight": "23px",
+        "paddingBottom": "0px",
+        "paddingLeft": "23px",
+        "borderTopWidth": "0px",
+        "borderBottomWidth": "0px",
+        "borderRadius": "0px",
+        "boxShadow": "none"
+      }
+    },
+    {
+      "selector": ".button.primary",
+      "prototype": {
+        "fontSize": "11px",
+        "fontWeight": "500",
+        "lineHeight": "14.3px",
+        "paddingTop": "8px",
+        "paddingRight": "13px",
+        "paddingBottom": "8px",
+        "paddingLeft": "13px",
+        "borderTopWidth": "1px",
+        "borderBottomWidth": "1px",
+        "borderRadius": "6px",
+        "boxShadow": "rgba(22, 112, 94, 0.043) 0px 2px 3px 0px"
+      },
+      "integrated": {
+        "fontSize": "11px",
+        "fontWeight": "500",
+        "lineHeight": "14.3px",
+        "paddingTop": "8px",
+        "paddingRight": "13px",
+        "paddingBottom": "8px",
+        "paddingLeft": "13px",
+        "borderTopWidth": "1px",
+        "borderBottomWidth": "1px",
+        "borderRadius": "6px",
+        "boxShadow": "rgba(22, 112, 94, 0.043) 0px 2px 3px 0px"
+      }
+    },
+    {
+      "selector": ".heading",
+      "prototype": {
+        "fontSize": "13px",
+        "fontWeight": "400",
+        "lineHeight": "normal",
+        "paddingTop": "0px",
+        "paddingRight": "0px",
+        "paddingBottom": "0px",
+        "paddingLeft": "0px",
+        "borderTopWidth": "0px",
+        "borderBottomWidth": "0px",
+        "borderRadius": "0px",
+        "boxShadow": "none"
+      },
+      "integrated": {
+        "fontSize": "13px",
+        "fontWeight": "400",
+        "lineHeight": "normal",
+        "paddingTop": "0px",
+        "paddingRight": "0px",
+        "paddingBottom": "0px",
+        "paddingLeft": "0px",
+        "borderTopWidth": "0px",
+        "borderBottomWidth": "0px",
+        "borderRadius": "0px",
+        "boxShadow": "none"
+      }
+    },
+    {
+      "selector": "tbody td",
+      "prototype": {
+        "fontSize": "11px",
+        "fontWeight": "400",
+        "lineHeight": "normal",
+        "paddingTop": "12px",
+        "paddingRight": "17px",
+        "paddingBottom": "12px",
+        "paddingLeft": "17px",
+        "borderTopWidth": "0px",
+        "borderBottomWidth": "0px",
+        "borderRadius": "0px",
+        "boxShadow": "none"
+      },
+      "integrated": {
+        "fontSize": "11px",
+        "fontWeight": "400",
+        "lineHeight": "normal",
+        "paddingTop": "12px",
+        "paddingRight": "17px",
+        "paddingBottom": "12px",
+        "paddingLeft": "17px",
+        "borderTopWidth": "0px",
+        "borderBottomWidth": "0px",
+        "borderRadius": "0px",
+        "boxShadow": "none"
+      }
+    }
+  ]
+}

@@ -15,6 +15,16 @@ import (
 // ProjectEngineering consumes an already-reviewed immutable revision. It keeps
 // planning facts in cmdb_field_source; an existing observed payload is untouched.
 func (s Service) ProjectEngineering(ctx context.Context, tx pgx.Tx, event, project, publication, target, actor string, m engineering.PhysicalModel) error {
+	return s.projectEngineering(ctx, tx, event, project, publication, target, actor, m, false)
+}
+
+// ProjectKnownLocations records reviewed rack associations without claiming
+// complete U occupancy. Missing geometry stays unknown and can be supplied later.
+func (s Service) ProjectKnownLocations(ctx context.Context, tx pgx.Tx, event, project, publication, actor string, m engineering.PhysicalModel) error {
+	return s.projectEngineering(ctx, tx, event, project, publication, engineering.PlacementTarget, actor, m, true)
+}
+
+func (s Service) projectEngineering(ctx context.Context, tx pgx.Tx, event, project, publication, target, actor string, m engineering.PhysicalModel, partialLocation bool) error {
 	schema, e := txSchema(ctx, tx)
 	if e != nil {
 		return e
@@ -275,7 +285,7 @@ func (s Service) ProjectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 		}
 		for _, v := range m.Placements {
 			eq, ok := equipment[v.EquipmentID]
-			if !ok || (!v.UsesNonUPosition() && (v.StartU == nil || v.HeightU == nil)) || (v.UsesNonUPosition() && v.PositionCode == "") {
+			if !ok || (!partialLocation && ((!v.UsesNonUPosition() && (v.StartU == nil || v.HeightU == nil)) || (v.UsesNonUPosition() && v.PositionCode == ""))) {
 				return Reject("PLACEMENT_INCOMPLETE", 422)
 			}
 			var kind string
@@ -283,9 +293,18 @@ func (s Service) ProjectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 				return e
 			}
 			attrs := map[string]any{"rack_uid": v.RackID, "rack_id": v.RackID, "mounting_face": v.MountFace, "depth_mm": number(v.DepthMM), "installation_type": v.InstallationType, "position_code": v.PositionCode}
+			if partialLocation {
+				attrs["placement_status"] = "needs_input"
+			} else {
+				attrs["placement_status"] = "validated"
+			}
 			if !v.UsesNonUPosition() {
-				attrs["u_start"] = float64(*v.StartU)
-				attrs["u_height"] = float64(*v.HeightU)
+				if v.StartU != nil && *v.StartU > 0 {
+					attrs["u_start"] = float64(*v.StartU)
+				}
+				if v.HeightU != nil && *v.HeightU > 0 {
+					attrs["u_height"] = float64(*v.HeightU)
+				}
 			}
 			if e = projectAsset(eq.EntityID, kind, eq.Label, attrs); e != nil {
 				return e
@@ -329,7 +348,7 @@ func engineeringPlanningFields(ctx context.Context, tx pgx.Tx, assets []*VisualA
 			return e
 		}
 		switch field {
-		case "rack_uid", "rack_id", "u_start", "u_height", "rack_height", "mounting_face", "depth_mm", "width_mm", "height_mm", "x_mm", "y_mm", "z_mm", "orientation_degrees", "coordinate_frame_id", "parent_port_id", "breakout_index", "rate_bps":
+		case "rack_uid", "rack_id", "u_start", "u_height", "rack_height", "placement_status", "mounting_face", "depth_mm", "width_mm", "height_mm", "x_mm", "y_mm", "z_mm", "orientation_degrees", "coordinate_frame_id", "parent_port_id", "breakout_index", "rate_bps":
 			if previous, ok := a.Fields[field]; ok {
 				old, _ := a.Fields["recorded_geometry"].(map[string]any)
 				if old == nil {

@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "scope": "Authenticated live MM pages on deployed main app; read-only browser checks",
+  "pages": [
+    "overview",
+    "review?category=connections",
+    "publish",
+    "models/cabling"
+  ],
+  "page_errors": [],
+  "http_failures": [],
+  "screenshots": "Private release directory only; no customer records committed"
+}

@@ -38,6 +38,324 @@ tags:
   - name: IA
     description: IA v2.3 project scope and lazy detail contracts
 paths:
+  /projects/{projectId}/kickoff/publications/{publicationId}/status:
+    get:
+      operationId: getKickoffPublicationStatus
+      tags:
+      - Kickoff
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: publicationId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Lightweight publication receipt
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required:
+                    - id
+                    - state
+                    - errorCode
+                    properties:
+                      id:
+                        type: string
+                      state:
+                        type: string
+                        enum:
+                        - pending
+                        - published
+                        - failed
+                      errorCode:
+                        type:
+                        - string
+                        - 'null'
+        '403':
+          description: Insufficient permission
+        '404':
+          description: Publication not found in project
+  /projects/{projectId}/kickoff/history:
+    post:
+      operationId: replayKickoffHistoricalSource
+      tags:
+      - Kickoff
+      description: Reuse an immutable same-project historical source and typed candidates
+        without AI. Requires an empty workspace.
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+              - sourceId
+              - expectedRevision
+              properties:
+                sourceId:
+                  type: string
+                expectedRevision:
+                  type: integer
+                  minimum: 1
+      responses:
+        '201':
+          description: Historical snapshot copied
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    type: object
+                    required:
+                    - sourceId
+                    - originalRevisionId
+                    properties:
+                      sourceId:
+                        type: string
+                      originalRevisionId:
+                        type: string
+        '403':
+          description: Insufficient permission
+        '404':
+          description: Source not in project
+        '409':
+          description: Workspace changed or already started
+  /projects/{projectId}/kickoff/calculations:
+    post:
+      operationId: calculateKickoffEngineering
+      tags:
+        - Kickoff
+      parameters: &kickoffAction1
+        - &kickoffAction6
+          name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                domain:
+                  type: string
+                  enum:
+                    - cabling
+                    - power
+                expectedRevision: &kickoffAction2
+                  type: integer
+                  minimum: 1
+              required:
+                - domain
+                - expectedRevision
+      responses:
+        "201":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: "#/components/schemas/KickoffCalculation"
+                  request_id:
+                    type: string
+                required:
+                  - data
+                  - request_id
+        "403": &kickoffAction3
+          description: Insufficient project or operation permission
+        "409": &kickoffAction4
+          description: Workspace revision changed
+        "422": &kickoffAction5
+          description: Invalid object, dependency or input
+  /projects/{projectId}/kickoff/publications:
+    post:
+      operationId: confirmKickoffPublication
+      tags:
+        - Kickoff
+      parameters: *kickoffAction1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                deviceIds:
+                  type: array
+                  minItems: 1
+                  uniqueItems: true
+                  items:
+                    type: string
+                reason:
+                  type: string
+                  minLength: 1
+                expectedRevision: *kickoffAction2
+              required:
+                - deviceIds
+                - reason
+                - expectedRevision
+      responses:
+        "202":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: "#/components/schemas/KickoffPublication"
+                  request_id:
+                    type: string
+                required:
+                  - data
+                  - request_id
+        "403": *kickoffAction3
+        "409": *kickoffAction4
+        "422": *kickoffAction5
+  /projects/{projectId}/kickoff/publications/{publicationId}:
+    get:
+      operationId: getKickoffPublicationReceipt
+      tags:
+        - Kickoff
+      parameters:
+        - *kickoffAction6
+        - name: publicationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: "#/components/schemas/KickoffPublication"
+                  request_id:
+                    type: string
+                required:
+                  - data
+                  - request_id
+        "403": *kickoffAction3
+        "404":
+          description: Publication not in this project
+  /projects/{projectId}/kickoff/issues/{issueId}/resolve:
+    post:
+      operationId: resolveKickoffIssue
+      tags:
+        - Kickoff
+      parameters:
+        - *kickoffAction6
+        - name: issueId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                value:
+                  type: string
+                expectedRevision: *kickoffAction2
+              required:
+                - value
+                - expectedRevision
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                      resolved:
+                        type: boolean
+                    required:
+                      - resolved
+                  request_id:
+                    type: string
+                required:
+                  - data
+                  - request_id
+        "403": *kickoffAction3
+        "409": *kickoffAction4
+        "422": *kickoffAction5
+  /projects/{projectId}/kickoff/sources/{sourceId}/analyze:
+    post:
+      operationId: analyzeKickoffSource
+      tags:
+        - Kickoff
+      parameters:
+        - *kickoffAction6
+        - name: sourceId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                expectedRevision: *kickoffAction2
+              required:
+                - expectedRevision
+      responses:
+        "403": *kickoffAction3
+        "503":
+          description: Agent not implemented in this delivery slice; source preserved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
   /projects/{projectId}/kickoff/workspace:
     get:
       operationId: getKickoffWorkspace
@@ -137,6 +455,21 @@ paths:
       responses:
         "201":
           description: Stored immutable source reference
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, request_id]
+                properties:
+                  request_id:
+                    type: string
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [id]
+                    properties:
+                      id:
+                        type: string
   /projects/{projectId}/kickoff/sources/{sourceId}:
     delete:
       operationId: detachKickoffSource
@@ -152,6 +485,21 @@ paths:
       responses:
         "200":
           description: Unused attachment detached; immutable source retained
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, request_id]
+                properties:
+                  request_id:
+                    type: string
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [removed]
+                    properties:
+                      removed:
+                        type: boolean
   /cmdb/visualization/subgraph:
     get:
       operationId: getCMDBVisualSubgraph
@@ -18439,6 +18787,7 @@ components:
           enum:
             - server
             - switch
+            - device
         model:
           type: string
         rackId:
@@ -18553,7 +18902,9 @@ components:
         room:
           type: string
         capacityU:
-          type: number
+          oneOf:
+            - type: number
+            - type: "null"
         evidence:
           $ref: "#/components/schemas/KickoffEvidence"
       required:
@@ -18634,6 +18985,8 @@ components:
       type: object
       additionalProperties: false
       properties:
+        action:
+          type: string
         id:
           type: string
         scope:
@@ -18853,6 +19206,14 @@ components:
           type: string
         reason:
           type: string
+        state:
+          type: string
+          enum:
+            - pending
+            - published
+            - failed
+        errorCode:
+          type: string
         deviceIds:
           type: array
           items:
@@ -18899,6 +19260,7 @@ components:
         - createdAt
         - actor
         - reason
+        - state
         - deviceIds
         - portIds
         - connectionIds

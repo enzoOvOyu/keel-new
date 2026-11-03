@@ -20,13 +20,31 @@ FabricWorkspace现在返回null，移除旧网络设备/ZTP/Golden/Doublecheck/P
 
 ## 唯一接续入口 · 2026-11-02 干净开发基线
 
-- **后续开发：`/home/ubuntu/keel-dev`，Git `dev`，应用目录 `dev/`。** `main`同步保留同一整合基线。
-- 已完整合入最新开局ab1bd85与新版作业平台12f8b80/ce1f199，组合代码与当前部署9441a89的整个`dev/`目录完全一致；其后的提交仅整合/清理记录，不是未部署功能。
+- **后续开发：`/home/ubuntu/keel-dev`，Git `dev`，应用目录 `dev/`。** `main`保留稳定整合基线，本轮kickoff新增功能在dev，未合并main。
+- 稳定基线9441a89已整合原开局与新版作业平台。本轮新kickoff继续在dev实现；当前5180/8081运行9a3e03b固定导出，原型5195及其他工作区保留。
 - GitHub `enzoOvOyu/keel-new`及本地仅保留main/dev。14个旧功能/修复/部署分支均已纳入后删除，10个无依赖旧工作区已移除；没有强制推送或删历史。
 - 原`keel-flows-dev`、`keel-kestra-ui-dev`、`keel-visualization-dev`只保留在线原型/依赖包/私有证书配置所需文件，已解除分支关联，**禁止在其中继续开发**。本次不迁移运行服务或删除其依赖。
-- 5180/8081继续运行固定发布9441a89，清理后均200，未重新部署/迁移/导入。原始Excel、私有配置、数据库和部署备份保留。
+- 当前5180/8081已部署新kickoff固定发布9a3e03b，原型仍在5195。迁移048–051已应用；发布前备份及旧9441a89回退保留。详见docs/kickoff/DEPLOYMENT.json。
 - 接续先读本节，再按`docs/REAL-API-CONTRACTS.md`、模块文档和`docs/flows-redesign/implementation.md`定位。不要再参考下方“独立作业分支/旧部署目录继续开发”的历史说明。
 - 清理清单与原分支SHA：`docs/git-baseline-20261102.json`；整合说明：`docs/integration-20261102.md`。既有未验收/真机限制维持原记录。
+
+## 已完成里程碑事件：新kickoff部署及MM历史CMDB闭环验收
+
+新工作台9a3e03b已部署5180/8081，迁移048–051已应用；固定发布和旧环境回退、发布前备份均保留。新9内容页/23表与原型指标对照、隔离Go/PostgreSQL/MinIO集成、在线主应用总览/连接核对/版本/布线页检查通过，截图仅保留私有目录。
+
+复用mm测试既有类型化候选和MinIO原件，无重新全量AI解析；971设备、14308端口、7154双端连接、85机柜候选及15来源区域保留，资产ID不变。首笔及位置增量均published；CMDB逐类回读通过，7154连接各有两个端点，967设备的机柜与起始U位对应59个有设备引用机柜；增量重试0。其余26机柜仍留建模输入，不冒称已发布。
+
+解决真实验收阻断：关系端点使用稳定顺序资产行锁，消除万级事务advisory锁耗尽；已知机柜/start-U先以planned入库，缺高度/容量保持needs_input，不冒称完整占位；冻结facility/location对象闭包，后续补参不改变历史回执。当前精确落位0，布线needs_input，功率partial均真实展示。
+
+本阶段截至非Agent闭环。新Agent仍未开发，分析接口明确503；历史候选组件0、4台通用device待补类型，不以本次历史复用宣称新Agent覆盖完整。没有执行设备/网络/装机动作。实施与证据：docs/kickoff/IMPLEMENTATION.txt、DEPLOYMENT.json、MM-HISTORY-CHECK.json、LIVE-UI-CHECK.json；真实接口台账补齐11项Kickoff操作，合计133项。完成后仅同步dev，不擅自合并main。
+
+## 已完成里程碑事件：新kickoff非Agent基础闭环与原型对照完成
+
+九个内容页、23张输入表、原型Drawer/表格/编辑/导入导出/版本交互均接入现有Shell、Router、ProjectContext、RBAC；旧BOM页面未用于替换原型。新增确定性工程输入生效、计算、范围审核、事务Outbox、CMDB投影/回执、历史候选复用与真实活动。源文件/历史复用原件在MinIO，核心事实继续使用eng_entity及类型化版本库；CMDB存规划事实和工程版本引用，不伪造成Observed。
+
+Go定向用例、隔离库与临时MinIO桶集成、受影响的原工程发布链路通过；覆盖10m参考线长、缺值非零、子集入库、幂等回执、历史复用、项目清理顺序及审计保留。主应用9页、23编辑器、Drawer、异步保存、项目隔离、只读权限和原项目路由通过协议回放检查；相对5195原型的字体、统计条、按钮、表格密度已做实际指标对照。全量TypeScript/Vite构建通过，原有OpenAPI路由和非Kickoff schemas保持不变。
+
+Agent按用户要求暂未开发，/analyze明确503，不伪造新资料解析成功。用户已要求自查后部署，再复用mm测试项目的历史资料/候选验收，不重新全量AI解析。部署及MM位置增量均已通过，见docs/kickoff/DEPLOYMENT.json、MM-HISTORY-CHECK.json。历史候选复用不等于新Agent识别验收。详见docs/kickoff/IMPLEMENTATION.txt、UI-CHECK.json、STYLE-CHECK.json。
 
 ## 已完成里程碑事件：新kickoff内容移植与来源/建模API切片
 
@@ -34,7 +52,7 @@ FabricWorkspace现在返回null，移除旧网络设备/ZTP/Golden/Doublecheck/P
 
 新API按原型契约实现工作区读取、MinIO资料上传/摘要复用/附件移除、23表版本保存。迁移048建立来源/输入暂存，不创建平行资产。OpenAPI及前端类型同步；TypeScript、Go编译及字段校验定向检查通过。未迁移在线库、未部署、未作浏览器视觉验收。
 
-整体任务仍未完成：真实对象投影/核对、领域模型采用、确定性计算、范围入库/Outbox回执/版本尚未接通；Agent按用户要求最后开发。用户最新明确本轮职责截止于正确录入CMDB并确认回执；拓扑、Fabric、装机的下游消费实现与联调不属于本轮范围，不作为验收前提。当前工作区对应对象集合明确为空，不能声称CMDB闭环。逐模块清单见docs/kickoff/IMPLEMENTATION.txt；继续以新原型为唯一业务基准，不读取/套用旧五步流程或旧交接门槛。
+整体任务仍未完成：真实对象投影/核对、领域模型采用、确定性计算、范围入库/Outbox回执/版本尚未接通；Agent按用户要求最后开发。用户最新明确本轮职责截止于正确录入CMDB并确认回执；用户随后进一步明确：原型启动总览的机柜图与空间、Fabric网络交付、装机管理区域必须实现真实状态、缺口、建议动作和路由跳转，依据CMDB入库结果及工程配置；这一块属于本轮验收，复用对应现有工作区。当前工作区对应对象集合明确为空，不能声称CMDB闭环。逐模块清单见docs/kickoff/IMPLEMENTATION.txt；继续以新原型为唯一业务基准，不读取/套用旧五步流程或旧交接门槛。
 
 ## 已完成里程碑事件：智能开局优化方案与独立工作台原型
 
