@@ -32,7 +32,7 @@ func (s *Server) kickoffWorkspaceKey(ctx context.Context, q engineeringQuery, re
 	if err != nil {
 		return "", err
 	}
-	return engineering.Digest([]any{"workspace-read-v2", s.project, revision, name, heads, receipts, sources}), nil
+	return engineering.Digest([]any{"workspace-read-v3", s.project, revision, name, heads, receipts, sources}), nil
 }
 func (s *Server) readKickoffWorkspaceArtifact(ctx context.Context, key string) json.RawMessage {
 	if s.objects == nil || key == "" {
@@ -40,7 +40,7 @@ func (s *Server) readKickoffWorkspaceArtifact(ctx context.Context, key string) j
 	}
 	ctx, cancel := context.WithTimeout(ctx, 350*time.Millisecond)
 	defer cancel()
-	object, err := s.objects.GetObject(ctx, s.bucket, s.project+"/kickoff/derived/workspace-v2.json.gz", minio.GetObjectOptions{})
+	object, err := s.objects.GetObject(ctx, s.bucket, s.project+"/kickoff/derived/workspace-v3.json.gz", minio.GetObjectOptions{})
 	if err != nil {
 		return nil
 	}
@@ -78,7 +78,7 @@ func (s *Server) saveKickoffWorkspaceArtifact(ctx context.Context, key string, p
 	}
 	ctx, cancel := context.WithTimeout(ctx, 350*time.Millisecond)
 	defer cancel()
-	_, _ = s.objects.PutObject(ctx, s.bucket, s.project+"/kickoff/derived/workspace-v2.json.gz", bytes.NewReader(data.Bytes()), int64(data.Len()), minio.PutObjectOptions{ContentType: "application/gzip"})
+	_, _ = s.objects.PutObject(ctx, s.bucket, s.project+"/kickoff/derived/workspace-v3.json.gz", bytes.NewReader(data.Bytes()), int64(data.Len()), minio.PutObjectOptions{ContentType: "application/gzip"})
 }
 
 // Only the large workspace response uses compression; the JSON contract and

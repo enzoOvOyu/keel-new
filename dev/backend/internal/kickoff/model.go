@@ -182,7 +182,14 @@ func project(m engineering.PhysicalModel, ev []engineering.SourceEvidence, sourc
 	}
 	for _, r := range m.Facilities {
 		if r.Kind == "rack" {
-			v.Racks = append(v.Racks, Rack{ID: r.EntityID, Name: r.Label, Room: stringValue(r.ParentID), CapacityU: r.CapacityU, Evidence: evidence(r.EntityID)})
+			label := r.Label
+			if label == "" {
+				label = r.Code
+			}
+			if label == "" {
+				label = "未命名机柜"
+			}
+			v.Racks = append(v.Racks, Rack{ID: r.EntityID, Name: label, Room: stringValue(r.ParentID), CapacityU: r.CapacityU, Evidence: evidence(r.EntityID)})
 		}
 	}
 	if details {

@@ -39,7 +39,7 @@ export function FacilityPanel({ activeRack, selectRack, edit }: { activeRack: st
     }
     // Missing fields remain gaps; actual placement conflicts are reported separately.
     const conflictIssues = s.issues.filter(i => !i.resolved && (i.entityId === r.id || i.scope === 'placement' && devices.some(d => d.id === i.entityId)) &&
-      /冲突|重叠|越界|重复|多个规划|无效/.test(i.title));
+      !/未知|缺少|缺失|待补充|不足以|无法|不能确认/.test(i.title) && /冲突|重叠|越界|超出|重复|多个规划|无效/.test(i.title));
     for (const issue of conflictIssues) if (devices.some(d => d.id === issue.entityId)) conflicts.add(issue.entityId);
     const complete = devices.filter(d => placementReady(s, d) && !conflicts.has(d.id));
     const published = devices.filter(d => s.publications.some(p => p.state === 'published' && p.deviceIds.includes(d.id))).length;
@@ -74,7 +74,7 @@ export function FacilityPanel({ activeRack, selectRack, edit }: { activeRack: st
   };
   return <Section title="机柜与设备归属" caption="按真实字段与实体关系计算覆盖率，点击任一项查看缺口。未引用的机房、机柜保留为候选。" action={<a className="text-link" href={'/racks?project_id=' + encodeURIComponent(s.projectId)} target="_blank" rel="noreferrer">打开机柜工作台（CMDB 已入库）<ArrowUpRight size={14}/></a>}>
     <div className="facility-coverage">{metrics.map(m => <button key={m.id} aria-pressed={filter === m.id} className={filter === m.id ? 'active' : ''} title={m.detail} onClick={() => setFilter(v => v === m.id ? undefined : m.id)}>
-      <span>{m.label}</span><b>{m.done}<em> / {m.total} {m.unit}</em></b><small>{m.total ? `${Math.round(m.done / m.total * 100)}% · ${m.total - m.done} ${m.unit}缺口` : '暂无适用对象'}<ChevronRight size={12}/></small>
+      <span>{m.label}</span><b>{m.done}<em> / {m.total} {m.unit}</em></b><small>{m.total ? `${m.done===m.total?100:Math.floor(m.done / m.total * 1000)/10}% · ${m.total - m.done} ${m.unit}缺口` : '暂无适用对象'}<ChevronRight size={12}/></small>
     </button>)}</div>
     {publicationError && <Notice tone="warning">设施发布状态读取失败：{publicationError}<Button onClick={() => setRetry(v => v + 1)}>重新核对</Button></Notice>}
     {metric && <div className="facility-gap-list"><div className="facility-filter-heading"><span><b>{metric.label}缺口</b> · {metric.detail}</span><div className="actions"><Button disabled={!can('bom:edit')} onClick={() => edit(metric.table)}>补充输入</Button><Button kind="ghost" onClick={() => setFilter(undefined)}>清除筛选</Button></div></div>
