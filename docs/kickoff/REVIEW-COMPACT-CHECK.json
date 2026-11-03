@@ -1,0 +1,58 @@
+{
+  "status": "implemented_verified_not_deployed",
+  "scope": "Local built frontend, synthetic protocol responses; no deployed API or business writes",
+  "checks": [
+    "compact title and single-line real-state summary; no decorative eyebrow/banner",
+    "five entity tabs and all quick filters retained",
+    "single toolbar search/facets/export",
+    "first row above 330px",
+    "all measured desktop row heights 58–64px",
+    "two problem tags and accessible +N menu with remaining findings",
+    "no horizontal overflow in issue sidebar",
+    "10/25/50/100 rows use existing limit/offset",
+    "page size changes reset offset; page two uses selected size",
+    "filters and size preserved on Drawer close",
+    "page size retained across tabs; existing facets and sidebar actions present",
+    "900px layout does not overflow document",
+    "zero page errors or fixture loads"
+  ],
+  "metrics": {
+    "firstRowY": 305.5,
+    "rowHeights": [
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60,
+      60
+    ],
+    "toolbarControlTops": [
+      235,
+      234,
+      234,
+      234,
+      234,
+      232
+    ],
+    "documentWidth": 1440,
+    "viewport": 1440,
+    "asideWidth": 238,
+    "asideScrollWidth": 238
+  },
+  "requests": 15,
+  "pageErrors": 0,
+  "fixtureRequests": 0,
+  "frontend_build": "PASS: npm run build (TypeScript + Vite), final isolated compact header and tab styles",
+  "backend_and_http_contract_changes": false,
+  "business_data_writes": false,
+  "ai_requests": 0,
+  "scope_limit": "Local frontend protocol replay and synthetic visual evidence; not live MM or production browser acceptance. Running environment remains 12af6e4.",
+  "screenshots": [
+    "docs/kickoff/screenshots/review-compact-desktop-synthetic.png",
+    "docs/kickoff/screenshots/review-compact-narrow-synthetic.png"
+  ]
+}

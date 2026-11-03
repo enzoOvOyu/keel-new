@@ -79,3 +79,86 @@
 .kickoff-workspace .detail-port-list{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
 .kickoff-workspace .detail-port-list th,.kickoff-workspace .detail-port-list td{text-align:left;padding:8px;border-bottom:1px solid var(--border)}
 .kickoff-workspace .detail-port-list th{font-size:11px;color:var(--muted);font-weight:500}
+
+/* Compact review workbench: presentation-only overrides, isolated from other pages. */
+.kickoff-workspace .review-workbench{margin-top:-12px;min-width:0}
+.kickoff-workspace .review-workbench-header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:5px 16px;margin-bottom:12px}
+.kickoff-workspace .review-workbench-title{display:flex;align-items:baseline;gap:12px;min-width:0}
+.kickoff-workspace .review-workbench-title h1{margin:0;font-size:20px;line-height:28px;letter-spacing:-.4px;font-weight:650;color:var(--text);white-space:nowrap}
+.kickoff-workspace .review-workbench-title p{margin:0;font-size:12px;line-height:18px;color:#69818f}
+.kickoff-workspace .review-workbench-header>.button{height:30px;padding:5px 11px;font-size:11px}
+.kickoff-workspace .review-status-summary{grid-column:1/-1;display:flex;align-items:center;gap:16px;min-height:20px;font-size:12px;color:#69818f;overflow-x:auto;white-space:nowrap}
+.kickoff-workspace .review-status-summary b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
+.kickoff-workspace .review-status-summary .badge{font-size:10px;padding:2px 5px}
+.kickoff-workspace .review-info{display:inline-flex;align-items:center;color:#81919a;padding:2px;border-radius:3px;flex-shrink:0}
+.kickoff-workspace .review-workbench .review-layout{grid-template-columns:minmax(0,1fr) 240px;gap:12px}
+.kickoff-workspace .review-workbench .review-tabs{padding:0 12px;margin:0}
+.kickoff-workspace .review-workbench .tabs{gap:22px;min-height:34px;margin:0;padding:0}
+.kickoff-workspace .review-workbench .tabs>button{padding:8px 0;font-size:12px;line-height:16px;gap:5px}
+.kickoff-workspace .review-workbench .tabs>button>span{font-size:10px;padding:1px 4px}
+.kickoff-workspace .review-workbench .review-quick-filters{gap:5px;padding:6px 12px;min-height:36px;align-items:center}
+.kickoff-workspace .review-workbench .review-quick-filters button{gap:6px;padding:3px 7px;border-radius:4px;font-size:11px;line-height:16px;border-color:transparent;background:#f4f6f7;color:#617580}
+.kickoff-workspace .review-workbench .review-quick-filters button.active{color:var(--green);background:var(--green-soft);border-color:#b9d7cc}
+.kickoff-workspace .review-workbench .review-quick-filters b{font-size:11px}
+.kickoff-workspace .review-workbench .table-toolbar{padding:6px 12px;min-height:42px;gap:6px;flex-wrap:nowrap;overflow-x:auto;border-top:0}
+.kickoff-workspace .review-workbench .table-toolbar .search-input{width:auto;flex:1 1 200px;min-width:160px;max-width:250px;height:30px;padding:4px 8px;gap:5px}
+.kickoff-workspace .review-workbench .table-toolbar .search-input input{font-size:11px;min-width:0}
+.kickoff-workspace .review-toolbar-facets{display:flex;align-items:center;gap:6px;min-width:0;flex:1 1 auto}
+.kickoff-workspace .review-toolbar-facets label{position:relative;min-width:76px;max-width:132px;flex:1 1 100px}
+.kickoff-workspace .review-toolbar-facets label>span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.kickoff-workspace .review-toolbar-facets select{width:100%;height:30px;border:1px solid var(--border);border-radius:4px;background:white;padding:3px 5px;color:#526d7b;font-size:11px;text-overflow:ellipsis}
+.kickoff-workspace .review-workbench .table-toolbar .button{flex-shrink:0;height:30px;padding:4px 7px;gap:5px;font-size:11px;white-space:nowrap}
+.kickoff-workspace .review-workbench .review-page{min-height:0}
+.kickoff-workspace .review-workbench .review-loading{inset:42px 0 0}
+.kickoff-workspace .review-workbench .table-scroll{max-height:calc(100dvh - 320px);overflow:auto;overscroll-behavior:contain}
+.kickoff-workspace .review-workbench .table-scroll thead{position:sticky;top:0;z-index:1;background:#f7f9fa}
+.kickoff-workspace .review-workbench .table-scroll th{height:32px;padding:6px 10px;font-size:11px;line-height:18px;background:#f7f9fa}
+.kickoff-workspace .review-workbench .table-scroll tbody tr{height:60px}
+.kickoff-workspace .review-workbench .table-scroll td{height:60px;padding:7px 10px;font-size:12px;line-height:18px;box-sizing:border-box;vertical-align:middle}
+.kickoff-workspace .review-workbench .table-name{gap:2px;min-width:0;max-width:190px}
+.kickoff-workspace .review-workbench .table-name>b,.kickoff-workspace .review-workbench .table-name>span,.kickoff-workspace .review-workbench .table-name>small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:18px}
+.kickoff-workspace .review-workbench .table-name small{font-size:11px;line-height:16px}
+.kickoff-workspace .review-workbench .review-row-signals{width:220px;min-width:180px;max-width:220px;gap:3px}
+.kickoff-workspace .review-workbench .review-row-signals>div{flex-wrap:nowrap;min-width:0;gap:4px}
+.kickoff-workspace .review-workbench .review-signal{display:inline-flex;flex:0 1 auto;min-width:0;max-width:104px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:10px;line-height:16px;padding:1px 4px}
+.kickoff-workspace .review-workbench .review-signal svg{flex-shrink:0}
+.kickoff-workspace .review-workbench .review-row-signals>small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:16px;font-size:11px}
+.kickoff-workspace .review-more-signals{padding:1px 4px;font-size:10px;line-height:16px;border:1px solid var(--border);border-radius:4px;color:#526d7b;background:#f4f6f7;flex-shrink:0}
+.kickoff-workspace .review-workbench .review-clear{font-size:11px}
+.kickoff-workspace .review-workbench .source-link{max-width:130px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:11px}
+.kickoff-workspace .review-workbench .pagination{padding:7px 12px;min-height:40px;gap:12px;color:#69818f;font-size:11px;flex-wrap:wrap}
+.kickoff-workspace .review-page-size{display:flex;align-items:center;gap:6px;margin-left:auto;font-size:11px;color:#69818f;white-space:nowrap}
+.kickoff-workspace .review-page-size select{height:26px;min-width:54px;padding:2px 5px;border:1px solid var(--border);border-radius:4px;background:white;font-size:11px;color:var(--text)}
+.kickoff-workspace .review-workbench .review-issues{min-width:0;padding:12px;top:12px;max-height:calc(100dvh - 180px);overflow:auto;overflow-x:hidden;overscroll-behavior:contain}
+.kickoff-workspace .review-workbench .issues-heading{gap:8px;margin-bottom:10px;min-width:0}
+.kickoff-workspace .review-workbench .issues-heading h2{margin:0;font-size:12px;line-height:18px}
+.kickoff-workspace .review-workbench .issue-card{min-width:0;padding:9px;margin-bottom:8px;overflow:hidden}
+.kickoff-workspace .review-workbench .issue-card>div{min-width:0;max-width:100%}
+.kickoff-workspace .review-workbench .issue-card .badge{max-width:100%;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kickoff-workspace .review-workbench .issue-card h3{font-size:12px;line-height:18px;margin:6px 0 3px;overflow-wrap:anywhere}
+.kickoff-workspace .review-workbench .issue-card p{font-size:11px;line-height:16px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:3px 0}
+.kickoff-workspace .review-workbench .issue-card .issue-impact{font-size:11px;line-height:17px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;margin:5px 0}
+.kickoff-workspace .review-workbench .issue-card .button{max-width:100%;font-size:11px;min-height:26px;padding:3px 5px;gap:4px}
+.kickoff-workspace .review-workbench .selection-bar{padding:8px 12px;font-size:12px;gap:10px}
+.review-findings-menu{width:min(340px,calc(100vw - 24px));font-size:12px;color:#263c46}
+.review-findings-menu .review-finding-option{align-items:flex-start;gap:10px;padding:9px;cursor:pointer;white-space:normal}
+.review-findings-menu .review-finding-option>span{min-width:0;flex:1;display:flex;flex-direction:column;gap:4px;overflow-wrap:anywhere}
+.review-findings-menu .review-finding-option b{font-size:12px;font-weight:600;line-height:18px}
+.review-findings-menu .review-finding-option small{font-size:11px;color:#69818f;line-height:17px}
+.review-findings-menu .review-finding-option[data-highlighted]{background:#edf6f2;color:#15715e}
+@media(max-width:1050px){
+ .kickoff-workspace .review-workbench .review-layout{grid-template-columns:minmax(0,1fr)}
+ .kickoff-workspace .review-workbench .review-issues{position:static;max-height:320px}
+ .kickoff-workspace .review-workbench-title{gap:8px}
+ .kickoff-workspace .review-workbench-title p{font-size:11px}
+ .kickoff-workspace .review-workbench .table-scroll{max-height:calc(100dvh - 300px)}
+}
+@media(max-width:760px){
+ .kickoff-workspace .review-workbench-header{gap:5px 8px}
+ .kickoff-workspace .review-workbench-title{align-items:flex-start;flex-direction:column;gap:0}
+ .kickoff-workspace .review-workbench-title h1{font-size:18px;line-height:24px}
+ .kickoff-workspace .review-status-summary{gap:10px;font-size:11px}
+ .kickoff-workspace .review-workbench .table-toolbar .search-input{min-width:170px;flex-shrink:0}
+ .kickoff-workspace .review-toolbar-facets{flex-shrink:0}
+ .kickoff-workspace .review-workbench .table-scroll td{font-size:12px}
+}
