@@ -1,5 +1,5 @@
 {
-  "status": "implemented_verified_deployment_pending",
+  "status": "deployed_live_readonly_ui_verified",
   "scope": "Local built frontend, synthetic protocol responses; no deployed API or business writes",
   "alignment": {
     "titleSize": "26px",
@@ -70,5 +70,29 @@
     "docs/kickoff/screenshots/review-compact-desktop-synthetic.png",
     "docs/kickoff/screenshots/review-compact-narrow-synthetic.png"
   ],
-  "scope_limit": "Synthetic protocol and visual checks; live deployment verification follows release."
+  "scope_limit": "Synthetic layout/protocol checks plus authenticated live MM frontend checks; no business writes or AI calls. API source and process unchanged.",
+  "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+  "live_ui": {
+    "status": "PASS",
+    "scope": "Authenticated live frontend and real API; read-only; no interception or screenshots",
+    "checks": [
+      "standard 26px page title",
+      "three real counters above findings card",
+      "primary tabs update selection and corresponding table columns",
+      "compact header and five-tab review loaded",
+      "default ten real records",
+      "25-record request and rendering",
+      "row heights 58–64px",
+      "sidebar has no horizontal overflow"
+    ],
+    "firstRowY": 336.59375,
+    "titleSize": "26px",
+    "statsAboveFindings": true,
+    "rowHeightRange": [
+      60,
+      60
+    ],
+    "pageErrors": 0,
+    "kickoff_mutations": 0
+  }
 }

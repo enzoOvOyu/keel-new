@@ -1,11 +1,11 @@
 {
-  "code_revision": "82c3c5840834c8af9c209ec60cc2fed632218a57",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-compact-82c3c58",
+  "code_revision": "1e5b298088b8a8d54577325d59097bb0de7c596e",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-navigation-1e5b298",
   "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-review-12af6e4",
   "backend_code_revision": "12af6e4ec606dfcd1a42c9c4773f7ebec8d44f84",
   "backend_source_unchanged": true,
   "api_restarted": false,
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-review-12af6e4",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-compact-82c3c58",
   "ports": [
     5180,
     8081
@@ -13,9 +13,11 @@
   "migrations": [],
   "status": "deployed",
   "binary_sha256": "68656cabd3db5a6477034d096af27cedeae939783f58940b13cbf3aece062e1a",
-  "frontend_index_sha256": "18c1d10045f19c83bfa346e6c7c506416b4a45db83d63dec81190b0977554ff9",
+  "frontend_index_sha256": "5f0d1badd7c3d3aa871ce44203a0e780d262878ba97025cfdcda3660a4179b6e",
   "binary_matches": true,
   "frontend_index_matches": true,
+  "url": "http://localhost:5180/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/kickoff/review",
+  "agent_implemented": false,
   "live_checks": {
     "status": "PASS",
     "startup_http": {
@@ -31,20 +33,23 @@
     "status": "PASS",
     "scope": "Authenticated live frontend and real API; read-only; no interception or screenshots",
     "checks": [
+      "standard 26px page title",
+      "three real counters above findings card",
+      "primary tabs update selection and corresponding table columns",
       "compact header and five-tab review loaded",
       "default ten real records",
       "25-record request and rendering",
       "row heights 58\u201364px",
       "sidebar has no horizontal overflow"
     ],
-    "firstRowY": 305.5,
+    "firstRowY": 336.59375,
+    "titleSize": "26px",
+    "statsAboveFindings": true,
     "rowHeightRange": [
       60,
       60
     ],
     "pageErrors": 0,
     "kickoff_mutations": 0
-  },
-  "url": "http://localhost:5180/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/kickoff/review",
-  "agent_implemented": false
+  }
 }

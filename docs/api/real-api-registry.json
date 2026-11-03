@@ -3,8 +3,8 @@
   "updated_at": "2026-11-03",
   "coverage": "Current module documentation baseline, 2026-11-03: deployed dev 686e9ea; CMDB routes additionally registered by source review only. Per-operation runtime verification is limited to cited evidence. Fabric 6a70041 belongs to a separate paused branch and is not included in this registry.",
   "schema_authority": "docs/openapi.yaml",
-  "code_revision": "82c3c5840834c8af9c209ec60cc2fed632218a57",
-  "deployed_revision": "82c3c5840834c8af9c209ec60cc2fed632218a57",
+  "code_revision": "1e5b298088b8a8d54577325d59097bb0de7c596e",
+  "deployed_revision": "1e5b298088b8a8d54577325d59097bb0de7c596e",
   "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
   "operations": [
     {
@@ -3148,15 +3148,15 @@
       "module": "kickoff"
     }
   ],
-  "development_note": "Current frontend 5180: 82c3c58 compact review; API 8081 unchanged at 12af6e4, not restarted. Existing review limit/offset contract reused. Authenticated live UI checked 10/25 records and row heights. Future kickoff edits auto-deploy to existing environment per user authorization in HANDOFF. No business writes, AI calls or migrations.",
+  "development_note": "Current frontend 5180: 1e5b298 standard review header, primary entity tabs and sidebar counter card; API unchanged at 12af6e4, not restarted. Authenticated live UI verified title, counter placement, entity switching and 25-row rendering. No HTTP/schema/model changes or business writes. Kickoff auto-deployment authorization is recorded in HANDOFF.",
   "last_deployed_changes": {
     "branch": "dev",
-    "base_revision": "12af6e4",
-    "code_revision": "82c3c5840834c8af9c209ec60cc2fed632218a57",
-    "deployed_revision": "82c3c5840834c8af9c209ec60cc2fed632218a57",
+    "base_revision": "82c3c58",
+    "code_revision": "1e5b298088b8a8d54577325d59097bb0de7c596e",
+    "deployed_revision": "1e5b298088b8a8d54577325d59097bb0de7c596e",
     "backend_code_revision": "12af6e4ec606dfcd1a42c9c4773f7ebec8d44f84",
     "deployed": true,
-    "scope": "Frontend-only compact review and page-size settings; HTTP contract unchanged",
+    "scope": "Frontend-only standard review title and top spacing, primary entity navigation, three real counters above findings; existing table interactions retained",
     "state": "deployed_live_readonly_ui_verified",
     "evidence": "docs/kickoff/REVIEW-COMPACT-CHECK.json"
   }
