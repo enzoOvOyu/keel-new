@@ -22,7 +22,7 @@ export function SourceAgentPanel({sourceId,sourceName,onResult,children}:{source
  const pending=useMutationState({filters:{mutationKey:adoptionKey,status:'pending'},select:m=>m.state.submittedAt});
  const adopting=pending.length>0||report?.adoption?.state==='pending'||report?.adoption?.state==='running';
  const adoption=useMutation({mutationKey:adoptionKey,mutationFn:({jobId,tableIds}:{jobId:string;tableIds:string[]})=>api.adoptSourceAnalysis!(sourceId,jobId,tableIds),onSuccess:task=>{notify('采用任务已提交，正在后台执行');setReport(v=>v?{...v,adoption:task}:v);setRetry(v=>v+1);},onError:e=>setError(e.message)});
- useEffect(()=>{if(report?.adoption?.state!=='succeeded')return;let active=true;void Promise.resolve(api.refresh?.()).then(()=>{if(active){onResult();notify(`采用完成：${report.adoption?.result?.adoptedTableIds.length??0} 类候选，可进入数据核对`);}}).catch(e=>{if(active)setError(e.message)});return()=>{active=false};},[api,sourceId,report?.adoption?.jobId,report?.adoption?.state]);
+ useEffect(()=>{if(report?.adoption?.state!=='succeeded')return;let active=true;void Promise.resolve(api.refresh?.()).then(()=>{if(active){onResult();}}).catch(e=>{if(active)setError(e.message)});return()=>{active=false};},[api,sourceId,report?.adoption?.jobId,report?.adoption?.state]);
  const supported=/\.xlsx$/i.test(sourceName);
  const running=report?.state==='pending'||report?.state==='running';
  useEffect(()=>{let live=true;let timer:ReturnType<typeof setTimeout>|undefined;let terminalNotified=false;
