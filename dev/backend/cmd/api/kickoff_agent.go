@@ -7,8 +7,10 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"github.com/google/uuid"
@@ -341,7 +343,18 @@ func (s *Server) runKickoffAgentJob(ctx context.Context, job, claim, source stri
 		return true, err
 	}
 	if request.Kind == kickoffAdoptionKind {
-		return true, s.runKickoffAdoption(ctx, job, claim, raw)
+		err := s.runKickoffAdoption(ctx, job, claim, raw)
+		if err != nil {
+			detail := "ADOPTION_INTERNAL_ERROR"
+			code := err.Error()
+			if regexp.MustCompile(`^[A-Z][A-Z0-9_]+$`).MatchString(code) {
+				detail = code
+			} else {
+				detail = fmt.Sprintf("%T", err)
+			}
+			_ = trace("adoption_failed", "failed", detail)
+		}
+		return true, err
 	}
 	if request.Kind != kickoffAgentKind {
 		return false, nil
