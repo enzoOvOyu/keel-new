@@ -7,7 +7,7 @@
 | 范围 | 当前事实 |
 |---|---|
 | 主开发 | `/home/ubuntu/keel-dev`，分支`dev`，应用目录`dev/`；文档定版已整合；本轮历史资料理解已提交dev并按用户要求发布 |
-| 当前主环境 | 5180前端发布`0239e8a`；8081 API保持`c6d5bc4b61f4e18844903369be64b30d5004dda0`；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json)记录逐设备实际变化筛选与核对处理入口；真实MM只读验证808台禁用、163台待增补可选，无发布写入 |
+| 当前主环境 | 5180前端发布`22d885e`；8081 API发布`1d68a05`；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json)记录逐设备实际变化筛选与核对处理入口；真实MM只读验证808台禁用、163台待增补可选，无发布写入 |
 | Fabric | `/home/ubuntu/keel-fabric-dev`，`feat/fabric-rebuild@6a70041`；5197/8100分支预览，未并入dev；**用户要求暂停，等待上游接入修复通知** |
 | 原型 | Kickoff5195、拓扑/机柜5181、Fabric5194仅设计参考，不是正式事实或执行来源；本次不启停服务 |
 | main与旧目录 | main保留稳定基线；旧Flows/Kestra/visualization detached目录仅残留原型/运行依赖，不在那里继续开发；本次不合并或推送main |
@@ -29,6 +29,12 @@
 ## 未完成功能入口清理（已部署）
 
 保留部署项目、Kickoff、数据中心拓扑/机柜、CMDB、作业平台和完整平台设置。其余13个模块移除Mock子菜单及主路由页面挂载，统一显示“功能建设中”，旧子路由同样进入占位页，不触发legacy fixture加载或原模块轮询。移除通知中心合成告警及全局搜索的Mock工单入口。真实AI Provider旧入口转到平台设置。共享Provider、fixture和领域源码仍为保留模块/测试依赖，不进行整库删除；真实数据库、MinIO及独立Fabric工作区未修改。变更位于app/main.tsx、registry.ts、api/project-scope.ts及GlobalSearch.tsx。最终TypeScript及Vite构建通过；发布前已修复菜单分组结束符。部署目录`/home/ubuntu/.local/state/keel-deployments/module-cleanup-0239e8a`，只切换前端，保留前版静态资源。23个登录态页面入口验收通过：15个占位/旧子路由无fixture请求，8个保留功能入口可加载，浏览器脚本异常0；占位页和拓扑截图已检查。验收记录见部署目录acceptance.json。未执行入库、作业或数据库写入；页面加载不代表全部业务回归。
+
+## 开局性能修复（已部署）
+
+真实页面不再触发Identity外层全量CMDB装载；修复MM切换作业平台连续20余次inventory请求。工程证据按集合读取，设备输入按归属比较，发布对象与CMDB规划字段批量写入，回执用集合校验。工作区派生缓存受项目/输入修订/模型head约束，空闲10分钟、最多3份；入库判断和下游摘要额外核对发布ID/状态，历史区域按源head复用。正式发布仍在事务中重新校验，不用缓存替代审批或回执。
+
+最新真实MM只读测量：冷工作区1978ms、首次范围判断2388ms；重复请求78ms/22ms。四个跨菜单导航无全量inventory/fixture请求、无脚本错误；观察时间含固定600ms等待，不当作绘制耗时。真实MM保持revision12、808无变化/163待增补。隔离PostgreSQL/MinIO完整发布与回执、部分落位、重复提交通过并清理隔离库/桶；未提交真实MM，未测900设备写入吞吐。相关Kickoff/CMDB测试、前端构建通过；更广cmd/api测试存在旧BOM识别测试失败，本次未扩展修复。证据：[性能记录](docs/kickoff/PERFORMANCE-20261103.json)。前端目录kickoff-perf-22d885e、API目录kickoff-perf-1d68a05，旧静态资源保留，无迁移。
 
 ## 验证和接续
 

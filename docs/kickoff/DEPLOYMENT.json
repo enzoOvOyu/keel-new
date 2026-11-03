@@ -1,18 +1,18 @@
 {
-  "code_revision": "0239e8a",
-  "backend_code_revision": "c6d5bc4b61f4e18844903369be64b30d5004dda0",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/module-cleanup-0239e8a",
-  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-actual-changes-c6d5bc4",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-actual-changes-c6d5bc4",
-  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-publish-fdd86dd",
+  "code_revision": "1d68a05",
+  "backend_code_revision": "1d68a05",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-perf-22d885e",
+  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-perf-1d68a05",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/module-cleanup-0239e8a",
+  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-actual-changes-c6d5bc4",
   "ports": [
     5180,
     8081
   ],
   "migrations": [],
-  "api_restarted": false,
-  "binary_sha256": "9c313c8c72184985b93a5456d563d2f2e4cfa8d93cbffaa158cea43397f4a41a",
-  "frontend_index_sha256": "4679945fffaac87f4f8e8611fbd2869455a5ea0f8e851b9c7f9a9563d169c41c",
+  "api_restarted": true,
+  "binary_sha256": "cc1269cd99bbd38e6fe6724bdbfde9b2ac5554322a0c4306cc1a63b96c341172",
+  "frontend_index_sha256": "a301dd146a1ec5e92a24f4efc146318fbfaa32e3de7ba76cf438318af345a8ff",
   "status": "deployed",
   "binary_matches": true,
   "frontend_index_matches": true,
@@ -167,5 +167,7 @@
     ],
     "pageErrors": [],
     "scope": "read-only navigation; no import, publication or job execution"
-  }
+  },
+  "frontend_code_revision": "22d885e",
+  "performance_evidence": "docs/kickoff/PERFORMANCE-20261103.json"
 }

@@ -1,0 +1,59 @@
+{
+  "samples": [
+    {
+      "run": 0,
+      "endpoint": "/workspace",
+      "ms": 1978
+    },
+    {
+      "run": 0,
+      "endpoint": "/publication-options?revision=12",
+      "ms": 2388
+    },
+    {
+      "run": 1,
+      "endpoint": "/workspace",
+      "ms": 78
+    },
+    {
+      "run": 1,
+      "endpoint": "/publication-options?revision=12",
+      "ms": 22
+    }
+  ],
+  "navigation": [
+    {
+      "label": "作业平台",
+      "ms": 672
+    },
+    {
+      "label": "数据中心拓扑",
+      "ms": 654
+    },
+    {
+      "label": "CMDB",
+      "ms": 631
+    },
+    {
+      "label": "部署项目",
+      "ms": 631
+    }
+  ],
+  "errors": [],
+  "inventoryRequests": 0,
+  "status": "PASS",
+  "frontend_revision": "22d885e",
+  "backend_revision": "1d68a05",
+  "baseline_ms": {
+    "workspace": 2115,
+    "publication_options": 3571
+  },
+  "isolated_publication": "PASS: TestKickoffBeforeAgent; independent disposable PostgreSQL database/private MinIO bucket; subset, Outbox receipt, partial location, idempotency",
+  "real_mm_readonly": "PASS: revision 12; 808 unchanged, 163 changed; 14308 ports,7154 connections",
+  "limitations": [
+    "Cold requests after API restart measured separately from warm requests.",
+    "Navigation samples include a fixed 600ms observation wait, not render completion benchmarks.",
+    "No real MM publication was submitted; 900-device write throughput was not measured.",
+    "Full cmd/api suite exposed unrelated TestFullResumeAppliesPreviouslyPartialSheetWithoutProvider failure; targeted Kickoff/CMDB suites passed."
+  ]
+}

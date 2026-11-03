@@ -87,3 +87,7 @@ GET publication-options（getKickoffPublicationOptions，bom:read）在同项目
 核对链接优先以SN定位；数据核对“处理”列不再留横线：有事项调用原处理流程，无事项提供“查看详情”。这不把没有待处理事项解释为运行健康。
 
 实际MM只读检查：971台中808台无变化禁用、163台待增补可选；核对跳转后处理列有有效操作。项目修订12/发布记录3未变；没有真实发布写入验收。
+
+### 2026-11-03 性能实现说明
+
+HTTP字段与业务校验不变。按项目、工程head及workspace修订复用有界派生读模型（最多3份，空闲10分钟）；publication-options与capabilities还核对发布ID/回执状态，避免pending→published后复用旧结果。历史区域按source/head复用。发布事务继续实时验证，批量SQL不放宽项目隔离、来源、Outbox及回执门槛。真实验证和冷/热耗时见[性能记录](../kickoff/PERFORMANCE-20261103.json)。
