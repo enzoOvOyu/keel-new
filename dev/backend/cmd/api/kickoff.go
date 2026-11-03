@@ -292,7 +292,20 @@ func (s *Server) kickoffWorkspace(w http.ResponseWriter, r *http.Request) {
 			ready--
 		}
 	}
-	capabilities, err := s.kickoffCapabilities(ctx, tx, len(view.Devices), servers, ready)
+	ledgerKey := ""
+	for _, publication := range publications {
+		ledgerKey += publication.ID + ":" + publication.State + ";"
+	}
+	snapshot.capabilitiesMu.Lock()
+	capabilities := snapshot.capabilities
+	if capabilities == nil || snapshot.capabilitiesKey != ledgerKey {
+		capabilities, err = s.kickoffCapabilities(ctx, tx, len(view.Devices), servers, ready)
+		if err == nil {
+			snapshot.capabilities = capabilities
+			snapshot.capabilitiesKey = ledgerKey
+		}
+	}
+	snapshot.capabilitiesMu.Unlock()
 	if err != nil {
 		fail(w, 500, "KICKOFF_CAPABILITIES_UNAVAILABLE")
 		return

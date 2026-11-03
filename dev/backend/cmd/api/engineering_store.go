@@ -51,6 +51,9 @@ func (s *Server) attachEngineering(ctx context.Context, importID, actor string, 
 }
 
 func engineeringModel(ctx context.Context, q engineeringQuery, revision, project string) (engineering.PhysicalModel, []engineering.SourceEvidence, error) {
+	return loadEngineeringModel(ctx, q, revision, project, true)
+}
+func loadEngineeringModel(ctx context.Context, q engineeringQuery, revision, project string, withEvidence bool) (engineering.PhysicalModel, []engineering.SourceEvidence, error) {
 	m := engineering.EmptyPhysical(project)
 	evidence := []engineering.SourceEvidence{}
 	var authorized bool
@@ -71,8 +74,12 @@ func engineeringModel(ctx context.Context, q engineeringQuery, revision, project
 		case "eng_placement":
 			extra = `, 'depth_mm',t.depth_mm::text`
 		}
+		evidenceFilter := "revision_id=$1"
+		if !withEvidence {
+			evidenceFilter = "false"
+		}
 		var raw []byte
-		sql := `WITH evidence AS MATERIALIZED (SELECT entity_id,jsonb_agg(id ORDER BY id) AS ids FROM eng_evidence WHERE revision_id=$1 GROUP BY entity_id) SELECT COALESCE(jsonb_agg(jsonb_strip_nulls(to_jsonb(t)||jsonb_build_object('provenance_id',v.provenance_id,'maturity',v.maturity,'attributes','[]'::jsonb,'evidence_ids',COALESCE(e.ids,'[]'::jsonb)` + extra + `)) ORDER BY t.entity_id),'[]'::jsonb) FROM ` + entry.table + ` t JOIN eng_entity_version v USING(revision_id,entity_id) LEFT JOIN evidence e ON e.entity_id=t.entity_id WHERE t.revision_id=$1`
+		sql := `WITH evidence AS MATERIALIZED (SELECT entity_id,jsonb_agg(id ORDER BY id) AS ids FROM eng_evidence WHERE ` + evidenceFilter + ` GROUP BY entity_id) SELECT COALESCE(jsonb_agg(jsonb_strip_nulls(to_jsonb(t)||jsonb_build_object('provenance_id',v.provenance_id,'maturity',v.maturity,'attributes','[]'::jsonb,'evidence_ids',COALESCE(e.ids,'[]'::jsonb)` + extra + `)) ORDER BY t.entity_id),'[]'::jsonb) FROM ` + entry.table + ` t JOIN eng_entity_version v USING(revision_id,entity_id) LEFT JOIN evidence e ON e.entity_id=t.entity_id WHERE t.revision_id=$1`
 		if e := q.QueryRow(ctx, sql, revision).Scan(&raw); e != nil {
 			return m, evidence, e
 		}
@@ -94,6 +101,9 @@ func engineeringModel(ctx context.Context, q engineeringQuery, revision, project
 	}
 	if e := loadEngineeringAttributes(ctx, q, revision, &m); e != nil {
 		return m, evidence, e
+	}
+	if !withEvidence {
+		return m, evidence, nil
 	}
 	rows, e := q.Query(ctx, `SELECT id::text,entity_id::text,sheet,cell,field,formula,calculation_run_id::text,source_id::text FROM eng_evidence WHERE revision_id=$1 ORDER BY id`, revision)
 	if e != nil {

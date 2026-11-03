@@ -170,7 +170,7 @@ func (s *Server) kickoffPublicationDeviceOptions(ctx context.Context, q engineer
 		}
 		model, ok := models[record.head]
 		if !ok {
-			model, _, err = engineeringModel(ctx, q, record.head, s.project)
+			model, _, err = loadEngineeringModel(ctx, q, record.head, s.project, false)
 			if err != nil {
 				return result, err
 			}

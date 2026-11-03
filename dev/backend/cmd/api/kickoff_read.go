@@ -20,6 +20,9 @@ var kickoffReads = struct {
 }{entries: map[string]*kickoffRead{}}
 
 type kickoffRead struct {
+	capabilitiesMu             sync.Mutex
+	capabilitiesKey            string
+	capabilities               []map[string]any
 	mu                         sync.Mutex
 	at                         time.Time
 	model                      engineering.PhysicalModel
