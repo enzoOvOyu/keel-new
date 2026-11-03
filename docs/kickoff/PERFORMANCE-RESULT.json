@@ -86,6 +86,28 @@
       "dependency": "existing golang.org/x/sync v0.23.0",
       "context_cancel": "errgroup.WithContext; final visualEnd uses original ctx",
       "limits": "single before/after samples; not P95; remains above proposed 2s target"
+    },
+    "physical_root_regression": {
+      "passed": true,
+      "elapsed_ms": 1726.807,
+      "view": "physical",
+      "depth": 2,
+      "limit": 1,
+      "root_ports": 2,
+      "db_contains_ports": 2,
+      "assets": 8,
+      "relations": 7,
+      "cables": 1,
+      "truncated": false,
+      "has_more": true,
+      "checks": [
+        "all root contains ports loaded despite cable limit=1",
+        "both selected cable endpoint ports/devices loaded",
+        "no remote sibling ports",
+        "continuation retained"
+      ],
+      "implementation": "device-root-only rich ID expansion merged with cable seeds; final upward-only context; existing 5000/5001 boundary preserved",
+      "evidence": "/tmp/visual-physical-root-readonly-results.txt"
     }
   },
   "inventory_and_provenance": {
@@ -361,5 +383,6 @@
       "unexpectedAPI": 0,
       "pageErrors": 0
     }
-  }
+  },
+  "code_revision": "68c683ce33266b88f4a496d0c334cfc3c9244ac4"
 }

@@ -369,25 +369,32 @@ func visualContextSQL() string {
  ) SELECT DISTINCT id FROM walk ORDER BY id LIMIT 5001`
 }
 
-func (s Service) visualContext(ctx context.Context, scope Scope, seeds []string, rich bool) (Visualization, error) {
+func (s Service) visualContextIDs(ctx context.Context, scope Scope, seeds []string, rich bool) ([]string, error) {
 	args := append(scope.Args(), seeds, rich)
 	rows, e := s.DB.Query(ctx, visualContextSQL(), args...)
 	if e != nil {
-		return Visualization{}, e
+		return nil, e
 	}
 	defer rows.Close()
 	ids := []string{}
 	for rows.Next() {
 		var id string
 		if e = rows.Scan(&id); e != nil {
-			return Visualization{}, e
+			return nil, e
 		}
 		ids = append(ids, id)
 	}
 	if e = rows.Err(); e != nil {
-		return Visualization{}, e
+		return nil, e
 	}
 	rows.Close()
+	return ids, nil
+}
+func (s Service) visualContext(ctx context.Context, scope Scope, seeds []string, rich bool) (Visualization, error) {
+	ids, e := s.visualContextIDs(ctx, scope, seeds, rich)
+	if e != nil {
+		return Visualization{}, e
+	}
 	partial := len(ids) > 5000
 	// Keep the lookahead ID so the shared reader detects truncation before
 	// deriving component counts from an incomplete context.
@@ -435,6 +442,23 @@ func (s Service) VisualSubgraph(ctx context.Context, scope Scope, q url.Values) 
 	reads, readCtx := errgroup.WithContext(ctx)
 	reads.Go(func() error {
 		var err error
+		// A focused device needs its full Port Panel, even when only one cable
+		// is paged. Expand only that root; remote devices remain upward-only.
+		if view == "physical" && q.Get("depth") == "2" && q.Get("root_id") != "" {
+			var deviceRoot bool
+			args := append(scope.Args(), q.Get("root_id"))
+			err = s.DB.QueryRow(readCtx, `SELECT EXISTS(SELECT 1 FROM cmdb_entity e WHERE e.item_uid=$3 AND e.asset_type IN('server','switch','pdu','patch_panel','device') AND `+activeVisualAsset("e")+`)`, args...).Scan(&deviceRoot)
+			if err != nil {
+				return err
+			}
+			if deviceRoot {
+				rootIDs, err := s.visualContextIDs(readCtx, scope, []string{q.Get("root_id")}, true)
+				if err != nil {
+					return err
+				}
+				contextIDs = append(contextIDs, rootIDs...)
+			}
+		}
 		snapshot, err = s.visualContext(readCtx, scope, contextIDs, view != "physical" && q.Get("depth") == "2")
 		return err
 	})

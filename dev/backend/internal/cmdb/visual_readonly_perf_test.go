@@ -96,6 +96,84 @@ func TestVisualExistingProjectReadOnly(t *testing.T) {
 		}
 	})
 
+	t.Run("physical_root", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		var root string
+		err := db.QueryRow(ctx, `SELECT e.item_uid FROM cmdb_entity e WHERE e.asset_type='server' AND `+activeVisualAsset("e")+`
+   AND (SELECT count(*) FROM cmdb_relationship r JOIN cmdb_entity p ON p.item_uid=r.to_uid WHERE r.from_uid=e.item_uid AND r.definition_id='contains' AND r.valid_to IS NULL AND p.asset_type='port')>1
+   AND EXISTS(SELECT 1 FROM cmdb_relationship r JOIN cmdb_relationship ep ON ep.to_uid=r.to_uid AND ep.definition_id IN('cable_endpoint_a','cable_endpoint_b') AND ep.valid_to IS NULL WHERE r.from_uid=e.item_uid AND r.definition_id='contains' AND r.valid_to IS NULL)
+   ORDER BY e.item_uid LIMIT 1`, scope.Args()...).Scan(&root)
+		if err != nil {
+			t.Fatal(err)
+		}
+		expected := map[string]bool{}
+		rows, err := db.Query(ctx, `WITH RECURSIVE members(id,depth) AS (
+   SELECT $3::text,0 UNION SELECT r.to_uid,m.depth+1 FROM members m JOIN cmdb_relationship r ON r.from_uid=m.id JOIN cmdb_entity child ON child.item_uid=r.to_uid
+   WHERE m.depth<8 AND r.definition_id='contains' AND r.valid_to IS NULL AND `+RelationshipVisible("r")+` AND `+activeVisualAsset("child")+`)
+   SELECT DISTINCT e.item_uid FROM members m JOIN cmdb_entity e ON e.item_uid=m.id WHERE e.asset_type='port'`, append(scope.Args(), root)...)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for rows.Next() {
+			var id string
+			if err = rows.Scan(&id); err != nil {
+				t.Fatal(err)
+			}
+			expected[id] = true
+		}
+		err = rows.Err()
+		rows.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(expected) < 2 {
+			t.Fatal("fixture needs multiple root ports")
+		}
+		started := time.Now()
+		out, err := s.VisualSubgraph(ctx, scope, url.Values{"view": {"physical"}, "depth": {"2"}, "root_id": {root}, "limit": {"1"}})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if out.Truncated || len(out.Cables) != 1 {
+			t.Fatal("focused physical page lost bounded cable context")
+		}
+		loaded := map[string]bool{}
+		endpoints := map[string]bool{}
+		for _, a := range out.Assets {
+			loaded[a.ID] = true
+		}
+		for _, c := range out.Cables {
+			endpoints[c.A] = true
+			endpoints[c.B] = true
+			if !loaded[c.A] || !loaded[c.B] || !loaded[c.DeviceA] || !loaded[c.DeviceB] {
+				t.Fatal("lost cable endpoint/device")
+			}
+		}
+		rootPorts := 0
+		for _, a := range out.Assets {
+			if a.Type == "port" {
+				if expected[a.ID] {
+					rootPorts++
+				} else if !endpoints[a.ID] {
+					t.Fatal("expanded remote sibling port")
+				}
+			}
+		}
+		for id := range expected {
+			if !loaded[id] {
+				t.Fatal("focused device port missing")
+			}
+		}
+		if rootPorts != len(expected) {
+			t.Fatal("root port count differs from contains")
+		}
+		if !out.Page.HasMore || out.Page.NextCursor == nil {
+			t.Fatal("limit=1 must retain continuation")
+		}
+		t.Logf("elapsed_ms=%.3f root_ports=%d db_contains_ports=%d assets=%d relations=%d cables=%d partial=%t", float64(time.Since(started).Microseconds())/1000, rootPorts, len(expected), len(out.Assets), len(out.Relationships), len(out.Cables), out.Truncated)
+	})
+
 	q := url.Values{"limit": {"100"}, "view": {"hierarchy"}, "depth": {"1"}, "axes": {"server_switch"}}
 	for _, name := range []string{"subgraph", "matrix", "connections", "physical"} {
 		t.Run(name, func(t *testing.T) {

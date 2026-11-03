@@ -10,9 +10,9 @@
 
 ## 最新里程碑事件：旧BOM前端及路由彻底退役
 
-用户最新明确不保留旧URL，覆盖此前本轮的兼容跳转安排。当前dev源码已删除旧BOM菜单、页面、redirect组件及专属Route；旧地址由应用404处理，不再跳转。所有活跃入口/来源链接直接使用/p/:projectId/kickoff。清理25个退役页面/组件/专属API文件，原realBom仅共用HTTP能力移至lib/api/request.ts；StageWorkspace的开局输入改读新kickoff摘要和版本，不再运行旧前端交接门禁。
+代码提交68c683c；用户最新明确不保留旧URL，覆盖此前本轮的兼容跳转安排。当前dev源码已删除旧BOM菜单、页面、redirect组件及专属Route；旧地址由应用404处理，不再跳转。所有活跃入口/来源链接直接使用/p/:projectId/kickoff。清理25个退役页面/组件/专属API文件，原realBom仅共用HTTP能力移至lib/api/request.ts；StageWorkspace的开局输入改读新kickoff摘要和版本，不再运行旧前端交接门禁。
 
-共享解析、工程事实、bom_item/CMDB、事务Outbox及原始文件/审计仍保留，未删除历史数据。CMDB新事件和历史查询投影返回kickoff链接，旧工程发布不伪造成新kickoff回执。当前运行仍9a3e03b，源码变更尚未部署；以前的跳转里程碑只作过程记录。删除后TypeScript/Vite构建及来源只读核对已通过，最终浏览器协议回放通过：旧地址保持原URL显示应用404、无跳转，fixture/inventory请求0；新工作台端口翻页、Drawer加载/失败/重试保持正常，无页面异常或意外API。这不是部署HTTP404或帧率验收，结果记录于PERFORMANCE-RESULT.json。
+共享解析、工程事实、bom_item/CMDB、事务Outbox及原始文件/审计仍保留，未删除历史数据。CMDB新事件和历史查询投影返回kickoff链接，旧工程发布不伪造成新kickoff回执。当前运行仍9a3e03b，源码变更尚未部署；以前的跳转里程碑只作过程记录。删除后TypeScript/Vite构建及来源只读核对已通过，最终浏览器协议回放通过：旧地址保持原URL显示应用404、无跳转，fixture/inventory请求0；新工作台端口翻页、Drawer加载/失败/重试保持正常，无页面异常或意外API。这不是部署HTTP404或帧率验收，结果记录于PERFORMANCE-RESULT.json。另完成物理端口面板定向回归：depth2显式设备root在连接limit=1时保留本设备全部端口，与DB contains一致，不向远端兄弟端口扩散；现有MM只读1.727秒、8资产/7关系/1线缆，无截断。
 
 ## 已完成里程碑事件：BOM菜单退役并统一跳转智能开局
 

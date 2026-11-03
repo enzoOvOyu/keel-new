@@ -3,7 +3,7 @@
   "updated_at": "2026-11-03",
   "coverage": "New kickoff on existing main app shell and backend. Isolated integration, prototype UI comparison and authenticated live MM page checks passed. Historical MM CMDB publications and known rack/start-U increment confirmed. Agent deferred; no device execution. Other modules retain previous verification limits.",
   "schema_authority": "docs/openapi.yaml",
-  "code_revision": "9a3e03b9095afa7c91214cd40c00292d288578ba",
+  "code_revision": "68c683ce33266b88f4a496d0c334cfc3c9244ac4",
   "deployed_revision": "9a3e03b9095afa7c91214cd40c00292d288578ba",
   "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
   "operations": [
@@ -2328,6 +2328,8 @@
     "base_revision": "f941397",
     "deployed": false,
     "scope": "Legacy BOM frontend/routes removed; kickoff paging/context/preview; inventory/provenance; topology queries",
-    "evidence": "docs/kickoff/PERFORMANCE-RESULT.json"
+    "evidence": "docs/kickoff/PERFORMANCE-RESULT.json",
+    "code_revision": "68c683ce33266b88f4a496d0c334cfc3c9244ac4",
+    "state": "implemented_and_verified_in_dev_not_deployed"
   }
 }
