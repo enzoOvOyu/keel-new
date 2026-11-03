@@ -3,8 +3,8 @@
   "updated_at": "2026-11-03",
   "coverage": "Current module documentation baseline, 2026-11-03: deployed dev 686e9ea; CMDB routes additionally registered by source review only. Per-operation runtime verification is limited to cited evidence. Fabric 6a70041 belongs to a separate paused branch and is not included in this registry.",
   "schema_authority": "docs/openapi.yaml",
-  "code_revision": "a8e454c4d91824621764c0787567120e0616fce7",
-  "deployed_revision": "a8e454c4d91824621764c0787567120e0616fce7",
+  "code_revision": "ef97bfec99ff5475e4ce13f5ac4226c6893a1143",
+  "deployed_revision": "ef97bfec99ff5475e4ce13f5ac4226c6893a1143",
   "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
   "operations": [
     {
@@ -3250,12 +3250,14 @@
       "operation_id": "listKickoffSourceTasks",
       "response_schema": "KickoffSourceTaskPage",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "NOT RUN; no Go build/tests, HTTP, database or AI calls performed in this task",
+      "deployment": "deployed",
+      "verification": "authenticated task list and selected adoption/analysis detail GET passed; no AI rerun",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff_tasks.go",
       "documentation": "docs/api/kickoff.md",
-      "module": "kickoff"
+      "module": "kickoff",
+      "deployed_revision": "d2f9accb146239cc9191f3fa60c0442985af3e22",
+      "verification_evidence": "docs/kickoff/DEPLOYMENT.json"
     },
     {
       "method": "get",
@@ -3263,12 +3265,14 @@
       "operation_id": "getKickoffSourceTask",
       "response_schema": "KickoffSourceTaskDetail",
       "implementation": "implemented",
-      "deployment": "not_deployed",
-      "verification": "NOT RUN; no Go build/tests, HTTP, database or AI calls performed in this task",
+      "deployment": "deployed",
+      "verification": "authenticated task list and selected adoption/analysis detail GET passed; no AI rerun",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff_tasks.go",
       "documentation": "docs/api/kickoff.md",
-      "module": "kickoff"
+      "module": "kickoff",
+      "deployed_revision": "d2f9accb146239cc9191f3fa60c0442985af3e22",
+      "verification_evidence": "docs/kickoff/DEPLOYMENT.json"
     }
   ],
   "development_note": "Frontend source redesign reverted 860029b with async compatibility retained; API 932c424. Async queue202/dedup verified, actual MM adoption failed duplicate entity identity; unshipped fix in worktree. Readonly rollback UI passed.",

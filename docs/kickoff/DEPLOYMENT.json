@@ -1,19 +1,19 @@
 {
-  "code_revision": "a8e454c4d91824621764c0787567120e0616fce7",
-  "frontend_code_revision": "860029b346cd76d307d2fe99788dd84c63dd0bf0",
-  "backend_code_revision": "a8e454c4d91824621764c0787567120e0616fce7",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-view-actions-860029b",
-  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-placement-a8e454c",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-23bd22a",
-  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-placement-3590d0c",
+  "code_revision": "ef97bfec99ff5475e4ce13f5ac4226c6893a1143",
+  "frontend_code_revision": "ef97bfec99ff5475e4ce13f5ac4226c6893a1143",
+  "backend_code_revision": "d2f9accb146239cc9191f3fa60c0442985af3e22",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-view-actions-ef97bfe",
+  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-d2f9acc",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-d2f9acc",
+  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-placement-a8e454c",
   "ports": [
     5180,
     8081
   ],
   "migrations": [],
-  "api_restarted": true,
-  "binary_sha256": "c82d37178f61fe6554fc5712e19928d1ba727840055bd9def0666d452cadeddd",
-  "frontend_index_sha256": "d063eb9ba909461f8d95dfb1235bca3202d30dc260a13c1641cb90692630275c",
+  "api_restarted": false,
+  "binary_sha256": "d35fe3c08a2ae85e9bea80dc2c3cd4c686768a3c1a886b71b8930fa957dede59",
+  "frontend_index_sha256": "1176caa853deb4381e94ccd731987d893e26de247ca1b95c4e765e18d74a0d82",
   "status": "deployed",
   "binary_matches": true,
   "frontend_index_matches": true,
@@ -23,11 +23,64 @@
     "health": 200,
     "index_matches": true
   },
-  "business_tests": "MM async adoption: 202 in 0.011s and same-task duplicate submission passed; worker failed INVALID_OR_DUPLICATE_ENTITY_ID; placement identity fix not deployed.",
+  "business_tests": "Existing MM analysis reused; async adoption recovered and succeeded at revision 3: 971 devices, 14308 ports, 7154 connections, 122 racks. 10 candidate tables adopted, 4 remain. No new AI call; no CMDB publication.",
   "provider_calls": 0,
-  "verification": "TypeScript/Vite passed with bounded heap; original source layout restored, read-only browser check passed; no new business writes during rollback.",
+  "verification": "Targeted Go tests/build, TypeScript, Vite and contract registry passed. Authenticated task history and task-specific logs passed. Source page layout/drawer/navigation check passed; no new AI call or CMDB publication.",
   "ui_verification": {
     "errors": [],
+    "checks": {
+      "layout": {
+        ".source-header": {
+          "x": 457,
+          "y": 200.28125,
+          "right": 1407,
+          "bottom": 284.46875,
+          "width": 950
+        },
+        ".recognition-pipeline": {
+          "x": 457,
+          "y": 284.46875,
+          "right": 1407,
+          "bottom": 351.46875,
+          "width": 950
+        },
+        ".source-agent-actions": {
+          "x": 819,
+          "y": 363.46875,
+          "right": 1389,
+          "bottom": 423.46875,
+          "width": 570
+        },
+        ".source-rail": {
+          "x": 273,
+          "y": 200.28125,
+          "right": 457,
+          "bottom": 4460.25,
+          "width": 184
+        },
+        ".source-main": {
+          "x": 457,
+          "y": 200.28125,
+          "right": 1407,
+          "bottom": 4460.25,
+          "width": 950
+        }
+      },
+      "selectedTaskDrawer": true,
+      "returnRestoresAdoption": true,
+      "narrowOverflow": false
+    },
     "status": "PASS"
+  },
+  "task_history_verification": {
+    "status": "PASS",
+    "total": 6,
+    "kinds": [
+      "adoption"
+    ],
+    "selectedTaskDetail": true,
+    "analysisDetail": true,
+    "analysisLogCount": 25,
+    "understandingPresent": true
   }
 }

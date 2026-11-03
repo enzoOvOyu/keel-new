@@ -160,3 +160,5 @@ POST analysis/adopt返回202与KickoffAdoptionTask，不等待合并；任务复
 - understanding复用现有SourceUnderstanding（OpenAPI `KickoffUnderstanding`）结构：仅读取当前分析任务、或采用任务显式关联且同项目/同资料的分析任务已成功持久化的kickoff_domain_understanding artifact。没有该证据就省略，不生成pending报告、不回退最新任务或历史报告；既有artifact读取/摘要校验失败按原接口返回500/503，不伪造结果。旧分析任务仅有结构artifact而没有理解报告时也省略。
 - 列表在同一只读快照计算total和当前页；详情按需读取日志与可选报告，不加载候选/工作簿，不新增表、不初始化workspace、不调用AI或业务写入，无服务端派生缓存。前端缓存必须按身份、授权、projectId/sourceId/jobId和分页隔离；活动任务刷新由调用方控制。任务状态可以在下一次请求变化，分页不是跨请求冻结快照。
 - 本轮仅实现及契约同步：按用户要求未运行Go编译/测试、HTTP或数据库验收；未部署、未提交，交由用户统一构建验证。完整日志不设分页；采用日志若未记录，后端不能补造。
+
+本轮任务记录接口已部署d2f9acc，真实项目列表及指定分析/采用详情GET通过。已有MM后台采用成功恢复；10类采用、4类保留，未运行新的AI分析或CMDB发布。
