@@ -3146,6 +3146,26 @@
       "documentation": "docs/api/kickoff.md",
       "verification_evidence": "docs/kickoff/HISTORY-UNDERSTANDING-CHECK.json",
       "module": "kickoff"
+    },
+    {
+      "module": "kickoff",
+      "method": "get",
+      "path": "/projects/{projectId}/kickoff/publication-options",
+      "operation_id": "getKickoffPublicationOptions",
+      "response_schema": "KickoffPublicationOptions",
+      "implementation": "implemented",
+      "deployment": "not_deployed",
+      "verification": "targeted Go content comparisons and read-only existing-data checks; publication selection UI",
+      "handler": "dev/backend/cmd/api/kickoff.go",
+      "source": "dev/backend/cmd/api/kickoff_publication_options.go",
+      "documentation": "docs/api/kickoff.md",
+      "verification_evidence": "docs/kickoff/PUBLISH-SCOPE-CHECK.json",
+      "scope": "authorized project, revision-bound read-only snapshot",
+      "permission": "bom:read",
+      "side_effects": "none; no publication/CMDB/AI writes",
+      "loading": "on publication page entry and revision/receipt change; typed identifiers and states only",
+      "errors": "403 denied, 409 stale, 500 unavailable; no fallback to enabling selection",
+      "limitations": "Present engineering objects and scoped inputs; physical removal requires CMDB change process"
     }
   ],
   "development_note": "Frontend 5180: 3c0ac07 selection-button progress with green background, no top loading notice. API unchanged at fdd86dd and not restarted. Live delayed read-only preview verified zero panel/button layout movement and cancel-all availability. No publication writes or schema changes.",

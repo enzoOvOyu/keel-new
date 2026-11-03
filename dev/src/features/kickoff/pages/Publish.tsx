@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ArrowRight, Check, CheckCircle2, ChevronRight, Database, Download, History, ShieldCheck, Loader2 } from 'lucide-react';
 import { useWorkspace } from '../context';
-import { capabilities, eligibleDevices, type Publication, type Device } from '../lib/api';
+import { capabilities, eligibleDevices, type Publication, type Device, type PublicationOptions } from '../lib/api';
 import { Badge, Button, DataTable, Empty, Field, Heading, KV, Modal, Notice, Section, formatDate } from '../components/ui';
 import { downloadFile } from '../lib/api/workbook';
 
@@ -14,19 +14,28 @@ export default function Publish(){
   const latestByDevice=new Map<string,Publication>(),publishedByDevice=new Map<string,Publication>();
   for(const record of history)for(const id of record.deviceIds){if(!latestByDevice.has(id))latestByDevice.set(id,record);if(record.state==='published'&&!publishedByDevice.has(id))publishedByDevice.set(id,record);}
   const eligible=eligibleDevices(s);
-  const valid=new Set(eligible.filter(d=>latestByDevice.get(d.id)?.state!=='pending').map(d=>d.id));
+  const publicationKey=s.publications.map(v=>v.id+':'+v.state).join('|');
+  const optionsKey=`${s.revision}:${publicationKey}`;
+  const [optionResult,setOptionResult]=useState<{key:string;value:PublicationOptions}>(),[optionsError,setOptionsError]=useState(''),[optionsRetry,setOptionsRetry]=useState(0);
+  const initialized=useRef(false);
+  const options=optionResult?.key===optionsKey?optionResult.value:undefined;
+  const optionsLoading=!options&&!optionsError;
+  const optionByDevice=new Map(options?.devices.map(v=>[v.id,v])??[]);
+  const valid=new Set(eligible.filter(d=>['new','changed'].includes(optionByDevice.get(d.id)?.state??'')&&latestByDevice.get(d.id)?.state!=='pending').map(d=>d.id));
   const [publishing,setPublishing]=useState(false);
-  const [selected,setSelected]=useState<string[]>(()=>(params.get('targets')?.split(',')??eligible.filter(d=>!publishedByDevice.has(d.id)).map(d=>d.id)).filter(id=>valid.has(id)));
+  const [selected,setSelected]=useState<string[]>([]);
   const [confirm,setConfirm]=useState(false),[expected,setExpected]=useState(s.revision),[reason,setReason]=useState('确认设备身份与已知关系，未完成的工程信息后续增补');
   const [detail,setDetail]=useState<Publication>(),[success,setSuccess]=useState<Publication>();
   const openDetail=async(v:Publication)=>{await run('版本明细已读取',async()=>{const full=await api.publicationDetail!(v.id);const previous=s.publications.find(p=>p.revision===v.revision-1);if(previous){const value=await api.publicationDetail!(previous.id);setPreviousDetail(value);}else setPreviousDetail(undefined);setDetail(full);});};
   const [previousDetail,setPreviousDetail]=useState<Publication>();
+  useEffect(()=>{let active=true;setOptionsError('');void api.publicationOptions(s.revision).then(value=>{if(!active)return;setOptionResult({key:optionsKey,value});if(!initialized.current){initialized.current=true;const ready=new Set(value.devices.filter(v=>v.state==='new'||v.state==='changed').map(v=>v.id));setSelected((params.get('targets')?.split(',')??[...ready]).filter(id=>ready.has(id)));}}).catch(e=>{if(active)setOptionsError(e.message);});return()=>{active=false;};},[api,optionsKey,optionsRetry]);
   useEffect(()=>{if(success)setSelected([]);},[success?.id]);
-  useEffect(()=>{if(!publishing)setSelected(ids=>ids.filter(id=>valid.has(id)));},[s.revision,publishing]);
+  useEffect(()=>{if(options&&!publishing)setSelected(ids=>ids.filter(id=>valid.has(id)));},[options,publishing]);
   const selectionKey=[...selected].sort().join(',');
-  const local=api.previewPublication(selected);
+  const activeSelected=selected.filter(id=>valid.has(id));
+  const local=api.previewPublication(activeSelected);
   const [evaluation,setEvaluation]=useState<{revision:number;counts:Record<string,number>;selectionKey:string}>(),[evaluating,setEvaluating]=useState(true),[evaluationError,setEvaluationError]=useState('');
-  useEffect(()=>{let active=true;setEvaluating(true);setEvaluationError('');const timer=setTimeout(()=>{if(!selected.length){if(active){setEvaluation(undefined);setEvaluating(false);}return;}void api.evaluatePublication!(selected,s.revision).then(v=>{if(active)setEvaluation({...v,selectionKey});}).catch(e=>{if(active)setEvaluationError(e.message);}).finally(()=>{if(active)setEvaluating(false);});},150);return()=>{active=false;clearTimeout(timer);};},[api,selected,s.revision]);
+  useEffect(()=>{let active=true;setEvaluating(true);setEvaluationError('');const timer=setTimeout(()=>{if(!options||!activeSelected.length){if(active){setEvaluation(undefined);setEvaluating(false);}return;}void api.evaluatePublication!(activeSelected,s.revision).then(v=>{if(active)setEvaluation({...v,selectionKey});}).catch(e=>{if(active)setEvaluationError(e.message);}).finally(()=>{if(active)setEvaluating(false);});},150);return()=>{active=false;clearTimeout(timer);};},[api,selected,s.revision,options]);
   const p={...local,counts:evaluation?.revision===s.revision&&evaluation.selectionKey===selectionKey?evaluation.counts:local.counts};
   const labels:Record<string,string>={devices:'设备',ports:'端口',connections:'双端连接',components:'组件',placements:'精确落位'};
   const caps=s.capabilities??capabilities(s);
@@ -39,20 +48,21 @@ export default function Publish(){
   const selectAll=()=>setSelected(allSelected?[]:[...valid]);
   return <div className="publication-page">
     <Heading eyebrow="PUBLISH & EVOLVE" title="入库与版本" description="选择本次设备范围，确认入库；历史回执与增补记录在右侧查看。" action={<Button kind="primary" disabled={evaluating||!!evaluationError||publishing||!p.devices.length||!can('bom:execute')||!can('bom:review')} onClick={()=>{setExpected(s.revision);setConfirm(true);}}><Database size={16}/>确认本次入库</Button>}/>
+    {optionsError&&<Notice tone="warning">{optionsError}<Button onClick={()=>setOptionsRetry(n=>n+1)}>重新检查可入库设备</Button></Notice>}
     {evaluationError&&<Notice tone="warning">{evaluationError}</Notice>}
     {success&&<div className="publish-success"><CheckCircle2 size={23}/><div><b>本次范围已入库 · r{success.revision} · {success.counts.devices} 台设备</b><p>已确认数据进入当前资产视图，工程补充不会生成另一套身份。</p></div><Button onClick={()=>go('overview')}>查看启动总览<ArrowRight size={14}/></Button></div>}
-    <div className="publish-layout"><div><Section title="本次确认范围" caption="以设备为单位选择，关联对象自动随本次范围一同确认。" action={<Button kind="secondary" className="publication-select-all" aria-label={allSelected?'取消全选':'选择全部可入库设备'} aria-busy={evaluating&&selected.length>0} disabled={!valid.size||publishing} onClick={selectAll}>{evaluating&&selected.length>0?<Loader2 size={14} className="animate-spin"/>:<Check size={14}/>}<span>{allSelected?'取消全选':'选择全部可入库设备'}</span>{evaluating&&selected.length>0&&<small>· 核对中</small>}</Button>}>
+    <div className="publish-layout"><div><Section title="本次确认范围" caption="以设备为单位选择，关联对象自动随本次范围一同确认。" action={<Button kind="secondary" className="publication-select-all" aria-label={allSelected?'取消全选':'选择全部可入库设备'} aria-busy={optionsLoading||evaluating&&selected.length>0} disabled={!valid.size||publishing||optionsLoading} onClick={selectAll}>{optionsLoading||evaluating&&selected.length>0?<Loader2 size={14} className="animate-spin"/>:<Check size={14}/>}<span>{allSelected?'取消全选':'选择全部可入库设备'}</span>{(optionsLoading||evaluating&&selected.length>0)&&<small>· 核对中</small>}</Button>}>
       <div className="publication-scope-note"><ShieldCheck size={17}/><div><b>确认身份、来源与关系端点，已知数据可以先入库。</b><p>自动包含所选设备的组件、端口，以及双端均在范围内的连接。机房坐标、布线、网络和电力信息可后补；未选设备及原始资料继续保留。</p></div></div>
       <div className="publish-counts">{Object.entries(p.counts).map(([key,n])=><div key={key}><strong>{selected.length&&(evaluating||evaluation?.selectionKey!==selectionKey)?'—':n.toLocaleString()}</strong><span>{labels[key]}</span></div>)}</div>
       <div className="publication-selection"><span><b>已选择 {selectedCount} 台</b> / 共 {s.devices.length} 台设备</span><span>{p.held.length} 台暂未纳入</span>{selected.length>0&&<Button kind="ghost" disabled={publishing} onClick={()=>setSelected([])}>清空选择</Button>}<button className="text-link" onClick={()=>go('review')}>前往数据核对<ArrowRight size={13}/></button></div>
-      {!selected.length&&s.devices.length>0&&<div className="publication-empty-selection">请选择本次需要入库的设备。已有回执的设备不默认勾选，增补时可按需选择。</div>}
+      {!selected.length&&s.devices.length>0&&<div className="publication-empty-selection">仅未入库或有实际增补变化的设备可选；已同步且无变化的设备不参与全选。</div>}
       <DataTable data={s.devices} searchPlaceholder="搜索设备名称、SN 或型号" columns={[
-        {id:'select',header:()=> <input aria-label="选择全部可入库设备" type="checkbox" checked={allSelected} aria-checked={allSelected?true:selectedCount>0?'mixed':false} ref={node=>{if(node)node.indeterminate=!allSelected&&selectedCount>0;}} disabled={!valid.size||publishing} onChange={selectAll}/>,size:44,enableSorting:false,cell:({row})=><input type="checkbox" aria-label={`入库 ${deviceName(row.original)}`} disabled={!valid.has(row.original.id)||publishing} checked={selected.includes(row.original.id)&&valid.has(row.original.id)} onChange={e=>setSelected(e.target.checked?[...new Set([...selected,row.original.id])]:selected.filter(id=>id!==row.original.id))}/>},
+        {id:'select',header:()=> <input aria-label="选择全部可入库设备" type="checkbox" checked={allSelected} aria-checked={allSelected?true:selectedCount>0?'mixed':false} ref={node=>{if(node)node.indeterminate=!allSelected&&selectedCount>0;}} disabled={!valid.size||publishing} onChange={selectAll}/>,size:44,enableSorting:false,cell:({row})=><input type="checkbox" aria-label={`入库 ${deviceName(row.original)}`} disabled={!valid.has(row.original.id)||publishing||optionsLoading} checked={selected.includes(row.original.id)&&valid.has(row.original.id)} onChange={e=>setSelected(e.target.checked?[...new Set([...selected,row.original.id])]:selected.filter(id=>id!==row.original.id))}/>},
         {id:'name',accessorFn:(device:Device)=>`${deviceName(device)} ${device.serial}`,header:'设备',cell:({row})=><div className="table-name"><b>{deviceName(row.original)}</b>{row.original.serial&&row.original.serial!==row.original.name&&<small>SN：{row.original.serial}</small>}</div>},
         {accessorKey:'type',header:'类型',cell:({getValue})=>typeLabel(getValue())},
         {accessorKey:'model',header:'型号',cell:({getValue})=>getValue()||'待补充'},
-        {id:'publication',header:'入库情况',cell:({row})=>{const record=latestByDevice.get(row.original.id),published=publishedByDevice.get(row.original.id);const blocked=!eligible.some(d=>d.id===row.original.id);return <div className="publication-device-status"><Badge state={blocked?'blocked':record?.state??'needs_input'}>{blocked?'身份待确认':record?.state==='published'?'已入库':record?.state==='pending'?'等待入库回执':record?.state==='failed'?'入库失败':'尚未入库'}</Badge>{record&&<small>最近记录 r{record.revision}{published&&published.id!==record.id?` · 已有回执 r${published.revision}`:''}</small>}</div>;}},
-        {id:'review',header:'核对',enableSorting:false,cell:({row})=><button className="text-link" onClick={()=>go('review?category=devices&q='+encodeURIComponent(deviceName(row.original)))}>查看<ArrowRight size={12}/></button>},
+        {id:'publication',header:'入库情况',cell:({row})=>{const record=latestByDevice.get(row.original.id),published=publishedByDevice.get(row.original.id);const option=optionByDevice.get(row.original.id);return <div className="publication-device-status"><Badge state={option?.state==='blocked'?'blocked':option?.state==='unchanged'?'published':option?.state==='pending'?'pending':'needs_input'}>{!option?'正在检查':option.state==='unchanged'?'已同步 · 无变化':option.state==='changed'?'已入库 · 待增补':option.reason}</Badge>{record&&<small>最近记录 r{record.revision}{published&&published.id!==record.id?` · 已有回执 r${published.revision}`:''}</small>}</div>;}},
+        {id:'review',header:'核对',enableSorting:false,cell:({row})=><button className="text-link" onClick={()=>go('review?category=devices&q='+encodeURIComponent(row.original.serial||deviceName(row.original)))}>查看<ArrowRight size={12}/></button>},
       ]}/>
     </Section></div>
     <aside><Section title="版本与增补记录" caption="按时间追溯每次确认及入库回执。" action={latest&&<Button kind="ghost" onClick={()=>void openDetail(latest)}><History size={14}/>最新记录</Button>}>{history.length?<div className="publication-history-list">{history.map(record=><button className="publication-history-entry" key={record.id} onClick={()=>void openDetail(record)}><div className="publication-history-heading"><b>r{record.revision}</b><Badge state={record.state}/>{record.id===current?.id&&<small>最近成功</small>}</div><div className="publication-history-meta"><time>{formatDate(record.createdAt)}</time><span title={record.actor}>确认人：{record.actor||'未记录'}</span></div><p className="publication-history-counts">{record.counts.devices} 台设备 · {record.counts.connections} 条连接</p><p className="publication-history-reason" title={record.reason}>{record.reason}</p><span className="publication-history-open">查看记录<ChevronRight size={13}/></span></button>)}</div>:<Empty title="暂无入库记录" description="首次确认后，版本与入库回执显示在这里。"/>}</Section>

@@ -1,6 +1,6 @@
 import { apiRequest } from '../request';
 import { publishPreview } from './provider';
-import type { KickoffAPI, Workspace, ModelRow, Publication, Calculation, ReviewPage, SourceUnderstanding, SourceRegionPreview } from './types';
+import type { KickoffAPI, Workspace, ModelRow, Publication, Calculation, ReviewPage, SourceUnderstanding, SourceRegionPreview, PublicationOptions } from './types';
 
 export class HttpKickoffProvider implements KickoffAPI {
  private state:Workspace;
@@ -16,6 +16,7 @@ export class HttpKickoffProvider implements KickoffAPI {
  refresh=async()=>{if(this.controller.signal.aborted)this.controller=new AbortController();const state=await apiRequest<Workspace>(this.path('/workspace'),'GET',undefined,undefined,this.controller.signal);if(state.projectId!==this.projectId)throw Error('工作区项目与请求不一致');this.state=state;this.emit();};
  loadSection=async(section:string)=>{const revision=this.state.revision;const items:unknown[]=[];let offset=0;for(;;){const page=await apiRequest<Workspace>(this.path(`/workspace?section=${encodeURIComponent(section)}&offset=${offset}&limit=200&revision=${revision}`),'GET',undefined,undefined,this.controller.signal);items.push(...page[section as keyof Workspace] as unknown[]);if(!page.page?.hasMore)break;offset+=page.page.limit;}if(revision!==this.state.revision)throw Error('工作区版本已变化，请重新加载');this.state={...this.state,[section]:items};this.emit();};
  loadContext=async(id:string)=>{const revision=this.state.revision;const data=await apiRequest<Pick<Workspace,'devices'|'ports'|'connections'|'components'|'revision'>>(this.path(`/workspace?section=context&entity_id=${encodeURIComponent(id)}&revision=${revision}`),'GET',undefined,undefined,this.controller.signal);if(revision!==this.state.revision||data.revision!==revision)return;for(const key of ['devices','ports','connections','components'] as const){const map=new Map(this.state[key].map(v=>[v.id,v]));for(const v of data[key])map.set(v.id,v as never);this.state={...this.state,[key]:[...map.values()]};}this.emit();};
+ publicationOptions=(revision:number)=>apiRequest<PublicationOptions>(this.path('/publication-options?revision='+revision),'GET',undefined,undefined,this.controller.signal);
  evaluatePublication=(deviceIds:string[],expectedRevision:number)=>apiRequest<{revision:number;counts:Record<string,number>}>(this.path('/preview'),'POST',{deviceIds,expectedRevision},undefined,this.controller.signal);
  reviewPage=(query:URLSearchParams)=>{const params=new URLSearchParams(query);params.set('revision',String(this.state.revision));return apiRequest<ReviewPage>(this.path('/review?'+params),'GET',undefined,undefined,this.controller.signal);};
  publicationDetail=(id:string)=>apiRequest<Publication>(this.path('/publications/'+encodeURIComponent(id)),'GET',undefined,undefined,this.controller.signal);

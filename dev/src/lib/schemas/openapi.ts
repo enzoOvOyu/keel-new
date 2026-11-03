@@ -52,6 +52,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/kickoff/publication-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getKickoffPublicationOptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/projects/{projectId}/kickoff/preview": {
         parameters: {
             query?: never;
@@ -7651,6 +7667,16 @@ export interface components {
             ports: components["schemas"]["KickoffPort"][];
             connections: components["schemas"]["KickoffConnection"][];
             components: components["schemas"]["KickoffComponent"][];
+        };
+        KickoffPublicationOption: {
+            id: string;
+            /** @enum {string} */
+            state: "new" | "changed" | "unchanged" | "blocked" | "pending";
+            reason: string;
+        };
+        KickoffPublicationOptions: {
+            revision: number;
+            devices: components["schemas"]["KickoffPublicationOption"][];
         };
         KickoffScopeEvaluation: {
             revision: number;
@@ -18757,6 +18783,54 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
+            };
+        };
+    };
+    getKickoffPublicationOptions: {
+        parameters: {
+            query?: {
+                revision?: number;
+            };
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Actual per-device changes against successful publication receipts, read-only. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["KickoffPublicationOptions"];
+                        request_id: string;
+                    };
+                };
+            };
+            /** @description Project or bom read permission denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description REVISION_CONFLICT */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description KICKOFF_PUBLICATION_OPTIONS_UNAVAILABLE; do not treat missing comparison as unchanged or selectable */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

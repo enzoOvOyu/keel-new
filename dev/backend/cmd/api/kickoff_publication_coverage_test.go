@@ -82,5 +82,30 @@ func TestKickoffScopeCoverageExistingReadOnly(t *testing.T) {
 	if err = db.QueryRow(ctx, `SHOW default_transaction_read_only`).Scan(&readonly); err != nil || readonly != "on" {
 		t.Fatal("read-only boundary lost")
 	}
-	t.Log("same-head coverage, subset, changed revision and changed input SQL verified with read-only database")
+	server := &Server{db: db, project: project}
+	var workspaceRevision int
+	if err = db.QueryRow(ctx, `SELECT revision FROM kickoff_workspace WHERE project_id=$1`, project).Scan(&workspaceRevision); err != nil {
+		t.Fatal(err)
+	}
+	read, err := server.kickoffReadSnapshot(ctx, db, workspaceRevision)
+	if err != nil {
+		t.Fatal(err)
+	}
+	options, err := server.kickoffPublicationDeviceOptions(ctx, db, read.model, read.inputs, read.detail(), workspaceRevision)
+	if err != nil {
+		t.Fatal(err)
+	}
+	counts := map[string]int{}
+	for _, v := range options.Devices {
+		counts[v.State]++
+	}
+	if len(options.Devices) != len(read.summary.Devices) {
+		t.Fatal("incomplete options")
+	}
+	raw, _ := json.Marshal(map[string]any{"counts": counts, "total": len(options.Devices), "database_readonly": true})
+	if err = os.WriteFile("/tmp/kickoff-publication-options-check.json", raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("options counts=%v", counts)
+	t.Log("same-head coverage, subset, changed revision/input SQL and device options verified with read-only database")
 }

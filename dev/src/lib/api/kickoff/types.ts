@@ -48,7 +48,10 @@ export interface Workspace {
 export interface Capability { id: string; title: string; detail: string; state: Readiness; available: number; total: number; action: string; href: string }
 export interface PublishPreview { devices: Device[]; ports: Port[]; connections: Connection[]; components: Component[]; placements: Device[]; held: Device[]; counts: Record<string, number> }
 export interface ImportPreview { rows: ModelRow[]; errors: string[]; unknownHeaders: string[]; sheet: string }
+export interface PublicationOption {id:string;state:'new'|'changed'|'unchanged'|'blocked'|'pending';reason:string}
+export interface PublicationOptions {revision:number;devices:PublicationOption[]}
 export interface KickoffAPI {
+ publicationOptions(revision:number):Promise<PublicationOptions>;
  sourceUnderstanding(id:string):Promise<SourceUnderstanding>;
  reuseSourceHistory(id:string):Promise<SourceUnderstanding>;
  sourceRegionPreview(sourceId:string,regionId:string,offset:number,revisionId:string,view:'source'|'normalized'):Promise<SourceRegionPreview>;

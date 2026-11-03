@@ -58,6 +58,8 @@ func (s *Server) kickoffRoutes(w http.ResponseWriter, r *http.Request) bool {
 		return true
 	}
 	switch {
+	case len(p) == 6 && p[5] == "publication-options" && r.Method == "GET":
+		s.kickoffPublicationOptions(w, r)
 	case len(p) == 8 && p[5] == "sources" && p[7] == "understanding" && r.Method == "GET":
 		s.kickoffUnderstanding(w, r, p[6], false)
 	case len(p) == 8 && p[5] == "sources" && p[7] == "reuse-history" && r.Method == "POST":

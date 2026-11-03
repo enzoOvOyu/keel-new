@@ -87,5 +87,45 @@
       "publicationSubmitRequests": 0
     },
     "api_restarted": false
+  },
+  "actual_change_filter": {
+    "status": "implemented_verified_pending_deployment",
+    "unit_tests": "PASS: metadata/input-version/row-order ignored; actual port/connection/scoped input changes detected without enabling unrelated devices",
+    "existing_data_readonly": {
+      "counts": {
+        "changed": 163,
+        "unchanged": 808
+      },
+      "database_readonly": true,
+      "total": 971
+    },
+    "frontend_protocol": {
+      "status": "PASS",
+      "scope": "Local built frontend protocol replay with synthetic publication service; no real project writes",
+      "checks": [
+        "scope conditions integrated with main selection",
+        "history relocated to right sidebar, with real state/time/actor/counts",
+        "SN displayed once; ambiguous status/identity columns removed",
+        "unchanged published devices disabled and excluded from select-all; changed/new selectable; pending/conflicted disabled",
+        "select-all, cancel-all and indeterminate header checkbox",
+        "empty selection disables unchanged confirm button",
+        "unchanged confirmation modal can open/cancel",
+        "history detail and export preserved",
+        "synthetic successful publish clears completed selection and updates history",
+        "publish review link reaches actionable details instead of dash",
+        "950px layout has no document overflow",
+        "zero page errors or unexpected API calls"
+      ],
+      "syntheticPublishes": 1,
+      "previewRequests": [
+        9,
+        1
+      ],
+      "pageErrors": 0
+    },
+    "limits": [
+      "Present engineering objects and scoped input content; physical removals require CMDB change process",
+      "No real publication POST or CMDB writes executed by validation"
+    ]
   }
 }

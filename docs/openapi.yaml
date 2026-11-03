@@ -295,6 +295,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorEnvelope'
+  /projects/{projectId}/kickoff/publication-options:
+    get:
+      operationId: getKickoffPublicationOptions
+      tags: [Kickoff]
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: revision
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        "200":
+          description: Actual per-device changes against successful publication receipts, read-only.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/KickoffPublicationOptions"
+                  request_id:
+                    type: string
+                required: [data, request_id]
+        "403":
+          description: Project or bom read permission denied
+        "409":
+          description: REVISION_CONFLICT
+        "500":
+          description: KICKOFF_PUBLICATION_OPTIONS_UNAVAILABLE; do not treat missing comparison as unchanged or selectable
   /projects/{projectId}/kickoff/preview:
     post:
       operationId: evaluateKickoffPublicationScope
@@ -20147,6 +20181,30 @@ components:
         - ports
         - connections
         - components
+    KickoffPublicationOption:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        state:
+          type: string
+          enum: [new, changed, unchanged, blocked, pending]
+        reason:
+          type: string
+      required: [id, state, reason]
+    KickoffPublicationOptions:
+      type: object
+      additionalProperties: false
+      properties:
+        revision:
+          type: integer
+          minimum: 0
+        devices:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffPublicationOption"
+      required: [revision, devices]
     KickoffScopeEvaluation:
       type: object
       additionalProperties: false

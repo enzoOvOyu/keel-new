@@ -291,6 +291,30 @@ func (s *Server) kickoffPublish(w http.ResponseWriter, r *http.Request) {
 		kickoffFailure(w, e)
 		return
 	}
+	options, err := s.kickoffPublicationDeviceOptions(ctx, tx, model, inputs, view, body.ExpectedRevision)
+	if err != nil {
+		fail(w, 500, "KICKOFF_PUBLICATION_OPTIONS_UNAVAILABLE")
+		return
+	}
+	stateByID := map[string]string{}
+	for _, v := range options.Devices {
+		stateByID[v.ID] = v.State
+	}
+	changed := false
+	for _, id := range body.DeviceIDs {
+		if stateByID[id] == "pending" {
+			fail(w, 409, "KICKOFF_PUBLICATION_PENDING")
+			return
+		}
+		if stateByID[id] == "new" || stateByID[id] == "changed" {
+			changed = true
+		}
+	}
+	if !changed {
+		fail(w, 422, "KICKOFF_NO_CHANGES")
+		return
+	}
+
 	var revision, importID string
 	if e = tx.QueryRow(ctx, `SELECT head_revision_id::text,import_id::text FROM eng_source WHERE id=$1`, source).Scan(&revision, &importID); e != nil {
 		kickoffFailure(w, e)
