@@ -13,7 +13,7 @@ export interface Component { id: string; deviceId: string; type: string; name: s
 export interface Rack { id: string; name: string; room: string; capacityU: number | null; evidence: Evidence }
 export interface SourceRegion { id: string; sheet: string; range: string; category: string; rowCount: number; state: 'extracted' | 'needs_input' | 'unmapped'; note: string }
 export interface Source {
-  id: string; name: string; size: string; version: number; state: 'recognized' | 'awaiting_analysis' | 'needs_input';
+  id: string; name: string; size: string; version: number; state: 'recognized' | 'historical' | 'partial' | 'awaiting_analysis' | 'needs_input';
   hash: string; createdAt: string; regions: SourceRegion[]; originalAvailable: boolean;
 }
 export interface Issue {
@@ -49,6 +49,9 @@ export interface Capability { id: string; title: string; detail: string; state: 
 export interface PublishPreview { devices: Device[]; ports: Port[]; connections: Connection[]; components: Component[]; placements: Device[]; held: Device[]; counts: Record<string, number> }
 export interface ImportPreview { rows: ModelRow[]; errors: string[]; unknownHeaders: string[]; sheet: string }
 export interface KickoffAPI {
+ sourceUnderstanding(id:string):Promise<SourceUnderstanding>;
+ reuseSourceHistory(id:string):Promise<SourceUnderstanding>;
+ sourceRegionPreview(sourceId:string,regionId:string,offset:number,revisionId:string,view:'source'|'normalized'):Promise<SourceRegionPreview>;
   evaluatePublication?(ids:string[],revision:number):Promise<{revision:number;counts:Record<string,number>}>;
   loadContext?(id:string):Promise<void>;
   exportReview?(query:URLSearchParams):Promise<ReviewRow[]>;
@@ -69,3 +72,14 @@ export interface KickoffAPI {
 
 export interface ReviewRow {id:string;name:string;description:string;reference:string;location:string;state:string;evidence:Evidence}
 export interface ReviewPage {revision:number;rows:ReviewRow[];total:number;offset:number;limit:number;hasMore:boolean}
+
+export interface SourceUnderstanding {
+ sourceId:string; revisionId:string; state:'historical'|'partial'|'unsupported'; origin:'history'|'none';
+ steps:{id:'structure'|'regions'|'semantics'|'relationships'|'fields';state:'complete'|'partial'|'pending'|'unsupported';count:number;completed:number;total:number;note:string}[];
+ regions:(SourceRegion & {categories:string[];evidenceCount:number;fieldEvidenceCount:number;objectCount:number;coveredCells:number;totalCells:number;mappings:{field:string;kind:'field'|'object';count:number}[];issues:string[]})[];
+ limitations:string[];
+}
+export interface SourceRegionPreview {
+ sourceId:string;revisionId:string;regionId:string;offset:number;limit:number;total:number;
+ rows:{row:number;objects:{id:string;kind:string;label:string;fields:{field:string;value:string}[];evidence:number}[];cells:{cell:string;column:number;value:string;formula:string;sensitive:boolean;fields:string[];entityIds:string[]}[]}[];
+}

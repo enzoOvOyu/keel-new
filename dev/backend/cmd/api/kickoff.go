@@ -58,6 +58,12 @@ func (s *Server) kickoffRoutes(w http.ResponseWriter, r *http.Request) bool {
 		return true
 	}
 	switch {
+	case len(p) == 8 && p[5] == "sources" && p[7] == "understanding" && r.Method == "GET":
+		s.kickoffUnderstanding(w, r, p[6], false)
+	case len(p) == 8 && p[5] == "sources" && p[7] == "reuse-history" && r.Method == "POST":
+		s.kickoffUnderstanding(w, r, p[6], true)
+	case len(p) == 10 && p[5] == "sources" && p[7] == "regions" && p[9] == "preview" && r.Method == "GET":
+		s.kickoffRegionPreview(w, r, p[6], p[8])
 	case len(p) == 6 && p[5] == "preview" && r.Method == "POST":
 		s.kickoffPreview(w, r)
 	case len(p) == 6 && p[5] == "review" && r.Method == "GET":
@@ -228,6 +234,9 @@ func (s *Server) kickoffWorkspace(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for i := range sources {
+		if sources[i].State == "recognized" {
+			sources[i].State = "historical"
+		}
 		sources[i].Regions, err = loadKickoffRegions(ctx, tx, sources[i].ID)
 		if err != nil {
 			fail(w, 500, "KICKOFF_REGIONS_UNAVAILABLE")

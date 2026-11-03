@@ -41,4 +41,16 @@
 
 `analyzeKickoffSource` 是已实现的明确拒绝入口：503 `KICKOFF_AGENT_NOT_CONFIGURED`。它没有成功分析结果，不因登记到真实接口表就成为Agent能力。
 
-当前网络输入及CMDB版本引用不等于完整Fabric NetworkPlan；缺口见[决策记录](../DECISIONS.md)。[部署证据](../kickoff/DEPLOYMENT.json)、[后端定向集成](../kickoff/BACKEND-CHECK.json)、[性能与在线读取](../kickoff/PERFORMANCE-RESULT.json)各自限定验证范围。本次文档任务未重新调用API。
+当前网络输入及CMDB版本引用不等于完整Fabric NetworkPlan；缺口见[决策记录](../DECISIONS.md)。[部署证据](../kickoff/DEPLOYMENT.json)、[后端定向集成](../kickoff/BACKEND-CHECK.json)、[性能与在线读取](../kickoff/PERFORMANCE-RESULT.json)各自限定验证范围。本轮新增历史资料理解为源码及定向检查结果，未更新部署。
+
+## 历史资料理解派生读取（本轮源码，未部署）
+
+- GET `sources/{sourceId}/understanding` (`getKickoffSourceUnderstanding`)：读取当前工程 head 的派生报告；未构建返回 unsupported/pending，不调用 AI。
+- POST `sources/{sourceId}/reuse-history` (`reuseKickoffSourceUnderstanding`)：需要 bom:import；复用现有原件、Proposal Columns/Records 与对象证据生成 MinIO 派生报告。同 source/head 重复操作返回同报告，不修改工程修订、输入、审批或 CMDB。
+- GET `sources/{sourceId}/regions/{regionId}/preview` (`getKickoffSourceRegionPreview`)：需要 bom:read；offset/limit（上限100），view=source|normalized。源行使用真实 Excel 坐标；normalized row=0 不是 Excel 行号。revisionId 是工程 head UUID，失效409；兼容 revision_id。
+- 报告按项目/source/head/v1隔离，原件只在显式构建时由现有敏感单元格脱敏 Parser 读取；区域、预览分对象持久化，不把整个工作簿放入 workspace 或无界内存缓存。
+- 结构使用现有 WorkbookIR 空白行分隔/256行分块，不宣称完整业务表边界。区域语义仅取精确单元格对应对象类型；同区域可含多类，不根据 Sheet 名猜测。
+- 历史 reviewed_model 为对象级、无单元格坐标。恢复唯一 SN/MAC 相等或有效历史 Proposal 的映射仅为 `_candidate`，不计入已确认字段覆盖；未知和敏感单元格不做映射。结构、区域、语义、关系、字段分别报告计数、依据与缺口；历史发布不使字段步骤通过。
+- 派生报告可重建，不是新事实层。不新增 Agent、映射向导或资产发布；analyze 仍503。读取存储故障503，缺报告/区域404，构建失败500，不伪造成功。
+
+定向结果见 [HISTORY-UNDERSTANDING-CHECK](../kickoff/HISTORY-UNDERSTANDING-CHECK.json)：MM 恢复54个结构分块、29,583个候选定位单元格、7,154条同原始行双端物理端口精确组合候选；明确字段证据仍为0。关系完成量是有坐标引用且确定性校验通过的连接数，不以已有连接总数填充；字段分母仅为明确映射的对象字段，标题/备注/重建候选不算必填字段。步骤按覆盖和校验计算 complete/partial/pending；无适用连接为 unsupported。workspace 不额外读取 MinIO 报告，报告和预览只由来源页按需加载。

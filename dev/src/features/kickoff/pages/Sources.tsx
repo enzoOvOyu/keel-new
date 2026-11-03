@@ -1,31 +1,79 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { ArrowRight, Check, ChevronRight, FileSpreadsheet, FolderOpen, Plus, ScanLine, Search, Trash2, UploadCloud } from 'lucide-react';
+import { ArrowRight, Check, ChevronRight, FileSpreadsheet, FolderOpen, Plus, Search, Trash2, UploadCloud } from 'lucide-react';
 import { useWorkspace } from '../context';
-import { Badge, Button, Empty, Heading, KV, Notice, Section, formatDate } from '../components/ui';
+import type { SourceRegionPreview, SourceUnderstanding } from '../lib/api';
+import { Badge, Button, Empty, Heading, Notice, Tabs, formatDate } from '../components/ui';
+
+const columnLabel=(column:number)=>{let label='';for(let n=column;n>0;n=Math.floor((n-1)/26))label=String.fromCharCode(65+(n-1)%26)+label;return label;};
+const stepNames = {structure:'工作簿结构',regions:'数据区域',semantics:'语义分类',relationships:'跨表关联',fields:'字段核对'};
+const stepStates = {complete:'已完成',partial:'部分完成',pending:'待处理',unsupported:'暂无结果'};
+const sourceLabels:Record<string,string> = {historical:'历史资料复用',partial:'部分识别',recognized:'已有识别结果',awaiting_analysis:'待分析',needs_input:'待补充'};
+const objectKind=(kind:string):'device'|'port'|'connection'|'component'|'evidence'=>['device','port','connection','component'].includes(kind)?kind as 'device'|'port'|'connection'|'component':'evidence';
 
 export default function Sources(){
-  const {api,state:s,go,notify,inspect,can}=useWorkspace();
-  const [params,setParams]=useSearchParams();
-  const source=s.sources.find(v=>v.id===params.get('source'))??s.sources[0];
-  const [regionId,setRegionId]=useState('');
-  const region=source?.regions.find(r=>r.id===regionId)??source?.regions[0];
-  const picker=useRef<HTMLInputElement>(null);
-  const [uploading,setUploading]=useState(false),[drag,setDrag]=useState(false),[error,setError]=useState('');
-  const add=async(files:File[])=>{setError('');setUploading(true);try{await api.addSources(files);notify('资料已添加，等待分析服务处理');}catch(e){setError((e as Error).message);}finally{setUploading(false);}};
-  const fromSource=(value:{evidence:{sourceId:string;sheet:string}})=>value.evidence.sourceId===source?.id&&(!region||value.evidence.sheet===region.sheet);
-  const selectedRows=region?.category==='组件关系'?s.components.filter(fromSource).slice(0,6).map(c=>[c.id,s.devices.find(d=>d.id===c.deviceId)?.name??'',c.model,c.slot]):region?.category==='端口'?s.ports.filter(fromSource).slice(0,6).map(p=>[p.name,s.devices.find(d=>d.id===p.deviceId)?.name??'',p.mac??'—',p.speed]):region?.category==='物理连接'?s.connections.filter(fromSource).slice(0,6).map(l=>{const a=s.ports.find(p=>p.id===l.a),b=s.ports.find(p=>p.id===l.b);return [s.devices.find(d=>d.id===a?.deviceId)?.name??'',a?.name??'',s.devices.find(d=>d.id===b?.deviceId)?.name??'',b?.name??''];}):region?.category==='机房机柜'?s.racks.filter(fromSource).slice(0,6).map(r=>[r.name,r.room,r.capacityU===null?'待补充':String(r.capacityU),'—']):['设备','落位'].includes(region?.category??'')?s.devices.filter(fromSource).slice(0,6).map(d=>[d.name,d.serial,d.model,region?.category==='落位'?`${d.rackId} / U${d.startU}`:d.role]):[];
-  const previewEvidence=region?.category==='组件关系'?s.components.filter(fromSource).slice(0,6).map(x=>x.evidence):region?.category==='端口'?s.ports.filter(fromSource).slice(0,6).map(x=>x.evidence):region?.category==='物理连接'?s.connections.filter(fromSource).slice(0,6).map(x=>x.evidence):region?.category==='机房机柜'?s.racks.filter(fromSource).slice(0,6).map(x=>x.evidence):s.devices.filter(fromSource).slice(0,6).map(x=>x.evidence);
-  const headers=region?.category==='组件关系'?['组件引用','父设备','型号','槽位']:region?.category==='端口'?['端口','设备','MAC','速率']:region?.category==='物理连接'?['本端设备','本端端口','对端设备','对端端口']:region?.category==='机房机柜'?['机柜','机房','容量U','坐标']:['设备名称','设备SN','型号',region?.category==='落位'?'机柜 / U位':'角色'];
-  return <>
-    <Heading eyebrow="SOURCES & INTELLIGENCE" title="资料与识别" description="一次接入多份资料，自动分类、关联，保留每项数据的依据。" action={<Button kind="primary" onClick={()=>picker.current?.click()} disabled={uploading||!can('bom:import')}><Plus size={15}/>添加资料</Button>}/>
-    <input ref={picker} hidden type="file" multiple accept=".xlsx,.csv,.pdf,.txt" onChange={e=>{void add([...e.target.files??[]]);e.target.value='';}}/>
-    <div className={`upload-strip ${drag?'dragging':''}`} onDragOver={e=>{e.preventDefault();setDrag(true);}} onDragLeave={()=>setDrag(false)} onDrop={e=>{e.preventDefault();setDrag(false);void add([...e.dataTransfer.files]);}}><span className="upload-icon"><UploadCloud size={23}/></span><div><b>{uploading?'正在登记资料…':'将工程资料拖入此处'}</b><p>设备清单、端接表、机柜布局、网络规划可以一起提交。</p></div><span className="file-formats">XLSX · CSV · PDF · TXT</span><Button onClick={()=>picker.current?.click()} disabled={uploading||!can('bom:import')}>选择文件</Button></div>
-    {error&&<Notice tone="error">{error}</Notice>}
-    <div className="source-layout"><aside className="source-rail"><div className="rail-heading"><b>资料包</b><span>{s.sources.length}</span></div>{s.sources.map(item=><button className={'source-file '+(source?.id===item.id?'selected':'')} key={item.id} onClick={()=>{setParams({source:item.id});setRegionId('');setError('');}}><FileSpreadsheet size={20}/><span><b>{item.name}</b><small>{item.size} · v{item.version}</small><Badge state={item.state}/></span></button>)}<div className="source-rail-foot"><FolderOpen size={15}/><span>相同内容按摘要复用，增补资料独立处理。</span></div></aside>
-      <div className="source-main">{source?<><div className="source-header"><FileSpreadsheet size={22}/><div><h2>{source.name}</h2><p>{source.size} · 添加于 {formatDate(source.createdAt)}</p></div><Badge state={source.state}/>{source.state==='recognized'?<Button onClick={()=>go('review')}>核对识别结果<ArrowRight size={14}/></Button>:<Button kind="primary" disabled={!can('bom:import')} onClick={()=>api.analyzeSource(source.id).catch(e=>setError(e.message))}><ScanLine size={15}/>开始识别</Button>}</div>
-      {source.regions.length?<><div className="recognition-pipeline">{['工作簿结构','数据区域','语义分类','跨表关联','字段核对'].map((label,i)=><div key={label}><span>{i===0||(i<4&&source.regions.some(r=>r.state==='extracted'))?<Check size={12}/>:<Search size={12}/>}</span><b>{label}</b>{i<4&&<ChevronRight size={13}/>}</div>)}</div><div className="source-region-layout"><div className="region-rail"><small>工作表与数据区域</small>{source.regions.map(r=><button className={region?.id===r.id?'active':''} key={r.id} onClick={()=>setRegionId(r.id)}><span><b>{r.sheet}</b><small>{r.range}</small></span><span className="region-count">{r.rowCount}</span></button>)}</div><div className="region-content"><div className="region-heading"><div><h3>{region?.sheet}</h3><p>{region?.note}</p></div><Badge state={region?.state??'needs_input'}/></div><div className="sheet-preview"><table><thead><tr><th/><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead><tbody><tr><th>1</th>{headers.map(h=><td className="sheet-header" key={h}>{h}</td>)}</tr>{selectedRows.map((row,i)=><tr key={i}><th>{i+2}</th>{row.map((cell,j)=><td className={j===1?'highlight-cell':''} key={j} onClick={()=>region&&inspect('evidence',region.id,{sourceId:source.id,sheet:previewEvidence[i]?.sheet??region.sheet,cell:previewEvidence[i]?.cell??region.range,method:previewEvidence[i]?.method??'mapping'})}>{cell}</td>)}</tr>)}</tbody></table></div><div className="mapping-strip"><span>来源区域</span><b>{region?.range}</b><ArrowRight size={15}/><span>工程类别</span><b>{region?.category}</b><span className="mapping-count">{region?.rowCount} 条</span></div><div className="source-note"><Check size={14}/><span>预览展示标准化字段与来源定位，全部识别记录在数据核对中查看。</span></div></div></div></>:<Empty title="资料已登记，等待分析" description="接入分析服务后，将在这里显示工作表、区域、映射和关联结果。标准格式可直接在工程建模中导入。" action={<Button onClick={()=>go('models/facility')}>进入工程建模<ArrowRight size={14}/></Button>}/>}
-      <div className="source-footer"><span>SHA-256 <code>{source.hash.slice(0,28)}…</code></span>{source.state!=='recognized'&&<Button kind="ghost" disabled={!can('bom:import')} onClick={()=>{void api.removeSource(source.id).then(()=>setParams({})).catch(e=>setError(e.message));}}><Trash2 size={13}/>移除待分析资料</Button>}<button className="text-link" onClick={()=>notify('来源摘要用于相同资料复用；原始文件和分析产物保留独立版本与来源。')}>来源版本说明</button></div></>:<Empty title="添加第一份工程资料" description="无需先选择工程步骤，资料会按内容分类。" action={<Button onClick={()=>picker.current?.click()}>选择文件</Button>}/>}</div>
-    </div>
-  </>;
+ const {api,state:s,go,notify,inspect,can}=useWorkspace();
+ const [params,setParams]=useSearchParams();
+ const source=s.sources.find(v=>v.id===params.get('source'))??s.sources[0];
+ const sourceId=source?.id;
+ const [report,setReport]=useState<SourceUnderstanding>();
+ const [regionId,setRegionId]=useState('');
+ const [preview,setPreview]=useState<SourceRegionPreview>();
+ const [offset,setOffset]=useState(0),[view,setView]=useState<'source'|'normalized'>('source');
+ const [loading,setLoading]=useState(false),[previewLoading,setPreviewLoading]=useState(false);
+ const [error,setError]=useState(''),[previewError,setPreviewError]=useState('');
+ const [retry,setRetry]=useState(0),[previewRetry,setPreviewRetry]=useState(0);
+ const [uploading,setUploading]=useState(false),[drag,setDrag]=useState(false),[reusing,setReusing]=useState(false);
+ const picker=useRef<HTMLInputElement>(null);
+ const requestKey=`${s.projectId}:${sourceId??''}:${s.revision}`;
+ const requestKeyRef=useRef<string|null>(requestKey);
+ requestKeyRef.current=requestKey;
+ useEffect(()=>{requestKeyRef.current=requestKey;setReusing(false);return()=>{requestKeyRef.current=null;};},[api,requestKey]);
+ const currentReport=report?.sourceId===sourceId?report:undefined;
+ const regions=currentReport?.regions??[];
+ const region=regions.find(r=>r.id===regionId)??regions[0];
+ useEffect(()=>{let active=true;setLoading(true);setError('');setReport(undefined);setOffset(0);setRegionId('');
+  if(!sourceId){setLoading(false);return;}
+  void api.sourceUnderstanding(sourceId).then(data=>{if(active)setReport(data);}).catch(e=>{if(active)setError(e.message);}).finally(()=>{if(active)setLoading(false);});
+  return()=>{active=false;};
+ },[api,sourceId,s.revision,retry]);
+ useEffect(()=>{let active=true;setPreview(undefined);setPreviewError('');
+  if(!sourceId||!region||!currentReport)return;
+  setPreviewLoading(true);
+  void api.sourceRegionPreview(sourceId,region.id,offset,currentReport.revisionId,view).then(data=>{if(active){if(data.revisionId!==currentReport.revisionId)throw Error('资料版本已变化，请重新读取识别结果');setPreview(data);}}).catch(e=>{if(active)setPreviewError(e.message);}).finally(()=>{if(active)setPreviewLoading(false);});
+  return()=>{active=false;};
+ },[api,sourceId,region?.id,currentReport?.revisionId,offset,view,previewRetry]);
+ const add=async(files:File[])=>{setError('');setUploading(true);try{await api.addSources(files);notify('资料已添加，等待分析服务处理');}catch(e){setError((e as Error).message);}finally{setUploading(false);}};
+ const reuse=async()=>{if(!sourceId)return;const key=requestKeyRef.current;setReusing(true);setError('');try{const data=await api.reuseSourceHistory(sourceId);if(requestKeyRef.current!==key)return;setReport(data);setOffset(0);setPreviewRetry(n=>n+1);notify('已复用历史资料与证据，未调用 AI，也未修改已确认输入');}catch(e){if(requestKeyRef.current===key)setError((e as Error).message);}finally{if(requestKeyRef.current===key)setReusing(false);}};
+ const columns=[...new Set(preview?.rows.flatMap(row=>row.cells.map(cell=>cell.column))??[])].sort((a,b)=>a-b);
+ const sourceEvidence=(cell:string)=>({sourceId:sourceId!,sheet:region?.sheet??'',cell,method:'source' as const});
+ return <>
+  <Heading eyebrow="SOURCES & INTELLIGENCE" title="资料与识别" description="一次接入多份资料，分类、关联，保留每项数据的依据。" action={<Button kind="primary" onClick={()=>picker.current?.click()} disabled={uploading||!can('bom:import')}><Plus size={15}/>添加资料</Button>}/>
+  <input ref={picker} hidden type="file" multiple accept=".xlsx,.csv,.pdf,.txt" onChange={e=>{void add([...e.target.files??[]]);e.target.value='';}}/>
+  <div className={`upload-strip ${drag?'dragging':''}`} onDragOver={e=>{e.preventDefault();setDrag(true);}} onDragLeave={()=>setDrag(false)} onDrop={e=>{e.preventDefault();setDrag(false);if(can('bom:import')&&!uploading)void add([...e.dataTransfer.files]);}}><span className="upload-icon"><UploadCloud size={23}/></span><div><b>{uploading?'正在登记资料…':'将工程资料拖入此处'}</b><p>设备清单、端接表、机柜布局、网络规划可以一起提交。</p></div><span className="file-formats">XLSX · CSV · PDF · TXT</span><Button onClick={()=>picker.current?.click()} disabled={uploading||!can('bom:import')}>选择文件</Button></div>
+  <div className="source-layout"><aside className="source-rail"><div className="rail-heading"><b>资料包</b><span>{s.sources.length}</span></div>{s.sources.map(item=><button className={'source-file '+(sourceId===item.id?'selected':'')} key={item.id} onClick={()=>{setParams({source:item.id});setRegionId('');setOffset(0);}}><FileSpreadsheet size={20}/><span><b>{item.name}</b><small>{item.size} · v{item.version}</small><Badge state={item.state}>{sourceLabels[item.state]??item.state}</Badge></span></button>)}<div className="source-rail-foot"><FolderOpen size={15}/><span>相同内容按摘要复用，增补资料独立处理。</span></div></aside>
+   <div className="source-main">{source?<>
+    <div className="source-header"><FileSpreadsheet size={22}/><div><h2>{source.name}</h2><p>{source.size} · 添加于 {formatDate(source.createdAt)}</p></div><Badge state={source.state}>{sourceLabels[source.state]??source.state}</Badge><Button disabled={reusing||loading||!can('bom:import')} onClick={()=>void reuse()}>{reusing?'正在复用历史资料…':'复用历史资料'}</Button><Button onClick={()=>go('review')}>核对识别结果<ArrowRight size={14}/></Button></div>
+    {error&&<Notice tone="error">{error}<Button onClick={()=>setRetry(n=>n+1)}>重新读取</Button></Notice>}
+    {loading?<div className="empty" aria-busy="true" role="status">正在读取资料理解与历史证据…</div>:currentReport&&<>
+     <div className="recognition-pipeline">{Object.entries(stepNames).map(([id,label],i)=>{const step=currentReport.steps.find(x=>x.id===id);return <div key={id} className={`recognition-step ${step?.state??'pending'}`} title={step?.note??'尚无阶段结果'}><span>{step?.state==='complete'?<Check size={12}/>:<Search size={12}/>}</span><b>{label}<small>{stepStates[step?.state??'pending']}{step&&step.total>0?` ${step.completed}/${step.total}`:''}</small></b>{i<4&&<ChevronRight size={13}/>}</div>;})}</div>
+     <div className="source-understanding-note"><b>{currentReport.origin==='history'?'历史资料与已有候选复用':'尚无资料识别结果'}</b>{currentReport.limitations.map((note,i)=><p key={i}>{note}</p>)}</div>
+     {regions.length?<div className="source-region-layout"><div className="region-rail"><small>工作表与数据区域</small>{regions.map(r=><button className={region?.id===r.id?'active':''} key={r.id} onClick={()=>{setRegionId(r.id);setOffset(0);setPreview(undefined);}}><span><b>{r.sheet}</b><small>{r.range} · {r.category==='unknown'?'待分类':r.category}</small></span><span className="region-count">{r.rowCount}</span></button>)}</div><div className="region-content">
+      <div className="region-heading"><div><h3>{region?.sheet}</h3><p>{region?.note}</p></div><Badge state={region?.state??'needs_input'}/></div>
+      <Tabs items={[{id:'source',label:'来源数据'},{id:'normalized',label:'标准化对象'}]} value={view} onChange={value=>{setView(value as 'source'|'normalized');setOffset(0);setPreview(undefined);}}/>
+      {previewLoading?<div className="empty" role="status" aria-busy="true">正在读取所选区域…</div>:previewError?<Notice tone="error">{previewError}<Button onClick={()=>setPreviewRetry(n=>n+1)}>重新加载区域</Button><Button onClick={()=>setRetry(n=>n+1)}>刷新资料版本</Button></Notice>:preview&&<>
+       {view==='source'?<div className="sheet-preview"><table><thead><tr><th aria-label="Excel 行号"/>{columns.map(col=><th key={col}>{columnLabel(col)}</th>)}</tr></thead><tbody>{preview.rows.map(row=><tr key={row.row}><th>{row.row}</th>{columns.map(col=>{const cell=row.cells.find(c=>c.column===col);return <td key={col} className={cell?.fields.some(field=>field.includes('_candidate'))?'candidate-cell':cell?.fields.length?'highlight-cell':''}>{cell&&<button className="source-cell" title={[cell.cell,!cell.sensitive&&cell.formula?`公式：${cell.formula}`:'',...cell.fields].filter(Boolean).join(' · ')} onClick={()=>inspect('evidence',`${source.id}:${cell.cell}`,sourceEvidence(cell.cell))}>{cell.sensitive?'[敏感信息已遮蔽]':cell.value||'—'}</button>}</td>;})}</tr>)}</tbody></table>{!preview.rows.length&&<Empty title="此区域暂无可预览单元格" description={region?.note??'来源范围仍然保留，可继续核对历史对象。'}/>}</div>:<div className="source-normalized">{preview.rows.flatMap(row=>row.objects??[]).map(item=><button className="relationship-row" key={item.id} onClick={()=>{const kind=objectKind(item.kind);if(kind==='evidence')inspect('evidence',item.id,{...sourceEvidence(region?.range??''),note:`区域来源，非字段证据。对象：${item.label||item.id}（${item.kind}）；此处仅表示该对象与当前来源区域有关联。`});else inspect(kind,item.id);}}><span><b>{item.label||item.id}</b><small>{item.kind} · {item.fields.map(f=>`${f.field}: ${f.value}`).join('、')||'对象级证据'} · {item.evidence} 条证据</small></span><ArrowRight size={14}/></button>)}{!preview.rows.some(row=>row.objects?.length)&&<Empty title="暂无关联工程对象" description="原始区域仍保留；没有对应字段证据不代表该区域已处理完成。"/>}</div>}
+       <div className="source-pagination"><span>{view==='source'?'来源行':'工程对象'} {preview.total?preview.offset+1:0}–{Math.min(preview.offset+preview.limit,preview.total)} / {preview.total}</span><Button disabled={offset===0} onClick={()=>setOffset(Math.max(0,offset-20))}>上一页</Button><Button disabled={preview.offset+preview.limit>=preview.total} onClick={()=>setOffset(offset+20)}>下一页</Button></div>
+      </>}
+      <div className="mapping-strip"><span>来源区域</span><b>{region?.range}</b><ArrowRight size={15}/><span>工程类别</span><b>{region?.categories.join('、')||'待分类'}</b><span className="mapping-count">{region?.objectCount??0} 个对象</span></div>
+      <div className="source-note"><span>{region?.coveredCells??0} / {region?.totalCells??0} 个单元格有证据 · {region?.fieldEvidenceCount??0} 条字段证据。对象级证据不等于字段已核对；标记 _candidate 的字段仅为精确值匹配候选，未经人工确认。</span></div>
+      {!!region?.mappings.length&&<div className="source-mappings">{region.mappings.map((m,i)=><span key={i}>{m.field} · {m.kind==='field'?'字段':'对象'} {m.count}</span>)}</div>}
+      {!!region?.issues.length&&<Notice tone="warning">{region.issues.map((issue,i)=><p key={i}>{issue}</p>)}</Notice>}
+     </div></div>:<Empty title="暂无数据区域结果" description="可复用已有历史资料生成区域和证据报告；新 Agent 尚未接入，不会将上传标记为识别完成。"/>}
+     <div className="source-stage-notes">{currentReport.steps.filter(step=>step.note).map(step=><p key={step.id}><b>{stepNames[step.id]}：</b>{step.note}</p>)}</div>
+    </>}
+    <div className="source-footer"><span>SHA-256 <code>{source.hash.slice(0,28)}…</code></span>{source.state==='awaiting_analysis'&&<Button kind="ghost" disabled={!can('bom:import')} onClick={()=>{void api.removeSource(source.id).then(()=>setParams({})).catch(e=>setError(e.message));}}><Trash2 size={13}/>移除待分析资料</Button>}<button className="text-link" onClick={()=>notify('原始资料与历史工程证据保留独立版本；复用不调用 AI，不覆盖已确认输入。')}>来源版本说明</button></div>
+   </>:<Empty title="添加第一份工程资料" description="无需先选择工程步骤，资料按内容分类。" action={<Button disabled={!can('bom:import')} onClick={()=>picker.current?.click()}>选择文件</Button>}/>}</div>
+  </div>
+ </>;
 }

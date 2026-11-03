@@ -1,0 +1,50 @@
+{
+  "status": "source_implemented_not_deployed",
+  "scope": "Existing MM data; read-only database connections; derived MinIO report writes only",
+  "ai_requests": 0,
+  "engineering_input_or_publication_writes": 0,
+  "workspace_revision_unchanged": true,
+  "single_run_seconds": 9.122,
+  "structural_regions": 54,
+  "meaningful_cells": 192318,
+  "candidate_located_cells": 29583,
+  "region_object_references_with_duplicates": 24204,
+  "confirmed_field_evidence": 0,
+  "connection_candidates_with_exact_same_row_endpoint_pair": 7154,
+  "connection_candidates_without_validation_issues": 7154,
+  "checks": [
+    "source preview pagination across all recovered regions",
+    "stale head UUID returns 409",
+    "same-head reuse returns stored report",
+    "workspace revision unchanged",
+    "ambiguous and sensitive identity refusal",
+    "exact connection pair and cross-row refusal",
+    "completion supports complete/partial/pending without false 0/0 pass"
+  ],
+  "limits": [
+    "Single service run, not HTTP deployment or P95 acceptance",
+    "Workbook IR regions are structural chunks, not proven complete business-table boundaries",
+    "Reconstructed unique SN/MAC and same-row physical-port pairs are candidates, not original field definitions or human approval",
+    "Historical reviewed_model evidence has no real source cell coordinate",
+    "Frontend check is local built-code protocol replay; no deployed HTTP write or real provider acceptance"
+  ],
+  "frontend_build": "PASS: npm run build (TypeScript + Vite); final async-key edit checked by npx tsc --noEmit",
+  "targeted_go_tests": "PASS: ambiguous/sensitive identity, exact same-row endpoint pair and cross-row refusal, completion scope",
+  "api_documentation_check": "PASS: 167 registered operations",
+  "frontend_protocol_replay": {
+    "status": "PASS",
+    "scope": "Local built frontend protocol replay with synthetic understanding responses and private existing workspace shell; not deployed API acceptance",
+    "checks": [
+      "history reuse action",
+      "five independent states",
+      "20-row preview and page two",
+      "Excel column labels",
+      "region switch resets pagination",
+      "candidate source evidence Drawer without entity request",
+      "normalized region evidence without fake entity context"
+    ],
+    "viewCalls": 4,
+    "contextCalls": 0,
+    "pageErrors": 0
+  }
+}

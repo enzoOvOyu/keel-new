@@ -4,6 +4,54 @@
  */
 
 export interface paths {
+    "/projects/{projectId}/kickoff/sources/{sourceId}/understanding": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getKickoffSourceUnderstanding"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/kickoff/sources/{sourceId}/reuse-history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["reuseKickoffSourceUnderstanding"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/kickoff/sources/{sourceId}/regions/{regionId}/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getKickoffSourceRegionPreview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/projects/{projectId}/kickoff/preview": {
         parameters: {
             query?: never;
@@ -7331,6 +7379,85 @@ export interface components {
             capacityU: number | null;
             evidence: components["schemas"]["KickoffEvidence"];
         };
+        KickoffUnderstandingStep: {
+            /** @enum {string} */
+            id: "structure" | "regions" | "semantics" | "relationships" | "fields";
+            /** @enum {string} */
+            state: "complete" | "partial" | "pending" | "unsupported";
+            count: number;
+            completed: number;
+            total: number;
+            note: string;
+        };
+        KickoffUnderstandingMapping: {
+            field: string;
+            /** @enum {string} */
+            kind: "field" | "object";
+            count: number;
+        };
+        KickoffUnderstandingRegion: {
+            id: string;
+            sheet: string;
+            range: string;
+            category: string;
+            rowCount: number;
+            /** @enum {string} */
+            state: "extracted" | "needs_input" | "unmapped";
+            note: string;
+            categories: string[];
+            evidenceCount: number;
+            fieldEvidenceCount: number;
+            objectCount: number;
+            coveredCells: number;
+            totalCells: number;
+            mappings: components["schemas"]["KickoffUnderstandingMapping"][];
+            issues: string[];
+        };
+        KickoffUnderstanding: {
+            sourceId: string;
+            revisionId: string;
+            /** @enum {string} */
+            state: "historical" | "partial" | "unsupported";
+            /** @enum {string} */
+            origin: "history" | "none";
+            steps: components["schemas"]["KickoffUnderstandingStep"][];
+            regions: components["schemas"]["KickoffUnderstandingRegion"][];
+            limitations: string[];
+        };
+        KickoffUnderstandingCell: {
+            cell: string;
+            column: number;
+            value: string;
+            formula: string;
+            sensitive: boolean;
+            fields: string[];
+            entityIds: string[];
+        };
+        KickoffUnderstandingField: {
+            field: string;
+            value: string;
+        };
+        KickoffUnderstandingObject: {
+            id: string;
+            kind: string;
+            label: string;
+            fields: components["schemas"]["KickoffUnderstandingField"][];
+            evidence: number;
+        };
+        KickoffUnderstandingRow: {
+            row: number;
+            cells: components["schemas"]["KickoffUnderstandingCell"][];
+            objects: components["schemas"]["KickoffUnderstandingObject"][];
+        };
+        KickoffRegionPreview: {
+            sourceId: string;
+            revisionId: string;
+            regionId: string;
+            offset: number;
+            limit: number;
+            total: number;
+            rows: components["schemas"]["KickoffUnderstandingRow"][];
+        };
         KickoffSourceRegion: {
             id: string;
             sheet: string;
@@ -7347,7 +7474,7 @@ export interface components {
             size: string;
             version: number;
             /** @enum {string} */
-            state: "recognized" | "awaiting_analysis" | "needs_input";
+            state: "recognized" | "historical" | "partial" | "awaiting_analysis" | "needs_input";
             hash: string;
             createdAt: string;
             regions: components["schemas"]["KickoffSourceRegion"][];
@@ -18332,6 +18459,259 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    getKickoffSourceUnderstanding: {
+        parameters: {
+            query?: {
+                /** @description Engineering head UUID; stale requests return 409. revision_id is accepted as an alias. */
+                revisionId?: string;
+            };
+            header?: never;
+            path: {
+                projectId: string;
+                sourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Rebuildable historical read product; not AI recognition or engineering approval. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["KickoffUnderstanding"];
+                        request_id: string;
+                    };
+                };
+            };
+            /** @description Permission, missing source/report, revision conflict, unsupported history, or storage failure. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Permission, missing source/report, revision conflict, unsupported history, or storage failure. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Permission, missing source/report, revision conflict, unsupported history, or storage failure. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Permission, missing source/report, revision conflict, unsupported history, or storage failure. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Permission, missing source/report, revision conflict, unsupported history, or storage failure. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Permission, missing source/report, revision conflict, unsupported history, or storage failure. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    reuseKickoffSourceUnderstanding: {
+        parameters: {
+            query?: {
+                /** @description Engineering head UUID; stale requests return 409. revision_id is accepted as an alias. */
+                revisionId?: string;
+            };
+            header?: never;
+            path: {
+                projectId: string;
+                sourceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Rebuildable historical read product; not AI recognition or engineering approval. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["KickoffUnderstanding"];
+                        request_id: string;
+                    };
+                };
+            };
+            /** @description Permission, missing source/report, revision conflict, unsupported history, or storage failure. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Permission, missing source/report, revision conflict, unsupported history, or storage failure. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Permission, missing source/report, revision conflict, unsupported history, or storage failure. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Permission, missing source/report, revision conflict, unsupported history, or storage failure. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Permission, missing source/report, revision conflict, unsupported history, or storage failure. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Permission, missing source/report, revision conflict, unsupported history, or storage failure. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    getKickoffSourceRegionPreview: {
+        parameters: {
+            query?: {
+                /** @description Engineering head UUID; stale requests return 409. revision_id is accepted as an alias. */
+                revisionId?: string;
+                offset?: number;
+                limit?: number;
+                view?: "source" | "normalized";
+            };
+            header?: never;
+            path: {
+                projectId: string;
+                sourceId: string;
+                regionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Rebuildable historical read product; not AI recognition or engineering approval. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["KickoffRegionPreview"];
+                        request_id: string;
+                    };
+                };
+            };
+            /** @description Permission, missing source/report, revision conflict, unsupported history, or storage failure. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Permission, missing source/report, revision conflict, unsupported history, or storage failure. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Permission, missing source/report, revision conflict, unsupported history, or storage failure. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Permission, missing source/report, revision conflict, unsupported history, or storage failure. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Permission, missing source/report, revision conflict, unsupported history, or storage failure. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Permission, missing source/report, revision conflict, unsupported history, or storage failure. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
     evaluateKickoffPublicationScope: {
         parameters: {
             query?: never;

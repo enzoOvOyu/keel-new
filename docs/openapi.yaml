@@ -38,6 +38,263 @@ tags:
   - name: IA
     description: IA v2.3 project scope and lazy detail contracts
 paths:
+  /projects/{projectId}/kickoff/sources/{sourceId}/understanding:
+    get:
+      operationId: getKickoffSourceUnderstanding
+      tags:
+      - Kickoff
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema: &id001
+          type: string
+      - in: path
+        name: sourceId
+        required: true
+        schema: *id001
+      - in: query
+        name: revisionId
+        schema: *id001
+        description: Engineering head UUID; stale requests return 409. revision_id is
+          accepted as an alias.
+      responses:
+        '200':
+          description: Rebuildable historical read product; not AI recognition or engineering
+            approval.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: '#/components/schemas/KickoffUnderstanding'
+                  request_id: *id001
+                required:
+                - data
+                - request_id
+        '403':
+          description: Permission, missing source/report, revision conflict, unsupported
+            history, or storage failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '404':
+          description: Permission, missing source/report, revision conflict, unsupported
+            history, or storage failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '409':
+          description: Permission, missing source/report, revision conflict, unsupported
+            history, or storage failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '422':
+          description: Permission, missing source/report, revision conflict, unsupported
+            history, or storage failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '500':
+          description: Permission, missing source/report, revision conflict, unsupported
+            history, or storage failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '503':
+          description: Permission, missing source/report, revision conflict, unsupported
+            history, or storage failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+  /projects/{projectId}/kickoff/sources/{sourceId}/reuse-history:
+    post:
+      operationId: reuseKickoffSourceUnderstanding
+      tags:
+      - Kickoff
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema: *id001
+      - in: path
+        name: sourceId
+        required: true
+        schema: *id001
+      - in: query
+        name: revisionId
+        schema: *id001
+        description: Engineering head UUID; stale requests return 409. revision_id is
+          accepted as an alias.
+      responses:
+        '200':
+          description: Rebuildable historical read product; not AI recognition or engineering
+            approval.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: '#/components/schemas/KickoffUnderstanding'
+                  request_id: *id001
+                required:
+                - data
+                - request_id
+        '403':
+          description: Permission, missing source/report, revision conflict, unsupported
+            history, or storage failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '404':
+          description: Permission, missing source/report, revision conflict, unsupported
+            history, or storage failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '409':
+          description: Permission, missing source/report, revision conflict, unsupported
+            history, or storage failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '422':
+          description: Permission, missing source/report, revision conflict, unsupported
+            history, or storage failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '500':
+          description: Permission, missing source/report, revision conflict, unsupported
+            history, or storage failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '503':
+          description: Permission, missing source/report, revision conflict, unsupported
+            history, or storage failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+  /projects/{projectId}/kickoff/sources/{sourceId}/regions/{regionId}/preview:
+    get:
+      operationId: getKickoffSourceRegionPreview
+      tags:
+      - Kickoff
+      parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema: *id001
+      - in: path
+        name: sourceId
+        required: true
+        schema: *id001
+      - in: path
+        name: regionId
+        required: true
+        schema: *id001
+      - in: query
+        name: revisionId
+        schema: *id001
+        description: Engineering head UUID; stale requests return 409. revision_id is
+          accepted as an alias.
+      - in: query
+        name: offset
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - in: query
+        name: view
+        schema:
+          type: string
+          enum:
+          - source
+          - normalized
+          default: source
+      responses:
+        '200':
+          description: Rebuildable historical read product; not AI recognition or engineering
+            approval.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: '#/components/schemas/KickoffRegionPreview'
+                  request_id: *id001
+                required:
+                - data
+                - request_id
+        '403':
+          description: Permission, missing source/report, revision conflict, unsupported
+            history, or storage failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '404':
+          description: Permission, missing source/report, revision conflict, unsupported
+            history, or storage failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '409':
+          description: Permission, missing source/report, revision conflict, unsupported
+            history, or storage failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '422':
+          description: Permission, missing source/report, revision conflict, unsupported
+            history, or storage failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '500':
+          description: Permission, missing source/report, revision conflict, unsupported
+            history, or storage failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '503':
+          description: Permission, missing source/report, revision conflict, unsupported
+            history, or storage failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
   /projects/{projectId}/kickoff/preview:
     post:
       operationId: evaluateKickoffPublicationScope
@@ -19063,6 +19320,232 @@ components:
         - room
         - capacityU
         - evidence
+    KickoffUnderstandingStep:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          enum:
+          - structure
+          - regions
+          - semantics
+          - relationships
+          - fields
+        state:
+          type: string
+          enum:
+          - complete
+          - partial
+          - pending
+          - unsupported
+        count: &id001
+          type: integer
+        completed: *id001
+        total: *id001
+        note: &id002
+          type: string
+      required:
+      - id
+      - state
+      - count
+      - completed
+      - total
+      - note
+    KickoffUnderstandingMapping:
+      type: object
+      additionalProperties: false
+      properties:
+        field: *id002
+        kind:
+          type: string
+          enum:
+          - field
+          - object
+        count: *id001
+      required:
+      - field
+      - kind
+      - count
+    KickoffUnderstandingRegion:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        sheet:
+          type: string
+        range:
+          type: string
+        category:
+          type: string
+        rowCount:
+          type: number
+        state:
+          type: string
+          enum:
+          - extracted
+          - needs_input
+          - unmapped
+        note:
+          type: string
+        categories:
+          type: array
+          items: *id002
+        evidenceCount: *id001
+        fieldEvidenceCount: *id001
+        objectCount: *id001
+        coveredCells: *id001
+        totalCells: *id001
+        mappings:
+          type: array
+          items:
+            $ref: '#/components/schemas/KickoffUnderstandingMapping'
+        issues:
+          type: array
+          items: *id002
+      required:
+      - id
+      - sheet
+      - range
+      - category
+      - rowCount
+      - state
+      - note
+      - categories
+      - evidenceCount
+      - fieldEvidenceCount
+      - objectCount
+      - coveredCells
+      - totalCells
+      - mappings
+      - issues
+    KickoffUnderstanding:
+      type: object
+      additionalProperties: false
+      properties:
+        sourceId: *id002
+        revisionId: *id002
+        state:
+          type: string
+          enum:
+          - historical
+          - partial
+          - unsupported
+        origin:
+          type: string
+          enum:
+          - history
+          - none
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/KickoffUnderstandingStep'
+        regions:
+          type: array
+          items:
+            $ref: '#/components/schemas/KickoffUnderstandingRegion'
+        limitations:
+          type: array
+          items: *id002
+      required:
+      - sourceId
+      - revisionId
+      - state
+      - origin
+      - steps
+      - regions
+      - limitations
+    KickoffUnderstandingCell:
+      type: object
+      additionalProperties: false
+      properties:
+        cell: *id002
+        column: *id001
+        value: *id002
+        formula: *id002
+        sensitive:
+          type: boolean
+        fields:
+          type: array
+          items: *id002
+        entityIds:
+          type: array
+          items: *id002
+      required:
+      - cell
+      - column
+      - value
+      - formula
+      - sensitive
+      - fields
+      - entityIds
+    KickoffUnderstandingField:
+      type: object
+      additionalProperties: false
+      properties:
+        field: *id002
+        value: *id002
+      required:
+      - field
+      - value
+    KickoffUnderstandingObject:
+      type: object
+      additionalProperties: false
+      properties:
+        id: *id002
+        kind: *id002
+        label: *id002
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/KickoffUnderstandingField'
+        evidence: *id001
+      required:
+      - id
+      - kind
+      - label
+      - fields
+      - evidence
+    KickoffUnderstandingRow:
+      type: object
+      additionalProperties: false
+      properties:
+        row: *id001
+        cells:
+          type: array
+          items:
+            $ref: '#/components/schemas/KickoffUnderstandingCell'
+        objects:
+          type: array
+          items:
+            $ref: '#/components/schemas/KickoffUnderstandingObject'
+      required:
+      - row
+      - cells
+      - objects
+    KickoffRegionPreview:
+      type: object
+      additionalProperties: false
+      properties:
+        sourceId: *id002
+        revisionId: *id002
+        regionId: *id002
+        offset: *id001
+        limit: *id001
+        total: *id001
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/KickoffUnderstandingRow'
+      required:
+      - sourceId
+      - revisionId
+      - regionId
+      - offset
+      - limit
+      - total
+      - rows
     KickoffSourceRegion:
       type: object
       additionalProperties: false
@@ -19109,6 +19592,8 @@ components:
           type: string
           enum:
             - recognized
+            - historical
+            - partial
             - awaiting_analysis
             - needs_input
         hash:
