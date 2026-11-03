@@ -4,17 +4,18 @@ import {identitySnapshot} from '../../../../lib/api/identityBridge';
 import {useNavigate} from 'react-router-dom';
 import {infrastructureApi,type InfraAsset,type InfraQuerySnapshot} from '../../../../lib/api/infrastructure';
 import {useWorkspace} from '../../context';
-import {Badge,Button,DataTable,Notice} from '../ui';
+import {Badge,Button,DataTable,Notice,Modal,Tabs} from '../ui';
 import {ModelEditor} from '../ModelEditor';
 import {modelRows} from './FacilityEntities';
 
 // Reuse the server's missing-endpoint filter; never load all ports or connections.
-export function TopologyPrerequisites({assets,snapshot,rackGaps,partial,refresh,cacheRevision}:{assets:InfraAsset[];snapshot:string;rackGaps:number;partial:boolean;refresh:()=>void;cacheRevision:number}){
+export function TopologyPrerequisites({assets,snapshot,rackGaps,partial,refresh,cacheRevision,supplement}:{supplement:(view:'global'|'rack')=>void;assets:InfraAsset[];snapshot:string;rackGaps:number;partial:boolean;refresh:()=>void;cacheRevision:number}){
  const {state:s,can,go}=useWorkspace(),navigate=useNavigate();
  const [cursor,setCursor]=useState<string>();
- const [editRoles,setEditRoles]=useState(false);
+ const [dialog,setDialog]=useState<{title:string;tab:string;network:boolean}>();
  const identity=identitySnapshot();
- const query=useQuery({queryKey:['kickoff-facility-connections',identity?.user.id,identity?.permission_revision,s.projectId,snapshot,cacheRevision,cursor],staleTime:Infinity,gcTime:30*60*1000,refetchOnMount:false,refetchOnWindowFocus:false,
+ const connectionKey=['kickoff-facility-connections',identity?.user.id,identity?.permission_revision,s.projectId,snapshot,cacheRevision,cursor];
+ const query=useQuery({queryKey:connectionKey,staleTime:Infinity,gcTime:30*60*1000,refetchOnMount:false,refetchOnWindowFocus:false,
   queryFn:async({signal})=>{const [missing,all]=await Promise.all([infrastructureApi.connections(s.projectId,{status:'incomplete',limit:10,snapshot_id:snapshot,cursor},signal),infrastructureApi.connections(s.projectId,{limit:1,snapshot_id:snapshot},signal)]);return {missing,hasConnections:all.cables.length>0}}
  });
  const result=query.data,error=query.error?.message;
@@ -25,18 +26,22 @@ export function TopologyPrerequisites({assets,snapshot,rackGaps,partial,refresh,
  const connectionReady=!!result&&!missing?.truncated&&!missing?.cables.length&&!missing?.page.has_more&&!cursor&&result.hasConnections;
  const baseStatus=(count:number)=>partial?'待完成检查':!assets.length?'尚无入库资料':count?'待补充':'已满足';
  const rows=[
-  {name:'全局拓扑',requirement:'机房 → 机柜 → 设备归属',status:baseStatus(locations)},
-  {name:'网络架构',requirement:'设备角色与双端连接；Fabric 使用已登记归属',status:partial?'待完成检查':!switches.length?'尚无交换机资料':roles.length?`${roles.length} 台缺少角色`:connectionStatus},
-  {name:'物理布线',requirement:'线缆两端端口及所属设备',status:connectionStatus},
-  {name:'链路追踪',requirement:'已登记的双端物理连接',status:connectionStatus},
-  {name:'机柜与机房',requirement:'机房归属、U位 / 高度、机柜供电容量与设备规划功率',status:baseStatus(rackGaps)},
+  {id:'global',name:'全局拓扑',requirement:'机房 → 机柜 → 设备归属',status:baseStatus(locations)},
+  {id:'network',name:'网络架构',requirement:'设备角色与双端连接；Fabric 使用已登记归属',status:partial?'待完成检查':!switches.length?'尚无交换机资料':roles.length?`${roles.length} 台缺少角色`:connectionStatus},
+  {id:'physical',name:'物理布线',requirement:'线缆两端端口及所属设备',status:connectionStatus},
+  {id:'trace',name:'链路追踪',requirement:'已登记的双端物理连接',status:connectionStatus},
+  {id:'rack',name:'机柜与机房',requirement:'机房归属、U位 / 高度、机柜供电容量与设备规划功率',status:baseStatus(rackGaps)},
  ];
  const cmdb=(id:string,changeset?:string)=>navigate('/cmdb/history?'+new URLSearchParams({project_id:s.projectId,asset:id,...(changeset?{changeset}:{})}));
  return <div className="facility-topology-check">
   {!partial&&assets.length>0&&!locations&&!rackGaps&&!roles.length&&connectionReady&&<p className="facility-relation-ready">当前已登记资料满足基础拓扑绘制要求，下方为 CMDB 机柜清单。</p>}
-  <div className="table-scroll"><table className="facility-requirements-table"><thead><tr><th>消费视图</th><th>使用的已入库信息</th><th>资料状态</th></tr></thead><tbody>{rows.map(row=><tr key={row.name}><td>{row.name}</td><td>{row.requirement}</td><td><Badge state={['已满足','双端资料已齐'].includes(row.status)?'ready':'needs_input'}>{row.status}</Badge></td></tr>)}</tbody></table></div>
+  <div className="table-scroll"><table className="facility-requirements-table"><thead><tr><th>消费视图</th><th>使用的已入库信息</th><th>资料状态</th><th>补充资料</th></tr></thead><tbody>{rows.map(row=><tr key={row.name}><td>{row.name}</td><td>{row.requirement}</td><td><Badge state={['已满足','双端资料已齐'].includes(row.status)?'ready':'needs_input'}>{row.status}</Badge></td><td>{!['已满足','双端资料已齐'].includes(row.status)&&<Button kind="primary" disabled={row.status==='正在读取'} onClick={()=>{if(row.status==='待完成检查'||row.status==='检查失败'||row.status==='返回不完整'){refresh();return;}if(row.id==='global'||row.id==='rack'){if(!assets.length){setDialog({title:row.name,tab:'connections',network:false});return;}supplement(row.id);return;}setDialog({title:row.name,tab:row.id==='network'&&roles.length?'network_roles':'connections',network:row.id==='network'});}}>{['待完成检查','检查失败','返回不完整'].includes(row.status)?'重新检查':'补充信息'}</Button>}</td></tr>)}</tbody></table></div>
   {error&&<Notice tone="error">连接资料检查未完成：{error}<Button onClick={refresh}>重新检查</Button></Notice>}
-  {!!roles.length&&<div className="facility-inline-gaps"><b>{roles.length} 台交换机尚未登记角色</b><p className="muted small-copy">角色用于网络分层；复用网络工程输入补录。保存后仍为工程输入，CMDB 读取到发布值前保持待补充。</p><Button kind="primary" disabled={!can('bom:edit')} onClick={()=>setEditRoles(true)}>批量补录交换机角色</Button></div>}
+  <details className="facility-topology-notes"><summary>显示信息与补录范围</summary><p>线缆介质、额定速率与长度可继续增补，不阻断基础连线。逻辑 Fabric 只使用明确归属；链路实际状态、流量、电力和温度来自采集，不通过手填判定正常。</p><p>机房空间视图目前为示意布局；实际坐标与尺寸不作为当前绘图的必填项。物理追踪只表示登记的连接，不等于实测连通。</p></details>
+  {dialog?.tab==='network_roles'&&<ModelEditor keepOpenOnSave fieldKeys={['device_id','role']} title={dialog.title+' · 补充信息'} tableId="network_roles" targetIds={roles.map(a=>a.id)} initialRows={[...modelRows(s,'network_roles'),...roles.filter(a=>!modelRows(s,'network_roles').some(r=>r.device_id===a.id)).map(a=>({device_id:a.id,role:''}))]} entityChoices={{device_id:roles.map(a=>({id:a.id,label:a.name}))}} relatedTables={[{id:'network_roles',label:'设备角色'},...(!connectionReady?[{id:'connections',label:'双端关联'}]:[])]} onTableChange={tab=>setDialog({...dialog,tab})} close={()=>setDialog(undefined)}/>}
+  {dialog?.tab==='connections'&&<Modal title={dialog.title+' · 补充信息'} description="仅处理当前视图缺失的资料；已登记关系无需重填。" wide close={()=>setDialog(undefined)}>
+   <Tabs value="connections" items={[...(dialog.network&&roles.length?[{id:'network_roles',label:'设备角色'}]:[]),{id:'connections',label:'双端关联'}]} onChange={tab=>setDialog({...dialog,tab})}/>
+   {dialog.network&&!switches.length?<Notice>尚无已入库交换机资料。<Button onClick={()=>go('review')}>核对设备资料</Button></Notice>:!assets.length?<Notice>尚无入库资料，请先核对并确认入库。<Button onClick={()=>go('publish')}>查看入库范围</Button></Notice>:<>
   {!!missing?.cables.length&&<div className="facility-inline-gaps"><b>待补充双端关联</b><DataTable data={missing.cables} pageSize={10} columns={[
    {id:'name',header:'线缆',cell:({row})=>missing.assets.find(a=>a.id===row.original.id)?.name||row.original.id},
    {id:'gap',header:'缺少信息',cell:({row})=>[!row.original.a&&'本端端口',!row.original.b&&'对端端口',!row.original.device_a&&'本端设备归属',!row.original.device_b&&'对端设备归属'].filter(Boolean).join('、')},
@@ -44,7 +49,12 @@ export function TopologyPrerequisites({assets,snapshot,rackGaps,partial,refresh,
   ]}/><div className="actions">{cursor&&<Button onClick={()=>setCursor(undefined)}>返回首批缺项</Button>}{missing.page.has_more&&<Button onClick={()=>setCursor(missing.page.next_cursor??undefined)}>查看下一批缺项</Button>}</div></div>}
   {cursor&&!missing?.cables.length&&<Button onClick={()=>setCursor(undefined)}>返回首批缺项</Button>}
   {result&&!result.hasConnections&&<p className="facility-relation-summary">尚未入库连接资料。<Button onClick={()=>go('review')}>核对连接资料</Button></p>}
-  <details className="facility-topology-notes"><summary>显示信息与补录范围</summary><p>线缆介质、额定速率与长度可继续增补，不阻断基础连线。逻辑 Fabric 只使用明确归属；链路实际状态、流量、电力和温度来自采集，不通过手填判定正常。</p><p>机房空间视图目前为示意布局；实际坐标与尺寸不作为当前绘图的必填项。物理追踪只表示登记的连接，不等于实测连通。</p></details>
-  {editRoles&&<ModelEditor tableId="network_roles" targetIds={roles.map(a=>a.id)} initialRows={[...modelRows(s,'network_roles'),...roles.filter(a=>!modelRows(s,'network_roles').some(r=>r.device_id===a.id)).map(a=>({device_id:a.id,role:''}))]} entityChoices={{device_id:roles.map(a=>({id:a.id,label:a.name}))}} close={()=>setEditRoles(false)}/>}
+
+   {error&&<Notice tone="error">{error}<Button onClick={refresh}>重新检查</Button></Notice>}
+   {connectionReady&&<Notice tone="success">双端资料已齐，无需补充。</Notice>}
+   <p className="muted small-copy">端口与设备归属通过现有 CMDB 关系变更处理，保留审核与发布。完成后点击刷新检查更新资料状态。</p>
+   <Button onClick={refresh}>刷新检查</Button></>}
+  </Modal>}
+
  </div>;
 }

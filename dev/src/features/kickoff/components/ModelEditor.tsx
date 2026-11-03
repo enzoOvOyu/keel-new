@@ -7,19 +7,20 @@ import { Button, Modal, Notice, Tabs } from './ui';
 import { EntityField, entityOptions, resolveEntity } from './facility/FacilityEntities';
 import './facility/facility.css';
 
-export function ModelEditor({ tableId, close, initialRows, targetIds, entityChoices, relatedTables, onTableChange, title, keepOpenOnSave }: { keepOpenOnSave?:boolean; relatedTables?:{id:string;label:string}[]; onTableChange?:(id:string)=>void; title?:string; tableId: string; close: () => void; initialRows?:ModelRow[]; targetIds?:string[]; entityChoices?:Record<string,{id:string;label:string}[]> }) {
+export function ModelEditor({ tableId, close, initialRows, targetIds, entityChoices, relatedTables, onTableChange, title, keepOpenOnSave, fieldKeys }: { fieldKeys?:string[]; keepOpenOnSave?:boolean; relatedTables?:{id:string;label:string}[]; onTableChange?:(id:string)=>void; title?:string; tableId: string; close: () => void; initialRows?:ModelRow[]; targetIds?:string[]; entityChoices?:Record<string,{id:string;label:string}[]> }) {
   const { api, state, run, can } = useWorkspace();
   const def = tableById(tableId);
+  const importDef=fieldKeys?{...def,fields:def.fields.filter(f=>fieldKeys.includes(f.key))}:def;
   const [showAdvanced,setShowAdvanced]=useState(false);
   const advancedKeys=tableId==='rooms'?['frame','unit']:tableId==='racks'?['x','y','orientation','frame','unit']:[];
-  const visibleFields=def.fields.filter(f=>showAdvanced||!advancedKeys.includes(f.key));
+  const visibleFields=def.fields.filter(f=>(!fieldKeys||fieldKeys.includes(f.key))&&(showAdvanced||!advancedKeys.includes(f.key)));
   const existing = state.models.find(m => m.tableId === tableId);
   const [rows, setRows] = useState<ModelRow[]>(() => structuredClone(initialRows ?? existing?.rows ?? []));
   const [preview, setPreview] = useState<ImportPreview>(), [error, setError] = useState(''), [source, setSource] = useState('页面编辑');
   const [page, setPage] = useState(0), [dirty, setDirty] = useState(false), [saving, setSaving] = useState(false);
   const [baseRevision,setBaseRevision] = useState(state.revision);
   const picker = useRef<HTMLInputElement>(null);
-  const scopeKey=['racks','rack_capacity'].includes(tableId)?'rack_id':'device_id';
+  const scopeKey=tableId==='rooms'?'room_id':['racks','rack_capacity'].includes(tableId)?'rack_id':'device_id';
   const scopedRows=rows.map((row,index)=>({row,index})).filter(v=>!targetIds||targetIds.includes(v.row[scopeKey])&&(tableId!=='power_profiles'||v.row.basis==='planned'));
   const pageSize = 12, pageRows = scopedRows.slice(page * pageSize, (page + 1) * pageSize);
   const editable = can('bom:edit') && !saving;
@@ -29,7 +30,7 @@ export function ModelEditor({ tableId, close, initialRows, targetIds, entityChoi
   const options = (key: string) => [...new Map([...entityOptions(state,key,tableId,rows),...(entityChoices?.[key]??[])].map(o=>[o.id,o])).values()];
   const labelFor = (key: string, value: string) => options(key).find(o => o.id === resolveEntity(options(key), value))?.label || value;
   async function importFile(file: File) {
-    try { setError(''); setPreview(await readModelFile(file, def)); setSource(file.name); }
+    try { setError(''); setPreview(await readModelFile(file, importDef)); setSource(file.name); }
     catch (e) { setError((e as Error).message); }
   }
   const finish = () => { if (saving || dirty && !window.confirm('有尚未应用的编辑。放弃这些编辑并关闭？')) return; close(); };
@@ -37,8 +38,8 @@ export function ModelEditor({ tableId, close, initialRows, targetIds, entityChoi
   return <Modal title={title??def.name + ' · 编辑输入'} description={def.description} close={finish} wide>
     <>{relatedTables&&<Tabs items={relatedTables} value={tableId} onChange={id=>{if(saving||dirty&&!window.confirm('切换前有未保存的编辑，是否放弃？'))return;onTableChange?.(id)}}/>}</>
     <div className="editor-tools"><div><b>{scopedRows.length} 行待核对</b><span>空配置可以保留，使用时再检查对应条件。</span></div><div className="actions">
-      <Button onClick={() => exportWorkbook(def, [], true)}><Download size={14}/>下载XLSX模板</Button>
-      <Button onClick={() => exportWorkbook(def, scopedRows.map(v=>v.row), false)}><Download size={14}/>导出当前输入</Button>
+      <Button onClick={() => exportWorkbook(importDef, [], true)}><Download size={14}/>下载XLSX模板</Button>
+      <Button onClick={() => exportWorkbook(importDef, scopedRows.map(v=>v.row), false)}><Download size={14}/>导出当前输入</Button>
       <Button disabled={!editable} onClick={() => picker.current?.click()}><Upload size={14}/>导入XLSX / CSV</Button>
       <Button disabled={!editable||!!targetIds} onClick={() => {
         const row = Object.fromEntries(def.fields.map(f => [f.key, '']));
@@ -51,7 +52,7 @@ export function ModelEditor({ tableId, close, initialRows, targetIds, entityChoi
     {stale && <Notice tone="warning">工程版本已变化，请保留导出后关闭并重新打开，避免覆盖新输入。</Notice>}
     {preview && <div className="import-preview"><div><b>导入预览 · {preview.sheet}</b><span>{preview.rows.length} 行 · {preview.errors.length ? '需要处理表头' : '字段已匹配'}</span></div>
       {preview.errors.map(e => <Notice key={e} tone="error">{e}</Notice>)}
-      <div className="table-scroll"><table><thead><tr>{def.fields.map(f => <th key={f.key}>{f.label}</th>)}</tr></thead><tbody>{preview.rows.slice(0, 3).map((r, i) => <tr key={i}>{def.fields.map(f => <td key={f.key}>{labelFor(f.key, r[f.key]) || '—'}</td>)}</tr>)}</tbody></table></div>
+      <div className="table-scroll"><table><thead><tr>{importDef.fields.map(f => <th key={f.key}>{f.label}</th>)}</tr></thead><tbody>{preview.rows.slice(0, 3).map((r, i) => <tr key={i}>{importDef.fields.map(f => <td key={f.key}>{labelFor(f.key, r[f.key]) || '—'}</td>)}</tr>)}</tbody></table></div>
       <div className="actions"><Button disabled={!editable} onClick={() => setPreview(undefined)}>取消导入</Button><Button kind="primary" disabled={!editable || !!preview.errors.length} onClick={() => {
         const incoming=preview.rows.map(row=>Object.fromEntries(Object.entries(row).map(([key,value])=>[key,isReference(key)?resolveEntity(options(key),value):value])));
         if(targetIds){
@@ -62,11 +63,11 @@ export function ModelEditor({ tableId, close, initialRows, targetIds, entityChoi
             for(const row of incoming){const index=next.findIndex(v=>v[scopeKey]===row[scopeKey]&&(tableId!=='power_profiles'||v.basis===row.basis));if(index>=0)next[index]={...next[index],...Object.fromEntries(Object.entries(row).filter(([,v])=>v!==''))};}
             return next;
           });
-        }else setRows(incoming);
+        }else if(fieldKeys){setRows(current=>{const next=[...current];for(const row of incoming){const index=row[scopeKey]?next.findIndex(v=>v[scopeKey]===row[scopeKey]):-1;if(index>=0)next[index]={...next[index],...Object.fromEntries(Object.entries(row).filter(([,v])=>v!==''))};else next.push(row);}return next;});}else setRows(incoming);
         setPreview(undefined); setPage(0); setDirty(true);
       }}>采用 {preview.rows.length} 行到编辑区</Button></div>
     </div>}
-    {!!advancedKeys.length&&<div className="editor-tools"><span>高级位置字段仅在需要绘制机房平面时补充。</span><Button kind="ghost" onClick={()=>setShowAdvanced(v=>!v)}>{showAdvanced?'收起高级位置参数':'高级位置参数'}</Button></div>}
+    {!fieldKeys&&!!advancedKeys.length&&<div className="editor-tools"><span>高级位置字段仅在需要绘制机房平面时补充。</span><Button kind="ghost" onClick={()=>setShowAdvanced(v=>!v)}>{showAdvanced?'收起高级位置参数':'高级位置参数'}</Button></div>}
     {targetIds&&['racks','placements'].includes(tableId)&&<div className="editor-tools"><span>已限定为本次缺口对象；已有值保留。</span><EntityField label={tableId==='racks'?'批量关联机房':'批量关联机柜'} value="" options={options(tableId==='racks'?'room_id':'rack_id')} onChange={value=>{const key=tableId==='racks'?'room_id':'rack_id';setRows(current=>current.map(row=>targetIds.includes(row[scopeKey])&&!row[key]?{...row,[key]:value}:row));setDirty(true)}}/></div>}
     <div className="editor-grid table-scroll"><table><thead><tr><th>#</th>{visibleFields.map(f => <th key={f.key}><b>{f.label}</b><code>{f.key}</code></th>)}<th>操作</th></tr></thead><tbody>{pageRows.map(({row,index:absolute}) => {
       return <tr key={absolute}><td>{absolute + 1}</td>{visibleFields.map(f => <td key={f.key}>
