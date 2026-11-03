@@ -38,6 +38,123 @@ tags:
   - name: IA
     description: IA v2.3 project scope and lazy detail contracts
 paths:
+  /projects/{projectId}/kickoff/preview:
+    post:
+      operationId: evaluateKickoffPublicationScope
+      tags:
+        - Kickoff
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema: &kickoffRead_a2_1
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                deviceIds:
+                  type: array
+                  items: *kickoffRead_a2_1
+                expectedRevision:
+                  type: integer
+                  minimum: 0
+              required:
+                - deviceIds
+                - expectedRevision
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: "#/components/schemas/KickoffScopeEvaluation"
+                  request_id: *kickoffRead_a2_1
+                required:
+                  - data
+        "409":
+          description: REVISION_CONFLICT
+        "422":
+          description: Selected scope or relationships are invalid
+  /projects/{projectId}/kickoff/review:
+    get:
+      operationId: getKickoffReviewPage
+      tags:
+        - Kickoff
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema: &a3
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum:
+              - devices
+              - components
+              - ports
+              - connections
+              - placements
+        - name: offset
+          in: query
+          schema: &kickoffRead_a2_2
+            type: integer
+            minimum: 0
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 10
+        - name: revision
+          in: query
+          schema: *kickoffRead_a2_2
+        - name: q
+          in: query
+          schema: *a3
+        - name: issues
+          in: query
+          schema: &a4
+            type: boolean
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum:
+              - name
+              - reference
+              - location
+              - state
+        - name: desc
+          in: query
+          schema: *a4
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: "#/components/schemas/KickoffReviewPage"
+                  request_id: *a3
+                required:
+                  - data
+        "409":
+          description: REVISION_CONFLICT
   /projects/{projectId}/kickoff/publications/{publicationId}/status:
     get:
       operationId: getKickoffPublicationStatus
@@ -368,6 +485,44 @@ paths:
           required: true
           schema:
             type: string
+        - name: section
+          in: query
+          schema:
+            type: string
+            enum:
+              - devices
+              - ports
+              - connections
+              - components
+              - racks
+              - issues
+              - models
+              - calculations
+              - publications
+              - sources
+              - activity
+              - context
+        - name: entity_id
+          in: query
+          schema:
+            type: string
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 100
+        - name: revision
+          in: query
+          schema:
+            type: integer
+            minimum: 0
       responses:
         "200":
           description: Successful response
@@ -379,9 +534,16 @@ paths:
                   - data
                 properties:
                   data:
-                    $ref: "#/components/schemas/KickoffWorkspace"
+                    oneOf:
+                      - $ref: "#/components/schemas/KickoffWorkspace"
+                      - $ref: "#/components/schemas/KickoffObjectContext"
                   request_id:
                     type: string
+      description: Summary omits ports/connections and calculation details. Section reads
+        are paged and revision-bound. context requires entity_id and returns
+        only the selected object neighbourhood. Publication lists contain counts
+        and frozen references; snapshots are loaded through the receipt
+        endpoint.
   /projects/{projectId}/kickoff/models/{tableId}:
     put:
       operationId: saveKickoffModelInput
@@ -13836,7 +13998,9 @@ paths:
       tags:
         - CMDB
       operationId: getCanonicalCMDBInventory
-      description: Real PostgreSQL CMDB. Existing presentation contract is retained. Asset writes publish through a versioned, independently approved ChangeSet. Unknown data remains unknown.
+      description: Real PostgreSQL CMDB. Existing presentation contract is retained.
+        Asset writes publish through a versioned, independently approved
+        ChangeSet. Unknown data remains unknown.
       security:
         - cookieSession: []
       responses:
@@ -13857,11 +14021,24 @@ paths:
         "409":
           description: Version, identity or idempotency conflict
         "422":
-          description: Schema, relation cardinality, validation or approval condition not satisfied
+          description: Schema, relation cardinality, validation or approval condition not
+            satisfied
       parameters:
         - in: query
           name: project_id
           required: false
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 2000
+            default: 1000
+        - in: query
+          name: cursor
+          description: Exclusive asset ID returned by the previous page.
           schema:
             type: string
   /cmdb/dossier/assets/{asset_id}:
@@ -19110,6 +19287,9 @@ components:
       type: object
       additionalProperties: false
       properties:
+        stale:
+          type: boolean
+          description: Server evaluates against complete current domain inputs, independent of loaded frontend pages.
         id:
           type: string
         domain:
@@ -19244,6 +19424,114 @@ components:
         - rackSnapshot
         - deviceSnapshot
         - counts
+    KickoffPage:
+      type: object
+      additionalProperties: false
+      properties:
+        section:
+          type: string
+        offset: &kickoffRead_a2_3
+          type: integer
+          minimum: 0
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 200
+        total: *kickoffRead_a2_3
+        hasMore:
+          type: boolean
+      required:
+        - section
+        - offset
+        - limit
+        - total
+        - hasMore
+    KickoffReviewRow:
+      type: object
+      additionalProperties: false
+      properties:
+        id: &kickoffRead_a2_4
+          type: string
+        name: *kickoffRead_a2_4
+        description: *kickoffRead_a2_4
+        reference: *kickoffRead_a2_4
+        location: *kickoffRead_a2_4
+        state: *kickoffRead_a2_4
+        evidence:
+          $ref: "#/components/schemas/KickoffEvidence"
+      required:
+        - id
+        - name
+        - description
+        - reference
+        - location
+        - state
+        - evidence
+    KickoffReviewPage:
+      type: object
+      additionalProperties: false
+      properties:
+        revision: &kickoffRead_a2_5
+          type: integer
+          minimum: 0
+        rows:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffReviewRow"
+        total: *kickoffRead_a2_5
+        offset: *kickoffRead_a2_5
+        limit: *kickoffRead_a2_5
+        hasMore:
+          type: boolean
+      required:
+        - revision
+        - rows
+        - total
+        - offset
+        - limit
+        - hasMore
+    KickoffObjectContext:
+      type: object
+      additionalProperties: false
+      properties:
+        revision:
+          type: integer
+          minimum: 0
+        devices:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffDevice"
+        ports:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffPort"
+        connections:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffConnection"
+        components:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffComponent"
+      required:
+        - revision
+        - devices
+        - ports
+        - connections
+        - components
+    KickoffScopeEvaluation:
+      type: object
+      additionalProperties: false
+      properties:
+        revision: &kickoffRead_a2_6
+          type: integer
+          minimum: 0
+        counts:
+          type: object
+          additionalProperties: *kickoffRead_a2_6
+      required:
+        - revision
+        - counts
     KickoffActivity:
       type: object
       additionalProperties: false
@@ -19317,6 +19605,17 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/KickoffActivity"
+        totals:
+          type: object
+          additionalProperties:
+            type: integer
+            minimum: 0
+        page:
+          $ref: "#/components/schemas/KickoffPage"
+        capabilities:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffCapability"
       required:
         - schemaVersion
         - projectId
@@ -41550,6 +41849,10 @@ components:
               type:
                 - string
                 - "null"
+            evidence_field:
+              type: string
+              description: Original evidence field; reviewed_model denotes object-level
+                reviewed evidence.
             sheet:
               type:
                 - string
@@ -45169,6 +45472,17 @@ components:
           type: string
         truncated:
           type: boolean
+        page:
+          type: object
+          properties:
+            limit:
+              type: integer
+            has_more:
+              type: boolean
+            next_cursor:
+              type: [ string, "null" ]
+          required: [ limit, has_more, next_cursor ]
+          additionalProperties: false
         request_id:
           type: string
       required:
@@ -45176,6 +45490,7 @@ components:
         - schema_version
         - source
         - truncated
+        - page
         - request_id
       additionalProperties: false
     CmdbAssetDetailsEnvelope:

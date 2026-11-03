@@ -1,1 +1,0 @@
-import {useProject} from '../app/ProjectContext';import type {ReactNode} from 'react';import {useIdentity} from './auth/IdentityProvider';export function useBOMSession(){const s=useIdentity();const p=useProject();return {...s,permissions:s.project_permissions[p.projectId]||s.global_permissions}}export function BOMAuth({children}:{children:ReactNode}){return <>{children}</>}

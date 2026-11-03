@@ -120,34 +120,38 @@ func (s *Server) kickoffPublication(w http.ResponseWriter, r *http.Request, id s
 	respond(w, 200, p)
 }
 func (s *Server) loadKickoffPublications(ctx context.Context, q engineeringQuery) ([]kickoff.Publication, error) {
-	ids := []string{}
-	rows, e := q.Query(ctx, `SELECT id::text FROM kickoff_publication WHERE project_id=$1 ORDER BY revision`, s.project)
-	if e != nil {
-		return nil, e
-	}
-	for rows.Next() {
-		var id string
-		if e = rows.Scan(&id); e != nil {
-			break
-		}
-		ids = append(ids, id)
-	}
-	if e == nil {
-		e = rows.Err()
-	}
-	rows.Close()
-	if e != nil {
-		return nil, e
-	}
 	out := []kickoff.Publication{}
-	for _, id := range ids {
-		p, e := s.loadKickoffPublication(ctx, q, id)
-		if e != nil {
-			return nil, e
+	rows, err := q.Query(ctx, `SELECT p.id::text,p.revision,p.created_at,p.actor,p.reason,p.state,p.error_code,
+ COALESCE((SELECT jsonb_object_agg(kind,n) FROM (SELECT kind,count(*) n FROM kickoff_publication_object WHERE publication_id=p.id GROUP BY kind) c),'{}'::jsonb),
+ COALESCE((SELECT jsonb_agg(entity_id::text ORDER BY entity_id) FROM kickoff_publication_object WHERE publication_id=p.id AND kind='device'),'[]'::jsonb),
+ COALESCE((SELECT jsonb_object_agg(table_id,version) FROM kickoff_publication_input WHERE publication_id=p.id),'{}'::jsonb)
+ FROM kickoff_publication p WHERE p.project_id=$1 ORDER BY p.revision`, s.project)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		p := kickoff.Publication{PortIDs: []string{}, ConnectionIDs: []string{}, ComponentIDs: []string{}, PlacementIDs: []string{}, ModelSnapshot: []kickoff.ModelInput{}, RackSnapshot: []kickoff.Rack{}, DeviceSnapshot: []kickoff.Device{}, Counts: map[string]int{}}
+		var counts, ids, versions []byte
+		if err := rows.Scan(&p.ID, &p.Revision, &p.CreatedAt, &p.Actor, &p.Reason, &p.State, &p.ErrorCode, &counts, &ids, &versions); err != nil {
+			return nil, err
+		}
+		var kinds map[string]int
+		if err := json.Unmarshal(counts, &kinds); err != nil {
+			return nil, err
+		}
+		if err := json.Unmarshal(ids, &p.DeviceIDs); err != nil {
+			return nil, err
+		}
+		if err := json.Unmarshal(versions, &p.ModelVersions); err != nil {
+			return nil, err
+		}
+		for singular, plural := range map[string]string{"device": "devices", "port": "ports", "component": "components", "connection": "connections", "placement": "placements"} {
+			p.Counts[plural] = kinds[singular]
 		}
 		out = append(out, p)
 	}
-	return out, nil
+	return out, rows.Err()
 }
 func (s *Server) projectKickoffPublication(ctx context.Context, tx pgx.Tx, event, project string, raw []byte) error {
 	var request struct {

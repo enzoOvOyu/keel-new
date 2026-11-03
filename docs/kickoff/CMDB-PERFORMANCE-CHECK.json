@@ -1,0 +1,83 @@
+{
+  "scope": "CMDB inventory paging, project scope and engineering provenance",
+  "deployment": "not deployed; working-tree changes only",
+  "data_mutations": false,
+  "ai_calls": false,
+  "checks": [
+    {
+      "command": "go test ./internal/cmdb -run TestInventory -v -count=1",
+      "cwd": "dev/backend",
+      "environment": "DATABASE_URL from existing runtime private environment; KEEL_INVENTORY_PROJECT selects existing MM project",
+      "result": "PASS",
+      "duration_seconds": 3.998,
+      "pages": 12,
+      "unique_inventory_assets": 22488,
+      "duplicate_assets": 0,
+      "cross_project_assets": 0,
+      "count_matches_database": true,
+      "resolved_provenance_rows": 30,
+      "notes": "Inventory kinds exclude four generic device entities and project anchor. Evidence may be object-level reviewed_model and is explicitly labelled; not claimed to be independent field evidence."
+    },
+    {
+      "command": "go test ./internal/cmdb ./cmd/api -run 'TestInventoryRejectsInvalidLimit|TestCMDB'",
+      "cwd": "dev/backend",
+      "result": "PASS; cmd/api reported no matching tests"
+    },
+    {
+      "command": "go test ./internal/cmdb ./cmd/api",
+      "cwd": "dev/backend",
+      "result": "CMDB PASS; API FAIL",
+      "failure": "TestFullResumeAppliesPreviouslyPartialSheetWithoutProvider: full resume retained partial candidates or pending sheet",
+      "notes": "BOM recognition test outside this slice; not modified or suppressed."
+    },
+    {
+      "command": "npx tsc --noEmit",
+      "cwd": "dev",
+      "result": "PASS; final rerun completed exit 0 before cancellation was necessary",
+      "notes": "No additional TSC runs scheduled by this agent. Hume/main owns centralized generate:api and final integrated verification."
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS"
+    }
+  ],
+  "documentation_pending": [
+    "CMDB module API documentation",
+    "real-api-registry.json",
+    "HANDOFF consolidated update"
+  ],
+  "openapi_changes": [
+    "GET /cmdb/inventory limit/cursor parameters",
+    "CmdbCanonicalInventoryEnvelope.page",
+    "CMDB source_location.evidence_field"
+  ],
+  "generated_types": "Hume to generate once centrally",
+  "lazy_fixture_check": {
+    "files": [
+      "dev/src/lib/api/index.tsx",
+      "dev/src/lib/api/fixture-resources.json",
+      "dev/src/features/auth/IdentityProvider.tsx"
+    ],
+    "command": "node /tmp/keel-fixture-check/check.cjs",
+    "test_mode": "VM-executed transpiled actual module; React/identity stubs, existing fixture read only when ensureLegacyFixtures called; not browser acceptance",
+    "result": "PASS",
+    "initial_fixture_fetches": 0,
+    "concurrent_and_repeat_legacy_fetches": 1,
+    "metadata_keys": 131,
+    "metadata_matches_existing_fixture": true,
+    "legacy_users_restored": true,
+    "checks": "Both changed TSX files transpile syntax PASS; git diff --check PASS",
+    "integrated_build": "main agent to run once; this agent did not run another TSC/build"
+  },
+  "legacy_scope_bootstrap_check": {
+    "command": "node /tmp/keel-fixture-check/scope-check.cjs",
+    "result": "PASS",
+    "scope_assertions": 9,
+    "route_assertions": 10,
+    "fabric_topology_independent": false,
+    "old_bom_independent": true,
+    "tsx_syntax": "PASS",
+    "diff_check": "PASS",
+    "notes": "Checks actual extracted independent regex and actual pure scope resolver; explicit route/query authorization, project/filter preservation and cross-project null filter. Not browser acceptance. No repeated build/TSC."
+  }
+}

@@ -1,6 +1,6 @@
-import {bomRequest} from './realBom';
+import {apiRequest} from './request';
 export type DeleteProjectResult={id:string;status:'deleted';storage_status:'pending';storage_event_id:string};
-export function deleteProject(id:string,confirmName:string){return bomRequest<DeleteProjectResult>('projects/'+encodeURIComponent(id),'DELETE',{confirm_name:confirmName})}
+export function deleteProject(id:string,confirmName:string){return apiRequest<DeleteProjectResult>('projects/'+encodeURIComponent(id),'DELETE',{confirm_name:confirmName})}
 
 import type {IdentitySnapshot} from './identityBridge';
 // Prune only the confirmed deleted scope; the next session request remains

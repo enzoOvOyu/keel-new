@@ -109,18 +109,29 @@ func IsDevice(e engineering.EquipmentPlan) bool {
 	return e.EquipmentType == "server" || e.EquipmentType == "switch" || e.EquipmentType == "device"
 }
 func Project(m engineering.PhysicalModel, ev []engineering.SourceEvidence, source string, inputs []ModelInput) View {
+	return project(m, ev, source, inputs, true)
+}
+func ProjectSummary(m engineering.PhysicalModel, ev []engineering.SourceEvidence, source string, inputs []ModelInput) View {
+	return project(m, ev, source, inputs, false)
+}
+func project(m engineering.PhysicalModel, ev []engineering.SourceEvidence, source string, inputs []ModelInput, details bool) View {
 	v := View{Devices: []Device{}, Ports: []Port{}, Connections: []Connection{}, Components: []Component{}, Racks: []Rack{}, Issues: []Issue{}}
+	evidenceByID := make(map[string]Evidence, len(ev))
+	for _, e := range ev {
+		if _, exists := evidenceByID[e.EntityID]; exists {
+			continue
+		}
+		method := "source"
+		if e.Sheet == "[manual]" {
+			method = "manual"
+		} else if strings.HasPrefix(e.Sheet, "[") {
+			method = "mapping"
+		}
+		evidenceByID[e.EntityID] = Evidence{SourceID: source, Sheet: e.Sheet, Cell: e.Cell, Method: method}
+	}
 	evidence := func(id string) Evidence {
-		for _, e := range ev {
-			if e.EntityID == id {
-				method := "source"
-				if e.Sheet == "[manual]" {
-					method = "manual"
-				} else if strings.HasPrefix(e.Sheet, "[") {
-					method = "mapping"
-				}
-				return Evidence{SourceID: source, Sheet: e.Sheet, Cell: e.Cell, Method: method}
-			}
+		if value, ok := evidenceByID[id]; ok {
+			return value
 		}
 		return Evidence{SourceID: source, Method: "mapping"}
 	}
@@ -138,31 +149,32 @@ func Project(m engineering.PhysicalModel, ev []engineering.SourceEvidence, sourc
 		}
 		return id
 	}
+	placements := map[string]engineering.RackPlacement{}
+	for _, p := range m.Placements {
+		placements[p.EquipmentID] = p
+	}
+	management, roles := map[string]string{}, map[string]string{}
+	for _, r := range Rows(inputs, "management") {
+		management[r["device_id"]] = r["management_ip"]
+	}
+	for _, r := range Rows(inputs, "network_roles") {
+		roles[r["device_id"]] = r["role"]
+	}
 	for _, e := range m.Equipment {
 		if e.IdentityKind == "group" {
 			continue
 		}
 		if IsDevice(e) {
 			d := Device{ID: e.EntityID, Name: e.Label, Serial: stringValue(e.Serial), Type: e.EquipmentType, Model: e.SourceModelLabel, HeightU: e.HeightU, Evidence: evidence(e.EntityID)}
-			for _, p := range m.Placements {
-				if p.EquipmentID == e.EntityID {
-					d.RackID = p.RackID
-					d.StartU = p.StartU
-					if p.HeightU != nil {
-						d.HeightU = p.HeightU
-					}
+			if p, ok := placements[e.EntityID]; ok {
+				d.RackID = p.RackID
+				d.StartU = p.StartU
+				if p.HeightU != nil {
+					d.HeightU = p.HeightU
 				}
 			}
-			for _, r := range Rows(inputs, "management") {
-				if r["device_id"] == d.ID {
-					d.ManagementAddress = r["management_ip"]
-				}
-			}
-			for _, r := range Rows(inputs, "network_roles") {
-				if r["device_id"] == d.ID {
-					d.Role = r["role"]
-				}
-			}
+			d.ManagementAddress = management[d.ID]
+			d.Role = roles[d.ID]
 			v.Devices = append(v.Devices, d)
 		} else if parent[e.EntityID] != "" {
 			v.Components = append(v.Components, Component{ID: e.EntityID, DeviceID: root(e.EntityID), Type: e.EquipmentType, Name: e.Label, Model: e.SourceModelLabel, Slot: slot[e.EntityID], Evidence: evidence(e.EntityID)})
@@ -173,22 +185,24 @@ func Project(m engineering.PhysicalModel, ev []engineering.SourceEvidence, sourc
 			v.Racks = append(v.Racks, Rack{ID: r.EntityID, Name: r.Label, Room: stringValue(r.ParentID), CapacityU: r.CapacityU, Evidence: evidence(r.EntityID)})
 		}
 	}
-	media := map[string]string{}
-	for _, p := range m.Ports {
-		id := root(p.EquipmentID)
-		component := ""
-		if id != p.EquipmentID {
-			component = p.EquipmentID
+	if details {
+		media := map[string]string{}
+		for _, p := range m.Ports {
+			id := root(p.EquipmentID)
+			component := ""
+			if id != p.EquipmentID {
+				component = p.EquipmentID
+			}
+			speed := ""
+			if p.RateBPS != nil {
+				speed = strconv.FormatInt(*p.RateBPS, 10) + " bps"
+			}
+			v.Ports = append(v.Ports, Port{ID: p.EntityID, DeviceID: id, Name: p.Name, MAC: stringValue(p.MAC), Speed: speed, Role: p.Role, ComponentID: component, Evidence: evidence(p.EntityID)})
+			media[p.EntityID] = p.Medium
 		}
-		speed := ""
-		if p.RateBPS != nil {
-			speed = strconv.FormatInt(*p.RateBPS, 10) + " bps"
+		for _, c := range m.Connections {
+			v.Connections = append(v.Connections, Connection{ID: c.EntityID, A: c.APortID, B: c.ZPortID, Medium: media[c.APortID], Evidence: evidence(c.EntityID)})
 		}
-		v.Ports = append(v.Ports, Port{ID: p.EntityID, DeviceID: id, Name: p.Name, MAC: stringValue(p.MAC), Speed: speed, Role: p.Role, ComponentID: component, Evidence: evidence(p.EntityID)})
-		media[p.EntityID] = p.Medium
-	}
-	for _, c := range m.Connections {
-		v.Connections = append(v.Connections, Connection{ID: c.EntityID, A: c.APortID, B: c.ZPortID, Medium: media[c.APortID], Evidence: evidence(c.EntityID)})
 	}
 	for _, i := range ValidationIssues(m) {
 		scope := "configuration"

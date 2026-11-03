@@ -1,6 +1,6 @@
-import { bomRequest } from '../realBom';
+import { apiRequest } from '../request';
 import { publishPreview } from './provider';
-import type { KickoffAPI, Workspace, ModelRow, Publication, Calculation } from './types';
+import type { KickoffAPI, Workspace, ModelRow, Publication, Calculation, ReviewPage } from './types';
 
 export class HttpKickoffProvider implements KickoffAPI {
  private state:Workspace;
@@ -10,10 +10,19 @@ export class HttpKickoffProvider implements KickoffAPI {
  private path=(suffix='')=>`projects/${encodeURIComponent(this.projectId)}/kickoff${suffix}`;
  subscribe=(fn:()=>void)=>{this.listeners.add(fn);return()=>{this.listeners.delete(fn);};};
  snapshot=()=>this.state;
- refresh=async()=>{if(this.controller.signal.aborted)this.controller=new AbortController();const state=await bomRequest<Workspace>(this.path('/workspace'),'GET',undefined,undefined,this.controller.signal);if(state.projectId!==this.projectId)throw Error('工作区项目与请求不一致');const prior=new Set(this.state.publications.filter(p=>p.state==='published').map(p=>p.id));this.state=state;this.listeners.forEach(fn=>fn());if(state.publications.some(p=>p.state==='published'&&!prior.has(p.id)))window.dispatchEvent(new Event('keel-inventory-published'));};
+
+
+ private emit=()=>this.listeners.forEach(fn=>fn());
+ refresh=async()=>{if(this.controller.signal.aborted)this.controller=new AbortController();const state=await apiRequest<Workspace>(this.path('/workspace'),'GET',undefined,undefined,this.controller.signal);if(state.projectId!==this.projectId)throw Error('工作区项目与请求不一致');this.state=state;this.emit();};
+ loadSection=async(section:string)=>{const revision=this.state.revision;const items:unknown[]=[];let offset=0;for(;;){const page=await apiRequest<Workspace>(this.path(`/workspace?section=${encodeURIComponent(section)}&offset=${offset}&limit=200&revision=${revision}`),'GET',undefined,undefined,this.controller.signal);items.push(...page[section as keyof Workspace] as unknown[]);if(!page.page?.hasMore)break;offset+=page.page.limit;}if(revision!==this.state.revision)throw Error('工作区版本已变化，请重新加载');this.state={...this.state,[section]:items};this.emit();};
+ loadContext=async(id:string)=>{const revision=this.state.revision;const data=await apiRequest<Pick<Workspace,'devices'|'ports'|'connections'|'components'|'revision'>>(this.path(`/workspace?section=context&entity_id=${encodeURIComponent(id)}&revision=${revision}`),'GET',undefined,undefined,this.controller.signal);if(revision!==this.state.revision||data.revision!==revision)return;for(const key of ['devices','ports','connections','components'] as const){const map=new Map(this.state[key].map(v=>[v.id,v]));for(const v of data[key])map.set(v.id,v as never);this.state={...this.state,[key]:[...map.values()]};}this.emit();};
+ evaluatePublication=(deviceIds:string[],expectedRevision:number)=>apiRequest<{revision:number;counts:Record<string,number>}>(this.path('/preview'),'POST',{deviceIds,expectedRevision},undefined,this.controller.signal);
+ reviewPage=(query:URLSearchParams)=>{const params=new URLSearchParams(query);params.set('revision',String(this.state.revision));return apiRequest<ReviewPage>(this.path('/review?'+params),'GET',undefined,undefined,this.controller.signal);};
+ publicationDetail=(id:string)=>apiRequest<Publication>(this.path('/publications/'+encodeURIComponent(id)),'GET',undefined,undefined,this.controller.signal);
  dispose=()=>{this.controller.abort();this.listeners.clear();};
- private command=async<T>(path:string,body:unknown,method='POST')=>{try{const result=await bomRequest<T>(this.path(path),method,body,undefined,this.controller.signal);await this.refresh();return result;}catch(error){if((error as {status?:number}).status===409)await this.refresh();throw error;}};
- addSources=async(files:File[])=>{for(const file of files){const body=new FormData();body.append('file',file);await this.command('/sources',body);}};
+ exportReview=async(query:URLSearchParams)=>{const revision=this.state.revision;const rows:ReviewPage['rows']=[];let offset=0;for(;;){const params=new URLSearchParams(query);params.set('offset',String(offset));params.set('limit','200');const page=await this.reviewPage(params);if(page.revision!==revision)throw Error('工作区版本已变化，请重新导出');rows.push(...page.rows);if(!page.hasMore)break;offset+=200;}return rows;};
+ private command=async<T>(path:string,body:unknown,method='POST')=>{try{const result=await apiRequest<T>(this.path(path),method,body,undefined,this.controller.signal);await this.refresh();return result;}catch(error){if((error as {status?:number}).status===409)await this.refresh();throw error;}};
+ addSources=async(files:File[])=>{try{for(const file of files){const body=new FormData();body.append('file',file);await apiRequest(this.path('/sources'),'POST',body,undefined,this.controller.signal);}}finally{await this.refresh();}};
  removeSource=async(id:string)=>{await this.command('/sources/'+encodeURIComponent(id),undefined,'DELETE');};
  analyzeSource=async(id:string)=>{await this.command('/sources/'+encodeURIComponent(id)+'/analyze',{expectedRevision:this.state.revision});};
  resolveIssue=async(id:string,value:string)=>{await this.command('/issues/'+encodeURIComponent(id)+'/resolve',{value,expectedRevision:this.state.revision});};
@@ -24,13 +33,14 @@ export class HttpKickoffProvider implements KickoffAPI {
   for(let i=0;result.state==='pending'&&i<60;i++){
    const signal=this.controller.signal;
    await new Promise<void>((resolve,reject)=>{const abort=()=>{clearTimeout(timer);reject(new DOMException('Aborted','AbortError'));};const timer=setTimeout(()=>{signal.removeEventListener('abort',abort);resolve();},1000);if(signal.aborted)abort();else signal.addEventListener('abort',abort,{once:true});});
-   const receipt=await bomRequest<{id:string;state:Publication['state'];errorCode:string|null}>(this.path('/publications/'+encodeURIComponent(result.id)+'/status'),'GET',undefined,undefined,signal);
+   const receipt=await apiRequest<{id:string;state:Publication['state'];errorCode:string|null}>(this.path('/publications/'+encodeURIComponent(result.id)+'/status'),'GET',undefined,undefined,signal);
    result={...result,state:receipt.state,errorCode:receipt.errorCode??undefined};
-   if(result.state==='published')result=await bomRequest<Publication>(this.path('/publications/'+encodeURIComponent(result.id)),'GET',undefined,undefined,signal);
+   if(result.state==='published')result=await apiRequest<Publication>(this.path('/publications/'+encodeURIComponent(result.id)),'GET',undefined,undefined,signal);
   }
   await this.refresh();
+  if(result.state==='published')window.dispatchEvent(new CustomEvent('keel-inventory-published',{detail:{projectId:this.projectId}}));
   if(result.state!=='published')throw Error(result.errorCode||'CMDB 投影仍在后台处理，请查看入库版本状态；无需重复提交。');
   return result;
  };
- calculate=(domain:'cabling'|'power')=>this.command<Calculation>('/calculations',{domain,expectedRevision:this.state.revision});
+ calculate=async(domain:'cabling'|'power')=>{const revision=this.state.revision;const result=await apiRequest<Calculation>(this.path('/calculations'),'POST',{domain,expectedRevision:revision},undefined,this.controller.signal);this.state={...this.state,revision:revision+1,calculations:[...this.state.calculations,result]};this.emit();return result;};
 }

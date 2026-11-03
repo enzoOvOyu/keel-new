@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
-import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
+import { Navigate, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { Check, CircleHelp, X } from 'lucide-react';
 import { useProject } from '../../app/ProjectContext';
 import { HttpKickoffProvider } from '../../lib/api/kickoff/http';
@@ -15,7 +15,7 @@ import './styles.css';
 
 export default function KickoffWorkspace(){const project=useProject();if(!project.permissions.includes('provision:read'))return <div className="empty"><h2>403 · 当前身份无此页面权限</h2></div>;return <ProjectWorkspace key={project.projectId+':'+project.permissionRevision}/>;}
 function ProjectWorkspace(){
- const project=useProject(),navigate=useNavigate();
+ const project=useProject(),navigate=useNavigate(),location=useLocation();
  const api=useMemo(()=>new HttpKickoffProvider(project.projectId,project.projects.find(p=>p.id===project.projectId)?.name||project.projectId),[project.projectId]);
  const state=useSyncExternalStore(api.subscribe,api.snapshot);
  const [loading,setLoading]=useState(true),[error,setError]=useState(''),[toast,setToast]=useState<{message:string;error:boolean}>();
@@ -23,6 +23,7 @@ function ProjectWorkspace(){
  const request=useRef(0);
  const load=()=>{const revision=++request.current;setLoading(true);setError('');void api.refresh().catch(e=>{if(request.current===revision&&e.name!=='AbortError')setError(e.message);}).finally(()=>{if(request.current===revision)setLoading(false);});};
  useEffect(()=>{load();return()=>{request.current++;api.dispose();};},[api]);
+ useEffect(()=>{if(loading||!location.pathname.includes('/models/'))return;void api.loadSection('calculations').catch(e=>{if(e.name!=='AbortError')setToast({message:e.message,error:true});});},[api,loading,location.pathname,state.revision]);
  useEffect(()=>{if(!toast)return;const timer=setTimeout(()=>setToast(undefined),6500);return()=>clearTimeout(timer);},[toast]);
  const notify=(message:string,error=false)=>setToast({message,error});
  const run=async(message:string,action:()=>unknown)=>{try{await action();notify(message);return true;}catch(e){notify((e as Error).message,true);return false;}};

@@ -1,0 +1,365 @@
+{
+  "scope": "Retire legacy BOM UI and frontend routes; kickoff -> CMDB -> datacenter topology performance remediation",
+  "implementation": "completed in dev; not deployed",
+  "running_environment_revision": "9a3e03b",
+  "database_writes": false,
+  "ai_calls": false,
+  "new_listener": false,
+  "migrations": false,
+  "topology": {
+    "kind": "existing-MM-readonly-Service-query",
+    "deployment": false,
+    "new_listener": false,
+    "business_writes": false,
+    "statement_timeout_ms": 5000,
+    "endpoints": {
+      "subgraph": {
+        "elapsed_ms": 1498.582,
+        "passed": true
+      },
+      "matrix": {
+        "elapsed_ms": 1205.684,
+        "passed": true
+      },
+      "connections": {
+        "elapsed_ms": 1356.179,
+        "passed": true
+      }
+    },
+    "subgraph": {
+      "assets": 130,
+      "groups": 59,
+      "has_more": true,
+      "truncated": false
+    },
+    "matrix": {
+      "cells": 100,
+      "included": 3862,
+      "excluded": 3292,
+      "has_more": true
+    },
+    "connections": {
+      "assets": 495,
+      "relations": 549,
+      "has_more": true,
+      "truncated": false
+    },
+    "checks": [
+      "planned precedence vs original ranked aggregate on read-only VALUES",
+      "denied context returns no assets or relationships",
+      "connection endpoints present and no sibling ports",
+      "SQL bindings and cursor scope/signature unit cases"
+    ],
+    "limits": "Single final sample, not P95; no deployed HTTP/browser measurement. Earlier same-code connections sample 2186.563ms under shared environment load.",
+    "indexes_added": 0,
+    "source_files": [
+      "dev/backend/internal/cmdb/visual_queries.go",
+      "dev/backend/internal/cmdb/visual_queries_test.go",
+      "dev/backend/internal/cmdb/visual_readonly_perf_test.go"
+    ],
+    "physical_subgraph": {
+      "elapsed_ms": 2660.913,
+      "passed": true,
+      "view": "physical",
+      "depth": 2,
+      "cables": 100,
+      "assets": 495,
+      "relations": 549,
+      "has_more": true,
+      "truncated": false,
+      "checks": [
+        "both endpoint ports and both devices loaded for all 100 cables",
+        "no sibling ports",
+        "continuation cursor present"
+      ],
+      "limit": "single Service sample; above proposed 2s target, below unchanged 5s deadline"
+    },
+    "physical_subgraph_parallel": {
+      "elapsed_ms": 2176.358,
+      "previous_serial_elapsed_ms": 2660.913,
+      "passed": true,
+      "assets": 495,
+      "relations": 549,
+      "cables": 100,
+      "truncated": false,
+      "has_more": true,
+      "dependency": "existing golang.org/x/sync v0.23.0",
+      "context_cancel": "errgroup.WithContext; final visualEnd uses original ctx",
+      "limits": "single before/after samples; not P95; remains above proposed 2s target"
+    }
+  },
+  "inventory_and_provenance": {
+    "scope": "CMDB inventory paging, project scope and engineering provenance",
+    "deployment": "not deployed; working-tree changes only",
+    "data_mutations": false,
+    "ai_calls": false,
+    "checks": [
+      {
+        "command": "go test ./internal/cmdb -run TestInventory -v -count=1",
+        "cwd": "dev/backend",
+        "environment": "DATABASE_URL from existing runtime private environment; KEEL_INVENTORY_PROJECT selects existing MM project",
+        "result": "PASS",
+        "duration_seconds": 3.998,
+        "pages": 12,
+        "unique_inventory_assets": 22488,
+        "duplicate_assets": 0,
+        "cross_project_assets": 0,
+        "count_matches_database": true,
+        "resolved_provenance_rows": 30,
+        "notes": "Inventory kinds exclude four generic device entities and project anchor. Evidence may be object-level reviewed_model and is explicitly labelled; not claimed to be independent field evidence."
+      },
+      {
+        "command": "go test ./internal/cmdb ./cmd/api -run 'TestInventoryRejectsInvalidLimit|TestCMDB'",
+        "cwd": "dev/backend",
+        "result": "PASS; cmd/api reported no matching tests"
+      },
+      {
+        "command": "go test ./internal/cmdb ./cmd/api",
+        "cwd": "dev/backend",
+        "result": "CMDB PASS; API FAIL",
+        "failure": "TestFullResumeAppliesPreviouslyPartialSheetWithoutProvider: full resume retained partial candidates or pending sheet",
+        "notes": "BOM recognition test outside this slice; not modified or suppressed."
+      },
+      {
+        "command": "npx tsc --noEmit",
+        "cwd": "dev",
+        "result": "PASS; final rerun completed exit 0 before cancellation was necessary",
+        "notes": "No additional TSC runs scheduled by this agent. Hume/main owns centralized generate:api and final integrated verification."
+      },
+      {
+        "command": "git diff --check",
+        "result": "PASS"
+      }
+    ],
+    "documentation_pending": [
+      "CMDB module API documentation",
+      "real-api-registry.json",
+      "HANDOFF consolidated update"
+    ],
+    "openapi_changes": [
+      "GET /cmdb/inventory limit/cursor parameters",
+      "CmdbCanonicalInventoryEnvelope.page",
+      "CMDB source_location.evidence_field"
+    ],
+    "generated_types": "Hume to generate once centrally",
+    "lazy_fixture_check": {
+      "files": [
+        "dev/src/lib/api/index.tsx",
+        "dev/src/lib/api/fixture-resources.json",
+        "dev/src/features/auth/IdentityProvider.tsx"
+      ],
+      "command": "node /tmp/keel-fixture-check/check.cjs",
+      "test_mode": "VM-executed transpiled actual module; React/identity stubs, existing fixture read only when ensureLegacyFixtures called; not browser acceptance",
+      "result": "PASS",
+      "initial_fixture_fetches": 0,
+      "concurrent_and_repeat_legacy_fetches": 1,
+      "metadata_keys": 131,
+      "metadata_matches_existing_fixture": true,
+      "legacy_users_restored": true,
+      "checks": "Both changed TSX files transpile syntax PASS; git diff --check PASS",
+      "integrated_build": "main agent to run once; this agent did not run another TSC/build"
+    },
+    "legacy_scope_bootstrap_check": {
+      "command": "node /tmp/keel-fixture-check/scope-check.cjs",
+      "result": "PASS",
+      "scope_assertions": 9,
+      "route_assertions": 10,
+      "fabric_topology_independent": false,
+      "old_bom_independent": true,
+      "tsx_syntax": "PASS",
+      "diff_check": "PASS",
+      "notes": "Checks actual extracted independent regex and actual pure scope resolver; explicit route/query authorization, project/filter preservation and cross-project null filter. Not browser acceptance. No repeated build/TSC."
+    }
+  },
+  "kickoff": {
+    "scope": "kickoff backend/frontend performance only; no CMDB/menu edits, no commit/deploy",
+    "validation": {
+      "mode": "httptest existing MM; default_transaction_read_only=on; no listening port",
+      "workspace_revision": 8,
+      "homepage_ms": 1755.69,
+      "homepage_bytes": 1151083,
+      "ports": {
+        "unique": 14308,
+        "pages": 72,
+        "p95_ms": 2.15,
+        "max_ms": 119.58
+      },
+      "connections": {
+        "unique": 7154,
+        "pages": 36,
+        "p95_ms": 1.94,
+        "max_ms": 2.29
+      },
+      "selected_device_context_ports": 122,
+      "revision_consistency": "passed",
+      "stale_revision_409": "passed",
+      "full_scope_preview_counts": "passed",
+      "single_detail_projection_per_cached_revision": "passed",
+      "readonly_test_seconds": 2.22
+    },
+    "checks": [
+      "TestKickoffExistingMMReadOnly passed",
+      "TestProjectSummaryPreservesEvidenceAndIssuesWithoutRelations and TestKickoff targeted Go selection passed",
+      "OpenAPI generated types synchronized",
+      "kickoff diff whitespace check passed"
+    ],
+    "limitations": [
+      "homepage remains above suggested 1 second / 500KB targets",
+      "not a browser/FPS or concurrent-load acceptance",
+      "final integrated frontend build/docs/registry handled by coordinating agent"
+    ],
+    "implementation": [
+      "3-entry/60-second revision-and-source-head keyed typed projection cache; oversize >100000 model/evidence records not retained",
+      "summary skips port/connection projection",
+      "Review uses server pagination/filter/sort; export deliberately retrieves full matching scope",
+      "publication preview evaluates full selected closure on server",
+      "history list reads counts/frozen references; two detail versions fetched only when opened",
+      "Drawer fetches selected local adjacency; no calculation or global relation downloads",
+      "initial mount emits no publication event; successful explicit publish emits scoped event",
+      "calculation stale flag computed on server using complete domain model",
+      "publish?publication=id opens kickoff receipt"
+    ]
+  },
+  "routing": {
+    "policy": "Legacy BOM frontend pages and URLs removed; no aliases or redirect components. Unknown pages return application 404. Active links use kickoff directly.",
+    "legacy_bom_menu_entries": 0,
+    "legacy_bom_route_declarations": 0,
+    "retired_frontend_files_removed": 25,
+    "shared_http_client": "dev/src/lib/api/request.ts",
+    "stage_input": "new kickoff summary/publications; no old frontend handoff gate",
+    "historical_data": "retained; outgoing CMDB links use kickoff without mutating stored audit",
+    "verification": "PASS: retired routes are unsupported (application404), new kickoff table/Drawer remain usable"
+  },
+  "checks": [
+    {
+      "command": "npm run build",
+      "result": "PASS: TypeScript and Vite; 1m20s Vite; before subsequent lazy fixture bootstrap improvement"
+    },
+    {
+      "command": "go test ./internal/cmdb ./internal/kickoff ./cmd/api -run 'TestVisualQuery|TestInventoryRejectsInvalidLimit|TestProjectSummary|TestNamedRoom|TestUnassignedRack|TestKnownRack|TestKickoff' -count=1",
+      "result": "PASS; explicit DB tests separately opted-in as recorded in module evidence"
+    },
+    {
+      "command": "git archive f941397 dev/backend; go test ./cmd/api -run '^TestFullResumeAppliesPreviouslyPartialSheetWithoutProvider$' -count=1",
+      "result": "FAIL in unchanged baseline: full resume retained partial candidates or pending sheet",
+      "meaning": "Same prior failure reported by broad API tests; unrelated historical BOM recognition test remains unfixed. No test removed or weakened."
+    },
+    {
+      "command": "npm run build",
+      "result": "PASS: final source TypeScript + Vite, Vite 1m16s; ordinary dependency annotation and bundle-size warnings retained"
+    },
+    {
+      "command": "node dev/scripts/check-real-api-docs.mjs",
+      "result": "PASS: 137 registered operations"
+    },
+    {
+      "command": "Parsed OpenAPI semantic comparison with f941397",
+      "result": "Only kickoff workspace/inventory paths changed; kickoff review/preview added; unrelated paths unchanged"
+    },
+    {
+      "command": "npm run build after complete BOM frontend retirement",
+      "result": "PASS: TypeScript + Vite; Vite 1m18s"
+    },
+    {
+      "command": "TestInventoryPagesReadOnly after provenance/source-link retirement",
+      "result": "PASS: 12 pages, 22488 applicable assets, 30 source evidence rows"
+    },
+    {
+      "command": "Final local-build protocol replay after complete legacy route removal",
+      "result": "PASS: retired URLs retain pathname and show application 404; kickoff pagination and Drawer loading/error/retry work; zero fixture/inventory requests or page errors; not server HTTP404/deployed acceptance"
+    }
+  ],
+  "remaining_acceptance_limits": [
+    "Cold workspace samples 1.756s and 2.584s / 1.151MB remain above suggested 1s/500KB targets; no claim that all proposed performance budgets are met.",
+    "Physical subgraph 2.176s final single sample remains above suggested 2s; other topology samples are single observations, not P95.",
+    "No deployed HTTP/browser-FPS or concurrent-load performance acceptance; local build protocol replay passed, no deployment performed.",
+    "MM precise placement remains limited by missing dimensions/capacity; no data fabricated; generic device classifications unchanged."
+  ],
+  "fixture_bootstrap": {
+    "initial_fixture_requests": 0,
+    "concurrent_and_repeated_legacy_initialization_requests": 1,
+    "metadata_resource_names": 131,
+    "original_fixture_retained": true,
+    "startup_fixture_bytes_avoided": 31238390,
+    "scope": "Shared index no longer top-level awaits/parses/clones fixture; legacy identity gate awaits original fixture only when needed"
+  },
+  "kickoff_final_current_code_readonly": {
+    "result": "PASS",
+    "homepage_ms": 2584.01,
+    "homepage_bytes": 1151083,
+    "ports_unique": 14308,
+    "connections_unique": 7154,
+    "revision": 8,
+    "port_page_p95_ms": 3.23,
+    "connection_page_p95_ms": 2.96,
+    "local_context_ports": 122,
+    "duration_seconds": 3.12,
+    "note": "Final-code rerun after capability query correction; shared environment also executing browser replay, not a controlled load benchmark. Previous cold sample 1755.69ms retained, not cherry-picked."
+  },
+  "superseded_browser_replay_before_route_retirement": {
+    "status": "PASS",
+    "scope": "Playwright protocol replay of local dev/dist with private MM response slicing and synthetic identity; NOT deployed API acceptance",
+    "checked": [
+      "global and project legacy BOM routes redirect to kickoff; sidebar has no BOM",
+      "Review port table requests server page two; only ten rows rendered",
+      "Drawer local context loading, failure, retry and successful details; no full relation/calculation downloads",
+      "independent pages request zero fixture and zero inventory"
+    ],
+    "metrics": {
+      "fixtureRequests": 0,
+      "inventoryRequests": 0,
+      "workspaceReads": 4,
+      "reviewRequests": [
+        {
+          "category": "ports",
+          "offset": 0,
+          "limit": 10
+        },
+        {
+          "category": "ports",
+          "offset": 10,
+          "limit": 10
+        }
+      ],
+      "contextRequests": 2,
+      "maxContextPorts": 138,
+      "unexpectedAPI": 0,
+      "pageErrors": 0
+    }
+  },
+  "browser_protocol_replay": {
+    "status": "PASS",
+    "scope": "Playwright protocol replay of local dev/dist with private MM response slicing and synthetic identity; NOT deployed API acceptance; application 404 check does not establish hosting HTTP status",
+    "checked": [
+      "retired global/project BOM URLs show application 404 without redirect; sidebar has no BOM",
+      "Review port table requests server page two; only ten rows rendered",
+      "Drawer local context loading, failure, retry and successful details; no full relation/calculation downloads",
+      "independent pages request zero fixture and zero inventory"
+    ],
+    "retiredURLRequests": {
+      "fixtureRequests": 0,
+      "inventoryRequests": 0
+    },
+    "metrics": {
+      "fixtureRequests": 0,
+      "inventoryRequests": 0,
+      "workspaceReads": 1,
+      "reviewRequests": [
+        {
+          "category": "ports",
+          "offset": 0,
+          "limit": 10
+        },
+        {
+          "category": "ports",
+          "offset": 10,
+          "limit": 10
+        }
+      ],
+      "contextRequests": 2,
+      "maxContextPorts": 138,
+      "unexpectedAPI": 0,
+      "pageErrors": 0
+    }
+  }
+}

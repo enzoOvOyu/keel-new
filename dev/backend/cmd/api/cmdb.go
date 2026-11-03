@@ -184,7 +184,16 @@ func (s *Server) cmdbRoutes(w http.ResponseWriter, r *http.Request) bool {
 		return true
 	}
 	if path == "cmdb/inventory" && r.Method == "GET" {
-		result, e := service.InventorySnapshot(ctx, scope)
+		limit := 1000
+		if raw := r.URL.Query().Get("limit"); raw != "" {
+			parsed, err := strconv.Atoi(raw)
+			if err != nil || parsed < 1 || parsed > 2000 {
+				cmdbFailure(w, cmdb.Reject("INVALID_LIMIT", 400))
+				return true
+			}
+			limit = parsed
+		}
+		result, e := service.InventoryPage(ctx, scope, r.URL.Query().Get("cursor"), limit)
 		if e != nil {
 			cmdbFailure(w, e)
 		} else {

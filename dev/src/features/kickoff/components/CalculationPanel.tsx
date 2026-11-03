@@ -8,7 +8,7 @@ import { Badge, Button, DataTable, Empty, Field, KV, Modal, Notice, Section, for
 export function CalculationPanel({domain,edit}:{domain:'cabling'|'power';edit:(id:string)=>void}){
   const {api,state:s,run,can}=useWorkspace();
   const result=s.calculations.filter(c=>c.domain===domain).at(-1);
-  const stale=result&&result.inputDigest!==calculationDigest(s,domain);
+  const stale=result&&(result.stale??(result.inputDigest!==calculationDigest(s,domain)));
   const [detail,setDetail]=useState<CalculationRow>(),[quick,setQuick]=useState(false);
   const distribution=new Map<number,number>();result?.rows.forEach(r=>{if(r.stockM!==null)distribution.set(r.stockM,(distribution.get(r.stockM)??0)+1);});
   return <Section className="calculation-section" title={domain==='cabling'?'确定性布线计算':'机柜负荷与容量计算'} caption={domain==='cabling'?'使用明确通道与参数，结果保留完整计算过程。':'只汇总明确的规划功率，缺失不按零计算。'} action={<><Button disabled={!can('bom:edit')} onClick={()=>domain==='cabling'?setQuick(true):edit('power_profiles')}><Settings2 size={14}/>{domain==='cabling'?'快速配置路径':'补充功率依据'}</Button><Button kind="primary" disabled={!can('bom:edit')} onClick={()=>run('计算结果已生成',()=>api.calculate(domain))}><Play size={14}/>{result?'重新计算':'运行计算'}</Button></>}>

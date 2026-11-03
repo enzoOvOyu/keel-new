@@ -140,11 +140,18 @@ func (s Service) Catalog(ctx context.Context, scope Scope, q CatalogRequest) (ma
 	return map[string]any{"data": data, "counts": counts, "total": total, "page": map[string]any{"limit": q.Limit, "has_more": next != nil, "next_cursor": next}, "schema_summary": schemaSummary(schema)}, nil
 }
 func (s Service) RawAssets(ctx context.Context, scope Scope, kinds []string) ([]map[string]any, error) {
+	return s.rawAssetsPage(ctx, scope, kinds, "", 0)
+}
+func (s Service) rawAssetsPage(ctx context.Context, scope Scope, kinds []string, cursor string, limit int) ([]map[string]any, error) {
 	schema, e := s.Active(ctx)
 	if e != nil {
 		return nil, e
 	}
-	rows, e := s.DB.Query(ctx, `SELECT e.item_uid,e.asset_type,e.payload,e.lifecycle_state,e.health,e.freshness,e.version,(SELECT sc.project_id FROM cmdb_asset_scope sc WHERE sc.asset_id=e.item_uid AND (sc.project_id=ANY($1) OR sc.project_id||':'||sc.asset_id=ANY($2)) ORDER BY sc.project_id LIMIT 1) FROM cmdb_entity e WHERE e.lifecycle_state<>'retired' AND `+Visible("e")+` AND (cardinality($3::text[])=0 OR e.asset_type=ANY($3)) ORDER BY e.name LIMIT 10000`, append(scope.Args(), kinds)...)
+	bound := ""
+	if limit > 0 {
+		bound = " LIMIT " + strconv.Itoa(limit)
+	}
+	rows, e := s.DB.Query(ctx, `SELECT e.item_uid,e.asset_type,e.payload,e.lifecycle_state,e.health,e.freshness,e.version,(SELECT sc.project_id FROM cmdb_asset_scope sc WHERE sc.asset_id=e.item_uid AND (sc.project_id=ANY($1) OR sc.project_id||':'||sc.asset_id=ANY($2)) ORDER BY sc.project_id LIMIT 1) FROM cmdb_entity e WHERE e.lifecycle_state<>'retired' AND `+Visible("e")+` AND (cardinality($3::text[])=0 OR e.asset_type=ANY($3)) AND e.item_uid::text>$4 ORDER BY e.item_uid::text`+bound, append(scope.Args(), kinds, cursor)...)
 	if e != nil {
 		return nil, e
 	}
@@ -154,7 +161,9 @@ func (s Service) RawAssets(ctx context.Context, scope Scope, kinds []string) ([]
 		var id, kind, life, health, fresh, project string
 		var version int64
 		var raw []byte
-		rows.Scan(&id, &kind, &raw, &life, &health, &fresh, &version, &project)
+		if err := rows.Scan(&id, &kind, &raw, &life, &health, &fresh, &version, &project); err != nil {
+			return nil, err
+		}
 		r := map[string]any{}
 		json.Unmarshal(raw, &r)
 		r["id"] = id
@@ -214,14 +223,14 @@ func (s Service) Tree(ctx context.Context, scope Scope) (map[string]any, error) 
 		}
 		site := stringValue(r["site"])
 		if site == "" {
-			site = "机房 unknown"
+			site = "机房待补充"
 		}
 		pod := stringValue(r["pod_id"])
 		if pod == "" {
 			pod = stringValue(r["row"])
 		}
 		if pod == "" {
-			pod = "Pod unknown"
+			pod = "分区待补充"
 		}
 		if siteBy[site] == nil {
 			siteBy[site] = map[string]any{"id": site, "label": site, "pods": []map[string]any{}}
@@ -319,6 +328,35 @@ func (s Service) Provenance(ctx context.Context, scope Scope, id string) ([]map[
 	if e != nil {
 		return nil, e
 	}
+	evidence := map[string]map[string]any{}
+	publicationLinks := map[string]string{}
+	evidenceRows, err := s.DB.Query(ctx, `WITH publications AS (
+ SELECT id,revision_id,source_id,project_id,'engineering' publication_kind FROM eng_publication WHERE project_id=$2
+ UNION ALL
+ SELECT p.id,p.model_revision,r.source_id,p.project_id,'kickoff' FROM kickoff_publication p JOIN eng_revision r ON r.id=p.model_revision WHERE p.project_id=$2
+) SELECT 'engineering:'||p.id::text,e.field,e.sheet,e.cell,src.import_id::text,p.publication_kind FROM eng_evidence e JOIN publications p ON p.revision_id=e.revision_id JOIN eng_source src ON src.id=p.source_id WHERE e.entity_id::text=$1 AND src.project_id=$2 ORDER BY e.id`, id, asset.ProjectID)
+	if err != nil {
+		return nil, err
+	}
+	for evidenceRows.Next() {
+		var ref, field, sheet, cell, importID, publicationKind string
+		if err := evidenceRows.Scan(&ref, &field, &sheet, &cell, &importID, &publicationKind); err != nil {
+			evidenceRows.Close()
+			return nil, err
+		}
+		if publicationKind == "kickoff" {
+			publicationLinks[ref] = "/p/" + asset.ProjectID + "/kickoff/publish?publication=" + url.QueryEscape(strings.TrimPrefix(ref, "engineering:"))
+		}
+		key := ref + ":" + field
+		if evidence[key] == nil {
+			evidence[key] = map[string]any{"sheet": sheet, "cell": cell, "import_id": importID, "evidence_field": field}
+		}
+	}
+	err = evidenceRows.Err()
+	evidenceRows.Close()
+	if err != nil {
+		return nil, err
+	}
 	rows, e := s.DB.Query(ctx, `SELECT id,field_name,value,source_type,source_ref,source_location,fact_layer,observed_at,revision,operator,approval_status,support,freshness,evidence_refs,updated_at,confidence FROM cmdb_field_source WHERE asset_id=$3 AND (project_id=ANY($1) OR project_id||':'||asset_id=ANY($2)) ORDER BY field_name,updated_at DESC`, append(scope.Args(), id)...)
 	if e != nil {
 		return nil, e
@@ -335,8 +373,24 @@ func (s Service) Provenance(ctx context.Context, scope Scope, id string) ([]map[
 		loc := map[string]any{}
 		json.Unmarshal(location, &loc)
 		var href any
-		if source == "bom" && !strings.HasPrefix(ref, "fixture:") {
-			href = "/p/" + asset.ProjectID + "/deploy/bom/" + ref
+		if strings.HasPrefix(ref, "engineering:") {
+			origin := evidence[ref+":"+field]
+			if origin == nil {
+				origin = evidence[ref+":reviewed_model"]
+			}
+			if origin != nil {
+				for k, v := range origin {
+					if loc[k] == nil || loc[k] == "" {
+						loc[k] = v
+					}
+				}
+			}
+			href = "/p/" + asset.ProjectID + "/kickoff/sources"
+			if target := publicationLinks[ref]; target != "" {
+				href = target
+			}
+		} else if source == "bom" && !strings.HasPrefix(ref, "fixture:") {
+			href = "/p/" + asset.ProjectID + "/kickoff/sources"
 		}
 		if resource, ok := loc["resource"].(string); ok {
 			if record, ok := loc["record_id"].(string); ok {
@@ -397,18 +451,21 @@ func (s Service) Lifecycle(ctx context.Context, scope Scope, id string) (map[str
 	if owner != nil {
 		ownerID = stringValue(owner["id"])
 	}
-	rows, e := s.DB.Query(ctx, `SELECT id,event_type,label,status,stage_id,source_type,source_ref,occurred_at,links FROM cmdb_lifecycle_event WHERE asset_id=ANY($3::text[]) AND (project_id=ANY($1) OR project_id||':'||asset_id=ANY($2)) ORDER BY occurred_at DESC,id LIMIT 500`, append(scope.Args(), []string{id, ownerID})...)
+	rows, e := s.DB.Query(ctx, `SELECT project_id,id,event_type,label,status,stage_id,source_type,source_ref,occurred_at,links FROM cmdb_lifecycle_event WHERE asset_id=ANY($3::text[]) AND (project_id=ANY($1) OR project_id||':'||asset_id=ANY($2)) ORDER BY occurred_at DESC,id LIMIT 500`, append(scope.Args(), []string{id, ownerID})...)
 	if e != nil {
 		return nil, e
 	}
 	defer rows.Close()
 	data := []map[string]any{}
 	for rows.Next() {
-		var eid, kind, label, status, source, ref string
+		var project, eid, kind, label, status, source, ref string
 		var stage *string
 		var at time.Time
 		var links []byte
-		rows.Scan(&eid, &kind, &label, &status, &stage, &source, &ref, &at, &links)
+		rows.Scan(&project, &eid, &kind, &label, &status, &stage, &source, &ref, &at, &links)
+		if kind == "bom.published" || kind == "engineering.published" {
+			links = Encode([]map[string]string{{"label": "智能开局工程", "href": "/p/" + project + "/kickoff/publish"}})
+		}
 		data = append(data, map[string]any{"id": eid, "asset_id": id, "event_type": kind, "label": label, "status": status, "stage_id": stage, "source": source, "source_ref": ref, "occurred_at": at, "links": json.RawMessage(links), "historical": false})
 	}
 	stages := []map[string]any{}
@@ -661,6 +718,12 @@ func (s Service) extraQuality(ctx context.Context, scope Scope, selected string)
 }
 
 func (s Service) InventorySnapshot(ctx context.Context, scope Scope) (map[string]any, error) {
+	return s.InventoryPage(ctx, scope, "", 1000)
+}
+func (s Service) InventoryPage(ctx context.Context, scope Scope, cursor string, limit int) (map[string]any, error) {
+	if limit < 1 || limit > 2000 {
+		return nil, Reject("INVALID_LIMIT", 400)
+	}
 	schema, e := s.Active(ctx)
 	if e != nil {
 		return nil, e
@@ -674,9 +737,17 @@ func (s Service) InventorySnapshot(ctx context.Context, scope Scope) (map[string
 			}
 		}
 	}
-	rows, e := s.RawAssets(ctx, scope, kinds)
+	rows, e := s.rawAssetsPage(ctx, scope, kinds, cursor, limit+1)
 	if e != nil {
 		return nil, e
+	}
+	hasMore := len(rows) > limit
+	if hasMore {
+		rows = rows[:limit]
+	}
+	var next any
+	if hasMore {
+		next = rows[len(rows)-1]["id"]
 	}
 	currentParents := map[string]string{}
 	parentRows, e := s.DB.Query(ctx, `SELECT r.to_uid,r.from_uid FROM cmdb_relationship r JOIN cmdb_entity a ON a.item_uid=r.from_uid JOIN cmdb_entity b ON b.item_uid=r.to_uid WHERE r.valid_to IS NULL AND r.definition_id IN('contains','optic_on_port') AND `+RelationshipVisible("r")+` AND `+Visible("a")+` AND `+Visible("b")+` ORDER BY CASE r.fact_layer WHEN 'observed' THEN 0 WHEN 'recorded' THEN 1 ELSE 2 END`, scope.Args()...)
@@ -693,6 +764,13 @@ func (s Service) InventorySnapshot(ctx context.Context, scope Scope) (map[string
 	parentRows.Close()
 	collections := map[string][]map[string]any{"servers": {}, "switches": {}, "gpus": {}, "nics": {}, "ports": {}, "switch_ports": {}, "optics": {}, "cables": {}, "racks": {}, "rack_placements": {}}
 	devices := map[string]string{}
+	deviceRows, err := s.RawAssets(ctx, scope, deviceKinds(schema))
+	if err != nil {
+		return nil, err
+	}
+	for _, d := range deviceRows {
+		devices[stringValue(d["id"])] = stringValue(d["category"])
+	}
 	for _, r := range rows {
 		if r["category"] == "server" || r["category"] == "switch" {
 			devices[stringValue(r["id"])] = stringValue(r["category"])
@@ -760,7 +838,7 @@ func (s Service) InventorySnapshot(ctx context.Context, scope Scope) (map[string
 			p["status"] = "pending_layout_review"
 		}
 	}
-	return map[string]any{"data": collections, "schema_version": schema.Version, "source": "CMDB PostgreSQL canonical inventory", "truncated": false}, nil
+	return map[string]any{"data": collections, "schema_version": schema.Version, "source": "CMDB PostgreSQL canonical inventory", "truncated": hasMore, "page": map[string]any{"limit": limit, "has_more": hasMore, "next_cursor": next}}, nil
 }
 func deviceKinds(schema Schema) []string {
 	out := []string{}

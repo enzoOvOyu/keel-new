@@ -4,6 +4,38 @@
  */
 
 export interface paths {
+    "/projects/{projectId}/kickoff/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["evaluateKickoffPublicationScope"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/kickoff/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getKickoffReviewPage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/projects/{projectId}/kickoff/publications/{publicationId}/status": {
         parameters: {
             query?: never;
@@ -124,6 +156,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description Summary omits ports/connections and calculation details. Section reads are paged and revision-bound. context requires entity_id and returns only the selected object neighbourhood. Publication lists contain counts and frozen references; snapshots are loaded through the receipt endpoint. */
         get: operations["getKickoffWorkspace"];
         put?: never;
         post?: never;
@@ -7372,6 +7405,8 @@ export interface components {
             stockM: number | null;
         };
         KickoffCalculation: {
+            /** @description Server evaluates against complete current domain inputs, independent of loaded frontend pages. */
+            stale?: boolean;
             id: string;
             /** @enum {string} */
             domain: "cabling" | "power";
@@ -7411,6 +7446,43 @@ export interface components {
                 [key: string]: number;
             };
         };
+        KickoffPage: {
+            section: string;
+            offset: number;
+            limit: number;
+            total: number;
+            hasMore: boolean;
+        };
+        KickoffReviewRow: {
+            id: string;
+            name: string;
+            description: string;
+            reference: string;
+            location: string;
+            state: string;
+            evidence: components["schemas"]["KickoffEvidence"];
+        };
+        KickoffReviewPage: {
+            revision: number;
+            rows: components["schemas"]["KickoffReviewRow"][];
+            total: number;
+            offset: number;
+            limit: number;
+            hasMore: boolean;
+        };
+        KickoffObjectContext: {
+            revision: number;
+            devices: components["schemas"]["KickoffDevice"][];
+            ports: components["schemas"]["KickoffPort"][];
+            connections: components["schemas"]["KickoffConnection"][];
+            components: components["schemas"]["KickoffComponent"][];
+        };
+        KickoffScopeEvaluation: {
+            revision: number;
+            counts: {
+                [key: string]: number;
+            };
+        };
         KickoffActivity: {
             id: string;
             action: string;
@@ -7433,6 +7505,11 @@ export interface components {
             calculations: components["schemas"]["KickoffCalculation"][];
             publications: components["schemas"]["KickoffPublication"][];
             activity: components["schemas"]["KickoffActivity"][];
+            totals?: {
+                [key: string]: number;
+            };
+            page?: components["schemas"]["KickoffPage"];
+            capabilities?: components["schemas"]["KickoffCapability"][];
         };
         KickoffCapability: {
             id: string;
@@ -14664,6 +14741,8 @@ export interface components {
             source_location?: {
                 import_id?: string | null;
                 document_id?: string | null;
+                /** @description Original evidence field; reviewed_model denotes object-level reviewed evidence. */
+                evidence_field?: string;
                 sheet?: string | null;
                 cell?: string | null;
                 row?: number;
@@ -15926,6 +16005,11 @@ export interface components {
             schema_version: string;
             source: string;
             truncated: boolean;
+            page: {
+                limit: number;
+                has_more: boolean;
+                next_cursor: string | null;
+            };
             request_id: string;
         };
         CmdbAssetDetailsEnvelope: {
@@ -18248,6 +18332,93 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    evaluateKickoffPublicationScope: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    deviceIds: string[];
+                    expectedRevision: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["KickoffScopeEvaluation"];
+                        request_id?: string;
+                    };
+                };
+            };
+            /** @description REVISION_CONFLICT */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Selected scope or relationships are invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getKickoffReviewPage: {
+        parameters: {
+            query?: {
+                category?: "devices" | "components" | "ports" | "connections" | "placements";
+                offset?: number;
+                limit?: number;
+                revision?: number;
+                q?: string;
+                issues?: boolean;
+                sort?: "name" | "reference" | "location" | "state";
+                desc?: boolean;
+            };
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["KickoffReviewPage"];
+                        request_id?: string;
+                    };
+                };
+            };
+            /** @description REVISION_CONFLICT */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     getKickoffPublicationStatus: {
         parameters: {
             query?: never;
@@ -18589,7 +18760,13 @@ export interface operations {
     };
     getKickoffWorkspace: {
         parameters: {
-            query?: never;
+            query?: {
+                section?: "devices" | "ports" | "connections" | "components" | "racks" | "issues" | "models" | "calculations" | "publications" | "sources" | "activity" | "context";
+                entity_id?: string;
+                offset?: number;
+                limit?: number;
+                revision?: number;
+            };
             header?: never;
             path: {
                 projectId: string;
@@ -18605,7 +18782,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        data: components["schemas"]["KickoffWorkspace"];
+                        data: components["schemas"]["KickoffWorkspace"] | components["schemas"]["KickoffObjectContext"];
                         request_id?: string;
                     };
                 };
@@ -33326,6 +33503,9 @@ export interface operations {
         parameters: {
             query?: {
                 project_id?: string;
+                limit?: number;
+                /** @description Exclusive asset ID returned by the previous page. */
+                cursor?: string;
             };
             header?: never;
             path?: never;

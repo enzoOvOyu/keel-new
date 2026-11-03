@@ -53,7 +53,7 @@ func TestVisualQuerySQLBindings(t *testing.T) {
 	if e != nil || !strings.Contains(expr[0], "type_a='server'") || !strings.Contains(expr[1], "type_b='server'") {
 		t.Fatal("rack-to-leaf axes must exclude switch uplinks")
 	}
-	if !strings.Contains(visualCTE(), "HAVING count(DISTINCT w.id)=1") {
+	if !strings.Contains(visualCTE(), "CASE WHEN count(DISTINCT w.id)=1 THEN min(w.id) END") {
 		t.Fatal("ambiguous port owner must not select arbitrary first device")
 	}
 }

@@ -2,6 +2,12 @@
 
 核对基准：代码 `4541850`，2026-10-31。Base URL 为 `/api/v1`。字段/类型权威为 [OpenAPI](../openapi.yaml)，机器登记见 [注册表](real-api-registry.json)。本文记录语义和使用方式，不复制另一套完整 Schema。
 
+## 本轮性能整改（开发代码，尚未部署）
+
+MM规模下原三个GET查询均触发5秒超时。当前改写关系优先聚合以避免中间行数估算坍缩；结构上下文从已选节点走现有关系索引，连接列表仅加载两端及父设备/机柜，不向兄弟端口扩散。矩阵分页与覆盖统计复用同次聚合。保留原5秒期限、RBAC、planned优先、歧义、cursor/snapshot及partial语义；没有新增资产事实源、索引或迁移。
+
+现有MM真实数据库的只读Service验证：subgraph 1498.582ms、matrix 1205.684ms、connections 1356.179ms，连接上下文495资产/549关系且未截断。是单轮样本，不能宣称P95达标；同代码先前连接样本2186.563ms。部署HTTP和浏览器性能尚未验证。证据将汇总于`docs/kickoff/PERFORMANCE-RESULT.json`；修复前证据见`docs/kickoff/PERFORMANCE-AUDIT.json`。
+
 ## 使用边界
 
 - 真实 Go 查询现有 CMDB；页面没有用 fixture 补齐缺失资产。数据库中带 synthetic 来源的记录仍是合成证据，不能当真机采集。

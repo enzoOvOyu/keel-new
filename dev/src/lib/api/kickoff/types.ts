@@ -28,7 +28,7 @@ export type ModelRow = Record<string, string>;
 export interface ModelInput { tableId: string; rows: ModelRow[]; version: number; confirmed: boolean; updatedAt: string; source: string }
 export interface CalculationRow { connectionId: string; from: string; to: string; route: string[]; pathM: number; leadM: number; slackM: number; calculatedM: number; stockM: number | null }
 export interface Calculation {
-  id: string; domain: 'cabling' | 'power'; inputDigest: string; createdAt: string; status: Readiness;
+  stale?: boolean; id: string; domain: 'cabling' | 'power'; inputDigest: string; createdAt: string; status: Readiness;
   rows: CalculationRow[]; issues: string[]; power: { rackId: string; loadKW: number | null; capacityKW: number | null; remainingKW: number | null }[];
 }
 export interface Publication {
@@ -38,6 +38,8 @@ export interface Publication {
 }
 export interface Activity { id: string; action: string; detail: string; at: string }
 export interface Workspace {
+  capabilities?: Capability[];
+  totals?: Record<string,number>; page?: {section:string;offset:number;limit:number;total:number;hasMore:boolean};
   schemaVersion: number; projectId: string; projectName: string; revision: number;
   devices: Device[]; ports: Port[]; connections: Connection[]; components: Component[]; racks: Rack[];
   sources: Source[]; issues: Issue[]; models: ModelInput[]; calculations: Calculation[];
@@ -47,6 +49,12 @@ export interface Capability { id: string; title: string; detail: string; state: 
 export interface PublishPreview { devices: Device[]; ports: Port[]; connections: Connection[]; components: Component[]; placements: Device[]; held: Device[]; counts: Record<string, number> }
 export interface ImportPreview { rows: ModelRow[]; errors: string[]; unknownHeaders: string[]; sheet: string }
 export interface KickoffAPI {
+  evaluatePublication?(ids:string[],revision:number):Promise<{revision:number;counts:Record<string,number>}>;
+  loadContext?(id:string):Promise<void>;
+  exportReview?(query:URLSearchParams):Promise<ReviewRow[]>;
+  reviewPage?(query:URLSearchParams):Promise<ReviewPage>;
+  loadSection?(section:string): Promise<void>;
+  publicationDetail?(id:string): Promise<Publication>;
   subscribe(listener: () => void): () => void;
   snapshot(): Workspace;
   addSources(files: File[]): Promise<void>;
@@ -58,3 +66,6 @@ export interface KickoffAPI {
   publish(ids: string[], reason: string, expectedRevision: number): Promise<Publication>;
   calculate(domain: 'cabling' | 'power'): Promise<Calculation>;
 }
+
+export interface ReviewRow {id:string;name:string;description:string;reference:string;location:string;state:string;evidence:Evidence}
+export interface ReviewPage {revision:number;rows:ReviewRow[];total:number;offset:number;limit:number;hasMore:boolean}

@@ -5,7 +5,7 @@ export const cmdbManualRequest=z.object({project_id:z.string(),asset_id:z.string
 export type CmdbAsset={id:string;project_id:string;asset_type:typeof cmdbAssetTypes[number];name:string;serial:string|null;model:string|null;address:string|null;rack_id:string|null;parent_id:string|null;delivery_stage:string|null;maintenance_state:string;health:string;freshness:string;completeness:string;source:string;revision:number};
 export type CmdbRelation={id:string;source:string;target:string;kind:'position'|'composition'|'physical'|'logical'|'business'|'dependency'|'reference';label:string;fact:'planned'|'observed'|'recorded'|'baseline'|'intended'|'actual'|'operational';source_ref:string;revision:string};
 export type CmdbNode={id:string;label:string;asset_type:string;project_id:string;href:string|null};
-export type CmdbSource={id:string;asset_id:string;field:string;value_json:string;source:string;revision:string;observed_at:string|null;freshness:string;support:string;evidence_refs:string[];import_id:string|null;sheet:string|null;cell:string|null;status:string;href:string|null};
+export type CmdbSource={source_location?:Record<string,unknown>;id:string;asset_id:string;field:string;value_json:string;source:string;revision:string;observed_at:string|null;freshness:string;support:string;evidence_refs:string[];import_id:string|null;sheet:string|null;cell:string|null;status:string;href:string|null};
 export type CmdbQuality={id:string;asset_id:string;field:string;code:string;summary:string;source:string;severity:'warning'|'critical';href:string;status:string};
 
 export const cmdbTypeLabels:Record<string,string>={server:'服务器',switch:'交换机',gpu:'GPU',nic:'NIC',port:'端口',optic:'光模块',cable:'线缆',rack:'机柜'};

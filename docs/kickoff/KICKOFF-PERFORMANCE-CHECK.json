@@ -1,0 +1,49 @@
+{
+  "scope": "kickoff backend/frontend performance only; no CMDB/menu edits, no commit/deploy",
+  "validation": {
+    "mode": "httptest existing MM; default_transaction_read_only=on; no listening port",
+    "workspace_revision": 8,
+    "homepage_ms": 1755.69,
+    "homepage_bytes": 1151083,
+    "ports": {
+      "unique": 14308,
+      "pages": 72,
+      "p95_ms": 2.15,
+      "max_ms": 119.58
+    },
+    "connections": {
+      "unique": 7154,
+      "pages": 36,
+      "p95_ms": 1.94,
+      "max_ms": 2.29
+    },
+    "selected_device_context_ports": 122,
+    "revision_consistency": "passed",
+    "stale_revision_409": "passed",
+    "full_scope_preview_counts": "passed",
+    "single_detail_projection_per_cached_revision": "passed",
+    "readonly_test_seconds": 2.22
+  },
+  "checks": [
+    "TestKickoffExistingMMReadOnly passed",
+    "TestProjectSummaryPreservesEvidenceAndIssuesWithoutRelations and TestKickoff targeted Go selection passed",
+    "OpenAPI generated types synchronized",
+    "kickoff diff whitespace check passed"
+  ],
+  "limitations": [
+    "homepage remains above suggested 1 second / 500KB targets",
+    "not a browser/FPS or concurrent-load acceptance",
+    "final integrated frontend build/docs/registry handled by coordinating agent"
+  ],
+  "implementation": [
+    "3-entry/60-second revision-and-source-head keyed typed projection cache; oversize >100000 model/evidence records not retained",
+    "summary skips port/connection projection",
+    "Review uses server pagination/filter/sort; export deliberately retrieves full matching scope",
+    "publication preview evaluates full selected closure on server",
+    "history list reads counts/frozen references; two detail versions fetched only when opened",
+    "Drawer fetches selected local adjacency; no calculation or global relation downloads",
+    "initial mount emits no publication event; successful explicit publish emits scoped event",
+    "calculation stale flag computed on server using complete domain model",
+    "publish?publication=id opens kickoff receipt"
+  ]
+}

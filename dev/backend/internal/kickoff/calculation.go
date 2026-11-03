@@ -28,6 +28,7 @@ type RackPower struct {
 	RemainingKW *float64 `json:"remainingKW"`
 }
 type Calculation struct {
+	Stale       bool             `json:"stale"`
 	ID          string           `json:"id"`
 	Domain      string           `json:"domain"`
 	InputDigest string           `json:"inputDigest"`

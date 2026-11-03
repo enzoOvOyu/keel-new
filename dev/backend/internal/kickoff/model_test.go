@@ -67,3 +67,23 @@ func TestKnownRackDoesNotRequireCompleteOccupancy(t *testing.T) {
 		t.Fatal("old publication acquired unapproved locations")
 	}
 }
+
+func TestProjectSummaryPreservesEvidenceAndIssuesWithoutRelations(t *testing.T) {
+	m := engineering.EmptyPhysical("p")
+	entity := engineering.EntityVersion{EntityID: "device", Maturity: engineering.Confirmed}
+	sn := "synthetic-serial"
+	m.Equipment = []engineering.EquipmentPlan{{EntityVersion: entity, EquipmentType: "server", IdentityKind: "planned_instance", Quantity: 1, Label: "server", Serial: &sn}}
+	m.Ports = []engineering.PlannedPort{{EntityVersion: engineering.EntityVersion{EntityID: "port"}, EquipmentID: "device", Name: "p1"}}
+	ev := []engineering.SourceEvidence{{EntityID: "device", Sheet: "first", Cell: "A1"}, {EntityID: "device", Sheet: "second", Cell: "B2"}}
+	summary := ProjectSummary(m, ev, "source", nil)
+	full := Project(m, ev, "source", nil)
+	if len(summary.Ports) != 0 || len(summary.Connections) != 0 || len(summary.Devices) != 1 || len(full.Ports) != 1 {
+		t.Fatal("summary projected relation details or lost devices")
+	}
+	if summary.Devices[0].Evidence.Sheet != "first" || summary.Devices[0].Evidence != full.Devices[0].Evidence {
+		t.Fatal("indexed evidence changed first-match semantics")
+	}
+	if len(summary.Issues) != len(full.Issues) {
+		t.Fatal("summary lost validation issues")
+	}
+}

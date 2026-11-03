@@ -8,11 +8,27 @@
 - 接续先读本节，再按`docs/REAL-API-CONTRACTS.md`、模块文档和`docs/flows-redesign/implementation.md`定位。不要再参考下方“独立作业分支/旧部署目录继续开发”的历史说明。
 - 清理清单与原分支SHA：`docs/git-baseline-20261102.json`；整合说明：`docs/integration-20261102.md`。既有未验收/真机限制维持原记录。
 
+## 最新里程碑事件：旧BOM前端及路由彻底退役
+
+用户最新明确不保留旧URL，覆盖此前本轮的兼容跳转安排。当前dev源码已删除旧BOM菜单、页面、redirect组件及专属Route；旧地址由应用404处理，不再跳转。所有活跃入口/来源链接直接使用/p/:projectId/kickoff。清理25个退役页面/组件/专属API文件，原realBom仅共用HTTP能力移至lib/api/request.ts；StageWorkspace的开局输入改读新kickoff摘要和版本，不再运行旧前端交接门禁。
+
+共享解析、工程事实、bom_item/CMDB、事务Outbox及原始文件/审计仍保留，未删除历史数据。CMDB新事件和历史查询投影返回kickoff链接，旧工程发布不伪造成新kickoff回执。当前运行仍9a3e03b，源码变更尚未部署；以前的跳转里程碑只作过程记录。删除后TypeScript/Vite构建及来源只读核对已通过，最终浏览器协议回放通过：旧地址保持原URL显示应用404、无跳转，fixture/inventory请求0；新工作台端口翻页、Drawer加载/失败/重试保持正常，无页面异常或意外API。这不是部署HTTP404或帧率验收，结果记录于PERFORMANCE-RESULT.json。
+
 ## 已完成里程碑事件：BOM菜单退役并统一跳转智能开局
 
 用户已授权按PERFORMANCE-REMEDIATION.txt实施整改。BOM菜单及全局模块搜索入口移除，旧/p/:projectId/deploy/bom/*、旧provision/bom及/bom路径统一重定向到对应项目kickoff总览/资料页；新建项目与项目总览入口直接进入kickoff，沿用ProjectContext/RBAC。旧BOM后端及历史事实不删除。应用修改尚未部署；最终类型检查和定向验证随本轮整改统一执行。
 
-性能整改正在实施：拓扑SQL、inventory分页/完整性、kickoff装载及来源展示分别推进，原只读诊断记录保留为修复前证据。
+性能整改已完成代码实现与定向验证：拓扑SQL修复估算坍缩及不必要兄弟端口展开，矩阵合并统计；inventory真实分页与来源证据/路由修复；workspace摘要、服务器Review分页与完整范围preview、局部Drawer加载/错误/重试、历史详情按需；移除独立真实页面启动时31MB演示fixture的顶层加载，legacy按需初始化同一原fixture。原只读诊断记录保留为修复前证据。
+
+## 已完成里程碑事件：智能开局性能整改实现及MM只读核对
+
+代码位于dev，线上仍9a3e03b，尚未部署或合并main。BOM菜单、全局模块搜索和旧BOM路由统一指向kickoff，旧后端/事实保留。原型布局/组件/密度保留，表格服务端分页、Drawer只读当前局部对象，保存仅刷新摘要；版本差异按需取详情。源文件仍在MinIO，事实与修订仍持久化，3项/60秒有限类型化读缓存仅为可重建投影。
+
+MM只读核对：workspace冷首屏20.600秒/12.9MB降至1.756秒/1.151MB，最终源码在共享环境并行浏览器回放时复测2.584秒/同字节数，14308端口/7154连接分页无重复且修订一致；库存12页22488个适用类型实体与DB一致，无跨项目混入，四个generic device及project锚点不属于旧库存类型集合，仍可在CMDB目录查看。30条工程来源解析成功，reviewed_model明确标对象级依据。subgraph/matrix/connections单次样本1.50/1.21/1.36秒；physical最终2.176秒、495资产/549关系且无截断，双端/所属设备完整，不扩兄弟端口。原31MBfixture初始请求0次，按需并发/重复加载合计1次，131资源名metadata不含业务记录。
+
+定向Go、TS/Vite构建、React Router匹配和契约台账检查通过，最终源码TypeScript/Vite构建通过（Vite1m16秒），137项契约台账检查通过；本地构建协议回放验证旧BOM重定向/侧栏、端口0→10翻页、局部Drawer失败/重试，无意外API或页面异常，fixture/inventory请求均0。它不等于部署API或浏览器FPS验收。结果写入PERFORMANCE-RESULT.json。旧BOM TestFullResumeAppliesPreviouslyPartialSheetWithoutProvider失败，已在未整改基线f941397单独复现，未削弱测试或扩展修复。没有新增资产、重新导入、AI调用、迁移或监听端口。
+
+真实限制：首页尚未达到建议1秒/500KB，physical仍略高于建议2秒，单次拓扑观测不宣称P95；未做部署后HTTP、浏览器FPS或并发验收。精确机柜占位仍受缺高度/容量限制，不伪造值，不把后续全域就绪加为入库门槛。明细与证据：docs/kickoff/PERFORMANCE-RESULT.json、KICKOFF-PERFORMANCE-CHECK.json、CMDB-PERFORMANCE-CHECK.json；契约与注册表已同步。
 
 ## 已完成里程碑事件：MM规模性能与CMDB/拓扑只读诊断
 

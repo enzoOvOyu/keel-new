@@ -1,5 +1,5 @@
 import type {components} from '../schemas/openapi';
-import {identitySnapshot} from './identityBridge';import {registerResourceReadAdapter,installCanonicalInventory,type Row,type Resource} from './index';import {cmdbAssetTypes,cmdbTypeLabels,type CmdbAsset,type CmdbNode,type CmdbRelation,type CmdbSource,type CmdbQuality} from '../schemas/cmdb';import type {CmdbConfigVersion,CmdbEvent} from './cmdb';
+import {identitySnapshot} from './identityBridge';import {mockApi,registerResourceReadAdapter,installCanonicalInventory,type Row,type Resource} from './index';import {cmdbAssetTypes,cmdbTypeLabels,type CmdbAsset,type CmdbNode,type CmdbRelation,type CmdbSource,type CmdbQuality} from '../schemas/cmdb';import type {CmdbConfigVersion,CmdbEvent} from './cmdb';
 export const realCmdbEnabled=import.meta.env.VITE_CMDB_PROVIDER!=='mock';
 let actor='';const assets=new Map<string,{asset:CmdbAsset;attributes:Row;owner:Row|null}>();const devices=new Map<string,Row>();const resources=new Map<string,Row[]>();let views:Row[]=[];const listeners=new Set<()=>void>();
 function ensureIdentity(){const s=identitySnapshot();const key=s?s.user.id+':'+s.permission_revision:'';if(key!==actor){actor=key;assets.clear();devices.clear();resources.clear();views=[]}}
@@ -9,7 +9,7 @@ export async function cmdbFetch<T=any>(path:string,method='GET',body?:unknown,si
 function params(input:Record<string,unknown>){const q=new URLSearchParams();for(const[k,v]of Object.entries(input))if(v!==undefined&&v!==null&&v!=='')q.set(k,Array.isArray(v)?v.join(','):String(v));return q.toString()}
 const assetPath=(id:string,project?:string,sub='')=>'dossier/assets/'+encodeURIComponent(id)+(sub?'/'+sub:'')+'?'+params({project_id:project});
 function remember(row:{data:CmdbAsset;attributes?:Row;owner_device?:Row|null}){assets.set(row.data.id,{asset:row.data,attributes:row.attributes||{id:row.data.id},owner:row.owner_device||null});if(row.owner_device)devices.set(row.owner_device.id,row.owner_device)}
-function changed(){listeners.forEach(f=>f());void refreshCanonicalInventory(true).catch(()=>{})}
+function changed(){listeners.forEach(f=>f());if(inventoryConsumer)void refreshCanonicalInventory(true).catch(()=>{})}
 type Page={limit:number;has_more:boolean;next_cursor:string|null};type TreeSite={id:string;label:string;pods:{id:string;label:string;racks:{id:string;label:string;health:string;devices:{id:string;label:string;type:string;health:string}[]}[]}[]};
 export const realCmdbApi={
  subscribe(listener:()=>void){listeners.add(listener);return()=>{listeners.delete(listener)}},async beforeRequest(signal?:AbortSignal){if(signal?.aborted)throw new DOMException('Aborted','AbortError')},
@@ -35,16 +35,34 @@ export type CmdbRevision=components['schemas']['CmdbRevision'];
 export type ChangeSet=components['schemas']['CmdbChangeSet'];
 export async function cmdbDrawerTab(project:string,id:string,tab:string,signal?:AbortSignal){const r=await cmdbFetch<any>(assetPath(id,project,'drawer/'+tab),'GET',undefined,signal);if(r.device)devices.set(r.device.id,r.device);for(const[key,rows]of Object.entries(r.resources||{}))resources.set(project+':'+id+':'+key,rows as Row[]);return r}
 
+let inventoryAbort:AbortController|null=null;
+let inventoryConsumer=false;
+export function setCanonicalInventoryConsumer(active:boolean){inventoryConsumer=active;if(!active){inventoryAbort?.abort();inventoryGeneration++;inventoryPending=null;inventoryIdentity=''}}
 let inventoryIdentity='';let inventoryPending:Promise<void>|null=null;let inventoryGeneration=0;
-function inventoryKey(session:NonNullable<ReturnType<typeof identitySnapshot>>){return session.user.id+':'+session.permission_revision+':'+JSON.stringify([session.grants,session.authorized_projects.map(p=>p.id)])}
+function inventoryProject(){const scope=mockApi.scope;return scope.mode==='project'?scope.projectId:scope.filter||''}
+function inventoryKey(session:NonNullable<ReturnType<typeof identitySnapshot>>){return session.user.id+':'+session.permission_revision+':'+inventoryProject()+':'+JSON.stringify(session.grants)}
 export function refreshCanonicalInventory(force=false):Promise<void>{
  const session=identitySnapshot();
  if(!session||!realCmdbEnabled||!session.authorized_projects.length){inventoryGeneration++;inventoryIdentity='';inventoryPending=null;if(realCmdbEnabled)installCanonicalInventory(Object.fromEntries(['servers','switches','gpus','nics','ports','switch_ports','optics','cables','racks','rack_placements'].map(k=>[k,[]])));return Promise.resolve()}
  const key=inventoryKey(session);if(!force&&key===inventoryIdentity)return inventoryPending||Promise.resolve();
+ inventoryAbort?.abort();const controller=new AbortController();inventoryAbort=controller;
  const generation=++inventoryGeneration;inventoryIdentity=key;
- const pending=cmdbFetch<{data:Record<string,Row[]>}>('inventory').then(result=>{const current=identitySnapshot();if(generation===inventoryGeneration&&current&&inventoryKey(current)===key)installCanonicalInventory(result.data)}).catch(error=>{if(generation===inventoryGeneration)inventoryIdentity='';throw error}).finally(()=>{if(generation===inventoryGeneration)inventoryPending=null});
+ const project=inventoryProject();
+ const pending=(async()=>{
+  const snapshot:Record<string,Row[]>={};let cursor:string|null=null;
+  do{
+   const result:{data:Record<string,Row[]>;page:Page}=await cmdbFetch<{data:Record<string,Row[]>;page:Page}>('inventory?'+params({project_id:project,limit:1000,cursor}),'GET',undefined,controller.signal);
+   if(generation!==inventoryGeneration)return;
+   for(const [key,rows]of Object.entries(result.data))(snapshot[key]??=[]).push(...rows);
+   cursor=result.page.has_more?result.page.next_cursor:null;
+  }while(cursor);
+  const current=identitySnapshot();
+  if(generation===inventoryGeneration&&current&&inventoryKey(current)===key)installCanonicalInventory(Object.fromEntries(['servers','switches','gpus','nics','ports','switch_ports','optics','cables','racks','rack_placements'].map(k=>[k,snapshot[k]||[]])));
+ })().catch(error=>{if(generation===inventoryGeneration)inventoryIdentity='';throw error}).finally(()=>{if(generation===inventoryGeneration)inventoryPending=null});
  inventoryPending=pending;return pending
 }
-window.addEventListener('keel-inventory-published',()=>{void refreshCanonicalInventory(true).catch(()=>{})});
+let lastInventoryScope='';
+mockApi.subscribe(()=>{const scope=JSON.stringify(mockApi.scope);if(scope!==lastInventoryScope){lastInventoryScope=scope;if(inventoryConsumer)void refreshCanonicalInventory().catch(()=>{})}});
+window.addEventListener('keel-inventory-published',()=>{if(inventoryConsumer)void refreshCanonicalInventory(true).catch(()=>{})});
 
 export function cmdbAttributes(schema:CmdbSchema|undefined,kind:string){const fields=new Map<string,NonNullable<CmdbSchema['types'][number]>['attributes'][number]>();const seen=new Set<string>();function load(name:string){if(seen.has(name))return;seen.add(name);const t=schema?.types.find(t=>t.name===name);if(!t)return;if(t.extends)load(t.extends);for(const a of t.attributes)fields.set(a.name,a)}load(kind);return [...fields.values()]}

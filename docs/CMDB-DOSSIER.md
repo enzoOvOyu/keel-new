@@ -32,3 +32,14 @@
 ## 本轮实际验证
 
 最终TypeScript+Vite生产构建通过。浏览器完成资产→部件→端口→Cable→对端及五/八Tab抽屉、配置版本/来源、验机/NCCL/历史退场归档、Execution、质量导入入口、保存视图、人工备注/审计与权限。10类真实返回response通过JSON Schema校验，维护态/stale/unknown与无授权项目已检查。结果见CMDB-DOSSIER-VALIDATION.json；不等于正式Go、原生采集或全平台回归通过。
+
+
+## 本轮库存与工程来源读取整改（未部署）
+
+GET /api/v1/cmdb/inventory接受现有project_id授权范围及limit/cursor；limit默认1000、最大2000，返回page.limit/has_more/next_cursor，truncated与has_more一致。按稳定资产ID翻页，旧LIMIT 10000静默截断已移除；适用类型仍为server/switch/gpu/nic/port/optic/cable/rack的Schema派生类型，四个尚未明确分类的generic device仍由CMDB目录展示，不伪造类型。原有消费Adapter逐页取得相应scope，不用未加载范围推断资产不存在。
+
+kickoff、CMDB档案、数据中心拓扑和机柜使用各自真实API，身份安装后即可进入，不以公共库存全量装载作为前置。旧库存消费页面继续保留加载/错误状态与授权scope切换、取消旧请求。只在真实发布完成后刷新相关消费，不将首次进入kickoff的已有历史记录误当成新发布。
+
+工程来源同时解析eng_publication和kickoff_publication版本关联，保留实际eng_evidence的Sheet/单元格；reviewed_model为对象级审核依据，必须明确标注，不能当作独立字段证据。新kickoff工程链接定位/p/:projectId/kickoff/publish?publication=:id；旧工程及原始导入来源直接定位新资料页。旧BOM前端URL已删除，历史事件在读取投影时直接提供kickoff链接，不依赖重定向，也不改写原审计。health/freshness/maintenance_state为unknown时展示待采集/暂无观测/尚未进入维护，原始状态与事实分层不改成健康或已维护。
+
+现有MM只读分页12页核对22488个适用库存对象，无重复或跨项目对象；端口14308、线缆7154已在数据库，数量不因前端名额截断而丢失。30条工程来源解析成功，但其中对象级依据不宣称独立字段证据。验证和真实限制见docs/kickoff/CMDB-PERFORMANCE-CHECK.json。未执行数据库迁移、重新导入、AI解析或部署。

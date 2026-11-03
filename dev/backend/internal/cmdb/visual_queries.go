@@ -12,6 +12,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"golang.org/x/sync/errgroup"
 )
 
 type VisualPage struct {
@@ -248,14 +250,26 @@ func visualPage(scope Scope, path string, q url.Values, revision, last string, l
 
 // Every derived join below is between authorized existing entities and typed
 // relations. Geometry, LLDP and display names never create a physical edge.
+// Prefer planned relations without filtering a ranked derived table: the rank=1
+// selectivity estimate collapses thousands of endpoints to one row and leads to
+// quadratic nested-loop joins. Keep ambiguous targets NULL, not an arbitrary ID.
+func visualPreferredTarget() string {
+	return `CASE WHEN bool_or(fact_layer='planned') THEN
+ CASE WHEN count(DISTINCT to_uid) FILTER(WHERE fact_layer='planned')=1 THEN min(to_uid) FILTER(WHERE fact_layer='planned') END
+ ELSE CASE WHEN count(DISTINCT to_uid)=1 THEN min(to_uid) END END`
+}
+func visualPreferredLayer() string {
+	return `CASE WHEN bool_or(fact_layer='planned') THEN 'planned'
+ WHEN count(DISTINCT fact_layer)=1 THEN min(fact_layer) ELSE 'mixed' END`
+}
 func visualCTE() string {
-	return `WITH RECURSIVE visible AS (SELECT e.* FROM cmdb_entity e WHERE ` + activeVisualAsset("e") + `), rel AS (SELECT r.from_uid,r.to_uid,r.definition_id,r.fact_layer FROM cmdb_relationship r WHERE r.valid_to IS NULL AND ` + RelationshipVisible("r") + ` AND EXISTS(SELECT 1 FROM visible va WHERE va.item_uid=r.from_uid) AND EXISTS(SELECT 1 FROM visible vb WHERE vb.item_uid=r.to_uid)), location_ranked AS (SELECT r.*,dense_rank() OVER(PARTITION BY from_uid ORDER BY CASE WHEN fact_layer='planned' THEN 0 ELSE 1 END) preference FROM rel r WHERE definition_id='located_in'), locations AS (SELECT from_uid,CASE WHEN count(DISTINCT to_uid)=1 THEN min(to_uid) END rack_id FROM location_ranked WHERE preference=1 GROUP BY from_uid), hierarchy(parent_id,child_id) AS (SELECT from_uid,to_uid FROM rel WHERE definition_id IN('parent','contains') UNION SELECT rack_id,from_uid FROM locations WHERE rack_id IS NOT NULL), scope_nodes(id) AS (SELECT item_uid FROM visible WHERE item_uid=$3 UNION SELECT h.child_id FROM hierarchy h JOIN scope_nodes n ON n.id=h.parent_id), owners(port_id,id,depth,path) AS (SELECT item_uid,item_uid,0,ARRAY[item_uid] FROM visible WHERE asset_type='port' UNION ALL SELECT w.port_id,r.from_uid,w.depth+1,w.path||r.from_uid FROM owners w JOIN rel r ON r.to_uid=w.id AND r.definition_id='contains' WHERE w.depth<8 AND NOT r.from_uid=ANY(w.path)), device_owner_candidates AS (SELECT w.port_id,w.id FROM owners w JOIN visible d ON d.item_uid=w.id AND d.asset_type IN('server','switch','pdu','patch_panel','device')), owner_candidates AS (
+	return `WITH RECURSIVE visible AS (SELECT e.* FROM cmdb_entity e WHERE ` + activeVisualAsset("e") + `), rel AS (SELECT r.from_uid,r.to_uid,r.definition_id,r.fact_layer FROM cmdb_relationship r WHERE r.valid_to IS NULL AND ` + RelationshipVisible("r") + ` AND EXISTS(SELECT 1 FROM visible va WHERE va.item_uid=r.from_uid) AND EXISTS(SELECT 1 FROM visible vb WHERE vb.item_uid=r.to_uid)), locations AS (SELECT from_uid,` + visualPreferredTarget() + ` rack_id FROM rel WHERE definition_id='located_in' GROUP BY from_uid), hierarchy(parent_id,child_id) AS (SELECT from_uid,to_uid FROM rel WHERE definition_id IN('parent','contains') UNION SELECT rack_id,from_uid FROM locations WHERE rack_id IS NOT NULL), scope_nodes(id) AS (SELECT item_uid FROM visible WHERE item_uid=$3 UNION SELECT h.child_id FROM hierarchy h JOIN scope_nodes n ON n.id=h.parent_id), owners(port_id,id,depth,path) AS (SELECT item_uid,item_uid,0,ARRAY[item_uid] FROM visible WHERE asset_type='port' UNION ALL SELECT w.port_id,r.from_uid,w.depth+1,w.path||r.from_uid FROM owners w JOIN rel r ON r.to_uid=w.id AND r.definition_id='contains' WHERE w.depth<8 AND NOT r.from_uid=ANY(w.path)), device_owner_candidates AS (SELECT w.port_id,w.id FROM owners w JOIN visible d ON d.item_uid=w.id AND d.asset_type IN('server','switch','pdu','patch_panel','device')), owner_candidates AS (
  SELECT port_id,id FROM device_owner_candidates
  UNION ALL
  SELECT w.port_id,w.id FROM owners w JOIN visible d ON d.item_uid=w.id
  WHERE w.depth=1 AND d.asset_type IN('gpu','nic','psu','bmc','component','optic','electrical_module','connector')
  AND NOT EXISTS(SELECT 1 FROM device_owner_candidates c WHERE c.port_id=w.port_id)
-), owner AS (SELECT w.port_id,min(w.id) id FROM owner_candidates w GROUP BY w.port_id HAVING count(DISTINCT w.id)=1), ranked_ends AS (SELECT r.*,dense_rank() OVER(PARTITION BY from_uid,definition_id ORDER BY CASE WHEN fact_layer='planned' THEN 0 ELSE 1 END) preference FROM rel r WHERE definition_id IN('cable_endpoint_a','cable_endpoint_b')), ends AS (SELECT from_uid,definition_id,CASE WHEN count(DISTINCT to_uid)=1 THEN min(to_uid) END port_id,CASE WHEN count(DISTINCT fact_layer)=1 THEN min(fact_layer) ELSE 'mixed' END fact_layer FROM ranked_ends WHERE preference=1 GROUP BY from_uid,definition_id), con AS MATERIALIZED (
+), owner AS (SELECT w.port_id,CASE WHEN count(DISTINCT w.id)=1 THEN min(w.id) END id FROM owner_candidates w GROUP BY w.port_id), ends_a AS MATERIALIZED (SELECT from_uid,` + visualPreferredTarget() + ` port_id,` + visualPreferredLayer() + ` fact_layer FROM rel WHERE definition_id='cable_endpoint_a' GROUP BY from_uid), ends_b AS MATERIALIZED (SELECT from_uid,` + visualPreferredTarget() + ` port_id,` + visualPreferredLayer() + ` fact_layer FROM rel WHERE definition_id='cable_endpoint_b' GROUP BY from_uid), con AS MATERIALIZED (
  SELECT c.item_uid id,
  CASE WHEN a.fact_layer=b.fact_layer THEN a.fact_layer ELSE 'mixed' END fact_layer,
  COALESCE(c.payload->>'media_type',c.payload->'fields'->>'media_type',c.payload->>'cable_type','') media_type,
@@ -266,8 +280,8 @@ func visualCTE() string {
  CASE WHEN la.from_uid IS NOT NULL THEN la.rack_id ELSE pra.item_uid END rack_a,
  CASE WHEN lb.from_uid IS NOT NULL THEN lb.rack_id ELSE prb.item_uid END rack_b
  FROM visible c
- LEFT JOIN ends a ON a.from_uid=c.item_uid AND a.definition_id='cable_endpoint_a'
- LEFT JOIN ends b ON b.from_uid=c.item_uid AND b.definition_id='cable_endpoint_b'
+ LEFT JOIN ends_a a ON a.from_uid=c.item_uid
+ LEFT JOIN ends_b b ON b.from_uid=c.item_uid
  LEFT JOIN owner oa ON oa.port_id=a.port_id LEFT JOIN owner ob ON ob.port_id=b.port_id
  LEFT JOIN cmdb_entity da ON da.item_uid=oa.id LEFT JOIN cmdb_entity db ON db.item_uid=ob.id
  LEFT JOIN locations la ON la.from_uid=oa.id LEFT JOIN locations lb ON lb.from_uid=ob.id
@@ -333,9 +347,28 @@ func (s Service) visualIDs(ctx context.Context, scope Scope, q url.Values, after
 
 // Only the selected seeds and their structural context reach Go. The bounded
 // closure never expands arbitrary sibling devices through a rack.
+// Deduplicate each node/depth frontier, rather than enumerating every path to
+// the same port. The depth bound still terminates cycles and preserves reachability.
 func visualContextSQL() string {
-	return `WITH RECURSIVE visible AS (SELECT e.item_uid,e.asset_type FROM cmdb_entity e WHERE ` + activeVisualAsset("e") + `), rel AS (SELECT r.* FROM cmdb_relationship r JOIN visible a ON a.item_uid=r.from_uid JOIN visible b ON b.item_uid=r.to_uid WHERE r.valid_to IS NULL AND ` + RelationshipVisible("r") + `), links(a,b) AS (SELECT from_uid,to_uid FROM rel WHERE definition_id IN('cable_endpoint_a','cable_endpoint_b','located_in') UNION SELECT to_uid,from_uid FROM rel WHERE definition_id IN('parent','contains') UNION SELECT r.from_uid,r.to_uid FROM rel r JOIN visible a ON a.item_uid=r.from_uid WHERE $4::boolean AND r.definition_id='contains' AND a.asset_type NOT IN('data_center','region','pod','rack','fabric')), walk(id,depth,path) AS (SELECT v.item_uid,0,ARRAY[v.item_uid] FROM visible v WHERE v.item_uid=ANY($3::text[]) UNION ALL SELECT l.b,w.depth+1,w.path||l.b FROM walk w JOIN links l ON l.a=w.id WHERE w.depth<8 AND NOT l.b=ANY(w.path)) SELECT DISTINCT id FROM walk ORDER BY id LIMIT 5001`
+	return `WITH RECURSIVE walk(id,depth) AS (
+ SELECT e.item_uid,0 FROM cmdb_entity e WHERE e.item_uid=ANY($3::text[]) AND ` + activeVisualAsset("e") + `
+ UNION
+ SELECT target.item_uid,w.depth+1 FROM walk w
+ CROSS JOIN LATERAL (
+  SELECT r.to_uid id FROM cmdb_relationship r
+  WHERE r.from_uid=w.id AND r.valid_to IS NULL AND r.definition_id IN('cable_endpoint_a','cable_endpoint_b','located_in') AND ` + RelationshipVisible("r") + `
+  UNION
+  SELECT r.from_uid FROM cmdb_relationship r
+  WHERE r.to_uid=w.id AND r.valid_to IS NULL AND r.definition_id IN('parent','contains') AND ` + RelationshipVisible("r") + `
+  UNION
+  SELECT r.to_uid FROM cmdb_relationship r
+  WHERE $4::boolean AND r.from_uid=w.id AND r.valid_to IS NULL AND r.definition_id='contains' AND ` + RelationshipVisible("r") + `
+   AND EXISTS(SELECT 1 FROM cmdb_entity source WHERE source.item_uid=w.id AND source.asset_type NOT IN('data_center','region','pod','rack','fabric'))
+ ) edge JOIN cmdb_entity target ON target.item_uid=edge.id AND ` + activeVisualAsset("target") + `
+ WHERE w.depth<8
+ ) SELECT DISTINCT id FROM walk ORDER BY id LIMIT 5001`
 }
+
 func (s Service) visualContext(ctx context.Context, scope Scope, seeds []string, rich bool) (Visualization, error) {
 	args := append(scope.Args(), seeds, rich)
 	rows, e := s.DB.Query(ctx, visualContextSQL(), args...)
@@ -397,15 +430,23 @@ func (s Service) VisualSubgraph(ctx context.Context, scope Scope, q url.Values) 
 	if view == "physical" && q.Get("root_id") != "" {
 		contextIDs = append(contextIDs, q.Get("root_id"))
 	}
-	snapshot, e := s.visualContext(ctx, scope, contextIDs, view == "physical" || q.Get("depth") == "2")
-	if e != nil {
+	var snapshot Visualization
+	var groups []VisualGroup
+	reads, readCtx := errgroup.WithContext(ctx)
+	reads.Go(func() error {
+		var err error
+		snapshot, err = s.visualContext(readCtx, scope, contextIDs, view != "physical" && q.Get("depth") == "2")
+		return err
+	})
+	reads.Go(func() error {
+		var err error
+		groups, err = s.visualGroups(readCtx, scope, q)
+		return err
+	})
+	if e = reads.Wait(); e != nil {
 		return VisualSubgraph{}, e
 	}
 	snapshot.SnapshotID = rev
-	groups, e := s.visualGroups(ctx, scope, q)
-	if e != nil {
-		return VisualSubgraph{}, e
-	}
 
 	if len(groups) > 200 {
 		groups = groups[:200]
@@ -592,7 +633,7 @@ func (s Service) VisualConnections(ctx context.Context, scope Scope, q url.Value
 			contextIDs = append(contextIDs, id)
 		}
 	}
-	snapshot, e := s.visualContext(ctx, scope, contextIDs, true)
+	snapshot, e := s.visualContext(ctx, scope, contextIDs, false)
 	if e != nil {
 		return VisualSubgraph{}, e
 	}
@@ -642,7 +683,9 @@ func (s Service) VisualMatrix(ctx context.Context, scope Scope, q url.Values) (V
 		return VisualMatrix{}, e
 	}
 	base := visualCTE() + `, selected AS (SELECT c.*,` + expr[0] + ` row_id,` + expr[1] + ` column_id FROM con c WHERE ` + connectionQueryPredicate(q) + `), classified AS (SELECT row_id,column_id,fact_layer,media_type,speed,count(*) n FROM selected WHERE row_id IS NOT NULL AND column_id IS NOT NULL AND a IS NOT NULL AND b IS NOT NULL AND device_a IS NOT NULL AND device_b IS NOT NULL GROUP BY row_id,column_id,fact_layer,media_type,speed), cells AS (SELECT row_id,column_id,sum(n) n,jsonb_agg(jsonb_build_object('fact_layer',fact_layer,'media_type',media_type,'speed',speed,'count',n) ORDER BY fact_layer,media_type,speed) groups FROM classified GROUP BY row_id,column_id) `
-	rows, e := s.DB.Query(ctx, base+`SELECT row_id,column_id,n,groups FROM cells WHERE row_id||chr(31)||column_id>$6 ORDER BY row_id,column_id LIMIT `+strconv.Itoa(limit+1), visualArgs(scope, q, after)...)
+	totalsSQL := `COALESCE((SELECT sum(n) FROM cells),0), (SELECT count(*) FROM selected)-COALESCE((SELECT sum(n) FROM cells),0),(SELECT count(*) FROM cells)`
+	var included, excluded, total int
+	rows, e := s.DB.Query(ctx, base+`SELECT row_id,column_id,n,groups,`+totalsSQL+` FROM cells WHERE row_id||chr(31)||column_id>$6 ORDER BY row_id,column_id LIMIT `+strconv.Itoa(limit+1), visualArgs(scope, q, after)...)
 	if e != nil {
 		return VisualMatrix{}, e
 	}
@@ -650,7 +693,7 @@ func (s Service) VisualMatrix(ctx context.Context, scope Scope, q url.Values) (V
 	for rows.Next() {
 		var c VisualCell
 		var raw []byte
-		if e = rows.Scan(&c.Row, &c.Column, &c.Count, &raw); e != nil {
+		if e = rows.Scan(&c.Row, &c.Column, &c.Count, &raw, &included, &excluded, &total); e != nil {
 			rows.Close()
 			return VisualMatrix{}, e
 		}
@@ -704,10 +747,16 @@ func (s Service) VisualMatrix(ctx context.Context, scope Scope, q url.Values) (V
 			seenCols[c.Column] = true
 		}
 	}
-	e = s.DB.QueryRow(ctx, base+`SELECT COALESCE((SELECT sum(n) FROM cells),0), (SELECT count(*) FROM selected)-COALESCE((SELECT sum(n) FROM cells),0),(SELECT count(*) FROM cells)`, visualArgs(scope, q, "")[:5]...).Scan(&out.Included, &out.Excluded, &out.Coverage.Total)
-	if e != nil {
-		return VisualMatrix{}, e
+	// Reuse the same con/cells evaluation for page and global coverage totals.
+	// An empty cursor page still needs the totals, so retain that bounded fallback.
+	if len(cells) == 0 {
+		e = s.DB.QueryRow(ctx, base+`SELECT `+totalsSQL, visualArgs(scope, q, "")[:5]...).Scan(&included, &excluded, &total)
+		if e != nil {
+			return VisualMatrix{}, e
+		}
 	}
+	out.Included, out.Excluded, out.Coverage.Total = included, excluded, total
+
 	last := ""
 	if len(cells) > 0 {
 		c := cells[len(cells)-1]

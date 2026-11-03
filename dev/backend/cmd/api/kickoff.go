@@ -12,6 +12,8 @@ import (
 	"io"
 	"keel.local/dev/internal/kickoff"
 	"net/http"
+	"reflect"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -35,7 +37,7 @@ func (s *Server) kickoffRoutes(w http.ResponseWriter, r *http.Request) bool {
 		return false
 	}
 	permission := "bom:read"
-	if r.Method != "GET" {
+	if r.Method != "GET" && p[5] != "preview" {
 		permission = "bom:edit"
 		if p[5] == "sources" || p[5] == "history" {
 			permission = "bom:import"
@@ -56,6 +58,13 @@ func (s *Server) kickoffRoutes(w http.ResponseWriter, r *http.Request) bool {
 		return true
 	}
 	switch {
+	case len(p) == 6 && p[5] == "preview" && r.Method == "POST":
+		s.kickoffPreview(w, r)
+	case len(p) == 6 && p[5] == "review" && r.Method == "GET":
+		q := r.URL.Query()
+		q.Set("section", "review")
+		r.URL.RawQuery = q.Encode()
+		s.kickoffWorkspace(w, r)
 	case len(p) == 6 && p[5] == "workspace" && r.Method == "GET":
 		s.kickoffWorkspace(w, r)
 	case len(p) == 7 && p[5] == "models" && r.Method == "PUT":
@@ -97,18 +106,104 @@ func (s *Server) kickoffWorkspace(w http.ResponseWriter, r *http.Request) {
 		fail(w, 500, "KICKOFF_WORKSPACE_UNAVAILABLE")
 		return
 	}
-	inputs, err := loadKickoffInputs(ctx, tx, s.project)
-	if err != nil {
-		fail(w, 500, "KICKOFF_INPUT_UNAVAILABLE")
-		return
-	}
-	model, evidence, sourceID, err := s.kickoffModel(ctx, tx)
+	snapshot, err := s.kickoffReadSnapshot(ctx, tx, revision)
 	if err != nil {
 		fail(w, 500, "KICKOFF_MODEL_UNAVAILABLE")
 		return
 	}
-	inputs = kickoff.ResolveReferences(model, inputs)
-	view := kickoff.Project(model, evidence, sourceID, inputs)
+	if expected := r.URL.Query().Get("revision"); expected != "" && expected != strconv.Itoa(revision) {
+		fail(w, 409, "REVISION_CONFLICT")
+		return
+	}
+	if kickoffTypedPage(w, r, snapshot, s.project, name, revision) {
+		return
+	}
+	inputs := snapshot.inputs
+	view := snapshot.summary
+	if section := r.URL.Query().Get("section"); section == "ports" || section == "connections" || section == "review" || section == "context" {
+		view = snapshot.detail()
+	}
+	if r.URL.Query().Get("section") == "review" {
+		ids := []string{}
+		rows, err := tx.Query(ctx, `SELECT DISTINCT o.entity_id::text FROM kickoff_publication p JOIN kickoff_publication_object o ON o.publication_id=p.id WHERE p.project_id=$1 AND p.state='published' AND o.kind='device'`, s.project)
+		if err != nil {
+			fail(w, 500, "KICKOFF_PUBLICATION_UNAVAILABLE")
+			return
+		}
+		for rows.Next() {
+			var id string
+			if err = rows.Scan(&id); err != nil {
+				break
+			}
+			ids = append(ids, id)
+		}
+		if err == nil {
+			err = rows.Err()
+		}
+		rows.Close()
+		if err != nil {
+			fail(w, 500, "KICKOFF_PUBLICATION_UNAVAILABLE")
+			return
+		}
+		kickoffReviewPage(w, r, view, []kickoff.Publication{{State: "published", DeviceIDs: ids}}, revision)
+		return
+	}
+	if r.URL.Query().Get("section") == "context" {
+		id := r.URL.Query().Get("entity_id")
+		if id == "" {
+			fail(w, 400, "KICKOFF_ENTITY_REQUIRED")
+			return
+		}
+		portIDs, deviceIDs, connectionIDs := map[string]bool{id: true}, map[string]bool{id: true}, map[string]bool{id: true}
+		for _, c := range view.Components {
+			if c.ID == id {
+				deviceIDs[c.DeviceID] = true
+			}
+		}
+		for _, p := range view.Ports {
+			if p.ID == id {
+				deviceIDs[p.DeviceID] = true
+			}
+		}
+		for _, p := range view.Ports {
+			if deviceIDs[p.DeviceID] {
+				portIDs[p.ID] = true
+			}
+		}
+		seedPorts := map[string]bool{}
+		for id := range portIDs {
+			seedPorts[id] = true
+		}
+		links := []kickoff.Connection{}
+		for _, c := range view.Connections {
+			if connectionIDs[c.ID] || seedPorts[c.A] || seedPorts[c.B] {
+				links = append(links, c)
+				portIDs[c.A] = true
+				portIDs[c.B] = true
+			}
+		}
+		ports := []kickoff.Port{}
+		for _, p := range view.Ports {
+			if portIDs[p.ID] {
+				ports = append(ports, p)
+				deviceIDs[p.DeviceID] = true
+			}
+		}
+		devices := []kickoff.Device{}
+		for _, d := range view.Devices {
+			if deviceIDs[d.ID] {
+				devices = append(devices, d)
+			}
+		}
+		components := []kickoff.Component{}
+		for _, c := range view.Components {
+			if deviceIDs[c.DeviceID] {
+				components = append(components, c)
+			}
+		}
+		respond(w, 200, map[string]any{"revision": revision, "devices": devices, "ports": ports, "connections": links, "components": components})
+		return
+	}
 	sources := []kickoffSource{}
 	rows, err := tx.Query(ctx, `SELECT id::text,filename,byte_size,state,sha256,created_at FROM kickoff_source WHERE project_id=$1 AND detached_at IS NULL ORDER BY created_at`, s.project)
 	if err != nil {
@@ -139,7 +234,13 @@ func (s *Server) kickoffWorkspace(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	calculations, err := loadKickoffCalculations(ctx, tx, s.project)
+	calculations := []kickoff.Calculation{}
+	if r.URL.Query().Get("section") == "calculations" {
+		calculations, err = loadKickoffCalculations(ctx, tx, s.project)
+		for i := range calculations {
+			calculations[i].Stale = calculations[i].InputDigest != kickoff.Digest(snapshot.detail(), inputs, calculations[i].Domain)
+		}
+	}
 	if err != nil {
 		fail(w, 500, "KICKOFF_CALCULATION_UNAVAILABLE")
 		return
@@ -154,11 +255,84 @@ func (s *Server) kickoffWorkspace(w http.ResponseWriter, r *http.Request) {
 		fail(w, 500, "KICKOFF_ACTIVITY_UNAVAILABLE")
 		return
 	}
+	servers, ready := 0, len(view.Devices)
+	blocked := map[string]bool{}
+	for _, d := range view.Devices {
+		if d.Type == "server" {
+			servers++
+		}
+	}
+	for _, issue := range view.Issues {
+		if !issue.Resolved && issue.Scope == "identity" {
+			blocked[issue.EntityID] = true
+		}
+	}
+	for _, d := range view.Devices {
+		if blocked[d.ID] {
+			ready--
+		}
+	}
+	capabilities, err := s.kickoffCapabilities(ctx, tx, len(view.Devices), servers, ready)
+	if err != nil {
+		fail(w, 500, "KICKOFF_CAPABILITIES_UNAVAILABLE")
+		return
+	}
 	if err = tx.Commit(ctx); err != nil {
 		fail(w, 500, "KICKOFF_WORKSPACE_UNAVAILABLE")
 		return
 	}
-	respond(w, 200, map[string]any{"schemaVersion": 1, "projectId": s.project, "projectName": name, "revision": revision, "models": inputs, "sources": sources, "devices": view.Devices, "ports": view.Ports, "connections": view.Connections, "components": view.Components, "racks": view.Racks, "issues": view.Issues, "calculations": calculations, "publications": publications, "activity": activity})
+	payload := map[string]any{"capabilities": capabilities, "schemaVersion": 1, "projectId": s.project, "projectName": name, "revision": revision, "models": inputs, "sources": sources, "devices": view.Devices, "ports": view.Ports, "connections": view.Connections, "components": view.Components, "racks": view.Racks, "issues": view.Issues, "calculations": calculations, "publications": publications, "activity": activity}
+	if expected := r.URL.Query().Get("revision"); expected != "" && expected != strconv.Itoa(revision) {
+		fail(w, 409, "REVISION_CONFLICT")
+		return
+	}
+	section := r.URL.Query().Get("section")
+	if section == "review" {
+		kickoffReviewPage(w, r, view, publications, revision)
+		return
+	}
+	totals := map[string]int{}
+	for _, key := range []string{"devices", "ports", "connections", "components", "racks", "issues", "models", "calculations", "publications", "sources", "activity"} {
+		totals[key] = reflect.ValueOf(payload[key]).Len()
+		if section != "" && section != key {
+			payload[key] = []any{}
+		}
+	}
+	totals["ports"] = snapshot.portCount
+	totals["connections"] = snapshot.connectionCount
+	payload["totals"] = totals
+	if section != "" {
+		if _, ok := totals[section]; !ok {
+			fail(w, 400, "KICKOFF_SECTION_INVALID")
+			return
+		}
+		offset, limit := 0, 100
+		if value := r.URL.Query().Get("offset"); value != "" {
+			n, e := strconv.Atoi(value)
+			if e != nil || n < 0 {
+				fail(w, 400, "KICKOFF_PAGE_INVALID")
+				return
+			}
+			offset = n
+		}
+		if value := r.URL.Query().Get("limit"); value != "" {
+			n, e := strconv.Atoi(value)
+			if e != nil || n < 1 || n > 200 {
+				fail(w, 400, "KICKOFF_PAGE_INVALID")
+				return
+			}
+			limit = n
+		}
+		items := reflect.ValueOf(payload[section])
+		start := min(offset, items.Len())
+		end := min(start+limit, items.Len())
+		payload[section] = items.Slice(start, end).Interface()
+		payload["page"] = map[string]any{"section": section, "offset": offset, "limit": limit, "total": items.Len(), "hasMore": end < items.Len()}
+	} else {
+		payload["ports"] = []any{}
+		payload["connections"] = []any{}
+	}
+	respond(w, 200, payload)
 }
 func (s *Server) kickoffSaveInput(w http.ResponseWriter, r *http.Request, table string) {
 	var body struct {

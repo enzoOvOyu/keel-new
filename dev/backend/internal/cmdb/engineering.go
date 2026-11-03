@@ -145,7 +145,7 @@ func (s Service) projectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 		if _, err := s.PutRelation(ctx, tx, schema, RelationInput{Definition: "project_association", SourceID: id, TargetID: project, Project: project, Source: Source{Type: "derived", Ref: ref, Layer: "recorded", Operator: actor}}); err != nil {
 			return err
 		}
-		return s.AddEvent(ctx, tx, project, "engineering:"+event+":"+id, id, "engineering.published", "工程规划发布", "published", "bom", ref, actor, map[string]string{"target": target, "publication_id": publication}, []map[string]string{{"label": "开局工程", "href": "/p/" + project + "/deploy/bom"}})
+		return s.AddEvent(ctx, tx, project, "engineering:"+event+":"+id, id, "engineering.published", "工程规划发布", "published", "bom", ref, actor, map[string]string{"target": target, "publication_id": publication}, []map[string]string{{"label": "开局工程", "href": "/p/" + project + "/kickoff/publish"}})
 	}
 	relation := func(kind, from, to string) error {
 		// Replace only this project's prior engineering planning relation, preserving

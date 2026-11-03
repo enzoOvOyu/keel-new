@@ -533,7 +533,7 @@ func (s Service) ProjectBOM(ctx context.Context, tx pgx.Tx, event, project, revi
 		if e != nil {
 			return e
 		}
-		if e = s.AddEvent(ctx, tx, project, "bom:"+event+":"+uid, uid, "bom.published", "标准 BOM 发布", "published", "bom", importID, actor, map[string]string{"bom_revision": revision}, []map[string]string{{"label": "打开 BOM", "href": "/p/" + project + "/deploy/bom/" + importID}}); e != nil {
+		if e = s.AddEvent(ctx, tx, project, "bom:"+event+":"+uid, uid, "bom.published", "标准 BOM 发布", "published", "bom", importID, actor, map[string]string{"bom_revision": revision}, []map[string]string{{"label": "智能开局工程", "href": "/p/" + project + "/kickoff/publish"}}); e != nil {
 			return e
 		}
 	}

@@ -20,6 +20,7 @@ export function placementReady(s: Workspace, d: Device) {
     !s.issues.some(i => !i.resolved && i.scope === 'placement' && i.entityId === d.id);
 }
 export function capabilities(s: Workspace): Capability[] {
+  if(s.capabilities)return s.capabilities;
   const publications=s.publications.filter(p=>p.state==='published');
   const deviceMap=new Map<string,{device:Device;publication:typeof publications[number]}>();
   for(const publication of publications)for(const device of publication.deviceSnapshot)deviceMap.set(device.id,{device,publication});

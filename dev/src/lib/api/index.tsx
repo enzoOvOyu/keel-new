@@ -1,11 +1,11 @@
 import {identitySnapshot,installIdentity,legacyRoles,displayPermissions,canSnapshot,resourceModules,type IdentitySnapshot} from './identityBridge';
 import {createContext,useContext,useSyncExternalStore} from 'react';
 import seedUrl from '../../../fixtures/demo-full-64-b300/demo-seed.json?url';
+import fixtureResources from './fixture-resources.json';
 async function loadFixture<T>(url:string):Promise<T>{const response=await fetch(url);if(!response.ok)throw Error('演示数据装载失败：'+response.status);return response.json()}
 export type Row={id:string;[key:string]:any};
 type Fixture=typeof import('../../../fixtures/demo-full-64-b300/demo-seed.json');
-const seed=await loadFixture<{collections:Record<keyof Fixture['collections'],Row[]>}>(seedUrl);
-export const demoActors=seed.collections.users;
+export const demoActors:Row[]=[];
 export type Resource=Exclude<keyof Fixture['collections'],'scenario_profiles'>;
 export type ProjectScope={projectId:string;mode:'project'|'cross';filter:string|null};
 let resourceReadAdapter:((resource:Resource,project?:string)=>Row[]|null)|undefined;export function registerResourceReadAdapter(adapter:(resource:Resource,project?:string)=>Row[]|null){resourceReadAdapter=adapter}
@@ -15,7 +15,7 @@ type StageWriteGuard=(resource:Resource,row:Row,old:Row|undefined,internal:boole
 export interface ApiProvider {subscribe:(listener:()=>void)=>()=>void;list:(key:Resource)=>Row[]; update:(key:Resource,id:string,patch:Partial<Row>,action?:string)=>void;create:(key:Resource,data:Partial<Row>)=>Row;actor:string;setActor:(id:string)=>void;scope:ProjectScope;setScope:(scope:ProjectScope)=>void;session:()=>{actor_id:string;authorized_projects:Row[];permissions:string[];permission_revision:string};events:(lastId?:string)=>Row[];}
 let deliveryMutationDepth=0,deliveryDirty=false;export function lifecycleMutation<T>(fn:()=>T):T{const outer=deliveryMutationDepth===0;const snapshot=outer?{store:structuredClone(store),stream:structuredClone(streamLog),sequence:eventSequence}:null;deliveryMutationDepth++;try{return fn()}catch(e){if(snapshot){store=snapshot.store;streamLog=snapshot.stream;eventSequence=snapshot.sequence}throw e}finally{deliveryMutationDepth--;if(outer&&deliveryDirty){deliveryDirty=false;notify()}}}
 const FALLBACK='proj-b300-demo';
-function initialStore(){const collections=Object.fromEntries(Object.entries(seed.collections).filter(([name])=>name!=='scenario_profiles'));return structuredClone(collections) as Record<Resource,Row[]>}
+function initialStore(){return Object.fromEntries(fixtureResources.filter(name=>name!=='scenario_profiles').map(name=>[name,[] as Row[]])) as Record<Resource,Row[]>}
 let store=initialStore();let version=0;const listeners=new Set<()=>void>();const notify=()=>{if(deliveryMutationDepth){deliveryDirty=true;return}version++;listeners.forEach(f=>f())};
 function claims(actor:string){const real=identitySnapshot();if(real)return{authorized_project_ids:real.authorized_projects.map(p=>p.id),permissions:displayPermissions(mockApi.scope.projectId),permission_revision:String(real.permission_revision)};const user=store.users.find(r=>r.id===actor);if(!user)throw Error('403 · 当前身份没有演示授权');const reads=['ai','cleanup','cmdb','config','dashboard','delivery','fabric','fleet','flows','issues','monitor','project','provision','test','validation'].map(p=>p+':read');const writable=!user.roles.every((r:string)=>r==='Viewer');const permissions=[...reads,...(writable?['device:operate','flows:run','issues:write','project:create']:[]),...(user.roles.includes('admin')?['admin:read']:[])];const ids=user.roles.includes('admin')?store.projects.map(p=>p.id):[...new Set([...(user.project_scopes||[]),...store.project_members.filter(m=>m.user_id===actor&&m.status==='active').map(m=>m.project_id)])];return{authorized_project_ids:ids,permissions,permission_revision:'full-v24-'+user.revision+'-'+user.roles.join(',')}}
 function owner(key:Resource,row:Row){if(key==='projects')return row.id;if(typeof row.project_id==='string')return row.project_id;return FALLBACK}
@@ -34,3 +34,19 @@ function syncIdentityProjection(){const s=identitySnapshot();if(!s)return;const 
 export function applyIdentity(s:IdentitySnapshot|null){installIdentity(s);if(s)syncIdentityProjection();notify()}
 
 export function installCanonicalInventory(snapshot:Record<string,Row[]>){for(const key of ['servers','switches','gpus','nics','ports','switch_ports','optics','cables','racks','rack_placements'] as Resource[]){if(Array.isArray(snapshot[key]))store[key]=structuredClone(snapshot[key])}notify()}
+
+let legacyFixturesLoaded=false;
+let legacyFixturesPending:Promise<void>|null=null;
+export function ensureLegacyFixtures():Promise<void>{
+ if(legacyFixturesLoaded)return Promise.resolve();
+ if(legacyFixturesPending)return legacyFixturesPending;
+ legacyFixturesPending=loadFixture<{collections:Record<keyof Fixture['collections'],Row[]>}>(seedUrl).then(seed=>{
+  store=Object.fromEntries(Object.entries(seed.collections).filter(([name])=>name!=='scenario_profiles')) as Record<Resource,Row[]>;
+  demoActors.splice(0,demoActors.length,...seed.collections.users);
+  eventSequence=0;streamLog=[];
+  syncIdentityProjection();
+  legacyFixturesLoaded=true;
+  notify();
+ }).catch(error=>{legacyFixturesPending=null;throw error});
+ return legacyFixturesPending;
+}
