@@ -1,10 +1,10 @@
 {
-  "code_revision": "727956801e509a55bbb2959e9cdb554f69505fd5",
-  "frontend_code_revision": "727956801e509a55bbb2959e9cdb554f69505fd5",
+  "code_revision": "f41ec5eb77201e871a92b1f1b1f72d2098105a03",
+  "frontend_code_revision": "f41ec5eb77201e871a92b1f1b1f72d2098105a03",
   "backend_code_revision": "d2f9accb146239cc9191f3fa60c0442985af3e22",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-view-actions-7279568",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-view-actions-f41ec5e",
   "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-d2f9acc",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-view-actions-1024cc0",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-view-actions-7279568",
   "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-placement-a8e454c",
   "ports": [
     5180,
@@ -13,7 +13,7 @@
   "migrations": [],
   "api_restarted": false,
   "binary_sha256": "d35fe3c08a2ae85e9bea80dc2c3cd4c686768a3c1a886b71b8930fa957dede59",
-  "frontend_index_sha256": "6e442daf3e844be7cb91ce9cd4eb209e19e4b4cca75880e5ebb7033dc5306f67",
+  "frontend_index_sha256": "06005cbd6df5cedad236231296214f56ef76eb004ba5731a7cc1daca3dfeb6c2",
   "status": "deployed",
   "binary_matches": true,
   "frontend_index_matches": true,
@@ -25,7 +25,7 @@
   },
   "business_tests": "Existing MM analysis reused; async adoption recovered and succeeded at revision 3: 971 devices, 14308 ports, 7154 connections, 122 racks. 10 candidate tables adopted, 4 remain. No new AI call; no CMDB publication.",
   "provider_calls": 0,
-  "verification": "Vite/diff passed; browser verified full-width worksheet workspace at least 600px tall, top left stages and unified right Agent/history card, task drawer. No API or business changes.",
+  "verification": "TypeScript/Vite/diff checks passed; read-only source/review/drawer checks and intercepted empty-source UI check passed. No AI calls, API changes or business writes.",
   "task_history_verification": {
     "status": "PASS",
     "total": 6,
@@ -39,32 +39,9 @@
   },
   "ui_verification": {
     "errors": [],
-    "worksheet": {
-      "x": 473,
-      "y": 660.0625,
-      "width": 918,
-      "height": 1392.78125
-    },
-    "rects": {
-      ".recognition-pipeline": {
-        "x": 473,
-        "y": 300.46875,
-        "right": 1055,
-        "bottom": 378.46875
-      },
-      ".source-agent-actions": {
-        "x": 1071,
-        "y": 300.46875,
-        "right": 1391,
-        "bottom": 644.0625
-      },
-      ".source-task-history": {
-        "x": 1088,
-        "y": 427.0625,
-        "right": 1374,
-        "bottom": 627.0625
-      }
-    },
+    "source": "PASS",
+    "review": "PASS",
+    "empty": "PASS (intercepted empty source list; no project changes)",
     "status": "PASS"
   }
 }

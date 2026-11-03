@@ -3,8 +3,8 @@
   "updated_at": "2026-11-03",
   "coverage": "Current module documentation baseline, 2026-11-03: deployed dev 686e9ea; CMDB routes additionally registered by source review only. Per-operation runtime verification is limited to cited evidence. Fabric 6a70041 belongs to a separate paused branch and is not included in this registry.",
   "schema_authority": "docs/openapi.yaml",
-  "code_revision": "727956801e509a55bbb2959e9cdb554f69505fd5",
-  "deployed_revision": "727956801e509a55bbb2959e9cdb554f69505fd5",
+  "code_revision": "f41ec5eb77201e871a92b1f1b1f72d2098105a03",
+  "deployed_revision": "f41ec5eb77201e871a92b1f1b1f72d2098105a03",
   "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
   "operations": [
     {
