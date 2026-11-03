@@ -7,7 +7,7 @@
 | 范围 | 当前事实 |
 |---|---|
 | 主开发 | `/home/ubuntu/keel-dev`，分支`dev`，应用目录`dev/`；文档定版已整合；本轮历史资料理解已提交dev并按用户要求发布 |
-| 当前主环境 | 5180前端/8081 API发布`fdd86ddc477a400e0d4ed099145a1c412bfc84d8`；依据[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json)，本轮已更新前后端，沿用原配置和数据，未迁移或提交入库 |
+| 当前主环境 | 5180前端发布`3c0ac07fc20b0290267052e0e3e8a8c23f619ce8`，8081 API沿用fdd86dd未重启；依据[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json)，本轮只更新选择按钮的核对进度样式，无数据写入 |
 | Fabric | `/home/ubuntu/keel-fabric-dev`，`feat/fabric-rebuild@6a70041`；5197/8100分支预览，未并入dev；**用户要求暂停，等待上游接入修复通知** |
 | 原型 | Kickoff5195、拓扑/机柜5181、Fabric5194仅设计参考，不是正式事实或执行来源；本次不启停服务 |
 | main与旧目录 | main保留稳定基线；旧Flows/Kestra/visualization detached目录仅残留原型/运行依赖，不在那里继续开发；本次不合并或推送main |
@@ -18,7 +18,7 @@
 
 ## 五个模块当前结果
 
-- [Kickoff](docs/modules/kickoff.md)：9页/23表、非Agent范围发布和CMDB回执已上线；最新分页/来源/旧BOM退役也已上线。dev 新增历史资料理解报告、区域/对象分页和独立状态，已部署并通过定向真实HTTP检查；新Agent未开发，analyze503。数据核对五栏优化已上线：身份去重、独立规格列、异常影响与全量筛选；五栏及待定位筛选真实HTTP检查通过。Compact Workbench布局与10/25/50/100条分页已发布；真实MM页面只读交互检查通过。标题/主切换/右侧统计卡调整已自动发布。入库与版本页已发布：聚焦设备范围选择、右侧增补记录及同版本覆盖防重，保留确认按钮/弹窗；真实页面只读核查通过。
+- [Kickoff](docs/modules/kickoff.md)：9页/23表、非Agent范围发布和CMDB回执已上线；最新分页/来源/旧BOM退役也已上线。dev 新增历史资料理解报告、区域/对象分页和独立状态，已部署并通过定向真实HTTP检查；新Agent未开发，analyze503。数据核对五栏优化已上线：身份去重、独立规格列、异常影响与全量筛选；五栏及待定位筛选真实HTTP检查通过。Compact Workbench布局与10/25/50/100条分页已发布；真实MM页面只读交互检查通过。标题/主切换/右侧统计卡调整已自动发布。入库与版本页已发布，核对进度已合并到浅绿色全选/取消全选按钮内，不再插入顶部加载横幅；实测范围卡和按钮宽度位移均为0。聚焦设备范围选择、右侧增补记录及同版本覆盖防重，保留确认按钮/弹窗；真实页面只读核查通过。
 - [CMDB](docs/modules/cmdb.md)：统一身份、关系、版本、来源、ChangeSet及真实分页已上线；观测/采集未知不能显示健康。
 - [数据中心拓扑](docs/modules/topology.md)：五工作区使用真实CMDB；最新查询/端口上下文修复已上线。缺几何/观测保留限制。
 - [作业平台](docs/modules/jobs.md)：原生Kestra界面、Job Service、Agent/SSH及生命周期已上线；生产批次/NOS/规模验收未完成，ZTP事件消费者待Fabric联调。

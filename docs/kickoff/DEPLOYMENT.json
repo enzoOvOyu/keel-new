@@ -1,18 +1,18 @@
 {
-  "code_revision": "fdd86ddc477a400e0d4ed099145a1c412bfc84d8",
   "backend_code_revision": "fdd86ddc477a400e0d4ed099145a1c412bfc84d8",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-publish-fdd86dd",
   "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-publish-fdd86dd",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-navigation-1e5b298",
-  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-review-12af6e4",
   "ports": [
     5180,
     8081
   ],
-  "migrations": [],
-  "api_restarted": true,
   "binary_sha256": "ef3a724c7beb05affbc265f9c3cdd2f1e7640d271d20929be22055e9e1f6e46a",
-  "frontend_index_sha256": "00bb3d53b685b20d96059ad83f7bd446fb7524adefe64bd7308c0b8310cf5305",
+  "code_revision": "3c0ac07fc20b0290267052e0e3e8a8c23f619ce8",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-select-progress-3c0ac07",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-publish-fdd86dd",
+  "frontend_index_sha256": "bb9ee302442bfc46e944395db2a072d80ed385d69a35cac0653a97fcd8cb53cd",
+  "api_restarted": false,
+  "backend_source_unchanged": true,
+  "migrations": [],
   "status": "deployed",
   "binary_matches": true,
   "frontend_index_matches": true,
@@ -21,32 +21,25 @@
     "startup_http": {
       "http://localhost:8081/healthz": 200,
       "http://localhost:5180/": 200
-    },
-    "binary_matches": true,
-    "frontend_index_matches": true,
-    "workspace_revision": 12,
-    "publication_count": 3,
-    "api_restarted": true,
-    "migrations": []
+    }
   },
   "live_ui": {
     "status": "PASS",
-    "scope": "Authenticated deployed MM page; real read-only range preview and unchanged modal open/cancel, no publication submission or screenshots",
+    "scope": "Authenticated deployed page; real read-only preview held briefly at browser boundary to observe loading; no publication writes",
     "checks": [
-      "scope description integrated into main card",
-      "version/history card is first in right sidebar",
-      "published devices not selected by default",
-      "all selection/clear controls available",
-      "real range preview enables original confirmation action",
-      "original modal explanation and return action preserved",
-      "empty selection disables original confirmation action"
+      "range-check progress appears inside colored select/cancel button",
+      "no top loading notice",
+      "scope panel and selection button width stay fixed during loading",
+      "confirm action disabled until evaluation",
+      "cancel-all remains usable during evaluation",
+      "late preview response does not restore cleared selection"
     ],
-    "historyRecords": 3,
+    "panelTopDelta": 0,
+    "buttonWidthDelta": 0,
+    "buttonBackground": "rgb(223, 239, 231)",
     "pageErrors": 0,
     "publicationSubmitRequests": 0
   },
-  "workspace_revision_unchanged": true,
-  "publication_count_unchanged": true,
   "agent_implemented": false,
   "url": "http://localhost:5180/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/kickoff/publish"
 }

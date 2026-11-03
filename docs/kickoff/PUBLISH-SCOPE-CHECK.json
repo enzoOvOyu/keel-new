@@ -65,5 +65,27 @@
   },
   "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
   "workspace_revision_unchanged": true,
-  "publication_count_unchanged": true
+  "publication_count_unchanged": true,
+  "selection_button_progress": {
+    "code_revision": "3c0ac07fc20b0290267052e0e3e8a8c23f619ce8",
+    "build": "PASS: npx vite build",
+    "live_ui": {
+      "status": "PASS",
+      "scope": "Authenticated deployed page; real read-only preview held briefly at browser boundary to observe loading; no publication writes",
+      "checks": [
+        "range-check progress appears inside colored select/cancel button",
+        "no top loading notice",
+        "scope panel and selection button width stay fixed during loading",
+        "confirm action disabled until evaluation",
+        "cancel-all remains usable during evaluation",
+        "late preview response does not restore cleared selection"
+      ],
+      "panelTopDelta": 0,
+      "buttonWidthDelta": 0,
+      "buttonBackground": "rgb(223, 239, 231)",
+      "pageErrors": 0,
+      "publicationSubmitRequests": 0
+    },
+    "api_restarted": false
+  }
 }
