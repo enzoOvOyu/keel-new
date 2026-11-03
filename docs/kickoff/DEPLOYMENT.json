@@ -1,23 +1,23 @@
 {
-  "code_revision": "313ede2e672c20e5444ce7a64156bfe12454caf7",
-  "frontend_code_revision": "313ede2e672c20e5444ce7a64156bfe12454caf7",
-  "backend_code_revision": "aabae089188ac541402661c6e2d1edc79b5a8e9e",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-topology-input-313ede2",
-  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-workflows-aabae08",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-cmdb-check-d837e73",
-  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-rack-display-00fdf47",
+  "code_revision": "6d8a6b77c674c10bb19e892981a098f3ee0c237f",
+  "frontend_code_revision": "6d8a6b77c674c10bb19e892981a098f3ee0c237f",
+  "backend_code_revision": "6d8a6b77c674c10bb19e892981a098f3ee0c237f",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-agent-minimal-6d8a6b7",
+  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-agent-minimal-6d8a6b7",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-topology-input-313ede2",
+  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-workflows-aabae08",
   "ports": [
     5180,
     8081
   ],
   "migrations": [],
-  "api_restarted": false,
-  "binary_sha256": "8a1d85d96243df635e6b5a583b4927f4b2f3b83bc29ea8977f73c83d38bbbe61",
-  "frontend_index_sha256": "a4e6ad16e360a3b83462b24ceb9e7cc147be97c278f587ef94166814d449ccf2",
+  "api_restarted": true,
+  "binary_sha256": "747d39cdc041021c325e6797a4f10ca11596192f2842f9797675908286d459cf",
+  "frontend_index_sha256": "5f2f7066fb7ab6d8cd2206d054e7e571c53b764b6e2c59f067277564ae4c08f4",
   "status": "deployed",
   "binary_matches": true,
   "frontend_index_matches": true,
-  "old_assets_retained": 626,
+  "old_assets_retained": 688,
   "checks": {
     "health": 200,
     "frontend": 200,
@@ -25,28 +25,27 @@
   },
   "business_tests": "NOT RUN",
   "provider_calls": 0,
-  "ui_read_only": {
-    "errors": [],
-    "writes": [],
-    "connectionRequests": [
+  "verification": "Focused Go tests, TypeScript, Vite; local MM drawing region capacity/occupancy only. No live model or asset writes.",
+  "api_read_only": {
+    "status": "PASS",
+    "checks": [
       {
-        "status": "incomplete",
-        "limit": "10"
+        "endpoint": "/analysis",
+        "status": 200
       },
       {
-        "status": null,
-        "limit": "1"
+        "endpoint": "/understanding",
+        "status": 200
       }
     ],
-    "checks": [
-      "real MM: five view requirements and scoped supplementation entry; read-only",
-      "browser-only complete fixture: success and no supplementation buttons"
-    ],
-    "status": "PASS"
+    "providerCalls": 0,
+    "businessWrites": 0
   },
-  "verification": "TypeScript and Vite passed; real MM read-only five-view input status and scoped supplementation; browser-only complete fixture. No save/import/publication/provider calls.",
-  "limitations": [
-    "Network role input is editable in existing engineering model; CMDB publication projection remains incomplete.",
-    "Spatial view remains schematic; observed metrics are not manually supplied."
-  ]
+  "local_fixture": {
+    "scope": "one rack drawing region in local MM XLSX",
+    "capacity_u": 52,
+    "occupied_blocks": 9,
+    "provider_calls": 0,
+    "full_agent_acceptance": "NOT RUN"
+  }
 }

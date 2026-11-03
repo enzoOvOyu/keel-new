@@ -7,14 +7,14 @@
 | 范围 | 当前事实 |
 |---|---|
 | 主开发 | `/home/ubuntu/keel-dev`，分支`dev`，应用目录`dev/`；文档定版已整合；本轮历史资料理解已提交dev并按用户要求发布 |
-| 当前主环境 | 5180前端`313ede2` / 8081 API `aabae08`；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json)记录publish、设施与Agent整改部署；仅启动/静态资源验证，业务与模型效果等待用户统一测试指令 |
+| 当前主环境 | 5180前端`6d8a6b7` / 8081 API `6d8a6b7`；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json)记录publish、设施与Agent整改部署；仅启动/静态资源验证，业务与模型效果等待用户统一测试指令 |
 | Fabric | `/home/ubuntu/keel-fabric-dev`，`feat/fabric-rebuild@6a70041`；5197/8100分支预览，未并入dev；**用户要求暂停，等待上游接入修复通知** |
 | 原型 | Kickoff5195、拓扑/机柜5181、Fabric5194仅设计参考，不是正式事实或执行来源；本次不启停服务 |
 | main与旧目录 | main保留稳定基线；旧Flows/Kestra/visualization detached目录仅残留原型/运行依赖，不在那里继续开发；本次不合并或推送main |
 
 ## 本轮整改已部署：等待统一测试（优先于旧自动测试安排）
 
-当前5180前端为313ede2，8081 API为aabae08；前端目录`/home/ubuntu/.local/state/keel-deployments/kickoff-topology-input-313ede2`，API目录`/home/ubuntu/.local/state/keel-deployments/kickoff-workflows-aabae08`。本轮仅切换前端，旧静态资源保留，回退前端kickoff-cmdb-check-d837e73。TypeScript、Vite、契约文档检查通过；真实MM五视图状态/补录入口只读核查通过，仅两次连接查询(limit10缺项、limit1存在性)，无页面异常或业务写入。浏览器隔离完整资料场景验证显示满足、无补录按钮，不等于真实业务验收。未调用Provider、保存、导入或确认入库。网络角色工程输入到CMDB投影尚未补齐，明确为剩余缺口。
+当前5180前端与8081 API均为6d8a6b7；目录`/home/ubuntu/.local/state/keel-deployments/kickoff-agent-minimal-6d8a6b7`。无迁移，保留旧静态资源；回退前端kickoff-topology-input-313ede2、API kickoff-workflows-aabae08。定向Go单测、TypeScript、Vite、契约检查通过；当前资料analysis/understanding认证GET均200，启动与实际二进制检查通过。MM真实落位图局部本地展开52U/9个占位块通过，无真实Provider调用或资产写入。完整MM智能识别验收未启动。网络角色发布投影仍为独立遗留缺口，不在本次Agent修改范围。
 
 下列publish/Agent条目为既有能力记录，机房机柜UI以本轮“拓扑资料补齐”为准。
 
@@ -46,7 +46,7 @@
 
 本轮TypeScript、Vite、契约检查及只读页面核查通过；未调用Agent、保存输入、导入或确认入库。不新增API、Schema、数据模型或拓扑渲染器。
 
-## Agent最小修复（代码已完成，部署结果收尾登记）
+## Agent最小修复（已部署6d8a6b7）
 
 沿用原Agent/队列/MinIO/映射展开器；清理提示词中的旧五步与U刻度冲突，局部重跑保留其他域候选，Provider后域失败保留已有候选并停止后续模型请求，失败计划可重试。理解步骤增加不适用，总状态按实际结果生成，候选有问题不能报告全部识别完成。
 
