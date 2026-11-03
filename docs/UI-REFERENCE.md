@@ -1,6 +1,8 @@
 # UI-REFERENCE.md — keel 前端参考与页面线框
 
-> 作业平台当前要求：按 [DESIGN-SYSTEM §10](DESIGN-SYSTEM.md#10-作业平台kestra-原生-ui-实施硬规则) 和 [Kestra原生替换方案](flows-redesign/KESTRA-UI-REPLACEMENT.md) 直接复用原生组件与交互。下文旧Flow线框仅保留历史业务参考，不能作为另做自制UI的依据。
+> 当前通用视觉以[DESIGN-SYSTEM](DESIGN-SYSTEM.md)和智能开局工程[kickoff原型](../kickoff/src)为准：浅灰底、白色工作区、绿色主动作、紧凑表格、原型Drawer与Modal。后续各模块沿用自己的业务布局与交互，按该基准统一视觉；本次规范更新不代表页面已迁移。
+>
+> 作业平台继续按 [DESIGN-SYSTEM §10](DESIGN-SYSTEM.md#10-作业平台kestra-原生-ui-实施硬规则) 和 [Kestra原生替换方案](flows-redesign/KESTRA-UI-REPLACEMENT.md) 复用原生组件与交互，通用主题和控件密度按当前DESIGN-SYSTEM适配。下文历史线框/颜色不能覆盖新视觉基准；新Kickoff按其完整原型，不使用旧BOM线框。
 
 ## 1. 参考项目与具体借鉴点
 
@@ -15,7 +17,7 @@
 ## 2. 视觉方向
 
 - 产品类型是高密度工程控制台，不是营销网站。优先清晰层级、数据密度、对齐、可扫读性和可靠操作反馈。
-- 以 shadcn/ui 原生 token 为基础，建立全局 spacing/type/color/radius/shadow tokens；色彩只表示状态或主动作。
+- 将Kickoff原型的颜色、字体、间距、圆角、阴影映射到现有主题token与共享组件；具体值见DESIGN-SYSTEM §2–§6。专业画布仍按本业务的语义图例显示。
 - 主要内容宽度充分利用桌面视口；避免卡片套卡片、巨大标题、无意义环形图、过度渐变、过宽空白。
 - 状态文案使用一致的中文动作/状态词，时间与单位格式统一；设备/端口 ID 使用等宽字体。
 - 页面按任务设计：BOM 是解析/差异审核工作台，CMDB 是关系与生命周期视图，Flow 是脚本执行控制台，网络设备详情是工程证据面板。
