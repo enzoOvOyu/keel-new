@@ -80,9 +80,9 @@
 
 .kickoff-workspace .source-results-heading{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;margin-bottom:12px;font-size:13px}
 .kickoff-workspace .source-results-heading>span{font-size:11px;color:var(--muted)}
-.kickoff-workspace .source-page-empty{display:block;min-height:520px}
+.kickoff-workspace .source-layout.source-page-layout.source-page-empty{display:block;grid-template-columns:minmax(0,1fr);min-height:520px}
 .kickoff-workspace .source-page-empty>.source-rail{display:none}
-.kickoff-workspace .source-page-empty>.source-main{display:block;padding:0}
+.kickoff-workspace .source-layout.source-page-layout.source-page-empty>.source-main{display:block;grid-column:1/-1;width:100%;padding:0}
 .kickoff-workspace .source-empty-state{display:flex;flex-direction:column;align-items:center;text-align:center;padding:70px 24px 50px;gap:18px}
 .kickoff-workspace .source-empty-icon{display:grid;place-items:center;width:68px;height:68px;background:var(--green-soft);color:var(--green);border-radius:16px}
 .kickoff-workspace .source-empty-state h2{font-size:20px;font-weight:600;margin:0}
