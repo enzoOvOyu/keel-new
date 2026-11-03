@@ -1,10 +1,10 @@
 {
-  "code_revision": "ef08c25d889e5c2cbc72ff508d1b2b446fdb5edf",
-  "frontend_code_revision": "ef08c25d889e5c2cbc72ff508d1b2b446fdb5edf",
+  "code_revision": "313ede2e672c20e5444ce7a64156bfe12454caf7",
+  "frontend_code_revision": "313ede2e672c20e5444ce7a64156bfe12454caf7",
   "backend_code_revision": "aabae089188ac541402661c6e2d1edc79b5a8e9e",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-gaps-ef08c25",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-topology-input-313ede2",
   "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-workflows-aabae08",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-workflows-2357457",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-cmdb-check-d837e73",
   "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-rack-display-00fdf47",
   "ports": [
     5180,
@@ -13,11 +13,11 @@
   "migrations": [],
   "api_restarted": false,
   "binary_sha256": "8a1d85d96243df635e6b5a583b4927f4b2f3b83bc29ea8977f73c83d38bbbe61",
-  "frontend_index_sha256": "a11dfff053fe746d8d59f95d12eb8c6e022f5b9ecbb0cf298441b632b985b066",
+  "frontend_index_sha256": "a4e6ad16e360a3b83462b24ceb9e7cc147be97c278f587ef94166814d449ccf2",
   "status": "deployed",
   "binary_matches": true,
   "frontend_index_matches": true,
-  "old_assets_retained": 500,
+  "old_assets_retained": 626,
   "checks": {
     "health": 200,
     "frontend": 200,
@@ -28,11 +28,25 @@
   "ui_read_only": {
     "errors": [],
     "writes": [],
+    "connectionRequests": [
+      {
+        "status": "incomplete",
+        "limit": "10"
+      },
+      {
+        "status": null,
+        "limit": "1"
+      }
+    ],
     "checks": [
-      "capacity: 73 missing racks, capacity field only",
-      "height: 670 devices automatically grouped"
+      "real MM: five view requirements and scoped supplementation entry; read-only",
+      "browser-only complete fixture: success and no supplementation buttons"
     ],
     "status": "PASS"
   },
-  "verification": "TypeScript and Vite pass; read-only gap display and two automatic-scope dialogs pass; no AI, import, model save or publication writes."
+  "verification": "TypeScript and Vite passed; real MM read-only five-view input status and scoped supplementation; browser-only complete fixture. No save/import/publication/provider calls.",
+  "limitations": [
+    "Network role input is editable in existing engineering model; CMDB publication projection remains incomplete.",
+    "Spatial view remains schematic; observed metrics are not manually supplied."
+  ]
 }

@@ -7,14 +7,16 @@
 | 范围 | 当前事实 |
 |---|---|
 | 主开发 | `/home/ubuntu/keel-dev`，分支`dev`，应用目录`dev/`；文档定版已整合；本轮历史资料理解已提交dev并按用户要求发布 |
-| 当前主环境 | 5180前端`ef08c25` / 8081 API `aabae08`；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json)记录publish、设施与Agent整改部署；仅启动/静态资源验证，业务与模型效果等待用户统一测试指令 |
+| 当前主环境 | 5180前端`313ede2` / 8081 API `aabae08`；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json)记录publish、设施与Agent整改部署；仅启动/静态资源验证，业务与模型效果等待用户统一测试指令 |
 | Fabric | `/home/ubuntu/keel-fabric-dev`，`feat/fabric-rebuild@6a70041`；5197/8100分支预览，未并入dev；**用户要求暂停，等待上游接入修复通知** |
 | 原型 | Kickoff5195、拓扑/机柜5181、Fabric5194仅设计参考，不是正式事实或执行来源；本次不启停服务 |
 | main与旧目录 | main保留稳定基线；旧Flows/Kestra/visualization detached目录仅残留原型/运行依赖，不在那里继续开发；本次不合并或推送main |
 
 ## 本轮整改已部署：等待统一测试（优先于旧自动测试安排）
 
-当前5180前端为ef08c25，8081 API为aabae08；前端目录`/home/ubuntu/.local/state/keel-deployments/kickoff-gaps-ef08c25`，API目录`/home/ubuntu/.local/state/keel-deployments/kickoff-workflows-aabae08`；无数据库迁移。回退为kickoff-rack-display-00fdf47，旧静态资源保留。TypeScript、Vite与Go构建通过；设施基线定向单测通过；三页只读界面检查通过（机柜清单与抽屉、统一入库范围、五步分析入口），无页面异常及业务写入。本轮未触发Provider、导入或确认入库，不宣称业务全链验收。用户要求中止的MM分析保留USER_CANCELLED状态。
+当前5180前端为313ede2，8081 API为aabae08；前端目录`/home/ubuntu/.local/state/keel-deployments/kickoff-topology-input-313ede2`，API目录`/home/ubuntu/.local/state/keel-deployments/kickoff-workflows-aabae08`。本轮仅切换前端，旧静态资源保留，回退前端kickoff-cmdb-check-d837e73。TypeScript、Vite、契约文档检查通过；真实MM五视图状态/补录入口只读核查通过，仅两次连接查询(limit10缺项、limit1存在性)，无页面异常或业务写入。浏览器隔离完整资料场景验证显示满足、无补录按钮，不等于真实业务验收。未调用Provider、保存、导入或确认入库。网络角色工程输入到CMDB投影尚未补齐，明确为剩余缺口。
+
+下列publish/Agent条目为既有能力记录，机房机柜UI以本轮“拓扑资料补齐”为准。
 
 - publish：新增可选facilityIds，允许仅发布机房/空机柜/容量/坐标等设施增量；冻结祖先闭包、同项目已发布对端引用、连接事实增量基线、设施/设备请求范围幂等。回执区分设施、已知位置关联和精确落位；保留原确认按钮弹窗、事务Outbox、观察值保护。
 - 机房机柜：六项真实覆盖率/缺口筛选、机柜归属/容量/冲突/发布状态、稳定实体选择、批量关联/尺寸/型号高度/坐标赋值预览，默认只补空。高度补齐保护实例已有值；坐标无默认现实距离，步距不等于净距。复用原CMDB机柜图入口，无独立草稿画布。
@@ -36,13 +38,13 @@
 
 页面主线改为待补充事项：机柜归属、容量、型号高度、设备安装位置。直接打开批量窗口并自动带入缺口对象，已有信息保留；同型号高度一次填写，多型号同窗。无型号设备高度在位置窗口补录；无依据不猜。完整清单/Excel维护和平面布局折叠为辅助入口。房间关联中无效引用可修正，有效已有归属仍保护。确认保存复用原saveModel、修订检查与人工入库，不改API/模型/Agent。TypeScript、Vite通过；MM只读页面核对容量窗口自动带入73柜且仅显示容量，高度窗口自动带入670台并按型号分组；无页面异常或写入。后端未重启，原静态资源保留。实际补录保存由用户验证。
 
-## 拓扑资料补齐（本轮代码完成，部署结果见下次快照）
+## 拓扑资料补齐（已部署313ede2）
 
 用户明确只做前置CMDB与现有拓扑所需资料的差距检查，不遍历全量端口。以proj-b300-demo的小范围只读查询核对字段/关系；示例不是当前项目完成证据。现有hierarchy分页读取机房/机柜/设备；连接复用status=incomplete每批10条和单条存在性查询，不拉全量线缆。页面统一现有Kickoff表格/Badge/ModelEditor，五视图信息状态、机柜清单、仅缺项补录。设备落位复用geometry/layoutRack；工程输入不能消除CMDB缺项。完整状态仅指已登记基础绘图资料，不承诺实测连通或全部观测完整。
 
 补录复用机房/机柜/落位/网络角色ModelEditor（在线编辑及XLSX），连接缺项跳转现有CMDB关系变更流程。角色Schema不支持人工直接改写，因此未接入新通用CMDB编辑器；网络角色保存工程输入后，正式CMDB角色投影链路尚待补齐，不能宣称其发布闭环完成。真实坐标当前未被空间示意视图消费，采集状态亦不作为手填必填项。
 
-当前只读检查与编译/部署结果收尾登记；未调用Agent、保存输入、导入或确认入库。不新增API、Schema、数据模型或拓扑渲染器。
+本轮TypeScript、Vite、契约检查及只读页面核查通过；未调用Agent、保存输入、导入或确认入库。不新增API、Schema、数据模型或拓扑渲染器。
 
 ## 智能开局持续部署授权
 
