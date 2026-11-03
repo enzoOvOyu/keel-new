@@ -131,11 +131,16 @@ func (s Service) projectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 		}
 		// Preserve all typed planning attributes including geometry not yet exposed by
 		// the catalog's generic attribute editor. They remain planned source facts.
+		fields := []map[string]any{}
 		for field, value := range attrs {
-			if value == nil {
-				continue
+			if value != nil {
+				fields = append(fields, map[string]any{"id": uuid.NewString(), "field": field, "value": value})
 			}
-			if _, err := tx.Exec(ctx, `INSERT INTO cmdb_field_source(id,asset_id,field_name,value,source_type,source_ref,fact_layer,revision,operator,approval_status,support,freshness,evidence_refs,project_id) VALUES($1,$2,$3,$4,'bom',$5,'planned',$6,$7,'approved','supported','unknown',$8,$9) ON CONFLICT(asset_id,field_name,source_ref,fact_layer) DO NOTHING`, uuid.NewString(), id, field, Encode(value), ref, strconv.FormatInt(version, 10), actor, Encode([]string{publication}), project); err != nil {
+		}
+		if len(fields) > 0 {
+			if _, err := tx.Exec(ctx, `INSERT INTO cmdb_field_source(id,asset_id,field_name,value,source_type,source_ref,fact_layer,revision,operator,approval_status,support,freshness,evidence_refs,project_id)
+ SELECT (item->>'id')::uuid,$1,item->>'field',item->'value','bom',$2,'planned',$3,$4,'approved','supported','unknown',$5,$6 FROM jsonb_array_elements($7::jsonb) item
+ ON CONFLICT(asset_id,field_name,source_ref,fact_layer) DO NOTHING`, id, ref, strconv.FormatInt(version, 10), actor, Encode([]string{publication}), project, Encode(fields)); err != nil {
 				return err
 			}
 		}

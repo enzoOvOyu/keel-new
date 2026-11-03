@@ -30,6 +30,9 @@ type kickoffRead struct {
 	full                       *kickoff.View
 	portCount, connectionCount int
 	detailBuilds               int
+	optionsMu                  sync.Mutex
+	optionsKey                 string
+	options                    *kickoffPublicationOptions
 }
 
 func (v *kickoffRead) detail() kickoff.View {

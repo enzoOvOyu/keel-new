@@ -46,11 +46,26 @@ func (s *Server) kickoffPublicationOptions(w http.ResponseWriter, r *http.Reques
 		fail(w, 500, "KICKOFF_MODEL_UNAVAILABLE")
 		return
 	}
+	// The read snapshot already binds project, model head and input revision.
+	// Receipt transitions do not increment workspace revision, so check the ledger too.
+	var ledgerKey string
+	if err = tx.QueryRow(ctx, `SELECT COALESCE(string_agg(id::text||':'||state,',' ORDER BY id),'') FROM kickoff_publication WHERE project_id=$1`, s.project).Scan(&ledgerKey); err != nil {
+		fail(w, 500, "KICKOFF_PUBLICATION_OPTIONS_UNAVAILABLE")
+		return
+	}
+	read.optionsMu.Lock()
+	defer read.optionsMu.Unlock()
+	if read.options != nil && read.optionsKey == ledgerKey {
+		respond(w, 200, *read.options)
+		return
+	}
 	options, err := s.kickoffPublicationDeviceOptions(ctx, tx, read.model, read.inputs, read.detail(), revision)
 	if err != nil {
 		fail(w, 500, "KICKOFF_PUBLICATION_OPTIONS_UNAVAILABLE")
 		return
 	}
+	read.optionsKey = ledgerKey
+	read.options = &options
 	respond(w, 200, options)
 }
 

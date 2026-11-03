@@ -201,7 +201,7 @@ func (s *Server) projectKickoffPublication(ctx context.Context, tx pgx.Tx, event
 		ids = append(ids, group...)
 	}
 	var missing bool
-	if e = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM unnest($2::uuid[]) AS expected(id) WHERE NOT EXISTS(SELECT 1 FROM cmdb_asset_scope s WHERE s.project_id=$1 AND s.asset_id=expected.id))`, project, ids).Scan(&missing); e != nil {
+	if e = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM unnest($2::text[]) AS expected(id) WHERE NOT EXISTS(SELECT 1 FROM cmdb_asset_scope s WHERE s.project_id=$1 AND s.asset_id=expected.id))`, project, ids).Scan(&missing); e != nil {
 		return e
 	}
 	if missing {
