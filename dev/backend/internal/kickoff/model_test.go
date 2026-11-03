@@ -87,3 +87,23 @@ func TestProjectSummaryPreservesEvidenceAndIssuesWithoutRelations(t *testing.T) 
 		t.Fatal("summary lost validation issues")
 	}
 }
+
+func TestPlacementIdentityIsDistinctFromEquipment(t *testing.T) {
+	m := engineering.EmptyPhysical("p")
+	device := engineering.StableID("p", "equipment", "one")
+	m.Equipment = append(m.Equipment, engineering.EquipmentPlan{EntityVersion: engineering.EntityVersion{EntityID: device}})
+	inputs := []ModelInput{{TableID: "racks", Rows: []map[string]string{{"rack_id": "rack-one"}}}, {TableID: "placements", Rows: []map[string]string{{"device_id": device, "rack_id": "rack-one", "start_u": "1", "height_u": "2"}}}}
+	if err := ApplyInputs(&m, inputs); err != nil {
+		t.Fatal(err)
+	}
+	if len(m.Placements) != 1 || m.Placements[0].EntityID == device {
+		t.Fatal("placement reused equipment identity")
+	}
+	id := m.Placements[0].EntityID
+	if err := ApplyInputs(&m, inputs); err != nil {
+		t.Fatal(err)
+	}
+	if len(m.Placements) != 1 || m.Placements[0].EntityID != id {
+		t.Fatal("placement identity changed on reapply")
+	}
+}

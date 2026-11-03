@@ -424,7 +424,7 @@ func ApplyInputs(m *engineering.PhysicalModel, inputs []ModelInput) error {
 			}
 		}
 		if at < 0 {
-			m.Placements = append(m.Placements, engineering.RackPlacement{EntityVersion: version("placement", r["device_id"]), EquipmentID: r["device_id"]})
+			m.Placements = append(m.Placements, engineering.RackPlacement{EntityVersion: engineering.EntityVersion{EntityID: engineering.StableID(m.ProjectID, "placement", r["device_id"]), Maturity: engineering.Confirmed}, EquipmentID: r["device_id"]})
 			at = len(m.Placements) - 1
 		}
 		p := &m.Placements[at]
