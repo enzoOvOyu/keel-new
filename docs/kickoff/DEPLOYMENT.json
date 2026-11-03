@@ -1,173 +1,63 @@
 {
-  "code_revision": "802a001",
-  "backend_code_revision": "802a001",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-perf-22d885e",
-  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-cold-802a001",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/module-cleanup-0239e8a",
-  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-perf-1d68a05",
+  "code_revision": "66ce278e3ce47ee1aa189a3aee4a1713afa3a1a7",
+  "frontend_code_revision": "66ce278e3ce47ee1aa189a3aee4a1713afa3a1a7",
+  "backend_code_revision": "66ce278e3ce47ee1aa189a3aee4a1713afa3a1a7",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-domain-66ce278",
+  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-domain-66ce278",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-perf-22d885e",
+  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-cold-802a001",
   "ports": [
     5180,
     8081
   ],
   "migrations": [],
   "api_restarted": true,
-  "binary_sha256": "64f62c40c1de6ab5006b6c51d81d320e1d0c20fe5c88848412b8be5bde5de023",
-  "frontend_index_sha256": "a301dd146a1ec5e92a24f4efc146318fbfaa32e3de7ba76cf438318af345a8ff",
+  "binary_sha256": "aa7027764c8e198fa9ff1f0085789c20b267293535348c8ddb015a599af166a7",
+  "frontend_index_sha256": "7b218d0853c60a89548e0bc9918793ef3bf896a4b1f921f6bdb9bdd541419873",
   "status": "deployed",
   "binary_matches": true,
   "frontend_index_matches": true,
+  "old_assets_retained": 250,
+  "checks": {
+    "health": 200,
+    "frontend": 200,
+    "index_matches": true
+  },
+  "business_tests": "NOT RUN",
+  "provider_calls": 0,
+  "static_checks": [
+    {
+      "path": "/startup.css",
+      "status": 200,
+      "mime": "text/css"
+    },
+    {
+      "path": "/assets/index-zC83Fy2E.js",
+      "status": 200,
+      "mime": "text/javascript"
+    },
+    {
+      "path": "/assets/index-BvlS0FnI.css",
+      "status": 200,
+      "mime": "text/css"
+    },
+    {
+      "path": "/assets/ApprovedTopologyWorkspace-BP1PAbA4.js",
+      "status": 200,
+      "mime": "text/javascript"
+    }
+  ],
+  "active_agent_jobs_before_after": [
+    0,
+    0
+  ],
   "live_checks": {
     "status": "PASS",
     "startup_http": {
       "http://localhost:8081/healthz": 200,
       "http://localhost:5180/": 200
-    }
-  },
-  "live_ui": {
-    "status": "PASS",
-    "scope": "Authenticated deployed MM page; real eligibility/filter and review navigation; no publication POST or screenshots",
-    "counts": {
-      "changed": 163,
-      "unchanged": 808
     },
-    "selectable": 163,
-    "total": 971,
-    "checks": [
-      "unchanged device checkbox disabled and excluded from select-all",
-      "changed/new devices are selected and selectable",
-      "review link reaches nonempty processing action",
-      "unchanged confirmation UI and business data preserved"
-    ],
-    "reviewAction": "补充建模",
-    "pageErrors": 0,
-    "publicationSubmitRequests": 0,
-    "workspaceRevision": 12,
-    "publicationCount": 3
-  },
-  "agent_implemented": false,
-  "url": "http://localhost:5180/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/kickoff/publish",
-  "navigation_cleanup_acceptance": {
-    "status": "PASS",
-    "results": [
-      {
-        "path": "/dashboard",
-        "status": "PASS",
-        "fixtureRequests": 0
-      },
-      {
-        "path": "/fleet",
-        "status": "PASS",
-        "fixtureRequests": 0
-      },
-      {
-        "path": "/issues",
-        "status": "PASS",
-        "fixtureRequests": 0
-      },
-      {
-        "path": "/monitor",
-        "status": "PASS",
-        "fixtureRequests": 0
-      },
-      {
-        "path": "/ai",
-        "status": "PASS",
-        "fixtureRequests": 0
-      },
-      {
-        "path": "/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/deploy/overview",
-        "status": "PASS",
-        "fixtureRequests": 0
-      },
-      {
-        "path": "/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/deploy/fabric",
-        "status": "PASS",
-        "fixtureRequests": 0
-      },
-      {
-        "path": "/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/deploy/config",
-        "status": "PASS",
-        "fixtureRequests": 0
-      },
-      {
-        "path": "/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/deploy/provision",
-        "status": "PASS",
-        "fixtureRequests": 0
-      },
-      {
-        "path": "/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/deploy/validation",
-        "status": "PASS",
-        "fixtureRequests": 0
-      },
-      {
-        "path": "/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/deploy/nettest",
-        "status": "PASS",
-        "fixtureRequests": 0
-      },
-      {
-        "path": "/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/deploy/nccl",
-        "status": "PASS",
-        "fixtureRequests": 0
-      },
-      {
-        "path": "/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/deploy/cleanup",
-        "status": "PASS",
-        "fixtureRequests": 0
-      },
-      {
-        "path": "/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/deploy/fabric/ztp",
-        "status": "PASS",
-        "fixtureRequests": 0
-      },
-      {
-        "path": "/monitor/alerts",
-        "status": "PASS",
-        "fixtureRequests": 0
-      },
-      {
-        "path": "/projects",
-        "status": "PASS",
-        "scope": "authenticated page load"
-      },
-      {
-        "path": "/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/kickoff/review",
-        "status": "PASS",
-        "scope": "authenticated page load"
-      },
-      {
-        "path": "/topology",
-        "status": "PASS",
-        "scope": "authenticated page load"
-      },
-      {
-        "path": "/racks",
-        "status": "PASS",
-        "scope": "authenticated page load"
-      },
-      {
-        "path": "/cmdb",
-        "status": "PASS",
-        "scope": "authenticated page load"
-      },
-      {
-        "path": "/flows",
-        "status": "PASS",
-        "scope": "authenticated page load"
-      },
-      {
-        "path": "/admin/users",
-        "status": "PASS",
-        "scope": "authenticated page load"
-      },
-      {
-        "path": "/admin/ai-provider",
-        "status": "PASS",
-        "scope": "authenticated page load"
-      }
-    ],
-    "pageErrors": [],
-    "scope": "read-only navigation; no import, publication or job execution"
-  },
-  "frontend_code_revision": "22d885e",
-  "performance_evidence": "docs/kickoff/COLD-OPEN-PERFORMANCE.json"
+    "static_resources": "PASS; includes previous topology chunk",
+    "scope": "service startup and static asset loading only; no business/Agent acceptance"
+  }
 }

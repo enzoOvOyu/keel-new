@@ -1,6 +1,6 @@
 # Kickoff 设施、增量发布与分域 Agent 整改
 
-状态：功能已实现，静态整合完成，等待用户测试指令；用户要求全部完成后等待指令启动测试。不得将静态检查、编译或已上线旧功能作为本次业务验收。此轮不自动部署、不调用Provider、不执行资料导入或CMDB发布。
+状态：功能已实现，静态整合完成，等待用户测试指令；用户要求全部完成后等待指令启动测试。不得将静态检查、编译或已上线旧功能作为本次业务验收。用户随后授权部署66ce278；部署仅启动/静态检查通过，不调用Provider、不执行资料导入或CMDB发布。
 
 ## 验收边界
 
@@ -17,7 +17,7 @@
 - facility：FacilityPanel、FacilityBatchEditor、FacilityEntities复用现有四表与UI，真实覆盖/筛选、机柜状态、友好稳定引用、批量影响预览和空值补齐；正式机柜图仍读取CMDB。
 - Agent：新kickoff_agent*.go复用eng_job和MinIO，新增域参数、候选读取和人工采用；SourceAgentPanel接入API，原五栏及区域预览采用真实Agent证据。原Provider/Parser和工具框架保留，无第二队列。
 - 契约：OpenAPI、生成类型、Go服务、前端Adapter、模块API台账同步。最终TypeScript类型检查、Go编译、API文档引用及diff检查通过；运行/交互与真实模型验收未执行。
-- 真实模型调用、UI/数据库/端到端测试全部NOT RUN。未部署；现有运行环境继续旧版本。
+- 真实模型调用、UI/数据库/端到端测试全部NOT RUN。已部署66ce278，启动及静态资源检查通过；业务与Provider效果仍待用户测试指令。
 - 限制：仅XLSX；历史旧StepInputCatalog草稿不自动转换；首次新Agent分析不能冒称历史已完成域已无模型成本。缺依据仍需用户补充，不承诺任意资料全部自动识别。
 
 ## 明确U刻度与区间

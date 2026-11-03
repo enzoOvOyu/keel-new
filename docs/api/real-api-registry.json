@@ -3,8 +3,8 @@
   "updated_at": "2026-11-03",
   "coverage": "Current module documentation baseline, 2026-11-03: deployed dev 686e9ea; CMDB routes additionally registered by source review only. Per-operation runtime verification is limited to cited evidence. Fabric 6a70041 belongs to a separate paused branch and is not included in this registry.",
   "schema_authority": "docs/openapi.yaml",
-  "code_revision": "c6d5bc4b61f4e18844903369be64b30d5004dda0",
-  "deployed_revision": "802a001",
+  "code_revision": "66ce278e3ce47ee1aa189a3aee4a1713afa3a1a7",
+  "deployed_revision": "66ce278e3ce47ee1aa189a3aee4a1713afa3a1a7",
   "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
   "operations": [
     {
@@ -2213,12 +2213,12 @@
       "response_schema": "KickoffPublication",
       "implementation": "implemented_not_behavior_verified",
       "deployment": "deployed",
-      "verification": "NOT_RUN_user_requested_unified_testing_after_agent_completion",
+      "verification": "NOT_RUN_business_acceptance; deployment startup/static resources only",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff_publication.go",
       "documentation": "docs/api/kickoff.md",
       "verification_evidence": "docs/kickoff/PUBLISH-SCOPE-CHECK.json",
-      "deployed_revision": "fdd86ddc477a400e0d4ed099145a1c412bfc84d8",
+      "deployed_revision": "66ce278e3ce47ee1aa189a3aee4a1713afa3a1a7",
       "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
       "scope": "explicit projectId; existing IdentityProvider and project authorization",
       "permission": "bom:execute + bom:review",
@@ -2227,7 +2227,7 @@
       "side_effects": "versioned engineering facts, audit; publication additionally writes transactional Outbox",
       "limitations": "Coverage requires identical immutable engineering revision and all input versions, covered by a single prior scope; not field-level semantic diff. No real publication endpoint write acceptance performed this turn.",
       "module": "kickoff",
-      "development_changes": "Facility-only delta scope and project-local published endpoint references; Agent candidate flow where applicable. Not deployed or tested in this change."
+      "development_changes": "Facility-only delta scope and project-local published endpoint references; Agent candidate flow where applicable. Deployed; behavior not tested."
     },
     {
       "method": "get",
@@ -2237,12 +2237,12 @@
       "response_schema": "KickoffPublication",
       "implementation": "implemented_not_behavior_verified",
       "deployment": "deployed",
-      "verification": "NOT_RUN_user_requested_unified_testing_after_agent_completion",
+      "verification": "NOT_RUN_business_acceptance; deployment startup/static resources only",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff_publication.go",
       "documentation": "docs/api/kickoff.md",
       "verification_evidence": "docs/kickoff/BACKEND-CHECK.json",
-      "deployed_revision": "9a3e03b9095afa7c91214cd40c00292d288578ba",
+      "deployed_revision": "66ce278e3ce47ee1aa189a3aee4a1713afa3a1a7",
       "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
       "scope": "explicit projectId; existing IdentityProvider and project authorization",
       "permission": "bom:read",
@@ -2251,7 +2251,7 @@
       "side_effects": "read-only facts; workspace anchor may initialize",
       "limitations": "No network execution; planned and observed remain separate",
       "module": "kickoff",
-      "development_changes": "Facility-only delta scope and project-local published endpoint references; Agent candidate flow where applicable. Not deployed or tested in this change."
+      "development_changes": "Facility-only delta scope and project-local published endpoint references; Agent candidate flow where applicable. Deployed; behavior not tested."
     },
     {
       "method": "post",
@@ -2282,12 +2282,12 @@
       "response_status": "202",
       "implementation": "implemented_not_behavior_verified",
       "deployment": "deployed",
-      "verification": "NOT_RUN_user_requested_unified_testing_after_agent_completion",
+      "verification": "NOT_RUN_business_acceptance; deployment startup/static resources only",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff_agent.go",
       "documentation": "docs/api/kickoff.md",
       "verification_evidence": "docs/kickoff/BACKEND-CHECK.json",
-      "deployed_revision": "9a3e03b9095afa7c91214cd40c00292d288578ba",
+      "deployed_revision": "66ce278e3ce47ee1aa189a3aee4a1713afa3a1a7",
       "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
       "scope": "explicit projectId; existing IdentityProvider and project authorization",
       "permission": "bom:import",
@@ -2296,7 +2296,7 @@
       "side_effects": "enqueue durable eng_job and audit; no candidate adoption or CMDB publication",
       "limitations": "Development only; no provider invocation or real-file acceptance performed",
       "module": "kickoff",
-      "development_changes": "Facility-only delta scope and project-local published endpoint references; Agent candidate flow where applicable. Not deployed or tested in this change.",
+      "development_changes": "Facility-only delta scope and project-local published endpoint references; Agent candidate flow where applicable. Deployed; behavior not tested.",
       "response_schema": "KickoffAnalysisQueued"
     },
     {
@@ -2417,7 +2417,7 @@
       "response_status": "200",
       "implementation": "implemented_not_behavior_verified",
       "deployment": "deployed",
-      "verification": "NOT_RUN_user_requested_unified_testing_after_agent_completion",
+      "verification": "NOT_RUN_business_acceptance; deployment startup/static resources only",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff_review.go",
       "documentation": "docs/api/kickoff.md",
@@ -2428,10 +2428,10 @@
       "side_effects": "read projection only; preview does not approve or publish; no AI or device actions",
       "errors": "403 scope denied; 400 invalid query; 409 stale kickoff revision; service errors retained",
       "limitations": "Suggested latency/payload budgets not fully met; no FPS/concurrent load or full-module acceptance",
-      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "deployed_revision": "66ce278e3ce47ee1aa189a3aee4a1713afa3a1a7",
       "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
       "module": "kickoff",
-      "development_changes": "Facility-only delta scope and project-local published endpoint references; Agent candidate flow where applicable. Not deployed or tested in this change."
+      "development_changes": "Facility-only delta scope and project-local published endpoint references; Agent candidate flow where applicable. Deployed; behavior not tested."
     },
     {
       "method": "get",
@@ -3160,7 +3160,7 @@
       "response_schema": "KickoffPublicationOptions",
       "implementation": "implemented_not_behavior_verified",
       "deployment": "deployed",
-      "verification": "NOT_RUN_user_requested_unified_testing_after_agent_completion",
+      "verification": "NOT_RUN_business_acceptance; deployment startup/static resources only",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff_publication_options.go",
       "documentation": "docs/api/kickoff.md",
@@ -3171,8 +3171,9 @@
       "loading": "on publication page entry and revision/receipt change; typed identifiers and states only",
       "errors": "403 denied, 409 stale, 500 unavailable; no fallback to enabling selection",
       "limitations": "Present engineering objects and scoped inputs; physical removal requires CMDB change process",
-      "deployed_revision": "c6d5bc4b61f4e18844903369be64b30d5004dda0",
-      "development_changes": "Facility-only delta scope and project-local published endpoint references; Agent candidate flow where applicable. Not deployed or tested in this change."
+      "deployed_revision": "66ce278e3ce47ee1aa189a3aee4a1713afa3a1a7",
+      "development_changes": "Facility-only delta scope and project-local published endpoint references; Agent candidate flow where applicable. Deployed; behavior not tested.",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json"
     },
     {
       "method": "get",
@@ -3181,8 +3182,8 @@
       "response_status": "200",
       "response_schema": "KickoffSourceAnalysis",
       "implementation": "implemented_not_behavior_verified",
-      "deployment": "not_deployed",
-      "verification": "NOT_RUN_user_requested_unified_testing_after_agent_completion",
+      "deployment": "deployed",
+      "verification": "NOT_RUN_business_acceptance; deployment startup/static resources only",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff_agent.go",
       "documentation": "docs/api/kickoff.md",
@@ -3192,7 +3193,10 @@
       "errors": "400 invalid domain/table;403;404 source/job;409 revision/active/not-ready;422 invalid candidates;503 artifact unavailable",
       "side_effects": "read bounded candidate preview and source evidence; full artifacts remain in MinIO",
       "limitations": "No tests or external model acceptance this iteration",
-      "module": "kickoff"
+      "module": "kickoff",
+      "deployed_revision": "66ce278e3ce47ee1aa189a3aee4a1713afa3a1a7",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "development_changes": ""
     },
     {
       "method": "post",
@@ -3201,8 +3205,8 @@
       "response_status": "200",
       "response_schema": "KickoffAnalysisAdoption",
       "implementation": "implemented_not_behavior_verified",
-      "deployment": "not_deployed",
-      "verification": "NOT_RUN_user_requested_unified_testing_after_agent_completion",
+      "deployment": "deployed",
+      "verification": "NOT_RUN_business_acceptance; deployment startup/static resources only",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff_agent_adopt.go",
       "documentation": "docs/api/kickoff.md",
@@ -3212,10 +3216,13 @@
       "errors": "400 invalid domain/table;403;404 source/job;409 revision/active/not-ready;422 invalid candidates;503 artifact unavailable",
       "side_effects": "explicit candidate adoption; preserve nonempty existing values; no CMDB publication",
       "limitations": "No tests or external model acceptance this iteration",
-      "module": "kickoff"
+      "module": "kickoff",
+      "deployed_revision": "66ce278e3ce47ee1aa189a3aee4a1713afa3a1a7",
+      "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
+      "development_changes": ""
     }
   ],
-  "development_note": "Local dev remediation implemented and compiled: facility delta publication, facility modeling and domain Agent with five understanding stages. User requires unified testing only after explicit instruction. Not deployed; runtime remains frontend22d885e/API802a001. See docs/kickoff/REMEDIATION-IMPLEMENTATION.md.",
+  "development_note": "Deployed frontend/API 66ce278: facility delta publication, facility modeling, domain Agent and five understanding stages. Startup/static assets only verified. No Provider invocation, import, publication or business acceptance. Unified testing awaits user instruction.",
   "last_deployed_changes": {
     "branch": "dev",
     "base_revision": "3c0ac07",
