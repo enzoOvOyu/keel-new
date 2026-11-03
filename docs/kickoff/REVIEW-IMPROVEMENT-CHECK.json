@@ -1,5 +1,5 @@
 {
-  "status": "implemented_not_deployed",
+  "status": "deployed_targeted_read_checks_passed",
   "scope": "Kickoff review five tabs and existing EvidenceDrawer only; read projection/UI changes, no migrations, asset writes or provider requests",
   "go_tests": {
     "command": "go test ./cmd/api -run '^TestKickoffReview' -count=1",
@@ -37,7 +37,7 @@
     "Synthetic frontend API protocol replay is not deployed HTTP or MM acceptance",
     "Findings describe engineering data quality; unconnected is not observed link-down",
     "Geometry findings do not change existing publication checks",
-    "Current environment remains af63cb3",
+    "Current environment is 12af6e4; previous release af63cb3 retained for rollback",
     "Connection type/model/rack facet values currently describe the local endpoint; no inferred logical network configuration"
   ],
   "api_documentation_check": "PASS: 167 registered operations",
@@ -45,5 +45,92 @@
     "status": "PASS",
     "scope": "Built frontend, synthetic data only; 1720px desktop. Existing shell, table density, right sidebar, signal emphasis and independent status labels retained.",
     "screenshot": "docs/kickoff/screenshots/review-improvement-synthetic.png"
-  }
+  },
+  "live_deployed_checks": {
+    "status": "PASS",
+    "scope": "Authenticated deployed HTTP read-only checks; no asset writes, imports or AI requests",
+    "checks": [
+      {
+        "endpoint": "http://localhost:8081/healthz",
+        "status": 200
+      },
+      {
+        "endpoint": "http://localhost:5180/",
+        "status": 200
+      },
+      {
+        "category": "devices",
+        "status": 200,
+        "rows": 10,
+        "total": 971,
+        "counts": {
+          "all": 971,
+          "geometry": 930,
+          "issues": 930,
+          "model_missing": 4,
+          "published": 971,
+          "unplaced": 4
+        }
+      },
+      {
+        "category": "components",
+        "status": 200,
+        "rows": 0,
+        "total": 0,
+        "counts": {}
+      },
+      {
+        "category": "ports",
+        "status": 200,
+        "rows": 10,
+        "total": 14308,
+        "counts": {
+          "all": 14308,
+          "issues": 14308,
+          "published": 14308,
+          "spec_missing": 14308
+        }
+      },
+      {
+        "category": "connections",
+        "status": 200,
+        "rows": 10,
+        "total": 7154,
+        "counts": {
+          "all": 7154,
+          "issues": 4,
+          "published": 7154,
+          "unplaced": 4
+        }
+      },
+      {
+        "category": "placements",
+        "status": 200,
+        "rows": 10,
+        "total": 971,
+        "counts": {
+          "all": 971,
+          "geometry": 930,
+          "issues": 930,
+          "model_missing": 4,
+          "published": 971,
+          "unplaced": 4
+        }
+      },
+      {
+        "filter": "unplaced",
+        "status": 200,
+        "total": 4
+      }
+    ],
+    "binary_matches": true,
+    "frontend_index_matches": true,
+    "workspace_revision_unchanged": true,
+    "mutations": false,
+    "ai_requests": 0,
+    "limits": [
+      "Single sequential API samples, not P95/concurrency or full live browser acceptance"
+    ]
+  },
+  "deployment_evidence": "docs/kickoff/DEPLOYMENT.json"
 }

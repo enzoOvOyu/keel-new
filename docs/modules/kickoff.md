@@ -1,6 +1,6 @@
 # 智能开局 Kickoff · 当前实现定版
 
-基准：主环境 5180/8081 为 `af63cb3`；历史资料理解已部署，定向真实HTTP检查通过。本页以已实现结果定版，不再沿旧 BOM 四步/五步方案开发。
+基准：主环境 5180/8081 为 `12af6e4`；历史资料理解已部署，定向真实HTTP检查通过。本页以已实现结果定版，不再沿旧 BOM 四步/五步方案开发。
 
 ## 产品与闭环
 
@@ -16,7 +16,7 @@
 |---|---|
 | overview | 工作区摘要、真实入库版本、缺口/建议动作、活动；机柜/Fabric/装机区域链接既有模块，不伪造后置完成 |
 | sources | MinIO 资料、摘要复用、附件移除；已上线显式复用历史资料、五项独立识别状态、区域来源/标准对象分页及来源 Drawer；新文件仍等待 Agent |
-| review | 已上线五栏分页与来源Drawer；本轮 dev 优化身份去重、端口/速率分列、工程异常及影响、全量计数快捷筛选与URL属性筛选，尚未部署 |
+| review | 已上线五栏分页与来源Drawer；已上线身份去重、端口/速率分列、工程异常及影响、全量计数快捷筛选与URL属性筛选，五栏定向HTTP检查通过 |
 | publish | 服务端完整范围预览、冻结闭包、确认、Outbox 状态/回执、历史差异与导出；排队不是入库完成 |
 | models/facility | 场地/机房/机柜、型号几何、设备位置；缺高度/容量保持未知 |
 | models/network | 网络域/角色、管理接入、接口、地址/ASN、协议/策略的版本化工程输入 |
@@ -52,6 +52,6 @@
 | [BACKEND-CHECK](../kickoff/BACKEND-CHECK.json)、[UI-CHECK](../kickoff/UI-CHECK.json) | 定向隔离集成、9页/23表/交互协议回放；不能当作全部真实页面写入验收 |
 | [HISTORY-UNDERSTANDING-CHECK](../kickoff/HISTORY-UNDERSTANDING-CHECK.json) | 本轮只读数据库/派生 MinIO 验证：54结构区域、29,583候选定位单元格、7,154双端连接候选；明确字段证据0，workspace修订不变；已部署，真实HTTP报告/复用/两类预览通过 |
 | [MM-HISTORY-CHECK](../kickoff/MM-HISTORY-CHECK.json) | 历史候选入库：971设备、14308端口、7154双端连接；967已知位置关联59柜；精确几何占位0 |
-| [DEPLOYMENT](../kickoff/DEPLOYMENT.json)、[PERFORMANCE-RESULT](../kickoff/PERFORMANCE-RESULT.json) | af63cb3 为当前部署；来源报告/复用/分页及过期版本拒绝为本轮HTTP证据，其他性能与页面为686e9ea历史证据；非 P95/FPS/并发验收 |
+| [DEPLOYMENT](../kickoff/DEPLOYMENT.json)、[PERFORMANCE-RESULT](../kickoff/PERFORMANCE-RESULT.json) | 12af6e4 为当前部署（五栏核对证据见 REVIEW-IMPROVEMENT-CHECK），af63cb3为历史资料理解证据；来源报告/复用/分页及过期版本拒绝为本轮HTTP证据，其他性能与页面为686e9ea历史证据；非 P95/FPS/并发验收 |
 
 新 Agent 未开发，analyze 明确503；历史候选组件0、4台通用设备待补类型，不声称新资料覆盖。布线 needs_input、电力 partial、缺几何继续如实显示。建议1s/500KB摘要和全部拓扑2s目标未全部达到。以上为后续明确缺口，不自动扩展本次任务。

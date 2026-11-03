@@ -1,6 +1,6 @@
 # Kickoff · 当前 API 使用契约
 
-基准：dev/部署 `af63cb3`。产品行为见[模块定版](../modules/kickoff.md)。[OpenAPI](../openapi.yaml)定义唯一请求/响应/枚举；[注册表](real-api-registry.json)链接实现及证据。
+基准：dev/部署 `12af6e4`。产品行为见[模块定版](../modules/kickoff.md)。[OpenAPI](../openapi.yaml)定义唯一请求/响应/枚举；[注册表](real-api-registry.json)链接实现及证据。
 
 ## 操作索引
 
@@ -55,7 +55,7 @@
 
 定向结果见 [HISTORY-UNDERSTANDING-CHECK](../kickoff/HISTORY-UNDERSTANDING-CHECK.json)：MM 恢复54个结构分块、29,583个候选定位单元格、7,154条同原始行双端物理端口精确组合候选；明确字段证据仍为0。关系完成量是有坐标引用且确定性校验通过的连接数，不以已有连接总数填充；字段分母仅为明确映射的对象字段，标题/备注/重建候选不算必填字段。步骤按覆盖和校验计算 complete/partial/pending；无适用连接为 unsupported。workspace 不额外读取 MinIO 报告，报告和预览只由来源页按需加载。
 
-## 数据核对信息与筛选（本轮 dev，未部署）
+## 数据核对信息与筛选（已部署）
 
 GET review 保留既有分页协议，新增明确类型的 `facts` 和 `signals`。设备身份、型号、端口名称、速率、MAC、角色及位置分别返回；不再以 description 的 UI 拼接作为字段语义。signals 包含 code/label/severity/impact/action，是当前工程核对的只读发现，不新增审批门槛，也不是观测健康结论。
 
@@ -66,4 +66,4 @@ GET review 保留既有分页协议，新增明确类型的 `facts` 和 `signals
 - 前端筛选/搜索/排序/分页保存在URL；Drawer关闭后保持原位置。每次只返回当前页，不下载全量端口/连接到浏览器。导出沿同一筛选逐页读取。
 - 右侧事项区仅显示当前页对象的发现及处理入口，不罗列整个项目无关事项。稳定ID收纳于抽屉“内部标识”；SN与名称相同只显示一次。设备抽屉端口表明确分为端口名称、速率、角色；不拼接速率到端口名称中。
 
-验证范围见 [REVIEW-IMPROVEMENT-CHECK](../kickoff/REVIEW-IMPROVEMENT-CHECK.json)。当前已部署版本仍为af63cb3。
+验证范围见 [REVIEW-IMPROVEMENT-CHECK](../kickoff/REVIEW-IMPROVEMENT-CHECK.json)。当前已部署版本为12af6e4，五栏及待定位筛选的真实HTTP只读检查通过。

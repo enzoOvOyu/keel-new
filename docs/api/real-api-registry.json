@@ -3,8 +3,8 @@
   "updated_at": "2026-11-03",
   "coverage": "Current module documentation baseline, 2026-11-03: deployed dev 686e9ea; CMDB routes additionally registered by source review only. Per-operation runtime verification is limited to cited evidence. Fabric 6a70041 belongs to a separate paused branch and is not included in this registry.",
   "schema_authority": "docs/openapi.yaml",
-  "code_revision": "af63cb3f151cad9e0200a364281eca5bd525b47e",
-  "deployed_revision": "af63cb3f151cad9e0200a364281eca5bd525b47e",
+  "code_revision": "12af6e4ec606dfcd1a42c9c4773f7ebec8d44f84",
+  "deployed_revision": "12af6e4ec606dfcd1a42c9c4773f7ebec8d44f84",
   "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
   "operations": [
     {
@@ -2391,21 +2391,20 @@
       "response_status": "200",
       "implementation": "implemented",
       "deployment": "deployed",
-      "verification": "authenticated_live_GET_subset_and_browser_subset; see deployment evidence for exact checks; earlier read-only cases retained",
+      "verification": "authenticated_deployed_HTTP_five_categories_and_unplaced_filter; local synthetic browser protocol replay",
       "handler": "dev/backend/cmd/api/kickoff.go",
       "source": "dev/backend/cmd/api/kickoff_review.go",
       "documentation": "docs/api/kickoff.md",
-      "verification_evidence": "docs/kickoff/PERFORMANCE-RESULT.json",
+      "verification_evidence": "docs/kickoff/REVIEW-IMPROVEMENT-CHECK.json",
       "scope": "explicit project authorization; current revision bound for kickoff paged reads and preview",
       "permission": "bom:read",
-      "loading": "on demand; revision-keyed bounded typed read cache and server pages; local object context",
+      "loading": "on demand, revision-bound server pages; full-scope counts/facets; URL filters; local object context",
       "side_effects": "read projection only; preview does not approve or publish; no AI or device actions",
       "errors": "403 scope denied; 400 invalid query; 409 stale kickoff revision; service errors retained",
-      "limitations": "Suggested latency/payload budgets not fully met; no FPS/concurrent load or full-module acceptance",
-      "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
+      "limitations": "Single read-only samples and synthetic browser replay, not full live browser/P95 acceptance; connection type/model/rack facets describe local endpoint",
+      "deployed_revision": "12af6e4ec606dfcd1a42c9c4773f7ebec8d44f84",
       "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
-      "module": "kickoff",
-      "pending_source_changes": "Typed review facts/signals, full-result filter counts/facets, explicit object publication receipts; implemented in dev, not deployed; see docs/kickoff/REVIEW-IMPROVEMENT-CHECK.json"
+      "module": "kickoff"
     },
     {
       "method": "post",
@@ -3149,15 +3148,15 @@
       "module": "kickoff"
     }
   ],
-  "development_note": "Current main environment 5180/8081: af63cb3, historical source understanding deployed and targeted HTTP verified. Kickoff Agent remains unimplemented (503). No asset publications or migrations; Fabric separate branch remains paused.",
+  "development_note": "Current main environment 5180/8081: 12af6e4; review facts/signals/counts/facets deployed and five-category read-only HTTP checks passed. Agent remains unimplemented; no migrations, data imports or publications. Fabric remains paused.",
   "last_deployed_changes": {
     "branch": "dev",
-    "base_revision": "686e9ea",
+    "base_revision": "af63cb3",
     "deployed": true,
-    "scope": "Historical workbook understanding, independent stage status, paged region preview and source evidence",
-    "evidence": "docs/kickoff/DEPLOYMENT.json",
-    "code_revision": "af63cb3f151cad9e0200a364281eca5bd525b47e",
-    "state": "deployed_targeted_source_http_verified",
-    "deployed_revision": "af63cb3f151cad9e0200a364281eca5bd525b47e"
+    "scope": "Review five tabs: typed facts and engineering findings, whole-result filters, exact object publication status, identity deduplication and Drawer",
+    "evidence": "docs/kickoff/REVIEW-IMPROVEMENT-CHECK.json",
+    "code_revision": "12af6e4ec606dfcd1a42c9c4773f7ebec8d44f84",
+    "deployed_revision": "12af6e4ec606dfcd1a42c9c4773f7ebec8d44f84",
+    "state": "deployed_targeted_read_checks_passed"
   }
 }

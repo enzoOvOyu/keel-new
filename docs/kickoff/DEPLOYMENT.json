@@ -1,80 +1,103 @@
 {
-  "code_revision": "af63cb3f151cad9e0200a364281eca5bd525b47e",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-understanding-af63cb3",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-perf-686e9ea",
+  "code_revision": "12af6e4ec606dfcd1a42c9c4773f7ebec8d44f84",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-review-12af6e4",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-understanding-af63cb3",
   "ports": [
     5180,
     8081
   ],
   "migrations": [],
-  "binary_sha256": "4eb65bcbf3d4f2b100026bec918976dd51906f6260bef542f19d122c908dbe91",
-  "frontend_index_sha256": "7fbcf41e7654807e6f2158cb7ae7a7b343bad4befddd5704512845f91c7cad8b",
   "status": "deployed",
+  "binary_sha256": "68656cabd3db5a6477034d096af27cedeae939783f58940b13cbf3aece062e1a",
+  "frontend_index_sha256": "e4181d1a6f8465839e97f89a73fee40ef40615a68a170bc9fafe26253f147fa1",
   "binary_matches": true,
   "frontend_index_matches": true,
   "live_checks": {
-    "status": "deployed",
-    "code_revision": "af63cb3",
-    "startup_http": {
-      "http://localhost:8081/healthz": 200,
-      "http://localhost:5180/": 200,
-      "understanding": 200,
-      "preview_source": {
+    "status": "PASS",
+    "scope": "Authenticated deployed HTTP read-only checks; no asset writes, imports or AI requests",
+    "checks": [
+      {
+        "endpoint": "http://localhost:8081/healthz",
+        "status": 200
+      },
+      {
+        "endpoint": "http://localhost:5180/",
+        "status": 200
+      },
+      {
+        "category": "devices",
         "status": 200,
-        "rows": 20,
-        "total": 22
+        "rows": 10,
+        "total": 971,
+        "counts": {
+          "all": 971,
+          "geometry": 930,
+          "issues": 930,
+          "model_missing": 4,
+          "published": 971,
+          "unplaced": 4
+        }
       },
-      "preview_normalized": {
+      {
+        "category": "components",
         "status": 200,
-        "rows": 20,
-        "total": 189
-      },
-      "stale_revision": 409,
-      "reuse_history": 200
-    },
-    "frontend_index_matches": true,
-    "workspace_revision_unchanged": true,
-    "structural_regions": 54,
-    "steps": [
-      {
-        "id": "structure",
-        "state": "complete",
-        "completed": 15,
-        "total": 15
+        "rows": 0,
+        "total": 0,
+        "counts": {}
       },
       {
-        "id": "regions",
-        "state": "complete",
-        "completed": 54,
-        "total": 54
+        "category": "ports",
+        "status": 200,
+        "rows": 10,
+        "total": 14308,
+        "counts": {
+          "all": 14308,
+          "issues": 14308,
+          "published": 14308,
+          "spec_missing": 14308
+        }
       },
       {
-        "id": "semantics",
-        "state": "partial",
-        "completed": 35,
-        "total": 54
+        "category": "connections",
+        "status": 200,
+        "rows": 10,
+        "total": 7154,
+        "counts": {
+          "all": 7154,
+          "issues": 4,
+          "published": 7154,
+          "unplaced": 4
+        }
       },
       {
-        "id": "relationships",
-        "state": "complete",
-        "completed": 7154,
-        "total": 7154
+        "category": "placements",
+        "status": 200,
+        "rows": 10,
+        "total": 971,
+        "counts": {
+          "all": 971,
+          "geometry": 930,
+          "issues": 930,
+          "model_missing": 4,
+          "published": 971,
+          "unplaced": 4
+        }
       },
       {
-        "id": "fields",
-        "state": "partial",
-        "completed": 0,
-        "total": 0
+        "filter": "unplaced",
+        "status": 200,
+        "total": 4
       }
     ],
-    "ai_calls": 0,
-    "asset_publications": 0,
-    "scope": "Authenticated deployed HTTP checks, derivative report read/build only; no full workflow or provider acceptance"
+    "binary_matches": true,
+    "frontend_index_matches": true,
+    "workspace_revision_unchanged": true,
+    "mutations": false,
+    "ai_requests": 0,
+    "limits": [
+      "Single sequential API samples, not P95/concurrency or full live browser acceptance"
+    ]
   },
-  "url": "http://localhost:5180/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/kickoff/sources",
   "agent_implemented": false,
-  "limits": [
-    "Targeted authenticated source HTTP verification, not full workflow/provider/P95 acceptance",
-    "Historical candidate matching does not supply missing original field mappings"
-  ]
+  "url": "http://localhost:5180/p/proj-6e5d54e6-f8e8-42c8-97ad-6868959f89db/kickoff/review"
 }
