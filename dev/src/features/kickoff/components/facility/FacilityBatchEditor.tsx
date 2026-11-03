@@ -10,7 +10,7 @@ type Change = { target: string; field: string; before: string; after: string; gr
 type Plan = { rows: ModelRow[]; changes: Change[]; notes: string[]; revision: number; projectId: string; affected: number;  };
 const titles: Record<Mode, string> = { room: '批量关联机房', geometry: '批量容量与尺寸', height: '按型号补高度', coordinates: '按明确参数生成坐标' };
 
-export function FacilityBatchEditor({ mode, rackIds, close }: { mode: Mode; rackIds: string[]; close: () => void }) {
+export function FacilityBatchEditor({ mode, rackIds, close, geometryFields = ['capacity_u','width_mm','depth_mm'] }: { mode: Mode; rackIds: string[]; close: () => void; geometryFields?: string[] }) {
   const { state: s, api, run, can } = useWorkspace();
   const [values, setValues] = useState<Record<string, string>>({});
   const [overwrite, setOverwrite] = useState(false);
@@ -35,7 +35,8 @@ export function FacilityBatchEditor({ mode, rackIds, close }: { mode: Mode; rack
       let affected = 0;
       const set = (row: ModelRow, key: string, value: string, target: string, grid = '', existing?: string) => {
         const before = filled(row[key]) ? row[key] : existing ?? '';
-        if (!filled(value) || (!overwrite && filled(before)) || before === value) return;
+        const known = key === 'room_id' ? entityOptions(s, 'room_id').some(room => room.id === resolveEntity(entityOptions(s, 'room_id'), before)) : filled(before);
+        if (!filled(value) || (!overwrite && known) || before === value) return;
         row[key] = value;
         changes.push({ target, field: def.fields.find(f => f.key === key)?.label ?? key, before, after: value, grid });
       };
@@ -104,7 +105,7 @@ export function FacilityBatchEditor({ mode, rackIds, close }: { mode: Mode; rack
   return <Modal title={titles[mode]} description={mode === 'height' ? '只补充明确匹配型号的高度；已有设备和落位高度不覆盖。' : `对所选 ${racks.length} 个机柜赋值，先预览字段差异，再保存工程输入。`} close={() => { if (!saving) close(); }} wide>
     <fieldset disabled={saving} className="facility-batch-fields">
       {mode === 'room' && <Field label="关联机房"><EntityField label="批量关联机房" value={values.room_id ?? ''} options={entityOptions(s, 'room_id')} onChange={v => change('room_id', v)}/></Field>}
-      {mode === 'geometry' && <>{input('capacity_u', '机柜容量 U', '正整数，留空表示本次不赋值')}{input('width_mm', '机柜宽度 mm')}{input('depth_mm', '机柜深度 mm')}</>}
+      {mode === 'geometry' && <>{geometryFields.includes('capacity_u')&&input('capacity_u', '机柜容量 U', '正整数，留空表示本次不赋值')}{geometryFields.includes('width_mm')&&input('width_mm', '机柜宽度 mm')}{geometryFields.includes('depth_mm')&&input('depth_mm', '机柜深度 mm')}</>}
       {mode === 'height' && <><Field label="设备型号"><select value={values.model ?? ''} onChange={e => change('model', e.target.value)}><option value="">选择明确型号</option>{models.map(model => <option key={model} value={model}>{model}</option>)}</select></Field>{input('height_u', '设备高度 U', '正整数；型号按原值精确匹配')}<p className="facility-batch-impact">匹配 {matching.length} 台 · 缺高度 {missingHeight.length} 台 · 已有高度 {matching.length - missingHeight.length} 台</p></>}
       {mode === 'coordinates' && <>{input('frame', '坐标系', '由用户明确提供参考系标识')}<Field label="坐标与间距单位"><select value={values.unit ?? ''} onChange={e => change('unit', e.target.value)}><option value="">请选择单位</option><option value="mm">毫米 mm</option><option value="cm">厘米 cm</option><option value="m">米 m</option></select></Field>{input('rows', '行数')}{input('columns', '列数')}<Field label="机柜排列方向"><select value={values.order ?? ''} onChange={e => change('order', e.target.value)}><option value="">请选择排列方式</option><option value="row">先填满一行，再向下一行</option><option value="column">先填满一列，再向下一列</option></select></Field>{input('origin_x', '第 1 行第 1 列起点 X')}{input('origin_y', '第 1 行第 1 列起点 Y')}{input('spacing_x', '列坐标步距 ΔX', '相邻机柜同一参考点的坐标差，非净距；负数表示反向')}{input('spacing_y', '行坐标步距 ΔY', '相邻行同一参考点的坐标差，非净距；负数表示反向')}</>}
       {mode !== 'height' && <label className="facility-overwrite"><input type="checkbox" checked={overwrite} onChange={e => { setOverwrite(e.target.checked); setPlan(undefined); }}/>明确覆盖已有值（默认关闭）</label>}
