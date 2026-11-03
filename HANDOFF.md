@@ -8,6 +8,12 @@
 - 接续先读本节，再按`docs/REAL-API-CONTRACTS.md`、模块文档和`docs/flows-redesign/implementation.md`定位。不要再参考下方“独立作业分支/旧部署目录继续开发”的历史说明。
 - 清理清单与原分支SHA：`docs/git-baseline-20261102.json`；整合说明：`docs/integration-20261102.md`。既有未验收/真机限制维持原记录。
 
+## 已完成里程碑事件：BOM菜单退役并统一跳转智能开局
+
+用户已授权按PERFORMANCE-REMEDIATION.txt实施整改。BOM菜单及全局模块搜索入口移除，旧/p/:projectId/deploy/bom/*、旧provision/bom及/bom路径统一重定向到对应项目kickoff总览/资料页；新建项目与项目总览入口直接进入kickoff，沿用ProjectContext/RBAC。旧BOM后端及历史事实不删除。应用修改尚未部署；最终类型检查和定向验证随本轮整改统一执行。
+
+性能整改正在实施：拓扑SQL、inventory分页/完整性、kickoff装载及来源展示分别推进，原只读诊断记录保留为修复前证据。
+
 ## 已完成里程碑事件：MM规模性能与CMDB/拓扑只读诊断
 
 用户要求先给整改方案，尚未授权本轮实施。线上仍9a3e03b，业务代码、数据库与运行配置未修改，无新导入或AI调用。当前MM含971设备/14308端口/7154线缆/59已入库机柜，3笔published回执；不能将此前写入回读验收当作规模性能与拓扑可用验收。
