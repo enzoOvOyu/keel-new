@@ -62,12 +62,12 @@ export function SourceAgentPanel({sourceId,sourceName,onResult,children}:{source
   </div>
 
    <div className="source-task-history"><div className="source-task-history-heading"><b>AI 执行记录</b><Button kind="ghost" onClick={()=>setTaskRetry(v=>v+1)}>刷新</Button></div>
-    {!api.sourceTasks?<p className="muted">任务记录接口尚未接入</p>:tasksError?<Notice tone="error">{tasksError}</Notice>:tasksLoading?<p role="status">正在读取任务记录…</p>:tasks?.items.length?tasks.items.map(task=><div key={task.id} title={task.id} className={'source-task-row '+(selectedTask===task.id?'selected':'')}>
+    <div className="source-task-scroll">{!api.sourceTasks?<p className="muted">任务记录接口尚未接入</p>:tasksError?<Notice tone="error">{tasksError}</Notice>:tasksLoading?<p role="status">正在读取任务记录…</p>:tasks?.items.length?tasks.items.map(task=><div key={task.id} title={task.id} className={'source-task-row '+(selectedTask===task.id?'selected':'')}>
      <div><b>{task.kind==='analysis'?'资料分析':'候选采用'}</b><span>{(task.state==='pending'||task.state==='running')&&<LoaderCircle size={12} className="source-task-spinner" aria-hidden="true"/>}{taskState(task.state)}</span></div><small>{formatDate(task.createdAt)}</small>
      {task.errorCode&&<p>{apiError(task.errorCode)}</p>}
      <button className="text-link" onClick={()=>setSelectedTask(task.id)}>资料理解与候选证据</button>
     </div>):<p className="muted">暂无任务记录</p>}
-    {tasks&&tasks.total>0&&<div className="source-task-pagination"><span>共 {tasks.total} 次任务</span><Button kind="ghost" disabled={tasksLoading||taskOffset===0} onClick={()=>setTaskOffset(v=>Math.max(0,v-5))}>上一页</Button><Button kind="ghost" disabled={tasksLoading||taskOffset+tasks.limit>=tasks.total} onClick={()=>setTaskOffset(v=>v+5)}>下一页</Button></div>}
+    </div>{tasks&&tasks.total>0&&<div className="source-task-pagination"><span>共 {tasks.total} 次任务</span><Button kind="ghost" disabled={tasksLoading||taskOffset===0} onClick={()=>setTaskOffset(v=>Math.max(0,v-5))}>上一页</Button><Button kind="ghost" disabled={tasksLoading||taskOffset+tasks.limit>=tasks.total} onClick={()=>setTaskOffset(v=>v+5)}>下一页</Button></div>}
    </div>
   </aside>
   </div>
@@ -77,17 +77,16 @@ export function SourceAgentPanel({sourceId,sourceName,onResult,children}:{source
    <div className="agent-domain-options">{domains.map(d=><label key={d.id}><input type="checkbox" checked={selected.includes(d.id)} onChange={e=>setSelected(v=>e.target.checked?[...v,d.id]:v.filter(x=>x!==d.id))}/>{d.label}</label>)}</div>
    <div className="actions"><Button onClick={()=>setScopeOpen(false)}>取消</Button><Button kind="primary" disabled={!selected.length||busy||running||adopting||!can('bom:import')} onClick={()=>void start(selected)}>分析所选内容</Button></div>
   </Modal>}
-  {report&&report.state!=='idle'&&!!(report.missing.length||report.coverage.length||report.drafts.length)&&<details className="source-analysis-results">
-   <summary>识别结果 <span>{report.drafts.length} 类待核对候选 · {report.missingTotal??report.missing.length} 项待补充</span></summary>
+  {report&&report.state!=='idle'&&!!(report.missing.length||report.coverage.length||report.drafts.length)&&<section className="source-analysis-results" aria-label="识别结果">
+   <div className="source-results-heading"><b>识别结果</b> <span>{report.drafts.length} 类待核对候选 · {report.missingTotal??report.missing.length} 项待补充</span></div>
   {!!report?.missing.length&&<Notice tone="warning"><details><summary>{report.missingTotal??report.missing.length} 项缺失或未覆盖信息（当前显示 {report.missing.length} 项）</summary>{report.missing.map((message,i)=><p key={i}>{message}</p>)}</details></Notice>}
-  {!!report?.coverage.length&&<details className="agent-region-coverage"><summary>查看区域覆盖结果与原因（当前显示 {report.coverage.length}/{report.coverageTotal??report.coverage.length} 项）</summary><DataTable data={report.coverage} pageSize={5} columns={[{accessorKey:'region',header:'区域'},{id:'state',header:'处理结果',cell:({row})=>({complete:'已覆盖',ready:'已就绪',needs_input:'待补充',unsupported:'暂不支持',not_applicable:'不适用'}[row.original.state]??row.original.state)},{accessorKey:'rows',header:'候选行数'},{accessorKey:'reason',header:'依据或未完成原因'}]}/></details>}
   {!!report?.drafts.length&&<><DataTable data={report.drafts} pageSize={6} columns={[
    {id:'select',header:'采用',enableSorting:false,cell:({row})=><input type="checkbox" aria-label={'采用 '+row.original.tableId} disabled={adopting||!row.original.rowCount||report.state!=='succeeded'} checked={tables.includes(row.original.tableId)} onChange={e=>setTables(v=>e.target.checked?[...v,row.original.tableId]:v.filter(x=>x!==row.original.tableId))}/>},
    {id:'table',header:'候选内容',cell:({row})=>tableById(row.original.tableId)?.name||({devices:'设备',ports:'端口',connections:'双端连接',components:'组件'}[row.original.tableId]??row.original.tableId)},
    {accessorKey:'rowCount',header:'候选数量'},{id:'issues',header:'核对事项',cell:({row})=>row.original.issues.length+' 项（预览范围）'},
    {id:'view',header:'来源与内容',cell:({row})=><Button kind="ghost" onClick={()=>{setPreviewAnalysis(undefined);setPreview(row.original.tableId)}}>核对候选</Button>},
   ]}/><div className="actions"><span className="muted small-copy">仅补充新增和空字段，已有值保留；采用不等于CMDB发布。</span><Button kind="primary" disabled={adopting||running||!tables.length||report.state!=='succeeded'||!can('bom:edit')} onClick={()=>{if(report.jobId&&!adopting)adoption.mutate({jobId:report.jobId,tableIds:tables})}}>{adopting&&<LoaderCircle size={14} className="source-task-spinner" aria-hidden="true"/>}{adopting?'正在采用…':'确认采用所选候选'}</Button></div></>}
-  </details>}
+  </section>}
   {selectedTask&&<Modal drawer title="资料理解与候选证据" description={`所选任务 ${selectedTask} · ${sourceName}`} close={()=>setSelectedTask(undefined)}>
    {taskLoading&&<p role="status">正在读取任务日志…</p>}
    {taskError&&<Notice tone="error">{taskError}<Button onClick={()=>setTaskRetry(v=>v+1)}>重新读取</Button></Notice>}
