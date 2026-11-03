@@ -7580,6 +7580,42 @@ export interface components {
             total: number;
             hasMore: boolean;
         };
+        KickoffReviewSignal: {
+            code: string;
+            label: string;
+            /** @enum {string} */
+            severity: "block" | "warning" | "info";
+            impact: string;
+            action: string;
+        };
+        KickoffReviewOption: {
+            value: string;
+            label: string;
+        };
+        KickoffReviewFacts: {
+            type: string;
+            model: string;
+            serial: string;
+            ownerId: string;
+            ownerName: string;
+            rackId: string;
+            rackName: string;
+            room: string;
+            mac: string;
+            speed: string;
+            role: string;
+            localPort: string;
+            peerName: string;
+            peerPort: string;
+            medium: string;
+            slot: string;
+            startU: number | null;
+            heightU: number | null;
+            capacityU: number | null;
+            portCount: number;
+            connectionCount: number;
+            componentCount: number;
+        };
         KickoffReviewRow: {
             id: string;
             name: string;
@@ -7587,6 +7623,8 @@ export interface components {
             reference: string;
             location: string;
             state: string;
+            facts: components["schemas"]["KickoffReviewFacts"];
+            signals: components["schemas"]["KickoffReviewSignal"][];
             evidence: components["schemas"]["KickoffEvidence"];
         };
         KickoffReviewPage: {
@@ -7595,6 +7633,16 @@ export interface components {
             total: number;
             offset: number;
             limit: number;
+            /** @description Overlapping quick-filter counts over all rows matching search and facet filters, not just the current page. */
+            counts: {
+                [key: string]: number;
+            };
+            facets: {
+                type: components["schemas"]["KickoffReviewOption"][];
+                model: components["schemas"]["KickoffReviewOption"][];
+                rack: components["schemas"]["KickoffReviewOption"][];
+                source: components["schemas"]["KickoffReviewOption"][];
+            };
             hasMore: boolean;
         };
         KickoffObjectContext: {
@@ -18767,7 +18815,13 @@ export interface operations {
                 revision?: number;
                 q?: string;
                 issues?: boolean;
-                sort?: "name" | "reference" | "location" | "state";
+                /** @description Quick filter, applied after search and facets. Counts reflect search and facets before this filter. */
+                filter?: "all" | "issues" | "blocked" | "unplaced" | "geometry" | "model_missing" | "ready" | "published" | "unconnected" | "occupied" | "endpoint_missing" | "spec_missing";
+                type?: string;
+                model?: string;
+                rack?: string;
+                source?: string;
+                sort?: "name" | "reference" | "location" | "state" | "model" | "speed";
                 desc?: boolean;
             };
             header?: never;

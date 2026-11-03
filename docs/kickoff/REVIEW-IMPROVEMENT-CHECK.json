@@ -1,0 +1,49 @@
+{
+  "status": "implemented_not_deployed",
+  "scope": "Kickoff review five tabs and existing EvidenceDrawer only; read projection/UI changes, no migrations, asset writes or provider requests",
+  "go_tests": {
+    "command": "go test ./cmd/api -run '^TestKickoffReview' -count=1",
+    "status": "PASS",
+    "cases": [
+      "geometry gaps stay visible without blocking device identity publication",
+      "exact object publication instead of parent status inference",
+      "separate port identity and speed, physical port degree and repeated MAC findings",
+      "full-result filter counts/facets before pagination",
+      "unsupported filter rejection",
+      "overlap and parent identity conflict emphasis"
+    ]
+  },
+  "frontend_build": "PASS: npm run build (TypeScript + Vite), final five-tab and current-page sidebar implementation",
+  "frontend_protocol_replay": {
+    "status": "PASS",
+    "scope": "Local built frontend with synthetic API protocol responses; no deployed MM mutations or AI calls",
+    "checks": [
+      "five review tabs",
+      "SN displayed once in list and Drawer",
+      "explicit port-name and speed columns in list and Drawer",
+      "missing rack emphasized with impact",
+      "server pagination",
+      "quick filters and counts",
+      "type facet request",
+      "URL filters preserved on Drawer close",
+      "current-page findings sidebar and explicit publication status labels",
+      "zero fixture loads or page errors"
+    ],
+    "requests": 8,
+    "pageErrors": 0,
+    "fixtureRequests": 0
+  },
+  "limits": [
+    "Synthetic frontend API protocol replay is not deployed HTTP or MM acceptance",
+    "Findings describe engineering data quality; unconnected is not observed link-down",
+    "Geometry findings do not change existing publication checks",
+    "Current environment remains af63cb3",
+    "Connection type/model/rack facet values currently describe the local endpoint; no inferred logical network configuration"
+  ],
+  "api_documentation_check": "PASS: 167 registered operations",
+  "visual_check": {
+    "status": "PASS",
+    "scope": "Built frontend, synthetic data only; 1720px desktop. Existing shell, table density, right sidebar, signal emphasis and independent status labels retained.",
+    "screenshot": "docs/kickoff/screenshots/review-improvement-synthetic.png"
+  }
+}

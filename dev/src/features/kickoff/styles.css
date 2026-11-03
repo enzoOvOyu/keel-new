@@ -48,3 +48,34 @@
 .kickoff-workspace .source-mappings span{font-size:10px;border:1px solid var(--border);border-radius:4px;padding:4px 6px}
 
 .kickoff-workspace .sheet-preview td.candidate-cell{background:var(--amber-bg);color:var(--amber);box-shadow:inset 0 -1px 0 var(--amber)}
+
+/* Review: separate identity, specification and engineering findings. */
+.kickoff-workspace .review-quick-filters{display:flex;gap:6px;flex-wrap:wrap;padding:14px 16px 10px;border-bottom:1px solid var(--border)}
+.kickoff-workspace .review-quick-filters button{display:flex;align-items:center;gap:8px;padding:6px 9px;border:1px solid var(--border);border-radius:6px;background:var(--surface,#fff);color:var(--muted);font-size:12px}
+.kickoff-workspace .review-quick-filters button.active{border-color:var(--green);color:var(--green);background:var(--green-soft)}
+.kickoff-workspace .review-quick-filters b{font-size:11px;font-variant-numeric:tabular-nums}
+.kickoff-workspace .review-facets{display:flex;gap:10px;align-items:end;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--border)}
+.kickoff-workspace .review-facets label{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--muted);min-width:100px;flex:1;max-width:220px}
+.kickoff-workspace .review-facets select{height:30px;padding:3px 7px;max-width:100%;font-size:12px;border:1px solid var(--border);border-radius:5px;background:white;color:var(--text)}
+.kickoff-workspace .review-page{position:relative;min-height:180px}
+.kickoff-workspace .review-loading{position:absolute;inset:50px 0 0;z-index:2;display:flex;align-items:flex-start;justify-content:center;padding-top:40px;background:rgba(255,255,255,.92);color:var(--muted);font-size:12px}
+.kickoff-workspace .review-row-signals{min-width:180px;max-width:290px;display:flex;flex-direction:column;gap:5px}
+.kickoff-workspace .review-row-signals>div{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.kickoff-workspace .review-row-signals>small{font-size:11px;line-height:1.5;white-space:normal;color:var(--muted)}
+.kickoff-workspace .review-signal{display:inline-flex;align-items:center;gap:3px;padding:2px 5px;font-size:11px;line-height:1.5;border-radius:4px;white-space:nowrap;background:#fff5e3;color:#9a6009}
+.kickoff-workspace .review-signal.block{background:#fff0ee;color:#b53429}
+.kickoff-workspace .review-signal.info{background:#eef2f6;color:#526174}
+.kickoff-workspace .review-clear{font-size:11px;color:var(--muted)}
+.kickoff-workspace .review-relations{font-size:11px;white-space:nowrap}
+.kickoff-workspace .review-count-link{font-variant-numeric:tabular-nums;color:var(--green);text-decoration:underline;text-underline-offset:3px}
+.kickoff-workspace .review-table .table-scroll table{min-width:1100px}
+.kickoff-workspace .detail-findings{display:flex;flex-direction:column;gap:8px;margin:0 0 18px}
+.kickoff-workspace .detail-finding{border-left:3px solid #d5a23f;background:#fff9ed;padding:9px 11px;font-size:12px}
+.kickoff-workspace .detail-finding.block{border-color:#cc5147;background:#fff3f1}
+.kickoff-workspace .detail-finding p{margin:4px 0;color:var(--muted);font-size:11px;line-height:1.6}
+.kickoff-workspace .detail-identifiers{margin:18px 0;color:var(--muted);font-size:11px}
+.kickoff-workspace .detail-identifiers summary{cursor:pointer;margin-bottom:8px}
+.kickoff-workspace .detail-identifiers code{overflow-wrap:anywhere;user-select:all}
+.kickoff-workspace .detail-port-list{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
+.kickoff-workspace .detail-port-list th,.kickoff-workspace .detail-port-list td{text-align:left;padding:8px;border-bottom:1px solid var(--border)}
+.kickoff-workspace .detail-port-list th{font-size:11px;color:var(--muted);font-weight:500}

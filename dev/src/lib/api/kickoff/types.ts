@@ -70,8 +70,14 @@ export interface KickoffAPI {
   calculate(domain: 'cabling' | 'power'): Promise<Calculation>;
 }
 
-export interface ReviewRow {id:string;name:string;description:string;reference:string;location:string;state:string;evidence:Evidence}
-export interface ReviewPage {revision:number;rows:ReviewRow[];total:number;offset:number;limit:number;hasMore:boolean}
+export interface ReviewSignal {code:string;label:string;severity:'block'|'warning'|'info';impact:string;action:string}
+export interface ReviewFacts {
+ type:string;model:string;serial:string;ownerId:string;ownerName:string;rackId:string;rackName:string;room:string;mac:string;speed:string;role:string;localPort:string;peerName:string;peerPort:string;medium:string;slot:string;
+ startU:number|null;heightU:number|null;capacityU:number|null;
+ portCount:number;connectionCount:number;componentCount:number;
+}
+export interface ReviewRow {id:string;name:string;description:string;reference:string;location:string;state:string;evidence:Evidence;facts:ReviewFacts;signals:ReviewSignal[]}
+export interface ReviewPage {revision:number;rows:ReviewRow[];total:number;offset:number;limit:number;hasMore:boolean;counts:Record<string,number>;facets:Record<'type'|'model'|'rack'|'source',{value:string;label:string}[]>}
 
 export interface SourceUnderstanding {
  sourceId:string; revisionId:string; state:'historical'|'partial'|'unsupported'; origin:'history'|'none';

@@ -384,6 +384,28 @@ paths:
           in: query
           schema: &a4
             type: boolean
+        - name: filter
+          in: query
+          description: Quick filter, applied after search and facets. Counts reflect search and facets before this filter.
+          schema:
+            type: string
+            enum: [all, issues, blocked, unplaced, geometry, model_missing, ready, published, unconnected, occupied, endpoint_missing, spec_missing]
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: model
+          in: query
+          schema:
+            type: string
+        - name: rack
+          in: query
+          schema:
+            type: string
+        - name: source
+          in: query
+          schema:
+            type: string
         - name: sort
           in: query
           schema:
@@ -393,6 +415,8 @@ paths:
               - reference
               - location
               - state
+              - model
+              - speed
         - name: desc
           in: query
           schema: *a4
@@ -19931,6 +19955,86 @@ components:
         - limit
         - total
         - hasMore
+    KickoffReviewSignal:
+      type: object
+      additionalProperties: false
+      properties:
+        code:
+          type: string
+        label:
+          type: string
+        severity:
+          type: string
+          enum: [block, warning, info]
+        impact:
+          type: string
+        action:
+          type: string
+      required: [code, label, severity, impact, action]
+    KickoffReviewOption:
+      type: object
+      additionalProperties: false
+      properties:
+        value:
+          type: string
+        label:
+          type: string
+      required: [value, label]
+    KickoffReviewFacts:
+      type: object
+      additionalProperties: false
+      properties:
+        type:
+          type: string
+        model:
+          type: string
+        serial:
+          type: string
+        ownerId:
+          type: string
+        ownerName:
+          type: string
+        rackId:
+          type: string
+        rackName:
+          type: string
+        room:
+          type: string
+        mac:
+          type: string
+        speed:
+          type: string
+        role:
+          type: string
+        localPort:
+          type: string
+        peerName:
+          type: string
+        peerPort:
+          type: string
+        medium:
+          type: string
+        slot:
+          type: string
+        startU:
+          type: integer
+          nullable: true
+        heightU:
+          type: integer
+          nullable: true
+        capacityU:
+          type: integer
+          nullable: true
+        portCount:
+          type: integer
+          minimum: 0
+        connectionCount:
+          type: integer
+          minimum: 0
+        componentCount:
+          type: integer
+          minimum: 0
+      required: [type, model, serial, ownerId, ownerName, rackId, rackName, room, mac, speed, role, localPort, peerName, peerPort, medium, slot, startU, heightU, capacityU, portCount, connectionCount, componentCount]
     KickoffReviewRow:
       type: object
       additionalProperties: false
@@ -19942,6 +20046,12 @@ components:
         reference: *kickoffRead_a2_4
         location: *kickoffRead_a2_4
         state: *kickoffRead_a2_4
+        facts:
+          $ref: "#/components/schemas/KickoffReviewFacts"
+        signals:
+          type: array
+          items:
+            $ref: "#/components/schemas/KickoffReviewSignal"
         evidence:
           $ref: "#/components/schemas/KickoffEvidence"
       required:
@@ -19952,6 +20062,8 @@ components:
         - location
         - state
         - evidence
+        - facts
+        - signals
     KickoffReviewPage:
       type: object
       additionalProperties: false
@@ -19966,6 +20078,33 @@ components:
         total: *kickoffRead_a2_5
         offset: *kickoffRead_a2_5
         limit: *kickoffRead_a2_5
+        counts:
+          type: object
+          description: Overlapping quick-filter counts over all rows matching search and facet filters, not just the current page.
+          additionalProperties:
+            type: integer
+            minimum: 0
+        facets:
+          type: object
+          additionalProperties: false
+          properties:
+            type:
+              type: array
+              items:
+                $ref: "#/components/schemas/KickoffReviewOption"
+            model:
+              type: array
+              items:
+                $ref: "#/components/schemas/KickoffReviewOption"
+            rack:
+              type: array
+              items:
+                $ref: "#/components/schemas/KickoffReviewOption"
+            source:
+              type: array
+              items:
+                $ref: "#/components/schemas/KickoffReviewOption"
+          required: [type, model, rack, source]
         hasMore:
           type: boolean
       required:
@@ -19975,6 +20114,8 @@ components:
         - offset
         - limit
         - hasMore
+        - counts
+        - facets
     KickoffObjectContext:
       type: object
       additionalProperties: false

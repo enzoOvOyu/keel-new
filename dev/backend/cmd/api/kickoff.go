@@ -130,18 +130,27 @@ func (s *Server) kickoffWorkspace(w http.ResponseWriter, r *http.Request) {
 		view = snapshot.detail()
 	}
 	if r.URL.Query().Get("section") == "review" {
-		ids := []string{}
-		rows, err := tx.Query(ctx, `SELECT DISTINCT o.entity_id::text FROM kickoff_publication p JOIN kickoff_publication_object o ON o.publication_id=p.id WHERE p.project_id=$1 AND p.state='published' AND o.kind='device'`, s.project)
+		published := kickoff.Publication{State: "published"}
+		rows, err := tx.Query(ctx, `SELECT DISTINCT o.kind,o.entity_id::text FROM kickoff_publication p JOIN kickoff_publication_object o ON o.publication_id=p.id WHERE p.project_id=$1 AND p.state='published'`, s.project)
 		if err != nil {
 			fail(w, 500, "KICKOFF_PUBLICATION_UNAVAILABLE")
 			return
 		}
 		for rows.Next() {
-			var id string
-			if err = rows.Scan(&id); err != nil {
+			var kind, id string
+			if err = rows.Scan(&kind, &id); err != nil {
 				break
 			}
-			ids = append(ids, id)
+			switch kind {
+			case "device":
+				published.DeviceIDs = append(published.DeviceIDs, id)
+			case "port":
+				published.PortIDs = append(published.PortIDs, id)
+			case "component":
+				published.ComponentIDs = append(published.ComponentIDs, id)
+			case "connection":
+				published.ConnectionIDs = append(published.ConnectionIDs, id)
+			}
 		}
 		if err == nil {
 			err = rows.Err()
@@ -151,7 +160,7 @@ func (s *Server) kickoffWorkspace(w http.ResponseWriter, r *http.Request) {
 			fail(w, 500, "KICKOFF_PUBLICATION_UNAVAILABLE")
 			return
 		}
-		kickoffReviewPage(w, r, view, []kickoff.Publication{{State: "published", DeviceIDs: ids}}, revision)
+		kickoffReviewPage(w, r, view, []kickoff.Publication{published}, revision)
 		return
 	}
 	if r.URL.Query().Get("section") == "context" {

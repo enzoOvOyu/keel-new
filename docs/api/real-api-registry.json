@@ -2404,7 +2404,8 @@
       "limitations": "Suggested latency/payload budgets not fully met; no FPS/concurrent load or full-module acceptance",
       "deployed_revision": "686e9ead0c977d29baeabbbe1c082965ba77e312",
       "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
-      "module": "kickoff"
+      "module": "kickoff",
+      "pending_source_changes": "Typed review facts/signals, full-result filter counts/facets, explicit object publication receipts; implemented in dev, not deployed; see docs/kickoff/REVIEW-IMPROVEMENT-CHECK.json"
     },
     {
       "method": "post",
