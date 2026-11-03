@@ -248,7 +248,7 @@ func (s *Server) kickoffWorkspace(w http.ResponseWriter, r *http.Request) {
 		if sources[i].State == "recognized" {
 			sources[i].State = "historical"
 		}
-		sources[i].Regions, err = loadKickoffRegions(ctx, tx, sources[i].ID)
+		sources[i].Regions, err = snapshot.sourceRegions(ctx, tx, sources[i].ID)
 		if err != nil {
 			fail(w, 500, "KICKOFF_REGIONS_UNAVAILABLE")
 			return

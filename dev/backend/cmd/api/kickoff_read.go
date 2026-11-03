@@ -20,6 +20,8 @@ var kickoffReads = struct {
 }{entries: map[string]*kickoffRead{}}
 
 type kickoffRead struct {
+	regionsMu                  sync.Mutex
+	regions                    map[string][]kickoffRegion
 	capabilitiesMu             sync.Mutex
 	capabilitiesKey            string
 	capabilities               []map[string]any
@@ -145,4 +147,27 @@ func kickoffTypedPage(w http.ResponseWriter, r *http.Request, read *kickoffRead,
 	payload["page"] = map[string]any{"section": section, "offset": offset, "limit": limit, "total": items.Len(), "hasMore": end < items.Len()}
 	respond(w, 200, payload)
 	return true
+}
+
+// Historical sheet extents are derived from immutable workbook contents. Avoid
+// expanding the entire workbook JSON again on every workspace navigation.
+func (v *kickoffRead) sourceRegions(ctx context.Context, q engineeringQuery, source string) ([]kickoffRegion, error) {
+	var head string
+	if err := q.QueryRow(ctx, `SELECT COALESCE(head_revision_id::text,'') FROM eng_source WHERE id::text=$1`, source).Scan(&head); err != nil {
+		return loadKickoffRegions(ctx, q, source)
+	}
+	key := source + ":" + head
+	v.regionsMu.Lock()
+	defer v.regionsMu.Unlock()
+	if regions, ok := v.regions[key]; ok {
+		return regions, nil
+	}
+	regions, err := loadKickoffRegions(ctx, q, source)
+	if err == nil {
+		if v.regions == nil {
+			v.regions = map[string][]kickoffRegion{}
+		}
+		v.regions[key] = regions
+	}
+	return regions, err
 }
