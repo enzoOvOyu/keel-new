@@ -7791,6 +7791,11 @@ export interface components {
                 start_row: number;
                 end_row: number;
             };
+            relationshipReason?: string;
+            relationshipEvidence?: {
+                sheet: string;
+                cell: string;
+            }[];
             normalizationEvidence?: components["schemas"]["KickoffAgentNormalizationEvidence"];
             normalization?: string;
             classification?: string;

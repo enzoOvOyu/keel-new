@@ -24,14 +24,15 @@ type EngineeringCheckpoint struct {
 	PendingDrafts   map[string]engineering.EngineeringProposal `json:"pending_drafts,omitempty"`
 }
 type EngineeringToolHooks struct {
-	SourceHash  string
-	Resume      *EngineeringCheckpoint
-	Checkpoint  func(context.Context, EngineeringCheckpoint) error
-	Artifact    func(context.Context, string, string, any) error
-	Attributes  []engineering.AttributeDefinition
-	Names       []excelize.DefinedName
-	ProposeRule func(context.Context, engineering.CalculationRule) (engineering.RuleView, error)
-	Calculate   func(context.Context, *engineering.VersionReference, []engineering.FormulaCell, []engineering.NamedValue) (engineering.CalculationPage, error)
+	VerifyWorkbook func(context.Context) (map[string]KickoffVerifiedCell, error)
+	SourceHash     string
+	Resume         *EngineeringCheckpoint
+	Checkpoint     func(context.Context, EngineeringCheckpoint) error
+	Artifact       func(context.Context, string, string, any) error
+	Attributes     []engineering.AttributeDefinition
+	Names          []excelize.DefinedName
+	ProposeRule    func(context.Context, engineering.CalculationRule) (engineering.RuleView, error)
+	Calculate      func(context.Context, *engineering.VersionReference, []engineering.FormulaCell, []engineering.NamedValue) (engineering.CalculationPage, error)
 }
 
 func (p *Provider) engineeringCompletion(ctx context.Context, prompt string, input any, functions []any, trace func(string, string, string) error, artifacts ...func(context.Context, string, string, any) error) ([]byte, error) {

@@ -31,6 +31,9 @@ func TestUnknownPlacementOnlyBlocksPlacement(t *testing.T) {
 	if !hasIssue(issues, "PLACEMENT_U_REQUIRED") {
 		t.Fatal(issues)
 	}
+	if len(issues) != 1 || issues[0].Field != "height_u" || issues[0].Message != "占用高度未知或无效" {
+		t.Fatalf("known startU with missing height reported incorrectly: %+v", issues)
+	}
 	for _, i := range issues {
 		if i.PublishTarget != "CMDB_PLANNED_PLACEMENT" {
 			t.Fatalf("unrelated equipment/facility blocked: %+v", i)
@@ -38,6 +41,38 @@ func TestUnknownPlacementOnlyBlocksPlacement(t *testing.T) {
 	}
 	if m.Placements[0].HeightU != nil {
 		t.Fatal("invented device height")
+	}
+}
+func TestPlacementUValidationFields(t *testing.T) {
+	for _, tc := range []struct {
+		name          string
+		start, height *int
+		want          map[string]string
+	}{
+		{"missing start", nil, ptr(2), map[string]string{"start_u": "起始U未知或无效"}},
+		{"zero start", ptr(0), ptr(2), map[string]string{"start_u": "起始U未知或无效"}},
+		{"negative start", ptr(-1), ptr(2), map[string]string{"start_u": "起始U未知或无效"}},
+		{"zero height", ptr(1), ptr(0), map[string]string{"height_u": "占用高度未知或无效"}},
+		{"negative height", ptr(1), ptr(-1), map[string]string{"height_u": "占用高度未知或无效"}},
+		{"both missing", nil, nil, map[string]string{"start_u": "起始U未知或无效", "height_u": "占用高度未知或无效"}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			m := physical()
+			m.Placements[0].StartU, m.Placements[0].HeightU = tc.start, tc.height
+			// Incomplete U dimensions still defer capacity validation.
+			m.Facilities[2].CapacityU = nil
+			issues := ValidatePhysical(m)
+			got := map[string]string{}
+			for _, issue := range issues {
+				if issue.Code != "PLACEMENT_U_REQUIRED" || issue.PublishTarget != PlacementTarget {
+					t.Fatalf("unexpected issue: %+v", issue)
+				}
+				got[issue.Field] = issue.Message
+			}
+			if len(issues) != len(tc.want) || !reflect.DeepEqual(got, tc.want) {
+				t.Fatalf("got %+v, want %+v", issues, tc.want)
+			}
+		})
 	}
 }
 func TestPlanningGroupCannotBePlacedAsAnInstance(t *testing.T) {

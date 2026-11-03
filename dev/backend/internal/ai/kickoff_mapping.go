@@ -52,6 +52,9 @@ func validateKickoffMappings(w bom.Workbook, regions []KickoffRegion, step int, 
 				return fmt.Errorf("INVALID_BINDING: %s", b.Field)
 			}
 			fields[b.Field] = true
+			if b.Relationship != "" && b.Lookup != nil {
+				return fmt.Errorf("RELATION_LOOKUP_CONFLICT: %s", b.Field)
+			}
 			if b.Classification != "" {
 				allowed := map[string]bool{"server": true, "switch": true, "gpu": true, "nic": true}
 				axis := b.Classification == "rack_u_axis" && (b.Normalize == "u_scale_capacity" || b.Normalize == "u_grid_start" || b.Normalize == "u_grid_height")
@@ -100,6 +103,9 @@ func validateKickoffMappings(w bom.Workbook, regions []KickoffRegion, step int, 
 // Expansion runs locally against original cells. The model never returns raw
 // identity values or materialized rows and cannot invent missing source data.
 func expandKickoffRegion(w bom.Workbook, region KickoffRegion, m KickoffMapping) ([][]string, any, error) {
+	return expandKickoffRegionWithRelationships(w, region, m, nil)
+}
+func expandKickoffRegionWithRelationships(w bom.Workbook, region KickoffRegion, m KickoffMapping, relationships kickoffRelationIndex) ([][]string, any, error) {
 	table, _ := kickoffTable(m.Table)
 	sheet, _ := kickoffSheet(w, region.Sheet)
 	cells := map[[2]int]bom.Cell{}
@@ -177,6 +183,18 @@ func expandKickoffRegion(w bom.Workbook, region KickoffRegion, m KickoffMapping)
 				}
 				cell := read(rr, cc)
 				value := strings.TrimSpace(cell.Value)
+				var relationMatch *kickoffRelationMatch
+				if b.Relationship != "" {
+					matched, ok := relationships[b.Relationship][KickoffCellRef{sheet.Name, cell.Ref}]
+					if !ok {
+						value = ""
+						missing = append(missing, b.Field+":跨表关系未匹配或冲突（"+b.Relationship+"）")
+					} else {
+						relationMatch = &matched
+						cell = matched.Cell
+						value = strings.TrimSpace(cell.Value)
+					}
+				}
 				if b.Lookup != nil {
 					matches := lookupIndices[b.Field][value]
 					if len(matches) != 1 {
@@ -188,6 +206,11 @@ func expandKickoffRegion(w bom.Workbook, region KickoffRegion, m KickoffMapping)
 					}
 				}
 				refs[b.Field] = map[string]any{"sheet": cell.Sheet, "cell": cell.Ref, "formula": cell.Formula, "cached_value": cell.Value, "normalization": b.Normalize, "classification": b.Classification}
+				if relationMatch != nil {
+					refs[b.Field].(map[string]any)["normalization"] = "relationship:" + b.Relationship
+					refs[b.Field].(map[string]any)["relationship_evidence"] = relationMatch.Evidence
+					refs[b.Field].(map[string]any)["relationship_reason"] = relationMatch.Reason
+				}
 				if cell.Sensitive {
 					value = ""
 					missing = append(missing, b.Field+":敏感字段未导入")
@@ -207,6 +230,12 @@ func expandKickoffRegion(w bom.Workbook, region KickoffRegion, m KickoffMapping)
 						sourceColumn = b.Lookup.ValueColumn
 						headerStart = 1
 						dataStart = b.Lookup.StartRow
+					}
+					if relationMatch != nil {
+						source, _ = kickoffSheet(w, relationMatch.Cell.Sheet)
+						sourceColumn = relationMatch.Cell.Column
+						headerStart = 1
+						dataStart = relationMatch.DataStart
 					}
 					serialHeader := false
 					for _, header := range source.Cells {

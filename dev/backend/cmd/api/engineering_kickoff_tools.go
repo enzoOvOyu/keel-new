@@ -15,6 +15,9 @@ import (
 
 func (s *Server) kickoffToolHooks(ctx context.Context, source string, revision int, wb bom.Workbook) ai.EngineeringToolHooks {
 	hooks := ai.EngineeringToolHooks{}
+	hooks.VerifyWorkbook = func(ctx context.Context) (map[string]ai.KickoffVerifiedCell, error) {
+		return s.kickoffVerifyWorkbook(ctx, source, revision, wb)
+	}
 	hidden := map[string]bool{}
 	for _, sheet := range engineeringSafeWorkbook(wb).Sheets {
 		for _, cell := range sheet.Cells {

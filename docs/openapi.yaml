@@ -20560,6 +20560,16 @@ components:
             start_row: {type: integer}
             end_row: {type: integer}
           required: [sheet, key_column, value_column, start_row, end_row]
+        relationshipReason: {type: string}
+        relationshipEvidence:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              sheet: {type: string}
+              cell: {type: string}
+            required: [sheet, cell]
         normalizationEvidence: {$ref: "#/components/schemas/KickoffAgentNormalizationEvidence"}
         normalization: {type: string}
         classification: {type: string}

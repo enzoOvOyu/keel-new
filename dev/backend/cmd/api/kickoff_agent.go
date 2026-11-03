@@ -559,7 +559,6 @@ func kickoffAgentFailure(w http.ResponseWriter, err error) {
 // endpoint identities without asking the model to identify them again. No
 // specification, MAC, role, or component association is inferred.
 func kickoffAgentProjectEndpoints(values []ai.KickoffAgentCandidate) []ai.KickoffAgentCandidate {
-	devices := ai.KickoffAgentCandidate{TableID: "devices", Domain: "equipment", Rows: []map[string]string{}, Issues: []engineering.InputProblem{}, Evidence: []ai.KickoffAgentEvidence{}}
 	ports := ai.KickoffAgentCandidate{TableID: "ports", Domain: "equipment", Rows: []map[string]string{}, Issues: []engineering.InputProblem{}, Evidence: []ai.KickoffAgentEvidence{}}
 	seenDevice, seenPort := map[string]bool{}, map[string]bool{}
 	for _, c := range values {
@@ -596,9 +595,10 @@ func kickoffAgentProjectEndpoints(values []ai.KickoffAgentCandidate) []ai.Kickof
 					continue
 				}
 				if !seenDevice[serial] {
-					seenDevice[serial] = true
-					devices.Rows = append(devices.Rows, map[string]string{"serial": serial})
-					devices.Evidence = append(devices.Evidence, ai.KickoffAgentEvidence{Row: len(devices.Rows), Region: ref.Region, Sheet: ref.Sheet, SourceRow: ref.SourceRow, SourceColumn: ref.SourceColumn, Fields: map[string]ai.KickoffAgentCell{"serial": serialCell}, Missing: []string{"仅复用端口/连接中的明确设备身份，类型和型号仍待补充"}})
+					// An endpoint name/SN alone cannot promote a module, role or
+					// summary into equipment. The Agent must justify a device
+					// candidate with its cross-sheet assessment first.
+					continue
 				}
 				if name != "" && !seenPort[serial+"\x00"+name] {
 					portCell, hasPort := ref.Fields[side+"port"]
@@ -611,9 +611,6 @@ func kickoffAgentProjectEndpoints(values []ai.KickoffAgentCandidate) []ai.Kickof
 				}
 			}
 		}
-	}
-	if len(devices.Rows) > 0 {
-		values = append(values, devices)
 	}
 	if len(ports.Rows) > 0 {
 		values = append(values, ports)

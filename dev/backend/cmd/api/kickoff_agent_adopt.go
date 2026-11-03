@@ -451,12 +451,20 @@ func kickoffAgentMergePhysical(m *engineering.PhysicalModel, evidence *[]enginee
 				if row[field] == "" || cell.Cell == "" {
 					continue
 				}
-				id := engineering.StableID(source, "agent-field-evidence", entity+"/"+field+"/"+cell.Sheet+"/"+cell.Cell)
-				if knownEvidence[id] {
-					continue
+				refs := append([]ai.KickoffCellRef{{Sheet: cell.Sheet, Cell: cell.Cell}}, cell.RelationshipEvidence...)
+				for _, ref := range refs {
+					id := engineering.StableID(source, "agent-field-evidence", entity+"/"+field+"/"+ref.Sheet+"/"+ref.Cell)
+					if knownEvidence[id] {
+						continue
+					}
+					knownEvidence[id] = true
+					ev := engineering.SourceEvidence{ID: id, SourceID: source, EntityID: entity, Sheet: ref.Sheet, Cell: ref.Cell, Field: field, Formula: cell.Formula && ref.Sheet == cell.Sheet && ref.Cell == cell.Cell}
+					if ev.Formula && cell.CalculationRunID != "" {
+						run := cell.CalculationRunID
+						ev.CalculationRunID = &run
+					}
+					*evidence = append(*evidence, ev)
 				}
-				knownEvidence[id] = true
-				*evidence = append(*evidence, engineering.SourceEvidence{ID: id, SourceID: source, EntityID: entity, Sheet: cell.Sheet, Cell: cell.Cell, Field: field, Formula: cell.Formula})
 			}
 		}
 	}
@@ -614,21 +622,82 @@ func kickoffAgentMergePhysical(m *engineering.PhysicalModel, evidence *[]enginee
 				continue
 			}
 			aid, bid := m.Ports[ap].EntityID, m.Ports[bp].EntityID
-			exists := false
-			for _, conn := range m.Connections {
-				if conn.APortID == aid || conn.ZPortID == aid || conn.APortID == bid || conn.ZPortID == bid {
-					exists = true
-					break
+			at, occupied := -1, false
+			for i, conn := range m.Connections {
+				exact := conn.APortID == aid && conn.ZPortID == bid || conn.APortID == bid && conn.ZPortID == aid
+				if exact {
+					if at >= 0 {
+						occupied = true
+					}
+					at = i
+				} else if conn.APortID == aid || conn.ZPortID == aid || conn.APortID == bid || conn.ZPortID == bid {
+					occupied = true
+				}
+				for _, patch := range conn.PatchPortIDs {
+					if patch == aid || patch == bid {
+						occupied = true
+					}
 				}
 			}
-			if exists {
+			if occupied {
 				continue
 			}
-			ids := []string{aid, bid}
-			sort.Strings(ids)
-			conn := engineering.PlannedConnection{EntityVersion: version("connection", strings.Join(ids, "/")), APortID: aid, ZPortID: bid, PatchPortIDs: []string{}}
-			m.Connections = append(m.Connections, conn)
+			if at < 0 {
+				ids := []string{aid, bid}
+				sort.Strings(ids)
+				at = len(m.Connections)
+				m.Connections = append(m.Connections, engineering.PlannedConnection{EntityVersion: version("connection", strings.Join(ids, "/")), APortID: aid, ZPortID: bid, PatchPortIDs: []string{}})
+			}
+			conn := &m.Connections[at]
+			// Includes both optic model source cells; a model alone does not establish
+			// an OpticDemand quantity or an observed installed transceiver.
 			addEvidence(conn.EntityID, row)
+			model, medium := strings.TrimSpace(row["cable_model"]), strings.TrimSpace(row["medium"])
+			length := engineering.Quantity{Value: strings.TrimSpace(row["cable_length_m"]), Unit: "m"}
+			lengthValue, lengthErr := strconv.ParseFloat(length.Value, 64)
+			hasLength := length.Validate() == nil && lengthErr == nil && lengthValue > 0
+			if model == "" && medium == "" && !hasLength {
+				continue
+			}
+			cableAt, count := -1, 0
+			for i, cable := range m.Cables {
+				if cable.ConnectionID == conn.EntityID {
+					cableAt = i
+					count++
+				}
+			}
+			// Unsegmented source rows cannot select a segment of a routed cable.
+			if count > 1 || len(conn.PatchPortIDs) > 0 {
+				continue
+			}
+			if cableAt < 0 {
+				cableAt = len(m.Cables)
+				m.Cables = append(m.Cables, engineering.CablePlan{EntityVersion: version("cable-plan", conn.EntityID), ConnectionID: conn.EntityID, Spec: engineering.CableSpec{ID: engineering.StableID(m.ProjectID, "cable-spec", conn.EntityID)}, Route: []engineering.RouteSegment{}})
+			}
+			cable := &m.Cables[cableAt]
+			addEvidence(cable.EntityID, row)
+			// Source estimates never change observed cable specifications or maturity.
+			if cable.Maturity == engineering.AsBuilt || cable.AsBuilt != nil {
+				continue
+			}
+			if cable.Spec.SourceModelLabel == "" {
+				cable.Spec.SourceModelLabel = model
+			}
+			if cable.Spec.Medium == "" {
+				cable.Spec.Medium = medium
+			}
+			if cable.Spec.ID == "" {
+				cable.Spec.ID = engineering.StableID(m.ProjectID, "cable-spec", conn.EntityID)
+			}
+			if cable.Estimated == nil && hasLength {
+				refs := []string{}
+				for _, e := range *evidence {
+					if e.EntityID == cable.EntityID && e.SourceID == source && e.Field == "cable_length_m" {
+						refs = append(refs, e.ID)
+					}
+				}
+				cable.Estimated = &engineering.LengthEvidence{Length: length, EvidenceIDs: refs}
+			}
 		}
 	}
 	// Attach original source evidence to each touched object, keeping existing IDs.

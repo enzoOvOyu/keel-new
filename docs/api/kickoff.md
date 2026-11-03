@@ -162,3 +162,7 @@ POST analysis/adopt返回202与KickoffAdoptionTask，不等待合并；任务复
 - 本轮仅实现及契约同步：按用户要求未运行Go编译/测试、HTTP或数据库验收；未部署、未提交，交由用户统一构建验证。完整日志不设分页；采用日志若未记录，后端不能补造。
 
 本轮任务记录接口已部署d2f9acc，真实项目列表及指定分析/采用详情GET通过。已有MM后台采用成功恢复；10类采用、4类保留，未运行新的AI分析或CMDB发布。
+
+### 关系推理Agent更新
+
+沿用分析启动/任务历史/候选/采用API。后台新增独立AI对象性质与关系调查，工具检验全行跨表候选后才展开事实；调用过程及简短依据进入既有任务日志。字段证据新增可选`relationshipEvidence`（sheet/cell）与`relationshipReason`，类型以OpenAPI为准。连接候选行可保留线缆型号/规划长度/介质及两端模块来源；人工采用才关联CablePlan，不写实装长度。详见[实施说明](../kickoff/RELATIONSHIP-AGENT.md)。本轮真实Provider/MM验收NOT RUN，部署不自动重跑历史任务。

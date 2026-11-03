@@ -251,7 +251,12 @@ func ValidatePhysical(m PhysicalModel) []ValidationIssue {
 		} else if p.InstallationType != "" && p.InstallationType != "u" {
 			issue("INSTALLATION_TYPE_INVALID", locTarget, "facility_placement", "installation_type", "安装方式须为u或non_u", p.EntityVersion)
 		} else if p.StartU == nil || p.HeightU == nil || *p.StartU <= 0 || *p.HeightU <= 0 {
-			issue("PLACEMENT_U_REQUIRED", locTarget, "facility_placement", "start_u", "起始U和占用高度未知或无效", p.EntityVersion)
+			if p.StartU == nil || *p.StartU <= 0 {
+				issue("PLACEMENT_U_REQUIRED", locTarget, "facility_placement", "start_u", "起始U未知或无效", p.EntityVersion)
+			}
+			if p.HeightU == nil || *p.HeightU <= 0 {
+				issue("PLACEMENT_U_REQUIRED", locTarget, "facility_placement", "height_u", "占用高度未知或无效", p.EntityVersion)
+			}
 		} else if rack.CapacityU == nil {
 			issue("PLACEMENT_CAPACITY_UNKNOWN", locTarget, "facility_placement", "rack_id", "机柜容量未知，不能确认落位未越界", p.EntityVersion)
 		} else if *p.StartU > *rack.CapacityU || *p.HeightU > *rack.CapacityU-*p.StartU+1 {

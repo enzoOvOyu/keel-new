@@ -73,6 +73,8 @@ func TestKickoffPartialProviderFailureAndDomainReuse(t *testing.T) {
 		case 1:
 			content = map[string]any{"regions": []KickoffRegion{region}, "missing_inputs": []string{}}
 		case 2:
+			content = KickoffRelationshipPlan{Entities: []KickoffEntityAssessment{{Region: region.ID, Kind: "placement", Reason: "rack drawing, not inventory", Evidence: []KickoffCellRef{{region.Sheet, "B1"}}}}, Relations: []KickoffRelation{}, Missing: []string{"drawing labels have no serial identity source"}}
+		case 3:
 			content = KickoffTaskResult{Mappings: []KickoffMapping{mapping}, Missing: []string{}}
 		default:
 			http.Error(w, "synthetic unavailable", 401)
