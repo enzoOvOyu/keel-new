@@ -1,4 +1,4 @@
-import {entries} from '../../app/registry';
+import {entries,isConstructionPath} from '../../app/registry';
 import type {ProjectScope} from './index';
 
 // Resolve the existing provider's scope before legacy data is read. No parallel context.
@@ -15,6 +15,7 @@ export function initialProjectScope(previous:ProjectScope,authorized:string[],pa
 
 // Unknown pages need no legacy data; registered real workspaces load their own APIs.
 export function requiresLegacyFixtures(pathname:string):boolean{
+ if(isConstructionPath(pathname))return false;
  const parts=pathname.split('/').filter(Boolean);
  const offset=parts[0]==='p'&&parts[2]==='deploy'?3:0;
  const entry=entries.find(e=>e.id===parts[offset]);

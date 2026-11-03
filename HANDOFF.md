@@ -26,6 +26,10 @@
 
 当前全平台仍遵守六阶段，但后续按模块授权实现和发布，不把这些剩余事项展开成一次全量开发。
 
+## 未完成功能入口清理（本地开发，未部署）
+
+保留部署项目、Kickoff、数据中心拓扑/机柜、CMDB、作业平台和完整平台设置。其余13个模块移除Mock子菜单及主路由页面挂载，统一显示“功能建设中”，旧子路由同样进入占位页，不触发legacy fixture加载或原模块轮询。移除通知中心合成告警及全局搜索的Mock工单入口。真实AI Provider旧入口转到平台设置。共享Provider、fixture和领域源码仍为保留模块/测试依赖，不进行整库删除；真实数据库、MinIO及独立Fabric工作区未修改。变更位于app/main.tsx、registry.ts、api/project-scope.ts及GlobalSearch.tsx。TypeScript检查、git diff --check和保留模块分派/部署项目页面逐字对比通过；未部署、未执行浏览器或真实业务回归。
+
 ## 验证和接续
 
 [真实API入口](docs/REAL-API-CONTRACTS.md)区分源码、部署和验证。最新主环境证据记录Kickoff/CMDB/拓扑只读API及少量真实页面；建议1s/500KB摘要与所有查询2s预算未全部达到，无P95/FPS/并发或现场全链验收。
