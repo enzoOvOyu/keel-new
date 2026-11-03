@@ -61,6 +61,14 @@ export function SourceAgentPanel({sourceId,sourceName,onResult,children}:{source
    </div>
   </div>
 
+   <div className="source-task-history"><div className="source-task-history-heading"><b>AI 执行记录</b><Button kind="ghost" onClick={()=>setTaskRetry(v=>v+1)}>刷新</Button></div>
+    {!api.sourceTasks?<p className="muted">任务记录接口尚未接入</p>:tasksError?<Notice tone="error">{tasksError}</Notice>:tasksLoading?<p role="status">正在读取任务记录…</p>:tasks?.items.length?tasks.items.map(task=><div key={task.id} title={task.id} className={'source-task-row '+(selectedTask===task.id?'selected':'')}>
+     <div><b>{task.kind==='analysis'?'资料分析':'候选采用'}</b><span>{(task.state==='pending'||task.state==='running')&&<LoaderCircle size={12} className="source-task-spinner" aria-hidden="true"/>}{taskState(task.state)}</span></div><small>{formatDate(task.createdAt)}</small>
+     {task.errorCode&&<p>{apiError(task.errorCode)}</p>}
+     <button className="text-link" onClick={()=>setSelectedTask(task.id)}>资料理解与候选证据</button>
+    </div>):<p className="muted">暂无任务记录</p>}
+    {tasks&&tasks.total>0&&<div className="source-task-pagination"><span>共 {tasks.total} 次任务</span><Button kind="ghost" disabled={tasksLoading||taskOffset===0} onClick={()=>setTaskOffset(v=>Math.max(0,v-5))}>上一页</Button><Button kind="ghost" disabled={tasksLoading||taskOffset+tasks.limit>=tasks.total} onClick={()=>setTaskOffset(v=>v+5)}>下一页</Button></div>}
+   </div>
   </aside>
   </div>
   {!supported&&<Notice tone="warning">当前自动分析支持 XLSX；其他格式保留为附件。</Notice>}
@@ -80,14 +88,6 @@ export function SourceAgentPanel({sourceId,sourceName,onResult,children}:{source
    {id:'view',header:'来源与内容',cell:({row})=><Button kind="ghost" onClick={()=>{setPreviewAnalysis(undefined);setPreview(row.original.tableId)}}>核对候选</Button>},
   ]}/><div className="actions"><span className="muted small-copy">仅补充新增和空字段，已有值保留；采用不等于CMDB发布。</span><Button kind="primary" disabled={adopting||running||!tables.length||report.state!=='succeeded'||!can('bom:edit')} onClick={()=>{if(report.jobId&&!adopting)adoption.mutate({jobId:report.jobId,tableIds:tables})}}>{adopting&&<LoaderCircle size={14} className="source-task-spinner" aria-hidden="true"/>}{adopting?'正在采用…':'确认采用所选候选'}</Button></div></>}
   </details>}
-   <div className="source-task-history"><div className="source-task-history-heading"><b>任务记录</b><Button kind="ghost" onClick={()=>setTaskRetry(v=>v+1)}>刷新</Button></div>
-    {!api.sourceTasks?<p className="muted">任务记录接口尚未接入</p>:tasksError?<Notice tone="error">{tasksError}</Notice>:tasksLoading?<p role="status">正在读取任务记录…</p>:tasks?.items.length?tasks.items.map(task=><div key={task.id} title={task.id} className={'source-task-row '+(selectedTask===task.id?'selected':'')}>
-     <div><b>{task.kind==='analysis'?'资料分析':'候选采用'}</b><span>{(task.state==='pending'||task.state==='running')&&<LoaderCircle size={12} className="source-task-spinner" aria-hidden="true"/>}{taskState(task.state)}</span></div><small>{formatDate(task.createdAt)}</small>
-     {task.errorCode&&<p>{apiError(task.errorCode)}</p>}
-     <button className="text-link" onClick={()=>setSelectedTask(task.id)}>资料理解与候选证据</button>
-    </div>):<p className="muted">暂无任务记录</p>}
-    {tasks&&tasks.total>0&&<div className="source-task-pagination"><span>共 {tasks.total} 次任务</span><Button kind="ghost" disabled={tasksLoading||taskOffset===0} onClick={()=>setTaskOffset(v=>Math.max(0,v-5))}>上一页</Button><Button kind="ghost" disabled={tasksLoading||taskOffset+tasks.limit>=tasks.total} onClick={()=>setTaskOffset(v=>v+5)}>下一页</Button></div>}
-   </div>
   {selectedTask&&<Modal drawer title="资料理解与候选证据" description={`所选任务 ${selectedTask} · ${sourceName}`} close={()=>setSelectedTask(undefined)}>
    {taskLoading&&<p role="status">正在读取任务日志…</p>}
    {taskError&&<Notice tone="error">{taskError}<Button onClick={()=>setTaskRetry(v=>v+1)}>重新读取</Button></Notice>}
