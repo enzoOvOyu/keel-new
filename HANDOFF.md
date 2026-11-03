@@ -97,3 +97,11 @@ API目录`/home/ubuntu/.local/state/keel-deployments/kickoff-cold-802a001`，前
 [文档整理记录](docs/DOCUMENTATION-REORGANIZATION.md)保留归档依据。来源页历史资料理解见[理解检查](docs/kickoff/HISTORY-UNDERSTANDING-CHECK.json)，核对页见[核对优化](docs/kickoff/REVIEW-IMPROVEMENT-CHECK.json)和[布局检查](docs/kickoff/REVIEW-COMPACT-CHECK.json)。最新入库页范围说明、选择操作、真实状态和右侧记录已发布；原确认按钮/弹窗逐字保留。Go覆盖判断与强制只读数据库SQL、前端构建、合成成功流程、真实MM页面预览/打开并取消确认均通过；见[入库范围检查](docs/kickoff/PUBLISH-SCOPE-CHECK.json)。实际项目修订和3条发布记录未改变，没有真实入库或AI调用。新增实际内容判断忽略修订/证据ID、输入版本号和行顺序，按设备及关联对象/相关输入比较已发布内容；808台无变化禁用，163台待增补可选。处理列始终有对应处理或查看详情入口。物理删除仍走CMDB变更，不声称本次执行了实际发布写入。待办在模块页与[未决项](docs/DECISIONS.md)维护。
 
 后续修改只读目标模块及调用链；完成后替换当前快照，不再向HANDOFF堆叠里程碑。历史全文在[归档](docs/archive/2026-11-03/previous/HANDOFF.md)。
+
+## 消费视图补录位置与返回缓存纠正（本轮）
+
+上轮按钮误放机柜清单，现移至五个消费视图资料状态之后，仅未满足行显示；按视图限定缺项、表与字段，连接修改沿用CMDB关系变更。曾尝试sessionStorage持久化完整结果，用户指出资源风险后已撤回，未部署；跨页面重载缓存仍待修复。工程保存修订变化及手动刷新仍更新检查。未改业务API、正式数据或Agent。部署与定向验证随后登记。
+
+环境中断：2026-11-03虚拟机已重启，原构建已不存在，未部署本轮UI。恢复时约13GB内存可用；上次启动日志存在09:30全局OOM且杀死Node进程，不能据此归因到尚未部署的浏览器缓存。先恢复原运行服务，不运行新构建或业务测试。
+
+恢复结果：启动原有keel-dev-postgres/redis/minio容器及0ee1b00前端/API运行脚本，5180首页与8081 healthz均200；约13.6GB可用内存。未重建镜像、构建前端或运行业务测试；本轮五视图补录代码仍在工作区未验收未部署，浏览器持久缓存方案已移除。
