@@ -176,7 +176,10 @@ func project(m engineering.PhysicalModel, ev []engineering.SourceEvidence, sourc
 				}
 			}
 			d.ManagementAddress = management[d.ID]
-			d.Role = roles[d.ID]
+			d.Role = e.Role
+			if roles[d.ID] != "" {
+				d.Role = roles[d.ID]
+			}
 			v.Devices = append(v.Devices, d)
 		} else if parent[e.EntityID] != "" {
 			v.Components = append(v.Components, Component{ID: e.EntityID, DeviceID: root(e.EntityID), Type: e.EquipmentType, Name: e.Label, Model: e.SourceModelLabel, Slot: slot[e.EntityID], Evidence: evidence(e.EntityID)})

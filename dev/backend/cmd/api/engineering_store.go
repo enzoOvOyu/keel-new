@@ -478,7 +478,7 @@ func (s *Server) saveEngineeringDraftTx(ctx context.Context, tx pgx.Tx, source s
 		if e = insertVersion(&v.EntityVersion, "equipment"); e != nil {
 			return "", e
 		}
-		_, e = tx.Exec(ctx, `INSERT INTO eng_equipment(revision_id,entity_id,equipment_type,model_ref,source_model_label,quantity,identity_kind,label,serial,height_u) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`, revision, v.EntityID, v.EquipmentType, v.ModelRef, v.SourceModelLabel, v.Quantity, v.IdentityKind, v.Label, v.Serial, v.HeightU)
+		_, e = tx.Exec(ctx, `INSERT INTO eng_equipment(revision_id,entity_id,equipment_type,model_ref,source_model_label,quantity,identity_kind,label,serial,height_u,role) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`, revision, v.EntityID, v.EquipmentType, v.ModelRef, v.SourceModelLabel, v.Quantity, v.IdentityKind, v.Label, v.Serial, v.HeightU, v.Role)
 		if e != nil {
 			return "", e
 		}

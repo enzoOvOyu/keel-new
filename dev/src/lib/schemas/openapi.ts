@@ -7858,7 +7858,9 @@ export interface components {
             domain: components["schemas"]["KickoffAnalysisDomain"];
             rowCount: number;
             previewLimit: number;
-            /** @description Full candidate rows eligible for adoption after validation. */
+            /** @description This table was adopted from this analysis; retain candidates and outstanding issues for traceability. */
+            adopted?: boolean;
+            /** @description Full candidate rows eligible for adoption after validation; zero after adoption. */
             applicableRowCount: number;
             baseVersion: number;
             rows: components["schemas"]["KickoffModelRow"][];
@@ -17295,6 +17297,8 @@ export interface components {
             revision_id: string;
         };
         IDEEquipmentPlan: {
+            /** @description Source-supported device role; optional, distinct from approved network configuration. */
+            role?: string;
             attributes: components["schemas"]["IDEAttributeValue"][];
             entity_id: string;
             equipment_type: string;

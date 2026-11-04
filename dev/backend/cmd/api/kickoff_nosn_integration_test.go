@@ -135,7 +135,7 @@ func TestKickoffNoSNAdoptionPublication(t *testing.T) {
 	json.Unmarshal(w.Body.Bytes(), &uploaded)
 	source := uploaded.Data.ID
 
-	connections := identityCandidate("connections", map[string]string{"a_device_ref": "Node A", "a_port": "eth1", "a_equipment_type": "server", "b_device_ref": "Switch B", "b_port": "eth2", "b_equipment_type": "switch", "cable_model": "Synthetic DAC", "cable_length_m": "3.5", "medium": "DAC"})
+	connections := identityCandidate("connections", map[string]string{"a_device_ref": "Node A", "a_port": "eth1", "a_equipment_type": "server", "a_role": "gpu_compute", "b_role": "leaf", "b_device_ref": "Switch B", "b_port": "eth2", "b_equipment_type": "switch", "cable_model": "Synthetic DAC", "cable_length_m": "3.5", "medium": "DAC"})
 	// All evidence refers to the synthetic file only. Projection and adoption are real.
 	for field, cell := range connections.Evidence[0].Fields {
 		cell.Sheet = "Sheet1"
@@ -179,6 +179,9 @@ func TestKickoffNoSNAdoptionPublication(t *testing.T) {
 	}
 	ids := []string{}
 	for _, device := range m.Equipment {
+		if device.Role == "" {
+			t.Fatal("source device role lost after persistence")
+		}
 		if device.Serial != nil || device.IdentityKind != "planned_instance" || device.EntityID != engineering.StableID(project, "equipment_ref", kickoff.NormalizeDeviceRef(device.Label)) {
 			t.Fatalf("persisted identity: %+v", device)
 		}

@@ -20664,7 +20664,8 @@ components:
         domain: {$ref: "#/components/schemas/KickoffAnalysisDomain"}
         rowCount: {type: integer, minimum: 0}
         previewLimit: {type: integer, maximum: 20}
-        applicableRowCount: {type: integer, minimum: 0, description: Full candidate rows eligible for adoption after validation.}
+        adopted: {type: boolean, description: This table was adopted from this analysis; retain candidates and outstanding issues for traceability.}
+        applicableRowCount: {type: integer, minimum: 0, description: Full candidate rows eligible for adoption after validation; zero after adoption.}
         baseVersion: {type: integer}
         rows:
           type: array
@@ -49114,6 +49115,9 @@ components:
     IDEEquipmentPlan:
       additionalProperties: false
       properties:
+        role:
+          type: string
+          description: Source-supported device role; optional, distinct from approved network configuration.
         attributes:
           items:
             $ref: "#/components/schemas/IDEAttributeValue"

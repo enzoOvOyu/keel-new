@@ -55,6 +55,7 @@ type kickoffAgentAnalysisResponse struct {
 	Drafts            []kickoffAgentDraftPreview `json:"drafts"`
 }
 type kickoffAgentDraftPreview struct {
+	Adopted bool `json:"adopted"`
 	ai.KickoffAgentCandidate
 	RowCount           int `json:"rowCount"`
 	PreviewLimit       int `json:"previewLimit"`
@@ -289,14 +290,14 @@ func (s *Server) kickoffAgentAnalysis(w http.ResponseWriter, r *http.Request, so
 		adopted[id] = true
 	}
 	for _, candidate := range result.Candidates {
-		if adopted[candidate.TableID] {
-			continue
-		}
 		validRows, validationErr := kickoffAgentAdoptionRows(candidate)
 		applicable := len(validRows)
 		if validationErr != nil {
 			applicable = 0
 			candidate.Issues = append([]engineering.InputProblem{{Row: 0, Code: "KICKOFF_INPUT_INVALID", Message: validationErr.Error()}}, candidate.Issues...)
+		}
+		if adopted[candidate.TableID] {
+			applicable = 0
 		}
 		count := len(candidate.Rows)
 		candidate.Rows = candidate.Rows[:min(count, 20)]
@@ -310,7 +311,7 @@ func (s *Server) kickoffAgentAnalysis(w http.ResponseWriter, r *http.Request, so
 		if len(candidate.Issues) > 20 {
 			candidate.Issues = candidate.Issues[:20]
 		}
-		out.Drafts = append(out.Drafts, kickoffAgentDraftPreview{KickoffAgentCandidate: candidate, RowCount: count, PreviewLimit: 20, ApplicableRowCount: applicable})
+		out.Drafts = append(out.Drafts, kickoffAgentDraftPreview{Adopted: adopted[candidate.TableID], KickoffAgentCandidate: candidate, RowCount: count, PreviewLimit: 20, ApplicableRowCount: applicable})
 	}
 	respond(w, 200, out)
 }
@@ -348,6 +349,9 @@ func (s *Server) kickoffAgentArtifact(ctx context.Context, job, kind string, val
 	}
 	if hex.EncodeToString(hash.Sum(nil)) != digest {
 		return errors.New("ANALYSIS_ARTIFACT_HASH_MISMATCH")
+	}
+	if result, ok := value.(*ai.KickoffResult); ok {
+		kickoffPrepareCandidates(result)
 	}
 	return nil
 }
@@ -415,6 +419,7 @@ func (s *Server) runKickoffAgentJob(ctx context.Context, job, claim, source stri
 		return true, err
 	}
 	result.Candidates = kickoffAgentProjectEndpoints(kickoffAgentCombine(result.Candidates))
+	kickoffPrepareCandidates(&result)
 	for i := range result.Candidates {
 		result.Candidates[i].BaseVersion = request.BaseVersions[result.Candidates[i].TableID]
 	}
@@ -485,7 +490,7 @@ func (s *Server) kickoffAgentCheckpoint(ctx context.Context, job, source string,
 		return nil, err
 	}
 	var previous string
-	err = s.db.QueryRow(ctx, `SELECT j.id::text FROM eng_job j WHERE j.source_id=$1 AND j.project_id=$2 AND j.expected_revision=$3 AND j.id<>$4 AND j.proposal->>'kind'=$5 AND EXISTS(SELECT 1 FROM eng_analysis_artifact a WHERE a.job_id=j.id AND a.kind='checkpoint') ORDER BY j.created_at DESC LIMIT 1`, source, s.project, expected, job, kickoffAgentKind).Scan(&previous)
+	err = s.db.QueryRow(ctx, `SELECT j.id::text FROM eng_job j WHERE j.source_id=$1 AND j.project_id=$2 AND j.expected_revision=$3 AND j.id<>$4 AND j.proposal->>'kind'=$5 AND j.proposal->>'flowVersion'='termination-v1' AND EXISTS(SELECT 1 FROM eng_analysis_artifact a WHERE a.job_id=j.id AND a.kind='checkpoint') ORDER BY j.created_at DESC LIMIT 1`, source, s.project, expected, job, kickoffAgentKind).Scan(&previous)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
 	}

@@ -1,0 +1,1 @@
+ALTER TABLE eng_equipment ADD COLUMN IF NOT EXISTS role text NOT NULL DEFAULT '';

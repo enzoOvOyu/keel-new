@@ -148,6 +148,7 @@ type EntityVersion struct {
 }
 type EquipmentPlan struct {
 	EntityVersion
+	Role             string  `json:"role,omitempty"`
 	EquipmentType    string  `json:"equipment_type"`
 	ModelRef         *ID     `json:"model_ref,omitempty"`
 	SourceModelLabel string  `json:"source_model_label"`

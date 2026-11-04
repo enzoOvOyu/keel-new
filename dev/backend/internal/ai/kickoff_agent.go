@@ -524,7 +524,7 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 	needRelationships := extended && (selected[1] || selected[2] || selected[3])
 	if needRelationships && cp.Relationships == nil {
 		var plan KickoffRelationshipPlan
-		err := ask("reason_relationships", map[string]any{"regions": cp.Regions, "region_samples": kickoffSamples(safe, cp.Regions), "prior_plan_to_recheck": priorRelationshipPlan, "objective": "判断真实设备，跨表佐证双端连接，再关联机柜/U位和线缆；字段映射不是本任务的结论。"}, func(raw []byte) error {
+		err := ask("reason_relationships", map[string]any{"regions": cp.Regions, "region_samples": kickoffSamples(safe, cp.Regions), "prior_plan_to_recheck": priorRelationshipPlan, "objective": "以端接两端建立唯一设备人口，同名设备跨网络保持同一身份；结合型号、双端角色、端口速率与连接数量判断GPU计算网络leaf/spine、CPU或存储网络、OOB管理网络及对端服务器角色。400G/800G、八个高速端口、一台服务器一个管理口是推理线索，不是独立结论；同一设备可服务多个网络。对证据支持的设备分组使用role分类输出，不能仅在missing中叙述。用同名或已验证别名关联机柜与起始U，再将线缆规格和米制长度关联到同一双端端口。库存中无端接的设备只保留证据，不进入设备或落位采用集合。SN、MAC、长度、占用高度缺失不阻断基础底账。字段映射必须服从这一对象关系。"}, func(raw []byte) error {
 			if err := kickoffDecode(raw, &plan); err != nil {
 				return err
 			}

@@ -205,3 +205,9 @@ KickoffConnection与KickoffReviewFacts新增cableModel/cableLengthM，单一连�
 
 ### 终止分析任务
 POST `/projects/{projectId}/kickoff/sources/{sourceId}/tasks/{jobId}/cancel`，bom:import，当前项目/未移除资料/新版分析任务范围。返回KickoffSourceTask；pending/running原子改为failed+CANCELLED_BY_USER并清除claim，同事务审计；重复调用幂等，完成任务保持原状态。旧worker心跳最多20秒取消上下文，迟到写入被claim围栏拒绝。仅分析可终止，不取消采用、不修改已采用或CMDB数据。前端按钮与开始分析并列，红色同尺寸；空闲禁用，提交时显示正在终止，完成后刷新任务/五步。无缓存变更。404任务不存在，403权限不足。
+
+### 端接候选与采用一致性
+本次分析设备集合为位置关联依据；无匹配的库存落位保留原始候选及KICKOFF_PLACEMENT_UNMATCHED，不作为可采用行。明确的数字U（包括尾部连字符）仅规范化起始U，不推算占用高度。不可解析U保留机柜关联及待确认项。分析预览与采用共同调用kickoffPrepareCandidates和kickoffAgentAdoptionRows。选择连接带入同次候选端口/设备，选择落位带入同次设备/机柜/机房依赖；已确认旧值不覆盖。
+KickoffAgentDraft.adopted表示本次候选表已采用，applicableRowCount归零防止重复采用，原候选/来源/未采用问题继续可见。设备role持久化到IDEEquipmentPlan.role，投影到核对facts.role及CMDB planned role；NetworkPlan显式角色仍可作为核对覆盖，识别角色不等于网络配置已审批。
+
+设备角色通过053_engineering_equipment_role.sql增量持久化；历史数据库已存在52，保留该历史记录，新增53避免重用迁移版本。

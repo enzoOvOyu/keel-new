@@ -58,6 +58,23 @@ func (s *Server) applyKickoffAdoption(ctx context.Context, source string, body k
 			selected[table] = true
 		}
 	}
+	// Selecting relationships includes their source-backed identity dependencies.
+	include := func(table string) {
+		if _, ok := candidates[table]; ok {
+			selected[table] = true
+		}
+	}
+	if selected["connections"] {
+		include("ports")
+		include("devices")
+	}
+	if selected["ports"] || selected["placements"] {
+		include("devices")
+	}
+	if selected["placements"] {
+		include("racks")
+		include("rooms")
+	}
 	if len(selected) == 0 {
 		return nil, errors.New("KICKOFF_AGENT_NO_CANDIDATES")
 	}
@@ -299,6 +316,9 @@ func kickoffAgentAdoptionRows(c ai.KickoffAgentCandidate) ([]map[string]string, 
 // Optional attributes can remain unresolved without discarding an otherwise
 // explicit endpoint. Conflicting values are never written as accepted facts.
 func kickoffAgentOptionalIssue(table string, row map[string]string, issue engineering.InputProblem) bool {
+	if table == "placements" && issue.Code == "KICKOFF_POSITION_NEEDS_INPUT" {
+		return true
+	}
 	field := issue.Field
 	// Length disagreements can omit the attribute. Identity disagreements cannot.
 	if field == "serial" || field == "a_serial" || field == "b_serial" {
@@ -690,6 +710,9 @@ func kickoffAgentMergePhysical(m *engineering.PhysicalModel, evidence *[]enginee
 			register(deviceIDs, d.EntityID, at)
 			if d.Serial != nil {
 				register(deviceIndex, strings.TrimSpace(*d.Serial), at)
+			}
+			if d.Role == "" {
+				d.Role = row["role"]
 			}
 			if d.SourceModelLabel == "" {
 				d.SourceModelLabel = row["model"]

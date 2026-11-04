@@ -176,6 +176,9 @@ func (s Service) projectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 				kind = "device"
 			}
 			attrs := map[string]any{"hostname": v.Label, "model": v.SourceModelLabel}
+			if v.Role != "" {
+				attrs["role"] = v.Role
+			}
 			if v.HeightU != nil {
 				attrs["height_u"] = float64(*v.HeightU)
 			}

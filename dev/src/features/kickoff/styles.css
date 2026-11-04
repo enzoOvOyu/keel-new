@@ -253,3 +253,34 @@
 
 .kickoff-workspace .source-analysis-toolbar .actions{flex-wrap:wrap}.kickoff-workspace .button.source-analysis-start,.kickoff-workspace .button.source-analysis-cancel{width:108px;height:34px;padding:8px 10px}
 .kickoff-workspace .source-analysis-toolbar .actions:has(.source-analysis-cancel){display:grid;grid-template-columns:repeat(2,108px);gap:8px}.kickoff-workspace .source-analysis-toolbar .actions:has(.source-analysis-cancel)>:first-child{grid-column:1/-1;justify-self:start}
+
+/* Candidate results follow the termination ledger, with optional enrichment below. */
+.kickoff-workspace .source-ledger-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.kickoff-workspace .source-ledger-summary>button{display:flex;flex-direction:column;gap:6px;min-width:0;padding:15px;text-align:left;background:var(--surface);border:0;border-right:1px solid var(--border);color:var(--text)}
+.kickoff-workspace .source-ledger-summary>button:last-child{border-right:0}
+.kickoff-workspace .source-ledger-summary>button:hover:not(:disabled){background:var(--green-soft)}
+.kickoff-workspace .source-ledger-summary>button:focus-visible{outline:2px solid var(--green);outline-offset:-3px}
+.kickoff-workspace .source-ledger-summary>button:disabled{cursor:default}
+.kickoff-workspace .source-ledger-summary span{font-size:12px;font-weight:500}
+.kickoff-workspace .source-ledger-summary strong{font-size:27px;font-weight:550;line-height:1.2}
+.kickoff-workspace .source-ledger-summary small,.kickoff-workspace .source-ledger-note{font-size:10px;color:var(--muted);line-height:1.6;overflow-wrap:anywhere}
+.kickoff-workspace .source-ledger-note{margin:10px 0 14px}
+.kickoff-workspace .source-ledger-selection{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-bottom:12px}
+.kickoff-workspace .source-candidate-group{border-top:1px solid var(--border);margin-top:14px}
+.kickoff-workspace .source-candidate-group-heading{padding:14px 0 8px}
+.kickoff-workspace .source-candidate-group-heading h3{font-size:13px;font-weight:600;margin:0 0 5px}
+.kickoff-workspace .source-candidate-group-heading p{font-size:10px;line-height:1.6;color:var(--muted);margin:0}
+.kickoff-workspace .source-candidate-entry{display:grid;grid-template-columns:minmax(115px,1fr) minmax(95px,.8fr) minmax(130px,1.2fr) auto;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);font-size:11px}
+.kickoff-workspace .source-candidate-entry>label{display:flex;align-items:center;gap:8px;min-width:0;overflow-wrap:anywhere}
+.kickoff-workspace .source-candidate-entry b{font-weight:500}
+.kickoff-workspace .source-candidate-count,.kickoff-workspace .source-candidate-findings{display:flex;flex-direction:column;gap:5px;min-width:0;overflow-wrap:anywhere}
+.kickoff-workspace .source-candidate-entry small{font-size:10px;color:var(--muted);line-height:1.5}
+@media(max-width:1350px){.kickoff-workspace .source-candidate-entry{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.kickoff-workspace .source-candidate-entry>.button{justify-self:end}}
+@media(max-width:760px){.kickoff-workspace .source-ledger-summary>button{padding:12px 8px}.kickoff-workspace .source-ledger-summary strong{font-size:23px}.kickoff-workspace .source-candidate-entry{gap:10px 8px}}
+
+.kickoff-workspace .source-ledger-summary>button[aria-pressed="true"]{background:var(--green-soft);box-shadow:inset 0 -2px var(--green)}
+.kickoff-workspace .source-ledger-workbench{border:1px solid var(--border);border-radius:6px;margin:12px 0 16px;min-width:0;overflow:hidden}
+.kickoff-workspace .source-ledger-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 12px 8px}
+.kickoff-workspace .source-ledger-heading h3{font-size:13px;font-weight:600;margin:0 0 5px}
+.kickoff-workspace .source-ledger-heading p,.kickoff-workspace .source-ledger-preview-note{font-size:10px;color:var(--muted);line-height:1.6;margin:0}
+.kickoff-workspace .source-ledger-preview-note{padding:0 12px 12px}
