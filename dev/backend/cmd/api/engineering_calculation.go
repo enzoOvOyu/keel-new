@@ -170,6 +170,9 @@ func engineeringCalculationEvidence(x *engineering.Extraction, refs map[string]s
 }
 
 func (s *Server) queueEngineeringCalculation(ctx context.Context, source string, q engineering.CalculationRequest, actor string) (string, error) {
+	if q.RequestedCells == nil {
+		q.RequestedCells = []engineering.FormulaCell{}
+	}
 	if len(q.RequestedCells) > 1000 {
 		return "", fmt.Errorf("CALC_REQUEST_LIMIT")
 	}

@@ -168,3 +168,11 @@ agent测试1103的新Agent分析已成功：971设备、14308端口、7154连接
 实现及限制：[RELATIONSHIP-AGENT](docs/kickoff/RELATIONSHIP-AGENT.md)。定向Go合成用例、Go构建、TypeScript和Vite通过，现有5180/8081部署完成，启动/静态资源匹配200。用户最新要求：做完上线后等待下一步，不启动真实MM分析或入库测试。旧候选不自动变成新版结果，未宣称MM识别已通过。
 
 本轮代码提交13e858f、d5c99fb；未更新main、无迁移、无真实AI或业务写入。默认分析收敛设备/设施/布线，其他域保持显式选择。用户要求发布后等待，下一步需由用户安排真实MM识别验收，不能把旧候选计为新版成果。
+
+## 2026-11-04 · 项目001分析失败修复
+
+只读核对项目001最近三次失败任务；最新任务336c8473在route后进入reason_relationships，公式工具实际返回eng_calculation_run_requested_cells_check约束错误，之后出现INVALID_JSON。旧路径未持久化非原生工具协议的失败响应，无法追溯当时Provider具体返回文本，不能认定模型能力或用户资料有问题。
+
+修复：计算请求nil RequestedCells在队列入口规范为[]；无公式工作簿不发起计算；JSON协议与原生工具协议均仅进行一次明确格式纠正，失败响应保存到已有私有MinIO artifact；删除Kickoff外层重复格式重试。未改变领域模型、发布门禁或页面。
+
+验证：定向TestKickoff、JSON纠正成功/再次失败/证据保留及原生工具纠错用例通过，Go构建通过。未启动真实Provider/项目001分析、采用或CMDB发布；本轮不宣称真实项目验收通过。部署状态见DEPLOYMENT。

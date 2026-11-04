@@ -42,17 +42,25 @@ func (p *Provider) engineeringCompletion(ctx context.Context, prompt string, inp
 		if err == nil {
 			return raw, nil
 		}
-		if (err.Error() == "INVALID_JSON" || err.Error() == "PROVIDER_OUTPUT_TRUNCATED" || err.Error() == "SCHEMA_VALIDATION_FAILED") && corrections < 1 && len(functions) > 0 {
+		if err.Error() == "INVALID_JSON" || err.Error() == "PROVIDER_OUTPUT_TRUNCATED" || err.Error() == "SCHEMA_VALIDATION_FAILED" {
 			if len(artifacts) > 0 && artifacts[0] != nil {
 				if e := artifacts[0](ctx, "provider_output", "rejected", map[string]any{"error": err.Error(), "response": string(p.Raw)}); e != nil {
 					return nil, e
 				}
 			}
+			if corrections >= 1 {
+				_ = trace("provider_request", "failed", err.Error())
+				return nil, err
+			}
 			corrections++
 			if e := trace("provider_output", "retrying", err.Error()+"；要求模型重新输出精简、合法的工具参数"); e != nil {
 				return nil, e
 			}
-			prompt += "\nYour previous output was rejected: " + err.Error() + ". Call exactly one supplied function with a complete valid JSON object as arguments. Keep it concise; bind columns instead of listing source rows. Do not output commentary or markdown."
+			instruction := "Return exactly one complete JSON object matching the current task's action or final-result schema. Do not output commentary or markdown."
+			if len(functions) > 0 {
+				instruction = "Call exactly one supplied function with a complete valid JSON object as arguments. Do not output commentary or markdown."
+			}
+			prompt += "\nYour previous output was rejected: " + err.Error() + ". " + instruction
 			continue
 		}
 		var upstream *ProviderError

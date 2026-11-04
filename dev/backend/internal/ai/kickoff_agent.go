@@ -198,11 +198,6 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 			}
 			raw, err := p.engineeringCompletion(ctx, callPrompt, input, nil, trace, hooks.Artifact)
 			if err != nil {
-				if (err.Error() == "INVALID_JSON" || err.Error() == "SCHEMA_VALIDATION_FAILED" || err.Error() == "PROVIDER_OUTPUT_TRUNCATED") && !correction {
-					correction = true
-					history = append(history, map[string]any{"error": err.Error()})
-					continue
-				}
 				return err
 			}
 			var resolved struct {

@@ -14,6 +14,18 @@ import (
 // Local-only result path: text identities stay in the private checkpoint, never
 // in the model tool response. One isolated recalculation covers all formula rows.
 func (s *Server) kickoffVerifyWorkbook(ctx context.Context, source string, revision int, wb bom.Workbook) (map[string]ai.KickoffVerifiedCell, error) {
+	hasFormula := false
+	for _, sheet := range wb.Sheets {
+		for _, cell := range sheet.Cells {
+			if cell.Formula != "" {
+				hasFormula = true
+				break
+			}
+		}
+	}
+	if !hasFormula {
+		return map[string]ai.KickoffVerifiedCell{}, nil
+	}
 	id, err := s.queueEngineeringCalculation(ctx, source, engineering.CalculationRequest{ExpectedRevision: revision}, "engineering-agent")
 	if err != nil {
 		return nil, err
