@@ -52,8 +52,9 @@ type kickoffAgentAnalysisResponse struct {
 }
 type kickoffAgentDraftPreview struct {
 	ai.KickoffAgentCandidate
-	RowCount     int `json:"rowCount"`
-	PreviewLimit int `json:"previewLimit"`
+	RowCount           int `json:"rowCount"`
+	PreviewLimit       int `json:"previewLimit"`
+	ApplicableRowCount int `json:"applicableRowCount"`
 }
 
 func kickoffAgentPermission(w http.ResponseWriter, r *http.Request, project, permission string) bool {
@@ -276,6 +277,12 @@ func (s *Server) kickoffAgentAnalysis(w http.ResponseWriter, r *http.Request, so
 		if adopted[candidate.TableID] {
 			continue
 		}
+		validRows, validationErr := kickoffAgentAdoptionRows(candidate)
+		applicable := len(validRows)
+		if validationErr != nil {
+			applicable = 0
+			candidate.Issues = append([]engineering.InputProblem{{Row: 0, Code: "KICKOFF_INPUT_INVALID", Message: validationErr.Error()}}, candidate.Issues...)
+		}
 		count := len(candidate.Rows)
 		candidate.Rows = candidate.Rows[:min(count, 20)]
 		refs := []ai.KickoffAgentEvidence{}
@@ -288,7 +295,7 @@ func (s *Server) kickoffAgentAnalysis(w http.ResponseWriter, r *http.Request, so
 		if len(candidate.Issues) > 20 {
 			candidate.Issues = candidate.Issues[:20]
 		}
-		out.Drafts = append(out.Drafts, kickoffAgentDraftPreview{KickoffAgentCandidate: candidate, RowCount: count, PreviewLimit: 20})
+		out.Drafts = append(out.Drafts, kickoffAgentDraftPreview{KickoffAgentCandidate: candidate, RowCount: count, PreviewLimit: 20, ApplicableRowCount: applicable})
 	}
 	respond(w, 200, out)
 }

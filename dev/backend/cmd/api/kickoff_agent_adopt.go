@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net"
 	"sort"
 	"strconv"
@@ -163,8 +164,8 @@ func (s *Server) applyKickoffAdoption(ctx context.Context, source string, body k
 	sort.Strings(tables)
 	for _, table := range tables {
 		candidate := candidates[table]
-		validRows := kickoffAgentValidRows(candidate)
-		if err = kickoff.ValidateInput(table, validRows); err != nil {
+		validRows, validationErr := kickoffAgentAdoptionRows(candidate)
+		if validationErr != nil {
 			skipped = append(skipped, table)
 			continue
 		}
@@ -253,6 +254,30 @@ func (s *Server) applyKickoffAdoption(ctx context.Context, source string, body k
 	return receipt, nil
 }
 
+// The preview and executor share eligibility; preview truncation must not
+// turn invalid rows into selectable candidates.
+func kickoffAgentAdoptionRows(c ai.KickoffAgentCandidate) ([]map[string]string, error) {
+	rows := kickoffAgentValidRows(c)
+	switch c.TableID {
+	case "devices", "components", "ports", "connections":
+		return rows, nil
+	default:
+		if err := kickoff.ValidateInput(c.TableID, rows); err != nil {
+			return nil, err
+		}
+		eligible := make([]map[string]string, 0, len(rows))
+		for _, row := range rows {
+			if kickoffAgentRowKey(c.TableID, row) != "" {
+				eligible = append(eligible, row)
+			}
+		}
+		if len(rows) > 0 && len(eligible) == 0 {
+			return nil, fmt.Errorf("候选缺少采用所需的关联字段：%s", strings.ReplaceAll(kickoffAgentRowKeyFields(c.TableID), "|", "、"))
+		}
+		return eligible, nil
+	}
+}
+
 func kickoffAgentValidRows(c ai.KickoffAgentCandidate) []map[string]string {
 	invalid := map[int]bool{}
 	for _, issue := range c.Issues {
@@ -282,8 +307,8 @@ func kickoffAgentValidRows(c ai.KickoffAgentCandidate) []map[string]string {
 	}
 	return out
 }
-func kickoffAgentRowKey(table string, row map[string]string) string {
-	spec := map[string]string{
+func kickoffAgentRowKeyFields(table string) string {
+	return map[string]string{
 		"rooms": "room_id", "racks": "rack_id", "equipment_specs": "model", "placements": "device_id", "management": "device_id",
 		"network_planes": "fabric|plane", "network_roles": "device_id|fabric|plane", "network_interfaces": "device_id|port|interface",
 		"network_addresses": "device_id|interface|address", "network_bgp": "device_id|interface|peer", "network_policies": "scope|profile",
@@ -291,6 +316,9 @@ func kickoffAgentRowKey(table string, row map[string]string) string {
 		"cable_specs": "code|length_m", "optic_specs": "model|port_type", "cabling_rules": "code|version", "power_profiles": "device_id|basis",
 		"rack_capacity": "rack_id", "power_circuits": "code|circuit", "power_connections": "device_id|psu|circuit", "power_rules": "code|version",
 	}[table]
+}
+func kickoffAgentRowKey(table string, row map[string]string) string {
+	spec := kickoffAgentRowKeyFields(table)
 	if spec == "" {
 		return ""
 	}

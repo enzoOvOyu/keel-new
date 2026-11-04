@@ -63,6 +63,15 @@ func (s *Server) kickoffAgentAdopt(w http.ResponseWriter, r *http.Request, sourc
 		respond(w, 202, existing)
 		return
 	}
+	var workspaceRevision int
+	if err = s.db.QueryRow(r.Context(), `SELECT revision FROM kickoff_workspace WHERE project_id=$1`, s.project).Scan(&workspaceRevision); err != nil {
+		kickoffAgentFailure(w, err)
+		return
+	}
+	if workspaceRevision != body.ExpectedRevision {
+		fail(w, 409, "REVISION_CONFLICT")
+		return
+	}
 	var original string
 	var expected int
 	if err = s.db.QueryRow(r.Context(), `SELECT source_id::text,expected_revision FROM eng_job WHERE id=$1 AND project_id=$2`, job, s.project).Scan(&original, &expected); err != nil {

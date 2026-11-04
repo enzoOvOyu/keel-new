@@ -7816,6 +7816,8 @@ export interface components {
             domain: components["schemas"]["KickoffAnalysisDomain"];
             rowCount: number;
             previewLimit: number;
+            /** @description Full candidate rows eligible for adoption after validation. */
+            applicableRowCount: number;
             baseVersion: number;
             rows: components["schemas"]["KickoffModelRow"][];
             issues: components["schemas"]["KickoffAgentIssue"][];

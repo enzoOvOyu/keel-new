@@ -20598,6 +20598,7 @@ components:
         domain: {$ref: "#/components/schemas/KickoffAnalysisDomain"}
         rowCount: {type: integer, minimum: 0}
         previewLimit: {type: integer, maximum: 20}
+        applicableRowCount: {type: integer, minimum: 0, description: Full candidate rows eligible for adoption after validation.}
         baseVersion: {type: integer}
         rows:
           type: array
@@ -20609,7 +20610,7 @@ components:
         evidence:
           type: array
           items: {$ref: "#/components/schemas/KickoffAgentEvidence"}
-      required: [tableId, domain, rowCount, previewLimit, baseVersion, rows, issues, evidence]
+      required: [tableId, domain, rowCount, applicableRowCount, previewLimit, baseVersion, rows, issues, evidence]
     KickoffAgentCoverage:
       type: object
       additionalProperties: false
