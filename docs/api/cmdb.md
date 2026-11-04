@@ -61,3 +61,7 @@ GET只读；POST Schema安装/ChangeSet/action、PATCH说明、POST保存视图�
 历史[后端定向记录](../CMDB-REAL-BACKEND-CHECK.json)覆盖资产/关系/Schema/ChangeSet典型场景，最新[部署记录](../kickoff/DEPLOYMENT.json)只覆盖目录与inventory等读取。此次新增登记只核对源码路由及服务，不声称对每个接口重新运行验收，也不声称字段一致性审计全部完成。
 
 早期`/cmdb/entities*`/`/cmdb/events*`仍存在OpenAPI设计声明，但当前cmdbRoutes没有对应分支，统一未知资源处理；见[差异](../DECISIONS.md)。不删协议、不新增兼容路由来掩盖这一事实。
+
+## 工程发布批量写入
+
+工程Outbox投影采用本次任务内的批量资产、字段来源、关系及版本写入；保持同事务和现有稳定身份，不改变HTTP契约。单对象编辑继续使用原接口；规划与Observed/人工事实分层。阶段日志记录SQL数量和耗时，详见[实施记录](../kickoff/CMDB-WRITE-PERFORMANCE-IMPLEMENTATION.md)。来源公共元数据拆表及发布版本切换未实施。

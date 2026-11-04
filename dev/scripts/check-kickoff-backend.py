@@ -2,6 +2,7 @@
 import argparse, json, os, pathlib, subprocess, uuid
 parser=argparse.ArgumentParser()
 parser.add_argument("--run", default="^(TestKickoffBeforeAgent|TestEngineeringPhysicalPublication)$", help="Go test name regular expression")
+parser.add_argument("--package",default="./cmd/api",choices=["./cmd/api","./internal/cmdb"],help="Targeted backend package")
 args=parser.parse_args()
 from urllib.parse import quote
 root=pathlib.Path(__file__).resolve().parents[2]
@@ -25,5 +26,5 @@ try:
  env['KEEL_KICKOFF_TEST_S3_ENDPOINT']='127.0.0.1:'+s3ports['9000/tcp'][0]['HostPort']
  env['KEEL_KICKOFF_TEST_S3_USER']=s3.get('MINIO_ROOT_USER','minioadmin');env['KEEL_KICKOFF_TEST_S3_PASSWORD']=s3.get('MINIO_ROOT_PASSWORD','minioadmin')
  env['KEEL_KICKOFF_TEST_ARTIFACT']='/tmp/keel-kickoff-verified-workspace.json'
- subprocess.run(['go','test','./cmd/api','-run',args.run,'-count=1','-v'],cwd=root/'dev/backend',env=env,check=True)
+ subprocess.run(['go','test',args.package,'-run',args.run,'-count=1','-v'],cwd=root/'dev/backend',env=env,check=True)
 finally:pgexec('dropdb','-U',user,'--force',name)

@@ -3,13 +3,11 @@ package cmdb
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"keel.local/dev/internal/bom"
 	"keel.local/dev/internal/engineering"
+	"log/slog"
 	"strconv"
-	"strings"
+	"time"
 )
 
 // ProjectEngineering consumes an already-reviewed immutable revision. It keeps
@@ -25,6 +23,13 @@ func (s Service) ProjectKnownLocations(ctx context.Context, tx pgx.Tx, event, pr
 }
 
 func (s Service) projectEngineering(ctx context.Context, tx pgx.Tx, event, project, publication, target, actor string, m engineering.PhysicalModel, partialLocation bool) error {
+	counter := &engineeringSQLCounter{Tx: tx}
+	tx = counter
+	started := time.Now()
+	var assetDuration, relationDuration time.Duration
+	defer func() {
+		slog.InfoContext(ctx, "cmdb engineering projection", "target", target, "project", project, "publication", publication, "sql_statements", counter.Statements, "duration_ms", time.Since(started).Milliseconds(), "asset_ms", assetDuration.Milliseconds(), "relation_ms", relationDuration.Milliseconds())
+	}()
 	schema, e := txSchema(ctx, tx)
 	if e != nil {
 		return e
@@ -48,122 +53,22 @@ func (s Service) projectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 	for _, object := range engineering.ModelObjects(&m) {
 		extensionValues[object.Version.EntityID] = object.Version.Attributes
 	}
+	assets := []engineeringAssetWrite{}
+	relations := []RelationInput{}
 	projectAsset := func(id, kind, label string, attrs map[string]any) error {
 		for _, value := range extensionValues[id] {
 			attrs["engineering.attribute."+value.DefinitionID+"@"+strconv.Itoa(value.DefinitionVersion)] = value.Value
 		}
-
-		var exists, inProject bool
-		if err := tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM cmdb_entity WHERE item_uid=$1),EXISTS(SELECT 1 FROM cmdb_asset_scope WHERE asset_id=$1 AND project_id=$2)`, id, project).Scan(&exists, &inProject); err != nil {
-			return err
-		}
-		if exists && !inProject {
-			return Reject("CROSS_PROJECT_ASSET_ASSOCIATION_DENIED", 403)
-		}
 		attrs["name"] = label
 		attrs["lifecycle_state"] = "planned"
 		attrs["fact_layer"] = "planned"
-		item := bom.Item{UID: id, Category: kind, Hostname: label, Fields: map[string]string{}}
-		for k, v := range attrs {
-			if v != nil {
-				if _, typed := v.(engineering.TypedValue); typed {
-					item.Fields[k] = string(Encode(v))
-				} else {
-					item.Fields[k] = fmt.Sprint(v)
-				}
-			}
-		}
-		if model, ok := attrs["model"].(string); ok {
-			item.Model = model
-		}
-		if _, err := tx.Exec(ctx, `INSERT INTO bom_item(item_uid,identity_key,category,payload) VALUES($1,$2,$3,$4) ON CONFLICT(item_uid) DO NOTHING`, id, "engineering:"+project+":"+id, kind, Encode(item)); err != nil {
-			return err
-		}
-		if _, err := tx.Exec(ctx, `INSERT INTO bom_item_revision(revision_id,item_uid,payload) VALUES($1,$2,$3) ON CONFLICT DO NOTHING`, publication, id, Encode(item)); err != nil {
-			return err
-		}
-		if _, err := tx.Exec(ctx, `INSERT INTO project_asset(project_id,item_uid,revision_id) VALUES($1,$2,$3) ON CONFLICT DO NOTHING`, project, id, publication); err != nil {
-			return err
-		}
-		filtered := map[string]any{}
-		for key, v := range attrs {
-			if v != nil {
-				if _, ok := schema.Attributes(kind)[key]; ok {
-					filtered[key] = v
-				}
-			}
-		}
-		version := int64(1)
-		if !exists {
-			if _, err := s.UpsertAsset(ctx, tx, schema, AssetInput{ID: id, Type: kind, Project: project, Attributes: filtered, Source: source, BOMItemID: &id, BOMRevision: &publication}); err != nil {
-				return err
-			}
-		} else {
-			var raw []byte
-			var oldRef, oldKind string
-			if err := tx.QueryRow(ctx, `SELECT payload,source_ref,asset_type,version FROM cmdb_entity WHERE item_uid=$1 FOR UPDATE`, id).Scan(&raw, &oldRef, &oldKind, &version); err != nil {
-				return err
-			}
-			if oldKind != kind {
-				return Reject("ASSET_TYPE_IDENTITY_CONFLICT", 409)
-			}
-			var hasObserved bool
-			if err := tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM cmdb_field_source WHERE asset_id=$1 AND fact_layer<>'planned')`, id).Scan(&hasObserved); err != nil {
-				return err
-			}
-			if strings.HasPrefix(oldRef, "engineering:") && !hasObserved {
-				var err error
-				version, err = s.UpsertAsset(ctx, tx, schema, AssetInput{ID: id, Type: kind, Project: project, Attributes: filtered, Source: source, BOMItemID: &id, BOMRevision: &publication})
-				if err != nil {
-					return err
-				}
-			} else {
-				// Advance the read revision for new planning evidence without changing the
-				// recorded/observed attributes, source, lifecycle or freshness.
-				version++
-				if _, err := tx.Exec(ctx, `UPDATE cmdb_entity SET version=$2,updated_at=now() WHERE item_uid=$1`, id, version); err != nil {
-					return err
-				}
-				if _, err := tx.Exec(ctx, `INSERT INTO cmdb_revision(id,asset_id,version,schema_version,payload,before_payload,source_type,source_ref,operator,project_id) VALUES($1,$2,$3,$4,$5,$5,'bom',$6,$7,$8)`, uuid.NewString(), id, version, schema.Version, raw, ref, actor, project); err != nil {
-					return err
-				}
-			}
-		}
-		// Preserve all typed planning attributes including geometry not yet exposed by
-		// the catalog's generic attribute editor. They remain planned source facts.
-		fields := []map[string]any{}
-		for field, value := range attrs {
-			if value != nil {
-				fields = append(fields, map[string]any{"id": uuid.NewString(), "field": field, "value": value})
-			}
-		}
-		if len(fields) > 0 {
-			if _, err := tx.Exec(ctx, `INSERT INTO cmdb_field_source(id,asset_id,field_name,value,source_type,source_ref,fact_layer,revision,operator,approval_status,support,freshness,evidence_refs,project_id)
- SELECT (item->>'id')::uuid,$1,item->>'field',item->'value','bom',$2,'planned',$3,$4,'approved','supported','unknown',$5,$6 FROM jsonb_array_elements($7::jsonb) item
- ON CONFLICT(asset_id,field_name,source_ref,fact_layer) DO NOTHING`, id, ref, strconv.FormatInt(version, 10), actor, Encode([]string{publication}), project, Encode(fields)); err != nil {
-				return err
-			}
-		}
-		if _, err := tx.Exec(ctx, `UPDATE eng_entity SET bom_item_uid=$3 WHERE project_id=$1 AND id=$2`, project, id, id); err != nil {
-			return err
-		}
-		if _, err := s.PutRelation(ctx, tx, schema, RelationInput{Definition: "project_association", SourceID: id, TargetID: project, Project: project, Source: Source{Type: "derived", Ref: ref, Layer: "recorded", Operator: actor}}); err != nil {
-			return err
-		}
-		return s.AddEvent(ctx, tx, project, "engineering:"+event+":"+id, id, "engineering.published", "工程规划发布", "published", "bom", ref, actor, map[string]string{"target": target, "publication_id": publication}, []map[string]string{{"label": "开局工程", "href": "/p/" + project + "/kickoff/publish"}})
+		assets = append(assets, engineeringAssetWrite{ID: id, Kind: kind, Label: label, Attrs: attrs})
+		relations = append(relations, RelationInput{Definition: "project_association", SourceID: id, TargetID: project, Project: project, Source: Source{Type: "derived", Ref: ref, Layer: "recorded", Operator: actor}})
+		return nil
 	}
 	relation := func(kind, from, to string) error {
-		// Replace only this project's prior engineering planning relation, preserving
-		// observations and manually confirmed relationships from other sources.
-		sql := `UPDATE cmdb_relationship SET valid_to=now() WHERE project_id=$1 AND definition_id=$2 AND to_uid=$4 AND fact_layer='planned' AND source_ref LIKE 'engineering:%' AND from_uid<>$3 AND valid_to IS NULL`
-		if kind == "located_in" || kind == "cable_endpoint_a" || kind == "cable_endpoint_b" {
-			sql = `UPDATE cmdb_relationship SET valid_to=now() WHERE project_id=$1 AND definition_id=$2 AND from_uid=$3 AND fact_layer='planned' AND source_ref LIKE 'engineering:%' AND to_uid<>$4 AND valid_to IS NULL`
-		}
-		if _, err := tx.Exec(ctx, sql, project, kind, from, to); err != nil {
-			return err
-		}
-		_, err := s.PutRelation(ctx, tx, schema, RelationInput{Definition: kind, SourceID: from, TargetID: to, Project: project, Source: source})
-		return err
+		relations = append(relations, RelationInput{Definition: kind, SourceID: from, TargetID: to, Project: project, Source: source})
+		return nil
 	}
 	switch target {
 	case engineering.EquipmentTarget:
@@ -345,6 +250,32 @@ func (s Service) projectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 		}
 	default:
 		return Reject("ENGINEERING_TARGET_UNSUPPORTED", 422)
+	}
+	stage := time.Now()
+	if e = s.writeEngineeringAssets(ctx, tx, schema, project, publication, actor, assets); e != nil {
+		return e
+	}
+	assetDuration = time.Since(stage)
+	stage = time.Now()
+	if e = s.writeEngineeringRelations(ctx, tx, schema, project, relations); e != nil {
+		return e
+	}
+	relationDuration = time.Since(stage)
+	// Lifecycle entries preserve per-object IDs while sharing one bounded insert.
+	for offset := 0; offset < len(assets); offset += 500 {
+		end := offset + 500
+		if end > len(assets) {
+			end = len(assets)
+		}
+		events := []map[string]any{}
+		for _, a := range assets[offset:end] {
+			events = append(events, map[string]any{"id": "engineering:" + event + ":" + a.ID, "asset": a.ID})
+		}
+		_, e = tx.Exec(ctx, `INSERT INTO cmdb_lifecycle_event(id,project_id,asset_id,event_type,label,status,source_type,source_ref,operator,details,links)
+ SELECT x.id,$1,x.asset,'engineering.published','工程规划发布','published','bom',$2,$3,$4,$5 FROM jsonb_to_recordset($6::jsonb) AS x(id text,asset text) ON CONFLICT(id) DO NOTHING`, project, ref, actor, Encode(map[string]string{"target": target, "publication_id": publication}), Encode([]map[string]string{{"label": "开局工程", "href": "/p/" + project + "/kickoff/publish"}}), Encode(events))
+		if e != nil {
+			return e
+		}
 	}
 	_, e = tx.Exec(ctx, `INSERT INTO cmdb_ingest_event(event_id,source_type,source_ref) VALUES($1,'bom',$2) ON CONFLICT DO NOTHING`, event, ref)
 	return e

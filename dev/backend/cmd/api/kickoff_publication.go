@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"keel.local/dev/internal/engineering"
 	"keel.local/dev/internal/kickoff"
+	"log/slog"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func (s *Server) kickoffSelectPublication(ctx context.Context, q engineeringQuery, model engineering.PhysicalModel, view kickoff.View, deviceIDs, facilityIDs []string) (engineering.PhysicalModel, kickoff.Publication, error) {
@@ -189,7 +190,11 @@ func (s *Server) loadKickoffPublications(ctx context.Context, q engineeringQuery
 	}
 	return out, rows.Err()
 }
-func (s *Server) projectKickoffPublication(ctx context.Context, tx pgx.Tx, event, project string, raw []byte) error {
+func (s *Server) projectKickoffPublication(ctx context.Context, tx pgx.Tx, event, project string, raw []byte) (resultErr error) {
+	started := time.Now()
+	defer func() {
+		slog.InfoContext(ctx, "kickoff CMDB publication", "project", project, "event", event, "duration_ms", time.Since(started).Milliseconds(), "success", resultErr == nil)
+	}()
 	var request struct {
 		ID string `json:"publication_id"`
 	}
@@ -251,63 +256,72 @@ func (s *Server) projectKickoffPublication(ctx context.Context, tx pgx.Tx, event
 // Store engineering revision references in CMDB once per project; retain the
 // full domain rows in their owning versioned engineering tables.
 func (s *Server) projectKickoffConfiguration(ctx context.Context, tx pgx.Tx, p kickoff.Publication) error {
+	refs := []map[string]any{}
 	for _, input := range p.ModelSnapshot {
-		id := "kickoff:" + p.ID + ":" + input.TableID
-		fields := map[string]any{"table_id": input.TableID, "input_version": input.Version, "row_count": len(input.Rows), "publication_id": p.ID, "state": "planning", "href": "/p/" + s.project + "/kickoff/publish"}
-		if _, e := tx.Exec(ctx, `INSERT INTO cmdb_config_reference(id,project_id,asset_id,layer,revision,source_ref,source_type,freshness,support,fields) VALUES($1,$2,$2,'intended',$3,$4,'bom','unknown','supported',$5) ON CONFLICT DO NOTHING`, id, s.project, fmt.Sprint(input.Version), "engineering:"+p.ID, jsonBytes(fields)); e != nil {
-			return e
+		refs = append(refs, map[string]any{"id": "kickoff:" + p.ID + ":" + input.TableID, "version": fmt.Sprint(input.Version), "fields": map[string]any{"table_id": input.TableID, "input_version": input.Version, "row_count": len(input.Rows), "publication_id": p.ID, "state": "planning", "href": "/p/" + s.project + "/kickoff/publish"}})
+	}
+	if len(refs) > 0 {
+		if _, err := tx.Exec(ctx, `INSERT INTO cmdb_config_reference(id,project_id,asset_id,layer,revision,source_ref,source_type,freshness,support,fields)
+ SELECT x.id,$1,$1,'intended',x.version,$2,'bom','unknown','supported',x.fields FROM jsonb_to_recordset($3::jsonb) AS x(id text,version text,fields jsonb) ON CONFLICT DO NOTHING`, s.project, "engineering:"+p.ID, jsonBytes(refs)); err != nil {
+			return err
 		}
 	}
-	for _, device := range p.DeviceSnapshot {
-		fields := map[string]any{}
-		for _, row := range kickoff.Rows(p.ModelSnapshot, "management") {
-			if row["device_id"] == device.ID {
-				for key, target := range map[string]string{"management_ip": "management_address", "bmc_ip": "bmc_address", "management_port": "management_port", "credential_ref": "credential_reference", "method": "management_method"} {
-					if row[key] != "" {
-						fields[target] = row[key]
+	// Index the publication snapshot once instead of scanning every input per device.
+	devices := map[string]map[string]any{}
+	for _, d := range p.DeviceSnapshot {
+		devices[d.ID] = map[string]any{}
+	}
+	mappings := map[string]map[string]string{
+		"management":      {"management_ip": "management_address", "bmc_ip": "bmc_address", "management_port": "management_port", "credential_ref": "credential_reference", "method": "management_method"},
+		"boot_interfaces": {"port": "boot_interface_name", "mac": "boot_mac", "boot_mode": "boot_mode", "network": "installation_network"},
+	}
+	for table, mapping := range mappings {
+		for _, row := range kickoff.Rows(p.ModelSnapshot, table) {
+			if fields, ok := devices[row["device_id"]]; ok {
+				for from, to := range mapping {
+					if row[from] != "" {
+						fields[to] = row[from]
 					}
 				}
 			}
 		}
-		for _, row := range kickoff.Rows(p.ModelSnapshot, "boot_interfaces") {
-			if row["device_id"] == device.ID {
-				for key, target := range map[string]string{"port": "boot_interface_name", "mac": "boot_mac", "boot_mode": "boot_mode", "network": "installation_network"} {
-					if row[key] != "" {
-						fields[target] = row[key]
-					}
-				}
-			}
-		}
-		for _, row := range kickoff.Rows(p.ModelSnapshot, "power_profiles") {
-			if row["device_id"] == device.ID && row["basis"] == "planned" && row["power_kw"] != "" {
-				if n, e := strconv.ParseFloat(row["power_kw"], 64); e == nil && n >= 0 {
-					fields["planned_power_kw"] = n
-				}
-			}
-		}
-		for key, value := range fields {
-			if _, e := tx.Exec(ctx, `INSERT INTO cmdb_field_source(id,asset_id,field_name,value,source_type,source_ref,fact_layer,revision,operator,approval_status,support,freshness,evidence_refs,project_id) VALUES($1,$2,$3,$4,'bom',$5,'planned',$6,$7,'approved','supported','unknown',$8,$9) ON CONFLICT(asset_id,field_name,source_ref,fact_layer) DO NOTHING`, uuid.NewString(), device.ID, key, jsonBytes(value), "engineering:"+p.ID, p.ID, p.Actor, jsonBytes([]string{p.ID}), s.project); e != nil {
-				return e
+	}
+	for _, row := range kickoff.Rows(p.ModelSnapshot, "power_profiles") {
+		if fields, ok := devices[row["device_id"]]; ok && row["basis"] == "planned" {
+			if n, err := strconv.ParseFloat(row["power_kw"], 64); err == nil && n >= 0 {
+				fields["planned_power_kw"] = n
 			}
 		}
 	}
-	// Rack power planning is independently publishable with the selected rack;
-	// it does not change observed consumption or physical nameplate capacity.
+	facts := []map[string]any{}
+	for id, fields := range devices {
+		for field, value := range fields {
+			facts = append(facts, map[string]any{"asset": id, "field": field, "value": value})
+		}
+	}
+	racks := map[string]bool{}
 	for _, rack := range p.RackSnapshot {
-		for _, row := range kickoff.Rows(p.ModelSnapshot, "rack_capacity") {
-			if row["rack_id"] != rack.ID {
-				continue
-			}
-			value, err := strconv.ParseFloat(row["capacity_kw"], 64)
-			if err != nil || value <= 0 {
-				continue
-			}
-			if _, err = tx.Exec(ctx, `INSERT INTO cmdb_field_source(id,asset_id,field_name,value,source_type,source_ref,fact_layer,revision,operator,approval_status,support,freshness,evidence_refs,project_id) VALUES($1,$2,'planned_power_capacity_kw',$3,'bom',$4,'planned',$5,$6,'approved','supported','unknown',$7,$8) ON CONFLICT(asset_id,field_name,source_ref,fact_layer) DO NOTHING`, uuid.NewString(), rack.ID, jsonBytes(value), "engineering:"+p.ID, p.ID, p.Actor, jsonBytes([]string{p.ID}), s.project); err != nil {
-				return err
+		racks[rack.ID] = true
+	}
+	for _, row := range kickoff.Rows(p.ModelSnapshot, "rack_capacity") {
+		if racks[row["rack_id"]] {
+			if value, err := strconv.ParseFloat(row["capacity_kw"], 64); err == nil && value > 0 {
+				facts = append(facts, map[string]any{"asset": row["rack_id"], "field": "planned_power_capacity_kw", "value": value})
 			}
 		}
 	}
-
+	for offset := 0; offset < len(facts); offset += 1000 {
+		end := offset + 1000
+		if end > len(facts) {
+			end = len(facts)
+		}
+		_, err := tx.Exec(ctx, `INSERT INTO cmdb_field_source(id,asset_id,field_name,value,source_type,source_ref,fact_layer,revision,operator,approval_status,support,freshness,evidence_refs,project_id)
+ SELECT gen_random_uuid(),x.asset,x.field,x.value,'bom',$1,'planned',$2,$3,'approved','supported','unknown',$4,$5 FROM jsonb_to_recordset($6::jsonb) AS x(asset text,field text,value jsonb)
+ ON CONFLICT(asset_id,field_name,source_ref,fact_layer) DO NOTHING`, "engineering:"+p.ID, p.ID, p.Actor, jsonBytes([]string{p.ID}), s.project, jsonBytes(facts[offset:end]))
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
