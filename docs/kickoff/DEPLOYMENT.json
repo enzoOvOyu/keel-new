@@ -1,19 +1,19 @@
 {
-  "code_revision": "3e6061d7ebb7ff2017112d082b27d88f1c522a05",
-  "frontend_code_revision": "c80611d74ea35e6d05589479756c85954b2a5db2",
-  "backend_code_revision": "3e6061d7ebb7ff2017112d082b27d88f1c522a05",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-c80611d",
-  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-provider-3e6061d",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-d5c99fb",
-  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-provider-8ec5420",
+  "code_revision": "7c26376405bece1f389d7315a00cf0296eff5e5a",
+  "frontend_code_revision": "7c26376405bece1f389d7315a00cf0296eff5e5a",
+  "backend_code_revision": "7c26376405bece1f389d7315a00cf0296eff5e5a",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-7c26376",
+  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-7c26376",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-c80611d",
+  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-provider-3e6061d",
   "ports": [
     5180,
     8081
   ],
   "migrations": [],
   "api_restarted": true,
-  "binary_sha256": "ca7306ccc30d76541886e8a0ab998fd43860064898e1c9c3f5aca2e228b8d3b8",
-  "frontend_index_sha256": "8a5efc33a0c197e394f3aeeaf7898e843c4cd2eea4a8fad34b900db7eecc1573",
+  "binary_sha256": "cd081fdde93eacf111761e5a947a5eca442ceafe15bdd4aa4f3b65bba97fb4b0",
+  "frontend_index_sha256": "152325674a6e87ec7907f8bc174cbdc744bd3071af5337af0036666ee0733f84",
   "status": "deployed",
   "binary_matches": true,
   "frontend_index_matches": true,
@@ -23,7 +23,12 @@
     "health": 200,
     "index_matches": true
   },
-  "business_tests": "Project001 failure artifacts read only. Real analysis/adoption/publication NOT RUN.",
+  "business_tests": "No real Provider analysis, customer adoption or CMDB publication executed.",
   "provider_calls": 0,
-  "verification": "Targeted Go JSON correction and Kickoff tests, Go build, API registry passed; API health200. Frontend unchanged. No real Provider call."
+  "verification": "Targeted termination graph, name identity adoption/review/publication plan tests; TypeScript, Vite, Go build and contract checks passed. API health and frontend artifact match passed.",
+  "ui_verification": {
+    "status": "PASS",
+    "scope": "Existing project002 sources/review/publish read-only page load, historical flow separation, no horizontal overflow or JS error; no AI or business writes",
+    "evidence": "docs/kickoff/TERMINATION-UI-CHECK.json"
+  }
 }

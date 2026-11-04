@@ -7,14 +7,14 @@
 | 范围 | 当前事实 |
 |---|---|
 | 主开发 | `/home/ubuntu/keel-dev`，分支`dev`，应用目录`dev/`；文档定版已整合；本轮历史资料理解已提交dev并按用户要求发布 |
-| 当前主环境 | 5180前端`c80611d` / 8081 API `8ec5420`；关系推理Agent已部署，服务启动和静态资源匹配检查通过。新版真实Provider/MM验收尚未运行，等待用户指令；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json) |
+| 当前主环境 | 5180前端 / 8081 API均为`7c26376`；端接驱动Agent、采用/核对/发布及新版五步已部署，服务启动和静态资源匹配检查通过。新版真实Provider/MM验收尚未运行；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json) |
 | Fabric | `/home/ubuntu/keel-fabric-dev`，`feat/fabric-rebuild@6a70041`；5197/8100分支预览，未并入dev；**用户要求暂停，等待上游接入修复通知** |
 | 原型 | Kickoff5195、拓扑/机柜5181、Fabric5194仅设计参考，不是正式事实或执行来源；本次不启停服务 |
 | main与旧目录 | main保留稳定基线；旧Flows/Kestra/visualization detached目录仅残留原型/运行依赖，不在那里继续开发；本次不合并或推送main |
 
 ## 当前里程碑：端接驱动闭环重构
 
-用户批准端接作为设备存在依据、名称作为规划身份、SN可选；本轮统一整改Agent→采用→核对→发布及五步语义。代码完成；Go定向用例、TypeScript、Vite和契约检查通过，正在部署。未启动真实资料AI或CMDB写入。实现与验证边界见[端接重构](docs/kickoff/TERMINATION-REFACTOR.md)。用户AGENTS.md修改保留，不合并main。
+用户批准端接作为设备存在依据、名称作为规划身份、SN可选；本轮统一整改Agent→采用→核对→发布及五步语义。代码已提交`7c26376`并部署5180/8081；Go定向用例、TypeScript、Vite和契约检查通过；三个页面只读加载、历史流程隔离、无横向溢出/脚本错误检查通过。未启动真实资料AI或CMDB写入。实现与验证边界见[端接重构](docs/kickoff/TERMINATION-REFACTOR.md)。用户AGENTS.md修改保留，不合并main。
 
 以下为先前里程碑记录，不能覆盖本节及部署快照。
 

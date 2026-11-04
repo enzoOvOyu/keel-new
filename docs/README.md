@@ -4,7 +4,7 @@
 
 | 模块 | 当前设计与实现入口 | API 语义 | 当前交付边界 |
 |---|---|---|---|
-| 智能开局 Kickoff | [kickoff](modules/kickoff.md) | [kickoff API](api/kickoff.md) | 非 Agent 工程建模、审核及 CMDB 入库闭环已上线；新 Agent 待开发 |
+| 智能开局 Kickoff | [kickoff](modules/kickoff.md) | [kickoff API](api/kickoff.md) | 端接驱动 Agent、名称身份采用/核对/发布已部署；真实 Provider 验收待执行 |
 | CMDB | [cmdb](modules/cmdb.md) | [cmdb API](api/cmdb.md) | 统一身份、关系、来源、版本和 ChangeSet 已实现上线；设备观测不因此视为完成 |
 | 数据中心拓扑与机柜 | [topology](modules/topology.md) | [visualization API](api/visualization.md) | 五工作区及真实 CMDB 查询已上线；缺几何/观测的能力如实不可用 |
 | 作业平台 | [jobs](modules/jobs.md) | [flows API](api/flows.md) | Kestra 原生界面、统一 Job Service 与 Agent/SSH 已实现上线；生产设备批量验收未完成 |
@@ -12,7 +12,7 @@
 
 ## 从哪里继续
 
-- 运行版本、工作区和当前交接：[HANDOFF](../HANDOFF.md)。当前主环境记录为 `686e9ea`，不是通过本次文档任务重新测得。
+- 运行版本、工作区和当前交接：[HANDOFF](../HANDOFF.md)。当前主环境记录为 `7c26376`，不是通过本次文档任务重新测得。
 - 新需求/后续上线流程：[模块维护规则](MODULE-WORKFLOW.md)。只更新受影响模块，不重新展开全量 PRD。
 - 字段、枚举和 HTTP 定义：[OpenAPI](openapi.yaml)；实际实现登记及证据：[API 入口](REAL-API-CONTRACTS.md)、[注册表](api/real-api-registry.json)。Schema 存在不代表接口可用。
 - 未决冲突及真实缺口：[DECISIONS](DECISIONS.md)；模块自身的待办见模块页，不复制到多份总表。

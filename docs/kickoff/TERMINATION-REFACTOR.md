@@ -27,3 +27,5 @@
 - `go test ./cmd/api ./internal/kickoff -run 'Test(Kickoff|AdoptionEvidence|AdoptionCable|ResolveIdentitySourceBackedName|NameIdentityConflictBlocksPublication|UnassignedRack|KnownRack|PublicationFacts)' -count=1`：通过，含反向连接/证据、名称标准化、冲突SN不可采用、多角色、无SN发布计划。
 - `npx tsc --noEmit`、`npx vite build`、`node dev/scripts/check-real-api-docs.mjs`：通过。Vite保留既有大chunk和第三方注释提示。
 - 无全仓回归、无真实Provider调用、无客户资产写入。
+
+部署：5180/8081运行`7c26376`。三个真实页面只读加载检查通过，历史结果保持旧语义，无横向溢出、浏览器异常或业务写入；见[页面检查](TERMINATION-UI-CHECK.json)。新版真实Provider识别/客户数据入库验收仍未执行。

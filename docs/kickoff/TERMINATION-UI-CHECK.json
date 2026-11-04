@@ -1,0 +1,11 @@
+{
+  "checks": [
+    "sources loads without page errors or horizontal overflow",
+    "review loads without page errors or horizontal overflow",
+    "publish loads without page errors or horizontal overflow",
+    "current source page captured; historical result not relabelled as new analysis"
+  ],
+  "errors": [],
+  "writes": [],
+  "status": "PASS"
+}
