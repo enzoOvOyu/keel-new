@@ -73,15 +73,11 @@ func (s *Server) kickoffRoutes(w http.ResponseWriter, r *http.Request) bool {
 	case len(p) == 6 && p[5] == "publication-options" && r.Method == "GET":
 		s.kickoffPublicationOptions(w, r)
 	case len(p) == 8 && p[5] == "sources" && p[7] == "understanding" && r.Method == "GET":
-		if !s.kickoffAgentUnderstanding(w, r, p[6]) {
-			s.kickoffUnderstanding(w, r, p[6], false)
-		}
+		s.kickoffAgentUnderstanding(w, r, p[6])
 	case len(p) == 8 && p[5] == "sources" && p[7] == "reuse-history" && r.Method == "POST":
-		s.kickoffUnderstanding(w, r, p[6], true)
+		fail(w, 410, "KICKOFF_LEGACY_ANALYSIS_RETIRED")
 	case len(p) == 10 && p[5] == "sources" && p[7] == "regions" && p[9] == "preview" && r.Method == "GET":
-		if !s.kickoffAgentRegionPreview(w, r, p[6], p[8]) {
-			s.kickoffRegionPreview(w, r, p[6], p[8])
-		}
+		s.kickoffAgentRegionPreview(w, r, p[6], p[8])
 	case len(p) == 6 && p[5] == "preview" && r.Method == "POST":
 		s.kickoffPreview(w, r)
 	case len(p) == 6 && p[5] == "review" && r.Method == "GET":
@@ -114,7 +110,7 @@ func (s *Server) kickoffRoutes(w http.ResponseWriter, r *http.Request) bool {
 	case len(p) == 9 && p[5] == "sources" && p[7] == "analysis" && p[8] == "adopt" && r.Method == "POST":
 		s.kickoffAgentAdopt(w, r, p[6])
 	case len(p) == 6 && p[5] == "history" && r.Method == "POST":
-		s.kickoffHistory(w, r)
+		fail(w, 410, "KICKOFF_LEGACY_ANALYSIS_RETIRED")
 	case len(p) == 8 && p[5] == "publications" && p[7] == "status" && r.Method == "GET":
 		s.kickoffPublicationStatus(w, r, p[6])
 	default:

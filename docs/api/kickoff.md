@@ -196,3 +196,9 @@ POST analysis/adopt返回202与KickoffAdoptionTask，不等待合并；任务复
 设备使用`device_ref`、端口使用`device_ref+port`、连接使用`a_device_ref/a_port/b_device_ref/b_port`；明确来源的serial及a_serial/b_serial保留身份兼容。可选serial、型号、位置或线缆字段缺失仅保留缺口提示，不记为任务失败；已有值错误、身份冲突、未解析区域仍不能标为完成。自由文本missing保留于limitations，不将其数量直接当作必填缺口数。步骤只有complete/partial/pending/unsupported/not_applicable，不制造执行失败状态。`recognized`仅指以上证据核对通过，不代表采用、发布、设备健康或真实模型验收。
 
 验证记录：定向`TestKickoffAgentUnderstandingNotApplicable`、`TestKickoffTerminationUnderstanding*`通过（可选缺失、未解析端点、重复身份、缺来源、未重算公式、覆盖缺口及旧版本隔离）；OpenAPI类型生成与限定diff检查通过。整合后`check-real-api-docs.mjs`通过。部署以DEPLOYMENT.json为准；未运行全量测试或真实Agent；无报告的进行中/失败任务读取入队flowVersion，旧任务无版本不补标；只将eng_step中route/graph/reason_relationships/kickoff_step_1/2/3真实succeeded记录加入对应步骤note，计数保持0、步骤保持pending，不伪造完成比例。候选issues按row索引，全局问题按field去重，避免每行重复遍历全量问题。
+
+## 当前流程隔离与字段贯通纠正
+
+当前analysis/understanding/region-preview/tasks及采用仅接受flowVersion=termination-v1；旧识别结果不再返回或允许采用。无新任务时返回空候选及新版待分析步骤，不回退旧报告。reuse-history及history入口退役返回410 KICKOFF_LEGACY_ANALYSIS_RETIRED，前端入口删除。历史原始存储不再进入当前工作链。
+
+KickoffConnection与KickoffReviewFacts新增cableModel/cableLengthM，单一连接的源线缆规格和估算米数进入核对列表、详情抽屉；多段线缆不冒充单根线长，安装实测长度保持独立。

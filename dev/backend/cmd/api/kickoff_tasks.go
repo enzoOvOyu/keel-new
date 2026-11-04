@@ -41,7 +41,8 @@ const kickoffTaskScope = ` FROM eng_job j
  JOIN eng_source e ON e.id=j.source_id AND e.project_id=j.project_id
  JOIN kickoff_source k ON k.id::text=j.proposal->>'sourceId' AND k.project_id=j.project_id
  WHERE j.project_id=$1 AND k.id::text=$2 AND k.detached_at IS NULL
- AND j.proposal->>'kind' IN ('kickoff-domain-agent/v1','kickoff-adoption/v1')`
+ AND (j.proposal->>'kind'='kickoff-domain-agent/v1' AND j.proposal->>'flowVersion'='termination-v1'
+ OR j.proposal->>'kind'='kickoff-adoption/v1' AND EXISTS(SELECT 1 FROM eng_job a WHERE a.id::text=j.proposal->'body'->>'jobId' AND a.project_id=j.project_id AND a.proposal->>'flowVersion'='termination-v1'))`
 const kickoffTaskColumns = `j.id::text,CASE WHEN j.proposal->>'kind'='kickoff-domain-agent/v1' THEN 'analysis' ELSE 'adoption' END,
  j.state,j.created_at,j.updated_at,j.error_code,
  CASE WHEN j.proposal->>'kind'='kickoff-adoption/v1' THEN NULLIF(j.proposal->'body'->>'jobId','') END`

@@ -8,7 +8,7 @@ export interface Device {
   managementAddress: string; evidence: Evidence;
 }
 export interface Port { id: string; deviceId: string; name: string; mac?: string; speed: string; role: string; componentId?: string; evidence: Evidence }
-export interface Connection { id: string; a: string; b: string; medium: string; evidence: Evidence }
+export interface Connection { cableModel?:string; cableLengthM?:number; id: string; a: string; b: string; medium: string; evidence: Evidence }
 export interface Component { id: string; deviceId: string; type: string; name: string; model: string; slot: string; evidence: Evidence }
 export interface Rack { id: string; name: string; room: string; capacityU: number | null; evidence: Evidence }
 export interface SourceRegion { id: string; sheet: string; range: string; category: string; rowCount: number; state: 'extracted' | 'needs_input' | 'unmapped'; note: string }
@@ -84,6 +84,7 @@ export interface KickoffAPI {
 
 export interface ReviewSignal {code:string;label:string;severity:'block'|'warning'|'info';impact:string;action:string}
 export interface ReviewFacts {
+ cableModel?:string; cableLengthM?:number|null;
  type:string;model:string;serial:string;ownerId:string;ownerName:string;rackId:string;rackName:string;room:string;mac:string;speed:string;role:string;localPort:string;peerName:string;peerPort:string;medium:string;slot:string;
  startU:number|null;heightU:number|null;capacityU:number|null;
  portCount:number;connectionCount:number;componentCount:number;

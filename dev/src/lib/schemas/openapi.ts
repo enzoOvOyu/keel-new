@@ -63,6 +63,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * @deprecated
+         * @description Retired. Old analysis results cannot enter the current termination workflow.
+         */
         post: operations["reuseKickoffSourceUnderstanding"];
         delete?: never;
         options?: never;
@@ -159,7 +163,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Reuse an immutable same-project historical source and typed candidates without AI. Requires an empty workspace. */
+        /**
+         * @deprecated
+         * @description Retired legacy analysis replay; use current source analysis instead.
+         */
         post: operations["replayKickoffHistoricalSource"];
         delete?: never;
         options?: never;
@@ -7439,6 +7446,10 @@ export interface components {
             evidence: components["schemas"]["KickoffEvidence"];
         };
         KickoffConnection: {
+            /** @description Source cable model associated with this endpoint pair. */
+            cableModel?: string;
+            /** @description Source estimated length in metres, not observed installed length. */
+            cableLengthM?: number | null;
             id: string;
             a: string;
             b: string;
@@ -7681,6 +7692,10 @@ export interface components {
             label: string;
         };
         KickoffReviewFacts: {
+            /** @description Source cable model associated with this endpoint pair. */
+            cableModel?: string;
+            /** @description Source estimated length in metres, not observed installed length. */
+            cableLengthM?: number | null;
             type: string;
             model: string;
             serial: string;
@@ -19065,6 +19080,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
+            /** @description KICKOFF_LEGACY_ANALYSIS_RETIRED */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Permission, missing source/report, revision conflict, unsupported history, or storage failure. */
             422: {
                 headers: {
@@ -19419,6 +19441,13 @@ export interface operations {
             };
             /** @description Workspace changed or already started */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description KICKOFF_LEGACY_ANALYSIS_RETIRED */
+            410: {
                 headers: {
                     [name: string]: unknown;
                 };

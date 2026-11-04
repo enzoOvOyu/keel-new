@@ -43,7 +43,24 @@ func (s *Server) kickoffAgentUnderstanding(w http.ResponseWriter, r *http.Reques
 	}
 	job, state, code, request, err := s.kickoffAgentJob(r.Context(), source, "")
 	if errors.Is(err, pgx.ErrNoRows) {
-		return false
+		var exists bool
+		if e := s.db.QueryRow(r.Context(), `SELECT EXISTS(SELECT 1 FROM kickoff_source WHERE id::text=$1 AND project_id=$2 AND detached_at IS NULL)`, source, s.project).Scan(&exists); e != nil {
+			kickoffAgentFailure(w, e)
+			return true
+		}
+		if !exists {
+			fail(w, 404, "KICKOFF_SOURCE_NOT_FOUND")
+			return true
+		}
+		report := emptyUnderstanding(source, "")
+		report.FlowVersion = "termination-v1"
+		for i := range report.Steps {
+			report.Steps[i].Note = "等待端接资料分析"
+		}
+		report.Origin = "agent"
+		report.Limitations = []string{}
+		respond(w, 200, report)
+		return true
 	}
 	if err != nil {
 		kickoffAgentFailure(w, err)
@@ -325,7 +342,8 @@ func (s *Server) kickoffAgentRegionPreview(w http.ResponseWriter, r *http.Reques
 	}
 	job, state, _, _, err := s.kickoffAgentJob(r.Context(), source, "")
 	if errors.Is(err, pgx.ErrNoRows) {
-		return false
+		fail(w, 404, "KICKOFF_REGION_NOT_FOUND")
+		return true
 	}
 	if err != nil {
 		kickoffAgentFailure(w, err)

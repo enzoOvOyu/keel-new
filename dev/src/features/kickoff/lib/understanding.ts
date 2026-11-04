@@ -1,13 +1,12 @@
 import type { SourceUnderstanding } from './api';
 
 export const understandingStepIds = ['structure', 'regions', 'semantics', 'relationships', 'fields'] as const;
-const legacyNames = {structure:'工作簿结构',regions:'数据区域',semantics:'语义分类',relationships:'跨表关联',fields:'字段核对'};
-const terminationNames = {structure:'端接资料定位',regions:'设备与端口识别',semantics:'关系推理与佐证',relationships:'位置与线缆关联',fields:'候选完整性核对'};
+export const terminationNames = {structure:'端接资料定位',regions:'设备与端口识别',semantics:'关系推理与佐证',relationships:'位置与线缆关联',fields:'候选完整性核对'};
 export const understandingStates = {complete:'已完成',partial:'部分完成',pending:'待处理',unsupported:'暂无结果',not_applicable:'不适用'};
 
 // The version is supplied by the backend; never reinterpret historical counts.
-export function understandingStepName(report: SourceUnderstanding | undefined, id: SourceUnderstanding['steps'][number]['id']) {
-  return (report?.flowVersion === 'termination-v1' ? terminationNames : legacyNames)[id];
+export function understandingStepName(_report: SourceUnderstanding | undefined, id: SourceUnderstanding['steps'][number]['id']) {
+  return terminationNames[id];
 }
 export function understandingDescription(report: SourceUnderstanding | undefined) {
   if (!report || (!report.flowVersion && report.origin !== 'history' && report.steps.every(step => step.state === 'pending' || step.state === 'unsupported'))) {
@@ -15,7 +14,7 @@ export function understandingDescription(report: SourceUnderstanding | undefined
   }
   return report.flowVersion === 'termination-v1'
     ? '端接资料识别 · 五步按实际执行证据展示；候选需人工采用、核对后发布。'
-    : '历史识别流程 · 保留原阶段与证据，不代表已执行新版端接识别。';
+    : '等待端接分析，生成设备、端口与连接候选。';
 }
 export const candidateFieldLabels: Record<string, string> = {
   device_ref:'设备名称', a_device_ref:'A端设备名称', b_device_ref:'B端设备名称',

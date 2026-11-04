@@ -131,6 +131,15 @@ func SelectScope(m engineering.PhysicalModel, v View, ids, facilityIDs []string,
 			}
 		}
 	}
+	selectedConnections := map[string]bool{}
+	for _, id := range p.ConnectionIDs {
+		selectedConnections[id] = true
+	}
+	for _, cable := range m.Cables {
+		if selectedConnections[cable.ConnectionID] {
+			subset.Cables = append(subset.Cables, cable)
+		}
+	}
 	placementCount := map[string]int{}
 	for _, placement := range m.Placements {
 		placementCount[placement.EquipmentID]++
@@ -292,6 +301,11 @@ func FrozenModel(m engineering.PhysicalModel, p Publication) engineering.Physica
 	for _, v := range m.Connections {
 		if connections[v.EntityID] {
 			out.Connections = append(out.Connections, v)
+		}
+	}
+	for _, cable := range m.Cables {
+		if connections[cable.ConnectionID] {
+			out.Cables = append(out.Cables, cable)
 		}
 	}
 	for _, v := range m.Placements {

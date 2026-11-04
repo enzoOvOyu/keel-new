@@ -46,6 +46,10 @@ func (s *Server) kickoffAgentAdopt(w http.ResponseWriter, r *http.Request, sourc
 		return
 	}
 	job, state, _, _, err := s.kickoffAgentJob(r.Context(), source, body.JobID)
+	if errors.Is(err, pgx.ErrNoRows) {
+		fail(w, 404, "KICKOFF_ANALYSIS_NOT_FOUND")
+		return
+	}
 	if err != nil {
 		kickoffAgentFailure(w, err)
 		return

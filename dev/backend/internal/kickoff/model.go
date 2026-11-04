@@ -40,11 +40,13 @@ type Port struct {
 	Evidence    Evidence `json:"evidence"`
 }
 type Connection struct {
-	ID       string   `json:"id"`
-	A        string   `json:"a"`
-	B        string   `json:"b"`
-	Medium   string   `json:"medium"`
-	Evidence Evidence `json:"evidence"`
+	CableModel   string   `json:"cableModel,omitempty"`
+	CableLengthM *float64 `json:"cableLengthM,omitempty"`
+	ID           string   `json:"id"`
+	A            string   `json:"a"`
+	B            string   `json:"b"`
+	Medium       string   `json:"medium"`
+	Evidence     Evidence `json:"evidence"`
 }
 type Component struct {
 	ID       string   `json:"id"`
@@ -207,8 +209,25 @@ func project(m engineering.PhysicalModel, ev []engineering.SourceEvidence, sourc
 			v.Ports = append(v.Ports, Port{ID: p.EntityID, DeviceID: id, Name: p.Name, MAC: stringValue(p.MAC), Speed: speed, Role: p.Role, ComponentID: component, Evidence: evidence(p.EntityID)})
 			media[p.EntityID] = p.Medium
 		}
+		cables := map[string][]engineering.CablePlan{}
+		for _, cable := range m.Cables {
+			cables[cable.ConnectionID] = append(cables[cable.ConnectionID], cable)
+		}
 		for _, c := range m.Connections {
-			v.Connections = append(v.Connections, Connection{ID: c.EntityID, A: c.APortID, B: c.ZPortID, Medium: media[c.APortID], Evidence: evidence(c.EntityID)})
+			link := Connection{ID: c.EntityID, A: c.APortID, B: c.ZPortID, Medium: media[c.APortID], Evidence: evidence(c.EntityID)}
+			if plans := cables[c.EntityID]; len(plans) == 1 {
+				plan := plans[0]
+				link.CableModel = plan.Spec.SourceModelLabel
+				if link.Medium == "" {
+					link.Medium = plan.Spec.Medium
+				}
+				if plan.Estimated != nil && plan.Estimated.Length.Unit == "m" {
+					if length, err := strconv.ParseFloat(plan.Estimated.Length.Value, 64); err == nil && length > 0 {
+						link.CableLengthM = &length
+					}
+				}
+			}
+			v.Connections = append(v.Connections, link)
 		}
 	}
 	for _, i := range ValidationIssues(m) {

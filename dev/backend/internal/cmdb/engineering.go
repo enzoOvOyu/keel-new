@@ -255,6 +255,12 @@ func (s Service) projectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 				return Reject("BREAKOUT_PARENT_UNRESOLVED", 422)
 			}
 		}
+		cablePlans := map[string]engineering.CablePlan{}
+		cableCounts := map[string]int{}
+		for _, plan := range m.Cables {
+			cablePlans[plan.ConnectionID] = plan
+			cableCounts[plan.ConnectionID]++
+		}
 		for _, c := range m.Connections {
 			path := append([]string{c.APortID}, c.PatchPortIDs...)
 			path = append(path, c.ZPortID)
@@ -272,6 +278,22 @@ func (s Service) projectEngineering(ctx context.Context, tx pgx.Tx, event, proje
 					}
 				}
 				attrs := map[string]any{"endpoint_a_uid": path[i], "endpoint_b_uid": path[i+1], "connection_plan_id": c.EntityID, "segment_index": float64(i/2 + 1), "record_kind": "planned_connection", "termination_type": c.TerminationType, "b_rack_position_declaration": c.BRackPosition}
+				// A whole-connection length is not a per-segment length. Only
+				// an unambiguous direct connection carries these planned facts.
+				if len(path) == 2 && cableCounts[c.EntityID] == 1 {
+					plan := cablePlans[c.EntityID]
+					if plan.Spec.SourceModelLabel != "" {
+						attrs["model"] = plan.Spec.SourceModelLabel
+					}
+					if plan.Spec.Medium != "" {
+						attrs["medium"] = plan.Spec.Medium
+					}
+					if plan.Estimated != nil && plan.Estimated.Length.Unit == "m" && plan.Estimated.Length.Validate() == nil {
+						if length, err := strconv.ParseFloat(plan.Estimated.Length.Value, 64); err == nil && length > 0 {
+							attrs["length_m"] = length
+						}
+					}
+				}
 				if e = projectAsset(id, "cable", "规划连接 "+strconv.Itoa(i/2+1), attrs); e != nil {
 					return e
 				}

@@ -17,28 +17,30 @@ type kickoffReviewSignal struct {
 	Action   string `json:"action"`
 }
 type kickoffReviewFacts struct {
-	Type            string `json:"type"`
-	Model           string `json:"model"`
-	Serial          string `json:"serial"`
-	OwnerID         string `json:"ownerId"`
-	OwnerName       string `json:"ownerName"`
-	RackID          string `json:"rackId"`
-	RackName        string `json:"rackName"`
-	Room            string `json:"room"`
-	StartU          *int   `json:"startU"`
-	HeightU         *int   `json:"heightU"`
-	CapacityU       *int   `json:"capacityU"`
-	MAC             string `json:"mac"`
-	Speed           string `json:"speed"`
-	Role            string `json:"role"`
-	LocalPort       string `json:"localPort"`
-	PeerName        string `json:"peerName"`
-	PeerPort        string `json:"peerPort"`
-	Medium          string `json:"medium"`
-	Slot            string `json:"slot"`
-	PortCount       int    `json:"portCount"`
-	ConnectionCount int    `json:"connectionCount"`
-	ComponentCount  int    `json:"componentCount"`
+	CableModel      string   `json:"cableModel"`
+	CableLengthM    *float64 `json:"cableLengthM"`
+	Type            string   `json:"type"`
+	Model           string   `json:"model"`
+	Serial          string   `json:"serial"`
+	OwnerID         string   `json:"ownerId"`
+	OwnerName       string   `json:"ownerName"`
+	RackID          string   `json:"rackId"`
+	RackName        string   `json:"rackName"`
+	Room            string   `json:"room"`
+	StartU          *int     `json:"startU"`
+	HeightU         *int     `json:"heightU"`
+	CapacityU       *int     `json:"capacityU"`
+	MAC             string   `json:"mac"`
+	Speed           string   `json:"speed"`
+	Role            string   `json:"role"`
+	LocalPort       string   `json:"localPort"`
+	PeerName        string   `json:"peerName"`
+	PeerPort        string   `json:"peerPort"`
+	Medium          string   `json:"medium"`
+	Slot            string   `json:"slot"`
+	PortCount       int      `json:"portCount"`
+	ConnectionCount int      `json:"connectionCount"`
+	ComponentCount  int      `json:"componentCount"`
 }
 type kickoffReviewRow struct {
 	ID          string                `json:"id"`
@@ -236,6 +238,8 @@ func kickoffReviewRows(view kickoff.View, pubs []kickoff.Publication, category s
 			f.PeerName = db.Name
 			f.PeerPort = b.Name
 			f.Medium = c.Medium
+			f.CableModel = c.CableModel
+			f.CableLengthM = c.CableLengthM
 			v := kickoffReviewRow{ID: c.ID, Name: da.Name, Description: a.Name, Reference: db.Name + " / " + b.Name, Location: c.Medium, State: "ready", Evidence: c.Evidence, Facts: f, Signals: []kickoffReviewSignal{}}
 			if a.ID == "" || b.ID == "" || da.ID == "" || db.ID == "" {
 				v.State = "blocked"

@@ -269,6 +269,8 @@ paths:
                 $ref: '#/components/schemas/ErrorEnvelope'
   /projects/{projectId}/kickoff/sources/{sourceId}/reuse-history:
     post:
+      deprecated: true
+      description: Retired. Old analysis results cannot enter the current termination workflow.
       operationId: reuseKickoffSourceUnderstanding
       tags:
       - Kickoff
@@ -287,6 +289,8 @@ paths:
         description: Engineering head UUID; stale requests return 409. revision_id is
           accepted as an alias.
       responses:
+        '410':
+          description: KICKOFF_LEGACY_ANALYSIS_RETIRED
         '200':
           description: Rebuildable historical read product; not AI recognition or engineering
             approval.
@@ -687,11 +691,11 @@ paths:
           description: Publication not found in project
   /projects/{projectId}/kickoff/history:
     post:
+      deprecated: true
+      description: Retired legacy analysis replay; use current source analysis instead.
       operationId: replayKickoffHistoricalSource
       tags:
       - Kickoff
-      description: Reuse an immutable same-project historical source and typed candidates
-        without AI. Requires an empty workspace.
       parameters:
       - name: projectId
         in: path
@@ -715,6 +719,8 @@ paths:
                   type: integer
                   minimum: 1
       responses:
+        '410':
+          description: KICKOFF_LEGACY_ANALYSIS_RETIRED
         '201':
           description: Historical snapshot copied
           content:
@@ -19602,6 +19608,13 @@ components:
       type: object
       additionalProperties: false
       properties:
+        cableModel:
+          type: string
+          description: Source cable model associated with this endpoint pair.
+        cableLengthM:
+          type: number
+          nullable: true
+          description: Source estimated length in metres, not observed installed length.
         id:
           type: string
         a:
@@ -20317,6 +20330,13 @@ components:
       type: object
       additionalProperties: false
       properties:
+        cableModel:
+          type: string
+          description: Source cable model associated with this endpoint pair.
+        cableLengthM:
+          type: number
+          nullable: true
+          description: Source estimated length in metres, not observed installed length.
         type:
           type: string
         model:

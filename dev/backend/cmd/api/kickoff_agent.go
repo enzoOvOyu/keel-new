@@ -219,7 +219,7 @@ func (s *Server) kickoffAgentJob(ctx context.Context, source, requested string) 
 	var code *string
 	var raw []byte
 	var request kickoffAgentRequest
-	err := s.db.QueryRow(ctx, `SELECT j.id::text,j.state,j.error_code,j.proposal FROM eng_job j JOIN kickoff_source k ON k.id::text=j.proposal->>'sourceId' AND k.project_id=j.project_id WHERE j.project_id=$1 AND k.id::text=$2 AND k.detached_at IS NULL AND j.proposal->>'kind'=$3 AND ($4='' OR j.id::text=$4) ORDER BY j.created_at DESC,j.id DESC LIMIT 1`, s.project, source, kickoffAgentKind, requested).Scan(&job, &state, &code, &raw)
+	err := s.db.QueryRow(ctx, `SELECT j.id::text,j.state,j.error_code,j.proposal FROM eng_job j JOIN kickoff_source k ON k.id::text=j.proposal->>'sourceId' AND k.project_id=j.project_id WHERE j.project_id=$1 AND k.id::text=$2 AND k.detached_at IS NULL AND j.proposal->>'kind'=$3 AND j.proposal->>'flowVersion'='termination-v1' AND ($4='' OR j.id::text=$4) ORDER BY j.created_at DESC,j.id DESC LIMIT 1`, s.project, source, kickoffAgentKind, requested).Scan(&job, &state, &code, &raw)
 	if err == nil {
 		err = json.Unmarshal(raw, &request)
 	}
