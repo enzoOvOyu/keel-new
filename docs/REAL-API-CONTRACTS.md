@@ -1,6 +1,6 @@
 # 当前真实 API 入口
 
-更新：2026-11-03。主环境前端为`d5c99fb`，API为`ef91704`，发布证据[DEPLOYMENT](kickoff/DEPLOYMENT.json)。精确字段/请求/响应/枚举以[本分支OpenAPI](openapi.yaml)为准；实现、部署及验证按[机器注册表](api/real-api-registry.json)逐项查询。
+更新：2026-11-03。主环境前端为`d5c99fb`，API为`63c8865`，发布证据[DEPLOYMENT](kickoff/DEPLOYMENT.json)。精确字段/请求/响应/枚举以[本分支OpenAPI](openapi.yaml)为准；实现、部署及验证按[机器注册表](api/real-api-registry.json)逐项查询。
 
 | 模块 | 当前语义契约 | 登记范围 | 真实性边界 |
 |---|---|---:|---|

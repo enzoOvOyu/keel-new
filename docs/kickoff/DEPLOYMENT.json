@@ -1,18 +1,18 @@
 {
-  "code_revision": "ef91704f1efd8a6c22dce0ccddb32a551a01fad0",
+  "code_revision": "63c88653209792b8c56bb38bd3a16adc7a54b2a7",
   "frontend_code_revision": "d5c99fb049b1a89bc3de46ae3f76d6a8148733ad",
-  "backend_code_revision": "ef91704f1efd8a6c22dce0ccddb32a551a01fad0",
+  "backend_code_revision": "63c88653209792b8c56bb38bd3a16adc7a54b2a7",
   "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-d5c99fb",
-  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-provider-ef91704",
+  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-provider-63c8865",
   "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-view-actions-98c41e8",
-  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-d5c99fb",
+  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-provider-ef91704",
   "ports": [
     5180,
     8081
   ],
   "migrations": [],
   "api_restarted": true,
-  "binary_sha256": "bf6cfcfc5f5d2c1c27a0e8a07480f25974d3ada657c152563969d79949fa53b7",
+  "binary_sha256": "e16b54cd8fc93a4b46b331ab48d008fdc539ca6a038b4530d68311e0a2639f4c",
   "frontend_index_sha256": "94a73ead142cfb3ae0c9b8db65146a4f60e67d50d30f93d3fda30f687375c7c2",
   "status": "deployed",
   "binary_matches": true,
@@ -23,7 +23,7 @@
     "health": 200,
     "index_matches": true
   },
-  "business_tests": "Project001 failure artifacts read only. Real analysis/adoption/publication NOT RUN.",
+  "business_tests": "No new real analysis/adoption/publication started. Existing user analysis not considered accepted by protocol replay.",
   "provider_calls": 0,
-  "verification": "Targeted Go JSON correction and Kickoff tests, Go build, API registry passed; API health200. Frontend unchanged. No real Provider call."
+  "verification": "10 actual rejected Responses envelopes replayed locally through HTTP and completion parser: all parsed without retry; targeted Responses and JSON correction tests, Go build, API health passed."
 }

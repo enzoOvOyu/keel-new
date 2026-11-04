@@ -7,7 +7,7 @@
 | 范围 | 当前事实 |
 |---|---|
 | 主开发 | `/home/ubuntu/keel-dev`，分支`dev`，应用目录`dev/`；文档定版已整合；本轮历史资料理解已提交dev并按用户要求发布 |
-| 当前主环境 | 5180前端为`d5c99fb` / 8081 API为`ef91704`；关系推理Agent已部署，服务启动和静态资源匹配检查通过。新版真实Provider/MM验收尚未运行，等待用户指令；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json) |
+| 当前主环境 | 5180前端为`d5c99fb` / 8081 API为`63c8865`；关系推理Agent已部署，服务启动和静态资源匹配检查通过。新版真实Provider/MM验收尚未运行，等待用户指令；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json) |
 | Fabric | `/home/ubuntu/keel-fabric-dev`，`feat/fabric-rebuild@6a70041`；5197/8100分支预览，未并入dev；**用户要求暂停，等待上游接入修复通知** |
 | 原型 | Kickoff5195、拓扑/机柜5181、Fabric5194仅设计参考，不是正式事实或执行来源；本次不启停服务 |
 | main与旧目录 | main保留稳定基线；旧Flows/Kestra/visualization detached目录仅残留原型/运行依赖，不在那里继续开发；本次不合并或推送main |
@@ -184,3 +184,5 @@ agent测试1103的新Agent分析已成功：971设备、14308端口、7154连接
 项目001任务baaee7b3新保存的provider_output证据显示：Responses同时返回phase=commentary与phase=final_answer，两条消息各自为合法JSON。旧responsesCompletion拼接全部output_text，导致合法对象被拼成两个相邻对象并误报INVALID_JSON。上轮只修纠错机制未解决此根因。
 
 本轮解析器忽略commentary和非message文本，仅消费最终回答（兼容不带phase的标准消息）；原生function_call继续独立处理。10份实际拒绝响应本地HTTP回放全部一次解析成功，未调用外部Provider；合成多文本分段/纯文字commentary/原有Responses及纠错测试通过，Go构建通过。真实响应仅在私有临时目录，不入Git。项目001完整关系识别与采用入库仍未验收，不将协议回放视为语义验收。
+
+Responses根因修复已部署API `63c8865`，运行二进制匹配且health200。前端仍`d5c99fb`，无迁移。
