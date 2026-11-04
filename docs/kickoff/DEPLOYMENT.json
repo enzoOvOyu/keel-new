@@ -1,34 +1,33 @@
 {
-  "code_revision": "7c26376405bece1f389d7315a00cf0296eff5e5a",
-  "frontend_code_revision": "7c26376405bece1f389d7315a00cf0296eff5e5a",
-  "backend_code_revision": "7c26376405bece1f389d7315a00cf0296eff5e5a",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-7c26376",
-  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-7c26376",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-c80611d",
-  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-provider-3e6061d",
+  "code_revision": "2ddc1f9430ad6e17ba869c92ce00711e8e8dad13",
+  "frontend_code_revision": "2ddc1f9430ad6e17ba869c92ce00711e8e8dad13",
+  "backend_code_revision": "2ddc1f9430ad6e17ba869c92ce00711e8e8dad13",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-2ddc1f9",
+  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-2ddc1f9",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-7c26376",
+  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-7c26376",
   "ports": [
     5180,
     8081
   ],
   "migrations": [],
   "api_restarted": true,
-  "binary_sha256": "cd081fdde93eacf111761e5a947a5eca442ceafe15bdd4aa4f3b65bba97fb4b0",
-  "frontend_index_sha256": "152325674a6e87ec7907f8bc174cbdc744bd3071af5337af0036666ee0733f84",
+  "binary_sha256": "ceb33f2301376e8817e833a87eba84b25a90487c1cb0616944b594d3d665281b",
+  "frontend_index_sha256": "6e2f29a813ddc1a01eae9d70ce6985aadec69085a3873771c5177b5533f3cf5d",
   "status": "deployed",
   "binary_matches": true,
   "frontend_index_matches": true,
-  "old_assets_retained": 750,
   "checks": {
     "frontend": 200,
     "health": 200,
     "index_matches": true
   },
-  "business_tests": "No real Provider analysis, customer adoption or CMDB publication executed.",
+  "business_tests": "Synthetic candidates in disposable database: 2 devices, 2 ports, 1 connection, 2 placements published; cable model/3.5m retained; repeated adoption entity count 9 to 9. Real Provider/workbook not rerun.",
   "provider_calls": 0,
-  "verification": "Targeted termination graph, name identity adoption/review/publication plan tests; TypeScript, Vite, Go build and contract checks passed. API health and frontend artifact match passed.",
+  "verification": "TypeScript, Vite, Go build and targeted checks passed; isolated database no-SN adoption/review/publication integration passed.",
   "ui_verification": {
     "status": "PASS",
-    "scope": "Existing project002 sources/review/publish read-only page load, historical flow separation, no horizontal overflow or JS error; no AI or business writes",
-    "evidence": "docs/kickoff/TERMINATION-UI-CHECK.json"
+    "scope": "Current five steps visible, legacy tasks/candidates absent, legacy result 404, reuse entry removed; no JavaScript errors. Read-only existing project.",
+    "evidence": "docs/kickoff/CURRENT-FLOW-CHECK.json"
   }
 }

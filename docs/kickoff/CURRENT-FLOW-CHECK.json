@@ -1,0 +1,10 @@
+{
+  "checks": [
+    "current five stages visible without new analysis",
+    "legacy candidates and tasks absent",
+    "direct legacy result request rejected",
+    "history reuse entry removed"
+  ],
+  "errors": [],
+  "status": "PASS"
+}
