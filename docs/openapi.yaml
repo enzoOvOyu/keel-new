@@ -117,6 +117,44 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorEnvelope"
+  /projects/{projectId}/kickoff/sources/{sourceId}/tasks/{jobId}/cancel:
+    post:
+      operationId: cancelKickoffSourceAnalysis
+      tags: [Kickoff]
+      description: Requires bom:import in the current project. Idempotently terminates a pending/running termination-v1 analysis only. Persists failed with CANCELLED_BY_USER, clears worker claim, audits cancellation. Existing heartbeat cancels execution within 20 seconds. Completed tasks are unchanged; adoption is not cancellable here.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: sourceId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: jobId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Current persisted task; repeated cancellation returns the same terminal state.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, request_id]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/KickoffSourceTask'
+                  request_id:
+                    type: string
+        '403':
+          description: Insufficient project permission.
+        '404':
+          description: Analysis not found in the selected project and source.
   /projects/{projectId}/kickoff/sources/{sourceId}/tasks/{jobId}:
     get:
       operationId: getKickoffSourceTask

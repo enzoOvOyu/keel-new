@@ -101,6 +101,8 @@ func (s *Server) kickoffRoutes(w http.ResponseWriter, r *http.Request) bool {
 		s.kickoffPublish(w, r)
 	case len(p) == 7 && p[5] == "publications" && r.Method == "GET":
 		s.kickoffPublication(w, r, p[6])
+	case len(p) == 10 && p[5] == "sources" && p[7] == "tasks" && p[9] == "cancel" && r.Method == "POST":
+		s.kickoffCancelAnalysis(w, r, p[6], p[8])
 	case len(p) == 8 && p[5] == "sources" && p[7] == "analyze" && r.Method == "POST":
 		s.kickoffAgentAnalyze(w, r, p[6])
 	case len(p) == 8 && p[5] == "sources" && p[7] == "analysis" && r.Method == "GET":

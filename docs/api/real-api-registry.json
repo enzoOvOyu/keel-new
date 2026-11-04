@@ -2298,7 +2298,7 @@
       "module": "kickoff",
       "development_changes": "Facility-only delta scope and project-local published endpoint references; Agent candidate flow where applicable. Deployed; behavior not tested.",
       "response_schema": "KickoffAnalysisQueued",
-      "implementation_notes": "端接驱动termination-v1；名称身份、可选SN、候选采用与五步证据见docs/kickoff/TERMINATION-REFACTOR.md。真实Provider验收未运行。"
+      "implementation_notes": "\u7aef\u63a5\u9a71\u52a8termination-v1\uff1b\u540d\u79f0\u8eab\u4efd\u3001\u53ef\u9009SN\u3001\u5019\u9009\u91c7\u7528\u4e0e\u4e94\u6b65\u8bc1\u636e\u89c1docs/kickoff/TERMINATION-REFACTOR.md\u3002\u771f\u5b9eProvider\u9a8c\u6536\u672a\u8fd0\u884c\u3002"
     },
     {
       "method": "get",
@@ -3122,7 +3122,7 @@
       "documentation": "docs/api/kickoff.md",
       "verification_evidence": "docs/kickoff/HISTORY-UNDERSTANDING-CHECK.json",
       "module": "kickoff",
-      "implementation_notes": "端接驱动termination-v1；名称身份、可选SN、候选采用与五步证据见docs/kickoff/TERMINATION-REFACTOR.md。真实Provider验收未运行。"
+      "implementation_notes": "\u7aef\u63a5\u9a71\u52a8termination-v1\uff1b\u540d\u79f0\u8eab\u4efd\u3001\u53ef\u9009SN\u3001\u5019\u9009\u91c7\u7528\u4e0e\u4e94\u6b65\u8bc1\u636e\u89c1docs/kickoff/TERMINATION-REFACTOR.md\u3002\u771f\u5b9eProvider\u9a8c\u6536\u672a\u8fd0\u884c\u3002"
     },
     {
       "method": "post",
@@ -3199,7 +3199,7 @@
       "deployed_revision": "66ce278e3ce47ee1aa189a3aee4a1713afa3a1a7",
       "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
       "development_changes": "",
-      "implementation_notes": "端接驱动termination-v1；名称身份、可选SN、候选采用与五步证据见docs/kickoff/TERMINATION-REFACTOR.md。真实Provider验收未运行。"
+      "implementation_notes": "\u7aef\u63a5\u9a71\u52a8termination-v1\uff1b\u540d\u79f0\u8eab\u4efd\u3001\u53ef\u9009SN\u3001\u5019\u9009\u91c7\u7528\u4e0e\u4e94\u6b65\u8bc1\u636e\u89c1docs/kickoff/TERMINATION-REFACTOR.md\u3002\u771f\u5b9eProvider\u9a8c\u6536\u672a\u8fd0\u884c\u3002"
     },
     {
       "method": "post",
@@ -3223,7 +3223,7 @@
       "deployed_revision": "66ce278e3ce47ee1aa189a3aee4a1713afa3a1a7",
       "deployment_evidence": "docs/kickoff/DEPLOYMENT.json",
       "development_changes": "Background adoption reuses existing engineering queue/claim/heartbeat, evidence and identity indexes.",
-      "implementation_notes": "端接驱动termination-v1；名称身份、可选SN、候选采用与五步证据见docs/kickoff/TERMINATION-REFACTOR.md。真实Provider验收未运行。"
+      "implementation_notes": "\u7aef\u63a5\u9a71\u52a8termination-v1\uff1b\u540d\u79f0\u8eab\u4efd\u3001\u53ef\u9009SN\u3001\u5019\u9009\u91c7\u7528\u4e0e\u4e94\u6b65\u8bc1\u636e\u89c1docs/kickoff/TERMINATION-REFACTOR.md\u3002\u771f\u5b9eProvider\u9a8c\u6536\u672a\u8fd0\u884c\u3002"
     },
     {
       "method": "get",
@@ -3277,6 +3277,26 @@
       "module": "kickoff",
       "deployed_revision": "d2f9accb146239cc9191f3fa60c0442985af3e22",
       "verification_evidence": "docs/kickoff/DEPLOYMENT.json"
+    },
+    {
+      "method": "post",
+      "path": "/projects/{projectId}/kickoff/sources/{sourceId}/tasks/{jobId}/cancel",
+      "operation_id": "cancelKickoffSourceAnalysis",
+      "response_schema": "KickoffSourceTask",
+      "implementation": "implemented",
+      "deployment": "pending",
+      "verification": "targeted isolated integration pending",
+      "handler": "dev/backend/cmd/api/kickoff_tasks.go",
+      "source": "dev/backend/cmd/api/kickoff_tasks.go",
+      "documentation": "docs/api/kickoff.md",
+      "verification_evidence": "docs/kickoff/TERMINATION-REFACTOR.md",
+      "scope": "current project and attached source analysis only",
+      "permission": "bom:import",
+      "loading_cache": "Explicit mutation; refresh analysis and task list",
+      "errors": "403 forbidden; 404 analysis not found",
+      "side_effects": "Cancel analysis claim and persist audit; no CMDB changes",
+      "limitations": "Worker observes cancellation within 20 seconds; no adoption cancellation",
+      "module": "kickoff"
     }
   ],
   "development_note": "Frontend source redesign reverted 860029b with async compatibility retained; API 932c424. Async queue202/dedup verified, actual MM adoption failed duplicate entity identity; unshipped fix in worktree. Readonly rollback UI passed.",

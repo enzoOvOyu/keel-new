@@ -53,6 +53,7 @@ export interface FacilityPublicationOption extends PublicationOption {label:stri
 export interface PublicationOptions {revision:number;devices:PublicationOption[];facilities?:FacilityPublicationOption[]}
 export interface KickoffAPI {
  refresh?():Promise<void>;
+ cancelSourceAnalysis?(id:string,jobId:string):Promise<SourceTask>;
  sourceTasks?(sourceId:string,offset?:number,limit?:number):Promise<SourceTaskPage>;
  sourceTask?(sourceId:string,jobId:string):Promise<SourceTaskDetail>;
  adoptionStatus?(sourceId:string):Promise<AdoptionTask|null>;

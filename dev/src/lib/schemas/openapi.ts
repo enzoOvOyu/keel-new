@@ -21,6 +21,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/kickoff/sources/{sourceId}/tasks/{jobId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Requires bom:import in the current project. Idempotently terminates a pending/running termination-v1 analysis only. Persists failed with CANCELLED_BY_USER, clears worker claim, audits cancellation. Existing heartbeat cancels execution within 20 seconds. Completed tasks are unchanged; adoption is not cancellable here. */
+        post: operations["cancelKickoffSourceAnalysis"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/projects/{projectId}/kickoff/sources/{sourceId}/tasks/{jobId}": {
         parameters: {
             query?: never;
@@ -18868,6 +18885,47 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
+            };
+        };
+    };
+    cancelKickoffSourceAnalysis: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                sourceId: string;
+                jobId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current persisted task; repeated cancellation returns the same terminal state. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["KickoffSourceTask"];
+                        request_id: string;
+                    };
+                };
+            };
+            /** @description Insufficient project permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Analysis not found in the selected project and source. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

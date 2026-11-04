@@ -248,3 +248,8 @@
 .kickoff-workspace .source-analysis-flow>.source-analysis-toolbar{margin-left:auto;padding:0;border:0;flex-direction:column;align-items:flex-end;gap:6px}
 .kickoff-workspace .source-analysis-flow .source-analysis-status{font-size:11px}
 @media(max-width:760px){.kickoff-workspace .source-analysis-flow>.recognition-pipeline{min-width:0;flex-basis:100%}.kickoff-workspace .source-analysis-flow>.source-analysis-toolbar{flex-direction:row;align-items:center;width:100%;justify-content:space-between}}
+
+.kickoff-workspace .button.source-analysis-cancel{background:var(--danger);border-color:var(--danger);color:#fff;min-width:82px}.kickoff-workspace .button.source-analysis-cancel:hover:not(:disabled){filter:brightness(.92)}
+
+.kickoff-workspace .source-analysis-toolbar .actions{flex-wrap:wrap}.kickoff-workspace .button.source-analysis-start,.kickoff-workspace .button.source-analysis-cancel{width:108px;height:34px;padding:8px 10px}
+.kickoff-workspace .source-analysis-toolbar .actions:has(.source-analysis-cancel){display:grid;grid-template-columns:repeat(2,108px);gap:8px}.kickoff-workspace .source-analysis-toolbar .actions:has(.source-analysis-cancel)>:first-child{grid-column:1/-1;justify-self:start}

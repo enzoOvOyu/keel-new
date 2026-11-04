@@ -14,6 +14,7 @@ export function SourceAgentPanel({sourceId,sourceName,onResult,children}:{source
  const [selected,setSelected]=useState<AnalysisDomain[]>(defaultDomains);
  const [report,setReport]=useState<SourceAnalysis>(),[error,setError]=useState(''),[busy,setBusy]=useState(false),[retry,setRetry]=useState(0);
  const [tables,setTables]=useState<string[]>([]),[preview,setPreview]=useState<string>();
+ const [cancelling,setCancelling]=useState(false);
  const [scopeOpen,setScopeOpen]=useState(false);
  const [tasks,setTasks]=useState<SourceTaskPage>(),[taskOffset,setTaskOffset]=useState(0),[taskRetry,setTaskRetry]=useState(0);
  const [tasksLoading,setTasksLoading]=useState(false),[tasksError,setTasksError]=useState('');
@@ -33,6 +34,7 @@ export function SourceAgentPanel({sourceId,sourceName,onResult,children}:{source
   if(api.sourceAnalysis)void read();return()=>{live=false;if(timer)clearTimeout(timer)};
  },[api,sourceId,retry]);
  const start=async(scope:AnalysisDomain[])=>{setBusy(true);setError('');try{await api.startSourceAnalysis!(sourceId,scope);setScopeOpen(false);setRetry(v=>v+1);onResult();notify('分析任务已排队；候选生成后仍需确认采用。');}catch(e){setError((e as Error).message);}finally{setBusy(false)}};
+ const cancel=async()=>{if(!report?.jobId||!api.cancelSourceAnalysis)return;setCancelling(true);setError('');try{await api.cancelSourceAnalysis(sourceId,report.jobId);setReport(v=>v?{...v,state:'failed',errorCode:'CANCELLED_BY_USER'}:v);setRetry(v=>v+1);setTaskRetry(v=>v+1);onResult();notify('分析任务已终止');}catch(e){setError((e as Error).message);}finally{setCancelling(false);}};
  // History is server-owned; refresh only while real tasks are active.
  useEffect(()=>{if(!api.sourceTasks)return;let live=true;let timer:ReturnType<typeof setTimeout>|undefined;
   setTasksLoading(true);setTasksError('');
@@ -55,17 +57,18 @@ export function SourceAgentPanel({sourceId,sourceName,onResult,children}:{source
   <div className="source-analysis-flow">
    {typeof children==='function'?children(report):children}
   <aside className="source-agent-actions"><div className="source-analysis-toolbar"><b>Agent 任务</b>
-   <span className="source-analysis-status" role="status" aria-busy={running||adopting||busy}>{(running||adopting||busy)&&<LoaderCircle size={14} className="source-task-spinner" aria-hidden="true"/>}{adopting?'候选采用任务处理中':report?states[report.state]:'正在读取分析状态…'}{report?.state==='failed'&&report.errorCode?' · '+apiError(report.errorCode):''}{report?.adoption?.state==='failed'?' · 采用失败：'+apiError(report.adoption.errorCode??'ENGINEERING_ANALYSIS_FAILED'):''}{report?.adoption?.state==='succeeded'?' · 本次采用已处理，可进入数据核对':''}</span>
+   <span className="source-analysis-status" role="status" aria-busy={running||adopting||busy}>{(running||adopting||busy)&&<LoaderCircle size={14} className="source-task-spinner" aria-hidden="true"/>}{adopting?'候选采用任务处理中':report?report.errorCode==='CANCELLED_BY_USER'?'已终止':states[report.state]:'正在读取分析状态…'}{report?.state==='failed'&&report.errorCode&&report.errorCode!=='CANCELLED_BY_USER'?' · '+apiError(report.errorCode):''}{report?.adoption?.state==='failed'?' · 采用失败：'+apiError(report.adoption.errorCode??'ENGINEERING_ANALYSIS_FAILED'):''}{report?.adoption?.state==='succeeded'?' · 本次采用已处理，可进入数据核对':''}</span>
    <div className="actions">
     <Button disabled={!supported||!report||busy||running||adopting||!can('bom:import')} onClick={()=>setScopeOpen(true)}>分析范围</Button>
-    <Button kind="primary" disabled={!supported||!report||busy||running||adopting||!can('bom:import')} onClick={()=>void start(defaultDomains)}>{adopting?'正在采用…':busy?'正在排队…':running?states[report!.state]:report?.jobId?'重新分析资料':'开始分析'}</Button>
+    <Button kind="primary" className="source-analysis-start" disabled={!supported||!report||busy||running||adopting||!can('bom:import')} onClick={()=>void start(defaultDomains)}>{adopting?'正在采用…':busy?'正在排队…':running?states[report!.state]:report?.jobId?'重新分析资料':'开始分析'}</Button>
+    {api.cancelSourceAnalysis&&<Button kind="danger" className="source-analysis-cancel" disabled={!running||cancelling||!can('bom:import')} onClick={()=>void cancel()}>{cancelling?'正在终止…':'终止任务'}</Button>}
    </div>
   </div>
 
    <div className="source-task-history"><div className="source-task-history-heading"><b>AI 执行记录</b><Button kind="ghost" onClick={()=>setTaskRetry(v=>v+1)}>刷新</Button></div>
     <div className="source-task-scroll">{!api.sourceTasks?<p className="muted">任务记录接口尚未接入</p>:tasksError?<Notice tone="error">{tasksError}</Notice>:tasksLoading?<p role="status">正在读取任务记录…</p>:tasks?.items.length?tasks.items.map(task=><div key={task.id} title={task.id} className={'source-task-row '+(selectedTask===task.id?'selected':'')}>
-     <div><b>{task.kind==='analysis'?'资料分析':'候选采用'}</b><span>{(task.state==='pending'||task.state==='running')&&<LoaderCircle size={12} className="source-task-spinner" aria-hidden="true"/>}{taskState(task.state)}</span></div><small>{formatDate(task.createdAt)}</small>
-     {task.errorCode&&<p>{apiError(task.errorCode)}</p>}
+     <div><b>{task.kind==='analysis'?'资料分析':'候选采用'}</b><span>{(task.state==='pending'||task.state==='running')&&<LoaderCircle size={12} className="source-task-spinner" aria-hidden="true"/>}{task.errorCode==='CANCELLED_BY_USER'?'已终止':taskState(task.state)}</span></div><small>{formatDate(task.createdAt)}</small>
+     {task.errorCode&&task.errorCode!=='CANCELLED_BY_USER'&&<p>{apiError(task.errorCode)}</p>}
      <button className="text-link" onClick={()=>setSelectedTask(task.id)}>资料理解与候选证据</button>
     </div>):<p className="muted">暂无任务记录</p>}
     </div>{tasks&&tasks.total>0&&<div className="source-task-pagination"><span>共 {tasks.total} 次任务</span><Button kind="ghost" disabled={tasksLoading||taskOffset===0} onClick={()=>setTaskOffset(v=>Math.max(0,v-5))}>上一页</Button><Button kind="ghost" disabled={tasksLoading||taskOffset+tasks.limit>=tasks.total} onClick={()=>setTaskOffset(v=>v+5)}>下一页</Button></div>}

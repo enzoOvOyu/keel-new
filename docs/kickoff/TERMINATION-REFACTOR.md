@@ -35,3 +35,7 @@
 旧任务、候选、区域及历史复用入口退出当前流程；主页面固定新版五步，无新分析时显示待分析。旧分析不能再次采用。线缆规格与资料米制长度贯穿采用、核对、冻结发布范围和 CMDB planned 属性；不覆盖 observed。
 
 隔离数据库 TestKickoffNoSNAdoptionPublication 已通过：2设备、2端口、1连接、2落位，无SN；核对规格/长度保留，发布回执完成，CMDB规划线长3.5米，重复采用实体数9→9。采用合成候选，未调用真实Provider；不作为真实工作簿AI识别验收。
+
+## 分析终止验证
+
+TestKickoffNoSNAdoptionPublication增加cancel_pending/cancel_running并通过：同项目资料任务终止、重复终止幂等、错误资料404，清除claim后原worker完成写入影响0行。取消保留原有任务状态枚举，以failed/CANCELLED_BY_USER表达；前端任务记录显示已终止。未调用外部AI。

@@ -187,3 +187,46 @@ func (s *Server) kickoffTasks(w http.ResponseWriter, r *http.Request, source, jo
 	}
 	respond(w, 200, out)
 }
+
+// Cancel only the selected same-project analysis. Clearing the claim fences late
+// writes and the existing worker heartbeat cancels the provider request.
+func (s *Server) kickoffCancelAnalysis(w http.ResponseWriter, r *http.Request, source, job string) {
+	if !kickoffAgentPermission(w, r, s.project, "bom:import") {
+		return
+	}
+	ctx := r.Context()
+	tx, err := s.db.Begin(ctx)
+	if err != nil {
+		kickoffAgentFailure(w, err)
+		return
+	}
+	defer tx.Rollback(ctx)
+	task, err := scanKickoffTask(tx.QueryRow(ctx, `SELECT `+kickoffTaskColumns+kickoffTaskScope+` AND j.id::text=$3 AND j.proposal->>'kind'='kickoff-domain-agent/v1' FOR UPDATE OF j`, s.project, source, job))
+	if errors.Is(err, pgx.ErrNoRows) {
+		fail(w, 404, "KICKOFF_ANALYSIS_NOT_FOUND")
+		return
+	}
+	if err != nil {
+		kickoffAgentFailure(w, err)
+		return
+	}
+	if task.State == "pending" || task.State == "running" {
+		_, err = tx.Exec(ctx, `UPDATE eng_job SET state='failed',error_code='CANCELLED_BY_USER',claim_id=NULL,updated_at=now() WHERE id::text=$1`, job)
+		if err == nil {
+			err = s.kickoffAudit(ctx, tx, "kickoff.analysis.cancelled", source, map[string]any{"jobId": job})
+		}
+		if err != nil {
+			kickoffAgentFailure(w, err)
+			return
+		}
+		task.State = "failed"
+		code := "CANCELLED_BY_USER"
+		task.ErrorCode = &code
+		task.UpdatedAt = time.Now()
+	}
+	if err = tx.Commit(ctx); err != nil {
+		kickoffAgentFailure(w, err)
+		return
+	}
+	respond(w, 200, task)
+}

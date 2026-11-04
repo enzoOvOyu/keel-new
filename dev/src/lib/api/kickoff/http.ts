@@ -1,6 +1,6 @@
 import { apiRequest } from '../request';
 import { publishPreview } from './provider';
-import type { KickoffAPI, Workspace, ModelRow, Publication, Calculation, ReviewPage, SourceUnderstanding, SourceRegionPreview, PublicationOptions, AnalysisDomain, SourceAnalysis,AdoptionTask,SourceTaskPage,SourceTaskDetail } from './types';
+import type { KickoffAPI, Workspace, ModelRow, Publication, Calculation, ReviewPage, SourceUnderstanding, SourceRegionPreview, PublicationOptions, AnalysisDomain, SourceAnalysis,AdoptionTask,SourceTask,SourceTaskPage,SourceTaskDetail } from './types';
 
 export class HttpKickoffProvider implements KickoffAPI {
  private state:Workspace;
@@ -28,6 +28,7 @@ export class HttpKickoffProvider implements KickoffAPI {
  sourceAnalysis=async(id:string,jobId?:string)=>{const report=await apiRequest<SourceAnalysis>(this.path('/sources/'+encodeURIComponent(id)+'/analysis'+(jobId?'?jobId='+encodeURIComponent(jobId):'')),'GET',undefined,undefined,this.controller.signal);await this.syncAdoption(report.adoption);return report;};
  adoptSourceAnalysis=async(id:string,jobId:string,tableIds:string[])=>{await this.refresh();return apiRequest<AdoptionTask>(this.path('/sources/'+encodeURIComponent(id)+'/analysis/adopt'),'POST',{jobId,tableIds,expectedRevision:this.state.revision});};
 
+ cancelSourceAnalysis=(id:string,jobId:string)=>apiRequest<SourceTask>(this.path('/sources/'+encodeURIComponent(id)+'/tasks/'+encodeURIComponent(jobId)+'/cancel'),'POST',{});
  sourceTasks=(id:string,offset=0,limit=5)=>apiRequest<SourceTaskPage>(this.path('/sources/'+encodeURIComponent(id)+'/tasks?'+new URLSearchParams({offset:String(offset),limit:String(limit)})),'GET',undefined,undefined,this.controller.signal);
  sourceTask=(id:string,jobId:string)=>apiRequest<SourceTaskDetail>(this.path('/sources/'+encodeURIComponent(id)+'/tasks/'+encodeURIComponent(jobId)),'GET',undefined,undefined,this.controller.signal);
  private syncAdoption=async(task?:AdoptionTask|null)=>{if(task?.state==='succeeded'&&task.result&&task.result.revision>this.state.revision)await this.refresh();};

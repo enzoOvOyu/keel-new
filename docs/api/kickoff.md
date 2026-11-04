@@ -202,3 +202,6 @@ POST analysis/adopt返回202与KickoffAdoptionTask，不等待合并；任务复
 当前analysis/understanding/region-preview/tasks及采用仅接受flowVersion=termination-v1；旧识别结果不再返回或允许采用。无新任务时返回空候选及新版待分析步骤，不回退旧报告。reuse-history及history入口退役返回410 KICKOFF_LEGACY_ANALYSIS_RETIRED，前端入口删除。历史原始存储不再进入当前工作链。
 
 KickoffConnection与KickoffReviewFacts新增cableModel/cableLengthM，单一连接的源线缆规格和估算米数进入核对列表、详情抽屉；多段线缆不冒充单根线长，安装实测长度保持独立。
+
+### 终止分析任务
+POST `/projects/{projectId}/kickoff/sources/{sourceId}/tasks/{jobId}/cancel`，bom:import，当前项目/未移除资料/新版分析任务范围。返回KickoffSourceTask；pending/running原子改为failed+CANCELLED_BY_USER并清除claim，同事务审计；重复调用幂等，完成任务保持原状态。旧worker心跳最多20秒取消上下文，迟到写入被claim围栏拒绝。仅分析可终止，不取消采用、不修改已采用或CMDB数据。前端按钮与开始分析并列，红色同尺寸；空闲禁用，提交时显示正在终止，完成后刷新任务/五步。无缓存变更。404任务不存在，403权限不足。

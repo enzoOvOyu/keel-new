@@ -281,5 +281,29 @@ func TestKickoffNoSNAdoptionPublication(t *testing.T) {
 	if facts["cableLengthM"] != float64(3.5) && facts["cableLengthM"] != "3.5" || facts["cableModel"] != "Synthetic DAC" {
 		t.Errorf("review cable attributes lost: %+v", facts)
 	}
+	for _, initial := range []string{"pending", "running"} {
+		t.Run("cancel_"+initial, func(t *testing.T) {
+			id := uuid.NewString()
+			claim := uuid.NewString()
+			if _, e := db.Exec(ctx, `INSERT INTO eng_job(id,source_id,project_id,expected_revision,state,claim_id,proposal) VALUES($1,$2,$3,$4,$5,$6,$7)`, id, source, project, engVersion, initial, claim, jsonBytes(request)); e != nil {
+				t.Fatal(e)
+			}
+			call("POST", "sources/"+source+"/tasks/"+id+"/cancel", nil, 200)
+			call("POST", "sources/"+source+"/tasks/"+id+"/cancel", nil, 200)
+			var state, code string
+			var fenced bool
+			if e := db.QueryRow(ctx, `SELECT state,error_code,claim_id IS NULL FROM eng_job WHERE id=$1`, id).Scan(&state, &code, &fenced); e != nil {
+				t.Fatal(e)
+			}
+			if state != "failed" || code != "CANCELLED_BY_USER" || !fenced {
+				t.Fatalf("cancel failed: %s %s %v", state, code, fenced)
+			}
+			tag, e := db.Exec(ctx, `UPDATE eng_job SET state='succeeded' WHERE id=$1 AND claim_id=$2`, id, claim)
+			if e != nil || tag.RowsAffected() != 0 {
+				t.Fatal("late worker write not fenced", e)
+			}
+			call("POST", "sources/"+uuid.NewString()+"/tasks/"+id+"/cancel", nil, 404)
+		})
+	}
 	t.Logf("isolated no-SN closure: devices=2 ports=2 connections=1 placements=2, repeat adoption entities=%d/%d, publication=%s", beforeEntities, afterEntities, publication.State)
 }
