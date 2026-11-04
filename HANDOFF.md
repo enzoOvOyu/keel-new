@@ -178,3 +178,9 @@ agent测试1103的新Agent分析已成功：971设备、14308端口、7154连接
 验证：定向TestKickoff、JSON纠正成功/再次失败/证据保留及原生工具纠错用例通过，Go构建通过。未启动真实Provider/项目001分析、采用或CMDB发布；本轮不宣称真实项目验收通过。部署状态见DEPLOYMENT。
 
 项目001修复已部署API `ef91704`，health200且运行二进制匹配；5180前端保持`d5c99fb`。无迁移，未调用真实Provider。
+
+## 2026-11-04 · INVALID_JSON实际根因已确认
+
+项目001任务baaee7b3新保存的provider_output证据显示：Responses同时返回phase=commentary与phase=final_answer，两条消息各自为合法JSON。旧responsesCompletion拼接全部output_text，导致合法对象被拼成两个相邻对象并误报INVALID_JSON。上轮只修纠错机制未解决此根因。
+
+本轮解析器忽略commentary和非message文本，仅消费最终回答（兼容不带phase的标准消息）；原生function_call继续独立处理。10份实际拒绝响应本地HTTP回放全部一次解析成功，未调用外部Provider；合成多文本分段/纯文字commentary/原有Responses及纠错测试通过，Go构建通过。真实响应仅在私有临时目录，不入Git。项目001完整关系识别与采用入库仍未验收，不将协议回放视为语义验收。

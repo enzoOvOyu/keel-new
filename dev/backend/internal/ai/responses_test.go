@@ -38,3 +38,20 @@ func TestResponsesToolHistory(t *testing.T) {
 		t.Fatal("truncated response accepted")
 	}
 }
+
+func TestResponsesFinalAnswerExcludesCommentary(t *testing.T) {
+	for _, commentary := range []string{`{"action":"inspect_sheet","sheet":"synthetic"}`, "Inspecting the supplied workbook."} {
+		raw, _ := json.Marshal(map[string]any{"status": "completed", "output": []any{
+			map[string]any{"type": "message", "phase": "commentary", "content": []any{map[string]string{"type": "output_text", "text": commentary}}},
+			map[string]any{"type": "reasoning", "content": []any{map[string]string{"type": "output_text", "text": "not a final result"}}},
+			map[string]any{"type": "message", "phase": "final_answer", "content": []any{map[string]string{"type": "output_text", "text": `{"action":"inspect_sheet",`}, map[string]string{"type": "output_text", "text": `"sheet":"synthetic"}`}}},
+		}})
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { _, _ = w.Write(raw) }))
+		p := Provider{Endpoint: server.URL, Protocol: "openai-responses", Timeout: time.Second}
+		result, err := p.completeJSON(context.Background(), "Return JSON", map[string]any{})
+		server.Close()
+		if err != nil || string(result) != `{"action":"inspect_sheet","sheet":"synthetic"}` {
+			t.Fatalf("final answer corrupted: %s %v", result, err)
+		}
+	}
+}

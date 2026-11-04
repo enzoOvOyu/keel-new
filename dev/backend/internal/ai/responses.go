@@ -70,6 +70,7 @@ func responsesCompletion(raw []byte) ([]byte, error) {
 		Status string `json:"status"`
 		Output []struct {
 			Type      string `json:"type"`
+			Phase     string `json:"phase"`
 			Name      string `json:"name"`
 			Arguments string `json:"arguments"`
 			Content   []struct {
@@ -96,6 +97,12 @@ func responsesCompletion(raw []byte) ([]byte, error) {
 	for _, item := range r.Output {
 		if item.Type == "function_call" {
 			calls = append(calls, map[string]any{"function": map[string]string{"name": item.Name, "arguments": item.Arguments}})
+		}
+		// Commentary is an intermediate assistant message, not part of the
+		// final structured result. Concatenating it with final_answer produces
+		// invalid JSON even when both messages contain valid objects.
+		if item.Type != "message" || item.Phase == "commentary" {
+			continue
 		}
 		for _, part := range item.Content {
 			if part.Type == "refusal" {
