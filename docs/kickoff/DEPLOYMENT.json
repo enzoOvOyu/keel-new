@@ -1,18 +1,18 @@
 {
-  "code_revision": "c80611d74ea35e6d05589479756c85954b2a5db2",
+  "code_revision": "8ec5420726fa074ba908408c91dd653677b1a97b",
   "frontend_code_revision": "c80611d74ea35e6d05589479756c85954b2a5db2",
-  "backend_code_revision": "c80611d74ea35e6d05589479756c85954b2a5db2",
+  "backend_code_revision": "8ec5420726fa074ba908408c91dd653677b1a97b",
   "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-c80611d",
-  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-c80611d",
+  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-provider-8ec5420",
   "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-d5c99fb",
-  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-provider-63c8865",
+  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-c80611d",
   "ports": [
     5180,
     8081
   ],
   "migrations": [],
   "api_restarted": true,
-  "binary_sha256": "6b8963c04ef3758dcb5b82f692320e1fc93352a3a9cb45e6fa6dce3ce0331890",
+  "binary_sha256": "d1bc8304532870667df111bc3fe62a931c4c422da99b246a9850ab6c91ee2e30",
   "frontend_index_sha256": "8a5efc33a0c197e394f3aeeaf7898e843c4cd2eea4a8fad34b900db7eecc1573",
   "status": "deployed",
   "binary_matches": true,
@@ -23,7 +23,7 @@
     "health": 200,
     "index_matches": true
   },
-  "business_tests": "Existing project001 revision7 and five review categories checked read-only. No new Agent analysis, adoption or CMDB writes. Browser interaction not run.",
-  "provider_calls": 0,
-  "verification": "Go candidate eligibility tests, frontend Provider revision lifecycle checks, TypeScript/Vite, Go build and API registry passed. Existing project001 candidate replay and read-only handlers passed. Deployment health200 and frontend index match."
+  "business_tests": "Project001 source analysis b8e57cdb-fcae-4839-b8eb-a9829b273def in progress with user-confirmed metre unit. No adoption or CMDB writes.",
+  "provider_calls": "analysis in progress",
+  "verification": "Targeted endpoint identity/placement/U/length/candidate tests, Go build, TypeScript passed; API health200. Frontend unchanged."
 }
