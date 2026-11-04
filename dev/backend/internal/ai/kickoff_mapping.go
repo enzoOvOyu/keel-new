@@ -58,8 +58,11 @@ func validateKickoffMappings(w bom.Workbook, regions []KickoffRegion, step int, 
 			if b.Classification != "" {
 				allowed := map[string]bool{"server": true, "switch": true, "gpu": true, "nic": true}
 				axis := b.Classification == "rack_u_axis" && (b.Normalize == "u_scale_capacity" || b.Normalize == "u_grid_start" || b.Normalize == "u_grid_height")
-				typedEntity := m.Table == "equipment_specs" || m.Table == "kickoff23/devices" || m.Table == "kickoff23/components"
-				if !axis && (!typedEntity || b.Field != "equipment_type" || !allowed[b.Classification] || b.Normalize != "") {
+				typedEntity := m.Table == "equipment_specs" || m.Table == "kickoff23/devices" || m.Table == "kickoff23/components" || m.Table == "kickoff23/connections"
+				typeField := b.Field == "equipment_type" || m.Table == "kickoff23/connections" && (b.Field == "a_equipment_type" || b.Field == "b_equipment_type")
+				roleField := (m.Table == "kickoff23/ports" || m.Table == "kickoff23/devices") && b.Field == "role" || m.Table == "kickoff23/connections" && (b.Field == "a_role" || b.Field == "b_role")
+				role := roleField && map[string]bool{"gpu_compute": true, "cpu_compute": true, "oob": true, "storage": true, "leaf": true, "spine": true, "management": true, "nvlink": true}[b.Classification]
+				if !axis && !role && (!typedEntity || !typeField || !allowed[b.Classification] || b.Normalize != "") {
 					return fmt.Errorf("INVALID_EQUIPMENT_CLASSIFICATION: %s", b.Field)
 				}
 			}
@@ -168,6 +171,20 @@ func expandKickoffRegionWithRelationships(w bom.Workbook, region KickoffRegion, 
 		}
 		for col := first; col <= last; col++ {
 			key := cells[[2]int{r, col}]
+			// A partially filled termination is an exception row, not an empty row.
+			// Keep the other explicit endpoint when the chosen leading column is absent.
+			if m.Table == "kickoff23/connections" && m.Layout == "rows" && strings.TrimSpace(key.Value) == "" {
+				for _, binding := range m.Bindings {
+					if binding.Field != "a_device_ref" && binding.Field != "b_device_ref" && binding.Field != "a_port" && binding.Field != "b_port" {
+						continue
+					}
+					candidate := cells[[2]int{r, binding.Column}]
+					if !candidate.Sensitive && strings.TrimSpace(candidate.Value) != "" {
+						key = candidate
+						break
+					}
+				}
+			}
 			if key.Sensitive || strings.TrimSpace(key.Value) == "" {
 				continue
 			}
@@ -251,7 +268,7 @@ func expandKickoffRegionWithRelationships(w bom.Workbook, region KickoffRegion, 
 					}
 					if !serialHeader {
 						value = ""
-						missing = append(missing, b.Field+":缺少明确SN来源，规划标签不能替代物理身份")
+						missing = append(missing, b.Field+":缺少明确SN来源，保留名称身份且不填造序列号")
 					}
 				}
 				if value != "" && strings.HasPrefix(m.Table, "kickoff23/") && b.Field == "start_u" && b.Normalize == "" {

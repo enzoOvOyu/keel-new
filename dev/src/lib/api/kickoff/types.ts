@@ -92,6 +92,7 @@ export interface ReviewRow {id:string;name:string;description:string;reference:s
 export interface ReviewPage {revision:number;rows:ReviewRow[];total:number;offset:number;limit:number;hasMore:boolean;counts:Record<string,number>;facets:Record<'type'|'model'|'rack'|'source',{value:string;label:string}[]>}
 
 export interface SourceUnderstanding {
+ flowVersion?: 'legacy-v1' | 'termination-v1';
  sourceId:string; revisionId:string; state:'historical'|'recognized'|'partial'|'unsupported'; origin:'history'|'agent'|'none';
  steps:{id:'structure'|'regions'|'semantics'|'relationships'|'fields';state:'complete'|'partial'|'pending'|'unsupported'|'not_applicable';count:number;completed:number;total:number;note:string}[];
  regions:(SourceRegion & {categories:string[];evidenceCount:number;fieldEvidenceCount:number;objectCount:number;coveredCells:number;totalCells:number;mappings:{field:string;kind:'field'|'object';count:number}[];issues:string[]})[];
@@ -105,7 +106,9 @@ export interface SourceRegionPreview {
 export type AnalysisDomain='equipment'|'facility'|'cabling'|'network'|'power'|'provisioning';
 export interface AgentNormalizationEvidence {rule:string;sheet?:string;column?:number;mapping_bounds?:{start_row:number;end_row:number;start_column:number;end_column:number};region_bounds?:{start_row:number;end_row:number;start_column:number;end_column:number};ticks?:{sheet:string;cell:string;value:string;u:number}[];unit_headers?:{sheet:string;cell:string;value:string}[];start_u?:string;height_u?:string;normalized_value?:string}
 export interface AgentFieldEvidence {row:number;region:string;sheet:string;sourceRow:number;sourceColumn:number;fields:Record<string,{sheet:string;cell:string;formula:boolean;relationshipEvidence?:{sheet:string;cell:string}[];relationshipReason?:string;normalizationEvidence?:AgentNormalizationEvidence;calculationRunId?:string;lookup?:{sheet:string;key_column:number;value_column:number;start_row:number;end_row:number};normalization?:string;classification?:string}>;missing:string[]}
-export interface AgentDraft {tableId:string;domain:AnalysisDomain;rowCount:number;applicableRowCount:number;previewLimit:number;rows:ModelRow[];issues:{row:number;field:string;code:string;message:string}[];baseVersion:number;evidence:AgentFieldEvidence[]}
+// Candidate references are source identities, not published CMDB IDs.
+export type AgentCandidateRow = ModelRow & {device_ref?:string;a_device_ref?:string;b_device_ref?:string;sn?:string};
+export interface AgentDraft {tableId:string;domain:AnalysisDomain;rowCount:number;applicableRowCount:number;previewLimit:number;rows:AgentCandidateRow[];issues:{row:number;field:string;code:string;message:string}[];baseVersion:number;evidence:AgentFieldEvidence[]}
 export interface AdoptionTask {jobId:string;state:'pending'|'running'|'succeeded'|'failed';errorCode?:string;result?:{revision:number;adoptedTableIds:string[];skippedTableIds:string[]}}
 export interface SourceAnalysis {adoption?:AdoptionTask;coverageTotal?:number;missingTotal?:number;coverageTruncated?:boolean;missingTruncated?:boolean;jobId:string|null;state:'idle'|'pending'|'running'|'succeeded'|'failed';errorCode?:string;domains:AnalysisDomain[];coverage:{region:string;step:number;state:string;rows:number;reason:string}[];missing:string[];drafts:AgentDraft[]}
 

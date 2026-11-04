@@ -41,7 +41,7 @@ func (s *Server) kickoffAgentUnderstanding(w http.ResponseWriter, r *http.Reques
 	if !kickoffAgentPermission(w, r, s.project, "bom:read") {
 		return true
 	}
-	job, state, code, _, err := s.kickoffAgentJob(r.Context(), source, "")
+	job, state, code, request, err := s.kickoffAgentJob(r.Context(), source, "")
 	if errors.Is(err, pgx.ErrNoRows) {
 		return false
 	}
@@ -63,11 +63,36 @@ func (s *Server) kickoffAgentUnderstanding(w http.ResponseWriter, r *http.Reques
 		if code != nil {
 			report.Limitations = append(report.Limitations, *code)
 		}
+		if request.FlowVersion == "termination-v1" {
+			rows, e := s.db.Query(r.Context(), `SELECT DISTINCT tool FROM eng_step WHERE job_id::text=$1 AND state='succeeded' AND tool IN ('route','graph','reason_relationships','kickoff_step_1','kickoff_step_2','kickoff_step_3')`, job)
+			if e != nil {
+				kickoffAgentFailure(w, e)
+				return true
+			}
+			completed := []string{}
+			for rows.Next() {
+				var tool string
+				if e = rows.Scan(&tool); e != nil {
+					break
+				}
+				completed = append(completed, tool)
+			}
+			if e == nil {
+				e = rows.Err()
+			}
+			rows.Close()
+			if e != nil {
+				kickoffAgentFailure(w, e)
+				return true
+			}
+			kickoffTerminationPending(&report, state, completed)
+			respond(w, 200, report)
+			return true
+		}
 		var structure kickoffAgentStructure
 		e := s.kickoffAgentArtifact(r.Context(), job, "kickoff_domain_structure", &structure)
 		if e == nil {
-			report.Steps[0] = understandingStep{ID: "structure", State: "complete", Count: structure.Sheets, Completed: structure.Sheets, Total: structure.Sheets, Note: fmt.Sprintf("Parser已读取%d张工作表、%d个非敏感单元格", structure.Sheets, structure.Cells)}
-			report.Steps[1].Total = len(structure.Regions)
+			report.Steps[0] = understandingStep{ID: "structure", State: "pending", Note: fmt.Sprintf("Parser已读取%d张工作表、%d个非敏感单元格；尚无理解报告，不能据此确定流程版本或业务阶段完成", structure.Sheets, structure.Cells)}
 		} else if !errors.Is(e, pgx.ErrNoRows) {
 			kickoffAgentFailure(w, e)
 			return true
@@ -81,6 +106,26 @@ func (s *Server) kickoffAgentUnderstanding(w http.ResponseWriter, r *http.Reques
 	}
 	respond(w, 200, report)
 	return true
+}
+
+// Completed execution tools are notes, never candidate coverage or percentages.
+func kickoffTerminationPending(report *understandingReport, state string, completed []string) {
+	report.FlowVersion = "termination-v1"
+	names := []string{"端接资料定位", "设备与端口识别", "关系推理与佐证", "位置与线缆关联", "候选完整性核对"}
+	stages := map[string]int{"route": 0, "graph": 0, "kickoff_step_1": 1, "reason_relationships": 2, "kickoff_step_2": 3, "kickoff_step_3": 3}
+	for i := range report.Steps {
+		report.Steps[i].State = "pending"
+		report.Steps[i].Count = 0
+		report.Steps[i].Completed = 0
+		report.Steps[i].Total = 0
+		report.Steps[i].Note = names[i] + "：任务" + state + "，等待实际候选核对结果"
+	}
+	sort.Strings(completed)
+	for _, tool := range completed {
+		if i, ok := stages[tool]; ok {
+			report.Steps[i].Note += "；已有工具完成记录：" + tool
+		}
+	}
 }
 
 // The report is a derived read product of immutable Workbook IR and locally
@@ -267,6 +312,9 @@ func kickoffAgentUnderstandingReport(source, job string, wb bom.Workbook, result
 	}
 	if complete {
 		report.State = "recognized"
+	}
+	if result.FlowVersion == "termination-v1" {
+		kickoffTerminationUnderstanding(&report, wb, result)
 	}
 	return report
 }

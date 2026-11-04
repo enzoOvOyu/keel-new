@@ -308,7 +308,7 @@ func validateKickoffRelationshipBindings(w bom.Workbook, regions []KickoffRegion
 	}
 	for _, m := range task.Mappings {
 		table := strings.TrimPrefix(m.Table, "kickoff23/")
-		if table == "devices" && kinds[m.Region] != "device" && kinds[m.Region] != "connection" {
+		if (table == "devices" || table == "connections") && kinds[m.Region] != "device" && kinds[m.Region] != "connection" {
 			return fmt.Errorf("NOT_ASSESSED_AS_DEVICE: %s", m.Region)
 		}
 		sheet := ""
@@ -320,12 +320,6 @@ func validateKickoffRelationshipBindings(w bom.Workbook, regions []KickoffRegion
 		bound := map[string]bool{}
 		for _, b := range m.Bindings {
 			bound[b.Field] = true
-			if table == "connections" && (b.Field == "a_serial" || b.Field == "b_serial") && b.Relationship == "" {
-				return fmt.Errorf("ENDPOINT_RELATION_REQUIRED: %s/%s", m.Region, b.Field)
-			}
-			if table == "devices" && kinds[m.Region] == "connection" && b.Field == "serial" && b.Relationship == "" {
-				return fmt.Errorf("ENDPOINT_RELATION_REQUIRED: %s/serial", m.Region)
-			}
 			if b.Relationship == "" {
 				continue
 			}
@@ -351,11 +345,14 @@ func validateKickoffRelationshipBindings(w bom.Workbook, regions []KickoffRegion
 				}
 			}
 		}
-		if table == "devices" && kinds[m.Region] == "connection" && (!bound["serial"] || !bound["label"]) {
+		if table == "devices" && !bound["device_ref"] && !bound["serial"] {
 			return fmt.Errorf("ENDPOINT_DEVICE_IDENTITY_REQUIRED: %s", m.Region)
 		}
 		if table == "connections" {
-			for _, field := range []string{"a_serial", "b_serial", "a_port", "b_port"} {
+			if kinds[m.Region] != "connection" {
+				return fmt.Errorf("TERMINATION_EVIDENCE_REQUIRED: %s", m.Region)
+			}
+			for _, field := range []string{"a_device_ref", "b_device_ref", "a_port", "b_port"} {
 				if !bound[field] {
 					return fmt.Errorf("ENDPOINT_BINDING_REQUIRED: %s/%s", m.Region, field)
 				}

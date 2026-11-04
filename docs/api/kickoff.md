@@ -178,3 +178,21 @@ POST analysis/adopt返回202与KickoffAdoptionTask，不等待合并；任务复
 
 ### 来源事实闭合修复
 分析请求可传`cableLengthUnit`（m/cm/mm/ft），只作为本项目不可变资料的人工确认，保存于已有持久任务proposal；后续同资料分析复用，参与checkpoint指纹，不作为其他资料默认值。端接区域经AI判断、完整关系求值和显式SN来源校验后可以作为设备身份依据，不强制独立库存清单。位置通过标签关联端接SN；明确U起始写法规范化，不猜高度。连接保留同行线长及单位换算证据。候选缺SN/端口/落位关联时记录问题及needs_input，不能只按已展开行数报完整。旧checkpoint只复用同来源已读区域边界作为提示，身份关系重新求值。
+
+### 2026-11-04 端接理解五步（源码契约，未部署）
+
+`KickoffUnderstanding.flowVersion`为可选字段；已产出报告仅实际Agent结果`flow_version=termination-v1`生成新语义；未产出报告时按入队`eng_job.proposal.flowVersion=termination-v1`显示新五步pending。没有该版本的既有artifact、历史复用报告及无结果任务保持旧语义，不用`origin=agent`或任务成功推断新版、不改写历史存储。报告仍由已有同项目/资料权限与artifact读取路径返回，无新增操作、副作用或自动采用。
+
+技术step ID保留，`count=completed`，分母仅对应当前步骤的实际核对对象：
+
+| ID | termination-v1语义 | 实际判据/分母 |
+| --- | --- | --- |
+| structure | 端接资料定位 | WorkbookIR区域中有实际Agent路由范围重叠且有coverage记录的区域数/全部IR区域；Parser成功不能单独完成此步 |
+| regions | 设备与端口识别 | 有来源支持且身份/归属唯一的设备与端口候选行/该类全部候选行；设备来自端接候选投影，报告自身不生成设备 |
+| semantics | 关系推理与佐证 | 两端身份、端口均有来源且唯一引用已有候选、非自身连接的连接行/全部连接行；公式必须有独立重算记录，模型自评不计完成 |
+| relationships | 位置与线缆关联 | 已提供的位置行与线缆属性的有效关联数/该类已提供信息数；未提供U位、长度、型号等不猜测，零对象为not_applicable |
+| fields | 候选完整性核对 | 关键身份、已提供字段来源、类型和候选问题通过的候选行/全部候选行加未展开的needs_input覆盖记录；无证据的候选不算完成 |
+
+设备使用`device_ref`、端口使用`device_ref+port`、连接使用`a_device_ref/a_port/b_device_ref/b_port`；明确来源的serial及a_serial/b_serial保留身份兼容。可选serial、型号、位置或线缆字段缺失仅保留缺口提示，不记为任务失败；已有值错误、身份冲突、未解析区域仍不能标为完成。自由文本missing保留于limitations，不将其数量直接当作必填缺口数。步骤只有complete/partial/pending/unsupported/not_applicable，不制造执行失败状态。`recognized`仅指以上证据核对通过，不代表采用、发布、设备健康或真实模型验收。
+
+验证记录：定向`TestKickoffAgentUnderstandingNotApplicable`、`TestKickoffTerminationUnderstanding*`通过（可选缺失、未解析端点、重复身份、缺来源、未重算公式、覆盖缺口及旧版本隔离）；OpenAPI类型生成与限定diff检查通过。整合后`check-real-api-docs.mjs`通过。部署以DEPLOYMENT.json为准；未运行全量测试或真实Agent；无报告的进行中/失败任务读取入队flowVersion，旧任务无版本不补标；只将eng_step中route/graph/reason_relationships/kickoff_step_1/2/3真实succeeded记录加入对应步骤note，计数保持0、步骤保持pending，不伪造完成比例。候选issues按row索引，全局问题按field去重，避免每行重复遍历全量问题。

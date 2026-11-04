@@ -11,6 +11,7 @@ import (
 	"io"
 	"net/http"
 	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/google/uuid"
@@ -19,6 +20,7 @@ import (
 	"keel.local/dev/internal/ai"
 	"keel.local/dev/internal/bom"
 	"keel.local/dev/internal/engineering"
+	"keel.local/dev/internal/kickoff"
 )
 
 const kickoffAgentKind = "kickoff-domain-agent/v1"
@@ -27,6 +29,7 @@ const kickoffAgentKind = "kickoff-domain-agent/v1"
 // ExpectedRevision on eng_job is the ENGINEERING version. WorkspaceRevision and
 // BaseVersions are separate snapshots; HTTP expectedRevision is always Kickoff.
 type kickoffAgentRequest struct {
+	FlowVersion            string         `json:"flowVersion,omitempty"`
 	CableLengthUnit        string         `json:"cableLengthUnit,omitempty"`
 	Kind                   string         `json:"kind"`
 	SourceID               string         `json:"sourceId"`
@@ -143,7 +146,7 @@ func (s *Server) kickoffAgentAnalyze(w http.ResponseWriter, r *http.Request, sou
 			return
 		}
 	}
-	request := kickoffAgentRequest{CableLengthUnit: body.CableLengthUnit, Kind: kickoffAgentKind, SourceID: source, Domains: domains, WorkspaceRevision: body.ExpectedRevision, BaseVersions: map[string]int{}, Actor: subjectOf(ctx).ID}
+	request := kickoffAgentRequest{FlowVersion: "termination-v1", CableLengthUnit: body.CableLengthUnit, Kind: kickoffAgentKind, SourceID: source, Domains: domains, WorkspaceRevision: body.ExpectedRevision, BaseVersions: map[string]int{}, Actor: subjectOf(ctx).ID}
 	for _, input := range inputs {
 		request.BaseVersions[input.TableID] = input.Version
 	}
@@ -424,7 +427,11 @@ func (s *Server) runKickoffAgentJob(ctx context.Context, job, claim, source stri
 		return true, err
 	}
 	// Source status is attachment metadata only; it is not confirmation or release.
-	_, err = s.db.Exec(ctx, `UPDATE kickoff_source SET state='needs_input' WHERE id::text=$1 AND project_id=$2 AND detached_at IS NULL AND EXISTS(SELECT 1 FROM eng_job WHERE id=$3 AND claim_id=$4 AND state='running')`, request.SourceID, s.project, job, claim)
+	sourceState := "needs_input"
+	if report.State == "recognized" {
+		sourceState = "recognized"
+	}
+	_, err = s.db.Exec(ctx, `UPDATE kickoff_source SET state=$5 WHERE id::text=$1 AND project_id=$2 AND detached_at IS NULL AND EXISTS(SELECT 1 FROM eng_job WHERE id=$3 AND claim_id=$4 AND state='running')`, request.SourceID, s.project, job, claim, sourceState)
 	return true, err
 }
 func (s *Server) kickoffAgentWorkbook(ctx context.Context, source string, expected int) (bom.Workbook, string, string, error) {
@@ -497,10 +504,85 @@ func (s *Server) kickoffAgentCheckpoint(ctx context.Context, job, source string,
 	}
 	return &cp, nil
 }
+func kickoffAgentSwapEndpointField(field string) string {
+	if strings.HasPrefix(field, "a_") {
+		return "b_" + strings.TrimPrefix(field, "a_")
+	}
+	if strings.HasPrefix(field, "b_") {
+		return "a_" + strings.TrimPrefix(field, "b_")
+	}
+	return field
+}
+
+// Normalize both the endpoint attributes and their provenance before merging.
+// Input maps are copied; the original analysis artifact remains unchanged.
+func kickoffAgentOrientConnections(c *ai.KickoffAgentCandidate) {
+	reversed := map[int]bool{}
+	for i, row := range c.Rows {
+		a, b := kickoffAgentEndpointKey(row, "a_"), kickoffAgentEndpointKey(row, "b_")
+		if a == "" || b == "" || row["a_port"] == "" || row["b_port"] == "" {
+			continue
+		}
+		if a+"\x00"+row["a_port"] <= b+"\x00"+row["b_port"] {
+			continue
+		}
+		swapped := map[string]string{}
+		for field, value := range row {
+			swapped[kickoffAgentSwapEndpointField(field)] = value
+		}
+		c.Rows[i] = swapped
+		reversed[i+1] = true
+	}
+	for i, e := range c.Evidence {
+		if !reversed[e.Row] {
+			continue
+		}
+		fields := map[string]ai.KickoffAgentCell{}
+		for field, cell := range e.Fields {
+			fields[kickoffAgentSwapEndpointField(field)] = cell
+		}
+		c.Evidence[i].Fields = fields
+	}
+	for i, issue := range c.Issues {
+		if reversed[issue.Row] {
+			c.Issues[i].Field = kickoffAgentSwapEndpointField(issue.Field)
+		}
+	}
+}
+
+func kickoffAgentRoleField(table, field string) bool {
+	return (table == "devices" || table == "ports") && field == "role" || table == "connections" && (field == "a_role" || field == "b_role")
+}
+
+// Role is a text field in the existing candidate contract. Retain all explicit
+// roles as a sorted semicolon-separated set, with each source cell retained.
+func kickoffAgentMergeRoles(a, b string) string {
+	roles := map[string]bool{}
+	for _, value := range []string{a, b} {
+		for _, role := range strings.Split(value, ";") {
+			if role = strings.TrimSpace(role); role != "" {
+				roles[role] = true
+			}
+		}
+	}
+	values := make([]string, 0, len(roles))
+	for role := range roles {
+		values = append(values, role)
+	}
+	sort.Strings(values)
+	return strings.Join(values, ";")
+}
+
 func kickoffAgentCombine(values []ai.KickoffAgentCandidate) []ai.KickoffAgentCandidate {
 	out := []ai.KickoffAgentCandidate{}
 	index := map[string]int{}
 	for _, v := range values {
+		v.Rows = append([]map[string]string{}, v.Rows...)
+		v.Evidence = append([]ai.KickoffAgentEvidence{}, v.Evidence...)
+		v.Issues = append([]engineering.InputProblem{}, v.Issues...)
+		if v.TableID == "connections" {
+			kickoffAgentOrientConnections(&v)
+		}
 		n, ok := index[v.TableID]
 		if !ok {
 			index[v.TableID] = len(out)
@@ -531,12 +613,38 @@ func kickoffAgentCombine(values []ai.KickoffAgentCandidate) []ai.KickoffAgentCan
 		numbers := map[int]int{}
 		rows := []map[string]string{}
 		for j, row := range c.Rows {
-			key := engineering.Digest(row)
+			key := kickoffAgentPhysicalRowKey(c.TableID, row)
+			if key == "" {
+				key = engineering.Digest(row)
+			}
 			n, ok := seen[key]
 			if !ok {
-				rows = append(rows, row)
+				copyRow := map[string]string{}
+				for k, value := range row {
+					copyRow[k] = value
+				}
+				rows = append(rows, copyRow)
 				n = len(rows)
 				seen[key] = n
+			} else {
+				for field, value := range row {
+					if value == "" {
+						continue
+					}
+					previous := rows[n-1][field]
+					if previous == "" {
+						rows[n-1][field] = value
+						continue
+					}
+					if kickoffAgentRoleField(c.TableID, field) {
+						rows[n-1][field] = kickoffAgentMergeRoles(previous, value)
+						continue
+					}
+					sameName := (field == "device_ref" || field == "a_device_ref" || field == "b_device_ref" || c.TableID == "devices" && field == "label") && kickoff.NormalizeDeviceRef(previous) == kickoff.NormalizeDeviceRef(value)
+					if previous != value && !sameName {
+						c.Issues = append(c.Issues, engineering.InputProblem{Row: j + 1, Field: field, Code: "KICKOFF_CANDIDATE_FIELD_CONFLICT", Message: "同一身份的候选字段存在冲突：" + field})
+					}
+				}
 			}
 			numbers[j+1] = n
 		}
@@ -574,65 +682,175 @@ func kickoffAgentFailure(w http.ResponseWriter, err error) {
 	fail(w, status, code)
 }
 
-// Like the existing termination-to-port projection, this reuses explicit
-// endpoint identities without asking the model to identify them again. No
-// specification, MAC, role, or component association is inferred.
+// Device names and SNs are distinct namespaces. Network roles are attributes,
+// never part of the device identity.
+func kickoffAgentEndpointKey(row map[string]string, prefix string) string {
+	if ref := strings.TrimSpace(row[prefix+"device_ref"]); ref != "" {
+		return "ref:" + kickoff.NormalizeDeviceRef(ref)
+	}
+	if serial := strings.TrimSpace(row[prefix+"serial"]); serial != "" {
+		return "serial:" + serial
+	}
+	return ""
+}
+func kickoffAgentPhysicalRowKey(table string, row map[string]string) string {
+	key := kickoffAgentEndpointKey(row, "")
+	switch table {
+	case "devices":
+		return key
+	case "ports":
+		if key != "" && strings.TrimSpace(row["port"]) != "" {
+			return key + "\x00" + strings.TrimSpace(row["port"])
+		}
+	case "connections":
+		a, b := kickoffAgentEndpointKey(row, "a_"), kickoffAgentEndpointKey(row, "b_")
+		if a != "" && b != "" && row["a_port"] != "" && row["b_port"] != "" {
+			left, right := a+"\x00"+row["a_port"], b+"\x00"+row["b_port"]
+			if left > right {
+				left, right = right, left
+			}
+			return left + "\x00" + right
+		}
+	}
+	return ""
+}
+
+// Only source-backed termination endpoints establish the equipment set.
+// Inventory candidates can enrich that set, but cannot add unrelated devices.
 func kickoffAgentProjectEndpoints(values []ai.KickoffAgentCandidate) []ai.KickoffAgentCandidate {
-	ports := ai.KickoffAgentCandidate{TableID: "ports", Domain: "equipment", Rows: []map[string]string{}, Issues: []engineering.InputProblem{}, Evidence: []ai.KickoffAgentEvidence{}}
-	seenDevice, seenPort := map[string]bool{}, map[string]bool{}
-	for _, c := range values {
-		for _, row := range c.Rows {
-			if c.TableID == "devices" {
-				seenDevice[row["serial"]] = true
-			}
-			if c.TableID == "ports" {
-				seenPort[row["serial"]+"\x00"+row["port"]] = true
-			}
+	devices := ai.KickoffAgentCandidate{TableID: "devices", Domain: "equipment"}
+	ports := ai.KickoffAgentCandidate{TableID: "ports", Domain: "equipment"}
+	out := []ai.KickoffAgentCandidate{}
+	allowed := map[string]bool{}
+	serialKeys := map[string]string{}
+	registerSerial := func(serial, key string) {
+		if serial == "" {
+			return
+		}
+		if previous, ok := serialKeys[serial]; ok && previous != key {
+			serialKeys[serial] = ""
+		} else if !ok {
+			serialKeys[serial] = key
 		}
 	}
 	for _, c := range values {
-		if c.TableID != "connections" && c.TableID != "ports" {
+		if c.TableID != "devices" && c.TableID != "ports" {
+			out = append(out, c)
+		}
+		if c.TableID != "connections" {
 			continue
 		}
-		evidence := map[int]ai.KickoffAgentEvidence{}
+		refs := map[int][]ai.KickoffAgentEvidence{}
 		for _, e := range c.Evidence {
-			evidence[e.Row] = e
+			refs[e.Row] = append(refs[e.Row], e)
 		}
-		for i, row := range c.Rows {
-			sides := []string{""}
-			if c.TableID == "connections" {
-				sides = []string{"a_", "b_"}
+		for i, row := range kickoffAgentValidRowsIndexed(c) {
+			if row == nil {
+				continue
 			}
-			for _, side := range sides {
-				serial, name := row[side+"serial"], row[side+"port"]
-				ref, exists := evidence[i+1]
-				if serial == "" || !exists {
+			for _, side := range []string{"a_", "b_"} {
+				identityField := side + "device_ref"
+				if strings.TrimSpace(row[identityField]) == "" {
+					identityField = side + "serial"
+				}
+				key := kickoffAgentEndpointKey(row, side)
+				if key == "" || strings.TrimSpace(row[side+"port"]) == "" {
 					continue
 				}
-				serialCell, hasSerial := ref.Fields[side+"serial"]
-				if !hasSerial || serialCell.Cell == "" {
-					continue
-				}
-				if !seenDevice[serial] {
-					// An endpoint name/SN alone cannot promote a module, role or
-					// summary into equipment. The Agent must justify a device
-					// candidate with its cross-sheet assessment first.
-					continue
-				}
-				if name != "" && !seenPort[serial+"\x00"+name] {
-					portCell, hasPort := ref.Fields[side+"port"]
-					if !hasPort || portCell.Cell == "" {
-						continue
+				fields := map[string]ai.KickoffAgentCell{}
+				for _, e := range refs[i+1] {
+					for field, cell := range e.Fields {
+						if cell.Cell != "" {
+							fields[field] = cell
+						}
 					}
-					seenPort[serial+"\x00"+name] = true
-					ports.Rows = append(ports.Rows, map[string]string{"serial": serial, "port": name})
-					ports.Evidence = append(ports.Evidence, ai.KickoffAgentEvidence{Row: len(ports.Rows), Region: ref.Region, Sheet: ref.Sheet, SourceRow: ref.SourceRow, SourceColumn: ref.SourceColumn, Fields: map[string]ai.KickoffAgentCell{"serial": serialCell, "port": portCell}, Missing: []string{"仅复用明确端点，端口规格仍待补充"}})
 				}
+				if fields[identityField].Cell == "" || fields[side+"port"].Cell == "" {
+					continue
+				}
+				allowed[key] = true
+				if fields[side+"serial"].Cell != "" {
+					registerSerial(strings.TrimSpace(row[side+"serial"]), key)
+				}
+				device := map[string]string{}
+				port := map[string]string{}
+				deviceMap := map[string]string{"device_ref": side + "device_ref", "serial": side + "serial", "label": identityField, "equipment_type": side + "equipment_type", "model": side + "model", "role": side + "role"}
+				portMap := map[string]string{"device_ref": side + "device_ref", "serial": side + "serial", "port": side + "port", "mac": side + "mac", "role": side + "role", "rate": "rate", "rate_unit": "rate_unit", "medium": "medium"}
+				project := func(target map[string]string, mapping map[string]string, candidate *ai.KickoffAgentCandidate) {
+					for field, sourceField := range mapping {
+						if row[sourceField] != "" && fields[sourceField].Cell != "" {
+							target[field] = strings.TrimSpace(row[sourceField])
+						}
+					}
+					candidate.Rows = append(candidate.Rows, target)
+					for _, e := range refs[i+1] {
+						projected := e
+						projected.Row = len(candidate.Rows)
+						projected.Fields = map[string]ai.KickoffAgentCell{}
+						for field, sourceField := range mapping {
+							if target[field] != "" && e.Fields[sourceField].Cell != "" {
+								projected.Fields[field] = e.Fields[sourceField]
+							}
+						}
+						if len(projected.Fields) > 0 {
+							candidate.Evidence = append(candidate.Evidence, projected)
+						}
+					}
+				}
+				project(device, deviceMap, &devices)
+				project(port, portMap, &ports)
 			}
 		}
 	}
-	if len(ports.Rows) > 0 {
-		values = append(values, ports)
+	// Merge source-backed inventory enrichment using the endpoint identity. A
+	// legacy SN may match only one endpoint; ambiguity must never choose a winner.
+	for _, c := range values {
+		if c.TableID != "devices" && c.TableID != "ports" {
+			continue
+		}
+		enriched := c
+		enriched.Rows = nil
+		enriched.Evidence = nil
+		enriched.Issues = nil
+		refs := map[int][]ai.KickoffAgentEvidence{}
+		issues := map[int][]engineering.InputProblem{}
+		for _, e := range c.Evidence {
+			refs[e.Row] = append(refs[e.Row], e)
+		}
+		for _, issue := range c.Issues {
+			issues[issue.Row] = append(issues[issue.Row], issue)
+		}
+		enriched.Issues = append(enriched.Issues, issues[0]...)
+		for i, row := range c.Rows {
+			key := kickoffAgentEndpointKey(row, "")
+			if !allowed[key] && strings.TrimSpace(row["device_ref"]) == "" {
+				key = serialKeys[strings.TrimSpace(row["serial"])]
+			}
+			if key == "" || !allowed[key] {
+				continue
+			}
+			copyRow := map[string]string{}
+			for field, value := range row {
+				copyRow[field] = value
+			}
+			if strings.HasPrefix(key, "ref:") && strings.TrimSpace(copyRow["device_ref"]) == "" {
+				copyRow["device_ref"] = strings.TrimPrefix(key, "ref:")
+			}
+			enriched.Rows = append(enriched.Rows, copyRow)
+			for _, e := range refs[i+1] {
+				e.Row = len(enriched.Rows)
+				enriched.Evidence = append(enriched.Evidence, e)
+			}
+			for _, issue := range issues[i+1] {
+				issue.Row = len(enriched.Rows)
+				enriched.Issues = append(enriched.Issues, issue)
+			}
+		}
+		if len(enriched.Rows) > 0 {
+			out = append(out, enriched)
+		}
 	}
-	return kickoffAgentCombine(values)
+	// Endpoint-derived identities precede optional enrichment so a display label
+	// cannot replace the name that established the stable identity.
+	return kickoffAgentCombine(append([]ai.KickoffAgentCandidate{devices, ports}, out...))
 }

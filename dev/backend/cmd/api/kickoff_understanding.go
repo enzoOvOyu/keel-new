@@ -43,6 +43,7 @@ type understandingRegion struct {
 	Issues             []string               `json:"issues"`
 }
 type understandingReport struct {
+	FlowVersion string                `json:"flowVersion,omitempty"`
 	SourceID    string                `json:"sourceId"`
 	RevisionID  string                `json:"revisionId"`
 	State       string                `json:"state"`

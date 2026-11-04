@@ -3,12 +3,18 @@ package kickoff
 import (
 	"github.com/google/uuid"
 	"keel.local/dev/internal/engineering"
+	"strings"
 )
 
-// Resolves only exact, unique project-local references. Original input revisions
+// NormalizeDeviceRef changes only whitespace and case, never punctuation or digits.
+func NormalizeDeviceRef(value string) string {
+	return strings.ToLower(strings.Join(strings.Fields(value), " "))
+}
+
+// Resolves unique project-local references; device names use conservative normalization. Original input revisions
 // remain unchanged; the API/model projection exposes stable canonical IDs.
 func ResolveReferences(m engineering.PhysicalModel, inputs []ModelInput) []ModelInput {
-	aliases := map[string]map[string]string{"device_id": {}, "rack_id": {}, "room_id": {}}
+	aliases := map[string]map[string]string{"device_id": {}, "rack_id": {}, "room_id": {}, "device_name": {}}
 	add := func(kind, key, id string) {
 		if key == "" {
 			return
@@ -27,7 +33,7 @@ func ResolveReferences(m engineering.PhysicalModel, inputs []ModelInput) []Model
 	}
 	for _, e := range m.Equipment {
 		add("device_id", e.EntityID, e.EntityID)
-		add("device_id", e.Label, e.EntityID)
+		add("device_name", NormalizeDeviceRef(e.Label), e.EntityID)
 		if e.Serial != nil {
 			add("device_id", *e.Serial, e.EntityID)
 		}
@@ -75,7 +81,21 @@ func ResolveReferences(m engineering.PhysicalModel, inputs []ModelInput) []Model
 				value[key] = raw
 				own := input.TableID == "racks" && key == "rack_id" || input.TableID == "rooms" && key == "room_id"
 				if !own {
-					if a := aliases[key]; a != nil && a[raw] != "" {
+					if key == "device_id" {
+						exact, exactExists := aliases[key][raw]
+						name, nameExists := aliases["device_name"][NormalizeDeviceRef(raw)]
+						// Ambiguous names or disagreement with an explicit SN/ID never choose a winner.
+						if nameExists && (name == "" || exactExists && exact != name) {
+							continue
+						}
+						if exactExists {
+							if exact != "" {
+								value[key] = exact
+							}
+						} else if nameExists {
+							value[key] = name
+						}
+					} else if a := aliases[key]; a != nil && a[raw] != "" {
 						value[key] = a[raw]
 					}
 				}

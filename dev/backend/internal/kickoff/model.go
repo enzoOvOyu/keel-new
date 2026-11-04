@@ -106,7 +106,7 @@ func stringValue(v *string) string {
 	return *v
 }
 func IsDevice(e engineering.EquipmentPlan) bool {
-	return e.EquipmentType == "server" || e.EquipmentType == "switch" || e.EquipmentType == "device"
+	return e.EquipmentType == "server" || e.EquipmentType == "switch" || e.EquipmentType == "device" || e.EquipmentType == "patch_panel"
 }
 func Project(m engineering.PhysicalModel, ev []engineering.SourceEvidence, source string, inputs []ModelInput) View {
 	return project(m, ev, source, inputs, true)
@@ -482,6 +482,23 @@ func ValidationIssues(m engineering.PhysicalModel) []engineering.ValidationIssue
 			out = append(out, issue)
 		}
 	}
+	names := map[string][]engineering.EquipmentPlan{}
+	for _, e := range m.Equipment {
+		if IsDevice(e) && strings.TrimSpace(e.Label) != "" {
+			names[NormalizeDeviceRef(e.Label)] = append(names[NormalizeDeviceRef(e.Label)], e)
+		}
+	}
+	for _, entities := range names {
+		nameIdentity := false
+		for _, e := range entities {
+			nameIdentity = nameIdentity || strings.TrimSpace(stringValue(e.Serial)) == ""
+		}
+		if len(entities) > 1 && nameIdentity {
+			for _, e := range entities {
+				out = append(out, engineering.ValidationIssue{ID: engineering.StableID(m.ProjectID, "name-identity-conflict", e.EntityID), EntityID: e.EntityID, Code: "KICKOFF_DUPLICATE_DEVICE_REF", Severity: "BLOCK", Field: "device_ref", Message: "相同名称存在多个规划身份，请核对来源关联", PublishTarget: engineering.EquipmentTarget})
+			}
+		}
+	}
 	serials := map[string][]engineering.EquipmentPlan{}
 	for _, e := range m.Equipment {
 		if IsDevice(e) && e.Serial != nil && *e.Serial != "" {
@@ -498,11 +515,11 @@ func ValidationIssues(m engineering.PhysicalModel) []engineering.ValidationIssue
 	return out
 }
 
-// Only an explicit human choice between matching unpublished serial identities
-// can coalesce candidate references. The selected identity and its values survive.
+// An explicit human choice can associate matching serials or source-backed
+// names. A model/type match alone never establishes identity.
 func ResolveIdentity(m *engineering.PhysicalModel, from, to string) error {
 	if from == to {
-		return fmt.Errorf("请选择同一SN对应的另一个明确设备身份")
+		return fmt.Errorf("请选择同一SN或有来源名称对应的另一个明确设备身份")
 	}
 	var a, b *engineering.EquipmentPlan
 	for i := range m.Equipment {
@@ -513,8 +530,14 @@ func ResolveIdentity(m *engineering.PhysicalModel, from, to string) error {
 			b = &m.Equipment[i]
 		}
 	}
-	if a == nil || b == nil || !IsDevice(*a) || !IsDevice(*b) || a.Serial == nil || b.Serial == nil || *a.Serial == "" || *a.Serial != *b.Serial || a.EquipmentType != b.EquipmentType {
-		return fmt.Errorf("只有同类型、同SN且有依据的规划身份可以人工关联")
+	if a == nil || b == nil || !IsDevice(*a) || !IsDevice(*b) || a.EquipmentType != b.EquipmentType {
+		return fmt.Errorf("只有同类型、同SN或有来源名称的规划身份可以人工关联")
+	}
+	aSerial, bSerial := strings.TrimSpace(stringValue(a.Serial)), strings.TrimSpace(stringValue(b.Serial))
+	sameSerial := aSerial != "" && aSerial == bSerial
+	sameName := strings.TrimSpace(a.Label) != "" && NormalizeDeviceRef(a.Label) == NormalizeDeviceRef(b.Label) && len(a.EvidenceIDs) > 0 && len(b.EvidenceIDs) > 0 && a.IdentityKind == "planned_instance" && b.IdentityKind == "planned_instance"
+	if aSerial != "" && bSerial != "" && aSerial != bSerial || !sameSerial && !sameName {
+		return fmt.Errorf("身份依据不一致：需相同SN或有来源的相同名称，型号相同不能作为关联依据")
 	}
 	for _, p := range m.Placements {
 		if p.EquipmentID == from {
@@ -524,6 +547,10 @@ func ResolveIdentity(m *engineering.PhysicalModel, from, to string) error {
 				}
 			}
 		}
+	}
+	if bSerial == "" && aSerial != "" {
+		serial := aSerial
+		b.Serial = &serial
 	}
 	b.EvidenceIDs = append(b.EvidenceIDs, a.EvidenceIDs...)
 	equipment := m.Equipment[:0]

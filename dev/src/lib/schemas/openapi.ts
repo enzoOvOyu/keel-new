@@ -7462,7 +7462,10 @@ export interface components {
             evidence: components["schemas"]["KickoffEvidence"];
         };
         KickoffUnderstandingStep: {
-            /** @enum {string} */
+            /**
+             * @description Technical IDs retained. For flowVersion termination-v1, structure=termination source localization, regions=device and port identification, semantics=relationship inference and evidence, relationships=location and cable association, fields=candidate completeness. Without that version retain legacy semantics.
+             * @enum {string}
+             */
             id: "structure" | "regions" | "semantics" | "relationships" | "fields";
             /** @enum {string} */
             state: "complete" | "partial" | "pending" | "unsupported" | "not_applicable";
@@ -7496,6 +7499,8 @@ export interface components {
             issues: string[];
         };
         KickoffUnderstanding: {
+            /** @description termination-v1 identifies termination-based five-step evidence semantics. Absent or any other version must not be presented as the new flow; historical artifacts remain unchanged. Version is carried from the actual Agent result, or from the enqueued job proposal while its report is absent, never inferred from origin or task success. */
+            flowVersion?: string;
             sourceId: string;
             revisionId: string;
             /** @enum {string} */
@@ -7740,7 +7745,7 @@ export interface components {
         KickoffAnalysisRequest: {
             expectedRevision: number;
             /**
-             * @description Human-confirmed unit for bare cable lengths in this immutable source. Retained for subsequent analyses of the same source.
+             * @description Unit for bare cable lengths in this immutable source; defaults to metres under the intake convention. An explicit value is retained for subsequent analyses of the same source; explicit cell units take precedence.
              * @enum {string}
              */
             cableLengthUnit?: "m" | "cm" | "mm" | "ft";

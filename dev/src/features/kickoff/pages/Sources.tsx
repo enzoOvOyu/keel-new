@@ -2,14 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ArrowRight, Check, ChevronRight, FileSpreadsheet, FolderOpen, Plus, Search, Trash2 } from 'lucide-react';
 import './sources.css';
+import { understandingStepIds, understandingStepName, understandingStates, understandingDescription, identityGuidance } from '../lib/understanding';
 import {SourceAgentPanel} from '../components/SourceAgentPanel';
 import { useWorkspace } from '../context';
 import type { SourceRegionPreview, SourceUnderstanding } from '../lib/api';
 import { Badge, Button, Empty, Heading, Notice, Tabs, formatDate } from '../components/ui';
 
 const columnLabel=(column:number)=>{let label='';for(let n=column;n>0;n=Math.floor((n-1)/26))label=String.fromCharCode(65+(n-1)%26)+label;return label;};
-const stepNames = {structure:'工作簿结构',regions:'数据区域',semantics:'语义分类',relationships:'跨表关联',fields:'字段核对'};
-const stepStates = {complete:'已完成',partial:'部分完成',pending:'待处理',unsupported:'暂无结果',not_applicable:'不适用'};
 const sourceLabels:Record<string,string> = {historical:'历史资料复用',partial:'部分识别',recognized:'已有识别结果',awaiting_analysis:'待分析',needs_input:'待补充'};
 const objectKind=(kind:string):'device'|'port'|'connection'|'component'|'evidence'=>['device','port','connection','component'].includes(kind)?kind as 'device'|'port'|'connection'|'component':'evidence';
 
@@ -50,13 +49,14 @@ export default function Sources(){
  const columns=[...new Set(preview?.rows.flatMap(row=>row.cells.map(cell=>cell.column))??[])].sort((a,b)=>a-b);
  const sourceEvidence=(cell:string)=>({sourceId:sourceId!,sheet:region?.sheet??'',cell,method:'source' as const});
  return <>
-  <Heading eyebrow="SOURCES & INTELLIGENCE" title="资料与识别" description="一次接入多份资料，分类、关联，保留每项数据的依据。" action={<Button kind="primary" onClick={()=>picker.current?.click()} disabled={uploading||!can('bom:import')}><Plus size={15}/>添加资料</Button>}/>
-  <input ref={picker} hidden type="file" multiple accept=".xlsx,.csv,.pdf,.txt" onChange={e=>{void add([...e.target.files??[]]);e.target.value='';}}/>
+  <Heading eyebrow="SOURCES & INTELLIGENCE" title="资料与识别" description="资料识别 → 人工采用候选 → 数据核对 → 确认发布；保留每项数据的来源与依据。" action={<Button kind="primary" onClick={()=>picker.current?.click()} disabled={uploading||!can('bom:import')}><Plus size={15}/>添加资料</Button>}/>
+  <input ref={picker} hidden type="file" multiple accept=".xlsx" onChange={e=>{void add([...e.target.files??[]]);e.target.value='';}}/>
 
   <div className={'source-layout source-page-layout'+(!source?' source-page-empty':'')}><aside className="source-rail"><div className="rail-heading"><b>资料包</b><span>{s.sources.length}</span></div>{s.sources.map(item=><button className={'source-file '+(sourceId===item.id?'selected':'')} key={item.id} onClick={()=>{setParams({source:item.id});setRegionId('');setOffset(0);}}><FileSpreadsheet size={20}/><span><b title={item.name}>{item.name}</b><small>{item.size} · v{item.version}</small><Badge state={item.state}>{sourceLabels[item.state]??item.state}</Badge></span></button>)}<div className="source-rail-foot"><FolderOpen size={15}/><span>相同内容按摘要复用，增补资料独立处理。</span></div></aside>
    <div className="source-main">{source?<>
     <div className="source-header"><FileSpreadsheet size={22}/><div><h2 title={source.name}>{source.name}</h2><p>{source.size} · 添加于 {formatDate(source.createdAt)}</p></div><Badge state={source.state}>{sourceLabels[source.state]??source.state}</Badge><Button disabled={reusing||loading||!can('bom:import')} onClick={()=>void reuse()}>{reusing?'正在复用历史资料…':'复用历史资料'}</Button><Button onClick={()=>go('review')}>核对识别结果<ArrowRight size={14}/></Button></div>
-    <SourceAgentPanel key={source.id} sourceId={source.id} sourceName={source.name} onResult={()=>setRetry(n=>n+1)}><div className="recognition-pipeline" aria-label="资料理解五步状态">{Object.entries(stepNames).map(([id,label],i)=>{const step=currentReport?.steps.find(x=>x.id===id);return <div key={id} className={`recognition-step ${step?.state??'pending'}`} title={step?.note??'尚无阶段结果'}><span>{step?.state==='complete'?<Check size={12}/>:<Search size={12}/>}</span><b>{label}<small>{step?stepStates[step.state]:loading?'读取中':'暂无结果'}{step&&step.total>0?` ${step.completed}/${step.total}`:''}</small></b>{i<4&&<ChevronRight size={13}/>}</div>;})}</div></SourceAgentPanel>
+    <SourceAgentPanel key={source.id} sourceId={source.id} sourceName={source.name} onResult={()=>setRetry(n=>n+1)}>{analysis=>{const stageReport=currentReport?.origin==='agent'&&analysis?.jobId&&currentReport.revisionId!==analysis.jobId?undefined:currentReport;return <div className="recognition-pipeline" aria-label="资料理解五步状态">{understandingStepIds.map((id,i)=>{const step=stageReport?.steps.find(x=>x.id===id);return <div key={id} className={`recognition-step ${step?.state??'pending'}`} title={step?.note??'尚无阶段结果'}><span>{step?.state==='complete'?<Check size={12}/>:<Search size={12}/>}</span><b>{understandingStepName(stageReport,id)}<small>{step?understandingStates[step.state]:loading?'读取中':'暂无结果'}{step&&step.total>0?` ${step.completed}/${step.total}`:''}</small></b>{i<4&&<ChevronRight size={13}/>}</div>;})}<small className="recognition-explanation">{understandingDescription(stageReport)}</small></div>;}}</SourceAgentPanel>
+    <div className="source-understanding-note">{identityGuidance}{currentReport?.limitations.length? <details><summary>识别范围与限制</summary>{currentReport.limitations.map((note,i)=><p key={i}>{note}</p>)}</details>:null}</div>
     {error&&<Notice tone="error">{error}<Button onClick={()=>setRetry(n=>n+1)}>重新读取</Button></Notice>}
     {loading?<div className="empty" aria-busy="true" role="status">正在读取资料理解与历史证据…</div>:currentReport&&<>
 
@@ -74,7 +74,7 @@ export default function Sources(){
      </div></div>:<Empty title="暂无数据区域结果" description="识别完成后在此查看数据区域；已有历史资料可通过“复用历史资料”查看。"/>}
     </>}
     <div className="source-footer"><span>SHA-256 <code>{source.hash.slice(0,28)}…</code></span>{source.state==='awaiting_analysis'&&<Button kind="ghost" disabled={!can('bom:import')} onClick={()=>{void api.removeSource(source.id).then(()=>setParams({})).catch(e=>setError(e.message));}}><Trash2 size={13}/>移除待分析资料</Button>}<button className="text-link" onClick={()=>notify('原始资料与历史工程证据保留独立版本；复用不调用 AI，不覆盖已确认输入。')}>来源版本说明</button></div>
-   </>:<section className="source-empty-state"><div className="source-empty-icon"><FileSpreadsheet size={32}/></div><h2>从一份开局资料开始</h2><p>添加 XLSX，识别设备、连接与落位信息，再核对候选结果。</p><Button kind="primary" disabled={uploading||!can('bom:import')} onClick={()=>picker.current?.click()}><Plus size={15}/>{uploading?'正在上传…':'选择工程资料'}</Button><small>XLSX 支持自动分析 · CSV、PDF、TXT 可作为附件保存</small><div className="source-empty-guide"><span><b>01</b> 添加资料</span><ChevronRight size={14}/><span><b>02</b> Agent 识别</span><ChevronRight size={14}/><span><b>03</b> 核对并采用</span></div>{error&&<Notice tone="error">{error}</Notice>}</section>}</div>
+   </>:<section className="source-empty-state"><div className="source-empty-icon"><FileSpreadsheet size={32}/></div><h2>从一份开局资料开始</h2><p>添加 XLSX，识别设备、连接与落位信息，再核对候选结果。</p><Button kind="primary" disabled={uploading||!can('bom:import')} onClick={()=>picker.current?.click()}><Plus size={15}/>{uploading?'正在上传…':'选择工程资料'}</Button><small>仅支持上传 XLSX 工程资料</small><div className="source-empty-guide"><span><b>01</b> 添加资料</span><ChevronRight size={14}/><span><b>02</b> Agent 识别</span><ChevronRight size={14}/><span><b>03</b> 核对并采用</span></div>{error&&<Notice tone="error">{error}</Notice>}</section>}</div>
   </div>
  </>;
 }

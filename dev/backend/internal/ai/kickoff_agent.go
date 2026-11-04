@@ -81,6 +81,7 @@ type KickoffDraft struct {
 	Issues  []engineering.InputProblem `json:"issues"`
 }
 type KickoffResult struct {
+	FlowVersion    string                  `json:"flow_version,omitempty"`
 	Candidates     []KickoffAgentCandidate `json:"candidates,omitempty"`
 	Regions        []KickoffRegion         `json:"regions,omitempty"`
 	SourceCoverage []any                   `json:"source_coverage,omitempty"`
@@ -137,6 +138,7 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 	extended := len(options) > 0
 	if extended {
 		catalog = KickoffAgentCatalog()
+		result.FlowVersion = "termination-v1"
 		promptPath = "prompts/kickoff-domains-v1.txt"
 		selected = map[int]bool{}
 		for _, domain := range options[0].Domains {
@@ -152,6 +154,9 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 	confirmedLengthUnit := ""
 	if extended {
 		confirmedLengthUnit = options[0].CableLengthUnit
+		if confirmedLengthUnit == "" {
+			confirmedLengthUnit = "m"
+		}
 	}
 	fingerprint := engineering.Digest([]any{confirmedLengthUnit, hooks.SourceHash, p.ConfigID, p.ConfigRevision, p.Model, string(promptSource), string(relationPrompt), catalog.Version})
 	cp := KickoffCheckpoint{Fingerprint: fingerprint, Regions: []KickoffRegion{}, Tasks: map[int]KickoffTaskResult{}, Coverage: []KickoffCoverage{}}
@@ -191,6 +196,7 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 	safe = kickoffVerifiedWorkbook(safe, cp.Verified, true)
 	var graph []engineering.FormulaEvidence
 	testedRelations := map[string]bool{}
+	testedGraphs := map[string]bool{}
 	// One semantic correction, with a bounded number of read tools, per task.
 	ask := func(task string, input map[string]any, decode func([]byte) error) error {
 		history := []any{}
@@ -236,6 +242,7 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 			}
 			var action struct {
 				Action    string                        `json:"action"`
+				Ranges    []KickoffGraphRange           `json:"ranges,omitempty"`
 				Relations []KickoffRelation             `json:"relations,omitempty"`
 				Offset    int                           `json:"offset,omitempty"`
 				Sheet     string                        `json:"sheet"`
@@ -249,6 +256,31 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 			_ = json.Unmarshal(raw, &action)
 			if turn >= toolLimit && action.Action != "" {
 				history = append(history, map[string]any{"error": "FINAL_PLAN_REQUIRED", "instruction": "Return the final plan, not another tool request."})
+				continue
+			}
+			if action.Action == "inspect_connection_graph" {
+				value, graphErr := inspectKickoffConnectionGraph(original, safe, action.Ranges, action.Offset)
+				if graphErr == nil {
+					for _, gr := range action.Ranges {
+						for _, region := range cp.Regions {
+							if gr.Region == region.ID && gr.Sheet == region.Sheet && gr.StartRow >= region.Bounds.StartRow && gr.EndRow == region.Bounds.EndRow {
+								testedGraphs[gr.Region] = true
+							}
+						}
+					}
+				}
+				state := "succeeded"
+				if graphErr != nil {
+					value = map[string]string{"error": graphErr.Error()}
+					state = "failed"
+				}
+				history = append(history, map[string]any{"action": action, "result": value})
+				if e := artifact("kickoff_connection_graph", value); e != nil {
+					return e
+				}
+				if e := trace(action.Action, state, task+" · 全量端接关系与邻接证据"); e != nil {
+					return e
+				}
 				continue
 			}
 			if action.Action == "verify_workbook_formulas" {
@@ -420,6 +452,7 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 				return err
 			}
 			correction = true
+			input["validation_error"] = err.Error()
 			history = append(history, map[string]any{"error": err.Error(), "instruction": "Correct only the rejected mapping; no invented source values."})
 		}
 		return errors.New("KICKOFF_TASK_TOOL_LIMIT")
@@ -513,6 +546,9 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 				seen[entity.Region] = true
 				switch entity.Kind {
 				case "device", "component", "material", "aggregate", "unknown", "connection", "placement":
+					if entity.Kind == "connection" && !testedGraphs[entity.Region] {
+						return fmt.Errorf("CONNECTION_GRAPH_REQUIRED: inspect_connection_graph over all rows of %s before finalizing", entity.Region)
+					}
 				default:
 					return errors.New("ENTITY_ASSESSMENT_KIND_INVALID")
 				}
@@ -520,19 +556,12 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 			if err := validateKickoffRelations(original, plan); err != nil {
 				return err
 			}
-			if len(plan.Relations) == 0 {
-				for _, entity := range plan.Entities {
-					if entity.Kind == "connection" {
-						return errors.New("RELATIONSHIP_INVESTIGATION_REQUIRED: call the available evaluate_relationships function before finalizing connection identity conclusions")
-					}
-				}
-			}
 			for _, relation := range plan.Relations {
 				if !testedRelations[engineering.Digest(relation)] {
 					return fmt.Errorf("RELATION_NOT_CHECKED: %s; call evaluate_relationships before finalizing", relation.ID)
 				}
 			}
-			if len(plan.Relations) == 0 && len(plan.Missing) == 0 {
+			if len(plan.Relations) == 0 && len(plan.Missing) == 0 && len(plan.Entities) == 0 {
 				return errors.New("RELATION_OR_EXPLICIT_GAP_REQUIRED")
 			}
 			return nil
@@ -572,7 +601,7 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 		result.Missing = append(result.Missing, cp.Relationships.Missing...)
 		for _, r := range reports {
 			if r.Missing+r.Ambiguous > 0 {
-				result.Missing = append(result.Missing, fmt.Sprintf("关系%s：%d条来源，%d条关联，%d条未匹配，%d条冲突；未匹配行不会被当作设备。", r.ID, r.Total, r.Matched, r.Missing, r.Ambiguous))
+				result.Missing = append(result.Missing, fmt.Sprintf("关系%s：%d条来源，%d条关联，%d条未匹配，%d条冲突；未匹配属性保留缺口；已明确端接身份不因此丢弃。", r.ID, r.Total, r.Matched, r.Missing, r.Ambiguous))
 			}
 		}
 		if err := artifact("kickoff_relationship_validation", reports); err != nil {
@@ -904,7 +933,7 @@ func KickoffAgentDomain(step int) string {
 // A namespace explicitly distinguishes the new 23-table field contract from
 // identically named legacy StepInputCatalog tables. No CSV header guessing.
 func KickoffAgentCatalog() engineering.InputCatalog {
-	c := engineering.InputCatalog{Version: "kickoff23-agent/relationships-v4-native", Tables: []engineering.InputTable{}}
+	c := engineering.InputCatalog{Version: "kickoff23-agent/termination-v1", Tables: []engineering.InputTable{}}
 	add := func(id, domain, fields string) {
 		t := engineering.InputTable{ID: "kickoff23/" + id, Step: KickoffAgentStep(domain), Name: id, Fields: []engineering.InputField{}}
 		for _, field := range strings.Split(fields, "|") {
@@ -912,9 +941,9 @@ func KickoffAgentCatalog() engineering.InputCatalog {
 		}
 		c.Tables = append(c.Tables, t)
 	}
-	add("devices", "equipment", "serial|label|equipment_type|model")
-	add("ports", "equipment", "serial|port|mac|medium|connector|rate|rate_unit|parent_port|breakout_index|role")
-	add("connections", "equipment", "a_serial|a_port|b_serial|b_port|cable_model|cable_length_m|medium|a_optic_model|b_optic_model")
+	add("devices", "equipment", "device_ref|serial|label|equipment_type|model|role")
+	add("ports", "equipment", "device_ref|serial|port|mac|medium|connector|rate|rate_unit|parent_port|breakout_index|role")
+	add("connections", "equipment", "a_device_ref|a_serial|a_port|b_device_ref|b_serial|b_port|cable_model|cable_length_m|medium|a_optic_model|b_optic_model|a_model|b_model|a_equipment_type|b_equipment_type|a_role|b_role|a_mac|b_mac|rate|rate_unit")
 	add("components", "equipment", "parent_serial|serial|label|equipment_type|model|slot")
 	add("rooms", "facility", "room_id|name|site|address|frame|unit")
 	add("racks", "facility", "rack_id|room_id|capacity_u|width_mm|depth_mm|x|y|orientation|frame|unit")
@@ -951,8 +980,12 @@ func kickoffAgentCandidate(tableID string, rows [][]string, evidence any) Kickof
 				values[f.Code] = row[i]
 			}
 		}
-		for _, required := range map[string][]string{"devices": {"serial"}, "ports": {"serial", "port"}, "connections": {"a_serial", "a_port", "b_serial", "b_port"}, "placements": {"device_id", "rack_id"}}[c.TableID] {
-			if strings.TrimSpace(values[required]) == "" {
+		for _, required := range map[string][]string{"devices": {"device_ref|serial"}, "ports": {"device_ref|serial", "port"}, "connections": {"a_device_ref|a_serial", "a_port", "b_device_ref|b_serial", "b_port"}, "placements": {"device_id", "rack_id"}}[c.TableID] {
+			present := false
+			for _, alternative := range strings.Split(required, "|") {
+				present = present || strings.TrimSpace(values[alternative]) != ""
+			}
+			if !present {
 				c.Issues = append(c.Issues, engineering.InputProblem{Row: len(c.Rows) + 1, Field: required, Code: "KICKOFF_RELATION_UNRESOLVED", Message: "关键关联字段未闭合：" + required})
 			}
 		}

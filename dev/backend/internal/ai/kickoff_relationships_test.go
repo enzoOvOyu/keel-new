@@ -78,7 +78,7 @@ func TestKickoffRelationshipDeviceAssessmentGatesExtraction(t *testing.T) {
 	w, p := relationWorkbook()
 	bounds := engineering.Bounds{StartRow: 1, EndRow: 3, StartColumn: 1, EndColumn: 5}
 	regions := []KickoffRegion{{ID: "inventory", Sheet: "inventory", Bounds: bounds}}
-	task := KickoffTaskResult{Mappings: []KickoffMapping{{Region: "inventory", Table: "kickoff23/devices"}}}
+	task := KickoffTaskResult{Mappings: []KickoffMapping{{Region: "inventory", Table: "kickoff23/devices", Bindings: []KickoffBinding{{Field: "device_ref", Column: 2}}}}}
 	p.Entities[0].Kind = "material"
 	if validateKickoffRelationshipBindings(w, regions, p, task) == nil {
 		t.Fatal("material promoted into equipment")

@@ -260,7 +260,25 @@ func kickoffAgentAdoptionRows(c ai.KickoffAgentCandidate) ([]map[string]string, 
 	rows := kickoffAgentValidRows(c)
 	switch c.TableID {
 	case "devices", "components", "ports", "connections":
-		return rows, nil
+		eligible := make([]map[string]string, 0, len(rows))
+		for _, row := range rows {
+			present := func(key string) bool { return strings.TrimSpace(row[key]) != "" }
+			valid := false
+			switch c.TableID {
+			case "devices":
+				valid = present("serial") || present("device_ref")
+			case "components":
+				valid = present("parent_serial") && (present("serial") || present("slot"))
+			case "ports":
+				valid = (present("serial") || present("device_ref")) && present("port")
+			case "connections":
+				valid = (present("a_serial") || present("a_device_ref")) && (present("b_serial") || present("b_device_ref")) && present("a_port") && present("b_port")
+			}
+			if valid {
+				eligible = append(eligible, row)
+			}
+		}
+		return eligible, nil
 	default:
 		if err := kickoff.ValidateInput(c.TableID, rows); err != nil {
 			return nil, err
@@ -278,18 +296,72 @@ func kickoffAgentAdoptionRows(c ai.KickoffAgentCandidate) ([]map[string]string, 
 	}
 }
 
-func kickoffAgentValidRows(c ai.KickoffAgentCandidate) []map[string]string {
-	invalid := map[int]bool{}
-	for _, issue := range c.Issues {
-		invalid[issue.Row] = true
+// Optional attributes can remain unresolved without discarding an otherwise
+// explicit endpoint. Conflicting values are never written as accepted facts.
+func kickoffAgentOptionalIssue(table string, row map[string]string, issue engineering.InputProblem) bool {
+	field := issue.Field
+	// Length disagreements can omit the attribute. Identity disagreements cannot.
+	if field == "serial" || field == "a_serial" || field == "b_serial" {
+		code := strings.ToUpper(issue.Code)
+		if strings.Contains(code, "CONFLICT") || strings.Contains(code, "AMBIGUOUS") || strings.Contains(code, "MISMATCH") {
+			return false
+		}
+		if strings.TrimSpace(row[field]) != "" && !strings.Contains(code, "FORMAT") && !strings.Contains(code, "INVALID") {
+			return false
+		}
 	}
+	switch field {
+	case "serial":
+		return (table == "devices" || table == "ports") && strings.TrimSpace(row["device_ref"]) != ""
+	case "a_serial":
+		return table == "connections" && strings.TrimSpace(row["a_device_ref"]) != ""
+	case "b_serial":
+		return table == "connections" && strings.TrimSpace(row["b_device_ref"]) != ""
+	case "cable_length_m", "cable_length", "cable_length_unit":
+		return table == "connections"
+	}
+	return false
+}
+func kickoffAgentValidRows(c ai.KickoffAgentCandidate) []map[string]string {
 	out := []map[string]string{}
+	for _, row := range kickoffAgentValidRowsIndexed(c) {
+		if row != nil {
+			out = append(out, row)
+		}
+	}
+	return out
+}
+
+// Preserve source row positions so callers can index evidence without rescanning issues.
+func kickoffAgentValidRowsIndexed(c ai.KickoffAgentCandidate) []map[string]string {
+	invalid := map[int]bool{}
+	omitted := map[int]map[string]bool{}
+	for _, issue := range c.Issues {
+		if issue.Row > 0 && issue.Row <= len(c.Rows) && kickoffAgentOptionalIssue(c.TableID, c.Rows[issue.Row-1], issue) {
+			if omitted[issue.Row] == nil {
+				omitted[issue.Row] = map[string]bool{}
+			}
+			omitted[issue.Row][issue.Field] = true
+		} else {
+			invalid[issue.Row] = true
+		}
+	}
+	out := make([]map[string]string, len(c.Rows))
 	if invalid[0] {
 		return out
 	}
-	for i, row := range c.Rows {
+	for i, original := range c.Rows {
 		if invalid[i+1] {
 			continue
+		}
+		row := original
+		if len(omitted[i+1]) > 0 {
+			row = map[string]string{}
+			for key, value := range original {
+				if !omitted[i+1][key] {
+					row[key] = value
+				}
+			}
 		}
 		sensitive := false
 		for key, value := range row {
@@ -302,7 +374,7 @@ func kickoffAgentValidRows(c ai.KickoffAgentCandidate) []map[string]string {
 			}
 		}
 		if !sensitive {
-			out = append(out, row)
+			out[i] = row
 		}
 	}
 	return out
@@ -424,6 +496,8 @@ func kickoffAgentMergePhysical(m *engineering.PhysicalModel, evidence *[]enginee
 		return engineering.EntityVersion{EntityID: engineering.StableID(m.ProjectID, kind, key), Maturity: engineering.Estimated, EvidenceIDs: []string{}, Attributes: []engineering.AttributeValue{}}
 	}
 	deviceIndex := map[string]int{}
+	deviceRefs := map[string]int{}
+	deviceIDs := map[string]int{}
 	portIndex := map[string]int{}
 	register := func(index map[string]int, key string, at int) {
 		if key == "" {
@@ -436,14 +510,17 @@ func kickoffAgentMergePhysical(m *engineering.PhysicalModel, evidence *[]enginee
 		}
 	}
 	for i, d := range m.Equipment {
+		register(deviceRefs, kickoff.NormalizeDeviceRef(d.Label), i)
+		register(deviceIDs, d.EntityID, i)
 		if d.Serial != nil {
-			register(deviceIndex, *d.Serial, i)
+			register(deviceIndex, strings.TrimSpace(*d.Serial), i)
 		}
 	}
 	for i, p := range m.Ports {
 		register(portIndex, p.EquipmentID+"\x00"+p.Name, i)
 	}
 	findDevice := func(serial string) int {
+		serial = strings.TrimSpace(serial)
 		if serial == "" {
 			return -1
 		}
@@ -452,6 +529,35 @@ func kickoffAgentMergePhysical(m *engineering.PhysicalModel, evidence *[]enginee
 		}
 		return -1
 	}
+	// Labels and serial numbers are separate namespaces. A supplied pair must
+	// not select different devices, and ambiguous labels never choose a winner.
+	resolveDevice := func(serial, ref string) int {
+		serial, ref = strings.TrimSpace(serial), kickoff.NormalizeDeviceRef(ref)
+		sn := findDevice(serial)
+		alias := -1
+		if ref != "" {
+			if i, ok := deviceRefs[ref]; ok {
+				alias = i
+			}
+			if i, ok := deviceIDs[engineering.StableID(m.ProjectID, "equipment_ref", ref)]; ok {
+				if alias == -2 || alias >= 0 && alias != i {
+					return -2
+				}
+				alias = i
+			}
+		}
+		if sn == -2 || alias == -2 || sn >= 0 && alias >= 0 && sn != alias {
+			return -2
+		}
+		if alias >= 0 {
+			if serial != "" && m.Equipment[alias].Serial != nil && strings.TrimSpace(*m.Equipment[alias].Serial) != "" && strings.TrimSpace(*m.Equipment[alias].Serial) != serial {
+				return -2
+			}
+			return alias
+		}
+		return sn
+	}
+
 	findPort := func(device, name string) int {
 		if at, ok := portIndex[device+"\x00"+name]; ok {
 			return at
@@ -464,8 +570,10 @@ func kickoffAgentMergePhysical(m *engineering.PhysicalModel, evidence *[]enginee
 	}
 	evidenceByRow := map[string][]ai.KickoffAgentEvidence{}
 	rowDigests := make([]string, len(c.Rows))
-	for i, row := range c.Rows {
-		rowDigests[i] = engineering.Digest(row)
+	for i, row := range kickoffAgentValidRowsIndexed(c) {
+		if row != nil {
+			rowDigests[i] = engineering.Digest(row)
+		}
 	}
 	for _, ref := range c.Evidence {
 		if ref.Row > 0 && ref.Row <= len(rowDigests) {
@@ -496,27 +604,40 @@ func kickoffAgentMergePhysical(m *engineering.PhysicalModel, evidence *[]enginee
 			}
 		}
 	}
-	for _, row := range kickoffAgentValidRows(c) {
+	rows, _ := kickoffAgentAdoptionRows(c)
+	for _, row := range rows {
 		switch c.TableID {
 		case "devices", "components":
 			serial := strings.TrimSpace(row["serial"])
+			equipmentType := row["equipment_type"]
+			// In the termination device table, GPU denotes the server endpoint;
+			// component candidates keep their GPU component type.
+			if c.TableID == "devices" && strings.EqualFold(strings.TrimSpace(equipmentType), "gpu") {
+				equipmentType = "server"
+			}
+			ref := ""
+			if c.TableID == "devices" {
+				ref = strings.TrimSpace(row["device_ref"])
+			}
 			parent := -1
 			if c.TableID == "components" {
 				parent = findDevice(row["parent_serial"])
 				if parent < 0 || (serial == "" && row["slot"] == "") {
 					continue
 				}
-			} else if serial == "" {
+			} else if serial == "" && ref == "" {
 				continue
 			}
-			at := findDevice(serial)
+			at := resolveDevice(serial, ref)
 			if at == -2 {
 				continue
 			}
 			if at < 0 {
 				key := serial
 				kind := "equipment_serial"
-				if serial == "" {
+				if ref != "" {
+					key, kind = kickoff.NormalizeDeviceRef(ref), "equipment_ref"
+				} else if serial == "" {
 					key = m.Equipment[parent].EntityID + "/" + row["slot"]
 					kind = "component_slot"
 				}
@@ -529,10 +650,13 @@ func kickoffAgentMergePhysical(m *engineering.PhysicalModel, evidence *[]enginee
 					}
 				}
 				if at == len(m.Equipment) {
-					d := engineering.EquipmentPlan{EntityVersion: id, EquipmentType: row["equipment_type"], SourceModelLabel: row["model"], Label: row["label"], Quantity: 1, IdentityKind: "planned_instance"}
+					d := engineering.EquipmentPlan{EntityVersion: id, EquipmentType: equipmentType, SourceModelLabel: row["model"], Label: row["label"], Quantity: 1, IdentityKind: "planned_instance"}
 					if serial != "" {
 						v := serial
 						d.Serial = &v
+					}
+					if ref != "" {
+						d.Label = ref
 					}
 					if d.Label == "" {
 						d.Label = serial
@@ -552,14 +676,26 @@ func kickoffAgentMergePhysical(m *engineering.PhysicalModel, evidence *[]enginee
 				}
 			}
 			d := &m.Equipment[at]
+			if (d.Serial == nil || strings.TrimSpace(*d.Serial) == "") && serial != "" {
+				value := serial
+				d.Serial = &value
+			}
 			if d.Label == "" {
 				d.Label = row["label"]
+			}
+			if d.Label == "" {
+				d.Label = ref
+			}
+			register(deviceRefs, kickoff.NormalizeDeviceRef(d.Label), at)
+			register(deviceIDs, d.EntityID, at)
+			if d.Serial != nil {
+				register(deviceIndex, strings.TrimSpace(*d.Serial), at)
 			}
 			if d.SourceModelLabel == "" {
 				d.SourceModelLabel = row["model"]
 			}
 			if d.EquipmentType == "" {
-				d.EquipmentType = row["equipment_type"]
+				d.EquipmentType = equipmentType
 			}
 			addEvidence(d.EntityID, row)
 			if parent >= 0 && parent != at {
@@ -593,7 +729,7 @@ func kickoffAgentMergePhysical(m *engineering.PhysicalModel, evidence *[]enginee
 				}
 			}
 		case "ports":
-			owner := findDevice(row["serial"])
+			owner := resolveDevice(row["serial"], row["device_ref"])
 			name := strings.TrimSpace(row["port"])
 			if owner < 0 || name == "" {
 				continue
@@ -641,11 +777,11 @@ func kickoffAgentMergePhysical(m *engineering.PhysicalModel, evidence *[]enginee
 			}
 			addEvidence(p.EntityID, row)
 		case "connections":
-			a, b := findDevice(row["a_serial"]), findDevice(row["b_serial"])
+			a, b := resolveDevice(row["a_serial"], row["a_device_ref"]), resolveDevice(row["b_serial"], row["b_device_ref"])
 			if a < 0 || b < 0 {
 				continue
 			}
-			ap, bp := findPort(m.Equipment[a].EntityID, row["a_port"]), findPort(m.Equipment[b].EntityID, row["b_port"])
+			ap, bp := findPort(m.Equipment[a].EntityID, strings.TrimSpace(row["a_port"])), findPort(m.Equipment[b].EntityID, strings.TrimSpace(row["b_port"]))
 			if ap < 0 || bp < 0 || ap == bp {
 				continue
 			}
