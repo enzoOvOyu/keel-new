@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "dimensions": {
+    "width": 108,
+    "height": 34
+  },
+  "cancelBackground": "rgb(188, 94, 80)",
+  "scope": "Read-only deployed UI; equal-sized adjacent buttons, cancellation backend tested separately in isolated DB"
+}
