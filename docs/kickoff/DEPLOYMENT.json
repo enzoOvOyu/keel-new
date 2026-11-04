@@ -1,19 +1,19 @@
 {
-  "code_revision": "24bd44da94a05bdcee981f6378d965e7f865cef2",
-  "frontend_code_revision": "24bd44da94a05bdcee981f6378d965e7f865cef2",
-  "backend_code_revision": "24bd44da94a05bdcee981f6378d965e7f865cef2",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-24bd44d",
-  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-24bd44d",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-2ddc1f9",
-  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-2ddc1f9",
+  "code_revision": "b5e0a14758ec12b0a0e42c6396296edb91367676",
+  "frontend_code_revision": "b5e0a14758ec12b0a0e42c6396296edb91367676",
+  "backend_code_revision": "b5e0a14758ec12b0a0e42c6396296edb91367676",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-b5e0a14",
+  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-b5e0a14",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-abf94d9",
+  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-abf94d9",
   "ports": [
     5180,
     8081
   ],
   "migrations": [],
   "api_restarted": true,
-  "binary_sha256": "3c268d41cd45f130502475860c0559051258c651c2e520d72713ab1a75c50ca0",
-  "frontend_index_sha256": "6a27afbd0786755507e6524897eec8804beac85a8f3da0511350f2d1b340b5d9",
+  "binary_sha256": "be9115552a19b83cb2cc51c344f1755b276f292de970b7b8916640d462d374bb",
+  "frontend_index_sha256": "3c90a7f40a3b9d57095aa56122cc5c8c3cbbf578f2830c5aaa520eed0f9a8210",
   "status": "deployed",
   "binary_matches": true,
   "frontend_index_matches": true,
@@ -22,12 +22,8 @@
     "health": 200,
     "index_matches": true
   },
-  "business_tests": "Synthetic disposable database only; no live provider analysis or business data mutations.",
+  "business_tests": "Synthetic isolated PostgreSQL: 809 devices/14308 ports/7154 cables/88 racks/805 known locations; field-source and observed/manual protection assertions passed; projection 76078ms, test 83.87s. No AI calls or customer import.",
   "provider_calls": 0,
-  "verification": "Go/TypeScript builds and isolated pending/running cancellation, idempotency, wrong-source scope and late-write fencing checks passed; UI check pending.",
-  "ui_verification": {
-    "status": "PASS",
-    "evidence": "docs/kickoff/CANCEL-UI-CHECK.json",
-    "scope": "Read-only deployed page; adjacent equal-sized red cancel and analysis buttons."
-  }
+  "verification": "Go targeted checks, small isolated projection and full same-scale batch projection passed; API health and frontend artifact matching passed.",
+  "performance_evidence": "docs/kickoff/CMDB-BATCH-RESULT.json"
 }

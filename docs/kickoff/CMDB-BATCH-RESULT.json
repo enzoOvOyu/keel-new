@@ -1,0 +1,56 @@
+{
+  "counts": {
+    "assets": 22359,
+    "cables": 7154,
+    "core_objects": 22271,
+    "devices": 809,
+    "known_locations": 805,
+    "ports": 14308,
+    "project_assets": 1,
+    "racks": 88
+  },
+  "scale": "full",
+  "setup_ms": 1528,
+  "stages": [
+    {
+      "phase": "projection",
+      "target": "CMDB_PLANNED_EQUIPMENT",
+      "count": 809,
+      "duration_ms": 1589
+    },
+    {
+      "phase": "projection",
+      "target": "CMDB_PLANNED_FACILITY",
+      "count": 88,
+      "duration_ms": 268
+    },
+    {
+      "phase": "projection",
+      "target": "CMDB_PLANNED_PLACEMENT",
+      "count": 0,
+      "duration_ms": 43
+    },
+    {
+      "phase": "projection",
+      "target": "CMDB_PLANNED_CONNECTIVITY",
+      "count": 21462,
+      "duration_ms": 71848
+    },
+    {
+      "phase": "projection",
+      "target": "known_locations",
+      "count": 805,
+      "duration_ms": 2328
+    },
+    {
+      "phase": "projection",
+      "target": "all",
+      "count": 22359,
+      "duration_ms": 76078
+    }
+  ],
+  "verification_ms": 5109,
+  "status": "PASS",
+  "scope": "Synthetic same-scale disposable PostgreSQL transaction; projection time excludes AI, adoption and final commit; no customer data imported.",
+  "test": "TestEngineeringBatchProjection"
+}

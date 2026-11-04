@@ -1,0 +1,16 @@
+{
+  "checks": [
+    "source displays unified identity/port/connection ledger",
+    "live same-source candidate closure 809 devices / 7154 connections / 805 placements"
+  ],
+  "counts": {
+    "devices": 809,
+    "ports": 14308,
+    "connections": 7154,
+    "racks": 88,
+    "placements": 805,
+    "equipment_specs": 7,
+    "cable_specs": 25
+  },
+  "status": "PASS"
+}

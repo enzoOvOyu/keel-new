@@ -12,7 +12,7 @@
 
 ## 从哪里继续
 
-- 运行版本、工作区和当前交接：[HANDOFF](../HANDOFF.md)。当前主环境记录为 `24bd44d`，不是通过本次文档任务重新测得。
+- 运行版本、工作区和当前交接：[HANDOFF](../HANDOFF.md)。当前主环境记录为 `b5e0a14`，不是通过本次文档任务重新测得。
 - 新需求/后续上线流程：[模块维护规则](MODULE-WORKFLOW.md)。只更新受影响模块，不重新展开全量 PRD。
 - 字段、枚举和 HTTP 定义：[OpenAPI](openapi.yaml)；实际实现登记及证据：[API 入口](REAL-API-CONTRACTS.md)、[注册表](api/real-api-registry.json)。Schema 存在不代表接口可用。
 - 未决冲突及真实缺口：[DECISIONS](DECISIONS.md)；模块自身的待办见模块页，不复制到多份总表。
