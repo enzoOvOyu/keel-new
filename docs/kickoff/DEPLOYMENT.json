@@ -1,18 +1,18 @@
 {
-  "code_revision": "d5c99fb049b1a89bc3de46ae3f76d6a8148733ad",
+  "code_revision": "ef91704f1efd8a6c22dce0ccddb32a551a01fad0",
   "frontend_code_revision": "d5c99fb049b1a89bc3de46ae3f76d6a8148733ad",
-  "backend_code_revision": "d5c99fb049b1a89bc3de46ae3f76d6a8148733ad",
+  "backend_code_revision": "ef91704f1efd8a6c22dce0ccddb32a551a01fad0",
   "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-d5c99fb",
-  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-d5c99fb",
+  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-provider-ef91704",
   "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-view-actions-98c41e8",
-  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-d2f9acc",
+  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-d5c99fb",
   "ports": [
     5180,
     8081
   ],
   "migrations": [],
   "api_restarted": true,
-  "binary_sha256": "3f502c2b6bbd53cbf74a19cf93c68d1392b67adfadad24a30eb1bf63b14f3c4e",
+  "binary_sha256": "bf6cfcfc5f5d2c1c27a0e8a07480f25974d3ada657c152563969d79949fa53b7",
   "frontend_index_sha256": "94a73ead142cfb3ae0c9b8db65146a4f60e67d50d30f93d3fda30f687375c7c2",
   "status": "deployed",
   "binary_matches": true,
@@ -23,7 +23,7 @@
     "health": 200,
     "index_matches": true
   },
-  "business_tests": "NOT RUN per user: no new MM analysis, adoption or CMDB publication. Historical MM results belong to the previous Agent.",
+  "business_tests": "Project001 failure artifacts read only. Real analysis/adoption/publication NOT RUN.",
   "provider_calls": 0,
-  "verification": "Targeted synthetic Go relation/protocol/evidence/privacy/cable/placement tests, Go build, TypeScript, Vite and API registry passed. Deployment health/index match only; real model/MM acceptance pending user instruction."
+  "verification": "Targeted Go JSON correction and Kickoff tests, Go build, API registry passed; API health200. Frontend unchanged. No real Provider call."
 }

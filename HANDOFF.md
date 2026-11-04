@@ -1,13 +1,13 @@
 # Keel 当前交接
 
-更新：2026-11-03。这里只保留当前事实；开发先读[模块目录](docs/README.md)，然后目标模块及API，不沿历史PRD重新做全平台。
+更新：2026-11-04。这里只保留当前事实；开发先读[模块目录](docs/README.md)，然后目标模块及API，不沿历史PRD重新做全平台。
 
 ## 工作区与版本
 
 | 范围 | 当前事实 |
 |---|---|
 | 主开发 | `/home/ubuntu/keel-dev`，分支`dev`，应用目录`dev/`；文档定版已整合；本轮历史资料理解已提交dev并按用户要求发布 |
-| 当前主环境 | 5180前端 / 8081 API 均为`d5c99fb`；关系推理Agent已部署，服务启动和静态资源匹配检查通过。新版真实Provider/MM验收尚未运行，等待用户指令；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json) |
+| 当前主环境 | 5180前端为`d5c99fb` / 8081 API为`ef91704`；关系推理Agent已部署，服务启动和静态资源匹配检查通过。新版真实Provider/MM验收尚未运行，等待用户指令；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json) |
 | Fabric | `/home/ubuntu/keel-fabric-dev`，`feat/fabric-rebuild@6a70041`；5197/8100分支预览，未并入dev；**用户要求暂停，等待上游接入修复通知** |
 | 原型 | Kickoff5195、拓扑/机柜5181、Fabric5194仅设计参考，不是正式事实或执行来源；本次不启停服务 |
 | main与旧目录 | main保留稳定基线；旧Flows/Kestra/visualization detached目录仅残留原型/运行依赖，不在那里继续开发；本次不合并或推送main |
@@ -176,3 +176,5 @@ agent测试1103的新Agent分析已成功：971设备、14308端口、7154连接
 修复：计算请求nil RequestedCells在队列入口规范为[]；无公式工作簿不发起计算；JSON协议与原生工具协议均仅进行一次明确格式纠正，失败响应保存到已有私有MinIO artifact；删除Kickoff外层重复格式重试。未改变领域模型、发布门禁或页面。
 
 验证：定向TestKickoff、JSON纠正成功/再次失败/证据保留及原生工具纠错用例通过，Go构建通过。未启动真实Provider/项目001分析、采用或CMDB发布；本轮不宣称真实项目验收通过。部署状态见DEPLOYMENT。
+
+项目001修复已部署API `ef91704`，health200且运行二进制匹配；5180前端保持`d5c99fb`。无迁移，未调用真实Provider。
