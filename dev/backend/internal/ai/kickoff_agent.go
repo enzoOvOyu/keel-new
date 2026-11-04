@@ -212,9 +212,17 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 			if turn >= toolLimit {
 				callPrompt += "\nNo read/tool calls remain. Return the final route or extraction plan now, with explicit missing_inputs for unresolved facts. Do not request another tool."
 			}
-			raw, err := p.engineeringCompletion(ctx, callPrompt, input, nil, trace, hooks.Artifact)
+			callPrompt += "\nUse the supplied functions for every tool action. Finish by calling submit_result with the final task object in result. The workbook actions are real available tools, not examples of unavailable capabilities."
+			raw, err := p.engineeringCompletion(ctx, callPrompt, input, kickoffFunctions(turn >= toolLimit), trace, hooks.Artifact)
 			if err != nil {
 				return err
+			}
+			var submitted struct {
+				Action string          `json:"action"`
+				Result json.RawMessage `json:"result"`
+			}
+			if json.Unmarshal(raw, &submitted) == nil && submitted.Action == "submit_result" {
+				raw = submitted.Result
 			}
 			var resolved struct {
 				Model string `json:"model"`
@@ -511,6 +519,13 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 			}
 			if err := validateKickoffRelations(original, plan); err != nil {
 				return err
+			}
+			if len(plan.Relations) == 0 {
+				for _, entity := range plan.Entities {
+					if entity.Kind == "connection" {
+						return errors.New("RELATIONSHIP_INVESTIGATION_REQUIRED: call the available evaluate_relationships function before finalizing connection identity conclusions")
+					}
+				}
 			}
 			for _, relation := range plan.Relations {
 				if !testedRelations[engineering.Digest(relation)] {
@@ -889,7 +904,7 @@ func KickoffAgentDomain(step int) string {
 // A namespace explicitly distinguishes the new 23-table field contract from
 // identically named legacy StepInputCatalog tables. No CSV header guessing.
 func KickoffAgentCatalog() engineering.InputCatalog {
-	c := engineering.InputCatalog{Version: "kickoff23-agent/relationships-v3", Tables: []engineering.InputTable{}}
+	c := engineering.InputCatalog{Version: "kickoff23-agent/relationships-v4-native", Tables: []engineering.InputTable{}}
 	add := func(id, domain, fields string) {
 		t := engineering.InputTable{ID: "kickoff23/" + id, Step: KickoffAgentStep(domain), Name: id, Fields: []engineering.InputField{}}
 		for _, field := range strings.Split(fields, "|") {

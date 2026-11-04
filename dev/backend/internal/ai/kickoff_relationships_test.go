@@ -141,8 +141,18 @@ func TestKickoffAgentInvestigatesBeforeExtracting(t *testing.T) {
 			}
 			answer = KickoffTaskResult{Mappings: []KickoffMapping{}, Missing: []string{"source unresolved row retained"}}
 		}
-		raw, _ := json.Marshal(answer)
-		json.NewEncoder(out).Encode(map[string]any{"choices": []any{map[string]any{"message": map[string]string{"content": string(raw)}, "finish_reason": "stop"}}})
+		if len(body["tools"].([]any)) == 0 || body["tool_choice"] != "required" {
+			t.Error("workbook functions not registered with provider")
+		}
+		name := "submit_result"
+		arguments := map[string]any{"result": answer}
+		if action, ok := answer.(map[string]any); ok && action["action"] != nil {
+			name = action["action"].(string)
+			arguments = action
+			delete(arguments, "action")
+		}
+		raw, _ := json.Marshal(arguments)
+		json.NewEncoder(out).Encode(map[string]any{"choices": []any{map[string]any{"message": map[string]any{"tool_calls": []any{map[string]any{"function": map[string]string{"name": name, "arguments": string(raw)}}}}, "finish_reason": "tool_calls"}}})
 	}))
 	defer srv.Close()
 	provider := Provider{Endpoint: srv.URL, Model: "synthetic", Key: "synthetic", TokenBudget: 4096, Timeout: time.Second}
