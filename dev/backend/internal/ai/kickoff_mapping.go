@@ -106,7 +106,7 @@ func validateKickoffMappings(w bom.Workbook, regions []KickoffRegion, step int, 
 func expandKickoffRegion(w bom.Workbook, region KickoffRegion, m KickoffMapping) ([][]string, any, error) {
 	return expandKickoffRegionWithRelationships(w, region, m, nil)
 }
-func expandKickoffRegionWithRelationships(w bom.Workbook, region KickoffRegion, m KickoffMapping, relationships kickoffRelationIndex) ([][]string, any, error) {
+func expandKickoffRegionWithRelationships(w bom.Workbook, region KickoffRegion, m KickoffMapping, relationships kickoffRelationIndex, confirmedLengthUnit ...string) ([][]string, any, error) {
 	table, _ := kickoffTable(m.Table)
 	sheet, _ := kickoffSheet(w, region.Sheet)
 	cells := map[[2]int]bom.Cell{}
@@ -253,6 +253,23 @@ func expandKickoffRegionWithRelationships(w bom.Workbook, region KickoffRegion, 
 						value = ""
 						missing = append(missing, b.Field+":缺少明确SN来源，规划标签不能替代物理身份")
 					}
+				}
+				if value != "" && strings.HasPrefix(m.Table, "kickoff23/") && b.Field == "start_u" && b.Normalize == "" {
+					if normalized, ok := kickoffUStart(value); ok {
+						value = normalized
+						refs[b.Field].(map[string]any)["normalization"] = "explicit_u_start"
+					}
+				}
+				if value != "" && strings.HasPrefix(m.Table, "kickoff23/") && (b.Field == "cable_length_m" || b.Field == "length_m") {
+					unit := ""
+					if len(confirmedLengthUnit) > 0 {
+						unit = confirmedLengthUnit[0]
+					}
+					value = kickoffLengthMeters(value, unit)
+					if value == "" {
+						missing = append(missing, b.Field+":线长单位或数值待确认")
+					}
+					refs[b.Field].(map[string]any)["normalization"] = "length_to_m:" + unit
 				}
 				if b.Normalize == "mount_type" {
 					v := strings.ToLower(value)

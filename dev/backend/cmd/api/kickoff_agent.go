@@ -27,6 +27,7 @@ const kickoffAgentKind = "kickoff-domain-agent/v1"
 // ExpectedRevision on eng_job is the ENGINEERING version. WorkspaceRevision and
 // BaseVersions are separate snapshots; HTTP expectedRevision is always Kickoff.
 type kickoffAgentRequest struct {
+	CableLengthUnit        string         `json:"cableLengthUnit,omitempty"`
 	Kind                   string         `json:"kind"`
 	SourceID               string         `json:"sourceId"`
 	Domains                []string       `json:"domains"`
@@ -88,8 +89,13 @@ func (s *Server) kickoffAgentAnalyze(w http.ResponseWriter, r *http.Request, sou
 	var body struct {
 		ExpectedRevision int      `json:"expectedRevision"`
 		Domains          []string `json:"domains"`
+		CableLengthUnit  string   `json:"cableLengthUnit,omitempty"`
 	}
 	if !engineeringDecode(w, r, &body) {
+		return
+	}
+	if body.CableLengthUnit != "" && body.CableLengthUnit != "m" && body.CableLengthUnit != "cm" && body.CableLengthUnit != "mm" && body.CableLengthUnit != "ft" {
+		fail(w, 400, "KICKOFF_LENGTH_UNIT_INVALID")
 		return
 	}
 	domains, err := kickoffAgentDomains(body.Domains)
@@ -131,7 +137,13 @@ func (s *Server) kickoffAgentAnalyze(w http.ResponseWriter, r *http.Request, sou
 		kickoffAgentFailure(w, err)
 		return
 	}
-	request := kickoffAgentRequest{Kind: kickoffAgentKind, SourceID: source, Domains: domains, WorkspaceRevision: body.ExpectedRevision, BaseVersions: map[string]int{}, Actor: subjectOf(ctx).ID}
+	if body.CableLengthUnit == "" {
+		if err = tx.QueryRow(ctx, `SELECT COALESCE((SELECT proposal->>'cableLengthUnit' FROM eng_job WHERE project_id=$1 AND proposal->>'sourceId'=$2 AND proposal->>'kind'=$3 AND proposal->>'cableLengthUnit' IN ('m','cm','mm','ft') ORDER BY created_at DESC LIMIT 1),'')`, s.project, source, kickoffAgentKind).Scan(&body.CableLengthUnit); err != nil {
+			kickoffAgentFailure(w, err)
+			return
+		}
+	}
+	request := kickoffAgentRequest{CableLengthUnit: body.CableLengthUnit, Kind: kickoffAgentKind, SourceID: source, Domains: domains, WorkspaceRevision: body.ExpectedRevision, BaseVersions: map[string]int{}, Actor: subjectOf(ctx).ID}
 	for _, input := range inputs {
 		request.BaseVersions[input.TableID] = input.Version
 	}
@@ -395,7 +407,7 @@ func (s *Server) runKickoffAgentJob(ctx context.Context, job, claim, source stri
 	if err = trace("kickoff_domains_selected", "succeeded", strings.Join(request.Domains, ",")); err != nil {
 		return true, err
 	}
-	result, err := provider.ExtractKickoff(ctx, engineeringSafeWorkbook(wb), wb, trace, hooks, ai.KickoffAgentOptions{Domains: request.Domains})
+	result, err := provider.ExtractKickoff(ctx, engineeringSafeWorkbook(wb), wb, trace, hooks, ai.KickoffAgentOptions{Domains: request.Domains, CableLengthUnit: request.CableLengthUnit})
 	if err != nil {
 		return true, err
 	}

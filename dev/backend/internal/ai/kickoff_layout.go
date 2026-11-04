@@ -45,6 +45,24 @@ func kickoffURange(value string) (start, height string) {
 	return strconv.Itoa(min(a, z)), strconv.Itoa(max(a, z) - min(a, z) + 1)
 }
 
+// kickoffUStart accepts explicit positions and U ranges. An open U range
+// supplies only its stated start; it provides no evidence of device height.
+func kickoffUStart(value string) (string, bool) {
+	if number, _, valid := kickoffUPosition(value); valid {
+		return strconv.Itoa(number), true
+	}
+	if start, _ := kickoffURange(value); start != "" {
+		return start, true
+	}
+	parts := kickoffURangeSeparator.Split(strings.TrimSpace(value), -1)
+	if len(parts) == 2 && strings.TrimSpace(parts[1]) == "" {
+		if number, marked, valid := kickoffUPosition(parts[0]); marked && valid {
+			return strconv.Itoa(number), true
+		}
+	}
+	return "", false
+}
+
 func kickoffUHeader(value string) bool {
 	value = strings.ToLower(strings.Join(strings.Fields(value), ""))
 	value = strings.NewReplacer("(", "", ")", "", "（", "", "）", "").Replace(value)

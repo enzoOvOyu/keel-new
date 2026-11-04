@@ -56,7 +56,7 @@ export interface KickoffAPI {
  sourceTasks?(sourceId:string,offset?:number,limit?:number):Promise<SourceTaskPage>;
  sourceTask?(sourceId:string,jobId:string):Promise<SourceTaskDetail>;
  adoptionStatus?(sourceId:string):Promise<AdoptionTask|null>;
- startSourceAnalysis?(id:string,domains:AnalysisDomain[]):Promise<{jobId:string;state:string}>;
+ startSourceAnalysis?(id:string,domains:AnalysisDomain[],cableLengthUnit?:"m"|"cm"|"mm"|"ft"):Promise<{jobId:string;state:string}>;
  sourceAnalysis?(id:string,jobId?:string):Promise<SourceAnalysis>;
  adoptSourceAnalysis?(id:string,jobId:string,tableIds:string[]):Promise<AdoptionTask>;
 

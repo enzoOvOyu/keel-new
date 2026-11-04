@@ -149,10 +149,25 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 	}
 	promptSource, _ := prompts.ReadFile(promptPath)
 	relationPrompt, _ := prompts.ReadFile("prompts/kickoff-relations-v2.txt")
-	fingerprint := engineering.Digest([]any{hooks.SourceHash, p.ConfigID, p.ConfigRevision, p.Model, string(promptSource), string(relationPrompt), catalog.Version})
+	confirmedLengthUnit := ""
+	if extended {
+		confirmedLengthUnit = options[0].CableLengthUnit
+	}
+	fingerprint := engineering.Digest([]any{confirmedLengthUnit, hooks.SourceHash, p.ConfigID, p.ConfigRevision, p.Model, string(promptSource), string(relationPrompt), catalog.Version})
 	cp := KickoffCheckpoint{Fingerprint: fingerprint, Regions: []KickoffRegion{}, Tasks: map[int]KickoffTaskResult{}, Coverage: []KickoffCoverage{}}
 	if hooks.Resume != nil && hooks.Resume.Version == engineeringCheckpointVersion && hooks.Resume.Kickoff != nil && hooks.Resume.Kickoff.Fingerprint == fingerprint {
 		cp = *hooks.Resume.Kickoff
+	}
+	var priorRelationshipPlan *KickoffRelationshipPlan
+	if hooks.Resume != nil && hooks.Resume.Kickoff != nil && hooks.Resume.Kickoff.Fingerprint != fingerprint {
+		// Server resume is scoped to the same immutable source and revision.
+		// Reuse only inspected region bounds as hints; re-evaluate identities.
+		for _, region := range hooks.Resume.Kickoff.Regions {
+			if kickoffBounds(original, region.Sheet, region.Bounds) {
+				cp.Regions = append(cp.Regions, region)
+			}
+		}
+		priorRelationshipPlan = hooks.Resume.Kickoff.Relationships
 	}
 	if cp.Verified == nil {
 		cp.Verified = map[string]KickoffVerifiedCell{}
@@ -185,6 +200,7 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 			toolLimit = 18
 		}
 		for turn := 0; turn < toolLimit+3; turn++ {
+			input["confirmed_cable_length_unit"] = confirmedLengthUnit
 			input["history"] = boundedEngineeringHistory(history)
 			input["remaining_tool_calls"] = max(0, toolLimit-turn)
 			input["must_finish"] = turn >= toolLimit
@@ -467,7 +483,7 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 	needRelationships := extended && (selected[1] || selected[2] || selected[3])
 	if needRelationships && cp.Relationships == nil {
 		var plan KickoffRelationshipPlan
-		err := ask("reason_relationships", map[string]any{"regions": cp.Regions, "region_samples": kickoffSamples(safe, cp.Regions), "objective": "判断真实设备，跨表佐证双端连接，再关联机柜/U位和线缆；字段映射不是本任务的结论。"}, func(raw []byte) error {
+		err := ask("reason_relationships", map[string]any{"regions": cp.Regions, "region_samples": kickoffSamples(safe, cp.Regions), "prior_plan_to_recheck": priorRelationshipPlan, "objective": "判断真实设备，跨表佐证双端连接，再关联机柜/U位和线缆；字段映射不是本任务的结论。"}, func(raw []byte) error {
 			if err := kickoffDecode(raw, &plan); err != nil {
 				return err
 			}
@@ -685,7 +701,7 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 					}
 				}
 				return KickoffRegion{}
-			}(), mapping, relationshipIndex)
+			}(), mapping, relationshipIndex, confirmedLengthUnit)
 			if err != nil {
 				if !extended {
 					return result, err
@@ -694,8 +710,13 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 				result.Coverage = append(result.Coverage, KickoffCoverage{Region: mapping.Region, Step: step, State: "needs_input", Reason: "EXPANSION_FAILED"})
 				continue
 			}
+			state, reason := "extracted", "候选已展开，来源与未消费字段保留"
 			if extended {
 				candidate := kickoffAgentCandidate(mapping.Table, rows, evidence)
+				if len(candidate.Issues) > 0 {
+					state = "needs_input"
+					reason = fmt.Sprintf("候选存在%d项字段或关联缺口，尚未完整识别", len(candidate.Issues))
+				}
 				for i := range candidate.Evidence {
 					for field, cell := range candidate.Evidence[i].Fields {
 						for _, binding := range mapping.Bindings {
@@ -718,7 +739,7 @@ func (p *Provider) ExtractKickoff(ctx context.Context, safe, original bom.Workbo
 			if err = artifact("kickoff_evidence", evidence); err != nil {
 				return result, err
 			}
-			result.Coverage = append(result.Coverage, KickoffCoverage{Region: mapping.Region, Step: step, State: "extracted", Rows: len(rows), Reason: "固定格式候选已展开；未知字段和未消费单元格保留在coverage详情"})
+			result.Coverage = append(result.Coverage, KickoffCoverage{Region: mapping.Region, Step: step, State: state, Rows: len(rows), Reason: reason})
 		}
 	}
 	for _, r := range cp.Regions {
@@ -800,7 +821,10 @@ func kickoffTaskIndex(tasks map[int]KickoffTaskResult) any {
 }
 
 // KickoffAgentOptions selects domains without creating another model client or queue.
-type KickoffAgentOptions struct{ Domains []string }
+type KickoffAgentOptions struct {
+	Domains         []string
+	CableLengthUnit string
+}
 
 type KickoffAgentNormalizationTick struct {
 	Sheet string `json:"sheet"`
@@ -865,7 +889,7 @@ func KickoffAgentDomain(step int) string {
 // A namespace explicitly distinguishes the new 23-table field contract from
 // identically named legacy StepInputCatalog tables. No CSV header guessing.
 func KickoffAgentCatalog() engineering.InputCatalog {
-	c := engineering.InputCatalog{Version: "kickoff23-agent/relationships-v2", Tables: []engineering.InputTable{}}
+	c := engineering.InputCatalog{Version: "kickoff23-agent/relationships-v3", Tables: []engineering.InputTable{}}
 	add := func(id, domain, fields string) {
 		t := engineering.InputTable{ID: "kickoff23/" + id, Step: KickoffAgentStep(domain), Name: id, Fields: []engineering.InputField{}}
 		for _, field := range strings.Split(fields, "|") {
@@ -910,6 +934,11 @@ func kickoffAgentCandidate(tableID string, rows [][]string, evidence any) Kickof
 		for i, f := range t.Fields {
 			if i < len(row) {
 				values[f.Code] = row[i]
+			}
+		}
+		for _, required := range map[string][]string{"devices": {"serial"}, "ports": {"serial", "port"}, "connections": {"a_serial", "a_port", "b_serial", "b_port"}, "placements": {"device_id", "rack_id"}}[c.TableID] {
+			if strings.TrimSpace(values[required]) == "" {
+				c.Issues = append(c.Issues, engineering.InputProblem{Row: len(c.Rows) + 1, Field: required, Code: "KICKOFF_RELATION_UNRESOLVED", Message: "关键关联字段未闭合：" + required})
 			}
 		}
 		if c.Domain != "equipment" {

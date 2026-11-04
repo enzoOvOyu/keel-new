@@ -20482,6 +20482,10 @@ components:
       additionalProperties: false
       properties:
         expectedRevision: {type: integer, minimum: 0}
+        cableLengthUnit:
+          type: string
+          enum: [m, cm, mm, ft]
+          description: Human-confirmed unit for bare cable lengths in this immutable source. Retained for subsequent analyses of the same source.
         domains:
           type: array
           uniqueItems: true

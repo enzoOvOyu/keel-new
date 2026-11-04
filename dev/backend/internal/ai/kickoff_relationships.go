@@ -308,7 +308,7 @@ func validateKickoffRelationshipBindings(w bom.Workbook, regions []KickoffRegion
 	}
 	for _, m := range task.Mappings {
 		table := strings.TrimPrefix(m.Table, "kickoff23/")
-		if table == "devices" && kinds[m.Region] != "device" {
+		if table == "devices" && kinds[m.Region] != "device" && kinds[m.Region] != "connection" {
 			return fmt.Errorf("NOT_ASSESSED_AS_DEVICE: %s", m.Region)
 		}
 		sheet := ""
@@ -323,6 +323,9 @@ func validateKickoffRelationshipBindings(w bom.Workbook, regions []KickoffRegion
 			if table == "connections" && (b.Field == "a_serial" || b.Field == "b_serial") && b.Relationship == "" {
 				return fmt.Errorf("ENDPOINT_RELATION_REQUIRED: %s/%s", m.Region, b.Field)
 			}
+			if table == "devices" && kinds[m.Region] == "connection" && b.Field == "serial" && b.Relationship == "" {
+				return fmt.Errorf("ENDPOINT_RELATION_REQUIRED: %s/serial", m.Region)
+			}
 			if b.Relationship == "" {
 				continue
 			}
@@ -330,7 +333,7 @@ func validateKickoffRelationshipBindings(w bom.Workbook, regions []KickoffRegion
 			if !ok || relation.Source.Sheet != sheet || b.Column != relation.Source.Column || m.Bounds.StartRow < relation.Source.StartRow || m.Bounds.EndRow > relation.Source.EndRow {
 				return fmt.Errorf("RELATION_SOURCE_MISMATCH: %s", b.Relationship)
 			}
-			identity := b.Field == "a_serial" || b.Field == "b_serial" || table == "placements" && b.Field == "device_id"
+			identity := table == "devices" && b.Field == "serial" || b.Field == "a_serial" || b.Field == "b_serial" || table == "placements" && b.Field == "device_id"
 			if identity {
 				if relation.Kind != "device_identity" {
 					return fmt.Errorf("DEVICE_RELATION_REQUIRED: %s", b.Relationship)
@@ -338,7 +341,7 @@ func validateKickoffRelationshipBindings(w bom.Workbook, regions []KickoffRegion
 				for _, target := range relation.Targets {
 					trusted := false
 					for _, region := range regions {
-						if kinds[region.ID] == "device" && region.Sheet == target.Sheet && target.StartRow >= region.Bounds.StartRow && target.EndRow <= region.Bounds.EndRow && target.ValueColumn >= region.Bounds.StartColumn && target.ValueColumn <= region.Bounds.EndColumn {
+						if (kinds[region.ID] == "device" || kinds[region.ID] == "connection") && region.Sheet == target.Sheet && target.StartRow >= region.Bounds.StartRow && target.EndRow <= region.Bounds.EndRow && target.ValueColumn >= region.Bounds.StartColumn && target.ValueColumn <= region.Bounds.EndColumn {
 							trusted = true
 						}
 					}
@@ -347,6 +350,9 @@ func validateKickoffRelationshipBindings(w bom.Workbook, regions []KickoffRegion
 					}
 				}
 			}
+		}
+		if table == "devices" && kinds[m.Region] == "connection" && (!bound["serial"] || !bound["label"]) {
+			return fmt.Errorf("ENDPOINT_DEVICE_IDENTITY_REQUIRED: %s", m.Region)
 		}
 		if table == "connections" {
 			for _, field := range []string{"a_serial", "b_serial", "a_port", "b_port"} {

@@ -7739,6 +7739,11 @@ export interface components {
         KickoffAnalysisDomain: "equipment" | "facility" | "cabling" | "network" | "power" | "provisioning";
         KickoffAnalysisRequest: {
             expectedRevision: number;
+            /**
+             * @description Human-confirmed unit for bare cable lengths in this immutable source. Retained for subsequent analyses of the same source.
+             * @enum {string}
+             */
+            cableLengthUnit?: "m" | "cm" | "mm" | "ft";
             domains?: components["schemas"]["KickoffAnalysisDomain"][];
         };
         KickoffAnalysisQueued: {
