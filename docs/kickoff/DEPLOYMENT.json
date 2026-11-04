@@ -1,19 +1,19 @@
 {
-  "code_revision": "63c88653209792b8c56bb38bd3a16adc7a54b2a7",
-  "frontend_code_revision": "d5c99fb049b1a89bc3de46ae3f76d6a8148733ad",
-  "backend_code_revision": "63c88653209792b8c56bb38bd3a16adc7a54b2a7",
-  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-d5c99fb",
-  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-provider-63c8865",
-  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-view-actions-98c41e8",
-  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-provider-ef91704",
+  "code_revision": "c80611d74ea35e6d05589479756c85954b2a5db2",
+  "frontend_code_revision": "c80611d74ea35e6d05589479756c85954b2a5db2",
+  "backend_code_revision": "c80611d74ea35e6d05589479756c85954b2a5db2",
+  "release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-c80611d",
+  "api_release_directory": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-c80611d",
+  "rollback_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-adoption-d5c99fb",
+  "rollback_api_release": "/home/ubuntu/.local/state/keel-deployments/kickoff-provider-63c8865",
   "ports": [
     5180,
     8081
   ],
   "migrations": [],
   "api_restarted": true,
-  "binary_sha256": "e16b54cd8fc93a4b46b331ab48d008fdc539ca6a038b4530d68311e0a2639f4c",
-  "frontend_index_sha256": "94a73ead142cfb3ae0c9b8db65146a4f60e67d50d30f93d3fda30f687375c7c2",
+  "binary_sha256": "6b8963c04ef3758dcb5b82f692320e1fc93352a3a9cb45e6fa6dce3ce0331890",
+  "frontend_index_sha256": "8a5efc33a0c197e394f3aeeaf7898e843c4cd2eea4a8fad34b900db7eecc1573",
   "status": "deployed",
   "binary_matches": true,
   "frontend_index_matches": true,
@@ -23,7 +23,7 @@
     "health": 200,
     "index_matches": true
   },
-  "business_tests": "No new real analysis/adoption/publication started. Existing user analysis not considered accepted by protocol replay.",
+  "business_tests": "Existing project001 revision7 and five review categories checked read-only. No new Agent analysis, adoption or CMDB writes. Browser interaction not run.",
   "provider_calls": 0,
-  "verification": "10 actual rejected Responses envelopes replayed locally through HTTP and completion parser: all parsed without retry; targeted Responses and JSON correction tests, Go build, API health passed."
+  "verification": "Go candidate eligibility tests, frontend Provider revision lifecycle checks, TypeScript/Vite, Go build and API registry passed. Existing project001 candidate replay and read-only handlers passed. Deployment health200 and frontend index match."
 }

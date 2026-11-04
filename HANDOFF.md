@@ -7,7 +7,7 @@
 | 范围 | 当前事实 |
 |---|---|
 | 主开发 | `/home/ubuntu/keel-dev`，分支`dev`，应用目录`dev/`；文档定版已整合；本轮历史资料理解已提交dev并按用户要求发布 |
-| 当前主环境 | 5180前端为`d5c99fb` / 8081 API为`63c8865`；关系推理Agent已部署，服务启动和静态资源匹配检查通过。新版真实Provider/MM验收尚未运行，等待用户指令；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json) |
+| 当前主环境 | 5180前端 / 8081 API均为`c80611d`；关系推理Agent已部署，服务启动和静态资源匹配检查通过。新版真实Provider/MM验收尚未运行，等待用户指令；[DEPLOYMENT](docs/kickoff/DEPLOYMENT.json) |
 | Fabric | `/home/ubuntu/keel-fabric-dev`，`feat/fabric-rebuild@6a70041`；5197/8100分支预览，未并入dev；**用户要求暂停，等待上游接入修复通知** |
 | 原型 | Kickoff5195、拓扑/机柜5181、Fabric5194仅设计参考，不是正式事实或执行来源；本次不启停服务 |
 | main与旧目录 | main保留稳定基线；旧Flows/Kestra/visualization detached目录仅残留原型/运行依赖，不在那里继续开发；本次不合并或推送main |
@@ -194,3 +194,5 @@ Responses根因修复已部署API `63c8865`，运行二进制匹配且health200�
 候选资格由预览和采用共用函数判断，新增applicableRowCount（Schema/类型同步）。真实剩余落位1156条：189条有身份但U位无效，其余967条缺设备身份；线缆规格7条缺length_m合并关联键，均不应显示可采用。待修正保留来源，不伪装成功；本次没有把缺身份或缺关联键的候选标成已采用。
 
 定向Go资格用例、Provider模拟版本恢复/完成同步/乱序refresh通过；项目001只读工作区r7和五核对分类Handler200。未重新调用模型、采用或发布数据；前端部署和构建见DEPLOYMENT。
+
+采用版本修复已部署`c80611d`到5180/8081，健康检查及前端产物匹配通过。TypeScript/Vite/Go构建通过；本轮未做浏览器交互验收，未新建分析、采用或CMDB发布。
